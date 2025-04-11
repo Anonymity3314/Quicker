@@ -16,20 +16,7 @@ using System.IO;
 
 namespace Quicker.CommonFunctions
 {
-    // 按钮管理器接口
-    public interface IButtonManager
-    {
-        void Button_DragEnter(object sender, DragEventArgs e);
-        void Button_PreviewDragOver(object sender, DragEventArgs e);
-        void Button_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e);
-        void Button_PreviewMouseMove(object sender, MouseEventArgs e);
-        void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e);
-        void UpdateButtonContent(Button button, ButtonData data, bool hideTooltip, int maxWidth);
-        void AutoEllipsisTextBlock(TextBlock textBlock, int maxWidth);
-    }
-
-    // 按钮管理器类
-    internal class ButtonManager : IButtonManager
+    internal class ButtonManager
     {
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {

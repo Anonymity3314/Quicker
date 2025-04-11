@@ -3,6 +3,7 @@ using Hardcodet.Wpf.TaskbarNotification;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Quicker.CommonFunctions;
 using System.Windows.Input;
 using Quicker.Database;
 using Quicker.Windows;
@@ -36,13 +37,6 @@ namespace Quicker
     */
     public partial class App : System.Windows.Application
     {
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow(); // 获取当前活动窗口句柄
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count); // 获取窗口标题
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId); // 获取窗口进程ID
-
         public bool Book = false, Pause = false, Locked = false; // 是否订住、暂停、锁定
         public static DateTime RecordedTime { get; set; } // 记录时间
         public static DateTime StartTime { get; set; } // 启动时间
@@ -55,12 +49,14 @@ namespace Quicker
         private SettingDatabase db1; // 设置数据库
         public string CommonState; // 通用状态
         float Left, Top; // 窗口位置
+        WindowManager windowManager; // 窗口管理器
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e); // 调用基类的 OnStartup 方法
             db1 = new SettingDatabase(); // 创建数据库
             db1.InitializeDatabase(); // 创建数据库表
+            windowManager = new WindowManager(); // 创建窗口管理器
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
             ShowNotification(); // 弹出消息提醒
@@ -71,15 +67,13 @@ namespace Quicker
         // 鼠标按下事件
         static void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            IntPtr hWnd = GetForegroundWindow();
+            var windowManager = new WindowManager();
+            IntPtr hWnd = windowManager.GetCurrentForegroundWindow(); // 调用封装方法
             if (hWnd != IntPtr.Zero)
             {
-                // 获取窗口标题
-                StringBuilder windowTitle = new StringBuilder(256); // 创建一个 StringBuilder 对象来存储窗口标题
-                GetWindowText(hWnd, windowTitle, windowTitle.Capacity); // 获取窗口标题
-                // 获取进程ID
-                uint processId;
-                GetWindowThreadProcessId(hWnd, out processId); // 获取进程ID
+                string windowTitle = windowManager.GetWindowText(hWnd);
+                uint processId = windowManager.GetWindowProcessId(hWnd);
+
                 // 处理逻辑
             }
         }
@@ -428,7 +422,7 @@ namespace Quicker
         // 判断鼠标是否在桌面上
         public bool IsMouseOnDesktop()
         {
-            IntPtr foregroundWindow = GetForegroundWindow(); // 获取前台窗口句柄
+            IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 调用封装方法
             if (foregroundWindow == IntPtr.Zero) // 没有窗口获得焦点
             {
                 return true; // 鼠标在桌面上
@@ -470,7 +464,7 @@ namespace Quicker
             hook = null; // 清空钩子
             if (Pause) InitializeHookAsync(); // 重新初始化钩子
 
-            Pause = !Pause;
+            Pause = !Pause; // 切换暂停状态
             new ToastContentBuilder().AddText(toastMessage).Show(); // 弹出消息提醒
         }
 
@@ -493,7 +487,7 @@ namespace Quicker
             taskbarIcon?.Dispose(); // 释放托盘图标                      
             MainWindow?.Close(); // 关闭主窗口
 
-            base.OnExit(e);
+            base.OnExit(e); // 调用基类的 OnExit 方法
         }
     }
 }

@@ -9,18 +9,7 @@ using System;
 
 namespace Quicker.CommonFunctions
 {
-    // 图标管理器接口
-    public interface IIconManager
-    {
-        ImageSource GetIcon(string filePath); // 获取图标
-        string SaveIconToFile(ImageSource imageSource); // 保存图标到文件
-        string CheckCachedIcon(string filePath); // 检查缓存的图标
-        string GetIconFileName(string filePath); // 获取图标文件名
-        byte[] GetImageHash(ImageSource imageSource); // 计算图像的哈希值
-    }
-
-    // 图标管理器实现
-    internal class IconManager : IIconManager
+    internal class IconManager
     {
         // 获取文件图标
         [StructLayout(LayoutKind.Sequential)]

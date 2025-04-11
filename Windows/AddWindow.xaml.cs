@@ -24,9 +24,9 @@ namespace Quicker
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
         private readonly ButtonDatabase db2; // ButtonDatabase
         private TextBlock ButtonTitle; // ButtonTitle
-        IButtonManager buttonManager; // 按钮管理器接口
+        ButtonManager buttonManager; // 按钮管理器接口
         private Image ButtonImage; // ButtonImage
-        IIconManager iconManager; // 图标管理器接口
+        IconManager iconManager; // 图标管理器接口
         string iconPath; // 图标路径
 
         public string CurrentButton { get; private set; } // 当前按钮

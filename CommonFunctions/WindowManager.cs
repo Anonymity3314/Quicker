@@ -1,28 +1,37 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using System.Windows;
+using System.Text;
 using System;
 
 namespace Quicker.CommonFunctions
 {
-    // 窗口管理器接口
-    public interface IWindowManager
+    internal class WindowManager
     {
-        void SetWindowTopmost(Window window); // 设置窗口置顶
-        void TryToOpenExitingWindow(string windowTitle); // 尝试打开已存在的窗口
-    }
-
-    // 窗口管理器实现
-    internal class WindowManager : IWindowManager
-    {
-        // 查找窗口和设置前台窗口
+        // 设置窗口位置和大小
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags); // 设置窗口位置
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags); // 设置窗口位置和大小
+
+        // 查找窗口句柄
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName); // 查找窗口句柄
+
+        // 设置前台窗口
         [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd); // 将窗口置于前台
+        private static extern bool SetForegroundWindow(IntPtr hWnd); // 设置前台窗口
+
+        // 获取当前活动窗口句柄
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow(); // 获取当前活动窗口句柄
+
+        // 获取窗口标题
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count); // 获取窗口标题
+
+        // 获取窗口进程ID
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId); // 获取窗口进程ID
 
         // 窗口置顶相关常量
         private const int HWND_TOPMOST = -1; // 置顶
@@ -51,6 +60,35 @@ namespace Quicker.CommonFunctions
                 SetForegroundWindow(windowHandle); // 将窗口置于前台
                 return; // 如果找到窗口，则将窗口置于前台
             } // 如果找到窗口并且允许打开已存在的窗口，则将窗口置于前台
+        }
+
+        // 获取当前前台窗口句柄
+        public IntPtr GetCurrentForegroundWindow()
+        {
+            return GetForegroundWindow(); // 调用静态外部方法
+        }
+
+        /// <summary>
+        /// 获取窗口标题
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        public string GetWindowText(IntPtr hWnd)
+        {
+            StringBuilder text = new StringBuilder(256);
+            GetWindowText(hWnd, text, text.Capacity);
+            return text.ToString();
+        }
+
+        /// <summary>
+        /// 获取窗口进程ID
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
+        public uint GetWindowProcessId(IntPtr hWnd)
+        {
+            GetWindowThreadProcessId(hWnd, out uint processId);
+            return processId;
         }
     }
 }

@@ -879,6 +879,12 @@ namespace Quicker.Windows
             }
         }
 
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e); // 调用基类的OnClosing方法
+            timer.Stop(); // 停止定时器
+        }
+
         // 缓存对象类
         private class SettingsCache
         {

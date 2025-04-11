@@ -31,9 +31,9 @@ namespace Quicker.Windows
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
         private CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
-        private readonly IButtonManager buttonManager; // 按钮管理器
-        private readonly IWindowManager windowManager; // 窗口管理器
-        private readonly IIconManager iconManager; // 图标管理器
+        private readonly ButtonManager buttonManager; // 按钮管理器
+        private readonly WindowManager windowManager; // 窗口管理器
+        private readonly IconManager iconManager; // 图标管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
         private Button SourceButton; // 源按钮
@@ -1082,7 +1082,7 @@ namespace Quicker.Windows
             this.Closing -= MainWindow_Closing; // 解除窗口关闭事件绑定
             this.Deactivated -= MainWindow_Deactivated; // 解除窗口失去焦点事件绑定
             Book.Source = null; // 释放图像资源
-            Lock.Source = null;
+            Lock.Source = null; // 释放图像资源
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待所有终结器完成
             GC.Collect(); // 再次强制垃圾回收
