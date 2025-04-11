@@ -50,17 +50,18 @@ namespace Quicker.CommonFunctions
 
         public ButtonManager()
         {
-            db1 = new SettingDatabase();
-            db1.InitializeDatabase();
+            db1 = new SettingDatabase(); // 初始化设置数据库
+            db1.InitializeDatabase(); // 初始化设置数据库
 
-            db2 = new ButtonDatabase();
-            db2.InitializeDatabase();
+            db2 = new ButtonDatabase(); // 初始化按钮数据库
+            db2.InitializeDatabase(); // 初始化按钮数据库
         }
 
+        // 初始化按钮管理器
         public void Initialize()
         {
-            var Convention = db1.GetAllConventions().FirstOrDefault();
-            hideTooltip = Convention.HideTooltip;
+            var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取所有约定
+            hideTooltip = Convention.HideTooltip; // 获取隐藏提示标志
         }
 
         // 设置按钮拖拽效果
