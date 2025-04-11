@@ -1,0 +1,261 @@
+﻿<Window
+    mc:Ignorable="d"
+    x:Class="Quicker.Windows.SettingWindow"
+    xmlns:local="clr-namespace:Quicker.Windows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+    Width="1211"
+    Height="870"
+    MinWidth="863"
+    Title="Quicker设置"
+    WindowStartupLocation="CenterScreen"
+    Icon="/Resources/Images/Icons/SettingWindow.ico"
+    
+    Loaded="SettingWindow_Loaded"
+>
+    <Grid x:Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="49"/>
+            <ColumnDefinition Width="195"/>
+            <ColumnDefinition Width="967*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 侧边栏1 -->
+        <StackPanel x:Name="MainStackPanel" Background="#FFE0E0E0" Width="49" HorizontalAlignment="Center">
+            <Button x:Name="BasicSetting" Style="{StaticResource Button1}" ToolTip="基础设置" Background="#FFF4F4F4" Click="BasicSetting_Click" MouseLeave="BasicSetting_MouseLeave">
+                <Image Source="/Resources/Images/Icons/BasicSettingButton.ico" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
+            </Button>
+            <Button x:Name="Auxiliary_Functions" Style="{StaticResource Button1}" ToolTip="辅助功能" Background="#FFE0E0E0" Click="Auxiliary_Functions_Click" MouseLeave="Auxiliary_Functions_MouseLeave">
+                <!--<Image Source="/Resources/Images/Icons/Quicker1.ico"/>-->
+            </Button>
+            <Button x:Name="Tools" Style="{StaticResource Button1}" ToolTip="工具" Background="#FFE0E0E0" Click="Tools_Click" MouseLeave="Tools_MouseLeave">
+                <!--<Image Source="/Resources/Images/Icons/Quicker1.ico"/>-->
+            </Button>
+        </StackPanel>
+
+        <!-- 侧边栏2 -->
+        <Grid x:Name="MenuGrid" HorizontalAlignment="Center" Grid.Column="1">
+            <!-- 基础设置 -->
+            <StackPanel x:Name="BasicSettingStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Visible">
+                <Button x:Name="Convention" Style="{StaticResource Button2}" Background="#FFFAFAFA" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Icons/SettingImage2.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="常规" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                    <Button.ToolTip>
+                        <ToolTip Content="自动启动、鼠标挂钩、版本等" FontSize="12"/>
+                    </Button.ToolTip>
+                </Button>
+                <Button x:Name="OpenMainWindow" Style="{StaticResource Button2}" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Icons/OpenMainWindow2.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="弹出面板" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                    <Button.ToolTip>
+                        <ToolTip Content="面板弹出方式" FontSize="12"/>
+                        <!--面板弹出方式及界面选项-->
+                    </Button.ToolTip>
+                </Button>
+                <Button x:Name="Blacklist" Style="{StaticResource Button2}" Visibility="Collapsed" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="黑名单" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                    <Button.ToolTip>
+                        <ToolTip Content="在某些应用上停止使用Quicker" FontSize="12"/>
+                    </Button.ToolTip>
+                </Button>
+                <Button x:Name="AboutQuicker" Style="{StaticResource Button2}" Click="AboutQuicker_Click" MouseLeave="AboutQuicker_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Icons/AboutQuicker.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="关于Quicker" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                    <Button.ToolTip>
+                        <ToolTip Content="应用等相关信息" FontSize="12"/>
+                    </Button.ToolTip>
+                </Button>
+            </StackPanel>
+
+            <!-- 辅助功能 -->
+            <StackPanel x:Name="Auxiliary_FunctionsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
+
+            <!-- 工具 -->
+            <StackPanel x:Name="ToolsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
+        </Grid>
+
+        <!-- 设置菜单 -->
+        <Grid x:Name="ResultGrid" Margin="195,0,0,0" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="14*"/>
+                <ColumnDefinition Width="953*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 保存设置 -->
+            <Button x:Name="ApplySettingsButton" Content="应用设置" Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,0,50,30" VerticalAlignment="Bottom" Click="ApplySettings" FontSize="16" Width="129" Height="43" Grid.Column="1"/>
+            <Rectangle Fill="#FF707070" VerticalAlignment="Top" Height="1" Margin="0,43,0,0" Grid.Column="1"/>
+
+            <!-- 基础设置-常规 -->
+            <Grid x:Name="ConventionGrid" Visibility="Visible" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="952*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="常规" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="68" Grid.Column="1" Height="30"/>
+                <Grid Margin="10,43,0,0" Grid.ColumnSpan="2">
+                    <TextBlock HorizontalAlignment="Right" Margin="0,103,217,0" TextWrapping="Wrap" Text="总使用时长" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock x:Name="TotalUsageTimeTextBlock" HorizontalAlignment="Right" Margin="0,149,220,0" TextWrapping="Wrap" Text="加载中……" VerticalAlignment="Top" FontSize="14"/>
+                    <TextBlock HorizontalAlignment="Right" Margin="0,187,201,0" TextWrapping="Wrap" Text="本次使用时长" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock x:Name="CurrentUsingTimeTextBlock" HorizontalAlignment="Right" Margin="0,230,220,0" TextWrapping="Wrap" Text="加载中……" VerticalAlignment="Top" FontSize="14"/>
+                    <Label Content="当前版本：2.0.0" Margin="0,26,196,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+                    <ScrollViewer Margin="0,23,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="645" Height="779">
+                        <Grid>
+                            <Label Content="启动" HorizontalAlignment="Left" Margin="1,0,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                            <CheckBox x:Name="AutoStartCheckBox" Content="开机自动启动Quicker" HorizontalAlignment="Left" Margin="9,45,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click">
+                                <CheckBox.ToolTip>
+                                    <ToolTip FontSize="12">
+                                        <StackPanel>
+                                            <TextBlock Text="如果无法自动启动：有管家或安全类软件阻止了，请检查或卸载此类软件"/>
+                                            <TextBlock Text="可尝试以管理员身份运行来解决此问题"/>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </CheckBox.ToolTip>
+                            </CheckBox>
+                            <CheckBox x:Name="ShowNotificationCheckBox" Content="显示启动完成提示" ToolTip="Quicker启动后显示提示信息，方便您随后做某些操作。" HorizontalAlignment="Left" Margin="9,78,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+                            <Label Content="面板窗口" HorizontalAlignment="Left" Margin="1,132,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                            <CheckBox x:Name="ShowAddImageCheckBox" Content="左键点击空白按钮时显示创建动作菜单" ToolTip="在空白按钮上点击左键也显示右键菜单，可方便快速创建动作。" HorizontalAlignment="Left" Margin="9,189,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+                            <CheckBox x:Name="HideTooltipCheckBox" Content="面板窗口不显示Tooltip提示" ToolTip="当鼠标悬停在动作按钮上时，不显示动作提示信息。" HorizontalAlignment="Left" Margin="10,212,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+                            <CheckBox x:Name="LoopPageFlippingCheckBox" Content="翻页使用循环模式" ToolTip="在末页可以继续向后翻页到第一页，或者在第一页可以向前翻页到最后一页。" HorizontalAlignment="Left" Margin="10,235,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+                            <Label Content="操作触发参数" HorizontalAlignment="Left" Margin="1,272,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                            <Grid Margin="1,315,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Label Content="鼠标滑动触发距离" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14"/>
+                                <TextBox x:Name="MouseMovePixelsTextBox" ToolTip="按下鼠标移动超过多远触发滑动操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
+                                <Label Content="像素" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="207,0,0,0"/>
+                            </Grid>
+                            <Grid Margin="1,348,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Label Content="鼠标长按触发时间" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14"/>
+                                <TextBox x:Name="LongPressThresholdTextBox" ToolTip="鼠标按下并保持不动多长时间后触发操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
+                                <Label Content="毫秒" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="207,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+
+            <!-- 基础设置-弹出面板 -->
+            <Grid x:Name="OpenMainWindowGrid" Visibility="Hidden" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="952*"/>
+                </Grid.ColumnDefinitions>
+                <!-- 基础设置-弹出面板-弹出面板 -->
+                <Button x:Name="OpenMainWindowButton"  Content="弹出面板" ToolTip="面板窗口的触发方式" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="74" Click="OpenMainWindowButton_Click" Grid.Column="1" Height="30"/>
+                <Grid x:Name="OpenMainWindowButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="186*"/>
+                        <ColumnDefinition Width="133*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="鼠标方式" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="74"/>
+                    <StackPanel Margin="10,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="142" Width="110">
+                        <CheckBox x:Name="OpenMainWindowByMiddleMouseClickCheckBox" Content="按下中键" ToolTip="按下鼠标中键" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByX1MouseClickCheckBox" Content="按下X1键" ToolTip="需鼠标支持，通常为侧键" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByX2MouseClickCheckBox" Content="按下X2键" ToolTip="需鼠标支持，通常为侧键" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByCtrl_MiddleMouseClickCheckBox" Content="Ctrl+中键单击" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByCtrl_RightMouseClickCheckBox" Content="Ctrl+右键单击" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByMiddleMouseClickLongerCheckBox" Content="长按中键" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByRightMouseClickLongerCheckBox" Content="长按右键" FontSize="14" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="OpenMainWindowByRightMouseClick_MoveCheckBox" Content="按右键移动" FontSize="14" Click="CheckBox_Click"/>
+                    </StackPanel>
+                    <!--<GroupBox Header="鼠标弹出选项" Margin="10,213,621,509">
+                        <CheckBox Content="在按钮上松开后执行动作" HorizontalAlignment="Left" Margin="10,0,0,0" Height="17">
+                            <CheckBox.ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="激活面板后不松开鼠标，移动到按钮上松开，此时执行鼠标位置的动作。"/>
+                                    <TextBlock Text="单击中键\长按右键\按右键移动等方式下有效。"/>
+                                </StackPanel>
+                            </CheckBox.ToolTip>
+                        </CheckBox>
+                    </GroupBox>-->
+                    <Label Content="键盘方式" HorizontalAlignment="Left" Margin="10,240,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize=" 16" Height="30" Width="74"/>
+                    <CheckBox x:Name="OpenMainWindowByCtrlCheckBox" Content="单击Ctrl键" Margin="10,275,0,0" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="76"/>
+                    <!--<TextBox x:Name="DIY_ShortcutKeys" ToolTip="请按键" HorizontalAlignment="Left" Margin="10,373,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" KeyDown="DIY_ShortcutKeys_KeyDown" PreviewTextInput="DIY_ShortcutKeys_PreviewTextInput" PreviewKeyUp="DIY_ShortcutKeys_PreviewKeyUp" TextAlignment="Center"/>-->
+                    <!--<Button HorizontalAlignment="Left" Margin="240,373,0,0" VerticalAlignment="Top" Width="21" Height="17" Click="ClearDIY_ShortcutKeys"/>-->
+                    <GroupBox Header="键盘弹出选项" Margin="10,325,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="57" Width="202">
+                        <Grid>
+                            <!--<CheckBox Content="自动激活鼠标位置窗口" HorizontalAlignment="Left" Margin="10,52,0,10" Height="17"/>-->
+                            <ComboBox x:Name="WindowStartupLocationComboBox" HorizontalAlignment="Left" Margin="70,14,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectionChanged="ComboBox_SelectionChanged">
+                                <ComboBoxItem Content="系统默认"/>
+                                <ComboBoxItem Content="跟随鼠标"/>
+                                <ComboBoxItem Content="屏幕中心"/>
+                                <ComboBoxItem Content="当前窗口中心"/>
+                                <ComboBoxItem Content="上次弹出位置"/>
+                            </ComboBox>
+                            <Label Content="弹出位置：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                        </Grid>
+                    </GroupBox>
+                    <Button x:Name="TestButton" Content="按键测试区" ToolTip="在此处点击鼠标按键以显示按键名称。" Style="{StaticResource WhiteButton}" HorizontalAlignment="Stretch" Margin="0,35,17,0" VerticalAlignment="Top" Width="NaN" Height="83" PreviewMouseDown="TestMouseKey" FontSize="16" Grid.Column="1"/>
+                </Grid>
+
+                <!-- 基础设置-弹出面板-动作触发按键 -->
+                <!--<Button x:Name="DoActionKeyboardButton"  Content="动作触发按键" ToolTip="键盘方式弹出后，使用按键触发动作" Style="{StaticResource Button3}" Margin="90,13,0,0" Width="116" Click="DoActionKeyboard_Click" BorderThickness="0"/>-->
+                <Grid x:Name="DoActionKeyboardButtonGrid" Margin="10,43,0,0" Visibility="Hidden" Grid.ColumnSpan="2">
+
+                </Grid>
+            </Grid>
+
+            <!-- 基础设置-关于Quicker -->
+            <Grid x:Name="AboutQuickerGrid" Visibility="Hidden" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="952*"/>
+                </Grid.ColumnDefinitions>
+                <!-- 基础设置-关于Quicker-关于Quicker -->
+                <Button x:Name="AboutQuickerButton" Content="关于Quicker" ToolTip="基础信息" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="99" Click="AboutQuickerButton_Click" Grid.Column="1"/>
+                <Grid x:Name="AboutQuickerButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="647*"/>
+                        <ColumnDefinition Width="300*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Quicker" HorizontalAlignment="Left" Margin="57,16,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold"/>
+                    <Image HorizontalAlignment="Left" Height="48" Margin="4,12,0,0" VerticalAlignment="Top" Width="48" Source="/Resources/Images/Icons/Quicker1.ico"/>
+                    <Label Content="版本：2.0.0" HorizontalAlignment="Left" Margin="4,65,0,0" VerticalAlignment="Top" FontSize="16"/>
+                    <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+                    <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
+                    <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
+                    <Label Content="更新历史" HorizontalAlignment="Left" Margin="95,65,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseDoubleClick="OpenUpdateLog">
+                        <Label.ToolTip>
+                            <ToolTip Content="双击查看" FontSize="12" Foreground="Black"/>
+                        </Label.ToolTip>
+                    </Label>
+                    <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
+                    <Label HorizontalAlignment="Left" Margin="9,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
+                    <Label x:Name="www_iconfont_cn" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Content="www.iconfont.cn" MouseDoubleClick="www_iconfont_cn_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1">
+                        <Label.ToolTip>
+                            <ToolTip Content="双击前往" FontSize="12" Foreground="Black"/>
+                        </Label.ToolTip>
+                    </Label>
+                    <Label x:Name="fontawesome_com" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Content="fontawesome.com" MouseDoubleClick="fontawesome_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1">
+                        <Label.ToolTip>
+                            <ToolTip Content="双击前往" FontSize="12" Foreground="Black"/>
+                        </Label.ToolTip>
+                    </Label>
+                    <Label x:Name="icons8_com" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Content="icons8.com" MouseDoubleClick="icons8_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1">
+                        <Label.ToolTip>
+                            <ToolTip Content="双击前往" FontSize="12" Foreground="Black"/>
+                        </Label.ToolTip>
+                    </Label>
+                </Grid>
+
+                <!-- 基础设置-关于Quicker-隐私声明 -->
+                <Button x:Name="Privacy_StatementButton" Content="隐私声明" ToolTip="隐私声明" Style="{StaticResource Button3}" Margin="100,13,0,0" Width="74" Click="Privacy_StatementButton_Click" BorderThickness="0" Grid.Column="1"/>
+                <Grid x:Name="Privacy_StatementButtonGrid" Margin="10,43,317,0" Visibility="Hidden" Grid.ColumnSpan="2">
+                    <Label Content="键盘钩子(HOOK):" HorizontalAlignment="Left" Margin="16,43,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                    <Label Content="隐私声明" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="18"/>
+                    <Label Content="本软件会使用全局键盘钩子(HOOK)判断按键状态，实现激活面板、扩展热键和文本指令等功能。&#xD;&#xA;安全软件可能会因此弹出安全提示。&#xD;&#xA;本软件不会监听和记录您的普通按键输入，也不会将这些输入内容发送到网络，请放心使用。" HorizontalAlignment="Left" Margin="27,73,0,0" VerticalAlignment="Top" FontSize="14"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

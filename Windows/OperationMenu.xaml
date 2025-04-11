@@ -1,0 +1,82 @@
+﻿<Window 
+    mc:Ignorable="d"
+    x:Class="Quicker.Windows.OperationMenu"
+    xmlns:local="clr-namespace:Quicker.Windows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+    Height="121" 
+    Width="204"
+    WindowStyle="None" 
+    ShowInTaskbar="False" 
+    ResizeMode="NoResize"
+    
+    Loaded="OperationMenu_Loaded"
+    Deactivated="OperationMenu_Deactivated"
+>
+    <Window.Resources>
+        <Style x:Key="Button" TargetType="Button">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="White" BorderBrush="White" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFEAEAEA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TextBlock" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="30,0,0,0"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Width" Value="166"/>
+        </Style>
+        <Style x:Key="Image" TargetType="Image">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="7,0,0,0"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Width" Value="166"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel>
+            <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,5" Click="EditeInformation_Click">
+                <Grid>
+                    <Image Source="/Resources/Images/Icons/EditButton.ico" Style="{StaticResource Image}"/>
+                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="编辑"/></TextBlock>
+                </Grid>
+            </Button>
+            <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
+            <Button x:Name="DeleteAction" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,0" Click="DeleteAction_Click">
+                <Grid>
+                    <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource Image}"/>
+                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="删除"/></TextBlock>
+                </Grid>
+            </Button>
+            <Button x:Name="CheckImformation" ToolTip="查看动作信息" Style="{StaticResource Button}" Click="CheckImformation_Click">
+                <Grid>
+                    <Image Source="/Resources/Images/Icons/ActionInformation.ico" Style="{StaticResource Image}"/>
+                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="查看信息"/></TextBlock>
+                </Grid>
+            </Button>
+            <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource Button}" Margin="0,0,0,5" Click="OpenLocation_Click">
+                <Grid>
+                    <Image Source="/Resources/Images/Icons/OpenFile.ico" Style="{StaticResource Image}"/>
+                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="打开所在位置"/></TextBlock>
+                </Grid>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

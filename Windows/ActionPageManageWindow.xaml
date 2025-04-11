@@ -1,0 +1,89 @@
+﻿<Window
+    mc:Ignorable="d"
+    xmlns:local="clr-namespace:Quicker.Windows"
+    x:Class="Quicker.Windows.ActionPageManageWindow"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    
+    Width="1200"
+    Height="850"
+    Title="场景与动作管理"
+    WindowStartupLocation="CenterScreen"
+    
+    Loaded="ActionPageManageWindow_Loaded"
+>
+    <Window.Resources>
+        <Style x:Key="ActionPageButton" TargetType="Button">
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F5F5F5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <TextBox Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28"/>
+        <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">
+            <StackPanel>
+                <Button Style="{StaticResource ActionPageButton}" Click="GlobalButton_Click">
+                    <Grid>
+                        <TextBlock Text="全局" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                    </Grid>
+                </Button>
+                <Button Style="{StaticResource ActionPageButton}" Click="CommonButton_Click">
+                    <Grid>
+                        <TextBlock Text="通用" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </Border>
+        <Label Content="提示：将窗口最大化可以方便排序动作页。" Foreground="#FFABADB3" Margin="961,5,20,0" VerticalAlignment="Top" FontSize="11" HorizontalAlignment="Right">
+            <Label.ToolTip>
+                <ToolTip Content="双击这里：将按钮背景色改为灰色" Foreground="Black"/>
+            </Label.ToolTip>
+        </Label>
+        
+        <Border x:Name="MainBorder" Margin="239,31,11,564" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top">
+            <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
+                <StackPanel x:Name="GlobalStackPanel" Background="LightGray" Orientation="Horizontal">
+                    <Canvas x:Name="GlobalCanvas0" Height="215" Width="260" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3,0,0,0">
+                        <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3"/>
+
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="65"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="130"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="195"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85" Canvas.Left="65"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85" Canvas.Left="130"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85" Canvas.Left="195"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="65"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="130"/>
+                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="195"/>
+                    </Canvas>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <ScrollBar x:Name="ScrollBar" Margin="240,241.8,10,0" VerticalAlignment="Top" Orientation="Horizontal" ValueChanged="ScrollBar_ValueChanged"/>
+
+        <Button Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="239,264,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
+    </Grid>
+</Window>

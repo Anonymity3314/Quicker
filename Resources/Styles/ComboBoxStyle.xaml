@@ -1,0 +1,38 @@
+﻿<ResourceDictionary 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"        
+>
+    <!-- 圆角 ComboBox 的样式 -->
+    <!--<Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Border
+                            Background="White"
+                            BorderBrush="#FFABADB3"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                            <ContentPresenter
+                                Content="{TemplateBinding SelectionBoxItem}"
+                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left" />
+                        </Border>
+
+                        --><!-- 下拉箭头 --><!--
+                        <Path
+                                Data="M 0 0 L 4 4 L 8 0 Z"
+                                Fill="Black"
+                                Width="10"
+                                Height="6"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Margin="0,0,10,0" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>-->
+</ResourceDictionary>

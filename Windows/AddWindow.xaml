@@ -1,0 +1,161 @@
+﻿<Window
+    mc:Ignorable="d"
+    x:Class="Quicker.AddWindow"
+    xmlns:local="clr-namespace:Quicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+    Width="700"
+    Height="450"
+    Topmost="True"
+    ResizeMode="CanMinimize"
+    WindowStartupLocation="CenterScreen"
+    
+    KeyDown="SaveAction"
+    Loaded="AddWindow_Loaded"
+    MouseDown="AddWindow_MouseDown"
+>
+    <Window.Resources>
+        <!-- 菜单按钮上的图像样式 -->
+        <Style x:Key="ImageStyle" TargetType="Image">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Margin" Value="3,0,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <!-- “选择图片”的按钮样式 -->
+        <Style x:Key="ImageButton" TargetType="Button">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="BorderBrush" Value="{x:Null}"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="White" BorderBrush="White" BorderThickness="1" CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFF3F3F3"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid x:Name="MainGrid">
+        <Label Content="动作类型" HorizontalAlignment="Left" Margin="98,40,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="ChoiceComboBox" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top" Width="270" SelectedIndex="0" BorderBrush="#FFFBFBFB" Height="26" Background="White">
+            <ComboBoxItem VerticalAlignment="Center">
+                <Grid>
+                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                    <TextBlock Text="运行程序或打开文件" Margin="25,0" VerticalAlignment="Center"/>
+                </Grid>
+            </ComboBoxItem>
+            <ComboBoxItem VerticalAlignment="Center">
+                <Grid>
+                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                    <TextBlock Text="打开网址" Margin="25,0" VerticalAlignment="Center"/>
+                </Grid>
+            </ComboBoxItem>
+        </ComboBox>
+        <Label Content="路径/命令" HorizontalAlignment="Left" Margin="95,89,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LocationTextBox" Width="232" Height="20" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="162,92,0,0" TextChanged="LocationTextBox_TextChanged">
+            <TextBox.Style>
+                <Style TargetType="TextBox">
+                    <Style.Setters>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Border x:Name="border" CornerRadius="3,0,0,3" BorderThickness="1" BorderBrush="#FFABADB3">
+                                        <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" BorderThickness="0" Background="{x:Null}" VerticalAlignment="Center" Margin="2,0"/>
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="BorderBrush" TargetName="border" Value="#FF5B5B5B"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style.Setters>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <Label Content="窗口风格" HorizontalAlignment="Left" Margin="98,129,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="162,129,0,0" VerticalAlignment="Top" Width="270" Height="26" Background="White">
+            <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>
+            <ComboBoxItem Content="最小化(Minimized)" VerticalAlignment="Center"/>
+            <ComboBoxItem Content="最大化(Maximized)" VerticalAlignment="Center"/>
+        </ComboBox>
+        <Button x:Name="SaveButton" Style="{StaticResource BlueButton}" Content="保存(S)" HorizontalAlignment="Left" Margin="256,374,0,0" VerticalAlignment="Top" BorderBrush="{x:Null}" Width="81" Height="30" Click="SaveAction" IsEnabled="False"/>
+        <Button Style="{StaticResource WhiteButton}" Content="取消(C)" HorizontalAlignment="Left" Margin="348,374,0,0" VerticalAlignment="Top" Click="CloseAddWindow" Height="30" Width="81"/>
+        <Button Style="{StaticResource ImageButton}"  HorizontalAlignment="Left" Margin="587,123,0,0" VerticalAlignment="Top" Click="ManageLocalIcons"/>
+        <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,355,0,0" Stroke="LightGray" VerticalAlignment="Top" Width="648"/>
+        <Rectangle HorizontalAlignment="Left" Height="340" Margin="493,10,0,0" Stroke="LightGray" VerticalAlignment="Top" Width="1"/>
+        <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="161,205,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="161,242,0,0" VerticalAlignment="Top"/>
+        <Label Content="选项" HorizontalAlignment="Left" Margin="110,200,0,0" VerticalAlignment="Top"/>
+        <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="155,155,0,0" VerticalAlignment="Top" Foreground="#FF8C8C8C" Width="284"/>
+        <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,92,0,0" VerticalAlignment="Top" Height="20" Width="39" Click="OpenContextMenu"/>
+        <Button Style="{StaticResource Select}" x:Name="SelectButton复制__C_" HorizontalAlignment="Left" Margin="388,111,0,0" VerticalAlignment="Top" Height="1" Width="1" Visibility="Hidden"/>
+        <Popup x:Name="Popup" PopupAnimation="Fade" Width="180" Height="103" PlacementTarget="{Binding ElementName=SelectButton复制__C_}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+            <Grid>
+                <Rectangle Fill="White" Margin="5,7">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Border Width="170" Background="White" BorderBrush="{x:Null}" BorderThickness="0" CornerRadius="3" Margin="5">
+                    <StackPanel>
+                        <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications" Margin="-1,3,0,0">
+                            <Grid Width="180">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="已安装的软件..." TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess" Margin="-1,0">
+                            <Grid Width="180">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="文件..." TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder" Margin="-1,0">
+                            <Grid Width="180">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="文件夹..." TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation" Margin="-1,0,0,3">
+                            <Grid Width="180">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Popup>
+        <Button Style="{StaticResource ImageButton}" ToolTip="去除图标" HorizontalAlignment="Left" Margin="611,123,0,0" VerticalAlignment="Top" Click="DeleteImage">
+            <Image Source="/Resources/Images/Icons/DeleteImage.ico"/>
+        </Button>
+        <TextBox x:Name="TitleTextBox" Style="{StaticResource RoundedTextBox}" Width="138" Height="20"  Margin="530,184,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextChanged="UpdateTitle"/>
+        <TextBox x:Name="UsageTextBox" Style="{StaticResource RoundedTextBox}" Width="138" Height="20" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="530,235,0,0" TextChanged="UsageTextBox_TextChanged"/>
+        <Label Content="标题" HorizontalAlignment="Left" Margin="525,159,0,0" VerticalAlignment="Top"/>
+        <Label Content="功能/用途说明" HorizontalAlignment="Left" Margin="525,210,0,0" VerticalAlignment="Top"/>
+        <Button Style="{StaticResource ImageButton}" ToolTip="选择网络或文件图标" HorizontalAlignment="Left" Margin="558,123,0,0" VerticalAlignment="Top" Click="AddImage">
+            <Image Source="/Resources/Images/Icons/SelectLocalImage.ico" Width="16" Height="16"/>
+        </Button>
+        <Button x:Name="ButtonView" Width="78" Height="78" BorderBrush="#FF707070" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="1.5,1.5,1.5,1.5" Margin="557,40,0,0" Background="White" Click="SelectImage"/>
+    </Grid>
+</Window>

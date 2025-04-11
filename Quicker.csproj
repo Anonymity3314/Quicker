@@ -1,0 +1,201 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>True</UseWPF>
+    <ApplicationIcon>Quicker.ico</ApplicationIcon>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseWindowsForms>False</UseWindowsForms>
+    <PackageIcon>Quicker1.png</PackageIcon>
+    <NeutralLanguage>zh-CN</NeutralLanguage>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <FileVersion>2.0.0</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**" />
+    <Compile Remove="LocalIcons\**" />
+    <Compile Remove="OldVersion\**" />
+    <Compile Remove="Properties\**" />
+    <Compile Remove="新建文件夹\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="LocalIcons\**" />
+    <EmbeddedResource Remove="OldVersion\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <EmbeddedResource Remove="新建文件夹\**" />
+    <None Remove="bin\**" />
+    <None Remove="LocalIcons\**" />
+    <None Remove="OldVersion\**" />
+    <None Remove="Properties\**" />
+    <None Remove="新建文件夹\**" />
+    <Page Remove="bin\**" />
+    <Page Remove="LocalIcons\**" />
+    <Page Remove="OldVersion\**" />
+    <Page Remove="Properties\**" />
+    <Page Remove="新建文件夹\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="App.xaml.cs~RF119692ff.TMP" />
+    <None Remove="Quicker.ico" />
+    <None Remove="Resources\Images\AboutQuicker.ico" />
+    <None Remove="Resources\Images\ActionInformation.ico" />
+    <None Remove="Resources\Images\Add.ico" />
+    <None Remove="Resources\Images\BasicSettingButton.ico" />
+    <None Remove="Resources\Images\Book.ico" />
+    <None Remove="Resources\Images\CloseQuicker.ico" />
+    <None Remove="Resources\Images\CloseWindow.ico" />
+    <None Remove="Resources\Images\DeleteImage.ico" />
+    <None Remove="Resources\Images\Disbook.ico" />
+    <None Remove="Resources\Images\EditButton.ico" />
+    <None Remove="Resources\Images\Icons\ActionPagesManager.ico" />
+    <None Remove="Resources\Images\Icons\Locked.ico" />
+    <None Remove="Resources\Images\Icons\MoreSelection.ico" />
+    <None Remove="Resources\Images\Icons\OpenMainWindow1.ico" />
+    <None Remove="Resources\Images\Icons\OpenMainWindow2.ico" />
+    <None Remove="Resources\Images\Icons\UnLocked.ico" />
+    <None Remove="Resources\Images\OpenFile.ico" />
+    <None Remove="Resources\Images\OpenMainWindow.ico" />
+    <None Remove="Resources\Images\Pause.ico" />
+    <None Remove="Resources\Images\Quicker1.ico" />
+    <None Remove="Resources\Images\Quicker2.ico" />
+    <None Remove="Resources\Images\RestartQuicker.ico" />
+    <None Remove="Resources\Images\SelectLocalImage.ico" />
+    <None Remove="Resources\Images\SettingImage1.ico" />
+    <None Remove="Resources\Images\SettingImage2.ico" />
+    <None Remove="Resources\Images\SettingWindow.ico" />
+    <None Remove="Resources\Images\SourseImages\MoreSelection.png" />
+    <None Remove="Windows\MainWindow.xaml.cs~RF56f46fe.TMP" />
+    <None Remove="Windows\MainWindow.xaml.cs~RFc4626a.TMP" />
+    <None Remove="Windows\okjxncmm.k0p~" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Quicker.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\Icons\AboutQuicker.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\ActionInformation.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\ActionPagesManager.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Add.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\BasicSettingButton.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Book.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\CloseQuicker.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\CloseWindow.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\DeleteImage.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Disbook.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\EditButton.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Locked.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\MoreSelection.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\OpenFile.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\OpenMainWindow1.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\OpenMainWindow2.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Pause.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Quicker1.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\Quicker2.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\RestartQuicker.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\SelectLocalImage.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\SettingImage1.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\SettingImage2.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\SettingWindow.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Icons\UnLocked.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SourseImages\MoreSelection.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DK.WshRuntime" Version="4.1.3.201115164" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+    <PackageReference Include="SharpHook" Version="5.3.8" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Windows\SettingWindow.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Page>
+  </ItemGroup>
+
+</Project>

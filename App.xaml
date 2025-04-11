@@ -1,0 +1,29 @@
+﻿<Application
+    x:Class="Quicker.App"
+    xmlns:local="clr-namespace:Quicker"
+    StartupUri="Windows/CustomMenu.xaml"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    
+    ShutdownMode="OnMainWindowClose"
+>
+    <Application.Resources>
+        <!--合并资源词典-->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- 输入框样式 -->
+                <ResourceDictionary Source="Resources/Styles/TextBoxStyle.xaml"/>
+                <!-- 按钮样式 -->
+                <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
+                <!-- 提示框样式 -->
+                <ResourceDictionary Source="Resources/Styles/TooltipStyle.xaml"/>
+                <!-- 下拉框样式 -->
+                <ResourceDictionary Source="Resources/Styles/ComboBoxStyle.xaml"/>
+                <!-- 复选框样式 -->
+                <ResourceDictionary Source="Resources/Styles/CheckBoxStyle.xaml"/>
+                <!-- 滚动条样式 -->
+                <ResourceDictionary Source="Resources/Styles/ScrollBarStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
