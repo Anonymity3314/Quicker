@@ -27,16 +27,15 @@ namespace Quicker.Windows
             }
         } // 递归查找所有指定类型的子元素
         private Dictionary<string, bool> pageButtonCache = new Dictionary<string, bool>(); // 缓存页面按钮状态
-        private bool isDragging = false,isClosing = false, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
         private readonly CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
+        private bool shouldHideTooltip; // 窗口关闭、隐藏提示标志
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly WindowManager windowManager; // 窗口管理器
         private readonly IconManager iconManager; // 图标管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
-        private Button SourceButton; // 源按钮
         readonly string CommonStyle; // 样式
         private readonly App app; // App实例
 
@@ -326,9 +325,9 @@ namespace Quicker.Windows
         // 关闭功能面板
         private void CloseMainWindow(object sender, EventArgs e)
         {
-            if (!isClosing)
+            if (!buttonManager.isClosing)
             {
-                isClosing = true;
+                buttonManager.isClosing = true;
                 this.Close(); // 关闭窗口
             }
         }
@@ -338,9 +337,9 @@ namespace Quicker.Windows
         {
             if (!app.Pause)
             {
-                if (!isClosing && !app.Book)
+                if (!buttonManager.isClosing && !app.Book)
                 {
-                    isClosing = true;
+                    buttonManager.isClosing = true;
                     this.Close(); // 关闭窗口
                 }
             }
@@ -573,7 +572,7 @@ namespace Quicker.Windows
                         }; // 设置窗口位置
                         creatActionMenu.ClosingOrHiding += () =>
                         {
-                            isClosing = false;
+                            buttonManager.isClosing = false;
                         }; // 添加关闭事件
                         creatActionMenu.Show(); // 显示创建动作菜单
                     }
@@ -586,58 +585,26 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                isClosing = true; // 设置关闭标志
-                System.Windows.Point mousePosition = Mouse.GetPosition(this); // 获取鼠标位置
-                double left = mousePosition.X + 310.4, top = mousePosition.Y + 596 / 3; // 计算菜单位置
-                if (button.Tag is ButtonData data)
-                {
-                    OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
-                    operationMenu?.Close(); // 关闭操作菜单
-                    operationMenu = new(button.Name)
-                    {
-                        Left = left,
-                        Top = top
-                    }; // 设置菜单位置
-                    operationMenu.ClosingOrHiding += () =>
-                    {
-                        isClosing = false;
-                    };
-                    operationMenu.Show(); // 显示操作菜单
-                }
-                else
-                {
-                    CreatActionMenu creatActionMenu = Application.Current.Windows.OfType<CreatActionMenu>().FirstOrDefault(); // 查找现有的创建动作菜单
-                    creatActionMenu?.Close(); // 关闭创建动作菜单
-                    creatActionMenu = new(button.Name)
-                    {
-                        Left = left,
-                        Top = top
-                    }; // 设置菜单位置
-                    creatActionMenu.ClosingOrHiding += () =>
-                    {
-                        isClosing = false;
-                    };
-                    creatActionMenu.Show(); // 显示创建动作菜单
-                }
+                buttonManager.OpenCreatActionMenu(sender, e, true); // 打开创建动作菜单
             }
         }
 
         // 添加关闭标志防止报错
         private void MainWindow_Closing(object sender, EventArgs e)
         {
-            isClosing = true; // 设置关闭标志
+            buttonManager.isClosing = true; // 设置关闭标志
         }
 
         // 允许拖拽
         public void Button_DragEnter(object sender, DragEventArgs e)
         {
-            buttonManager.Button_DragEnter(sender, e);
+            buttonManager.Button_DragEnter(sender, e); // 允许拖拽
         }
 
         // 允许拖拽
         private void Button_PreviewDragOver(object sender, DragEventArgs e)
         {
-            buttonManager.Button_PreviewDragOver(sender, e);
+            buttonManager.Button_PreviewDragOver(sender, e); // 允许拖拽
         }
 
         /// <summary>
@@ -649,73 +616,8 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
-                if(TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
-                if (e.Data.GetDataPresent(typeof(ButtonData))) // 获取拖拽数据
-                {
-                    db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
-
-                    var TargetData = db2.GetButtonDataByID(SourceButton.Name); // 获取源按钮数据
-                    RefreshButtonDisplay(SourceButton, TargetData); // 更新 sourceButton 的内容
-                    SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
-
-                    var SourceData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                    RefreshButtonDisplay(TargetButton, SourceData); // 更新 targetButton 的内容
-                    TargetButton.Tag = SourceData; // 更新 targetButton 的标签
-                }
-                else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
-                {
-                    string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-                    if (filePaths.Length > 0)
-                    {
-                        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-                        if (files.Length > 0)
-                        {
-                            string filePath = files[0]; // 获取第一个文件的路径
-                            ProcessFileDrop(TargetButton, filePath); // 处理文件拖拽
-
-                            var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                            RefreshButtonDisplay(TargetButton, TargetData); // 更新目标按钮的内容
-                            TargetButton.Tag = TargetData;
-                        }
-                    }
-                }
+                buttonManager.Button_Drop(sender, e); // 处理拖拽事件
             }
-        }
-
-        /// <summary>
-        /// 处理文件拖拽
-        /// </summary>
-        /// <param name="button">目标按钮</param>
-        /// <param name="filePath">文件路径</param>
-        private void ProcessFileDrop(Button button, string filePath)
-        {
-            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
-            string iconPath = "none"; // 默认图标路径
-            if (iconSource != null)
-            {
-                iconPath = iconManager.CheckCachedIcon(filePath); // 检查缓存的图标
-                if (string.IsNullOrEmpty(iconPath))
-                {
-                    iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
-                }
-            }
-
-            string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath); // 获取文件名
-            ButtonData buttonData = new ButtonData
-            {
-                ButtonID = button.Name, // 获取按钮ID
-                ButtonName = fileName, // 设置按钮名称
-                Location = filePath, // 设置文件路径
-                ImagePath = iconPath, // 设置图标路径
-                RunByMessager = false, // 是否使用管理员身份运行
-                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
-                WindowState = 0, // 设置窗口状态
-                Usage = $"打开文件: {fileName}", // 设置用途
-                CreateTime = DateTime.Now, // 设置创建时间
-                LatestEditTime = DateTime.Now // 设置最新编辑时间
-            };
-            RefreshButtonDisplay(button, buttonData); // 更新按钮内容
-            db2.AddAction(buttonData); // 添加按钮数据到数据库
         }
 
         // 鼠标左键按下时记录初始位置
@@ -723,9 +625,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                initialMousePosition = e.GetPosition(this); // 记录初始位置
-                SourceButton = button; // 记录源按钮
-                isDragging = false; // 初始化拖拽状态
+                buttonManager.Button_PreviewMouseLeftButtonDown(sender, e); // 记录初始位置
             }
         }
 
@@ -734,38 +634,27 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
-                System.Windows.Point currentPosition = e.GetPosition(this); // 获取当前位置
-                double deltaX = currentPosition.X - initialMousePosition.X; // 计算 X 轴位移
-                double deltaY = currentPosition.Y - initialMousePosition.Y; // 计算 Y 轴位移
-                double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY); // 计算移动距离
-                if (distance > 10 && !isDragging) // 如果移动距离超过 10 像素，则视为拖拽开始
-                {
-                    isDragging = true; // 设置拖拽状态
-                    if (button.Tag is ButtonData data) // 如果按钮数据存在
-                    {
-                        DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
-                    }
-                }
+                buttonManager.Button_PreviewMouseMove(sender, e); // 检查拖拽条件
             }
         }
 
         // 鼠标左键释放时重置状态
         private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            isDragging = false; // 重置拖拽状态
+            buttonManager.Button_PreviewMouseLeftButtonUp(sender, e); // 重置状态
         }
 
         // 打开菜单
         private void OpenContextMenu(object sender, RoutedEventArgs e)
         {
-            Popup.IsOpen = true;
+            Popup.IsOpen = true; // 打开菜单
         }
 
         // 退出Quicker
         private void QuitQuicker(object sender, RoutedEventArgs e)
         {
             CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-            customMenu.Exit(sender, e);
+            customMenu.Exit(sender, e); // 退出Quicker
         }
 
         // 打开动作管理窗口

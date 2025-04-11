@@ -29,11 +29,12 @@ namespace Quicker.CommonFunctions
                 foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素的子元素
             }
         } // 递归查找所有指定类型的子元素
-        public bool isClosing = false, isDragging = false, hideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
-        private Point initialMousePosition; // 鼠标初始位置
+        public bool isClosing = false, isDragging, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
+        private readonly IconManager iconManager; // 图标管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
-        Button SourceButton; // 源按钮
+        private Point initialMousePosition; // 鼠标初始位置
+        private Button SourceButton; // 源按钮
 
         public ButtonManager()
         {
@@ -42,13 +43,15 @@ namespace Quicker.CommonFunctions
 
             db2 = new ButtonDatabase(); // 初始化按钮数据库
             db2.InitializeDatabase(); // 初始化按钮数据库
+
+            iconManager = new IconManager(); // 初始化图标管理器
         }
 
         // 初始化按钮管理器
         public void Initialize()
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取所有约定
-            hideTooltip = Convention.HideTooltip; // 获取隐藏提示标志
+            shouldHideTooltip = Convention.HideTooltip; // 获取隐藏提示标志
         }
 
         // 设置按钮拖拽效果
@@ -61,10 +64,162 @@ namespace Quicker.CommonFunctions
         // 设置按钮拖拽时的效果
         public void Button_PreviewDragOver(object sender, DragEventArgs e)
         {
-            e.Handled = true;
+            e.Handled = true; // 标记事件已处理
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = DragDropEffects.Copy; // 设置拖拽效果为复制
+            }
+        }
+
+        /// <summary>
+        /// 处理文件拖拽到按钮上
+        /// </summary>
+        /// <param name="sender">目标按钮</param>
+        /// <param name="e">拖拽事件参数</param>
+        public void Button_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is Button TargetButton)
+            {
+                if (TargetButton == SourceButton || SourceButton == null) return; // 如果目标按钮和源按钮相同，直接返回
+                if (e.Data.GetDataPresent(typeof(ButtonData))) // 获取拖拽数据
+                {
+                    db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
+
+                    var TargetData = db2.GetButtonDataByID(SourceButton.Name); // 获取源按钮数据
+                    RefreshButtonDisplay(SourceButton, TargetData); // 更新 sourceButton 的内容
+                    SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
+
+                    var SourceData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
+                    RefreshButtonDisplay(TargetButton, SourceData); // 更新 targetButton 的内容
+                    TargetButton.Tag = SourceData; // 更新 targetButton 的标签
+                }
+                else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
+                {
+                    string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+                    if (filePaths.Length > 0)
+                    {
+                        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+                        if (files.Length > 0)
+                        {
+                            string filePath = files[0]; // 获取第一个文件的路径
+                            ProcessFileDrop(TargetButton, filePath); // 处理文件拖拽
+
+                            var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
+                            RefreshButtonDisplay(TargetButton, TargetData); // 更新目标按钮的内容
+                            TargetButton.Tag = TargetData;
+                        }
+                    }
+                }
+
+                SourceButton = null; // 清空源按钮
+            }
+        }
+
+        /// <summary>
+        /// 处理文件拖拽
+        /// </summary>
+        /// <param name="button">目标按钮</param>
+        /// <param name="filePath">文件路径</param>
+        private void ProcessFileDrop(Button button, string filePath)
+        {
+            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
+            string iconPath = "none"; // 默认图标路径
+            if (iconSource != null)
+            {
+                iconPath = iconManager.CheckCachedIcon(filePath); // 检查缓存的图标
+                if (string.IsNullOrEmpty(iconPath))
+                {
+                    iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
+                }
+            }
+
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            ButtonData buttonData = new ButtonData
+            {
+                ButtonID = button.Name, // 获取按钮ID
+                ButtonName = fileName, // 设置按钮名称
+                Location = filePath, // 设置文件路径
+                ImagePath = iconPath, // 设置图标路径
+                RunByMessager = false, // 是否使用管理员身份运行
+                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
+                WindowState = 0, // 设置窗口状态
+                Usage = $"打开文件: {fileName}", // 设置用途
+                CreateTime = DateTime.Now, // 设置创建时间
+                LatestEditTime = DateTime.Now // 设置最新编辑时间
+            };
+            RefreshButtonDisplay(button, buttonData); // 更新按钮内容
+            db2.AddAction(buttonData); // 添加按钮数据到数据库
+        }
+
+        /// <summary>
+        /// 更新按钮内容
+        /// </summary>
+        /// <param name="button">目标按钮</param>
+        /// <param name="buttonInformation">按钮数据</param>
+        /// <param name="shouldHideTooltip">是否隐藏提示</param>
+        private void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
+        {
+            if (buttonInformation != null) // 如果Button的数据存在
+            {
+                Grid grid = new(); // 创建Grid对象
+                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 设置按钮背景
+                if (buttonInformation.ImagePath != "none")
+                {
+                    try
+                    {
+                        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+                        System.Windows.Controls.Image image = new()
+                        {
+                            Width = 36, // 设置宽度
+                            Height = 36, // 设置高度
+                            VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                            HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
+                            Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
+                        }; // 创建图像对象
+                        grid.Children.Add(image); // 添加图像到Grid
+                        Grid.SetRow(image, 0); // 设置图像所在行
+                    }
+                    catch // 如果失败，发送信息提示
+                    {
+                        new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonInformation.ButtonName}的图标被移动或删除").Show();
+                    }
+                } // 如果图标路径不为none
+
+                if (!string.IsNullOrEmpty(buttonInformation.ButtonName))
+                {
+                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+                    TextBlock textBlock = new()
+                    {
+                        Text = buttonInformation.ButtonName, // 设置文本
+                        TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
+                        VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
+                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center, // 水平居中
+                    }; // 创建文本块对象
+                    AutoEllipsisTextBlock(textBlock, 60); // 动态调整字体大小
+
+                    grid.Children.Add(textBlock); // 添加文本块到Grid
+                    Grid.SetRow(textBlock, 1); // 设置文本块所在行
+                } // 如果按钮名称不为空
+                button.Content = grid; // 设置按钮内容
+
+                if (!shouldHideTooltip)
+                {
+                    string toolTipText = null; // 提示文本
+                    if (!string.IsNullOrWhiteSpace(buttonInformation.ButtonName) || !string.IsNullOrWhiteSpace(buttonInformation.Usage))
+                    {
+                        string name = !string.IsNullOrWhiteSpace(buttonInformation.ButtonName) ? buttonInformation.ButtonName : null; // 获取按钮名称
+                        string usage = !string.IsNullOrWhiteSpace(buttonInformation.Usage) ? buttonInformation.Usage : null; // 获取按钮用途
+                        toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
+                    } // 如果按钮名称或用途不为空
+                    button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本
+                }
+            }
+            else // 如果Button的数据不存在
+            {
+                button.Content = null; // 清空按钮内容
+                button.ToolTip = null; // 清空按钮提示文本
+                button.Tag = null; // 清空按钮标签
+                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 重置按钮背景
             }
         }
 
@@ -200,13 +355,12 @@ namespace Quicker.CommonFunctions
         }
 
         // 右键按钮打开菜单
-        public void OpenCreatActionMenu(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        public void OpenCreatActionMenu(object sender, System.Windows.Input.MouseButtonEventArgs e, bool isMainWindow)
         {
             if (sender is Button button)
             {
-                isClosing = true; // 设置关闭标志
-                Point mousePosition = e.GetPosition(button); // 获取鼠标位置
-                double left = mousePosition.X + 310.4, top = mousePosition.Y + 596 / 3; // 计算菜单位置
+                if(isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
+                double left = System.Windows.Forms.Cursor.Position.X, top = System.Windows.Forms.Cursor.Position.Y; // 计算菜单位置
                 if (button.Tag is ButtonData data && button != null)
                 {
                     OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
@@ -216,10 +370,13 @@ namespace Quicker.CommonFunctions
                         Left = left,
                         Top = top
                     }; // 设置菜单位置
-                    operationMenu.ClosingOrHiding += () =>
+                    if(isMainWindow)
                     {
-                        isClosing = false;
-                    };
+                        operationMenu.ClosingOrHiding += () =>
+                        {
+                            isClosing = false; // 关闭标志
+                        }; // 关闭或隐藏操作菜单事件
+                    } // 如果是主窗口
                     operationMenu.Show(); // 显示操作菜单
                 }
                 else
@@ -231,10 +388,13 @@ namespace Quicker.CommonFunctions
                         Left = left,
                         Top = top
                     }; // 设置菜单位置
-                    creatActionMenu.ClosingOrHiding += () =>
+                    if (isMainWindow)
                     {
-                        isClosing = false;
-                    };
+                        creatActionMenu.ClosingOrHiding += () =>
+                        {
+                            isClosing = false; // 关闭标志
+                        }; // 关闭或隐藏创建动作菜单事件
+                    } // 如果是主窗口
                     creatActionMenu.Show(); // 显示创建动作菜单
                 }
             }

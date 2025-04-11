@@ -420,30 +420,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                Point mousePosition = Mouse.GetPosition(this); // 获取鼠标位置
-                double left = mousePosition.X + 310.4, top = mousePosition.Y + 596 / 3; // 计算菜单位置
-                if (button.Tag is ButtonData)
-                {
-                    OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找操作菜单
-                    operationMenu?.Close(); // 关闭已有菜单
-                    operationMenu = new(button.Name)
-                    {
-                        Left = left,
-                        Top = top
-                    }; // 创建新的菜单
-                    operationMenu.Show(); // 显示菜单
-                }
-                else
-                {
-                    CreatActionMenu creatActionMenu = Application.Current.Windows.OfType<CreatActionMenu>().FirstOrDefault(); creatActionMenu?.Close();
-                    creatActionMenu?.Close(); // 关闭已有菜单
-                    creatActionMenu = new(button.Name)
-                    {
-                        Left = left,
-                        Top = top
-                    }; creatActionMenu.Show();
-                    creatActionMenu.Show(); // 显示菜单
-                }
+                buttonManager.OpenCreatActionMenu(sender, e, false); // 打开创建动作菜单
             }
         }
     }
