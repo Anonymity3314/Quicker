@@ -279,6 +279,7 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
+                if (TargetButton == SourceButton || SourceButton == null) return; // 如果目标按钮和源按钮相同，直接返回
                 if (e.Data.GetDataPresent(typeof(ButtonData)))
                 {
                     db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮ID

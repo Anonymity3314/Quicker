@@ -86,11 +86,11 @@ namespace Quicker.CommonFunctions
                     db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
 
                     var TargetData = db2.GetButtonDataByID(SourceButton.Name); // 获取源按钮数据
-                    RefreshButtonDisplay(SourceButton, TargetData); // 更新 sourceButton 的内容
+                    RefreshButtonDisplay(SourceButton, TargetData, 60); // 更新 sourceButton 的内容
                     SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
 
                     var SourceData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                    RefreshButtonDisplay(TargetButton, SourceData); // 更新 targetButton 的内容
+                    RefreshButtonDisplay(TargetButton, SourceData, 60); // 更新 targetButton 的内容
                     TargetButton.Tag = SourceData; // 更新 targetButton 的标签
                 }
                 else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
@@ -105,7 +105,7 @@ namespace Quicker.CommonFunctions
                             ProcessFileDrop(TargetButton, filePath); // 处理文件拖拽
 
                             var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                            RefreshButtonDisplay(TargetButton, TargetData); // 更新目标按钮的内容
+                            RefreshButtonDisplay(TargetButton, TargetData, 60); // 更新目标按钮的内容
                             TargetButton.Tag = TargetData;
                         }
                     }
@@ -147,7 +147,7 @@ namespace Quicker.CommonFunctions
                 CreateTime = DateTime.Now, // 设置创建时间
                 LatestEditTime = DateTime.Now // 设置最新编辑时间
             };
-            RefreshButtonDisplay(button, buttonData); // 更新按钮内容
+            RefreshButtonDisplay(button, buttonData, 60); // 更新按钮内容
             db2.AddAction(buttonData); // 添加按钮数据到数据库
         }
 
@@ -157,7 +157,7 @@ namespace Quicker.CommonFunctions
         /// <param name="button">目标按钮</param>
         /// <param name="buttonInformation">按钮数据</param>
         /// <param name="shouldHideTooltip">是否隐藏提示</param>
-        private void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
+        public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth)
         {
             if (buttonInformation != null) // 如果Button的数据存在
             {
@@ -195,7 +195,7 @@ namespace Quicker.CommonFunctions
                         VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
                         HorizontalAlignment = System.Windows.HorizontalAlignment.Center, // 水平居中
                     }; // 创建文本块对象
-                    AutoEllipsisTextBlock(textBlock, 60); // 动态调整字体大小
+                    AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小
 
                     grid.Children.Add(textBlock); // 添加文本块到Grid
                     Grid.SetRow(textBlock, 1); // 设置文本块所在行
@@ -258,73 +258,6 @@ namespace Quicker.CommonFunctions
         public void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             isDragging = false; // 重置拖拽状态
-        }
-
-        // 加载 Button 数据
-        public void UpdateButtonContent(Button button, ButtonData data, bool hideTooltip, int maxWidth)
-        {
-            if (data != null) // 如果Button的数据存在
-            {
-                Grid grid = new(); // 创建Grid对象
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景
-                if (data.ImagePath != "none")
-                {
-                    try
-                    {
-                        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                        Image image = new()
-                        {
-                            Source = new BitmapImage(new Uri(data.ImagePath)), // 设置图像源
-                            Width = 36, // 设置宽度
-                            Height = 36, // 设置高度
-                            VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                            HorizontalAlignment = HorizontalAlignment.Center // 水平居中
-                        }; // 创建图像对象
-                        grid.Children.Add(image); // 添加图像到Grid
-                        Grid.SetRow(image, 0); // 设置图像所在行
-                    }
-                    catch // 如果失败，发送信息提示
-                    {
-                        new ToastContentBuilder().AddText($"图标加载失败：按钮{data.ButtonName}的图标被移动或删除").Show();
-                    }
-                } // 如果图标路径不为none
-
-                if (!string.IsNullOrEmpty(data.ButtonName))
-                {
-                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                    TextBlock textBlock = new()
-                    {
-                        Text = data.ButtonName, // 设置文本
-                        TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
-                        VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center // 水平居中
-                    }; // 创建文本块对象
-                    AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小
-
-                    grid.Children.Add(textBlock); // 添加文本块到Grid
-                    Grid.SetRow(textBlock, 1); // 设置文本块所在行
-                } // 如果按钮名称不为空
-                button.Content = grid; // 设置按钮内容
-
-                if (!hideTooltip)
-                {
-                    string toolTipText = null; // 提示文本
-                    if (!string.IsNullOrWhiteSpace(data.ButtonName) || !string.IsNullOrWhiteSpace(data.Usage))
-                    {
-                        string name = !string.IsNullOrWhiteSpace(data.ButtonName) ? data.ButtonName : null; // 获取按钮名称
-                        string usage = !string.IsNullOrWhiteSpace(data.Usage) ? data.Usage : null; // 获取按钮用途
-                        toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
-                    } // 如果按钮名称或用途不为空
-                    button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本
-                }
-            }
-            else // 如果Button的数据不存在
-            {
-                button.Content = null; // 清空按钮内容
-                button.ToolTip = null; // 清空按钮提示文本
-                button.Tag = null; // 清空按钮标签
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 重置按钮背景
-            }
         }
 
         /// <summary>
