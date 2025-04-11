@@ -86,14 +86,19 @@ namespace Quicker.CommonFunctions
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用程序目录
             string iconFileName = BitConverter.ToString(imageHash).Replace("-", "").ToLower() + ".png"; // 使用哈希值作为文件名
             string iconPath = Path.Combine(appDirectory, "LocalIcons", iconFileName); // 拼接文件路径
+            if (System.IO.File.Exists(iconPath)) return iconPath; // 如果文件存在，直接返回路径
             Directory.CreateDirectory(Path.GetDirectoryName(iconPath)); // 创建目录
-            using (FileStream iconStream = new FileStream(iconPath, FileMode.Create)) // 创建文件流
+            try
             {
-                BitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
-                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource)); // 将 ImageSource 转换为 BitmapFrame
-                encoder.Save(iconStream); // 保存图像到文件
+                using (FileStream iconStream = new FileStream(iconPath, FileMode.Create)) // 创建文件流
+                {
+                    BitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
+                    encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource)); // 将 ImageSource 转换为 BitmapFrame
+                    encoder.Save(iconStream); // 保存图像到文件
+                }
+                return iconPath; // 返回文件路径
             }
-            return iconPath; // 返回文件路径
+            catch { return null; } // 如果保存失败，返回 null
         }
 
         /// <summary>
