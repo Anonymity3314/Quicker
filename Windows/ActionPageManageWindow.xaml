@@ -84,6 +84,6 @@
         </Border>
         <ScrollBar x:Name="ScrollBar" Margin="240,241.8,10,0" VerticalAlignment="Top" Orientation="Horizontal" ValueChanged="ScrollBar_ValueChanged"/>
 
-        <Button Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="239,264,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
+        <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="239,264,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
     </Grid>
 </Window>

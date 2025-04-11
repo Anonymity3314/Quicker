@@ -393,6 +393,7 @@ namespace Quicker.Windows
             LoadGlobalCanvas(); // 加载全局画布
             MainBorder.Margin = new Thickness(239, 31, 11, 564); // 设置主边框边距
             ScrollBar.Margin = new Thickness(240, 241.8, 10, 0); // 设置滚动条边距
+            AddActionPageButton.Margin = new Thickness(239, 264, 0, 0); // 设置添加动作页按钮边距
         }
 
         // 公共按钮点击事件
@@ -402,6 +403,7 @@ namespace Quicker.Windows
             LoadCommonCanvas(); // 加载公共画布
             MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
             ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
+            AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
         }
 
         // 加载公共画布
