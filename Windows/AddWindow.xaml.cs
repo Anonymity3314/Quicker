@@ -62,8 +62,7 @@ namespace Quicker
                 string buttonName = match.Groups[1].Value; // 获取按钮名称
                 string numbersStr = match.Groups[2].Value; // 获取3个数字
                 int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-
-                if (Choice != 0)
+                if (Choice != 0) // 如果不是编辑动作
                 {
                     switch(buttonName)
                     {
@@ -84,7 +83,7 @@ namespace Quicker
                             break; // 默认动作
                     }
                 }
-                else
+                else // 如果是编辑动作
                 {
                     ButtonData buttonData = db2.GetButtonDataByID(CurrentButton);
                     Title = $"新动作--第{numbers[0] +1}页{numbers[1]}行{numbers[2]}列--编辑动作";
@@ -95,39 +94,39 @@ namespace Quicker
         // 初始化Button视图
         private void InitializeButtonView()
         {
-            Grid grid = new()
+            Grid grid = new() // 创建一个新的Grid
             {
-                Name = "ButtonView",
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
-            };
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                Name = "ButtonView", // 设置名称
+                VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center // 水平居中
+            }; // 设置对齐方式
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
 
-            ButtonImage = new()
+            ButtonImage = new() // 创建一个新的Image
             {
-                Name = "ButtonImage",
-                Width = 36,
-                Height = 36,
-                Visibility = Visibility.Collapsed,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
-                VerticalAlignment = System.Windows.VerticalAlignment.Center
-            };
-            grid.Children.Add(ButtonImage);
-            Grid.SetRow(ButtonImage, 0);
+                Width = 36, // 设置宽度
+                Height = 36, // 设置高度
+                Name = "ButtonImage", // 设置名称
+                Visibility = Visibility.Collapsed, // 初始隐藏
+                VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center // 水平居中
+            }; // 设置对齐方式
+            grid.Children.Add(ButtonImage); // 添加到Grid
+            Grid.SetRow(ButtonImage, 0); // 设置行索引
 
-            ButtonTitle = new()
+            ButtonTitle = new() // 创建一个新的TextBlock
             {
-                Name = "ButtonTitle",
-                Visibility = Visibility.Collapsed,
-                TextWrapping = TextWrapping.NoWrap,
-                VerticalAlignment = System.Windows.VerticalAlignment.Center,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                Name = "ButtonTitle", // 设置名称
+                Visibility = Visibility.Collapsed, // 初始隐藏
+                TextWrapping = TextWrapping.NoWrap, // 不换行
+                VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center, // 水平居中
             };
-            grid.Children.Add(ButtonTitle);
-            Grid.SetRow(ButtonTitle, 1);
+            grid.Children.Add(ButtonTitle); // 添加到Grid
+            Grid.SetRow(ButtonTitle, 1); // 设置行索引
 
-            ButtonView.Content = grid;
+            ButtonView.Content = grid; // 设置ButtonView的内容为Grid
         }
 
         // 根据上个窗口数据执行对应命令
@@ -156,7 +155,7 @@ namespace Quicker
         // 关闭添加动作窗口
         private void CloseAddWindow(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            this.Close(); // 关闭窗口
         }
 
         // 管理本地图标
@@ -166,22 +165,22 @@ namespace Quicker
             if (!Directory.Exists(localIconsPath)) Directory.CreateDirectory(localIconsPath); // 如果文件夹不存在，创建它
             Process.Start(new ProcessStartInfo
             {
-                FileName = localIconsPath,
-                UseShellExecute = true
+                FileName = localIconsPath, // 打开文件夹
+                UseShellExecute = true // 使用系统外壳程序打开
             });
         }
 
         // 删除图标
         private void DeleteImage(object sender, RoutedEventArgs e)
         {
-            ButtonImage.Source = null;
-            ButtonImage.Visibility = Visibility.Collapsed;
+            ButtonImage.Source = null; // 清空图标
+            ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
         }
 
         // 打开选择菜单
         private void OpenContextMenu(object sender, RoutedEventArgs e)
         {
-            Popup.IsOpen = true;
+            Popup.IsOpen = true; // 打开弹出菜单
         }
 
         // 选择本地应用
@@ -207,12 +206,12 @@ namespace Quicker
             if (selectedApp != null)
             {
                 // 更新控件数据
-                TitleTextBox.Text = selectedApp.Name;
-                LocationTextBox.Text = selectedApp.Location;
+                TitleTextBox.Text = selectedApp.Name; // 设置标题
+                LocationTextBox.Text = selectedApp.Location; // 设置地址
 
                 // 设置图标
-                ButtonImage.Source = selectedApp.Icon;
-                ButtonImage.Visibility = Visibility.Visible;
+                ButtonImage.Source = selectedApp.Icon; // 设置图标
+                ButtonImage.Visibility = Visibility.Visible; // 显示图标
                 FindAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
             }
         }
@@ -222,7 +221,7 @@ namespace Quicker
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "任意文件(*.*)|*.*|可执行程序(*.exe)|*.exe"
+                Filter = "任意文件(*.*)|*.*|可执行程序(*.exe)|*.exe" // 设置文件类型过滤器
             };
 
             if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了“确定”
@@ -283,14 +282,14 @@ namespace Quicker
         // 复制地址
         private void CopyLocation(object sender, RoutedEventArgs e)
         {
-            string clipboardText = System.Windows.Clipboard.GetText();
-            LocationTextBox.Text = clipboardText;
+            string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
+            LocationTextBox.Text = clipboardText; // 设置地址栏文本
         }
 
         // 选择打开网址
         private void ChooseWebsite()
         {
-            ChoiceComboBox.SelectedIndex = 1;
+            ChoiceComboBox.SelectedIndex = 1; // 设置选择框为网址
         }
 
         // 保存动作
@@ -299,10 +298,7 @@ namespace Quicker
             bool runbymessager = RunByMessager.IsChecked == true; // 是否通过管理员身份运行
             bool trytoopenexitingwindow = TryToOpenExitingWindow.IsChecked == true; // 是否尝试打开已存在的窗口
             int windowState = 0; // 窗口状态
-            if (WindowStateComboBox.SelectedIndex != -1)
-            {
-                windowState = WindowStateComboBox.SelectedIndex; // 获取窗口状态
-            }
+            if (WindowStateComboBox.SelectedIndex != -1) windowState = WindowStateComboBox.SelectedIndex; // 获取窗口状态
 
             // 处理图标路径
             iconPath = ButtonImage.Visibility == Visibility.Visible ? iconManager.SaveIconToFile(ButtonImage.Source) : "none"; // 如果图标可见，则保存图标，否则设置为默认值
@@ -318,7 +314,7 @@ namespace Quicker
                 Usage = UsageTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now
-            }; // 手动将 ButtonActionInform 转换为 ButtonData
+            }; // 创建按钮数据对象
             (Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
             this.Close(); // 关闭窗口
         }
@@ -326,22 +322,19 @@ namespace Quicker
         // 点击保存按钮保存动作
         private void SaveAction(object sender, RoutedEventArgs e)
         {
-            Save();
+            Save(); // 保存动作
         }
 
         // 按下 S 键保存动作
         private void SaveAction(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.S)
-            {
-                Save();
-            }
+            if (e.Key == Key.S) Save(); // 保存动作
         }
 
         // 选择已有图标
         private void AddImage(object sender, RoutedEventArgs e)
         {
-            SelectImage(sender, e);
+            SelectImage(sender, e); // 选择本地图片
         }
 
         // 更改ButtonName
@@ -417,7 +410,7 @@ namespace Quicker
             if (FindAppsWindow != null)
             {
                 SystemSounds.Beep.Play(); // 播放提示音
-                FindAppsWindow.Focus();
+                FindAppsWindow.Focus(); // 设置焦点
             }
         }
 

@@ -27,7 +27,7 @@ namespace Quicker.Windows
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 全局和公共动作页索引
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
         private bool shouldHideTooltip, isDragging = false; // 是否正在拖拽
-        private readonly IButtonManager buttonManager; // 按钮管理器
+        private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
