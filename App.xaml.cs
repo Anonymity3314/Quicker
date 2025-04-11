@@ -41,15 +41,15 @@ namespace Quicker
         public static DateTime RecordedTime { get; set; } // 记录时间
         public static DateTime StartTime { get; set; } // 启动时间
         private DateTime? keyPressStartTime = null; // 按键按下时的时间
+        private System.Windows.Point startPosition; // 鼠标位置
+        private WindowManager windowManager; // 窗口管理器
         private DispatcherTimer pressTimer; // 按键计时器
-        System.Windows.Point startPosition; // 鼠标位置
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
         private DispatcherTimer timer; // 定时器
         private SettingDatabase db1; // 设置数据库
         public string CommonState; // 通用状态
-        float Left, Top; // 窗口位置
-        WindowManager windowManager; // 窗口管理器
+        private float Left, Top; // 窗口位置
 
         protected override void OnStartup(StartupEventArgs e)
         {

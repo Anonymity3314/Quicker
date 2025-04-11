@@ -21,13 +21,13 @@ namespace Quicker
     public partial class AddWindow : Window
     {
         public static SelectImageWindow SelectImageWindow; // SelectImageWindow 的静态引用
+        private readonly ButtonManager buttonManager; // 按钮管理器接口
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
+        private readonly IconManager iconManager; // 图标管理器接口
         private readonly ButtonDatabase db2; // ButtonDatabase
         private TextBlock ButtonTitle; // ButtonTitle
-        ButtonManager buttonManager; // 按钮管理器接口
         private Image ButtonImage; // ButtonImage
-        IconManager iconManager; // 图标管理器接口
-        string iconPath; // 图标路径
+        private string iconPath; // 图标路径
 
         public string CurrentButton { get; private set; } // 当前按钮
         public int Choice { get; private set; } // 选择添加动作类型

@@ -29,7 +29,7 @@ namespace Quicker.Windows
         private Dictionary<string, bool> pageButtonCache = new Dictionary<string, bool>(); // 缓存页面按钮状态
         private bool isDragging = false,isClosing = false, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
-        private CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
+        private readonly CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly WindowManager windowManager; // 窗口管理器
@@ -37,8 +37,8 @@ namespace Quicker.Windows
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
         private Button SourceButton; // 源按钮
+        readonly string CommonStyle; // 样式
         private readonly App app; // App实例
-        string CommonStyle; // 样式
 
         public MainWindow(string Style)
         {
@@ -47,9 +47,9 @@ namespace Quicker.Windows
             MainGrid.Children.Remove(ViewGlobalCanvas); // 从主网格中移除
             CommonGrid.Children.Remove(ViewCommonCanvas); // 从主网格中移除
 
-            iconManager = new IconManager();
-            buttonManager = new ButtonManager();
-            windowManager = new WindowManager();
+            iconManager = new IconManager(); // 初始化图标管理器
+            buttonManager = new ButtonManager(); // 初始化按钮管理器
+            windowManager = new WindowManager(); // 初始化窗口管理器
 
             // 初始化数据库
             db1 = new SettingDatabase(); // 初始化设置数据库
@@ -65,17 +65,13 @@ namespace Quicker.Windows
         // 加载数据库和Button
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Task.Run(async() => // 在后台线程中加载按钮数据
+            Application.Current.Dispatcher.Invoke(() =>
             {
-            }) // 加载按钮数据
-                .ContinueWith(task => // 处理加载完成后的操作
-                {
-                    GenerateCanvas(0, "Global"); // 生成全局 Canvas
-                    GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
-
-                    GetTotalAntionPageIndex(); // 获取总的页面数
-                    GenerateButtons(); // 生成按钮
-                }, TaskScheduler.FromCurrentSynchronizationContext()); // 在主线程中更新按钮视图
+                GenerateCanvas(0, "Global"); // 生成全局 Canvas
+                GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
+                GetTotalAntionPageIndex(); // 获取总的页面数
+                GenerateButtons(); // 生成按钮
+            }); // 在主线程中执行
 
             // 加载BookButton
             BitmapImage bookimage = new(); // 创建图像对象
@@ -200,11 +196,11 @@ namespace Quicker.Windows
             }
         }
 
-        // 生成全局页面切换 Button
+        // 生成页面切换 Button
         private void GenerateButtons()
         {
-            GeneratePageButtons("Global", TotalGlobalAntionPageIndex, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel);
-            GeneratePageButtons(CommonStyle, TotalCommonActionPageIndex, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel);
+            GeneratePageButtons("Global", TotalGlobalAntionPageIndex, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
+            GeneratePageButtons(CommonStyle, TotalCommonActionPageIndex, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
         }
 
         /// <summary>
