@@ -236,7 +236,7 @@ namespace Quicker.Windows
         }
 
         // 滚动条鼠标左键按下事件
-        private void Button_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
             if (sender is Button button)
             {
@@ -246,7 +246,7 @@ namespace Quicker.Windows
         }
 
         // 滚动条鼠标左键抬起事件
-        private void Button_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
             if (sender is Button button)
             {
@@ -417,7 +417,7 @@ namespace Quicker.Windows
         }
 
         // 打开创建动作菜单
-        private void OpenCreatActionMenu(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
             if (sender is Button button)
             {

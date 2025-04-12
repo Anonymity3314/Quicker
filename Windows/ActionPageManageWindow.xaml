@@ -59,12 +59,18 @@
                 <ToolTip Content="双击这里：将按钮背景色改为灰色" Foreground="Black"/>
             </Label.ToolTip>
         </Label>
-        
+
         <Border x:Name="MainBorder" Margin="239,31,11,564" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
                 <StackPanel x:Name="GlobalStackPanel" Background="LightGray" Orientation="Horizontal">
                     <Canvas x:Name="GlobalCanvas0" Height="215" Width="260" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3,0,0,0">
-                        <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3"/>
+                        <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3">
+                            <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="17.24" BorderThickness="0,0,0,0" Margin="3,0,0,0">
+                                <Grid>
+                                    
+                                </Grid>
+                            </Button>
+                        </Grid>
 
                         <Button Style="{StaticResource ActionButton}" Canvas.Top="20"/>
                         <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="65"/>
