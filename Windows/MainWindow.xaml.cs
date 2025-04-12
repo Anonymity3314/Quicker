@@ -30,12 +30,12 @@ namespace Quicker.Windows
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
         private readonly CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
-        private bool shouldHideTooltip; // 窗口关闭、隐藏提示标志
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly WindowManager windowManager; // 窗口管理器
         private readonly IconManager iconManager; // 图标管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
+        private bool shouldHideTooltip; // 隐藏提示标志
         readonly string CommonStyle; // 样式
         private readonly App app; // App实例
 
@@ -318,8 +318,7 @@ namespace Quicker.Windows
         // 打开设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-            customMenu.ShowSettingWindow(sender, e);
+            windowManager.OpenTargetWindow("SettingWindow");
         }
 
         // 关闭功能面板
@@ -520,7 +519,7 @@ namespace Quicker.Windows
                 {
                     if(data.TryToOpenExitingWindow)
                     {
-                        string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location); // 获取窗口标题
+                        string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
                         windowManager.TryToOpenExitingWindow(windowTitle);
                     }
 
@@ -653,26 +652,19 @@ namespace Quicker.Windows
         // 退出Quicker
         private void QuitQuicker(object sender, RoutedEventArgs e)
         {
-            CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-            customMenu.Exit(sender, e); // 退出Quicker
+            System.Windows.Application.Current.Shutdown();
         }
 
         // 打开动作管理窗口
         private void OpenActionManageWindow(object sender, RoutedEventArgs e)
         {
-            CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-            customMenu.OpenActionManageWindow(sender, e); // 打开动作管理窗口
-            this.Close(); // 关闭当前窗口
+            windowManager.OpenTargetWindow("ActionManageWindow"); // 打开动作管理窗口
         }
 
         // 滚轮进行全局动作页翻页
         private void GolbalCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            e.Handled = true; // 标记事件已处理
-            int delta = e.Delta; // 获取鼠标滚轮的增量值
-            int currentCanvasIndex = GetVisibleCanvasIndex("Global"); // 获取当前可见的Canvas编号
-            if (delta > 0) SwitchToPreviousCanvas(currentCanvasIndex, "Global"); // 向上滚动，切换到上一页
-            else SwitchToNextCanvas(currentCanvasIndex, "Global"); // 向下滚动，切换到下一页
+            ChangeVisibleCanvas(e, "Global");
         }
 
         /// <summary>
@@ -702,6 +694,20 @@ namespace Quicker.Windows
                 }
             }
             return 0; // 默认返回0
+        }
+
+        /// <summary>
+        /// 滑动滚轮更改当前可见 Canvas
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="style">Canvas 类型</param>
+        private void ChangeVisibleCanvas(MouseWheelEventArgs e, string style)
+        {
+            e.Handled = true; // 标记事件已处理
+            int delta = e.Delta; // 获取鼠标滚轮的增量值
+            int currentCanvasIndex = GetVisibleCanvasIndex(style); // 获取当前可见的Canvas编号
+            if (delta > 0) SwitchToPreviousCanvas(currentCanvasIndex, style); // 向上滚动，切换到上一页
+            else SwitchToNextCanvas(currentCanvasIndex, style); // 向下滚动，切换到下一页
         }
 
         /// <summary>
@@ -937,11 +943,7 @@ namespace Quicker.Windows
         // 滚轮进行通用动作页翻页
         private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            e.Handled = true; // 标记事件已处理
-            int delta = e.Delta; // 获取鼠标滚轮的增量值
-            int currentCanvasIndex = GetVisibleCanvasIndex(CommonStyle); // 获取当前可见的CommonCanvas编号
-            if (delta > 0) SwitchToPreviousCanvas(currentCanvasIndex, CommonStyle); // 向上滚动，切换到上一页
-            else SwitchToNextCanvas(currentCanvasIndex, CommonStyle); // 向下滚动，切换到下一页
+            ChangeVisibleCanvas(e, CommonStyle);
         }
 
         // 通用动作页可见性与切换按钮背景绑定

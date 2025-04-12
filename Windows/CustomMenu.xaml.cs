@@ -1,6 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
+using Quicker.CommonFunctions;
 using System.Windows.Interop;
 using Quicker.Database;
 using System.Windows;
@@ -10,23 +10,9 @@ namespace Quicker.Windows
 {
     public partial class CustomMenu : Window
     {
-        // 设置窗口位置
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)] // 返回值为布尔类型
-        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags); // 设置窗口位置
-
-        // 查找窗口和设置前台窗口
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)] // 指定字符集
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName); // 查找窗口句柄
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd); // 将窗口置于前台
+        private readonly WindowManager windowManager;
         private readonly SettingDatabase db1; // 数据库实例
         private readonly App app; // App实例
-
-        // 窗口置顶相关常量
-        private const int HWND_TOPMOST = -1; // 置顶
-        private const int SWP_NOSIZE = 0x0001; // 大小不变
-        private const int SWP_NOMOVE = 0x0002; // 位置不变
 
         public CustomMenu()
         {
@@ -37,6 +23,8 @@ namespace Quicker.Windows
 
             db1 = new SettingDatabase();
             db1.InitializeDatabase();
+
+            windowManager = new WindowManager();
         }
 
         // 后台加载数据库
@@ -47,10 +35,7 @@ namespace Quicker.Windows
                 SettingDatabase db1 = new();
                 db1.InitializeDatabase();
             });
-
-            // 设置窗口置顶
-            IntPtr hWnd = new WindowInteropHelper(this).Handle; // 获取窗口句柄
-            SetWindowPos(hWnd, new IntPtr(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE); // 设置窗口置顶
+            windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 弹出面板窗口
@@ -64,52 +49,15 @@ namespace Quicker.Windows
         }
 
         // 弹出设置窗口
-        public void ShowSettingWindow(object sender, RoutedEventArgs e)
+        private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(() => // 确保UI操作在主线程中执行
-            {
-                SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (settingWindow != null) // 如果找到现有的设置窗口
-                {
-                    if (settingWindow.WindowState == WindowState.Minimized) // 如果设置窗口被最小化
-                    {
-                        settingWindow.WindowState = WindowState.Normal; // 恢复窗口
-                    }
-                    SetForegroundWindow(new WindowInteropHelper(settingWindow).Handle); // 将窗口置于前台
-                }
-                else // 如果没有找到现有的设置窗口，则创建并显示新窗口
-                {
-                    settingWindow = new(); // 创建设置窗口实例
-                    settingWindow.Show(); // 显示设置窗口
-                }
-                settingWindow.Activate(); // 激活设置窗口
-                this.Visibility = Visibility.Hidden; // 隐藏当前的CustomMenu窗口
-            });
+            windowManager.OpenTargetWindow("SettingWindow");
         }
 
         // 打开动作管理窗口
-        public void OpenActionManageWindow(object sender, RoutedEventArgs e)
+        private void OpenActionManageWindow(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(() => // 确保UI操作在主线程中执行
-            {
-                ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 查找现有的动作管理窗口
-                if (actionPageManageWindow != null) // 如果找到现有的设置窗口
-                {
-                    if (actionPageManageWindow.WindowState == WindowState.Minimized) // 如果设置窗口被最小化
-                    {
-                        actionPageManageWindow.WindowState = WindowState.Normal; // 恢复窗口
-                    }
-                    SetForegroundWindow(new WindowInteropHelper(actionPageManageWindow).Handle); // 将窗口置于前台
-                }
-                else // 如果没有找到现有的设置窗口，则创建并显示新窗口
-                {
-                    actionPageManageWindow = new(); // 创建设置窗口实例
-                    actionPageManageWindow.Show(); // 显示设置窗口
-                }
-                actionPageManageWindow.Activate(); // 激活设置窗口
-                this.Visibility = Visibility.Hidden; // 隐藏当前的CustomMenu窗口
-            });
-            this.Visibility = Visibility.Hidden; // 隐藏当前窗口
+            windowManager.OpenTargetWindow("ActionManageWindow"); // 打开动作管理窗口
         }
 
         // 暂停Quicker
@@ -145,7 +93,7 @@ namespace Quicker.Windows
         }
 
         // 退出应用
-        public void Exit(object sender, RoutedEventArgs e)
+        private void Exit(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
         }

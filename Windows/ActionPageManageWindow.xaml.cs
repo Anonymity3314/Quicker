@@ -26,11 +26,11 @@ namespace Quicker.Windows
 
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 全局和公共动作页索引
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
-        private bool shouldHideTooltip, isDragging = false; // 是否正在拖拽
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
+        private bool shouldHideTooltip; // 是否正在拖拽
         private Button SourceButton; // 源按钮
 
         public ActionPageManageWindow()
@@ -75,7 +75,6 @@ namespace Quicker.Windows
                     string style = match.Groups[1].Value; // 样式
                     string numbersStr = match.Groups[2].Value; // 数字字符串
                     int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 将数字字符串转换为整数数组
-
                     if (style == "Global") // 如果样式为全局
                     {
                         if (numbers[0] > TotalGlobalAntionPageIndex) TotalGlobalAntionPageIndex = numbers[0]; // 更新全局动作页索引
@@ -279,30 +278,14 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
-                if (TargetButton == SourceButton || SourceButton == null) return; // 如果目标按钮和源按钮相同，直接返回
-                if (e.Data.GetDataPresent(typeof(ButtonData)))
-                {
-                    db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮ID
-
-                    var TargetData = db2.GetButtonDataByID(SourceButton.Name); // 获取目标按钮数据
-                    RefreshButtonDisplay(SourceButton, TargetData); // 刷新按钮显示
-                    SourceButton.Tag = TargetData; // 设置源按钮标签
-
-                    var SourceData = db2.GetButtonDataByID(TargetButton.Name); // 获取源按钮数据
-                    RefreshButtonDisplay(TargetButton, SourceData); // 刷新按钮显示
-                    TargetButton.Tag = SourceData; // 设置目标按钮标签
-
-                    buttonDataDict[SourceButton.Name] = TargetData; // 更新按钮数据字典
-                    buttonDataDict[TargetButton.Name] = SourceData; // 更新按钮数据字典
-                }
+                buttonManager.Button_Drop(sender, e);
             }
         }
 
         // 拖入事件
         public void Button_DragEnter(object sender, DragEventArgs e)
         {
-            e.Effects = DragDropEffects.Move; // 设置拖拽效果为移动
-            e.Handled = true; // 标记事件已处理
+           buttonManager.Button_DragEnter(sender, e);
         }
 
         // 鼠标左键按下事件
@@ -310,9 +293,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                initialMousePosition = e.GetPosition(this); // 获取初始鼠标位置
-                SourceButton = button; // 设置源按钮
-                isDragging = false; // 设置拖拽状态为false
+                buttonManager.Button_PreviewMouseLeftButtonDown(sender, e);
             }
         }
 
@@ -321,28 +302,17 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed) // 如果鼠标左键按下
             {
-                Point currentPosition = e.GetPosition(this); // 获取当前鼠标位置
-                double deltaX = currentPosition.X - initialMousePosition.X; // 计算X轴偏移量
-                double deltaY = currentPosition.Y - initialMousePosition.Y; // 计算Y轴偏移量
-                double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY); // 计算距离
-                if (distance > 10 && !isDragging) // 如果距离大于10且未拖拽
-                {
-                    isDragging = true; // 设置拖拽状态为true
-                    if (button.Tag is ButtonData data)
-                    {
-                        DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 执行拖放操作
-                    }
-                }
+                buttonManager.Button_PreviewMouseMove(sender, e);
             }
         }
 
         // 鼠标左键抬起事件
         private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            isDragging = false; // 设置拖拽状态为false
+            buttonManager.Button_PreviewMouseLeftButtonUp(sender, e);
         }
 
-        // 显示创建动作菜单
+        // 左键空白 Button 显示创建动作菜单
         private void ShowCreatActionMenu(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag == null)

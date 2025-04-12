@@ -64,7 +64,7 @@
                         <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="显示面板窗口"/></TextBlock>
                     </Grid>
                 </Button>
-                <Button Click="ShowSettingWindow" ToolTip="打开设置窗口" Style="{StaticResource Button}">
+                <Button Click="OpenSettingWindow" ToolTip="打开设置窗口" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/SettingImage1.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
                         <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="设置"/></TextBlock>

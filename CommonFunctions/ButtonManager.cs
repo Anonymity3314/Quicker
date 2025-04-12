@@ -45,11 +45,7 @@ namespace Quicker.CommonFunctions
             db2.InitializeDatabase(); // 初始化按钮数据库
 
             iconManager = new IconManager(); // 初始化图标管理器
-        }
 
-        // 初始化按钮管理器
-        public void Initialize()
-        {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取所有约定
             shouldHideTooltip = Convention.HideTooltip; // 获取隐藏提示标志
         }
@@ -106,7 +102,7 @@ namespace Quicker.CommonFunctions
 
                             var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
                             RefreshButtonDisplay(TargetButton, TargetData, 60); // 更新目标按钮的内容
-                            TargetButton.Tag = TargetData;
+                            TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                         }
                     }
                 }

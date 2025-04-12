@@ -66,9 +66,7 @@
                     <Canvas x:Name="GlobalCanvas0" Height="215" Width="260" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3,0,0,0">
                         <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3">
                             <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="17.24" BorderThickness="0,0,0,0" Margin="3,0,0,0">
-                                <Grid>
-                                    
-                                </Grid>
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico"/>
                             </Button>
                         </Grid>
 

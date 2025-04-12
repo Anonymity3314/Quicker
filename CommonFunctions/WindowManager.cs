@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using Quicker.Windows;
 using System.Windows;
 using System.Text;
 using System;
@@ -51,15 +52,16 @@ namespace Quicker.CommonFunctions
         /// <summary>
         /// 尝试打开已存在的窗口
         /// </summary>
-        /// <param name="windowTitle"></param>
-        public void TryToOpenExitingWindow(string windowTitle)
-        {
-            IntPtr windowHandle = FindWindow(null, windowTitle); // 查找窗口句柄
-            if (windowHandle != IntPtr.Zero)
+        /// <param name="windowTitle">窗口标题</param>
+        /// <param name="windowHandle">窗口句柄（可选）</param>
+        public void TryToOpenExitingWindow(string windowTitle, IntPtr windowHandle = default)
+        {           
+            if (windowHandle != IntPtr.Zero) SetForegroundWindow(windowHandle); // 如果提供了窗口句柄，则直接使用该句柄
+            else // 如果没有提供窗口句柄，则通过标题查找
             {
-                SetForegroundWindow(windowHandle); // 将窗口置于前台
-                return; // 如果找到窗口，则将窗口置于前台
-            } // 如果找到窗口并且允许打开已存在的窗口，则将窗口置于前台
+                IntPtr hWnd = FindWindow(null, windowTitle);
+                if (hWnd != IntPtr.Zero) SetForegroundWindow(hWnd);
+            }
         }
 
         // 获取当前前台窗口句柄
@@ -89,6 +91,55 @@ namespace Quicker.CommonFunctions
         {
             GetWindowThreadProcessId(hWnd, out uint processId);
             return processId;
+        }
+
+        /// <summary>
+        /// 打开目标窗口
+        /// </summary>
+        /// <param name="targetWindow">目标窗口的类型名称</param>
+        public void OpenTargetWindow(string targetWindow)
+        {
+            Window window = null;
+            switch (targetWindow) // 尝试查找已存在的窗口
+            {
+                case "SettingWindow":
+                    window = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault();
+                    break;
+                case "ActionPageManageWindow":
+                    window = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault();
+                    break;
+            }
+
+            if (window != null)
+            {               
+                if (window.WindowState == WindowState.Minimized) window.WindowState = WindowState.Normal; // 如果窗口被最小化，则恢复窗口
+                IntPtr windowHandle = new WindowInteropHelper(window).Handle; // 获取窗口句柄
+                TryToOpenExitingWindow(null, windowHandle); // 将窗口置于前台
+            }
+            else // 如果未找到窗口，则创建并显示新窗口
+            {
+                window = CreateWindow(targetWindow);
+                window.Show();
+            }
+            window?.Activate(); // 激活窗口
+        }
+
+        /// <summary>
+        /// 创建窗口实例
+        /// </summary>
+        /// <param name="windowType">窗口类型名称</param>
+        /// <returns>创建的窗口实例</returns>
+        private Window CreateWindow(string windowType)
+        {
+            switch (windowType)
+            {
+                case "SettingWindow":
+                    return new SettingWindow();
+                case "ActionPageManageWindow":
+                    return new ActionPageManageWindow();
+                default:
+                    throw new NotSupportedException($"不支持的窗口类型: {windowType}");
+            }
         }
     }
 }

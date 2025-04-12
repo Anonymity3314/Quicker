@@ -40,42 +40,29 @@
         <Grid x:Name="MenuGrid" HorizontalAlignment="Center" Grid.Column="1">
             <!-- 基础设置 -->
             <StackPanel x:Name="BasicSettingStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Visible">
-                <Button x:Name="Convention" Style="{StaticResource Button2}" Background="#FFFAFAFA" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
+                <Button x:Name="Convention" ToolTip="自动启动、鼠标挂钩、版本等" Style="{StaticResource Button2}" Background="#FFFAFAFA" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Icons/SettingImage2.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="常规" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
-                    <Button.ToolTip>
-                        <ToolTip Content="自动启动、鼠标挂钩、版本等" FontSize="12"/>
-                    </Button.ToolTip>
                 </Button>
-                <Button x:Name="OpenMainWindow" Style="{StaticResource Button2}" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
+                <Button x:Name="OpenMainWindow" ToolTip="面板弹出方式" Style="{StaticResource Button2}" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Icons/OpenMainWindow2.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="弹出面板" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
-                    <Button.ToolTip>
-                        <ToolTip Content="面板弹出方式" FontSize="12"/>
-                        <!--面板弹出方式及界面选项-->
-                    </Button.ToolTip>
                 </Button>
-                <Button x:Name="Blacklist" Style="{StaticResource Button2}" Visibility="Collapsed" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
+                <Button x:Name="Blacklist" ToolTip="在某些应用上停止使用Quicker" Style="{StaticResource Button2}" Visibility="Collapsed" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="黑名单" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
-                    <Button.ToolTip>
-                        <ToolTip Content="在某些应用上停止使用Quicker" FontSize="12"/>
-                    </Button.ToolTip>
                 </Button>
-                <Button x:Name="AboutQuicker" Style="{StaticResource Button2}" Click="AboutQuicker_Click" MouseLeave="AboutQuicker_MouseLeave">
+                <Button x:Name="AboutQuicker" ToolTip="应用等相关信息" Style="{StaticResource Button2}" Click="AboutQuicker_Click" MouseLeave="AboutQuicker_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Icons/AboutQuicker.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="关于Quicker" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
-                    <Button.ToolTip>
-                        <ToolTip Content="应用等相关信息" FontSize="12"/>
-                    </Button.ToolTip>
                 </Button>
             </StackPanel>
 

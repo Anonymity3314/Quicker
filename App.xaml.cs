@@ -331,20 +331,20 @@ namespace Quicker
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
             if (mainWindow == null)
             {
-                SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
                 ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (settingWindow == null && actionPageManageWindow == null)
-                {
-                    string windowType = DetermineWindowType(); // 确定窗口类型
-                    mainWindow = new MainWindow(windowType); // 创建新的功能面板
+                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return;
+                SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return;
 
-                    var settings = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                    SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                    mainWindow.Show(); // 显示功能面板
-                    mainWindow.Activate(); // 激活功能面板
-                    Left = (float)mainWindow.Left; // 记录功能面板位置
-                    Top = (float)mainWindow.Top; // 记录功能面板位置
-                }
+                string windowType = DetermineWindowType(); // 确定窗口类型
+                mainWindow = new MainWindow(windowType); // 创建新的功能面板
+
+                var settings = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+                SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
+                mainWindow.Show(); // 显示功能面板
+                mainWindow.Activate(); // 激活功能面板
+                Left = (float)mainWindow.Left; // 记录功能面板位置
+                Top = (float)mainWindow.Top; // 记录功能面板位置
             }
             else
             {
