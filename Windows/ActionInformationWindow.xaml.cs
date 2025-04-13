@@ -16,7 +16,7 @@ namespace Quicker.Windows
     {
         public string CurrentButton { get; private set; } // 当前按钮ID
         private readonly ButtonDatabase db2; // 按钮数据库
-        private WindowManager windowManager;
+        private WindowManager windowManager; // 窗口管理器
 
         public ActionInformationWindow(string currentbutton)
         {

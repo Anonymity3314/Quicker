@@ -10,7 +10,7 @@ namespace Quicker.Windows
 {
     public partial class CustomMenu : Window
     {
-        private readonly WindowManager windowManager;
+        private readonly WindowManager windowManager; // 窗口管理器
         private readonly SettingDatabase db1; // 数据库实例
         private readonly App app; // App实例
 

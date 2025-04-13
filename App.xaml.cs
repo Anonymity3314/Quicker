@@ -355,22 +355,10 @@ namespace Quicker
         // 确定窗口类型
         private string DetermineWindowType()
         {
-            if (Locked && CommonState != null)
-            {
-                return CommonState; // 窗口类型为锁定状态
-            }
-            else if (IsMouseOnTaskbar())
-            {
-                return "TaskBar"; // 鼠标在任务栏上
-            }
-            else if (IsMouseOnDesktop())
-            {
-                return "Desktop"; // 鼠标在桌面上
-            }
-            else
-            {
-                return "Common"; // 鼠标在其他窗口上
-            }
+            if (Locked && CommonState != null) return CommonState; // 窗口类型为锁定状态
+            else if (IsMouseOnTaskbar()) return "TaskBar"; // 鼠标在任务栏上
+            else if (IsMouseOnDesktop()) return "Desktop"; // 鼠标在桌面上
+            else return "Common"; // 鼠标在其他窗口上
         }
 
         // 设置窗口位置

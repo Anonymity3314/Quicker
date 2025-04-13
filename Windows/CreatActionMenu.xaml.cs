@@ -11,7 +11,7 @@ namespace Quicker.Windows
         public string CurrentButton { get; private set; } // 当前按钮
         private readonly SettingDatabase db1; // 设置数据库
         public event Action? ClosingOrHiding; // 事件
-        private WindowManager windowManager;
+        private WindowManager windowManager; // 窗口管理器
 
         public CreatActionMenu(string currentbutton)
         {
