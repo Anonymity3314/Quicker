@@ -164,9 +164,10 @@ namespace Quicker
         private void Timer_Tick(object sender, EventArgs e)
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置
-            Convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
+            DateTime dateTime = DateTime.Now;
+            Convention.TotalUsageTime += (dateTime - RecordedTime).TotalSeconds; // 每 5 分钟增加 300 秒
             db1.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时长到数据库
-            RecordedTime = DateTime.Now; // 记录应用保存时间
+            RecordedTime = dateTime; // 记录应用保存时间
         }
 
         // 初始化钩子

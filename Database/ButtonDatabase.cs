@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Text;
@@ -204,12 +205,104 @@ namespace Quicker.Database
             }
             else // 将 ButtonID1 的编号改为 ButtonID2
             {
-                using var cmd = new SQLiteCommand("UPDATE ButtonData SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection); // 将 ButtonID1 的编号改为 ButtonID2
-                cmd.Parameters.AddWithValue("@NewButtonID", buttonID2); // ButtonID2
-                cmd.Parameters.AddWithValue("@OldButtonID", buttonID1); // ButtonID1
-                cmd.ExecuteNonQuery();
+                UpdateButtonID(connection, buttonID1, buttonID2);
             }
             transaction.Commit();
+        }
+
+        // 根据输入的字符串和数字 A1、A2，交换符合条件的 ButtonID 的 A 部分
+        public void SwapButtonAValues(string inputString, int a1, int a2)
+        {
+            List<ButtonData> allButtons = GetAllButtonData(); // 获取所有 Button 数据
+            Dictionary<string, ButtonData> buttonIDMap = new Dictionary<string, ButtonData>(); // 筛选符合条件的 ButtonID
+            foreach (var button in allButtons)
+            {
+                string buttonID = button.ButtonID;
+                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9]+)(\d{3})$"); // 匹配字符部分和三位数字
+                if (match.Success)
+                {
+                    string charPart = match.Groups[1].Value; // 提取字符部分
+                    string abcPart = match.Groups[2].Value; // 提取三位数字部分
+                    int aPart = int.Parse(abcPart[0].ToString()); // 提取 A 部分
+                    if (charPart == inputString && (aPart == a1 || aPart == a2)) // 筛选条件：字符部分与输入字符串相同，且 A 部分是 a1 或 a2
+                    {
+                        buttonIDMap[buttonID] = button;
+                    }
+                }
+            }
+
+            if (buttonIDMap.Count == 0) return; // 没有符合条件的 ButtonID，直接返回
+
+            // 使用事务确保所有操作的原子性
+            using var connection = new SQLiteConnection(dbPath2);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+
+            string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
+            foreach (var pair in buttonIDMap.ToList()) // 遍历 A1 部分的 ButtonID，将其前面的字符串改为临时标识符
+            {
+                string buttonID = pair.Key;
+                ButtonData button = pair.Value;
+                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9]+)(\d{3})$");
+                if (match.Success)
+                {
+                    string charPart = match.Groups[1].Value; // 提取字符部分
+                    string abcPart = match.Groups[2].Value; // 提取三位数字部分
+                    int aPart = int.Parse(abcPart[0].ToString()); // 提取 A 部分
+                    if (aPart == a1)
+                    {
+                        string newButtonID = $"{tempPrefix}{abcPart}";
+                        UpdateButtonID(connection, buttonID, newButtonID);
+                        buttonIDMap.Remove(buttonID);
+                        buttonIDMap[newButtonID] = button;
+                    }
+                }
+            }
+
+            foreach (var pair in buttonIDMap.ToList()) // 遍历 A2 部分的 ButtonID，将其 ID 改为目标 ID
+            {
+                string buttonID = pair.Key;
+                ButtonData button = pair.Value;
+                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9]+)(\d{3})$");
+                if (match.Success)
+                {
+                    string charPart = match.Groups[1].Value; // 提取字符部分
+                    string abcPart = match.Groups[2].Value; // 提取三位数字部分
+                    int aPart = int.Parse(abcPart[0].ToString()); // 提取 A 部分
+                    string bcPart = abcPart.Substring(1);
+                    if (aPart == a2)
+                    {
+                        string newButtonID = $"{inputString}{a1}{bcPart}";
+                        UpdateButtonID(connection, buttonID, newButtonID);
+                        buttonIDMap.Remove(buttonID);
+                        buttonIDMap[newButtonID] = button;
+                    }
+                }
+            }
+
+            foreach (var pair in buttonIDMap.ToList()) // 将之前 ID 字符串部分改为临时标识符的 ButtonID 改为目标 ButtonID
+            {
+                string buttonID = pair.Key;
+                if (buttonID.StartsWith(tempPrefix))
+                {
+                    string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 提取 BC 部分
+                    string newButtonID = $"{inputString}{a2}{bcPart}";
+                    UpdateButtonID(connection, buttonID, newButtonID);
+                    buttonIDMap.Remove(buttonID);
+                    buttonIDMap[newButtonID] = pair.Value;
+                }
+            }
+
+            transaction.Commit();
+        }
+
+        // 更新 ButtonID
+        private void UpdateButtonID(SQLiteConnection connection, string oldButtonID, string newButtonID)
+        {
+            using var command = new SQLiteCommand("UPDATE ButtonData SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
+            command.Parameters.AddWithValue("@NewButtonID", newButtonID);
+            command.Parameters.AddWithValue("@OldButtonID", oldButtonID);
+            command.ExecuteNonQuery();
         }
     }
 

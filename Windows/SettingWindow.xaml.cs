@@ -65,17 +65,16 @@ namespace Quicker.Windows
         // 异步加载使用时长
         private async Task LoadUsageTimeAsync()
         {
-            // 加载使用时长
+            DateTime currentTime = DateTime.Now;
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息            
-            totalUsageTime = Conventions.TotalUsageTime + (DateTime.Now - App.RecordedTime).TotalSeconds; // 加载总使用时长
-            currentSessionTime = (DateTime.Now - App.StartTime).TotalSeconds; // 更新当次应用使用时长
+            totalUsageTime = Conventions.TotalUsageTime + (currentTime - App.RecordedTime).TotalSeconds; // 加载总使用时长
+            currentSessionTime = (currentTime - App.StartTime).TotalSeconds; // 更新当次应用使用时长
             timer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1) // 设置定时器间隔为1秒
             }; // 创建定时器
             timer.Tick += Timer_Tick; // 定时器每秒更新使用时长
             timer.Start(); // 启动定时器
-
             Application.Current.Dispatcher.Invoke(() => // 更新界面显示
             {
                 CurrentUsingTimeTextBlock.Text = TimeSpan.FromSeconds(currentSessionTime).ToString(@"hh\:mm\:ss"); // 当次应用使用时长
