@@ -107,6 +107,7 @@ namespace Quicker.Windows
             Canvas dynamicCanvas = new Canvas // 创建画布
             {
                 Width = 260, // 画布宽度
+                AllowDrop = true,
                 Name = canvasName, // 画布名称
                 Margin = new Thickness(3, 0, 0, 0), // 画布边距
                 Height = style == "Global" ? 215 : 280, // 画布高度
@@ -124,6 +125,24 @@ namespace Quicker.Windows
             }; // 创建网格
 
             dynamicCanvas.Children.Add(grid); // 将网格添加到画布
+
+            Button pageButton = new Button
+            {
+                Width = 17.24,
+                Name = $"{style}{canvasIndex}",
+                Margin = new Thickness(3, 0, 0, 0),
+                BorderThickness = new Thickness(0, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
+                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
+            };
+
+            Image image = new Image
+            {
+                Source = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative))
+            };
+
+            pageButton.Content = image;
+            grid.Children.Add(pageButton);
 
             double buttonSpacing = 65; // 按钮间距
             int rows = style == "Global" ? 3 : 4; // 行数

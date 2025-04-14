@@ -1,15 +1,12 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
-using System.Security.Cryptography;
 using Quicker.CommonFunctions;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Diagnostics;
-using SharpHook.Logging;
 using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;

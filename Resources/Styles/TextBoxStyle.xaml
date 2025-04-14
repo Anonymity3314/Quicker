@@ -8,7 +8,7 @@
                 <Setter.Value>
                     <ControlTemplate>
                         <Border x:Name="border" CornerRadius="3" BorderThickness="1" BorderBrush="#FFABADB3">
-                            <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" BorderThickness="0" Background="{x:Null}" VerticalAlignment="Center" Margin="2,0"/>
+                            <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="{x:Null}" VerticalAlignment="Center" Margin="2,0"/>
                         </Border>
 
                         <ControlTemplate.Triggers>

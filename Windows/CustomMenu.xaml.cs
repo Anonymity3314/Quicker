@@ -55,9 +55,9 @@ namespace Quicker.Windows
         }
 
         // 打开动作管理窗口
-        private void OpenActionManageWindow(object sender, RoutedEventArgs e)
+        private void OpenActionPageManageWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("ActionManageWindow"); // 打开动作管理窗口
+            windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 
         // 暂停Quicker

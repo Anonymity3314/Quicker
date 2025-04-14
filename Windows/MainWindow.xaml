@@ -7,7 +7,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     
-    AllowDrop="True"
     WindowStyle="None"
     ResizeMode="NoResize"
     Background="{x:Null}"
@@ -81,7 +80,7 @@
                             </Rectangle>
                             <Border Width="170" Background="White" BorderBrush="{x:Null}" BorderThickness="0" CornerRadius="3" Margin="5">
                                 <StackPanel>
-                                    <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionManageWindow">
+                                    <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">
                                         <Grid Width="180">
                                             <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource ImageStyle}"/>
                                             <TextBlock Text="场景与动作" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
