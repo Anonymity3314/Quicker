@@ -195,16 +195,8 @@ namespace Quicker
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if(LocationTextBox.IsFocused)
-            {
-                if (!string.IsNullOrWhiteSpace(LocationTextBox.Text)) SaveButton.IsEnabled = true; // 启用保存按钮
-                else SaveButton.IsEnabled = false; // 禁用保存按钮
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(LocationTextBox.Text)) SaveButton.IsEnabled = true; // 启用保存按钮
-                else SaveButton.IsEnabled = false; // 禁用保存按钮
-            }
+            if (!string.IsNullOrWhiteSpace(LocationTextBox.Text)) SaveButton.IsEnabled = true; // 启用保存按钮
+            else SaveButton.IsEnabled = false; // 禁用保存按钮
         }
 
         // 处理选中的应用
