@@ -40,7 +40,11 @@ namespace Quicker.Database
             command.ExecuteNonQuery();
         }
 
-        // 通过ButtonID获取Button信息
+        /// <summary>
+        /// 通过ButtonID获取动作信息
+        /// </summary>
+        /// <param name="buttonID">要获取的动作信息</param>
+        /// <returns>动作信息</returns>
         public ButtonData GetButtonDataByID(string buttonID)
         {
             using var connection = new SQLiteConnection(dbPath2);
@@ -94,7 +98,10 @@ namespace Quicker.Database
             return contents;
         }
 
-        // 添加动作
+        /// <summary>
+        /// 添加动作
+        /// </summary>
+        /// <param name="buttonData">要添加的动作ID</param>
         public void AddAction(ButtonData buttonData)
         {
             using var connection = new SQLiteConnection(dbPath2);
@@ -120,7 +127,10 @@ namespace Quicker.Database
             transaction.Commit();
         }
 
-        // 更新动作
+        /// <summary>
+        /// 更新动作
+        /// </summary>
+        /// <param name="buttonData">要更新的动作ID</param>
         public void UpdateAction(ButtonData buttonData)
         {
             using var connection = new SQLiteConnection(dbPath2);
@@ -152,7 +162,10 @@ namespace Quicker.Database
             transaction.Commit();
         }
 
-        // 删除动作
+        /// <summary>
+        /// 删除动作
+        /// </summary>
+        /// <param name="buttonID">要删除的动作ID</param>
         public void DeleteAction(string buttonID)
         {
             using var connection = new SQLiteConnection(dbPath2);
@@ -164,18 +177,11 @@ namespace Quicker.Database
             transaction.Commit();
         }
 
-        // 生成ButtonID
-        public string GenerateButtonID(string filePath, int canvasIndex, int row, int col)
-        {
-            // 计算文件路径的哈希值
-            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(filePath));
-            string hashString = BitConverter.ToString(hash).Replace("-", "").ToLower();
-
-            // 生成ButtonID: 哈希值_页面索引_行_列
-            return $"{hashString}_{canvasIndex:D3}_{row:D1}_{col:D1}";
-        }
-
-        // 根据不同情况更改 Button 数据库
+        /// <summary>
+        /// 根据不同情况更改 Button 数据库
+        /// </summary>
+        /// <param name="buttonID1"></param>
+        /// <param name="buttonID2"></param>
         public void ExchangeButtonID(string buttonID1, string buttonID2)
         {
             using var connection = new SQLiteConnection(dbPath2); // 连接数据库
@@ -210,7 +216,26 @@ namespace Quicker.Database
             transaction.Commit();
         }
 
-        // 根据输入的字符串和数字 A1、A2，交换符合条件的 ButtonID 的 A 部分
+        /// <summary>
+        /// 更新 ButtonID
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="oldButtonID">要更改的 ButtonID</param>
+        /// <param name="newButtonID">目标 ButtonID</param>
+        private void UpdateButtonID(SQLiteConnection connection, string oldButtonID, string newButtonID)
+        {
+            using var command = new SQLiteCommand("UPDATE ButtonData SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
+            command.Parameters.AddWithValue("@NewButtonID", newButtonID);
+            command.Parameters.AddWithValue("@OldButtonID", oldButtonID);
+            command.ExecuteNonQuery();
+        }
+
+        /// <summary>
+        /// 根据输入的字符串和数字 A1、A2，交换符合条件的 ButtonID 的 A 部分
+        /// </summary>
+        /// <param name="inputString">Button的字符串索引</param>
+        /// <param name="a1"></param>
+        /// <param name="a2"></param>
         public void SwapButtonAValues(string inputString, int a1, int a2)
         {
             List<ButtonData> allButtons = GetAllButtonData(); // 获取所有 Button 数据
@@ -294,15 +319,6 @@ namespace Quicker.Database
             }
 
             transaction.Commit();
-        }
-
-        // 更新 ButtonID
-        private void UpdateButtonID(SQLiteConnection connection, string oldButtonID, string newButtonID)
-        {
-            using var command = new SQLiteCommand("UPDATE ButtonData SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
-            command.Parameters.AddWithValue("@NewButtonID", newButtonID);
-            command.Parameters.AddWithValue("@OldButtonID", oldButtonID);
-            command.ExecuteNonQuery();
         }
     }
 
