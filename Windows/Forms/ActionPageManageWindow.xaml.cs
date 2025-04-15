@@ -23,6 +23,7 @@ namespace Quicker.Windows
                 foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild;
             }
         } // 查找子元素
+
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly SettingDatabase db1; // 设置数据库
@@ -47,7 +48,7 @@ namespace Quicker.Windows
         // 窗口加载事件
         private async void ActionPageManageWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var buttonDataList =  db2.GetAllButtonData(); // 获取所有按钮数据
+            var buttonDataList = db2.GetAllButtonData(); // 获取所有按钮数据
             buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 将按钮数据转换为字典
 
             LoadCanvas("Global"); // 加载全局画布
@@ -111,7 +112,7 @@ namespace Quicker.Windows
             if (buttonDataDict == null || buttonDataDict.Count == 0) return 0; // 如果按钮数据字典为空，则返回
             foreach (var data in buttonDataDict.Values)
             {
-                if(data.ButtonID.StartsWith(style))
+                if (data.ButtonID.StartsWith(style))
                 {
                     Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 正则表达式匹配
                     string numbersStr = match.Groups[2].Value; // 数字字符串
@@ -208,7 +209,7 @@ namespace Quicker.Windows
         // 滚动条鼠标左键按下事件
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data)
             {
                 if (data.Location != null) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
@@ -219,7 +220,7 @@ namespace Quicker.Windows
         // 滚动条鼠标左键抬起事件
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data)
             {
                 if (data.Location != null) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
@@ -230,7 +231,7 @@ namespace Quicker.Windows
         /// <summary>
         /// 绑定按钮事件
         /// </summary>
-        /// <param name="button"></param>
+        /// <param name="button">按钮</param>
         private void BindButtonEvents(Button button)
         {
             button.AllowDrop = true; // 允许拖放
@@ -251,14 +252,14 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
-                buttonManager.Button_Drop(sender, e, false);
+                buttonManager.Button_Drop(sender, e, false); // 处理拖放事件
             }
         }
 
         // 拖入事件
         public void Button_DragEnter(object sender, DragEventArgs e)
         {
-           buttonManager.Button_DragEnter(sender, e);
+            buttonManager.Button_DragEnter(sender, e); // 处理拖入事件
         }
 
         // 鼠标左键按下事件
@@ -266,7 +267,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                buttonManager.Button_PreviewMouseLeftButtonDown(sender, e);
+                buttonManager.Button_PreviewMouseLeftButtonDown(sender, e); // 处理鼠标左键按下事件
             }
         }
 
@@ -275,14 +276,14 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed) // 如果鼠标左键按下
             {
-                buttonManager.Button_PreviewMouseMove(sender, e);
+                buttonManager.Button_PreviewMouseMove(sender, e); // 处理鼠标移动事件
             }
         }
 
         // 鼠标左键抬起事件
         private void Button_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            buttonManager.Button_PreviewMouseLeftButtonUp(sender, e);
+            buttonManager.Button_PreviewMouseLeftButtonUp(sender, e); // 处理鼠标左键抬起事件
         }
 
         // 左键空白 Button 显示创建动作菜单
@@ -371,7 +372,7 @@ namespace Quicker.Windows
         // 打开创建动作菜单
         private void OpenMenu(object sender, MouseButtonEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
             else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
         }
