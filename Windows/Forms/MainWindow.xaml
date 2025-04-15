@@ -135,31 +135,6 @@
                         <Image x:Name="Lock" Source="/Resources/Images/Icons/UnLocked.ico" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                 </Border>
-                <Popup x:Name="ChangeActionPagePop" PopupAnimation="Fade" Width="180" Height="65" PlacementTarget="{Binding ElementName=ActionPageSelecter}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
-                    <Grid>
-                        <Rectangle Fill="White" Margin="5,7">
-                            <Rectangle.Effect>
-                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
-                            </Rectangle.Effect>
-                        </Rectangle>
-                        <Border Width="170" Background="White" BorderBrush="{x:Null}" BorderThickness="0" CornerRadius="3" Margin="5">
-                            <StackPanel>
-                                <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">
-                                    <Grid Width="180">
-                                        <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource ImageStyle}"/>
-                                        <TextBlock Text="场景与动作" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
-                                    </Grid>
-                                </Button>
-                                <Button Style="{StaticResource MenuButton}" ToolTip="关闭Quicker软件" Click="QuitQuicker">
-                                    <Grid Width="180">
-                                        <Image Source="/Resources/Images/Icons/CloseQuicker.ico" Style="{StaticResource ImageStyle}"/>
-                                        <TextBlock Text="退出" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
-                                    </Grid>
-                                </Button>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Popup>
             </Grid>
 
             <!-- 通用动作 -->

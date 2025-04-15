@@ -17,9 +17,10 @@ namespace Quicker.Windows
         [DllImport("shell32.dll")]
         private static extern int SHOpenFolderAndSelectItems(IntPtr pidlList, uint cild, IntPtr children, uint dwFlags); // 打开文件夹并选中文件
         public string CurrentButton { get; private set; } // 当前按钮
+        private readonly ButtonManager buttonManager; // 按钮管理器
+        private readonly WindowManager windowManager; // 窗口管理器
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
         private readonly ButtonDatabase db2; // 按钮数据库
-        private WindowManager windowManager; // 窗口管理器
 
         public OperationMenu(string currentbutton)
         {
@@ -27,12 +28,8 @@ namespace Quicker.Windows
             CurrentButton = currentbutton; // 设置当前按钮
 
             db2 = new ButtonDatabase(); // 初始化按钮数据库
+            buttonManager = new ButtonManager(); // 初始化按钮管理器
             windowManager = new WindowManager(); // 初始化窗口管理器
-        }
-
-        // 设置窗口置顶
-        private void OperationMenu_Loaded(object sender, RoutedEventArgs e)
-        {
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
@@ -41,22 +38,14 @@ namespace Quicker.Windows
         {
             AddWindow addWindow = new AddWindow(CurrentButton, 0);
             addWindow.Show();
-
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-            mainWindow?.Close();
-
-            this.Close();
+            buttonManager.CloseMainWindow(this);
         }
 
         // 删除动作
         private async void DeleteAction_Click(object sender, RoutedEventArgs e)
         {
             db2.DeleteAction(CurrentButton);
-
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-            mainWindow?.Close();
-
-            this.Close();
+            buttonManager.CloseMainWindow(this);
         }
 
         // 查看动作信息
@@ -88,10 +77,7 @@ namespace Quicker.Windows
                 }
             }
 
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-            mainWindow?.Close();
-
-            this.Close();
+            buttonManager.CloseMainWindow(this);
         }
 
         // 失去焦点时关闭操作菜单

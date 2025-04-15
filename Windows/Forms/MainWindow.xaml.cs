@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using Quicker.CommonFunctions;
 using System.Windows.Controls;
+using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Input;
 using IWshRuntimeLibrary;
@@ -66,7 +67,20 @@ namespace Quicker.Windows
             Application.Current.Dispatcher.Invoke(() =>
             {
                 GenerateCanvas(0, "Global"); // 生成全局 Canvas
-                GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
+
+                bool haveCommonStyleButton = false;
+                var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
+                foreach (var data in buttonData) // 遍历按钮数据字典
+                {
+                    if(data.ButtonID.StartsWith($"{CommonStyle}"))
+                    {
+                        haveCommonStyleButton = true;
+                        break;
+                    }
+                }
+                if(haveCommonStyleButton) GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
+                else GenerateCanvas(0, "Common");
+
                 GetTotalAntionPageIndex(); // 获取总的页面数
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
@@ -518,8 +532,8 @@ namespace Quicker.Windows
                 {
                     if(data.TryToOpenExitingWindow)
                     {
-                        string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
-                        windowManager.TryToOpenExitingWindow(windowTitle);
+                        string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location); // 获取目标窗口标题
+                        windowManager.TryToOpenExitingWindow(windowTitle); // 调用窗口管理器打开已存在的目标窗口实例
                     }
 
                     if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(data.Location).Equals(".exe", StringComparison.OrdinalIgnoreCase))
@@ -529,28 +543,42 @@ namespace Quicker.Windows
                             ? GetShortcutTargetPath(data.Location)
                             : data.Location;
 
-                        ProcessStartInfo processStartInfo = new ProcessStartInfo
+                        try
                         {
-                            FileName = targetPath,
-                            UseShellExecute = data.RunByMessager,
-                            Verb = data.RunByMessager ? "runas" : null,
-                            WindowStyle = data.WindowState switch
+                            ProcessStartInfo processStartInfo = new ProcessStartInfo
                             {
-                                0 => ProcessWindowStyle.Normal,
-                                1 => ProcessWindowStyle.Minimized,
-                                2 => ProcessWindowStyle.Maximized
-                            }
-                        }; // 创建进程启动信息
-                        Process.Start(processStartInfo); // 启动进程
+                                FileName = targetPath,
+                                UseShellExecute = data.RunByMessager,
+                                Verb = data.RunByMessager ? "runas" : null,
+                                WindowStyle = data.WindowState switch
+                                {
+                                    0 => ProcessWindowStyle.Normal,
+                                    1 => ProcessWindowStyle.Minimized,
+                                    2 => ProcessWindowStyle.Maximized
+                                }
+                            }; // 创建进程启动信息
+                            Process.Start(processStartInfo); // 启动进程
+                        }
+                        catch(Exception ex)
+                        {
+                            new ToastContentBuilder().AddText($"打开失败：{ex}").Show();
+                        }
                     } // 如果是快捷方式或者可执行文件
                     else
                     {
-                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        try
                         {
-                            FileName = data.Location,
-                            UseShellExecute = true
-                        }; // 创建进程启动信息
-                        Process.Start(startInfo);
+                            ProcessStartInfo startInfo = new ProcessStartInfo
+                            {
+                                FileName = data.Location,
+                                UseShellExecute = true
+                            }; // 创建进程启动信息
+                            Process.Start(startInfo);
+                        }
+                        catch (Exception ex)
+                        {
+                            new ToastContentBuilder().AddText($"打开失败：{ex}").Show();
+                        }
                     } // 使用系统默认方式打开文件
                 }
                 else
@@ -583,7 +611,8 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                buttonManager.OpenCreatActionMenu(sender, e, true); // 打开创建动作菜单
+                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu");
+                else buttonManager.OpenMenu(sender, true, "CreatActionMenu");
             }
         }
 
@@ -962,7 +991,7 @@ namespace Quicker.Windows
         // 右键锁定 Button 切换菜单
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
-            ChangeActionPagePop.IsOpen = true;
+            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu");
         }
 
         // 窗口关闭时强制垃圾回收

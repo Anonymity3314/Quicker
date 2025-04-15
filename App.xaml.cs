@@ -42,6 +42,7 @@ namespace Quicker
         public static DateTime StartTime { get; set; } // 启动时间
         private DateTime? keyPressStartTime = null; // 按键按下时的时间
         private System.Windows.Point startPosition; // 鼠标位置
+        private  ButtonManager buttonManager; // 按钮管理器
         private WindowManager windowManager; // 窗口管理器
         private DispatcherTimer pressTimer; // 按键计时器
         private TaskbarIcon? taskbarIcon; // 托盘图标
@@ -57,6 +58,7 @@ namespace Quicker
             db1 = new SettingDatabase(); // 创建数据库
             db1.InitializeDatabase(); // 创建数据库表
             windowManager = new WindowManager(); // 创建窗口管理器
+            buttonManager = new ButtonManager(); // 创建按钮管理器
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
             ShowNotification(); // 弹出消息提醒
@@ -425,17 +427,7 @@ namespace Quicker
         // 弹出菜单栏
         private void ShowCustomMenu(object sender, RoutedEventArgs e)
         {
-            var mousePosition = System.Windows.Forms.Control.MousePosition; // 获取鼠标位置
-            var screenPosition = new System.Windows.Point(mousePosition.X, mousePosition.Y); // 获取屏幕位置
-            CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-            /* 终极版本数据
-            customMenu.Left = screenPosition.X / 2 + 340;
-            customMenu.Top = screenPosition.Y / 2 - 110;*/
-            customMenu.Visibility = Visibility.Hidden; // 隐藏菜单栏
-            customMenu.Left = screenPosition.X / 2 + 340;
-            customMenu.Top = screenPosition.Y / 2 + 65;
-            customMenu.Visibility = Visibility.Visible; // 显示菜单栏
-            customMenu.Focus(); // 聚焦菜单栏
+            buttonManager.OpenMenu(sender, false, "CustomMenu");
         }
 
         // 暂停Quicker

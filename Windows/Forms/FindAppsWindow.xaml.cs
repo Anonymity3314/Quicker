@@ -1,5 +1,4 @@
-﻿using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using Microsoft.Toolkit.Uwp.Notifications;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Collections.Concurrent;

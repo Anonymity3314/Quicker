@@ -13,7 +13,6 @@
     ShowInTaskbar="False" 
     ResizeMode="NoResize"
     
-    Loaded="OperationMenu_Loaded"
     Deactivated="OperationMenu_Deactivated"
 >
     <Window.Resources>

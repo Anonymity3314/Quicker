@@ -410,7 +410,8 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                buttonManager.OpenCreatActionMenu(sender, e, false); // 打开创建动作菜单
+                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu");
+                else buttonManager.OpenMenu(sender, false, "CreatActionMenu");
             }
         }
     }
