@@ -106,9 +106,8 @@ namespace Quicker.CommonFunctions
                             TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                         }
                     }
+                    SourceButton = null;
                 }
-
-                SourceButton = null; // 清空源按钮
             }
         }
 

@@ -16,6 +16,11 @@ namespace Quicker.Windows
 {
     public partial class MainWindow : Window
     {
+        private const string BookIconPath = "/Resources/Images/Icons/Book.ico"; // 订住图标路径
+        private const string DisBookIconPath = "/Resources/Images/Icons/Disbook.ico"; // 禁用订住图标路径
+        private const string LockIconPath = "/Resources/Images/Icons/Lock.ico"; // 锁定图标路径
+        private const string UnLockIconPath = "/Resources/Images/Icons/UnLock.ico"; // 解锁图标路径
+
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {
             if (obj == null) yield break; // 如果对象为空，停止枚举
@@ -68,42 +73,30 @@ namespace Quicker.Windows
             {
                 GenerateCanvas(0, "Global"); // 生成全局 Canvas
 
-                bool haveCommonStyleButton = false;
                 var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
-                foreach (var data in buttonData) // 遍历按钮数据字典
-                {
-                    if(data.ButtonID.StartsWith($"{CommonStyle}"))
-                    {
-                        haveCommonStyleButton = true;
-                        break;
-                    }
-                }
-                if(haveCommonStyleButton) GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
-                else GenerateCanvas(0, "Common");
+                bool haveCommonStyleButton = buttonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 是否存在通用样式按钮
+                if (haveCommonStyleButton) GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
+                else GenerateCanvas(0, "Common"); // 生成通用 Canvas
 
                 GetTotalAntionPageIndex(); // 获取总的页面数
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
 
-            // 加载BookButton
-            BitmapImage bookimage = new(); // 创建图像对象
-            bookimage.BeginInit(); // 开始初始化
-            if (app.Book) bookimage.UriSource = new Uri("/Resources/Images/Icons/Book.ico", UriKind.Relative); // 如果订住Quicker，则加载订住的样式
-            else bookimage.UriSource = new Uri("/Resources/Images/Icons/Disbook.ico", UriKind.Relative); // 否则加载不订住的样式
-            bookimage.EndInit(); // 结束初始化
-            Book.Source = bookimage; // 设置Book按钮的图标
+            // 加载BookButton图标
+            string iconPath = app.Book ? BookIconPath : DisBookIconPath; // 获取图标路径
+            BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
+            Book.Source = bookImage; // 设置Book按钮的图标
 
-            // 加载LockButton
-            BitmapImage lockimage = new(); // 创建图像对象
-            lockimage.BeginInit();
-            if (app.Locked) lockimage.UriSource = new Uri("/Resources/Images/Icons/Locked.ico", UriKind.Relative); // 如果锁定，则加载锁定的样式
-            else lockimage.UriSource = new Uri("/Resources/Images/Icons/UnLocked.ico", UriKind.Relative); // 否则加载不锁定的样式
-            lockimage.EndInit(); // 结束初始化
-            Lock.Source = lockimage;
+            // 加载LockButton图标
+            string lockIconPath = app.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
+            BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
+            Lock.Source = lockImage; // 设置Lock按钮的图标
 
-            var Convention = db1.GetAllConventions().FirstOrDefault();
-            shouldHideTooltip = Convention.HideTooltip;
+            // 获取配置信息
+            var convention = db1.GetAllConventions().FirstOrDefault();
+            shouldHideTooltip = convention?.HideTooltip ?? false;
 
+            // 设置窗口置顶
             windowManager.SetWindowTopmost(this);
             EditCommonLabel(); // 编辑通用标签
         }
@@ -229,7 +222,7 @@ namespace Quicker.Windows
             if (totalPages <= 0) return; // 如果没有页面，直接返回
             for (int i = 0; i <= totalPages; i++)
             {
-                Button button = new Button // 创建按钮
+                Button button = new Button
                 {
                     Name = $"{prefix}{i}", // 设置按钮名称
                     Margin = new Thickness(2.5, 0, 2.5, 0), // 设置按钮边距
@@ -242,8 +235,7 @@ namespace Quicker.Windows
                 button.MouseEnter += mouseEnterHandler;
                 button.MouseLeave += mouseLeaveHandler;
 
-                // 添加到面板
-                panel.Children.Add(button);
+                panel.Children.Add(button); // 添加到面板
             }
         }
 
@@ -474,10 +466,10 @@ namespace Quicker.Windows
         /// <summary>
         /// 鼠标移出Button还原外观
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <param name="prefix"></param>
-        /// <param name="color"></param>
+        /// <param name="sender">按钮</param>
+        /// <param name="e">事件参数</param>
+        /// <param name="prefix">按钮名称前缀</param>
+        /// <param name="color">按钮颜色</param>
         private void PageChangeButton_MouseLeave(object sender, MouseEventArgs e, string prefix, string color)
         {
             if (sender is Button button)
@@ -729,7 +721,7 @@ namespace Quicker.Windows
         /// <summary>
         /// 滑动滚轮更改当前可见 Canvas
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">鼠标滚轮事件参数</param>
         /// <param name="style">Canvas 类型</param>
         private void ChangeVisibleCanvas(MouseWheelEventArgs e, string style)
         {
@@ -747,7 +739,7 @@ namespace Quicker.Windows
         /// <param name="style">Canvas 类型</param>
         private void SwitchToPreviousCanvas(int currentCanvasIndex, string style)
         {
-            SwitchCanvas(currentCanvasIndex, style, false);
+            SwitchCanvas(currentCanvasIndex, style, false); // 向上滚动，切换到上一页
         }
 
         /// <summary>
@@ -757,7 +749,7 @@ namespace Quicker.Windows
         /// <param name="style">Canvas 类型</param>
         private void SwitchToNextCanvas(int currentCanvasIndex, string style)
         {
-            SwitchCanvas(currentCanvasIndex, style, true);
+            SwitchCanvas(currentCanvasIndex, style, true); // 向下滚动，切换到下一页
         }
 
         /// <summary>
@@ -964,16 +956,16 @@ namespace Quicker.Windows
         // 锁定通用动作页
         private void LockCommonActionPage(object sender, RoutedEventArgs e)
         {
-            app.Locked = !app.Locked;
-            BitmapImage lockimage = new BitmapImage(new Uri(app.Locked ? "pack://application:,,,/Resources/Images/Icons/Locked.ico" : "pack://application:,,,/Resources/Images/Icons/UnLocked.ico", UriKind.Absolute)); // 设置锁定图标
+            app.Locked = !app.Locked; // 切换锁定状态
+            string lockIconPath = app.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
+            Lock.Source = new BitmapImage(new Uri(lockIconPath)); // 设置图标
             if (app.Locked) app.CommonState = CommonStyle; // 设置锁定状态
-            Lock.Source = lockimage; // 设置锁定图标
         }
 
         // 滚轮进行通用动作页翻页
         private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ChangeVisibleCanvas(e, CommonStyle);
+            ChangeVisibleCanvas(e, CommonStyle); // 调用切换 Canvas 方法
         }
 
         // 通用动作页可见性与切换按钮背景绑定
@@ -993,7 +985,7 @@ namespace Quicker.Windows
         // 右键锁定 Button 切换菜单
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
-            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this);
+            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
         }
 
         // 窗口关闭时强制垃圾回收
