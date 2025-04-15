@@ -73,7 +73,7 @@ namespace Quicker.CommonFunctions
         /// </summary>
         /// <param name="sender">目标按钮</param>
         /// <param name="e">拖拽事件参数</param>
-        public void Button_Drop(object sender, DragEventArgs e)
+        public void Button_Drop(object sender, DragEventArgs e, bool isMainWindow)
         {
             if (sender is Button TargetButton && (TargetButton != SourceButton || SourceButton != null))
             {
@@ -83,11 +83,11 @@ namespace Quicker.CommonFunctions
                     db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
 
                     var TargetData = db2.GetButtonDataByID(SourceButton.Name); // 获取源按钮数据
-                    RefreshButtonDisplay(SourceButton, TargetData, 60); // 更新 sourceButton 的内容
+                    RefreshButtonDisplay(SourceButton, TargetData, 60, isMainWindow); // 更新 sourceButton 的内容
                     SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
 
                     var SourceData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                    RefreshButtonDisplay(TargetButton, SourceData, 60); // 更新 targetButton 的内容
+                    RefreshButtonDisplay(TargetButton, SourceData, 60, isMainWindow); // 更新 targetButton 的内容
                     TargetButton.Tag = SourceData; // 更新 targetButton 的标签
                 }
                 else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
@@ -99,10 +99,10 @@ namespace Quicker.CommonFunctions
                         if (files.Length > 0)
                         {
                             string filePath = files[0]; // 获取第一个文件的路径
-                            ProcessFileDrop(TargetButton, filePath); // 处理文件拖拽
+                            ProcessFileDrop(TargetButton, filePath, isMainWindow); // 处理文件拖拽
 
                             var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                            RefreshButtonDisplay(TargetButton, TargetData, 60); // 更新目标按钮的内容
+                            RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
                             TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                         }
                     }
@@ -116,7 +116,7 @@ namespace Quicker.CommonFunctions
         /// </summary>
         /// <param name="button">目标按钮</param>
         /// <param name="filePath">文件路径</param>
-        private void ProcessFileDrop(Button button, string filePath)
+        private void ProcessFileDrop(Button button, string filePath, bool isMainWindow)
         {
             ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
             string iconPath = "none"; // 默认图标路径
@@ -143,20 +143,22 @@ namespace Quicker.CommonFunctions
                 CreateTime = DateTime.Now, // 设置创建时间
                 LatestEditTime = DateTime.Now // 设置最新编辑时间
             };
-            RefreshButtonDisplay(button, buttonData, 60); // 更新按钮内容
+            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 更新按钮内容
             db2.AddAction(buttonData); // 添加按钮数据到数据库
         }
 
         /// <summary>
-        /// 更新按钮内容
+        /// 刷新按钮显示内容
         /// </summary>
-        /// <param name="button">目标按钮</param>
-        /// <param name="buttonInformation">按钮数据</param>
-        /// <param name="shouldHideTooltip">是否隐藏提示</param>
-        public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth)
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="maxWidth"> 最大宽度 </param>
+        public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth, bool isMainWindow)
         {
             if (buttonInformation != null) // 如果Button的数据存在
             {
+                button.Tag = buttonInformation; // 更新按钮标签
+
                 Grid grid = new(); // 创建Grid对象
                 button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 设置按钮背景
                 if (buttonInformation.ImagePath != "none")
@@ -166,8 +168,8 @@ namespace Quicker.CommonFunctions
                         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
                         System.Windows.Controls.Image image = new()
                         {
-                            Width = 36, // 设置宽度
-                            Height = 36, // 设置高度
+                            Width = isMainWindow ? 36 : 30, // 设置宽度
+                            Height = isMainWindow ? 36 : 30, // 设置高度
                             VerticalAlignment = VerticalAlignment.Center, // 垂直居中
                             HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
                             Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源

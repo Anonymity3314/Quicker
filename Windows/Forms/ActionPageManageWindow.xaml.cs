@@ -299,7 +299,7 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
-                buttonManager.Button_Drop(sender, e);
+                buttonManager.Button_Drop(sender, e, false);
             }
         }
 

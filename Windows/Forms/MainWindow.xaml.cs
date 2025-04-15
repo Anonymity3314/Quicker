@@ -101,78 +101,6 @@ namespace Quicker.Windows
             EditCommonLabel(); // 编辑通用标签
         }
 
-        /// <summary>
-        /// 更新按钮内容
-        /// </summary>
-        /// <param name="button">目标按钮</param>
-        /// <param name="buttonInformation">按钮数据</param>
-        /// <param name="shouldHideTooltip">是否隐藏提示</param>
-        private void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
-        {
-            if (buttonInformation.Location != null) // 如果Button的数据存在
-            {
-                Grid grid = new(); // 创建Grid对象
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 设置按钮背景
-                if (buttonInformation.ImagePath != "none")
-                {
-                    try
-                    {
-                        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                        System.Windows.Controls.Image image = new()
-                        {
-                            Width = 36, // 设置宽度
-                            Height = 36, // 设置高度
-                            VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                            HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
-                            Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
-                        }; // 创建图像对象
-                        grid.Children.Add(image); // 添加图像到Grid
-                        Grid.SetRow(image, 0); // 设置图像所在行
-                    }
-                    catch // 如果失败，发送信息提示
-                    {
-                        new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonInformation.ButtonName}的图标被移动或删除").Show();
-                    }
-                } // 如果图标路径不为none
-
-                if (!string.IsNullOrEmpty(buttonInformation.ButtonName))
-                {
-                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                    TextBlock textBlock = new()
-                    {
-                        Text = buttonInformation.ButtonName, // 设置文本
-                        TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
-                        VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center, // 水平居中
-                    }; // 创建文本块对象
-                    buttonManager.AutoEllipsisTextBlock(textBlock, 60); // 动态调整字体大小
-
-                    grid.Children.Add(textBlock); // 添加文本块到Grid
-                    Grid.SetRow(textBlock, 1); // 设置文本块所在行
-                } // 如果按钮名称不为空
-                button.Content = grid; // 设置按钮内容
-
-                if(!shouldHideTooltip)
-                {
-                    string toolTipText = null; // 提示文本
-                    if (!string.IsNullOrWhiteSpace(buttonInformation.ButtonName) || !string.IsNullOrWhiteSpace(buttonInformation.Usage))
-                    {
-                        string name = !string.IsNullOrWhiteSpace(buttonInformation.ButtonName) ? buttonInformation.ButtonName : null; // 获取按钮名称
-                        string usage = !string.IsNullOrWhiteSpace(buttonInformation.Usage) ? buttonInformation.Usage : null; // 获取按钮用途
-                        toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
-                    } // 如果按钮名称或用途不为空
-                    button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本
-                }
-            }
-            else // 如果Button的数据不存在
-            {
-                button.Content = null; // 清空按钮内容
-                button.ToolTip = null; // 清空按钮提示文本
-                button.Tag = null; // 清空按钮标签
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 重置按钮背景
-            }
-        }
-
         // 获取总的页面数
         private void GetTotalAntionPageIndex()
         {
@@ -637,7 +565,7 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
-                buttonManager.Button_Drop(sender, e); // 处理拖拽事件
+                buttonManager.Button_Drop(sender, e, true); // 处理拖拽事件
             }
         }
 
@@ -887,8 +815,7 @@ namespace Quicker.Windows
                     {
                         if(data.ButtonID == button.Name)
                         {
-                            RefreshButtonDisplay(button, data); // 更新按钮内容
-                            button.Tag = data; // 设置按钮标签
+                            buttonManager.RefreshButtonDisplay(button, data, 60, true); // 更新按钮内容
                         }
                     }
                 }
