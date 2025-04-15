@@ -36,7 +36,7 @@ namespace Quicker.Windows
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
-            GlobalStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
 
             db1 = new SettingDatabase(); // 初始化设置数据库
             db1.InitializeDatabase(); // 初始化设置数据库
@@ -173,7 +173,7 @@ namespace Quicker.Windows
                 }
             }
 
-            GlobalStackPanel.Children.Add(dynamicCanvas); // 将画布添加到全局堆栈面板
+            MainStackPanel.Children.Add(dynamicCanvas); // 将画布添加到全局堆栈面板
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace Quicker.Windows
         // 添加动作页
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
-            int canvasIndex = GlobalStackPanel.Children.Count; // 获取画布索引
+            int canvasIndex = MainStackPanel.Children.Count; // 获取画布索引
             if (canvasIndex > 9) return; // 如果索引大于9，则返回
             GenerateCanvas(canvasIndex, "Global"); // 生成画布
         }
@@ -379,7 +379,7 @@ namespace Quicker.Windows
         // 全局按钮点击事件
         private void GlobalButton_Click(object sender, RoutedEventArgs e)
         {
-            GlobalStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
             LoadGlobalCanvas(); // 加载全局画布
             MainBorder.Margin = new Thickness(239, 31, 11, 564); // 设置主边框边距
             ScrollBar.Margin = new Thickness(240, 241.8, 10, 0); // 设置滚动条边距
@@ -389,14 +389,14 @@ namespace Quicker.Windows
         // 公共按钮点击事件
         private void CommonButton_Click(object sender, RoutedEventArgs e)
         {
-            GlobalStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
             LoadCommonCanvas(); // 加载公共画布
             MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
             ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
             AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
         }
 
-        // 加载公共画布
+        // 加载CommonCanvas
         private void LoadCommonCanvas()
         {
             for (int i = 0; i <= TotalCommonActionPageIndex; i++)
@@ -405,13 +405,68 @@ namespace Quicker.Windows
             }
         }
 
+        private void TaskBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
+            ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
+            AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
+            bool haveCommonStyleButton = false;
+            var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
+            foreach (var data in buttonData) // 遍历按钮数据字典
+            {
+                if (data.ButtonID.StartsWith("TaskBar"))
+                {
+                    haveCommonStyleButton = true;
+                    break;
+                }
+            }
+            GenerateCanvas(0, "TaskBar"); // 生成通用 Canvas
+            if (!haveCommonStyleButton)
+            {
+                var canvasCollection = FindVisualChildren<Canvas>(MainStackPanel);
+                foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
+                {
+                    canvas.Visibility = Visibility.Hidden;
+                }
+            }
+        }
+
+        private void DesktopButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
+            ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
+            AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
+            bool haveCommonStyleButton = false;
+            var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
+            foreach (var data in buttonData) // 遍历按钮数据字典
+            {
+                if (data.ButtonID.StartsWith("Desktop"))
+                {
+                    haveCommonStyleButton = true;
+                    break;
+                }
+            }
+            
+            GenerateCanvas(0, "Desktop"); // 生成通用 Canvas
+            if (!haveCommonStyleButton)
+            {
+                var canvasCollection = FindVisualChildren<Canvas>(MainStackPanel);
+                foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
+                {
+                    canvas.Visibility = Visibility.Hidden;
+                }
+            }
+        }
+
         // 打开创建动作菜单
         private void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
             if (sender is Button button)
             {
-                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu");
-                else buttonManager.OpenMenu(sender, false, "CreatActionMenu");
+                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this);
+                else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this);
             }
         }
     }

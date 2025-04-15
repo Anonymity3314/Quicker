@@ -19,10 +19,10 @@ namespace Quicker.Windows
             InitializeComponent();
             CurrentButton = currentbutton;
 
-            db1 = new SettingDatabase();
-            buttonManager = new ButtonManager();
-            windowManager = new WindowManager();
-            windowManager.SetWindowTopmost(this);
+            db1 = new SettingDatabase(); // 初始化设置数据库
+            buttonManager = new ButtonManager(); // 初始化按钮管理器
+            windowManager = new WindowManager(); // 初始化窗口管理器
+            windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 启动软件

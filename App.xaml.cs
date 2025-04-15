@@ -427,7 +427,17 @@ namespace Quicker
         // 弹出菜单栏
         private void ShowCustomMenu(object sender, RoutedEventArgs e)
         {
-            buttonManager.OpenMenu(sender, false, "CustomMenu");
+            CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
+            var mousePosition = System.Windows.Forms.Control.MousePosition; // 获取鼠标位置
+            var screenPosition = new System.Windows.Point(mousePosition.X, mousePosition.Y); // 获取屏幕位置
+            /* 终极版本数据
+                      customMenu.Left = screenPosition.X / 2 + 340;
+                      customMenu.Top = screenPosition.Y / 2 - 110;*/
+            customMenu.Visibility = Visibility.Hidden; // 隐藏菜单栏
+            customMenu.Left = screenPosition.X / 2 + 340;
+            customMenu.Top = screenPosition.Y / 2 + 65;
+            customMenu.Visibility = Visibility.Visible; // 显示菜单栏
+            customMenu.Activate();
         }
 
         // 暂停Quicker

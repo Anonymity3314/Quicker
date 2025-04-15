@@ -52,6 +52,16 @@
                         <TextBlock Text="通用" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
                     </Grid>
                 </Button>
+                <Button Style="{StaticResource ActionPageButton}" Click="TaskBarButton_Click">
+                    <Grid>
+                        <TextBlock Text="任务栏" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                    </Grid>
+                </Button>
+                <Button Style="{StaticResource ActionPageButton}" Click="DesktopButton_Click">
+                    <Grid>
+                        <TextBlock Text="桌面" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+                    </Grid>
+                </Button>
             </StackPanel>
         </Border>
         <Label Content="提示：将窗口最大化可以方便排序动作页。" Foreground="#FFABADB3" Margin="961,5,20,0" VerticalAlignment="Top" FontSize="11" HorizontalAlignment="Right">
@@ -62,8 +72,8 @@
 
         <Border x:Name="MainBorder" Margin="239,31,11,564" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
-                <StackPanel x:Name="GlobalStackPanel" Background="LightGray" Orientation="Horizontal">
-                    <Canvas x:Name="GlobalCanvas0" Height="215" Width="260" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3,0,0,0">
+                <StackPanel x:Name="MainStackPanel" Background="LightGray" Orientation="Horizontal">
+                    <Canvas x:Name="ViewCanvas" Height="215" Width="260" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3,0,0,0">
                         <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3">
                             <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="17.24" BorderThickness="0,0,0,0" Margin="3,0,0,0">
                                 <Image Source="/Resources/Images/Icons/Quicker1.ico"/>

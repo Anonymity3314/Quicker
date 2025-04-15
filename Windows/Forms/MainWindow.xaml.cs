@@ -611,8 +611,8 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu");
-                else buttonManager.OpenMenu(sender, true, "CreatActionMenu");
+                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu", this);
+                else buttonManager.OpenMenu(sender, true, "CreatActionMenu", this);
             }
         }
 
@@ -991,7 +991,7 @@ namespace Quicker.Windows
         // 右键锁定 Button 切换菜单
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
-            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu");
+            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this);
         }
 
         // 窗口关闭时强制垃圾回收

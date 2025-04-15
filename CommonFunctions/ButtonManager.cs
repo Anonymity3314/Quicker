@@ -291,34 +291,22 @@ namespace Quicker.CommonFunctions
         /// <param name="e"></param>
         /// <param name="isMainWindow">是否为主面板</param>
         /// <param name="targetMenu">目标菜单</param>
-        public void OpenMenu(object sender, bool isMainWindow, string targetMenu)
+        public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow)
         {
             Window menu = null;
             Button button = sender as Button;
+            GeneralTransform transform = button.TransformToVisual(sourceWindow);
+            Point position = transform.Transform(new Point(0, 0));
             if (isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
-            var mousePosition = System.Windows.Forms.Control.MousePosition; // 获取鼠标位置
-            var screenPosition = new System.Windows.Point(mousePosition.X, mousePosition.Y); // 获取屏幕位置
-            double left = screenPosition.X, top = screenPosition.Y; // 计算菜单位置
             switch (targetMenu)
             {
-                case "CustomMenu":
-                    CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-                    /* 终极版本数据
-                    customMenu.Left = screenPosition.X / 2 + 340;
-                    customMenu.Top = screenPosition.Y / 2 - 110;*/
-                    customMenu.Visibility = Visibility.Hidden; // 隐藏菜单栏
-                    customMenu.Left = screenPosition.X / 2 + 340;
-                    customMenu.Top = screenPosition.Y / 2 + 65;
-                    customMenu.Visibility = Visibility.Visible; // 显示菜单栏
-                    customMenu.Activate();
-                    break;
                 case "OperationMenu":
                     OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
                     operationMenu?.Close(); // 关闭操作菜单
                     operationMenu = new(button.Name)
                     {
-                        Left = left,
-                        Top = top
+                        Left = position.X,
+                        Top = position.Y
                     }; // 设置菜单位置
                     if (isMainWindow)
                     {
@@ -334,8 +322,8 @@ namespace Quicker.CommonFunctions
                     creatActionMenu?.Close(); // 关闭创建动作菜单
                     creatActionMenu = new(button.Name)
                     {
-                        Left = left,
-                        Top = top
+                        Left = position.X,
+                        Top = position.Y
                     }; // 设置菜单位置
                     if (isMainWindow)
                     {
@@ -351,14 +339,15 @@ namespace Quicker.CommonFunctions
                     selectActionPageMenu?.Close();
                     selectActionPageMenu = new()
                     {
-                        Left = left,
-                        Top = top
+                        Left = position.X,
+                        Top = position.Y
                     };
                     selectActionPageMenu.ClosingOrHiding += () =>
                     {
                         isClosing = false;
                     };
                     selectActionPageMenu.Show();
+
                     break;
                 default:
                     break;
