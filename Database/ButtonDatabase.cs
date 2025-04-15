@@ -39,7 +39,6 @@ namespace Quicker.Database
             using var command = new SQLiteCommand(createTableQuery, connection);
             command.ExecuteNonQuery();
 
-           
             InsertDefaultData(connection); // 插入初始数据
         }
 

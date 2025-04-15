@@ -23,8 +23,6 @@ namespace Quicker.Windows
                 foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild;
             }
         } // 查找子元素
-
-        private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 全局和公共动作页索引
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly SettingDatabase db1; // 设置数据库
@@ -36,7 +34,7 @@ namespace Quicker.Windows
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
-            MainListView.Items.Clear(); // 清空全局列表视图
+
             db1 = new SettingDatabase(); // 初始化设置数据库
             db1.InitializeDatabase(); // 初始化设置数据库
 
@@ -52,47 +50,76 @@ namespace Quicker.Windows
             var buttonDataList =  db2.GetAllButtonData(); // 获取所有按钮数据
             buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 将按钮数据转换为字典
 
-            GetTotalAntionPageIndex(); // 获取全局和公共动作页索引
-            LoadGlobalCanvas(); // 加载全局画布
+            LoadCanvas("Global"); // 加载全局画布
 
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取约定
             shouldHideTooltip = Convention.HideTooltip; // 是否隐藏工具提示
         }
 
-        // 获取全局和公共动作页索引
-        private void GetTotalAntionPageIndex()
+        /// <summary>
+        /// 加载动作页
+        /// </summary>
+        /// <param name="style">动作页样式</param>
+        private void LoadCanvas(string style)
         {
-            TotalGlobalAntionPageIndex = 0; // 全局动作页索引
-            TotalCommonActionPageIndex = 0; // 公共动作页索引
-            if (buttonDataDict == null || buttonDataDict.Count == 0) return; // 如果按钮数据字典为空，则返回
-            foreach (var data in buttonDataDict.Values)
+            MainListView.Items.Clear(); // 清空总列表视图
+            int TotalAntionPageIndex = GetTotalAntionPageIndex(style); // 获取总动作页索引
+            for (int i = 0; i <= TotalAntionPageIndex; i++)
             {
-                string buttonID = data.ButtonID; // 按钮ID
-                Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 正则表达式匹配
-                if (match.Success)
-                {
-                    string style = match.Groups[1].Value; // 样式
-                    string numbersStr = match.Groups[2].Value; // 数字字符串
-                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 将数字字符串转换为整数数组
-                    if (style == "Global") // 如果样式为全局
+                GenerateCanvas(i, style); // 生成动作页
+            }
+
+            switch (style)
+            {
+                case "Global":
+                    MainBorder.Height = 224; // 设置主边框高度
+                    ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
+                    AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+                    break; // 全局动作页
+                case "Common":
+                    MainBorder.Height = 289; // 设置主边框高度
+                    ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                    AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
+                    break; // 普通动作页
+                default:
+                    bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith($"{style}")); // 是否有 style 样式的按钮
+                    if (!haveCommonStyleButton) // 如果没有 style 样式的按钮
                     {
-                        if (numbers[0] > TotalGlobalAntionPageIndex) TotalGlobalAntionPageIndex = numbers[0]; // 更新全局动作页索引
+                        var canvasCollection = FindVisualChildren<Canvas>(MainListView); // 获取动作页集合
+                        foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
+                        {
+                            canvas.Visibility = Visibility.Hidden; // 隐藏动作页
+                        }
+                        MainBorder.Height = 224; // 设置主边框高度
+                        ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
+                        AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
                     }
-                    else if (style == "Common") // 如果样式为公共
+                    else
                     {
-                        if (numbers[0] > TotalCommonActionPageIndex) TotalCommonActionPageIndex = numbers[0]; // 更新公共动作页索引
+                        MainBorder.Height = 289; // 设置主边框高度
+                        ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                        AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
                     }
-                }
+                    break;
             }
         }
 
-        // 加载全局画布
-        private void LoadGlobalCanvas()
+        // 获取全局和公共动作页索引
+        private int GetTotalAntionPageIndex(string style)
         {
-            for (int i = 0; i <= TotalGlobalAntionPageIndex; i++)
+            int actionPageIndex = 0; // 动作页索引
+            if (buttonDataDict == null || buttonDataDict.Count == 0) return 0; // 如果按钮数据字典为空，则返回
+            foreach (var data in buttonDataDict.Values)
             {
-                GenerateCanvas(i, "Global"); // 生成画布
+                if(data.ButtonID.StartsWith(style))
+                {
+                    Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 正则表达式匹配
+                    string numbersStr = match.Groups[2].Value; // 数字字符串
+                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 将数字字符串转换为整数数组
+                    if (numbers[0] > actionPageIndex) actionPageIndex = numbers[0]; // 更新全局动作页索引
+                }
             }
+            return actionPageIndex;
         }
 
         /// <summary>
@@ -214,7 +241,7 @@ namespace Quicker.Windows
             button.MouseLeave += Button_MouseLeave; // 鼠标离开事件
             button.MouseDoubleClick += ShowEditWindow; // 双击事件
             button.PreviewMouseMove += Button_PreviewMouseMove; // 鼠标移动事件
-            button.MouseRightButtonDown += OpenCreatActionMenu; // 右键点击事件
+            button.MouseRightButtonDown += OpenMenu; // 右键点击事件
             button.PreviewMouseLeftButtonDown += Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
             button.PreviewMouseLeftButtonUp += Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
         }
@@ -307,7 +334,7 @@ namespace Quicker.Windows
         private void GlobalButton_Click(object sender, RoutedEventArgs e)
         {
             MainListView.Items.Clear(); // 清空全局列表视图
-            LoadGlobalCanvas(); // 加载全局画布
+            LoadCanvas("Global"); // 加载全局画布
             MainBorder.Height = 224; // 设置主边框高度
             ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
             AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
@@ -326,58 +353,27 @@ namespace Quicker.Windows
         // 加载CommonCanvas
         private void LoadCommonCanvas()
         {
-            for (int i = 0; i <= TotalCommonActionPageIndex; i++)
-            {
-                GenerateCanvas(i, "Common"); // 生成画布
-            }
+            LoadCanvas("Common"); // 加载 Common 画布
         }
 
         // 加载任务栏动作页
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadActionPage("TaskBar"); // 加载任务栏动作页
+            LoadCanvas("TaskBar"); // 加载任务栏动作页
         }
 
         // 加载桌面动作页
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadActionPage("Desktop"); // 加载桌面动作页
-        }
-
-        // 加载动作页
-        private void LoadActionPage(string style)
-        {
-
-            MainListView.Items.Clear(); // 清空全局列表视图
-            bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith($"{style}")); // 检查是否存在 Common 样式的按钮
-            GenerateCanvas(0, $"{style}"); // 生成通用 Canvas
-            if (!haveCommonStyleButton) // 如果没有 Common 样式的按钮，隐藏所有 Canvas
-            {
-                var canvasCollection = FindVisualChildren<Canvas>(MainListView);
-                foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
-                {
-                    canvas.Visibility = Visibility.Hidden;
-                }
-                MainBorder.Height = 224; // 设置主边框高度
-                ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
-                AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
-            }
-            else
-            {
-                MainBorder.Height = 289; // 设置主边框高度
-                ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-                AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
-            }
+            LoadCanvas("Desktop"); // 加载桌面动作页
         }
 
         // 打开创建动作菜单
-        private void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
+        private void OpenMenu(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this);
-                else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this);
-            }
+            Button button = sender as Button;
+            if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
+            else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
         }
     }
 }

@@ -31,6 +31,7 @@ namespace Quicker.Windows
                 foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素的子元素
             }
         } // 递归查找所有指定类型的子元素
+
         private Dictionary<string, bool> pageButtonCache = new Dictionary<string, bool>(); // 缓存页面按钮状态
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
         private readonly CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
@@ -40,8 +41,8 @@ namespace Quicker.Windows
         private readonly IconManager iconManager; // 图标管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
+        private readonly string CommonStyle; // 样式
         private bool shouldHideTooltip; // 隐藏提示标志
-        readonly string CommonStyle; // 样式
         private readonly App app; // App实例
 
         public MainWindow(string Style)
@@ -121,7 +122,7 @@ namespace Quicker.Windows
                     {
                         if (numbers[0] > TotalGlobalAntionPageIndex) TotalGlobalAntionPageIndex = numbers[0]; // 更新全局页面索引
                     }
-                    else if(style == CommonStyle)
+                    else if (style == CommonStyle)
                     {
                         if (numbers[0] > TotalCommonActionPageIndex) TotalCommonActionPageIndex = numbers[0]; // 更新通用页面索引
                     }
@@ -214,16 +215,18 @@ namespace Quicker.Windows
         // 设置标签内容
         private void EditCommonLabel()
         {
-            switch(CommonStyle)
+            switch (CommonStyle)
             {
                 case "Common":
                     break; // 不设置标签内容
                 case "TaskBar":
                     CommonLabel.Content = "任务栏"; // 设置标签内容
                     break;
+
                 case "Desktop":
                     CommonLabel.Content = "桌面"; // 设置标签内容
                     break;
+
                 default:
                     CommonLabel.Content = $"{CommonStyle}"; // 设置标签内容
                     break;
@@ -251,7 +254,7 @@ namespace Quicker.Windows
         // 打开设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("SettingWindow");
+            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 关闭功能面板
@@ -259,7 +262,7 @@ namespace Quicker.Windows
         {
             if (!buttonManager.isClosing)
             {
-                buttonManager.isClosing = true;
+                buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
             }
         }
@@ -271,7 +274,7 @@ namespace Quicker.Windows
             {
                 if (!buttonManager.isClosing && !app.Book)
                 {
-                    buttonManager.isClosing = true;
+                    buttonManager.isClosing = true; // 设置关闭标志
                     this.Close(); // 关闭窗口
                 }
             }
@@ -280,7 +283,7 @@ namespace Quicker.Windows
         // 鼠标移入Button改变外观
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData data)
             {
                 if (data.Location != null)
@@ -291,7 +294,7 @@ namespace Quicker.Windows
                 } // 如果Button的数据存在
                 else
                 {
-                    var Convention = db1.GetAllConventions().FirstOrDefault();
+                    var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
                     if (Convention.ShowAddImage)
                     {
                         System.Windows.Controls.Image image = new()
@@ -312,7 +315,7 @@ namespace Quicker.Windows
         // 鼠标移出Button还原外观
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData data)
             {
                 if (data.Location != null)
@@ -356,10 +359,10 @@ namespace Quicker.Windows
         /// <summary>
         /// 鼠标移入Button改变外观
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <param name="prefix"></param>
-        /// <param name="color"></param>
+        /// <param name="sender">按钮</param>
+        /// <param name="e">事件参数</param>
+        /// <param name="prefix">按钮名称前缀</param>
+        /// <param name="color">按钮颜色</param>
         private void PageChangeButton_MouseEnter(object sender, MouseEventArgs e, string prefix, string color)
         {
             if (sender is Button button)
@@ -368,9 +371,7 @@ namespace Quicker.Windows
                 string targetCanvasName = $"{prefix}{canvasIndex}"; // 生成目标Canvas名称
                 Canvas targetCanvas = null; // 初始化目标Canvas
 
-                // 根据前缀选择不同的Grid
-                var grid = prefix == "Global" ? MainGrid : CommonGrid;
-
+                var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
                 foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
                 {
                     if (canvas.Name == targetCanvasName)
@@ -406,9 +407,7 @@ namespace Quicker.Windows
                 string targetCanvasName = $"{prefix}{canvasIndex}"; // 生成目标Canvas名称
                 Canvas targetCanvas = null; // 初始化目标Canvas
 
-                // 根据前缀选择不同的Grid
-                var grid = prefix == "Global" ? MainGrid : CommonGrid;
-
+                var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
                 foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
                 {
                     if (canvas.Name == targetCanvasName)
@@ -452,7 +451,7 @@ namespace Quicker.Windows
             {
                 if (button != null)
                 {
-                    if(data.TryToOpenExitingWindow)
+                    if (data.TryToOpenExitingWindow)
                     {
                         string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location); // 获取目标窗口标题
                         windowManager.TryToOpenExitingWindow(windowTitle); // 调用窗口管理器打开已存在的目标窗口实例
@@ -460,28 +459,27 @@ namespace Quicker.Windows
 
                     if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(data.Location).Equals(".exe", StringComparison.OrdinalIgnoreCase))
                     {
-                        // 获取目标路径
                         string targetPath = Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
                             ? GetShortcutTargetPath(data.Location)
-                            : data.Location;
+                            : data.Location; // 获取快捷方式目标路径
 
                         try
                         {
                             ProcessStartInfo processStartInfo = new ProcessStartInfo
                             {
-                                FileName = targetPath,
-                                UseShellExecute = data.RunByMessager,
-                                Verb = data.RunByMessager ? "runas" : null,
+                                FileName = targetPath, // 设置启动文件路径
+                                UseShellExecute = data.RunByMessager, // 是否使用系统默认方式运行
+                                Verb = data.RunByMessager ? "runas" : null, // 管理员权限运行
                                 WindowStyle = data.WindowState switch
                                 {
                                     0 => ProcessWindowStyle.Normal,
                                     1 => ProcessWindowStyle.Minimized,
                                     2 => ProcessWindowStyle.Maximized
-                                }
+                                } // 设置窗口状态
                             }; // 创建进程启动信息
                             Process.Start(processStartInfo); // 启动进程
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             new ToastContentBuilder().AddText($"打开失败：{ex}").Show();
                         }
@@ -533,8 +531,8 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu", this);
-                else buttonManager.OpenMenu(sender, true, "CreatActionMenu", this);
+                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu", this); // 打开操作菜单
+                else buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 打开创建动作菜单
             }
         }
 
@@ -602,7 +600,7 @@ namespace Quicker.Windows
         // 退出Quicker
         private void QuitQuicker(object sender, RoutedEventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown(); // 退出程序
         }
 
         // 打开动作管理窗口
@@ -614,7 +612,7 @@ namespace Quicker.Windows
         // 滚轮进行全局动作页翻页
         private void GolbalCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ChangeVisibleCanvas(e, "Global");
+            ChangeVisibleCanvas(e, "Global"); // 滚轮进行全局动作页翻页
         }
 
         /// <summary>
@@ -738,7 +736,7 @@ namespace Quicker.Windows
         /// <returns></returns>
         private bool CheckActionPageHasButton(int canvasIndex, string style)
         {
-            if(canvasIndex == 0) return true;
+            if (canvasIndex == 0) return true;
             string pattern = $@"^{style}{canvasIndex}(\d)(\d)(\d)$"; // 正则表达式模式
             Regex regex = new Regex(pattern); // 创建正则表达式对象
             var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
@@ -794,7 +792,7 @@ namespace Quicker.Windows
             foreach (var button in ParentPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
             {
                 if (!button.Name.Contains($"{canvasIndex}")) button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD3D3D3")); // 如果不是当前按钮
-                else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 重置按钮颜色                      
+                else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 重置按钮颜色
             }
 
             double buttonSpacing = 77.6; // 按钮间距
@@ -813,7 +811,7 @@ namespace Quicker.Windows
                     var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
                     foreach (var data in buttonData)
                     {
-                        if(data.ButtonID == button.Name)
+                        if (data.ButtonID == button.Name)
                         {
                             buttonManager.RefreshButtonDisplay(button, data, 60, true); // 更新按钮内容
                         }
@@ -844,7 +842,7 @@ namespace Quicker.Windows
             if (row == 3 && col == 0) button.Style = FindResource("SpecialButton1") as Style; // 设置特殊样式
             else if (row == 3 && col == 3) button.Style = FindResource("SpecialButton2") as Style; // 设置特殊样式
 
-            BindButtonEvents(button); // 绑定按钮事件  
+            BindButtonEvents(button); // 绑定按钮事件
             return button; // 返回创建的按钮
         }
 
@@ -875,7 +873,7 @@ namespace Quicker.Windows
                 foreach (var button in GlobalButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
                 {
                     if (!button.Name.Contains($"{canvasIndex}")) button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD3D3D3")); // 如果不是当前按钮
-                    else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 设置当前按钮颜色                       
+                    else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 设置当前按钮颜色
                 } // 重置所有按钮的颜色
             }
         }
@@ -885,7 +883,8 @@ namespace Quicker.Windows
         {
             app.Locked = !app.Locked; // 切换锁定状态
             string lockIconPath = app.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
-            Lock.Source = new BitmapImage(new Uri(lockIconPath)); // 设置图标
+            BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建 BitmapImage 对象
+            Lock.Source = lockImage; // 设置图标
             if (app.Locked) app.CommonState = CommonStyle; // 设置锁定状态
         }
 
@@ -904,7 +903,7 @@ namespace Quicker.Windows
                 foreach (var button in CommonButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
                 {
                     if (!button.Name.Contains($"{canvasIndex}")) button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD3D3D3")); // 如果不是当前按钮
-                    else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 设置当前按钮颜色                       
+                    else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 设置当前按钮颜色
                 } // 重置所有按钮的颜色
             }
         }
