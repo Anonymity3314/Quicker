@@ -332,36 +332,26 @@ namespace Quicker.Windows
             }
         }
 
+        // 加载任务栏动作页
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            MainListView.Items.Clear(); // 清空全局列表视图
-            bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith("TaskBar")); // 检查是否存在 TaskBar 样式的按钮
-            GenerateCanvas(0, "TaskBar"); // 生成 TaskBar Canvas
-            if (!haveCommonStyleButton) // 如果没有 TaskBar 样式的按钮，隐藏所有 Canvas
-            {
-                var canvasCollection = FindVisualChildren<Canvas>(MainListView);
-                foreach (Canvas canvas in canvasCollection)
-                {
-                    canvas.Visibility = Visibility.Hidden;
-                }
-                MainBorder.Height = 224; // 设置主边框高度
-                ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
-                AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
-            }
-            else
-            {
-                MainBorder.Height = 289; // 设置主边框高度
-                ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-                AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
-            }
+            LoadActionPage("TaskBar"); // 加载任务栏动作页
         }
 
+        // 加载桌面动作页
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
         {
+            LoadActionPage("Desktop"); // 加载桌面动作页
+        }
+
+        // 加载动作页
+        private void LoadActionPage(string style)
+        {
+
             MainListView.Items.Clear(); // 清空全局列表视图
-            bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith("Desktop")); // 检查是否存在 Desktop 样式的按钮            
-            GenerateCanvas(0, "Desktop"); // 生成通用 Canvas
-            if (!haveCommonStyleButton) // 如果没有 Desktop 样式的按钮，隐藏所有 Canvas
+            bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith($"{style}")); // 检查是否存在 Common 样式的按钮
+            GenerateCanvas(0, $"{style}"); // 生成通用 Canvas
+            if (!haveCommonStyleButton) // 如果没有 Common 样式的按钮，隐藏所有 Canvas
             {
                 var canvasCollection = FindVisualChildren<Canvas>(MainListView);
                 foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合

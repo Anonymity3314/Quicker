@@ -60,15 +60,15 @@ namespace Quicker.Database
                     "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
                     connection);
                 insertCommand.Parameters.AddWithValue("@ButtonID", "Desktop011");
-                insertCommand.Parameters.AddWithValue("@ButtonName", "");
-                insertCommand.Parameters.AddWithValue("@Location", "");
-                insertCommand.Parameters.AddWithValue("@ImagePath", "");
-                insertCommand.Parameters.AddWithValue("@RunByMessager", false);
-                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", false);
-                insertCommand.Parameters.AddWithValue("@WindowState", 0);
-                insertCommand.Parameters.AddWithValue("@Usage", "");
-                insertCommand.Parameters.AddWithValue("@CreateTime", DateTime.Now);
-                insertCommand.Parameters.AddWithValue("@LatestEditTime", DateTime.Now);
+                insertCommand.Parameters.AddWithValue("@ButtonName", null);
+                insertCommand.Parameters.AddWithValue("@Location", null);
+                insertCommand.Parameters.AddWithValue("@ImagePath", null);
+                insertCommand.Parameters.AddWithValue("@RunByMessager", null);
+                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", null);
+                insertCommand.Parameters.AddWithValue("@WindowState", null);
+                insertCommand.Parameters.AddWithValue("@Usage", null);
+                insertCommand.Parameters.AddWithValue("@CreateTime", null);
+                insertCommand.Parameters.AddWithValue("@LatestEditTime", null);
                 insertCommand.ExecuteNonQuery();
             }
 
@@ -82,15 +82,15 @@ namespace Quicker.Database
                     "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
                     connection);
                 insertCommand.Parameters.AddWithValue("@ButtonID", "TaskBar011");
-                insertCommand.Parameters.AddWithValue("@ButtonName", "");
-                insertCommand.Parameters.AddWithValue("@Location", "");
-                insertCommand.Parameters.AddWithValue("@ImagePath", "");
-                insertCommand.Parameters.AddWithValue("@RunByMessager", false);
-                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", false);
-                insertCommand.Parameters.AddWithValue("@WindowState", 0);
-                insertCommand.Parameters.AddWithValue("@Usage", "");
-                insertCommand.Parameters.AddWithValue("@CreateTime", DateTime.Now);
-                insertCommand.Parameters.AddWithValue("@LatestEditTime", DateTime.Now);
+                insertCommand.Parameters.AddWithValue("@ButtonName", null);
+                insertCommand.Parameters.AddWithValue("@Location", null);
+                insertCommand.Parameters.AddWithValue("@ImagePath", null);
+                insertCommand.Parameters.AddWithValue("@RunByMessager", null);
+                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", null);
+                insertCommand.Parameters.AddWithValue("@WindowState", null);
+                insertCommand.Parameters.AddWithValue("@Usage", null);
+                insertCommand.Parameters.AddWithValue("@CreateTime", null);
+                insertCommand.Parameters.AddWithValue("@LatestEditTime", null);
                 insertCommand.ExecuteNonQuery();
             }
         }
