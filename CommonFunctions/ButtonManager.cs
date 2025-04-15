@@ -349,8 +349,6 @@ namespace Quicker.CommonFunctions
                     selectActionPageMenu.Show();
 
                     break;
-                default:
-                    break;
             }
         }
 

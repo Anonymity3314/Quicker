@@ -116,7 +116,7 @@ namespace Quicker.Windows
         /// <param name="shouldHideTooltip">是否隐藏提示</param>
         private void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
         {
-            if (buttonInformation != null) // 如果Button的数据存在
+            if (buttonInformation.Location != null) // 如果Button的数据存在
             {
                 Grid grid = new(); // 创建Grid对象
                 button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 设置按钮背景
@@ -360,9 +360,10 @@ namespace Quicker.Windows
         // 鼠标移入Button改变外观
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
+            Button button = sender as Button;
+            if (button.Tag is ButtonData data)
             {
-                if (button.Tag is ButtonData data)
+                if (data.Location != null)
                 {
                     button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BEE6FD")); // 改变背景颜色
                     button.RenderTransform = new ScaleTransform(1.05, 1.05); // 改变按钮大小
@@ -384,19 +385,20 @@ namespace Quicker.Windows
                         button.Content = image; // 设置按钮内容
                     }
                     button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变背景颜色
-                } // 如果Button的数据不存在
+                } // 如果Button的目标地址不存在
             }
         }
 
         // 鼠标移出Button还原外观
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
+            Button button = sender as Button;
+            if (button.Tag is ButtonData data)
             {
-                Canvas.SetZIndex(button, 0); // 还原按钮层级
-                button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
-                if (button.Tag is ButtonData data)
+                if (data.Location != null)
                 {
+                    Canvas.SetZIndex(button, 0); // 还原按钮层级
+                    button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
                     button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 还原背景颜色
                 }
                 else

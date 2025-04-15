@@ -38,6 +38,61 @@ namespace Quicker.Database
             );";
             using var command = new SQLiteCommand(createTableQuery, connection);
             command.ExecuteNonQuery();
+
+           
+            InsertDefaultData(connection); // 插入初始数据
+        }
+
+        // 插入初始数据
+        private void InsertDefaultData(SQLiteConnection connection)
+        {
+            // 检查是否已有默认数据
+            string checkQuery = "SELECT COUNT(*) FROM ButtonData WHERE ButtonID = @ButtonID";
+            using var checkCommand = new SQLiteCommand(checkQuery, connection);
+
+            // 插入 Desktop011
+            checkCommand.Parameters.AddWithValue("@ButtonID", "Desktop011");
+            if (checkCommand.ExecuteScalar() is long count && count == 0)
+            {
+                using var insertCommand = new SQLiteCommand("INSERT INTO ButtonData " +
+                    "(ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime) " +
+                    "VALUES " +
+                    "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
+                    connection);
+                insertCommand.Parameters.AddWithValue("@ButtonID", "Desktop011");
+                insertCommand.Parameters.AddWithValue("@ButtonName", "");
+                insertCommand.Parameters.AddWithValue("@Location", "");
+                insertCommand.Parameters.AddWithValue("@ImagePath", "");
+                insertCommand.Parameters.AddWithValue("@RunByMessager", false);
+                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", false);
+                insertCommand.Parameters.AddWithValue("@WindowState", 0);
+                insertCommand.Parameters.AddWithValue("@Usage", "");
+                insertCommand.Parameters.AddWithValue("@CreateTime", DateTime.Now);
+                insertCommand.Parameters.AddWithValue("@LatestEditTime", DateTime.Now);
+                insertCommand.ExecuteNonQuery();
+            }
+
+            // 插入 TaskBar011
+            checkCommand.Parameters.AddWithValue("@ButtonID", "TaskBar011");
+            if (checkCommand.ExecuteScalar() is long count2 && count2 == 0)
+            {
+                using var insertCommand = new SQLiteCommand("INSERT INTO ButtonData " +
+                    "(ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime) " +
+                    "VALUES " +
+                    "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
+                    connection);
+                insertCommand.Parameters.AddWithValue("@ButtonID", "TaskBar011");
+                insertCommand.Parameters.AddWithValue("@ButtonName", "");
+                insertCommand.Parameters.AddWithValue("@Location", "");
+                insertCommand.Parameters.AddWithValue("@ImagePath", "");
+                insertCommand.Parameters.AddWithValue("@RunByMessager", false);
+                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", false);
+                insertCommand.Parameters.AddWithValue("@WindowState", 0);
+                insertCommand.Parameters.AddWithValue("@Usage", "");
+                insertCommand.Parameters.AddWithValue("@CreateTime", DateTime.Now);
+                insertCommand.Parameters.AddWithValue("@LatestEditTime", DateTime.Now);
+                insertCommand.ExecuteNonQuery();
+            }
         }
 
         /// <summary>
@@ -83,16 +138,16 @@ namespace Quicker.Database
             {
                 contents.Add(new ButtonData
                 {
-                    ButtonID = reader.GetString(0),
-                    ButtonName = reader.GetString(1),
-                    Location = reader.GetString(2),
-                    ImagePath = reader.GetString(3),
-                    RunByMessager = reader.GetBoolean(4),
-                    TryToOpenExitingWindow = reader.GetBoolean(5),
-                    WindowState = reader.GetInt32(6),
-                    Usage = reader.GetString(7),
-                    CreateTime = reader.GetDateTime(8),
-                    LatestEditTime = reader.GetDateTime(9),
+                    ButtonID = reader.IsDBNull(0) ? null : reader.GetString(0),
+                    ButtonName = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    Location = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    ImagePath = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    RunByMessager = reader.IsDBNull(4) ? false : reader.GetBoolean(4),
+                    TryToOpenExitingWindow = reader.IsDBNull(5) ? false : reader.GetBoolean(5),
+                    WindowState = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
+                    Usage = reader.IsDBNull(7) ? null : reader.GetString(7),
+                    CreateTime = reader.IsDBNull(8) ? DateTime.MinValue : reader.GetDateTime(8),
+                    LatestEditTime = reader.IsDBNull(9) ? DateTime.MinValue : reader.GetDateTime(9),
                 });
             }
             return contents;

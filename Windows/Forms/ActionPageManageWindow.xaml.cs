@@ -183,7 +183,7 @@ namespace Quicker.Windows
         /// <param name="buttonInformation"></param>
         private void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
         {
-            if (buttonInformation != null)
+            if (buttonInformation.Location != null)
             {
                 Grid grid = new(); // 创建网格
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
@@ -256,9 +256,10 @@ namespace Quicker.Windows
         // 滚动条鼠标左键按下事件
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
+            Button button = sender as Button;
+            if (button.Tag is ButtonData data)
             {
-                if (button.Tag is ButtonData) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
+                if (data.Location != null) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
                 else button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置按钮背景颜色
             }
         }
@@ -266,9 +267,10 @@ namespace Quicker.Windows
         // 滚动条鼠标左键抬起事件
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
+            Button button = sender as Button;
+            if (button.Tag is ButtonData data)
             {
-                if (button.Tag is ButtonData) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                if (data.Location != null) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
                 else button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
             }
         }
@@ -411,21 +413,12 @@ namespace Quicker.Windows
             MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
             ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
             AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
-            bool haveCommonStyleButton = false;
-            var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
-            foreach (var data in buttonData) // 遍历按钮数据字典
-            {
-                if (data.ButtonID.StartsWith("TaskBar"))
-                {
-                    haveCommonStyleButton = true;
-                    break;
-                }
-            }
-            GenerateCanvas(0, "TaskBar"); // 生成通用 Canvas
-            if (!haveCommonStyleButton)
+            bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith("TaskBar")); // 检查是否存在 TaskBar 样式的按钮
+            GenerateCanvas(0, "TaskBar"); // 生成 TaskBar Canvas
+            if (!haveCommonStyleButton) // 如果没有 TaskBar 样式的按钮，隐藏所有 Canvas
             {
                 var canvasCollection = FindVisualChildren<Canvas>(MainStackPanel);
-                foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
+                foreach (Canvas canvas in canvasCollection)
                 {
                     canvas.Visibility = Visibility.Hidden;
                 }
@@ -438,19 +431,9 @@ namespace Quicker.Windows
             MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
             ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
             AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
-            bool haveCommonStyleButton = false;
-            var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
-            foreach (var data in buttonData) // 遍历按钮数据字典
-            {
-                if (data.ButtonID.StartsWith("Desktop"))
-                {
-                    haveCommonStyleButton = true;
-                    break;
-                }
-            }
-            
+            bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith("Desktop")); // 检查是否存在 Desktop 样式的按钮            
             GenerateCanvas(0, "Desktop"); // 生成通用 Canvas
-            if (!haveCommonStyleButton)
+            if (!haveCommonStyleButton) // 如果没有 Desktop 样式的按钮，隐藏所有 Canvas
             {
                 var canvasCollection = FindVisualChildren<Canvas>(MainStackPanel);
                 foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
