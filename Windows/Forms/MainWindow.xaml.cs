@@ -254,7 +254,7 @@ namespace Quicker.Windows
         // 打开设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("SettingWindow");
+            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 关闭功能面板
@@ -262,7 +262,7 @@ namespace Quicker.Windows
         {
             if (!buttonManager.isClosing)
             {
-                buttonManager.isClosing = true;
+                buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
             }
         }
@@ -274,7 +274,7 @@ namespace Quicker.Windows
             {
                 if (!buttonManager.isClosing && !app.Book)
                 {
-                    buttonManager.isClosing = true;
+                    buttonManager.isClosing = true; // 设置关闭标志
                     this.Close(); // 关闭窗口
                 }
             }
@@ -283,7 +283,7 @@ namespace Quicker.Windows
         // 鼠标移入Button改变外观
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData data)
             {
                 if (data.Location != null)
@@ -294,7 +294,7 @@ namespace Quicker.Windows
                 } // 如果Button的数据存在
                 else
                 {
-                    var Convention = db1.GetAllConventions().FirstOrDefault();
+                    var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
                     if (Convention.ShowAddImage)
                     {
                         System.Windows.Controls.Image image = new()
@@ -315,7 +315,7 @@ namespace Quicker.Windows
         // 鼠标移出Button还原外观
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData data)
             {
                 if (data.Location != null)
@@ -359,10 +359,10 @@ namespace Quicker.Windows
         /// <summary>
         /// 鼠标移入Button改变外观
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <param name="prefix"></param>
-        /// <param name="color"></param>
+        /// <param name="sender">按钮</param>
+        /// <param name="e">事件参数</param>
+        /// <param name="prefix">按钮名称前缀</param>
+        /// <param name="color">按钮颜色</param>
         private void PageChangeButton_MouseEnter(object sender, MouseEventArgs e, string prefix, string color)
         {
             if (sender is Button button)
@@ -371,9 +371,7 @@ namespace Quicker.Windows
                 string targetCanvasName = $"{prefix}{canvasIndex}"; // 生成目标Canvas名称
                 Canvas targetCanvas = null; // 初始化目标Canvas
 
-                // 根据前缀选择不同的Grid
-                var grid = prefix == "Global" ? MainGrid : CommonGrid;
-
+                var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
                 foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
                 {
                     if (canvas.Name == targetCanvasName)
@@ -409,9 +407,7 @@ namespace Quicker.Windows
                 string targetCanvasName = $"{prefix}{canvasIndex}"; // 生成目标Canvas名称
                 Canvas targetCanvas = null; // 初始化目标Canvas
 
-                // 根据前缀选择不同的Grid
-                var grid = prefix == "Global" ? MainGrid : CommonGrid;
-
+                var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
                 foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
                 {
                     if (canvas.Name == targetCanvasName)
@@ -463,24 +459,23 @@ namespace Quicker.Windows
 
                     if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) || Path.GetExtension(data.Location).Equals(".exe", StringComparison.OrdinalIgnoreCase))
                     {
-                        // 获取目标路径
                         string targetPath = Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
                             ? GetShortcutTargetPath(data.Location)
-                            : data.Location;
+                            : data.Location; // 获取快捷方式目标路径
 
                         try
                         {
                             ProcessStartInfo processStartInfo = new ProcessStartInfo
                             {
-                                FileName = targetPath,
-                                UseShellExecute = data.RunByMessager,
-                                Verb = data.RunByMessager ? "runas" : null,
+                                FileName = targetPath, // 设置启动文件路径
+                                UseShellExecute = data.RunByMessager, // 是否使用系统默认方式运行
+                                Verb = data.RunByMessager ? "runas" : null, // 管理员权限运行
                                 WindowStyle = data.WindowState switch
                                 {
                                     0 => ProcessWindowStyle.Normal,
                                     1 => ProcessWindowStyle.Minimized,
                                     2 => ProcessWindowStyle.Maximized
-                                }
+                                } // 设置窗口状态
                             }; // 创建进程启动信息
                             Process.Start(processStartInfo); // 启动进程
                         }
@@ -536,8 +531,8 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu", this);
-                else buttonManager.OpenMenu(sender, true, "CreatActionMenu", this);
+                if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, true, "OperationMenu", this); // 打开操作菜单
+                else buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 打开创建动作菜单
             }
         }
 
@@ -605,7 +600,7 @@ namespace Quicker.Windows
         // 退出Quicker
         private void QuitQuicker(object sender, RoutedEventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown(); // 退出程序
         }
 
         // 打开动作管理窗口
@@ -617,7 +612,7 @@ namespace Quicker.Windows
         // 滚轮进行全局动作页翻页
         private void GolbalCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ChangeVisibleCanvas(e, "Global");
+            ChangeVisibleCanvas(e, "Global"); // 滚轮进行全局动作页翻页
         }
 
         /// <summary>
