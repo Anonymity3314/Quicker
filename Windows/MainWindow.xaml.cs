@@ -642,10 +642,10 @@ namespace Quicker.Windows
             buttonManager.Button_PreviewMouseLeftButtonUp(sender, e); // 重置状态
         }
 
-        // 打开菜单
-        private void OpenContextMenu(object sender, RoutedEventArgs e)
+        // 打开标题菜单
+        private void OpenTitleMenu(object sender, RoutedEventArgs e)
         {
-            Popup.IsOpen = true; // 打开菜单
+            TitlePop.IsOpen = true; // 打开菜单
         }
 
         // 退出Quicker
@@ -957,6 +957,12 @@ namespace Quicker.Windows
                     else button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 设置当前按钮颜色                       
                 } // 重置所有按钮的颜色
             }
+        }
+
+        // 右键锁定 Button 切换菜单
+        private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
+        {
+            ChangeActionPagePop.IsOpen = true;
         }
 
         // 窗口关闭时强制垃圾回收

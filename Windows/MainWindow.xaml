@@ -67,11 +67,11 @@
                         </Button>
                     </Border>
                     <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="82,0,0,0">
-                        <Button Style="{StaticResource Task}" Click="OpenContextMenu" x:Name="ActionPageManager">
+                        <Button x:Name="ActionPageManager" Style="{StaticResource Task}" Click="OpenTitleMenu">
                             <Image Source="/Resources/Images/Icons/MoreSelection.ico" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         </Button>
                     </Border>
-                    <Popup x:Name="Popup" PopupAnimation="Fade" Width="180" Height="65" PlacementTarget="{Binding ElementName=ActionPageManager}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                    <Popup x:Name="TitlePop" PopupAnimation="Fade" Width="180" Height="65" PlacementTarget="{Binding ElementName=ActionPageManager}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
                         <Grid>
                             <Rectangle Fill="White" Margin="5,7">
                                 <Rectangle.Effect>
@@ -123,7 +123,7 @@
                 <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                 <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>                
                 <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="253,0,0,0">
-                    <Button Style="{StaticResource Task}" Click="LockCommonActionPage">
+                    <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" Click="LockCommonActionPage" MouseRightButtonDown="OpenSelectActionPageMenu">
                         <Button.ToolTip>
                             <ToolTip>
                                 <StackPanel>
@@ -135,6 +135,31 @@
                         <Image x:Name="Lock" Source="/Resources/Images/Icons/UnLocked.ico" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                 </Border>
+                <Popup x:Name="ChangeActionPagePop" PopupAnimation="Fade" Width="180" Height="65" PlacementTarget="{Binding ElementName=ActionPageSelecter}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                    <Grid>
+                        <Rectangle Fill="White" Margin="5,7">
+                            <Rectangle.Effect>
+                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Rectangle.Effect>
+                        </Rectangle>
+                        <Border Width="170" Background="White" BorderBrush="{x:Null}" BorderThickness="0" CornerRadius="3" Margin="5">
+                            <StackPanel>
+                                <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">
+                                    <Grid Width="180">
+                                        <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource ImageStyle}"/>
+                                        <TextBlock Text="场景与动作" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource MenuButton}" ToolTip="关闭Quicker软件" Click="QuitQuicker">
+                                    <Grid Width="180">
+                                        <Image Source="/Resources/Images/Icons/CloseQuicker.ico" Style="{StaticResource ImageStyle}"/>
+                                        <TextBlock Text="退出" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Popup>
             </Grid>
 
             <!-- 通用动作 -->
