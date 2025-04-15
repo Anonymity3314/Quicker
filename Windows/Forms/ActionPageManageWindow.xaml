@@ -70,12 +70,18 @@
             </Label.ToolTip>
         </Label>
 
-        <Border x:Name="MainBorder" Margin="239,31,11,564" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top">
+        <Border x:Name="MainBorder" Margin="239,31,11,0" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top" Height="224">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
-                <StackPanel x:Name="MainStackPanel" Background="LightGray" Orientation="Horizontal">
-                    <Canvas x:Name="ViewCanvas" Height="215" Width="260" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="3,0,0,0">
+                <ListView x:Name="MainListView" Background="LightGray">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel x:Name="MainStackPanel" Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+
+                    <Canvas x:Name="ViewCanvas" Height="215" Width="260" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,3">
                         <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3">
-                            <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="17.24" BorderThickness="0,0,0,0" Margin="3,0,0,0">
+                            <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="17.24" BorderThickness="0,0,0,0">
                                 <Image Source="/Resources/Images/Icons/Quicker1.ico"/>
                             </Button>
                         </Grid>
@@ -93,11 +99,11 @@
                         <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="130"/>
                         <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="195"/>
                     </Canvas>
-                </StackPanel>
+                </ListView>
             </ScrollViewer>
         </Border>
-        <ScrollBar x:Name="ScrollBar" Margin="240,241.8,10,0" VerticalAlignment="Top" Orientation="Horizontal" ValueChanged="ScrollBar_ValueChanged"/>
+        <ScrollBar x:Name="ScrollBar" Margin="240,250,10,0" VerticalAlignment="Top" Orientation="Horizontal" ValueChanged="ScrollBar_ValueChanged"/>
 
-        <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="239,264,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
+        <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="240,272,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
     </Grid>
 </Window>

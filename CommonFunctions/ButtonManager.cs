@@ -157,6 +157,7 @@ namespace Quicker.CommonFunctions
         {
             if (buttonInformation != null) // 如果Button的数据存在
             {
+                if(buttonInformation.Location == null) return; // 如果文件路径不存在，直接返回
                 button.Tag = buttonInformation; // 更新按钮标签
 
                 Grid grid = new(); // 创建Grid对象

@@ -18,8 +18,8 @@ namespace Quicker.Windows
     {
         private const string BookIconPath = "/Resources/Images/Icons/Book.ico"; // 订住图标路径
         private const string DisBookIconPath = "/Resources/Images/Icons/Disbook.ico"; // 禁用订住图标路径
-        private const string LockIconPath = "/Resources/Images/Icons/Lock.ico"; // 锁定图标路径
-        private const string UnLockIconPath = "/Resources/Images/Icons/UnLock.ico"; // 解锁图标路径
+        private const string LockIconPath = "/Resources/Images/Icons/Locked.ico"; // 锁定图标路径
+        private const string UnLockIconPath = "/Resources/Images/Icons/UnLocked.ico"; // 解锁图标路径
 
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {

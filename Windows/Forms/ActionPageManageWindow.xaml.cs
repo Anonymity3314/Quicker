@@ -36,8 +36,7 @@ namespace Quicker.Windows
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
-            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
-
+            MainListView.Items.Clear(); // 清空全局列表视图
             db1 = new SettingDatabase(); // 初始化设置数据库
             db1.InitializeDatabase(); // 初始化设置数据库
 
@@ -109,7 +108,6 @@ namespace Quicker.Windows
                 Width = 260, // 画布宽度
                 AllowDrop = true,
                 Name = canvasName, // 画布名称
-                Margin = new Thickness(3, 0, 0, 0), // 画布边距
                 Height = style == "Global" ? 215 : 280, // 画布高度
                 VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
                 HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
@@ -167,84 +165,11 @@ namespace Quicker.Windows
 
                     if (buttonDataDict != null && buttonDataDict.TryGetValue(buttonName, out ButtonData data))
                     {
-                        RefreshButtonDisplay(button, data); // 刷新按钮显示
-                        button.Tag = data; // 设置按钮标签
+                        buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
                     }
                 }
             }
-
-            MainStackPanel.Children.Add(dynamicCanvas); // 将画布添加到全局堆栈面板
-        }
-
-        /// <summary>
-        /// 刷新按钮显示
-        /// </summary>
-        /// <param name="button"></param>
-        /// <param name="buttonInformation"></param>
-        private void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
-        {
-            if (buttonInformation.Location != null)
-            {
-                Grid grid = new(); // 创建网格
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
-                if (buttonInformation.ImagePath != "none") // 如果图标路径不为none
-                {
-                    try
-                    {
-                        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                        Image image = new() // 创建图像
-                        {
-                            Width = 30, // 图像宽度
-                            Height = 30, // 图像高度
-                            VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                            HorizontalAlignment = HorizontalAlignment.Center, // 水平对齐方式
-                            Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
-                        };
-                        grid.Children.Add(image); // 将图像添加到网格
-                        Grid.SetRow(image, 0); // 设置图像所在行
-                    }
-                    catch
-                    {
-                        new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonInformation.ButtonName}的图标被移动或删除").Show(); // 显示通知
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(buttonInformation.ButtonName)) // 如果按钮名称不为空
-                {
-                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                    TextBlock textBlock = new() // 创建文本块
-                    {
-                        TextWrapping = TextWrapping.NoWrap, // 文本换行方式
-                        Text = buttonInformation.ButtonName, // 设置文本
-                        VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直对齐方式
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center // 水平对齐方式
-                    }; // 创建文本块
-                    buttonManager.AutoEllipsisTextBlock(textBlock, 60); // 设置文本块自动省略
-                    grid.Children.Add(textBlock); // 将文本块添加到网格
-                    Grid.SetRow(textBlock, 1); // 设置文本块所在行
-                }
-
-                button.Content = grid; // 设置按钮内容
-
-                if (!shouldHideTooltip)
-                {
-                    string toolTipText = null; // 工具提示文本
-                    if (!string.IsNullOrWhiteSpace(buttonInformation.ButtonName) || !string.IsNullOrWhiteSpace(buttonInformation.Usage))
-                    {
-                        string name = !string.IsNullOrWhiteSpace(buttonInformation.ButtonName) ? buttonInformation.ButtonName : null; // 按钮名称
-                        string usage = !string.IsNullOrWhiteSpace(buttonInformation.Usage) ? buttonInformation.Usage : null; // 使用说明
-                        toolTipText = (name + "\n" + usage).Trim('\n'); // 设置工具提示文本
-                    }
-                    button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置工具提示
-                }
-            }
-            else
-            {
-                button.Tag = null; // 设置按钮标签为空
-                button.Content = null; // 设置按钮内容为空
-                button.ToolTip = null; // 设置工具提示为空
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
-            }
+            MainListView.Items.Add(dynamicCanvas); // 将画布添加到全局列表视图
         }
 
         // 滚动条值改变事件
@@ -365,7 +290,7 @@ namespace Quicker.Windows
         // 添加动作页
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
-            int canvasIndex = MainStackPanel.Children.Count; // 获取画布索引
+            int canvasIndex = MainListView.Items.Count; // 获取画布索引
             if (canvasIndex > 9) return; // 如果索引大于9，则返回
             GenerateCanvas(canvasIndex, "Global"); // 生成画布
         }
@@ -381,21 +306,21 @@ namespace Quicker.Windows
         // 全局按钮点击事件
         private void GlobalButton_Click(object sender, RoutedEventArgs e)
         {
-            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainListView.Items.Clear(); // 清空全局列表视图
             LoadGlobalCanvas(); // 加载全局画布
-            MainBorder.Margin = new Thickness(239, 31, 11, 564); // 设置主边框边距
-            ScrollBar.Margin = new Thickness(240, 241.8, 10, 0); // 设置滚动条边距
-            AddActionPageButton.Margin = new Thickness(239, 264, 0, 0); // 设置添加动作页按钮边距
+            MainBorder.Height = 224; // 设置主边框高度
+            ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
+            AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
         }
 
         // 公共按钮点击事件
         private void CommonButton_Click(object sender, RoutedEventArgs e)
         {
-            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
+            MainListView.Items.Clear(); // 清空全局列表视图
             LoadCommonCanvas(); // 加载公共画布
-            MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
-            ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
-            AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
+            MainBorder.Height = 289; // 设置主边框高度
+            ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+            AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
         }
 
         // 加载CommonCanvas
@@ -409,37 +334,49 @@ namespace Quicker.Windows
 
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
-            MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
-            ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
-            AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
+            MainListView.Items.Clear(); // 清空全局列表视图
             bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith("TaskBar")); // 检查是否存在 TaskBar 样式的按钮
             GenerateCanvas(0, "TaskBar"); // 生成 TaskBar Canvas
             if (!haveCommonStyleButton) // 如果没有 TaskBar 样式的按钮，隐藏所有 Canvas
             {
-                var canvasCollection = FindVisualChildren<Canvas>(MainStackPanel);
+                var canvasCollection = FindVisualChildren<Canvas>(MainListView);
                 foreach (Canvas canvas in canvasCollection)
                 {
                     canvas.Visibility = Visibility.Hidden;
                 }
+                MainBorder.Height = 224; // 设置主边框高度
+                ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
+                AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+            }
+            else
+            {
+                MainBorder.Height = 289; // 设置主边框高度
+                ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
             }
         }
 
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
         {
-            MainStackPanel.Children.Clear(); // 清空全局堆栈面板
-            MainBorder.Margin = new Thickness(239, 31, 11, 499); // 设置主边框边距
-            ScrollBar.Margin = new Thickness(240, 307.15, 10, 0); // 设置滚动条边距
-            AddActionPageButton.Margin = new Thickness(239, 330.15, 0, 0); // 设置添加动作页按钮边距
+            MainListView.Items.Clear(); // 清空全局列表视图
             bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith("Desktop")); // 检查是否存在 Desktop 样式的按钮            
             GenerateCanvas(0, "Desktop"); // 生成通用 Canvas
             if (!haveCommonStyleButton) // 如果没有 Desktop 样式的按钮，隐藏所有 Canvas
             {
-                var canvasCollection = FindVisualChildren<Canvas>(MainStackPanel);
+                var canvasCollection = FindVisualChildren<Canvas>(MainListView);
                 foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
                 {
                     canvas.Visibility = Visibility.Hidden;
                 }
+                MainBorder.Height = 224; // 设置主边框高度
+                ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
+                AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+            }
+            else
+            {
+                MainBorder.Height = 289; // 设置主边框高度
+                ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
             }
         }
 

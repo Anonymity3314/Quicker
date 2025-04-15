@@ -35,13 +35,11 @@ namespace Quicker.Windows
         // 更新滚动条的属性
         private void UpdateScrollBarProperties()
         {
-            if (listViewScrollViewer == null || VerticalScrollBar == null)
-                return;
+            if (listViewScrollViewer == null || VerticalScrollBar == null) return; // 如果 ScrollViewer 或 VerticalScrollBar 为 null，返回
 
             // 获取 WrapPanel
-            var itemsPanel = FindVisualChild<WrapPanel>(ImageListView);
-            if (itemsPanel == null)
-                return;
+            var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
+            if (itemsPanel == null) return;// 计算每行显示的项数
 
             // 计算 WrapPanel 的内容高度
             double contentHeight = 0;
@@ -223,10 +221,7 @@ namespace Quicker.Windows
         // 按下键盘事件
         private void SelectImageWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.S)
-            {
-                AddIcon(sender, e);
-            }
+            if (e.Key == System.Windows.Input.Key.S) AddIcon(sender, e); // 按下 S 键添加图标
         }
 
         // 添加图标
