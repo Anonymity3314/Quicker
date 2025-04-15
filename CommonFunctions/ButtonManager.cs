@@ -75,7 +75,7 @@ namespace Quicker.CommonFunctions
         /// <param name="e">拖拽事件参数</param>
         public void Button_Drop(object sender, DragEventArgs e)
         {
-            if (sender is Button TargetButton)
+            if (sender is Button TargetButton && (TargetButton != SourceButton || SourceButton != null))
             {
                 if (TargetButton == SourceButton || SourceButton == null) return; // 如果目标按钮和源按钮相同，直接返回
                 if (e.Data.GetDataPresent(typeof(ButtonData))) // 获取拖拽数据
