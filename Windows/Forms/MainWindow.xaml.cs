@@ -885,7 +885,8 @@ namespace Quicker.Windows
         {
             app.Locked = !app.Locked; // 切换锁定状态
             string lockIconPath = app.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
-            Lock.Source = new BitmapImage(new Uri(lockIconPath)); // 设置图标
+            BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建 BitmapImage 对象
+            Lock.Source = lockImage; // 设置图标
             if (app.Locked) app.CommonState = CommonStyle; // 设置锁定状态
         }
 
