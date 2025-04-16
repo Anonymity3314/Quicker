@@ -78,7 +78,7 @@
                                     <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
                                 </Rectangle.Effect>
                             </Rectangle>
-                            <Border Width="170" Background="White" BorderBrush="{x:Null}" BorderThickness="0" CornerRadius="3" Margin="5">
+                            <Border Width="170" Background="White" BorderThickness="0" CornerRadius="3" Margin="5">
                                 <StackPanel>
                                     <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">
                                         <Grid Width="180">

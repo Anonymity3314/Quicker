@@ -186,7 +186,11 @@ namespace Quicker
         // 按下鼠标快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue) return; // 提前判断，减少不必要的逻辑判断
+            if (keyPressStartTime.HasValue)
+            {
+                keyPressStartTime = null; // 清空按键按下时的时间
+                return;
+            }// 提前判断，减少不必要的逻辑判断
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
             this.Dispatcher.Invoke(() =>
@@ -284,7 +288,11 @@ namespace Quicker
         // 按下键盘快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue) return; // 提前判断，减少不必要的逻辑判断
+            if (keyPressStartTime.HasValue)
+            {
+                keyPressStartTime = null; // 清空按键按下时的时间
+                return;
+            }// 提前判断，减少不必要的逻辑判断
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             switch (e.Data.KeyCode)
             {

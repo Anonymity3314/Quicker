@@ -333,7 +333,19 @@ namespace Quicker.Windows
         {
             int canvasIndex = MainListView.Items.Count; // 获取画布索引
             if (canvasIndex > 9) return; // 如果索引大于9，则返回
-            GenerateCanvas(canvasIndex, "Global"); // 生成画布
+
+            string canvasName = null; // 画布名称
+            foreach (var item in MainListView.Items)
+            {
+                if (item is Canvas canvas)
+                {
+                    canvasName = canvas.Name; // 获取 Canvas 的名称
+                    break;
+                }
+            }
+            Match matchCanvas = Regex.Match(canvasName, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
+            string style = matchCanvas.Groups[1].Value; // 动作页样式
+            GenerateCanvas(canvasIndex, style); // 生成画布
         }
 
         // 滚动条滚动事件
