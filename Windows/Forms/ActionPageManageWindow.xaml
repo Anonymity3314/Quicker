@@ -72,7 +72,7 @@
 
         <Border x:Name="MainBorder" Margin="239,31,11,0" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top" Height="224">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
-                <ListView x:Name="MainListView" Background="LightGray">
+                <ListView x:Name="MainListView" Background="LightGray" AllowDrop="True" PreviewDragOver="ListView_PreviewDragOver" Drop="ListView_Drop">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel x:Name="MainStackPanel" Orientation="Horizontal"/>

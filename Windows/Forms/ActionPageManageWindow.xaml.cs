@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Database;
 using System.Windows;
+using System.Collections.ObjectModel;
 
 namespace Quicker.Windows
 {
@@ -105,7 +106,11 @@ namespace Quicker.Windows
             }
         }
 
-        // 获取全局和公共动作页索引
+        /// <summary>
+        /// 获取总动作页索引
+        /// </summary>
+        /// <param name="style">动作页样式</param>
+        /// <returns>总动作页索引</returns>
         private int GetTotalAntionPageIndex(string style)
         {
             int actionPageIndex = 0; // 动作页索引
@@ -155,12 +160,17 @@ namespace Quicker.Windows
             Button pageButton = new Button
             {
                 Width = 17.24,
+                Tag = $"{style}{canvasIndex}",
                 Name = $"{style}{canvasIndex}",
                 Margin = new Thickness(3, 0, 0, 0),
                 BorderThickness = new Thickness(0, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
                 HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
             };
+
+            pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
+            pageButton.PreviewMouseMove += Button1_PreviewMouseMove; // 鼠标移动事件
+            pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
 
             Image image = new Image
             {
@@ -237,7 +247,6 @@ namespace Quicker.Windows
             button.AllowDrop = true; // 允许拖放
             button.Drop += Button_Drop; // 拖放事件
             button.Click += ShowCreatActionMenu; // 点击事件
-            button.DragEnter += Button_DragEnter; // 拖入事件
             button.MouseEnter += Button_MouseEnter; // 鼠标进入事件
             button.MouseLeave += Button_MouseLeave; // 鼠标离开事件
             button.MouseDoubleClick += ShowEditWindow; // 双击事件
@@ -254,12 +263,6 @@ namespace Quicker.Windows
             {
                 buttonManager.Button_Drop(sender, e, false); // 处理拖放事件
             }
-        }
-
-        // 拖入事件
-        public void Button_DragEnter(object sender, DragEventArgs e)
-        {
-            buttonManager.Button_DragEnter(sender, e); // 处理拖入事件
         }
 
         // 鼠标左键按下事件
@@ -375,6 +378,87 @@ namespace Quicker.Windows
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
             else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
+        }
+
+        // 鼠标移动时检查是否满足拖拽条件
+        public void Button1_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
+            {
+                System.Windows.Point currentPosition = e.GetPosition(button); // 获取当前位置
+                double deltaX = currentPosition.X - initialMousePosition.X; // 计算 X 轴位移
+                double deltaY = currentPosition.Y - initialMousePosition.Y; // 计算 Y 轴位移
+                double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY); // 计算移动距离
+                if (distance > 10 && !buttonManager.isDragging) // 如果移动距离超过 10 像素，则视为拖拽开始
+                {
+                    buttonManager.isDragging = true; // 设置拖拽状态
+                                                     // 获取 Button 的 Name
+                    string buttonName = button.Name;
+
+                    // 设置拖拽数据
+                    DataObject data = new DataObject();
+                    data.SetData("ButtonData", buttonName); // 传递 Button 的 Name
+                    DragDrop.DoDragDrop(button, data, DragDropEffects.Move);
+                }
+            }
+        }
+
+        // 拖拽经过目标项
+        private void ListView_PreviewDragOver(object sender, DragEventArgs e)
+        {
+            buttonManager.Button_PreviewDragOver(sender, e); // 处理拖放事件
+        }
+        private string draggedItem;
+        // 拖拽完成
+        private void ListView_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent("ButtonData"))
+            {
+                string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
+
+                if (!string.IsNullOrEmpty(sourceButtonName))
+                {
+                    // 获取目标项的 Canvas
+                    Point point = e.GetPosition(MainListView);
+                    var hitTestResult = VisualTreeHelper.HitTest(MainListView, point);
+                    DependencyObject targetItem = hitTestResult.VisualHit;
+
+                    // 查找目标 Canvas
+                    Canvas targetCanvas = FindParent<Canvas>(targetItem);
+
+                    if (targetCanvas == null) return; // 如果目标 Canvas 为 null，则返回
+                    string targetCanvasName = targetCanvas.Name; // 获取目标 Canvas 的 Name
+                    if (sourceButtonName == targetCanvasName) return; // 如果目标 Canvas 与源 Canvas 相同，则返回
+
+                    string style = null; // 按钮样式
+                    int sourceIndex = int.Parse(sourceButtonName.Substring(sourceButtonName.Length - 1));
+                    int targetIndex = int.Parse(targetCanvasName.Substring(targetCanvasName.Length - 1));
+                    Match matchButton = Regex.Match(sourceButtonName, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
+                    if (matchButton.Success)
+                    {
+                        style = matchButton.Groups[1].Value; // 获取按钮名称
+                    }
+
+                    db2.SwapButtonAValues(style, sourceIndex, targetIndex);
+                    LoadCanvas(style);
+                }
+            }
+        }
+
+
+
+        // 查找父级控件
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            while (child != null)
+            {
+                if (child is T parent)
+                {
+                    return parent;
+                }
+                child = VisualTreeHelper.GetParent(child);
+            }
+            return null;
         }
 
         // 关闭窗口释放图标资源

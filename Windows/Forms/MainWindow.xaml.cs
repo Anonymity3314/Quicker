@@ -543,12 +543,6 @@ namespace Quicker.Windows
         }
 
         // 允许拖拽
-        public void Button_DragEnter(object sender, DragEventArgs e)
-        {
-            buttonManager.Button_DragEnter(sender, e); // 允许拖拽
-        }
-
-        // 允许拖拽
         private void Button_PreviewDragOver(object sender, DragEventArgs e)
         {
             buttonManager.Button_PreviewDragOver(sender, e); // 允许拖拽
@@ -854,7 +848,6 @@ namespace Quicker.Windows
         {
             button.Click += DoAction; // 左键点击事件
             button.Drop += Button_Drop; // 拖拽事件
-            button.DragEnter += Button_DragEnter; // 拖拽进入事件
             button.MouseEnter += Button_MouseEnter; // 鼠标移入事件
             button.MouseLeave += Button_MouseLeave; // 鼠标移出事件
             button.PreviewDragOver += Button_PreviewDragOver; // 添加拖拽事件

@@ -51,13 +51,6 @@ namespace Quicker.CommonFunctions
             shouldHideTooltip = Convention.HideTooltip; // 获取隐藏提示标志
         }
 
-        // 设置按钮拖拽效果
-        public void Button_DragEnter(object sender, DragEventArgs e)
-        {
-            e.Effects = DragDropEffects.Move; // 设置拖拽效果为移动
-            e.Handled = true; // 标记事件已处理
-        }
-
         // 设置按钮拖拽时的效果
         public void Button_PreviewDragOver(object sender, DragEventArgs e)
         {

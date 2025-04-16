@@ -14,10 +14,8 @@ namespace Quicker.Database
         // 初始化数据库
         public void InitializeDatabase()
         {
-            if (!File.Exists("Button.db"))
-            {
-                SQLiteConnection.CreateFile("Button.db");
-            }
+            if (File.Exists("Button.db")) return;
+            SQLiteConnection.CreateFile("Button.db");
 
             using var connection = new SQLiteConnection(dbPath2);
             connection.Open();
