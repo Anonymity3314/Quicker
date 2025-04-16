@@ -7,7 +7,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Database;
 using System.Windows;
-using System.Collections.ObjectModel;
 
 namespace Quicker.Windows
 {
@@ -392,13 +391,10 @@ namespace Quicker.Windows
                 if (distance > 10 && !buttonManager.isDragging) // 如果移动距离超过 10 像素，则视为拖拽开始
                 {
                     buttonManager.isDragging = true; // 设置拖拽状态
-                                                     // 获取 Button 的 Name
-                    string buttonName = button.Name;
-
-                    // 设置拖拽数据
-                    DataObject data = new DataObject();
+                    string buttonName = button.Name; // 获取按钮名称
+                    DataObject data = new DataObject();// 创建数据对象
                     data.SetData("ButtonData", buttonName); // 传递 Button 的 Name
-                    DragDrop.DoDragDrop(button, data, DragDropEffects.Move);
+                    DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 执行拖放操作
                 }
             }
         }
@@ -408,14 +404,13 @@ namespace Quicker.Windows
         {
             buttonManager.Button_PreviewDragOver(sender, e); // 处理拖放事件
         }
-        private string draggedItem;
+
         // 拖拽完成
         private void ListView_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent("ButtonData"))
             {
                 string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
-
                 if (!string.IsNullOrEmpty(sourceButtonName))
                 {
                     // 获取目标项的 Canvas
@@ -439,13 +434,13 @@ namespace Quicker.Windows
                         style = matchButton.Groups[1].Value; // 获取按钮名称
                     }
 
-                    db2.SwapButtonAValues(style, sourceIndex, targetIndex);
-                    LoadCanvas(style);
+                    db2.SwapButtonAValues(style, sourceIndex, targetIndex); // 更新数据库 Button A 值
+                    var buttonDataList = db2.GetAllButtonData(); // 获取所有按钮数据
+                    buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 转换为字典
+                    LoadCanvas(style); // 刷新界面
                 }
             }
         }
-
-
 
         // 查找父级控件
         private static T FindParent<T>(DependencyObject child) where T : DependencyObject
