@@ -107,8 +107,8 @@ namespace Quicker.CommonFunctions
         /// <summary>
         /// 处理文件拖拽
         /// </summary>
-        /// <param name="button">目标按钮</param>
-        /// <param name="filePath">文件路径</param>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="filePath"> 文件路径 </param>
         private void ProcessFileDrop(Button button, string filePath, bool isMainWindow)
         {
             ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
@@ -226,8 +226,13 @@ namespace Quicker.CommonFunctions
             }
         }
 
-        // 鼠标移动时检查是否满足拖拽条件
-        public void Button_PreviewMouseMove(object sender, MouseEventArgs e)
+        /// <summary>
+        /// 鼠标移动时检查是否满足拖拽条件
+        /// </summary>
+        /// <param name="sender"> 目标按钮 </param>
+        /// <param name="e"> 鼠标事件参数 </param>
+        /// <param name="isMainButton"> 是否为主按钮 </param>
+        public void Button_PreviewMouseMove(object sender, MouseEventArgs e, bool isMainButton)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
@@ -238,8 +243,16 @@ namespace Quicker.CommonFunctions
                 if (distance > 10 && !isDragging) // 如果移动距离超过 10 像素，则视为拖拽开始
                 {
                     isDragging = true; // 设置拖拽状态
-                    if (button.Tag is ButtonData data)
+                    if(isMainButton)
                     {
+                        ButtonData data = button.Tag as ButtonData; // 获取按钮数据
+                        DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
+                    }
+                    else
+                    {
+                        string buttonName = button.Name; // 获取按钮名称
+                        DataObject data = new DataObject();// 创建数据对象
+                        data.SetData("ButtonData", buttonName); // 传递 Button 的 Name
                         DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
                     }
                 }
@@ -282,10 +295,10 @@ namespace Quicker.CommonFunctions
         /// <summary>
         /// 打开指定菜单
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <param name="isMainWindow">是否为主面板</param>
-        /// <param name="targetMenu">目标菜单</param>
+        /// <param name="sender"> 触发菜单的按钮 </param>
+        /// <param name="e"> 事件参数 </param>
+        /// <param name="isMainWindow"> 是否为主面板 </param>
+        /// <param name="targetMenu"> 目标菜单 </param>
         public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow)
         {
             Window menu = null;
@@ -350,7 +363,7 @@ namespace Quicker.CommonFunctions
         /// <summary>
         /// 关闭面板窗口
         /// </summary>
-        /// <param name="window">要关闭面板窗口的窗口</param>
+        /// <param name="window"> 要关闭面板窗口的窗口 </param>
         public void CloseMainWindow(Window window)
         {
             MainWindow mainWindow = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();

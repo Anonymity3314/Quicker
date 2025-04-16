@@ -575,7 +575,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
-                buttonManager.Button_PreviewMouseMove(sender, e); // 检查拖拽条件
+                buttonManager.Button_PreviewMouseMove(sender, e, true); // 检查拖拽条件
             }
         }
 

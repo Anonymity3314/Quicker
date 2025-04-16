@@ -14,15 +14,26 @@ namespace Quicker.Windows
     {
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {
-            if (obj == null) yield break;
-
+            if (obj == null) yield break; // 空对象返回空序列
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child is T tChild) yield return tChild;
-                foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild;
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i); // 获取子元素
+                if (child is T tChild) yield return tChild; // 找到类型为 T 的子元素
+                foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素
             }
         } // 查找子元素
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            while (child != null)
+            {
+                if (child is T parent)
+                {
+                    return parent; // 找到父级控件
+                }
+                child = VisualTreeHelper.GetParent(child); // 获取父级控件
+            }
+            return null;
+        } // 查找父级控件
 
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
         private readonly ButtonManager buttonManager; // 按钮管理器
@@ -278,7 +289,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed) // 如果鼠标左键按下
             {
-                buttonManager.Button_PreviewMouseMove(sender, e); // 处理鼠标移动事件
+                buttonManager.Button_PreviewMouseMove(sender, e, true); // 处理鼠标移动事件
             }
         }
 
@@ -384,18 +395,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
-                System.Windows.Point currentPosition = e.GetPosition(button); // 获取当前位置
-                double deltaX = currentPosition.X - initialMousePosition.X; // 计算 X 轴位移
-                double deltaY = currentPosition.Y - initialMousePosition.Y; // 计算 Y 轴位移
-                double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY); // 计算移动距离
-                if (distance > 10 && !buttonManager.isDragging) // 如果移动距离超过 10 像素，则视为拖拽开始
-                {
-                    buttonManager.isDragging = true; // 设置拖拽状态
-                    string buttonName = button.Name; // 获取按钮名称
-                    DataObject data = new DataObject();// 创建数据对象
-                    data.SetData("ButtonData", buttonName); // 传递 Button 的 Name
-                    DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 执行拖放操作
-                }
+                buttonManager.Button_PreviewMouseMove(sender, e, false); // 处理鼠标移动事件
             }
         }
 
@@ -413,26 +413,19 @@ namespace Quicker.Windows
                 string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
                 if (!string.IsNullOrEmpty(sourceButtonName))
                 {
-                    // 获取目标项的 Canvas
-                    Point point = e.GetPosition(MainListView);
-                    var hitTestResult = VisualTreeHelper.HitTest(MainListView, point);
-                    DependencyObject targetItem = hitTestResult.VisualHit;
-
-                    // 查找目标 Canvas
-                    Canvas targetCanvas = FindParent<Canvas>(targetItem);
+                    Point point = e.GetPosition(MainListView); // 获取鼠标位置
+                    var hitTestResult = VisualTreeHelper.HitTest(MainListView, point); // 获取鼠标位置的项
+                    DependencyObject targetItem = hitTestResult.VisualHit; // 获取鼠标位置的项
+                    Canvas targetCanvas = FindParent<Canvas>(targetItem);// 查找目标 Canvas
 
                     if (targetCanvas == null) return; // 如果目标 Canvas 为 null，则返回
                     string targetCanvasName = targetCanvas.Name; // 获取目标 Canvas 的 Name
                     if (sourceButtonName == targetCanvasName) return; // 如果目标 Canvas 与源 Canvas 相同，则返回
 
-                    string style = null; // 按钮样式
-                    int sourceIndex = int.Parse(sourceButtonName.Substring(sourceButtonName.Length - 1));
-                    int targetIndex = int.Parse(targetCanvasName.Substring(targetCanvasName.Length - 1));
+                    int sourceIndex = int.Parse(sourceButtonName.Substring(sourceButtonName.Length - 1)); // 获取源 Button 索引
+                    int targetIndex = int.Parse(targetCanvasName.Substring(targetCanvasName.Length - 1)); // 获取目标 Button 索引
                     Match matchButton = Regex.Match(sourceButtonName, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
-                    if (matchButton.Success)
-                    {
-                        style = matchButton.Groups[1].Value; // 获取按钮名称
-                    }
+                    string style = matchButton.Groups[1].Value; // 动作页样式
 
                     db2.SwapButtonAValues(style, sourceIndex, targetIndex); // 更新数据库 Button A 值
                     var buttonDataList = db2.GetAllButtonData(); // 获取所有按钮数据
@@ -440,20 +433,6 @@ namespace Quicker.Windows
                     LoadCanvas(style); // 刷新界面
                 }
             }
-        }
-
-        // 查找父级控件
-        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            while (child != null)
-            {
-                if (child is T parent)
-                {
-                    return parent;
-                }
-                child = VisualTreeHelper.GetParent(child);
-            }
-            return null;
         }
 
         // 关闭窗口释放图标资源

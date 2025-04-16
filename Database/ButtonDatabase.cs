@@ -291,89 +291,67 @@ namespace Quicker.Database
         public void SwapButtonAValues(string inputString, int a1, int a2)
         {
             List<ButtonData> allButtons = GetAllButtonData(); // 获取所有 Button 数据
-            Dictionary<string, ButtonData> buttonIDMap = new Dictionary<string, ButtonData>(); // 筛选符合条件的 ButtonID
-            foreach (var button in allButtons)
-            {
-                string buttonID = button.ButtonID;
-                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9]+)(\d{3})$"); // 匹配字符部分和三位数字
-                if (match.Success)
-                {
-                    string charPart = match.Groups[1].Value; // 提取字符部分
-                    string abcPart = match.Groups[2].Value; // 提取三位数字部分
-                    int aPart = int.Parse(abcPart[0].ToString()); // 提取 A 部分
-                    if (charPart == inputString && (aPart == a1 || aPart == a2)) // 筛选条件：字符部分与输入字符串相同，且 A 部分是 a1 或 a2
-                    {
-                        buttonIDMap[buttonID] = button;
-                    }
-                }
-            }
+            var buttonIDMap = allButtons
+                .Select(b => new { ButtonID = b.ButtonID, Data = b })
+                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$") &&
+                            Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[1].Value == inputString &&
+                            (int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == a1 ||
+                             int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == a2))
+                .ToDictionary(b => b.ButtonID, b => b.Data); // 筛选出符合条件的 ButtonID
 
             if (buttonIDMap.Count == 0) return; // 没有符合条件的 ButtonID，直接返回
 
-            // 使用事务确保所有操作的原子性
-            using var connection = new SQLiteConnection(dbPath2);
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-
-            string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
-            foreach (var pair in buttonIDMap.ToList()) // 遍历 A1 部分的 ButtonID，将其前面的字符串改为临时标识符
+            using (var connection = new SQLiteConnection(dbPath2))
             {
-                string buttonID = pair.Key;
-                ButtonData button = pair.Value;
-                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9]+)(\d{3})$");
-                if (match.Success)
+                connection.Open(); // 打开数据库连接
+                using (var transaction = connection.BeginTransaction())
                 {
-                    string charPart = match.Groups[1].Value; // 提取字符部分
-                    string abcPart = match.Groups[2].Value; // 提取三位数字部分
-                    int aPart = int.Parse(abcPart[0].ToString()); // 提取 A 部分
-                    if (aPart == a1)
+                    string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
+                    foreach (var pair in buttonIDMap.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
                     {
-                        string newButtonID = $"{tempPrefix}{abcPart}";
-                        UpdateButtonID(connection, buttonID, newButtonID);
-                        buttonIDMap.Remove(buttonID);
-                        buttonIDMap[newButtonID] = button;
+                        string buttonID = pair.Key; // 原 ButtonID
+                        Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
+                        if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a1)
+                        {
+                            string newButtonID = $"{tempPrefix}{match.Groups[2].Value}"; // 新 ButtonID
+                            UpdateButtonID(connection, buttonID, newButtonID); // 更新 ButtonID
+                            buttonIDMap.Remove(buttonID); // 从字典中删除原数据
+                            buttonIDMap[newButtonID] = pair.Value; // 添加新数据
+                        }
                     }
-                }
-            }
 
-            foreach (var pair in buttonIDMap.ToList()) // 遍历 A2 部分的 ButtonID，将其 ID 改为目标 ID
-            {
-                string buttonID = pair.Key;
-                ButtonData button = pair.Value;
-                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9]+)(\d{3})$");
-                if (match.Success)
-                {
-                    string charPart = match.Groups[1].Value; // 提取字符部分
-                    string abcPart = match.Groups[2].Value; // 提取三位数字部分
-                    int aPart = int.Parse(abcPart[0].ToString()); // 提取 A 部分
-                    string bcPart = abcPart.Substring(1);
-                    if (aPart == a2)
+                    foreach (var pair in buttonIDMap.ToList())// 更新 A2 部分的 ButtonID 为目标 ID
                     {
-                        string newButtonID = $"{inputString}{a1}{bcPart}";
-                        UpdateButtonID(connection, buttonID, newButtonID);
-                        buttonIDMap.Remove(buttonID);
-                        buttonIDMap[newButtonID] = button;
+                        string buttonID = pair.Key; // 原 ButtonID
+                        Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
+                        if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a2)
+                        {
+                            string bcPart = match.Groups[2].Value.Substring(1); // 目标 ID 的 B 和 C 部分
+                            string newButtonID = $"{inputString}{a1}{bcPart}"; // 新 ButtonID
+                            UpdateButtonID(connection, buttonID, newButtonID); // 更新 ButtonID
+                            buttonIDMap.Remove(buttonID); // 从字典中删除原数据
+                            buttonIDMap[newButtonID] = pair.Value; // 添加新数据
+                        }
                     }
+
+                    foreach (var pair in buttonIDMap.ToList())// 更新临时标识符的 ButtonID 为目标 ID
+                    {
+                        string buttonID = pair.Key; // 原 ButtonID
+                        if (buttonID.StartsWith(tempPrefix))
+                        {
+                            string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 目标 ID 的 B 和 C 部分
+                            string newButtonID = $"{inputString}{a2}{bcPart}"; // 新 ButtonID
+                            UpdateButtonID(connection, buttonID, newButtonID); // 更新 ButtonID
+                        }
+                    }
+
+                    transaction.Commit(); // 提交事务
                 }
             }
-
-            foreach (var pair in buttonIDMap.ToList()) // 将之前 ID 字符串部分改为临时标识符的 ButtonID 改为目标 ButtonID
-            {
-                string buttonID = pair.Key;
-                if (buttonID.StartsWith(tempPrefix))
-                {
-                    string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 提取 BC 部分
-                    string newButtonID = $"{inputString}{a2}{bcPart}";
-                    UpdateButtonID(connection, buttonID, newButtonID);
-                    buttonIDMap.Remove(buttonID);
-                    buttonIDMap[newButtonID] = pair.Value;
-                }
-            }
-
-            transaction.Commit();
         }
     }
 
+    // ButtonData 类
     public class ButtonData
     {
         public string ButtonID { get; set; }
