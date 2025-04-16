@@ -62,10 +62,10 @@ namespace Quicker.CommonFunctions
         public void Button_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Handled = true; // 标记事件已处理
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
                 e.Effects = DragDropEffects.Copy; // 设置拖拽效果为复制
-            }
+            else if (e.Data.GetDataPresent(typeof(ButtonData))) // 如果拖拽的是按钮
+                e.Effects = DragDropEffects.Move; // 设置拖拽效果为移动
         }
 
         /// <summary>

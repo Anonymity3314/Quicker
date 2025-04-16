@@ -1,22 +1,20 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Runtime.InteropServices;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Windows.Controls;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Database;
 using Microsoft.Win32;
 using System.Windows;
-using DK.Standard;
-using Quicker;
 
 namespace Quicker.Windows
 {
     public partial class SettingWindow : Window
     {
+        private const string DefaultButtonColor = "#FFE0E0E0"; // 默认按钮颜色
+        private const string SelectedButtonColor = "#FFF4F4F4"; // 选中按钮颜色
+
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
         private readonly SettingDatabase db1; // 设置数据库
         private SettingsCache settingsCache; // 缓存对象
@@ -141,17 +139,18 @@ namespace Quicker.Windows
             });
         }
 
-        // 设置Button类型1颜色
+        /// <summary>
+        /// 更新按钮类型1颜色
+        /// </summary>
+        /// <param name="clickedButton">点击的按钮</param>
+        /// <param name="buttonPanel">按钮面板</param>
         private static void UpdateButtonStyle1(Button clickedButton, Panel buttonPanel)
         {
             foreach (var button in buttonPanel.Children.OfType<Button>())
             {
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE0E0E0"));
-            }// 重置所有按钮的颜色
-            if (clickedButton != null)
-            {
-                clickedButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF4F4F4"));
-            }// 设置当前点击的按钮颜色
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor)); // 设置默认颜色
+            }
+            clickedButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor)); // 设置选中颜色
         }
 
         // 设置Button类型2颜色&&字体粗细
@@ -199,13 +198,13 @@ namespace Quicker.Windows
         {
             if (sender is ComboBox comboBox)
             {
-                string comboBoxName = comboBox.Name;
-                int selectedIndex = comboBox.SelectedIndex;
+                string comboBoxName = comboBox.Name; // 获取ComboBox名称
+                int selectedIndex = comboBox.SelectedIndex; // 获取选中项索引
 
                 switch (comboBoxName)
                 {
                     case "WindowStartupLocationComboBox":
-                        settingsCache.WindowStartupLocation = selectedIndex;
+                        settingsCache.WindowStartupLocation = selectedIndex; // 设置窗口启动位置
                         break; // 功能面板打开位置
                 }
             }
@@ -216,8 +215,8 @@ namespace Quicker.Windows
         {
             if (sender is TextBox textBox)
             {
-                string textBoxName = textBox.Name;
-                string textBoxValue = textBox.Text;
+                string textBoxName = textBox.Name; // 获取文本框名称
+                string textBoxValue = textBox.Text; // 获取文本框内容
                 switch (textBoxName)
                 {
                     case "LongPressThresholdTextBox":
@@ -269,9 +268,8 @@ namespace Quicker.Windows
         {
             if (sender is CheckBox checkBox)
             {
-                string checkBoxName = checkBox.Name;
-                bool? isChecked = checkBox.IsChecked;
-
+                string checkBoxName = checkBox.Name; // 获取勾选框名称
+                bool? isChecked = checkBox.IsChecked; // 获取勾选框状态
                 switch (checkBoxName)
                 {
                     case "AutoStartCheckBox":
@@ -293,28 +291,28 @@ namespace Quicker.Windows
                         settingsCache.OpenMainWindowByMiddleMouseClick = isChecked == true;
                         break; // 按下中键
                     case "OpenMainWindowByX1MouseClickCheckBox":
-                        settingsCache.OpenMainWindowByX1MouseClick = isChecked == true;
+                        settingsCache.OpenMainWindowByX1MouseClick = isChecked == true; // 按下X1键
                         break; // 按下X1键
                     case "OpenMainWindowByX2MouseClickCheckBox":
-                        settingsCache.OpenMainWindowByX2MouseClick = isChecked == true;
+                        settingsCache.OpenMainWindowByX2MouseClick = isChecked == true; // 按下X2键
                         break; // 按下X2键
                     case "OpenMainWindowByCtrl_MiddleMouseClickCheckBox":
-                        settingsCache.OpenMainWindowByCtrl_MiddleMouseClick = isChecked == true;
+                        settingsCache.OpenMainWindowByCtrl_MiddleMouseClick = isChecked == true; // Ctrl+中键单击
                         break; // Ctrl+中键单击
                     case "OpenMainWindowByCtrl_RightMouseClickCheckBox":
-                        settingsCache.OpenMainWindowByCtrl_RightMouseClick = isChecked == true;
+                        settingsCache.OpenMainWindowByCtrl_RightMouseClick = isChecked == true; // Ctrl+右键单击
                         break; // Ctrl+右键单击
                     case "OpenMainWindowByMiddleMouseClickLongerCheckBox":
-                        settingsCache.OpenMainWindowByMiddleMouseClickLonger = isChecked == true;
+                        settingsCache.OpenMainWindowByMiddleMouseClickLonger = isChecked == true; // 长按中键
                         break; // 长按中键
                     case "OpenMainWindowByRightMouseClickLongerCheckBox":
-                        settingsCache.OpenMainWindowByRightMouseClickLonger = isChecked == true;
+                        settingsCache.OpenMainWindowByRightMouseClickLonger = isChecked == true; // 长按右键
                         break; // 长按右键
                     case "OpenMainWindowByRightMouseClick_MoveCheckBox":
-                        settingsCache.OpenMainWindowByRightMouseClick_Move = isChecked == true;
+                        settingsCache.OpenMainWindowByRightMouseClick_Move = isChecked == true; // 按右键移动
                         break; // 按右键移动
                     case "OpenMainWindowByCtrlCheckBox":
-                        settingsCache.OpenMainWindowByCtrl = isChecked == true;
+                        settingsCache.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
                         break; // 单击Ctrl键
                 }
             }

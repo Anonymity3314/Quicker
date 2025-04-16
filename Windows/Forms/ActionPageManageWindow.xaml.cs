@@ -376,5 +376,12 @@ namespace Quicker.Windows
             if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
             else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
         }
+
+        // 关闭窗口释放图标资源
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 关闭窗口释放图标资源
+            GC.Collect(); // 释放图标资源
+        }
     }
 }
