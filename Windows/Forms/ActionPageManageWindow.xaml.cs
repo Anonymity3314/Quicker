@@ -48,10 +48,10 @@ namespace Quicker.Windows
             InitializeComponent(); // 初始化窗口
 
             db1 = new SettingDatabase(); // 初始化设置数据库
-            db1.InitializeDatabase(); // 初始化设置数据库
+            db1.Initialize(); // 初始化设置数据库
 
             db2 = new ButtonDatabase(); // 初始化按钮数据库
-            db2.InitializeDatabase(); // 初始化按钮数据库
+            db2.Initialize(); // 初始化按钮数据库
 
             buttonManager = new ButtonManager(); // 初始化按钮管理器
         }

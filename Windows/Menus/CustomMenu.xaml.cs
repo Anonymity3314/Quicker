@@ -22,7 +22,7 @@ namespace Quicker.Windows
             app = (App.Current as App); // 获取App实例
 
             db1 = new SettingDatabase();
-            db1.InitializeDatabase();
+            db1.Initialize();
 
             windowManager = new WindowManager();
         }
@@ -33,7 +33,7 @@ namespace Quicker.Windows
             Task.Run(() =>
             {
                 SettingDatabase db1 = new();
-                db1.InitializeDatabase();
+                db1.Initialize();
             });
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }

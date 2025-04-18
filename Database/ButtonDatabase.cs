@@ -12,7 +12,7 @@ namespace Quicker.Database
         private readonly string dbPath2 = "Data Source=Button.db;Pooling=true;Max Pool Size=100;";
 
         // 初始化数据库
-        public void InitializeDatabase()
+        public void Initialize()
         {
             if (File.Exists("Button.db")) return;
             SQLiteConnection.CreateFile("Button.db");

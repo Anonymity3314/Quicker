@@ -58,10 +58,10 @@ namespace Quicker.Windows
 
             // 初始化数据库
             db1 = new SettingDatabase(); // 初始化设置数据库
-            db1.InitializeDatabase(); // 初始化数据库
+            db1.Initialize(); // 初始化数据库
 
             db2 = new ButtonDatabase(); // 初始化按钮数据库
-            db2.InitializeDatabase(); // 初始化数据库
+            db2.Initialize(); // 初始化数据库
 
             cancellationTokenSource = new CancellationTokenSource(); // 初始化CancellationTokenSource
             app = (App.Current as App); // 获取当前 App 实例

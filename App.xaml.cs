@@ -56,7 +56,7 @@ namespace Quicker
         {
             base.OnStartup(e); // 调用基类的 OnStartup 方法
             db1 = new SettingDatabase(); // 创建数据库
-            db1.InitializeDatabase(); // 创建数据库表
+            db1.Initialize(); // 创建数据库表
             windowManager = new WindowManager(); // 创建窗口管理器
             buttonManager = new ButtonManager(); // 创建按钮管理器
             InitializeTimer(); // 初始化定时器
@@ -132,7 +132,8 @@ namespace Quicker
                 var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置
                 double LongPressThreshold = Conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
                 var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger || OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger) 
+                if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger ||
+                    OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger) 
                 {
                     if(!keyPressStartTime.HasValue) // 如果没有按下时间
                     {
@@ -148,7 +149,7 @@ namespace Quicker
                         pressTimer.Stop(); // 停止计时器
                     }
                 } // 长按中键或右键
-                if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
+                else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
                 {
                     System.Windows.Point currentPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
                     double offsetX = currentPosition.X - startPosition.X; // 计算水平偏移量
@@ -166,10 +167,9 @@ namespace Quicker
         private void Timer_Tick(object sender, EventArgs e)
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置
-            DateTime dateTime = DateTime.Now;
-            Convention.TotalUsageTime += (dateTime - RecordedTime).TotalSeconds; // 每 5 分钟增加 300 秒
+            Convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
             db1.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时长到数据库
-            RecordedTime = dateTime; // 记录应用保存时间
+            RecordedTime = DateTime.Now; // 记录应用保存时间
         }
 
         // 初始化钩子
@@ -262,17 +262,16 @@ namespace Quicker
                 switch (e.Data.Button)
                 {
                     case SharpHook.Native.MouseButton.Button3:
-                        if (pressDuration.TotalSeconds <= 0.3) 
+                        if (pressDuration.TotalSeconds <= 0.3 &&
+                            OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick) 
                         {
-                            if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick) 
-                            {
-                                this.Dispatcher.Invoke(CloseOrShowMainWindow);
-                            }
+                            this.Dispatcher.Invoke(CloseOrShowMainWindow);
                         }
                         break; // 短按中键
                     case SharpHook.Native.MouseButton.Button4: // 短按X1键
                     case SharpHook.Native.MouseButton.Button5:
-                        if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick || OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
+                        if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick || 
+                            OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
                         {
                             if (pressDuration.TotalSeconds <= 0.3)
                             {
@@ -422,14 +421,8 @@ namespace Quicker
         public bool IsMouseOnDesktop()
         {
             IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 调用封装方法
-            if (foregroundWindow == IntPtr.Zero) // 没有窗口获得焦点
-            {
-                return true; // 鼠标在桌面上
-            }
-            else
-            {
-                return false; // 鼠标不在桌面上               
-            }
+            if (foregroundWindow == IntPtr.Zero) return true; // 没有前台窗口
+            else return false; // 鼠标在桌面上
         }
 
         // 弹出菜单栏
@@ -452,7 +445,7 @@ namespace Quicker
         public async void PauseQuicker(object sender, RoutedEventArgs e)
         {
             var toastMessage = Pause ? "Quicker已恢复" : "Quicker已暂停"; // 消息提醒
-            var text = Pause ? "暂停" : "启动"; // 消息提醒
+            var text = Pause ? "暂停" : "恢复"; // 消息提醒
             var icon1 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative));
             var icon2 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker2.ico", UriKind.Relative));
             CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏

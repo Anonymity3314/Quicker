@@ -8,7 +8,7 @@ public class SettingDatabase
     private readonly string dbPath1 = "Data Source=Setting.db;Pooling=true;Max Pool Size=100;";
 
     // 初始化数据库
-    public void InitializeDatabase()
+    public void Initialize()
     {
         if (!File.Exists("Setting.db"))
         {

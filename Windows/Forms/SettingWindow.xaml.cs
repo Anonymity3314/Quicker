@@ -75,10 +75,18 @@ namespace Quicker.Windows
             timer.Start(); // 启动定时器
             Application.Current.Dispatcher.Invoke(() => // 更新界面显示
             {
-                CurrentUsingTimeTextBlock.Text = TimeSpan.FromSeconds(currentSessionTime).ToString(@"hh\:mm\:ss"); // 当次应用使用时长
-                TotalUsageTimeTextBlock.Text = TimeSpan.FromSeconds(totalUsageTime).ToString(@"hh\:mm\:ss"); // 总使用时长
+                // 当次应用使用时长
+                var currentSessionTimeSpan = TimeSpan.FromSeconds(currentSessionTime);
+                double currentSessionHours = currentSessionTimeSpan.TotalHours;
+                CurrentUsingTimeTextBlock.Text = $"{currentSessionHours:0}:{currentSessionTimeSpan:mm}:{currentSessionTimeSpan:ss}";
+
+                // 总使用时长
+                var totalTimeSpan = TimeSpan.FromSeconds(totalUsageTime);
+                double totalHours = totalTimeSpan.TotalHours;
+                TotalUsageTimeTextBlock.Text = $"{totalHours:0}:{totalTimeSpan:mm}:{totalTimeSpan:ss}";
             });
         }
+
 
         // 异步加载常规设置信息
         private async Task LoadSettingsAsync()
@@ -112,14 +120,22 @@ namespace Quicker.Windows
         }
 
         // 定时器每秒更新使用时长
+        // 定时器每秒更新使用时长
         private void Timer_Tick(object sender, EventArgs e)
         {
-            currentSessionTime++; // 更新当次应用使用时长
-            totalUsageTime++; // 更新总使用时长
+            currentSessionTime += 1; // 更新当次应用使用时长
+            totalUsageTime += 1; // 更新总使用时长
             Application.Current.Dispatcher.Invoke(() => // 更新界面显示
             {
-                CurrentUsingTimeTextBlock.Text = TimeSpan.FromSeconds(currentSessionTime).ToString(@"hh\:mm\:ss"); // 当次应用使用时长
-                TotalUsageTimeTextBlock.Text = TimeSpan.FromSeconds(totalUsageTime).ToString(@"hh\:mm\:ss"); // 总使用时长
+                // 当次应用使用时长
+                var currentSessionTimeSpan = TimeSpan.FromSeconds(currentSessionTime);
+                double currentSessionHours = currentSessionTimeSpan.TotalHours;
+                CurrentUsingTimeTextBlock.Text = $"{currentSessionHours:0}:{currentSessionTimeSpan:mm}:{currentSessionTimeSpan:ss}";
+
+                // 总使用时长
+                var totalTimeSpan = TimeSpan.FromSeconds(totalUsageTime);
+                double totalHours = totalTimeSpan.TotalHours;
+                TotalUsageTimeTextBlock.Text = $"{totalHours:0}:{totalTimeSpan:mm}:{totalTimeSpan:ss}";
             });
         }
 

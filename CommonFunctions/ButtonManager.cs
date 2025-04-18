@@ -40,10 +40,10 @@ namespace Quicker.CommonFunctions
         public ButtonManager()
         {
             db1 = new SettingDatabase(); // 初始化设置数据库
-            db1.InitializeDatabase(); // 初始化设置数据库
+            db1.Initialize(); // 初始化设置数据库
 
             db2 = new ButtonDatabase(); // 初始化按钮数据库
-            db2.InitializeDatabase(); // 初始化按钮数据库
+            db2.Initialize(); // 初始化按钮数据库
 
             iconManager = new IconManager(); // 初始化图标管理器
 
@@ -355,7 +355,6 @@ namespace Quicker.CommonFunctions
                         isClosing = false;
                     };
                     selectActionPageMenu.Show();
-
                     break;
             }
         }
