@@ -41,8 +41,8 @@ namespace Quicker.Windows
         private readonly IconManager iconManager; // 图标管理器
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
-        private readonly string CommonStyle; // 样式
         private bool shouldHideTooltip; // 隐藏提示标志
+        private string CommonStyle; // 样式
         private readonly App app; // App实例
 
         public MainWindow(string Style)
@@ -76,8 +76,8 @@ namespace Quicker.Windows
 
                 var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
                 bool haveCommonStyleButton = buttonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 是否存在通用样式按钮
-                if (haveCommonStyleButton) GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
-                else GenerateCanvas(0, "Common"); // 生成通用 Canvas
+                if (!haveCommonStyleButton) CommonStyle = "Common"; // 如果不存在通用样式按钮，设置为默认样式
+                GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
 
                 GetTotalAntionPageIndex(); // 获取总的页面数
                 GenerateButtons(); // 生成按钮
