@@ -12,8 +12,10 @@ namespace Quicker.Windows
 {
     public partial class SettingWindow : Window
     {
-        private const string DefaultButtonColor = "#FFE0E0E0"; // 默认按钮颜色
-        private const string SelectedButtonColor = "#FFF4F4F4"; // 选中按钮颜色
+        private const string DefaultButtonColor1 = "#FFE0E0E0"; // 默认按钮颜色
+        private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮颜色
+        private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
+        private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
 
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
         private readonly SettingDatabase db1; // 设置数据库
@@ -30,13 +32,12 @@ namespace Quicker.Windows
         }
 
         // 设置StackPanel可见性
-        private static void SetStackPanelVisibility(StackPanel childrenstackpanel, Grid fathergrid)
+        private void SetStackPanelVisibility(StackPanel childrenstackpanel)
         {
-            foreach (var stackpanel in fathergrid.Children.OfType<StackPanel>())
+            foreach (var stackpanel in MenuGrid.Children.OfType<StackPanel>())
             {
-                stackpanel.Visibility = Visibility.Hidden;
-            } // 重置所有StackPanel的可见性
-            childrenstackpanel.Visibility = Visibility.Visible; // 设置指定StackPanel的可见性
+                stackpanel.Visibility = stackpanel == childrenstackpanel? Visibility.Visible: Visibility.Hidden;
+            }
         }
 
         // 设置Grid可见性
@@ -44,18 +45,16 @@ namespace Quicker.Windows
         {
             foreach (var grid in fathergrid.Children.OfType<Grid>())
             {
-                grid.Visibility = Visibility.Collapsed;
-            } // 重置所有Grid的可见性
-            childrengrid.Visibility = Visibility.Visible; // 设置指定Grid的可见性
+                grid.Visibility = grid == childrengrid? Visibility.Visible: Visibility.Collapsed;
+            }
         }
 
         // 初始化窗口
         private async void InitializeWindow()
         {
-            SetStackPanelVisibility(BasicSettingStackPanel, MenuGrid); // 设置默认显示的StackPanel
-            UpdateButtonStyle2(Convention, BasicSettingStackPanel);
-            SetGridVisible(ConventionGrid, ResultGrid); // 设置默认显示的Grid
-            
+            SetStackPanelVisibility(BasicSettingStackPanel); // 设置默认显示的StackPanel
+            ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid);
+
             await LoadUsageTimeAsync(); // 异步加载使用时长           
             await LoadSettingsAsync(); // 异步加载常规设置信息
         }
@@ -87,12 +86,10 @@ namespace Quicker.Windows
             });
         }
 
-
         // 异步加载常规设置信息
         private async Task LoadSettingsAsync()
         {
-            // 模拟异步操作
-            await Task.Run(() =>
+            await Task.Run(() => // 模拟异步操作
             {
                 var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
                 var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
@@ -119,7 +116,6 @@ namespace Quicker.Windows
             });
         }
 
-        // 定时器每秒更新使用时长
         // 定时器每秒更新使用时长
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -156,32 +152,87 @@ namespace Quicker.Windows
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="targetStackPanel"></param>
+        /// <param name="targetButton"></param>
+        /// <param name="fatherStackPanel"></param>
+        private void ButtonStyle1_Click(StackPanel targetStackPanel, Button targetButton, StackPanel fatherStackPanel)
+        {
+            SetStackPanelVisibility(targetStackPanel); // 设置StackPanel可见性
+            UpdateButtonStyle1(targetButton); // 设置Button类型1颜色
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="stackPanel"></param>
+        private void ButtonStyle1_MouseLeave(object sender, StackPanel stackPanel)
+        {
+            Button button = sender as Button;
+            button.Background = stackPanel.Visibility == Visibility.Visible ?
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1)) :
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1));
+        }
+
+        /// <summary>
         /// 更新按钮类型1颜色
         /// </summary>
         /// <param name="clickedButton">点击的按钮</param>
         /// <param name="buttonPanel">按钮面板</param>
-        private static void UpdateButtonStyle1(Button clickedButton, Panel buttonPanel)
+        private void UpdateButtonStyle1(Button clickedButton)
         {
-            foreach (var button in buttonPanel.Children.OfType<Button>())
+            foreach (var button in MainStackPanel.Children.OfType<Button>())
             {
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor)); // 设置默认颜色
+                button.Background = button == clickedButton ?
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1)) :
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1));
             }
-            clickedButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor)); // 设置选中颜色
         }
 
-        // 设置Button类型2颜色&&字体粗细
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="targetButton"></param>
+        /// <param name="stackPanel"></param>
+        /// <param name="targetGrid"></param>
+        /// <param name="fatherGrid"></param>
+        private void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, Grid targetGrid, Grid fatherGrid)
+        {
+            if (targetGrid.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
+            UpdateButtonStyle2(targetButton, stackPanel); // 更新Button外观
+            SetGridVisible(targetGrid, fatherGrid); // 设置Grid可见性
+        }
+
+        /// <summary>
+        /// 设置Button类型2颜色&&字体粗细
+        /// </summary>
+        /// <param name="clickedButton"> 点击的按钮</param>
+        /// <param name="buttonPanel"> 按钮所在的Panel</param>
         private static void UpdateButtonStyle2(Button clickedButton, Panel buttonPanel)
         {
             foreach (var button in buttonPanel.Children.OfType<Button>())
             {
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF0F0F0"));
-                button.FontWeight = FontWeights.Normal;
-            }// 重置所有按钮的颜色&&字体粗细
-            if (clickedButton != null)
-            {
-                clickedButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFAFAFA"));
-                clickedButton.FontWeight = FontWeights.Bold;
-            }// 设置当前点击的按钮颜色&&加粗字体
+                button.Background = button == clickedButton ?
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
+                button.FontWeight = button == clickedButton ? FontWeights.Bold : FontWeights.Normal; // 设置字体粗细
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="targetGrid"></param>
+        private void ButtonStyle2_MouseLeave(object sender, Grid targetGrid)
+        {
+            Button button = sender as Button;
+            button.Background = targetGrid.Visibility == Visibility.Visible?
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)):
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2));
         }
 
         // 设置Button类型3边框
@@ -420,35 +471,20 @@ namespace Quicker.Windows
         // 基础设置
         private void BasicSetting_Click(object sender, RoutedEventArgs e)
         {
-            SetStackPanelVisibility(BasicSettingStackPanel, MenuGrid); // 设置StackPanel可见性
-            UpdateButtonStyle1(BasicSetting, MainStackPanel); // 设置Button类型1颜色
+            ButtonStyle1_Click(BasicSettingStackPanel, BasicSetting, MainStackPanel);
         }
         // 鼠标移出Button恢复Background
         private void BasicSetting_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (BasicSettingStackPanel.Visibility == Visibility.Visible)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF4F4F4"));
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE0E0E0"));
-                }
-            }
+            ButtonStyle1_MouseLeave(sender, BasicSettingStackPanel);
         }
 
 
         // 基础设置-常规
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
-            if(ConventionGrid.Visibility == Visibility.Visible)
-            {
-                return; // 如果常规设置面板已经打开，则不执行任何操作
-            } // 防止重复加载
-            // 更新Button外观
-            UpdateButtonStyle2(Convention, BasicSettingStackPanel);
+            ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid);
+            ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
 
             // 加载常规设置信息
             AutoStartCheckBox.IsChecked = settingsCache.AutoStart; // 加载开机自启动设置
@@ -458,42 +494,18 @@ namespace Quicker.Windows
             LongPressThresholdTextBox.Text = settingsCache.LongPressThreshold.ToString(); // 加载长按阈值设置
             MouseMovePixelsTextBox.Text = settingsCache.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
             LoopPageFlippingCheckBox.IsChecked = settingsCache.LoopPageFlipping; // 加载循环翻页设置
-
-            // 设置ApplySettingsButton可见性
-            Button ApplySettingsButton = FindName("ApplySettingsButton") as Button; // 获取ApplySettingsButton
-            ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
-
-            // 设置Grid可见性
-            SetGridVisible(ConventionGrid, ResultGrid);
         }
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (ConventionGrid.Visibility == Visibility.Visible)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFAFAFA"));
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF0F0F0"));
-                }
-            }
+            ButtonStyle2_MouseLeave(sender, ConventionGrid);
         }
 
         // 基础设置-弹出面板
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
-            // 更新Button外观
-            UpdateButtonStyle2(OpenMainWindow, BasicSettingStackPanel);
-
-            // 设置ApplySettingsButton可见性
-            Button ApplySettingsButton = FindName("ApplySettingsButton") as Button; // 获取ApplySettingsButton
+            ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid);
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
-
-            // 设置Grid可见性
-            SetGridVisible(OpenMainWindowGrid, ResultGrid);
 
             // 重置测试Button
             TestButton.Content = "按键测试区";
@@ -513,17 +525,7 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void OpenMainWindow_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (OpenMainWindowGrid.Visibility == Visibility.Visible)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFAFAFA"));
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF0F0F0"));
-                }
-            }
+            ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid);
         }
 
         // 基础设置-弹出面板-弹出面板
@@ -767,34 +769,52 @@ namespace Quicker.Windows
             UpdateButtonStyle3(DoActionKeyboardButton, OpenMainWindowGrid);
         }*/
 
+        // 基础设置-黑名单
+        private void Blacklist_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid);
+            ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
+        }
+        // 鼠标移出Button恢复Background
+        private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
+        {
+            ButtonStyle2_MouseLeave(sender, BlacklistGrid);
+        }
+
+        // 基础设置-外观
+        private void Appearance_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid);
+            SetGridVisible(AppearanceGrid, ResultGrid); // 设置Grid可见性
+        }
+        // 鼠标移出Button恢复Background
+        private void Appearance_MouseLeave(object sender, MouseEventArgs e)
+        {
+            ButtonStyle2_MouseLeave(sender, AppearanceGrid);
+        }
+
+        // 鼠标移入界面显示滚动条
+        private void ScrollViewer_MouseEnter(object sender, MouseEventArgs e)
+        {
+            AppearanceButtonGridScrollBar.Visibility = Visibility.Visible;
+        }
+
+        // 鼠标移出界面隐藏滚动条
+        private void ScrollViewer_MouseLeave(object sender, MouseEventArgs e)
+        {
+            AppearanceButtonGridScrollBar.Visibility = Visibility.Hidden;
+        }
+
         // 基础设置-关于Quicker
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
-            // 更新Button外观
-            UpdateButtonStyle2(AboutQuicker, BasicSettingStackPanel); // 设置Button类型2颜色&&字体粗细
-            AboutQuickerGrid.BringIntoView(); // 滚动到AboutQuickerGrid
-
-            // 设置ApplySettingsButton可见性
-            Button ApplySettingsButton = FindName("ApplySettingsButton") as Button; // 获取ApplySettingsButton
+            ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid);
             ApplySettingsButton.Visibility = Visibility.Hidden; // 设置ApplySettingsButton可见性
-
-            // 设置Grid可见性
-            SetGridVisible(AboutQuickerGrid, ResultGrid);
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (AboutQuickerGrid.Visibility == Visibility.Visible)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFAFAFA"));
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF0F0F0"));
-                }
-            }
+            ButtonStyle2_MouseLeave(sender, AboutQuickerGrid);
         }
 
         // 基础设置-关于Quicker-关于Quicker
@@ -851,51 +871,31 @@ namespace Quicker.Windows
         // 辅助功能
         private void Auxiliary_Functions_Click(object sender, RoutedEventArgs e)
         {
-            SetStackPanelVisibility(Auxiliary_FunctionsStackPanel, MenuGrid); // 设置StackPanel可见性
-            UpdateButtonStyle1(Auxiliary_Functions, MainStackPanel); // 设置Button类型1颜色
+            ButtonStyle1_Click(Auxiliary_FunctionsStackPanel, Auxiliary_Functions, MainStackPanel);
         }
         // 鼠标移出Button恢复Background
         private void Auxiliary_Functions_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (Auxiliary_FunctionsStackPanel.Visibility == Visibility.Visible)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF4F4F4"));
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE0E0E0"));
-                }
-            }
+            ButtonStyle1_MouseLeave(sender, Auxiliary_FunctionsStackPanel);
         }
 
         // 工具
         private void Tools_Click(object sender, RoutedEventArgs e)
         {
-            SetStackPanelVisibility(ToolsStackPanel, MenuGrid); // 设置StackPanel可见性
-            UpdateButtonStyle1(Tools, MainStackPanel); // 设置Button类型1颜色
+            ButtonStyle1_Click(ToolsStackPanel, Tools, MainStackPanel);
         }
         // 鼠标移出Button恢复Background
         private void Tools_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (sender is Button button)
-            {
-                if (ToolsStackPanel.Visibility == Visibility.Visible)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF4F4F4"));
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE0E0E0"));
-                }
-            }
+            ButtonStyle1_MouseLeave(sender, ToolsStackPanel);
         }
 
+        // 关闭窗口回收资源
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e); // 调用基类的OnClosing方法
             timer.Stop(); // 停止定时器
+            GC.Collect();
         }
 
         // 缓存对象类

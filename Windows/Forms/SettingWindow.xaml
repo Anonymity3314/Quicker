@@ -52,10 +52,16 @@
                         <TextBlock Text="弹出面板" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
-                <Button x:Name="Blacklist" ToolTip="在某些应用上停止使用Quicker" Style="{StaticResource Button2}" Visibility="Collapsed" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
+                <Button x:Name="Blacklist" ToolTip="在某些应用上停止使用Quicker" Style="{StaticResource Button2}" Visibility="Collapsed" Click="Blacklist_Click" MouseLeave="Blacklist_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="黑名单" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                </Button>
+                <Button x:Name="Appearance" ToolTip="颜色、字体等样式设置" Style="{StaticResource Button2}" Click="Appearance_Click" MouseLeave="Appearance_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="外观" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
                 <Button x:Name="AboutQuicker" ToolTip="应用等相关信息" Style="{StaticResource Button2}" Click="AboutQuicker_Click" MouseLeave="AboutQuicker_MouseLeave">
@@ -85,7 +91,7 @@
             <Rectangle Fill="#FF707070" VerticalAlignment="Top" Height="1" Margin="0,43,0,0" Grid.Column="1"/>
 
             <!-- 基础设置-常规 -->
-            <Grid x:Name="ConventionGrid" Visibility="Visible" Grid.ColumnSpan="2">
+            <Grid x:Name="ConventionGrid" Visibility="Hidden" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="15*"/>
                     <ColumnDefinition Width="952*"/>
@@ -192,6 +198,45 @@
                 </Grid>
             </Grid>
 
+            <!-- 基础设置-黑名单 -->
+            <Grid x:Name="BlacklistGrid" Visibility="Hidden" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="952*"/>
+                </Grid.ColumnDefinitions>
+                <!-- 基础设置-黑名单-黑名单应用 -->
+                <Button x:Name="BlacklistButton"  Content="黑名单应用" ToolTip="设定需要禁用Quicker的软件" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="91" Grid.Column="1" Height="30"/>
+                <Grid x:Name="BlacklistButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="186*"/>
+                        <ColumnDefinition Width="133*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                </Grid>
+            </Grid>
+
+            <!-- 基础设置-外观 -->
+            <Grid x:Name="AppearanceGrid" Visibility="Visible" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                    <ColumnDefinition Width="952*"/>
+                </Grid.ColumnDefinitions>
+                <!-- 基础设置-外观-面板窗口 -->
+                <Button x:Name="AppearanceButton"  Content="面板窗口" ToolTip="外观设置" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="74" Grid.Column="1" Height="30"/>
+                <Grid x:Name="AppearanceButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="186*"/>
+                        <ColumnDefinition Width="133*"/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Hidden" MouseEnter="ScrollViewer_MouseEnter" MouseLeave="ScrollViewer_MouseLeave">
+                        <Grid>
+                            
+                        </Grid>
+                    </ScrollViewer>
+                    <ScrollBar x:Name="AppearanceButtonGridScrollBar" Grid.Column="0" Margin="541,0,0,0"/>
+                </Grid>
+            </Grid>
+
             <!-- 基础设置-关于Quicker -->
             <Grid x:Name="AboutQuickerGrid" Visibility="Hidden" Grid.ColumnSpan="2">
                 <Grid.ColumnDefinitions>
@@ -218,21 +263,9 @@
                     </Label>
                     <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
                     <Label HorizontalAlignment="Left" Margin="9,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
-                    <Label x:Name="www_iconfont_cn" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Content="www.iconfont.cn" MouseDoubleClick="www_iconfont_cn_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1">
-                        <Label.ToolTip>
-                            <ToolTip Content="双击前往" FontSize="12" Foreground="Black"/>
-                        </Label.ToolTip>
-                    </Label>
-                    <Label x:Name="fontawesome_com" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Content="fontawesome.com" MouseDoubleClick="fontawesome_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1">
-                        <Label.ToolTip>
-                            <ToolTip Content="双击前往" FontSize="12" Foreground="Black"/>
-                        </Label.ToolTip>
-                    </Label>
-                    <Label x:Name="icons8_com" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Content="icons8.com" MouseDoubleClick="icons8_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1">
-                        <Label.ToolTip>
-                            <ToolTip Content="双击前往" FontSize="12" Foreground="Black"/>
-                        </Label.ToolTip>
-                    </Label>
+                    <Label x:Name="www_iconfont_cn" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Content="www.iconfont.cn" MouseDoubleClick="www_iconfont_cn_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+                    <Label x:Name="fontawesome_com" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Content="fontawesome.com" MouseDoubleClick="fontawesome_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+                    <Label x:Name="icons8_com" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Content="icons8.com" MouseDoubleClick="icons8_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
                 </Grid>
 
                 <!-- 基础设置-关于Quicker-隐私声明 -->
