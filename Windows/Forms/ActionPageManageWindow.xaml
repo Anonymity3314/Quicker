@@ -42,22 +42,22 @@
         <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28" TextChanged="SearchTextBox_TextChanged"/>
         <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">
             <StackPanel x:Name="ActionPagesButtonPanel">
-                <Button Style="{StaticResource ActionPageButton}" Click="GlobalButton_Click">
+                <Button x:Name="Global" Style="{StaticResource ActionPageButton}" Click="GlobalButton_Click">
                     <Grid>
                         <TextBlock Text="全局" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
                     </Grid>
                 </Button>
-                <Button Style="{StaticResource ActionPageButton}" Click="CommonButton_Click">
+                <Button x:Name="Common" Style="{StaticResource ActionPageButton}" Click="CommonButton_Click">
                     <Grid>
                         <TextBlock Text="通用" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
                     </Grid>
                 </Button>
-                <Button Style="{StaticResource ActionPageButton}" Click="TaskBarButton_Click">
+                <Button x:Name="TaskBar" Style="{StaticResource ActionPageButton}" Click="TaskBarButton_Click">
                     <Grid>
                         <TextBlock Text="任务栏" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
                     </Grid>
                 </Button>
-                <Button Style="{StaticResource ActionPageButton}" Click="DesktopButton_Click">
+                <Button x:Name="Desktop" Style="{StaticResource ActionPageButton}" Click="DesktopButton_Click">
                     <Grid>
                         <TextBlock Text="桌面" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
                     </Grid>

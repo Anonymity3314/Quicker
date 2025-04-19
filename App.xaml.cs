@@ -193,7 +193,7 @@ namespace Quicker
             }// 提前判断，减少不必要的逻辑判断
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.BeginInvoke(() =>
             {
                 isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
             }); // 在 UI 线程中获取键盘状态

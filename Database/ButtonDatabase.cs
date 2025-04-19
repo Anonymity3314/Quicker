@@ -36,60 +36,6 @@ namespace Quicker.Database
             );";
             using var command = new SQLiteCommand(createTableQuery, connection);
             command.ExecuteNonQuery();
-
-            InsertDefaultData(connection); // 插入初始数据
-        }
-
-        // 插入初始数据
-        private void InsertDefaultData(SQLiteConnection connection)
-        {
-            // 检查是否已有默认数据
-            string checkQuery = "SELECT COUNT(*) FROM ButtonData WHERE ButtonID = @ButtonID";
-            using var checkCommand = new SQLiteCommand(checkQuery, connection);
-
-            // 插入 Desktop011
-            checkCommand.Parameters.AddWithValue("@ButtonID", "Desktop011");
-            if (checkCommand.ExecuteScalar() is long count && count == 0)
-            {
-                using var insertCommand = new SQLiteCommand("INSERT INTO ButtonData " +
-                    "(ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime) " +
-                    "VALUES " +
-                    "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
-                    connection);
-                insertCommand.Parameters.AddWithValue("@ButtonID", "Desktop011");
-                insertCommand.Parameters.AddWithValue("@ButtonName", null);
-                insertCommand.Parameters.AddWithValue("@Location", null);
-                insertCommand.Parameters.AddWithValue("@ImagePath", null);
-                insertCommand.Parameters.AddWithValue("@RunByMessager", null);
-                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", null);
-                insertCommand.Parameters.AddWithValue("@WindowState", null);
-                insertCommand.Parameters.AddWithValue("@Usage", null);
-                insertCommand.Parameters.AddWithValue("@CreateTime", null);
-                insertCommand.Parameters.AddWithValue("@LatestEditTime", null);
-                insertCommand.ExecuteNonQuery();
-            }
-
-            // 插入 TaskBar011
-            checkCommand.Parameters.AddWithValue("@ButtonID", "TaskBar011");
-            if (checkCommand.ExecuteScalar() is long count2 && count2 == 0)
-            {
-                using var insertCommand = new SQLiteCommand("INSERT INTO ButtonData " +
-                    "(ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime) " +
-                    "VALUES " +
-                    "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
-                    connection);
-                insertCommand.Parameters.AddWithValue("@ButtonID", "TaskBar011");
-                insertCommand.Parameters.AddWithValue("@ButtonName", null);
-                insertCommand.Parameters.AddWithValue("@Location", null);
-                insertCommand.Parameters.AddWithValue("@ImagePath", null);
-                insertCommand.Parameters.AddWithValue("@RunByMessager", null);
-                insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", null);
-                insertCommand.Parameters.AddWithValue("@WindowState", null);
-                insertCommand.Parameters.AddWithValue("@Usage", null);
-                insertCommand.Parameters.AddWithValue("@CreateTime", null);
-                insertCommand.Parameters.AddWithValue("@LatestEditTime", null);
-                insertCommand.ExecuteNonQuery();
-            }
         }
 
         /// <summary>

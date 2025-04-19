@@ -1,15 +1,19 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using Windows.Management.Deployment;
 using System.Collections.Concurrent;
 using System.Windows.Media.Imaging;
 using System.Security.Cryptography;
+using Windows.ApplicationModel;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Data;
+using System.Diagnostics;
 using Quicker.Database;
+using System.Xml.Linq;
 using Microsoft.Win32;
 using System.Windows;
 using System.Text;
@@ -588,18 +592,15 @@ namespace Quicker.Windows
             }
         }
 
-        // 外部滚动条的滚动事件
+        // 同步滚动条数据
         private void VerticalScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             scrollViewer.ScrollToVerticalOffset(VerticalScrollBar.Value);
         }
-
         private void HorizontalScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             scrollViewer.ScrollToHorizontalOffset(HorizontalScrollBar.Value);
         }
-
-        // ScrollViewer的滚动事件
         private void ListViewScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (scrollViewer != null)
@@ -613,6 +614,128 @@ namespace Quicker.Windows
                 HorizontalScrollBar.Maximum = scrollViewer.ScrollableWidth; // 设置最大值
                 HorizontalScrollBar.ViewportSize = scrollViewer.ViewportWidth; // 设置视口大小
                 HorizontalScrollBar.Value = scrollViewer.HorizontalOffset; // 设置当前值
+            }
+        }
+
+        // 加载应用商店应用
+        public void LoadUWPApps()
+        {
+            try
+            {
+                PackageManager packageManager = new PackageManager();
+                var packages = packageManager.FindPackagesForUser("");
+                foreach (var package in packages)
+                {
+                    try
+                    {
+                        if (package.IsFramework || package.IsResourcePackage || package.IsBundle)
+                        {
+                            continue;// 跳过框架包、资源包和系统组件
+                        } // 跳过框架包、资源包和系统组件
+                        if (string.IsNullOrWhiteSpace(package.DisplayName) ||
+                            package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue; // 跳过没有显示名称或显示名称是包ID的应用
+                        } // 跳过没有显示名称或显示名称是包ID的应用
+                        if (package.IsDevelopmentMode)
+                        {
+                            continue; // 跳过开发模式安装的应用
+                        } // 跳过开发模式安装的应用
+                        if (package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
+                            package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue; // 跳过Microsoft系统应用
+                        } // 跳过Microsoft系统应用
+
+                        // 获取显示名称
+                        var displayName = package.DisplayName;
+                        var packageFamilyName = package.Id.FamilyName;
+                        ImageSource icon = ExtractUWPAppIcon(packageFamilyName); // 获取应用图标
+                        _allApplications.Add(new AppInfo
+                        {
+                            Name = displayName,
+                            Location = packageFamilyName,
+                            Icon = icon
+                        }); // 添加到应用列表
+                    }
+                    catch { } // 忽略单个包的错误
+                }
+            }
+            catch { } // 忽略异常
+        }
+
+        private ImageSource ExtractUWPAppIcon(string packageFamilyName)
+        {
+            try
+            {
+                // 获取 UWP 应用的安装目录路径
+                string installPath = GetUWPAppInstallPath(packageFamilyName);
+                if (string.IsNullOrEmpty(installPath))
+                {
+                    return null;
+                }
+
+                // 从 AppxManifest.xml 文件中提取图标路径
+                string manifestPath = Path.Combine(installPath, "AppxManifest.xml");
+                if (!File.Exists(manifestPath))
+                {
+                    return null;
+                }
+
+                XDocument doc = XDocument.Load(manifestPath);
+                XNamespace ns = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
+                var visualElements = doc.Descendants(ns + "VisualElements").FirstOrDefault();
+                if (visualElements == null)
+                {
+                    return null;
+                }
+
+                string iconPath = visualElements.Attribute("Square150x150Logo")?.Value
+                               ?? visualElements.Attribute("Square44x44Logo")?.Value
+                               ?? visualElements.Attribute("Logo")?.Value;
+                if (string.IsNullOrEmpty(iconPath))
+                {
+                    return null;
+                }
+
+                // 构建完整的图标文件路径
+                iconPath = iconPath.Replace('/', '\\');
+                string fullIconPath = Path.Combine(installPath, iconPath);
+
+                // 加载图标
+                return LoadIconFromPath(fullIconPath);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error extracting UWP app icon: " + ex.Message);
+                return null;
+            }
+        }
+
+        private string GetUWPAppInstallPath(string packageFamilyName)
+        {
+            var package = new PackageManager().FindPackageForUser("", packageFamilyName);
+            return package?.InstalledLocation.Path;
+        }
+
+        private ImageSource LoadIconFromPath(string filePath)
+        {
+            try
+            {
+                var bitmap = new BitmapImage();
+                using (var stream = File.OpenRead(filePath))
+                {
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = stream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                }
+                bitmap.Freeze();
+                return bitmap;
+            }
+            catch
+            {
+                return null;
             }
         }
 

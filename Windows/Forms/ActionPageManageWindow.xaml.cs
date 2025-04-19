@@ -35,6 +35,7 @@ namespace Quicker.Windows
             return null;
         } // 查找父级控件
 
+        private Dictionary<string, List<string>> buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
         private readonly ButtonManager buttonManager; // 按钮管理器
         private readonly SettingDatabase db1; // 设置数据库
@@ -68,7 +69,69 @@ namespace Quicker.Windows
         }
 
         // 加载动作页按钮
-        private void LoadActionPageButtons()
+        private void LoadButtonPrefixes()
+        {
+            // 定义按钮名称和文本的映射
+            var buttonInfo = new[]
+            {
+                new { Name = "Global", Text = "全局" },
+                new { Name = "Common", Text = "通用" },
+                new { Name = "TaskBar", Text = "任务栏" },
+                new { Name = "Desktop", Text = "桌面" }
+            };
+
+            // 为每个按钮创建事件处理方法
+            var buttonClickHandlers = new[]
+            {
+                new RoutedEventHandler(GlobalButton_Click),
+                new RoutedEventHandler(CommonButton_Click),
+                new RoutedEventHandler(TaskBarButton_Click),
+                new RoutedEventHandler(DesktopButton_Click)
+            };
+
+            // 动态生成按钮
+            for (int i = 0; i < buttonInfo.Length; i++)
+            {
+                var button = new Button();
+                button.Name = buttonInfo[i].Name;
+                button.Style = FindResource("ActionPageButton") as Style; // 应用样式
+
+                // 创建按钮内容
+                Grid buttonContent = new Grid();
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = buttonInfo[i].Text;
+                textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                textBlock.VerticalAlignment = VerticalAlignment.Center;
+                textBlock.FontSize = 14;
+                buttonContent.Children.Add(textBlock);
+                button.Content = buttonContent;
+
+                // 设置点击事件
+                button.Click += buttonClickHandlers[i];
+
+                // 将按钮添加到StackPanel
+                ActionPagesButtonPanel.Children.Add(button);
+            }
+
+
+            buttonPrefixDict = new Dictionary<string, List<string>>();
+            foreach (var data in buttonDataDict.Values)
+            {
+                string buttonID = data.ButtonID; // 获取按钮ID
+                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
+                if (match.Success)
+                {
+                    string style = match.Groups[1].Value; // 获取按钮名称
+                    if (!buttonPrefixDict.ContainsKey(style))
+                    {
+                        buttonPrefixDict.Add(style, new List<string>());
+                    }
+                }
+            }
+        }
+
+        // 生成动作页按钮
+        private void GenerateButtons(string style)
         {
 
         }
@@ -81,11 +144,6 @@ namespace Quicker.Windows
         {
             MainListView.Items.Clear(); // 清空总列表视图
             int TotalAntionPageIndex = GetTotalAntionPageIndex(style); // 获取总动作页索引
-            for (int i = 0; i <= TotalAntionPageIndex; i++)
-            {
-                GenerateCanvas(i, style); // 生成动作页
-            }
-
             switch (style)
             {
                 case "Global":
@@ -102,14 +160,10 @@ namespace Quicker.Windows
                     bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith($"{style}")); // 是否有 style 样式的按钮
                     if (!haveCommonStyleButton) // 如果没有 style 样式的按钮
                     {
-                        var canvasCollection = FindVisualChildren<Canvas>(MainListView); // 获取动作页集合
-                        foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
-                        {
-                            canvas.Visibility = Visibility.Hidden; // 隐藏动作页
-                        }
                         MainBorder.Height = 224; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
                         AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+                        return;
                     }
                     else
                     {
@@ -118,6 +172,11 @@ namespace Quicker.Windows
                         AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
                     }
                     break;
+            }
+
+            for (int i = 0; i <= TotalAntionPageIndex; i++)
+            {
+                GenerateCanvas(i, style); // 生成动作页
             }
         }
 
@@ -452,7 +511,7 @@ namespace Quicker.Windows
             }
         }
 
-        // 查找动作页
+        // 查找动作页按钮
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写

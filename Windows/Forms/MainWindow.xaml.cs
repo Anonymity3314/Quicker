@@ -117,7 +117,6 @@ namespace Quicker.Windows
                     string style = match.Groups[1].Value; // 获取按钮名称
                     string numbersStr = match.Groups[2].Value; // 获取3个数字
                     int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-
                     if (style == "Global") // 如果是全局按钮
                     {
                         if (numbers[0] > TotalGlobalAntionPageIndex) TotalGlobalAntionPageIndex = numbers[0]; // 更新全局页面索引
