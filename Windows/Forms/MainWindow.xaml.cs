@@ -797,7 +797,7 @@ namespace Quicker.Windows
                     int buttonIndex = row * 4 + col + 1; // 按钮在Canvas中的位置
                     string buttonName = $"{style}{canvasIndex}{row + 1}{col + 1}"; // 按钮名称
                     Margin = new Thickness(col * buttonSpacing, row * buttonSpacing, 0, 0); // 按钮布局
-                    Style styleResource = FindResource(style == "Global" ? "Button" : (row == 3 && (col == 0 || col == 3) ? "SpecialButton1" : "SpecialButton2")) as Style; // 按钮样式
+                    Style styleResource = FindResource("Button") as Style; // 按钮样式
                     Button button = CreateButton(buttonName, styleResource, Margin, row, col); // 创建按钮
                     newCanvas.Children.Add(button); // 添加按钮到Canvas
 

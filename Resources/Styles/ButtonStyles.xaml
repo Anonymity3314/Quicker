@@ -76,7 +76,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="CornerRadius" Value="0,0,0,5"/>
+                            <Setter Property="Background" Value="#FFEAEAEA"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -100,7 +100,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="CornerRadius" Value="0,0,5,0"/>
+                            <Setter Property="Background" Value="#FFEAEAEA"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
