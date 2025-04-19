@@ -16,10 +16,10 @@
 >
     <Window.Resources>
         <Style x:Key="ActionPageButton" TargetType="Button">
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Margin" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -39,9 +39,9 @@
     </Window.Resources>
 
     <Grid>
-        <TextBox Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28"/>
+        <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28" TextChanged="SearchTextBox_TextChanged"/>
         <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">
-            <StackPanel>
+            <StackPanel x:Name="ActionPagesButtonPanel">
                 <Button Style="{StaticResource ActionPageButton}" Click="GlobalButton_Click">
                     <Grid>
                         <TextBlock Text="全局" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
@@ -78,27 +78,6 @@
                             <WrapPanel x:Name="MainStackPanel" Orientation="Horizontal"/>
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
-
-                    <Canvas x:Name="ViewCanvas" Height="215" Width="260" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,3">
-                        <Grid Height="20" Width="260" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F3F3F3">
-                            <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="17.24" BorderThickness="0,0,0,0">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico"/>
-                            </Button>
-                        </Grid>
-
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="65"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="130"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="20" Canvas.Left="195"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85" Canvas.Left="65"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85" Canvas.Left="130"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="85" Canvas.Left="195"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="65"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="130"/>
-                        <Button Style="{StaticResource ActionButton}" Canvas.Top="150" Canvas.Left="195"/>
-                    </Canvas>
                 </ListView>
             </ScrollViewer>
         </Border>

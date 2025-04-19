@@ -22,7 +22,6 @@
             <ColumnDefinition Width="195"/>
             <ColumnDefinition Width="967*"/>
         </Grid.ColumnDefinitions>
-
         <!-- 侧边栏1 -->
         <StackPanel x:Name="MainStackPanel" Background="#FFE0E0E0" Width="49" HorizontalAlignment="Center">
             <Button x:Name="BasicSetting" Style="{StaticResource Button1}" ToolTip="基础设置" Background="#FFF4F4F4" Click="BasicSetting_Click" MouseLeave="BasicSetting_MouseLeave">
@@ -35,7 +34,6 @@
                 <!--<Image Source="/Resources/Images/Icons/Quicker1.ico"/>-->
             </Button>
         </StackPanel>
-
         <!-- 侧边栏2 -->
         <Grid x:Name="MenuGrid" HorizontalAlignment="Center" Grid.Column="1">
             <!-- 基础设置 -->
@@ -78,7 +76,6 @@
             <!-- 工具 -->
             <StackPanel x:Name="ToolsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
         </Grid>
-
         <!-- 设置菜单 -->
         <Grid x:Name="ResultGrid" Margin="195,0,0,0" Grid.Column="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>

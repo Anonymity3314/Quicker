@@ -40,8 +40,7 @@ namespace Quicker.Windows
         private readonly SettingDatabase db1; // 设置数据库
         private readonly ButtonDatabase db2; // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
-        private bool shouldHideTooltip; // 是否正在拖拽
-        private Button SourceButton; // 源按钮
+        private bool shouldHideTooltip; // 是否隐藏提示
 
         public ActionPageManageWindow()
         {
@@ -66,6 +65,12 @@ namespace Quicker.Windows
 
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取约定
             shouldHideTooltip = Convention.HideTooltip; // 是否隐藏工具提示
+        }
+
+        // 加载动作页按钮
+        private void LoadActionPageButtons()
+        {
+
         }
 
         /// <summary>
@@ -444,6 +449,16 @@ namespace Quicker.Windows
                     buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 转换为字典
                     LoadCanvas(style); // 刷新界面
                 }
+            }
+        }
+
+        // 查找动作页
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写
+            if (string.IsNullOrEmpty(searchText))
+            {
+                ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
             }
         }
 
