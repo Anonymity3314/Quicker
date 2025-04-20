@@ -239,7 +239,6 @@ namespace Quicker.Windows
             {
                 string comboBoxName = comboBox.Name; // 获取ComboBox名称
                 int selectedIndex = comboBox.SelectedIndex; // 获取选中项索引
-
                 switch (comboBoxName)
                 {
                     case "WindowStartupLocationComboBox":
@@ -263,19 +262,19 @@ namespace Quicker.Windows
                         {
                             if (shortPressThreshold < 30) // 长按阈值不能小于30
                             {
-                                LongPressThresholdTextBox.Text = "30"; // 设置最小值
+                                textBox.Text = "30"; // 设置最小值
                                 settingsCache.LongPressThreshold = 30; // 设置最小值
                             }
                             else if (shortPressThreshold > 3000) // 长按阈值不能大于3000
                             {
-                                LongPressThresholdTextBox.Text = "3000"; // 设置最大值
+                                textBox.Text = "3000"; // 设置最大值
                                 settingsCache.LongPressThreshold = 3000; // 设置最大值
                             }
                             else settingsCache.LongPressThreshold = shortPressThreshold; // 设置长按阈值
                         }
                         else // 返回原来的数值
                         {
-                            LongPressThresholdTextBox.Text = settingsCache.LongPressThreshold.ToString(); // 设置原来的数值
+                            textBox.Text = settingsCache.LongPressThreshold.ToString(); // 设置原来的数值
                         } // 设置长按阈值
                         break; // 长按阈值
                     case "MouseMovePixelsTextBox":
@@ -283,19 +282,19 @@ namespace Quicker.Windows
                         {
                             if((int)mouseMovePixels < 1) // 鼠标移动像素不能小于 1
                             {
-                                MouseMovePixelsTextBox.Text = "1"; // 设置最小值
+                                textBox.Text = "1"; // 设置最小值
                                 settingsCache.MouseMovePixels = 1; // 设置最小值
                             }
                             else if ((int)mouseMovePixels > 200) // 鼠标移动像素不能大于 200
                             {
-                                MouseMovePixelsTextBox.Text = "200"; // 设置最大值
+                                textBox.Text = "200"; // 设置最大值
                                 settingsCache.MouseMovePixels = 200; // 设置最大值
                             }
                             else settingsCache.MouseMovePixels = mouseMovePixels; // 设置鼠标移动像素
                         }
                         else // 返回原来的数值
                         {
-                            MouseMovePixelsTextBox.Text = settingsCache.MouseMovePixels.ToString(); // 设置原来的数值
+                            textBox.Text = settingsCache.MouseMovePixels.ToString(); // 设置原来的数值
                         } // 设置鼠标移动像素
                         break; // 鼠标移动像素
                 }

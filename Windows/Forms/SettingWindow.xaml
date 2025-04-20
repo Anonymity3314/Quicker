@@ -232,7 +232,6 @@
                     </ScrollViewer>
                     <ScrollBar x:Name="AppearanceButtonGridScrollBar" Grid.Column="0" Margin="541,0,0,0"/>
                 </Grid>
-                <Button Grid.Column="1" Content="Button" HorizontalAlignment="Left" Margin="673,112,0,0" VerticalAlignment="Top"/>
             </Grid>
 
             <!-- 基础设置-关于Quicker -->
