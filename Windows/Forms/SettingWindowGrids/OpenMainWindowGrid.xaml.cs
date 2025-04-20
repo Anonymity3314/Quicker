@@ -7,9 +7,10 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
     public partial class OpenMainWindowGrid : UserControl
     {
         SettingWindow settingsWindow;
-        public OpenMainWindowGrid(SettingWindow window)
+        public OpenMainWindowGrid()
         {
             InitializeComponent();
+            SettingWindow window = (SettingWindow)Application.Current.MainWindow; // 获取父窗体
             settingsWindow = window;
         }
 

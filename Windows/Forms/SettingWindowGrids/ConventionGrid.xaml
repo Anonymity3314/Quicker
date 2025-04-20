@@ -10,6 +10,8 @@
     Background="White"
     d:DesignHeight="870"
     d:DesignWidth="967"
+    
+    Loaded="ConventionGrid_Loaded"
 >
     <Grid>
         <Button Content="常规" Style="{StaticResource Button3}" Margin="16,13,0,0" Width="68" Grid.Column="1" Height="30"/>

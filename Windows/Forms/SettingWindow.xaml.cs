@@ -20,9 +20,6 @@ namespace Quicker.Windows
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
         private readonly SettingDatabase db1; // 设置数据库
         private SettingsCache settingsCache; // 缓存对象
-        private double currentSessionTime; // 当次应用使用时长
-        private double totalUsageTime; // 总使用时长
-        private DispatcherTimer timer; // 定时器
 
         public SettingWindow()
         {
@@ -53,35 +50,11 @@ namespace Quicker.Windows
         private async void InitializeWindow()
         {
             SetStackPanelVisibility(BasicSettingStackPanel); // 设置默认显示的StackPanel
-            ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置默认显示的Grid
+            //ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置默认显示的Grid
 
-            await LoadUsageTimeAsync(); // 异步加载使用时长           
             await LoadSettingsAsync(); // 异步加载常规设置信息
         }
 
-        // 异步加载使用时长
-        private async Task LoadUsageTimeAsync()
-        {
-            DateTime currentTime = DateTime.Now;
-            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息            
-            totalUsageTime = Conventions.TotalUsageTime + (currentTime - App.RecordedTime).TotalSeconds; // 加载总使用时长
-            currentSessionTime = (currentTime - App.StartTime).TotalSeconds; // 更新当次应用使用时长
-            timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) }; // 创建定时器
-            timer.Tick += Timer_Tick; // 定时器每秒更新使用时长
-            timer.Start(); // 启动定时器
-            Application.Current.Dispatcher.Invoke(() => // 更新界面显示
-            {
-                // 当次应用使用时长
-                var currentSessionTimeSpan = TimeSpan.FromSeconds(currentSessionTime);
-                double currentSessionHours = currentSessionTimeSpan.TotalHours;
-                CurrentUsingTimeTextBlock.Text = $"{currentSessionHours:0}:{currentSessionTimeSpan:mm}:{currentSessionTimeSpan:ss}";
-
-                // 总使用时长
-                var totalTimeSpan = TimeSpan.FromSeconds(totalUsageTime);
-                double totalHours = totalTimeSpan.TotalHours;
-                TotalUsageTimeTextBlock.Text = $"{totalHours:0}:{totalTimeSpan:mm}:{totalTimeSpan:ss}";
-            });
-        }
 
         // 异步加载常规设置信息
         private async Task LoadSettingsAsync()
@@ -113,39 +86,20 @@ namespace Quicker.Windows
             });
         }
 
-        // 定时器每秒更新使用时长
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            currentSessionTime += 1; // 更新当次应用使用时长
-            totalUsageTime += 1; // 更新总使用时长
-            Application.Current.Dispatcher.Invoke(() => // 更新界面显示
-            {
-                // 当次应用使用时长
-                var currentSessionTimeSpan = TimeSpan.FromSeconds(currentSessionTime);
-                double currentSessionHours = currentSessionTimeSpan.TotalHours;
-                CurrentUsingTimeTextBlock.Text = $"{currentSessionHours:0}:{currentSessionTimeSpan:mm}:{currentSessionTimeSpan:ss}";
-
-                // 总使用时长
-                var totalTimeSpan = TimeSpan.FromSeconds(totalUsageTime);
-                double totalHours = totalTimeSpan.TotalHours;
-                TotalUsageTimeTextBlock.Text = $"{totalHours:0}:{totalTimeSpan:mm}:{totalTimeSpan:ss}";
-            });
-        }
-
         // 加载常规设置信息
         private void SettingWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                AutoStartCheckBox.IsChecked = Conventions.AutoStart; // 加载开机自启动设置
-                ShowNotificationCheckBox.IsChecked = Conventions.ShowNotification; // 加载显示启动完成提示设置
-                ShowAddImageCheckBox.IsChecked = Conventions.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
-                HideTooltipCheckBox.IsChecked = Conventions.HideTooltip; // 加载隐藏提示框设置
-                LongPressThresholdTextBox.Text = Conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
-                MouseMovePixelsTextBox.Text = Conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
-                LoopPageFlippingCheckBox.IsChecked = Conventions.LoopPageFlipping; // 加载循环翻页设置
-            });
+            //var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            //Application.Current.Dispatcher.Invoke(() =>
+            //{
+            //    AutoStartCheckBox.IsChecked = Conventions.AutoStart; // 加载开机自启动设置
+            //    ShowNotificationCheckBox.IsChecked = Conventions.ShowNotification; // 加载显示启动完成提示设置
+            //    ShowAddImageCheckBox.IsChecked = Conventions.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
+            //    HideTooltipCheckBox.IsChecked = Conventions.HideTooltip; // 加载隐藏提示框设置
+            //    LongPressThresholdTextBox.Text = Conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
+            //    MouseMovePixelsTextBox.Text = Conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
+            //    LoopPageFlippingCheckBox.IsChecked = Conventions.LoopPageFlipping; // 加载循环翻页设置
+            //});
         }
 
         /// <summary>
@@ -442,22 +396,22 @@ namespace Quicker.Windows
         // 基础设置-常规
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
+            //ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
 
-            // 加载常规设置信息
-            AutoStartCheckBox.IsChecked = settingsCache.AutoStart; // 加载开机自启动设置
-            ShowNotificationCheckBox.IsChecked = settingsCache.ShowNotification; // 加载显示启动完成提示设置
-            ShowAddImageCheckBox.IsChecked = settingsCache.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
-            HideTooltipCheckBox.IsChecked = settingsCache.HideTooltip; // 加载隐藏提示框设置
-            LongPressThresholdTextBox.Text = settingsCache.LongPressThreshold.ToString(); // 加载长按阈值设置
-            MouseMovePixelsTextBox.Text = settingsCache.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
-            LoopPageFlippingCheckBox.IsChecked = settingsCache.LoopPageFlipping; // 加载循环翻页设置
+            //// 加载常规设置信息
+            //AutoStartCheckBox.IsChecked = settingsCache.AutoStart; // 加载开机自启动设置
+            //ShowNotificationCheckBox.IsChecked = settingsCache.ShowNotification; // 加载显示启动完成提示设置
+            //ShowAddImageCheckBox.IsChecked = settingsCache.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
+            //HideTooltipCheckBox.IsChecked = settingsCache.HideTooltip; // 加载隐藏提示框设置
+            //LongPressThresholdTextBox.Text = settingsCache.LongPressThreshold.ToString(); // 加载长按阈值设置
+            //MouseMovePixelsTextBox.Text = settingsCache.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
+            //LoopPageFlippingCheckBox.IsChecked = settingsCache.LoopPageFlipping; // 加载循环翻页设置
         }
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle2_MouseLeave(sender, ConventionGrid); // 鼠标移出Button恢复Background
+            //ButtonStyle2_MouseLeave(sender, ConventionGrid); // 鼠标移出Button恢复Background
         }
 
         // 打开更新页面
@@ -859,7 +813,7 @@ namespace Quicker.Windows
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e); // 调用基类的OnClosing方法
-            timer.Stop(); // 停止定时器
+            ConventionGrid.CleanUp(); // 清除缓存对象
             GC.Collect(); // 回收资源
         }
 
