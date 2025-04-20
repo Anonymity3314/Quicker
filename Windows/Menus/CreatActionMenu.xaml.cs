@@ -1,8 +1,9 @@
 ﻿using System.Runtime.InteropServices;
-using Quicker.CommonFunctions;
 using System.Windows.Interop;
 using Quicker.Database;
+using Quicker.Managers;
 using System.Windows;
+using Quicker;
 
 namespace Quicker.Windows
 {

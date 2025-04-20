@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.CommonFunctions;
 using System.Windows.Interop;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
@@ -10,12 +9,14 @@ using System.Windows.Input;
 using IWshRuntimeLibrary;
 using System.Diagnostics;
 using System.Threading;
+using Quicker.Managers;
 using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
+using Quicker;
 
-namespace Quicker.CommonFunctions
+namespace Quicker.Managers
 {
     internal class ButtonManager
     {
@@ -122,7 +123,7 @@ namespace Quicker.CommonFunctions
                 }
             }
 
-            string fileName = System.IO.Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
             ButtonData buttonData = new ButtonData
             {
                 ButtonID = button.Name, // 获取按钮ID
@@ -154,13 +155,13 @@ namespace Quicker.CommonFunctions
                 button.Tag = buttonInformation; // 更新按钮标签
 
                 Grid grid = new(); // 创建Grid对象
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 设置按钮背景
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景
                 if (buttonInformation.ImagePath != "none")
                 {
                     try
                     {
                         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                        System.Windows.Controls.Image image = new()
+                        Image image = new()
                         {
                             Width = isMainWindow ? 36 : 30, // 设置宽度
                             Height = isMainWindow ? 36 : 30, // 设置高度
@@ -184,8 +185,8 @@ namespace Quicker.CommonFunctions
                     {
                         Text = buttonInformation.ButtonName, // 设置文本
                         TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
-                        VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
-                        HorizontalAlignment = System.Windows.HorizontalAlignment.Center, // 水平居中
+                        VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                        HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
                     }; // 创建文本块对象
                     AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小
 
@@ -211,7 +212,7 @@ namespace Quicker.CommonFunctions
                 button.Content = null; // 清空按钮内容
                 button.ToolTip = null; // 清空按钮提示文本
                 button.Tag = null; // 清空按钮标签
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 重置按钮背景
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 重置按钮背景
             }
         }
 
@@ -236,7 +237,7 @@ namespace Quicker.CommonFunctions
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
-                System.Windows.Point currentPosition = e.GetPosition(button); // 获取当前位置
+                Point currentPosition = e.GetPosition(button); // 获取当前位置
                 double deltaX = currentPosition.X - initialMousePosition.X; // 计算 X 轴位移
                 double deltaY = currentPosition.Y - initialMousePosition.Y; // 计算 Y 轴位移
                 double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY); // 计算移动距离
@@ -273,7 +274,7 @@ namespace Quicker.CommonFunctions
         public void AutoEllipsisTextBlock(TextBlock textBlock, int maxWidth)
         {
             if (string.IsNullOrEmpty(textBlock.Text)) return; // 如果文本为空，直接返回
-            textBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量文本块的大小
+            textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量文本块的大小
             double textWidth = textBlock.DesiredSize.Width; // 获取文本宽度           
             if (textWidth <= maxWidth) return; // 如果文本宽度小于等于最大宽度，直接返回
 
@@ -285,7 +286,7 @@ namespace Quicker.CommonFunctions
                 truncatedText = truncatedText.Substring(0, truncatedText.Length - 1); // 截断文本
                 string newText = truncatedText + ellipsis; // 添加省略号
                 textBlock.Text = newText; // 更新 TextBlock 的文本
-                textBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量文本块的大小
+                textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量文本块的大小
                 double newWidth = textBlock.DesiredSize.Width; // 获取新文本宽度
                 if (newWidth <= maxWidth) break; // 如果新文本宽度小于等于最大宽度，退出循环
             }
@@ -365,7 +366,7 @@ namespace Quicker.CommonFunctions
         /// <param name="window"> 要关闭面板窗口的窗口 </param>
         public void CloseMainWindow(Window window)
         {
-            MainWindow mainWindow = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 查找主窗口
+            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 查找主窗口
             mainWindow?.Close(); // 关闭主窗口
             window.Close(); // 关闭面板窗口
         }

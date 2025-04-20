@@ -1,10 +1,11 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Windows.Media.Imaging;
-using Quicker.CommonFunctions;
 using System.Windows.Interop;
 using Quicker.Database;
+using Quicker.Managers;
 using System.Windows;
 using System.IO;
+using Quicker;
 
 namespace Quicker.Windows
 {

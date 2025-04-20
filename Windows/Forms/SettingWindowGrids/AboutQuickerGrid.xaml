@@ -1,0 +1,52 @@
+﻿<UserControl
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:local="clr-namespace:Quicker.Windows.Forms.SettingWindowGrids"
+    x:Class="Quicker.Windows.Forms.SettingWindowGrids.AboutQuickerGrid"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    mc:Ignorable="d"
+
+    Background="White"
+    d:DesignHeight="870"
+    d:DesignWidth="967"
+>
+    <Grid x:Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="952*"/>
+        </Grid.ColumnDefinitions>
+        <!-- 基础设置-关于Quicker-关于Quicker -->
+        <Button x:Name="AboutQuickerButton" Content="关于Quicker" ToolTip="基础信息" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="99" Click="AboutQuickerButton_Click" Grid.Column="1"/>
+        <Grid x:Name="AboutQuickerButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="647*"/>
+                <ColumnDefinition Width="300*"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Quicker" HorizontalAlignment="Left" Margin="57,16,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold"/>
+            <Image HorizontalAlignment="Left" Height="48" Margin="4,12,0,0" VerticalAlignment="Top" Width="48" Source="/Resources/Images/Icons/Quicker1.ico"/>
+            <Label Content="版本：2.0.0" HorizontalAlignment="Left" Margin="4,65,0,0" VerticalAlignment="Top" FontSize="16"/>
+            <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+            <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
+            <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
+            <Label Content="更新历史" HorizontalAlignment="Left" Margin="95,65,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseDoubleClick="OpenUpdateLog">
+                <Label.ToolTip>
+                    <ToolTip Content="双击查看" FontSize="12" Foreground="Black"/>
+                </Label.ToolTip>
+            </Label>
+            <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
+            <Label HorizontalAlignment="Left" Margin="9,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
+            <Label x:Name="www_iconfont_cn" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Content="www.iconfont.cn" MouseDoubleClick="www_iconfont_cn_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <Label x:Name="fontawesome_com" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Content="fontawesome.com" MouseDoubleClick="fontawesome_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <Label x:Name="icons8_com" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Content="icons8.com" MouseDoubleClick="icons8_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+        </Grid>
+
+        <!-- 基础设置-关于Quicker-隐私声明 -->
+        <Button x:Name="Privacy_StatementButton" Content="隐私声明" ToolTip="隐私声明" Style="{StaticResource Button3}" Margin="100,13,0,0" Width="74" Click="Privacy_StatementButton_Click" BorderThickness="0" Grid.Column="1"/>
+        <Grid x:Name="Privacy_StatementButtonGrid" Margin="10,43,317,0" Visibility="Hidden" Grid.ColumnSpan="2">
+            <Label Content="键盘钩子(HOOK):" HorizontalAlignment="Left" Margin="16,43,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+            <Label Content="隐私声明" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="18"/>
+            <Label Content="本软件会使用全局键盘钩子(HOOK)判断按键状态，实现激活面板、扩展热键和文本指令等功能。&#xD;&#xA;安全软件可能会因此弹出安全提示。&#xD;&#xA;本软件不会监听和记录您的普通按键输入，也不会将这些输入内容发送到网络，请放心使用。" HorizontalAlignment="Left" Margin="27,73,0,0" VerticalAlignment="Top" FontSize="14"/>
+        </Grid>
+    </Grid>
+</UserControl>

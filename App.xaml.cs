@@ -3,13 +3,14 @@ using Hardcodet.Wpf.TaskbarNotification;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Quicker.CommonFunctions;
 using System.Windows.Input;
 using Quicker.Database;
+using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using System.Text;
 using SharpHook;
+using Quicker;
 
 namespace Quicker
 {
@@ -69,12 +70,12 @@ namespace Quicker
         // 鼠标按下事件
         static void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var windowManager = new WindowManager();
+            var windowManager = new WindowManager(); // 创建窗口管理器
             IntPtr hWnd = windowManager.GetCurrentForegroundWindow(); // 调用封装方法
             if (hWnd != IntPtr.Zero)
             {
-                string windowTitle = windowManager.GetWindowText(hWnd);
-                uint processId = windowManager.GetWindowProcessId(hWnd);
+                string windowTitle = windowManager.GetWindowText(hWnd); // 获取窗口标题
+                uint processId = windowManager.GetWindowProcessId(hWnd); // 获取进程ID
 
                 // 处理逻辑
             }
@@ -186,11 +187,7 @@ namespace Quicker
         // 按下鼠标快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue)
-            {
-                keyPressStartTime = null; // 清空按键按下时的时间
-                return;
-            }// 提前判断，减少不必要的逻辑判断
+            if (keyPressStartTime.HasValue) return; // 如果按键已经被记录，停止记录
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
             this.Dispatcher.BeginInvoke(() =>
@@ -287,11 +284,7 @@ namespace Quicker
         // 按下键盘快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue)
-            {
-                keyPressStartTime = null; // 清空按键按下时的时间
-                return;
-            }// 提前判断，减少不必要的逻辑判断
+            if (keyPressStartTime.HasValue) return; // 如果按键已经被记录，停止记录
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             switch (e.Data.KeyCode)
             {

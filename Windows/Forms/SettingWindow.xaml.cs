@@ -20,7 +20,7 @@ namespace Quicker.Windows
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
         private readonly SettingDatabase db1; // 设置数据库
         private SettingsCache settingsCache; // 缓存对象
-        private double currentSessionTime; // 总使用时长
+        private double currentSessionTime; // 当次应用使用时长
         private double totalUsageTime; // 总使用时长
         private DispatcherTimer timer; // 定时器
 
@@ -151,9 +151,9 @@ namespace Quicker.Windows
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="targetStackPanel"></param>
-        /// <param name="targetButton"></param>
-        /// <param name="fatherStackPanel"></param>
+        /// <param name="targetStackPanel"> 目标StackPanel </param>
+        /// <param name="targetButton"> 目标Button </param>
+        /// <param name="fatherStackPanel"> 父级StackPanel </param>
         private void ButtonStyle1_Click(StackPanel targetStackPanel, Button targetButton, StackPanel fatherStackPanel)
         {
             SetStackPanelVisibility(targetStackPanel); // 设置StackPanel可见性
@@ -169,7 +169,7 @@ namespace Quicker.Windows
         /// 
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="stackPanel"></param>
+        /// <param name="stackPanel"> 目标StackPanel </param>
         private void ButtonStyle1_MouseLeave(object sender, StackPanel stackPanel)
         {
             Button button = sender as Button; // 获取Button
@@ -181,10 +181,10 @@ namespace Quicker.Windows
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="targetButton"></param>
-        /// <param name="stackPanel"></param>
-        /// <param name="targetGrid"></param>
-        /// <param name="fatherGrid"></param>
+        /// <param name="targetButton"> 目标Button </param>
+        /// <param name="stackPanel"> 目标StackPanel </param>
+        /// <param name="targetGrid"> 目标Grid </param>
+        /// <param name="fatherGrid"> 父级Grid </param>
         private void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, Grid targetGrid, Grid fatherGrid)
         {
             if (targetGrid.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
@@ -202,7 +202,7 @@ namespace Quicker.Windows
         /// 
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="targetGrid"></param>
+        /// <param name="targetGrid"> 目标Grid </param>
         private void ButtonStyle2_MouseLeave(object sender, Grid targetGrid)
         {
             Button button = sender as Button; // 获取Button
@@ -233,7 +233,7 @@ namespace Quicker.Windows
         }
 
         // 下拉框选择改变事件
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ComboBox comboBox)
             {
@@ -250,7 +250,7 @@ namespace Quicker.Windows
         }
 
         // 文本框内容改变事件
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        public void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
             {
@@ -303,7 +303,7 @@ namespace Quicker.Windows
         }
 
         // 勾选框点击事件
-        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        public void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
             {
@@ -418,44 +418,32 @@ namespace Quicker.Windows
                 {
                     if (localMachine != null)
                     {
-                        if (autostart)
-                        {
-                            localMachine.SetValue(keyName, appPath); // 设置开机自启动
-                        }
-                        else
-                        {
-                            localMachine.DeleteValue(keyName, false); // 移除开机自启动
-                        }
+                        if (autostart) localMachine.SetValue(keyName, appPath); // 设置开机自启动
+                        else localMachine.DeleteValue(keyName, false); // 移除开机自启动
                     }
-                    else
-                    {
-                        return false; // 如果无法打开注册表，返回失败
-                    }
+                    else return false; // 如果无法打开注册表，返回失败
                 }
                 return true; // 返回设置成功
             }
-            catch
-            {
-                return false; // 返回设置失败
-            }
+            catch { return false; } // 出现异常，返回失败
         }
 
         // 基础设置
         private void BasicSetting_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle1_Click(BasicSettingStackPanel, BasicSetting, MainStackPanel);
+            ButtonStyle1_Click(BasicSettingStackPanel, BasicSetting, MainStackPanel); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
         private void BasicSetting_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle1_MouseLeave(sender, BasicSettingStackPanel);
+            ButtonStyle1_MouseLeave(sender, BasicSettingStackPanel); // 鼠标移出Button恢复Background
         }
 
 
         // 基础设置-常规
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid);
+            ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
 
             // 加载常规设置信息
@@ -470,13 +458,19 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle2_MouseLeave(sender, ConventionGrid);
+            ButtonStyle2_MouseLeave(sender, ConventionGrid); // 鼠标移出Button恢复Background
+        }
+
+        // 打开更新页面
+        private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
         }
 
         // 基础设置-弹出面板
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid);
+            ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
 
             // 重置测试Button
@@ -497,7 +491,7 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void OpenMainWindow_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid);
+            ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-弹出面板-弹出面板
@@ -744,49 +738,49 @@ namespace Quicker.Windows
         // 基础设置-黑名单
         private void Blacklist_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid);
+            ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle2_MouseLeave(sender, BlacklistGrid);
+            ButtonStyle2_MouseLeave(sender, BlacklistGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-外观
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid);
+            ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
             SetGridVisible(AppearanceGrid, ResultGrid); // 设置Grid可见性
         }
         // 鼠标移出Button恢复Background
         private void Appearance_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle2_MouseLeave(sender, AppearanceGrid);
+            ButtonStyle2_MouseLeave(sender, AppearanceGrid); // 鼠标移出Button恢复Background
         }
 
         // 鼠标移入界面显示滚动条
         private void ScrollViewer_MouseEnter(object sender, MouseEventArgs e)
         {
-            AppearanceButtonGridScrollBar.Visibility = Visibility.Visible;
+            AppearanceButtonGridScrollBar.Visibility = Visibility.Visible; // 显示滚动条
         }
 
         // 鼠标移出界面隐藏滚动条
         private void ScrollViewer_MouseLeave(object sender, MouseEventArgs e)
         {
-            AppearanceButtonGridScrollBar.Visibility = Visibility.Hidden;
+            AppearanceButtonGridScrollBar.Visibility = Visibility.Hidden; // 隐藏滚动条
         }
 
         // 基础设置-关于Quicker
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid);
+            ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Hidden; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle2_MouseLeave(sender, AboutQuickerGrid);
+            ButtonStyle2_MouseLeave(sender, AboutQuickerGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-关于Quicker-关于Quicker
@@ -805,33 +799,33 @@ namespace Quicker.Windows
         // 前往图标网站www.iconfont.cn
         private void www_iconfont_cn_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "https://www.iconfont.cn", // 打开图标网站www.iconfont.cn
-                UseShellExecute = true // 使用外壳程序启动
-            });
+            OpenWebsite("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
         }
 
         // 前往图标网站icons8.com
         private void icons8_com_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "https://icons8.com/", // 打开图标网站icons8.com
-                UseShellExecute = true // 使用外壳程序启动
-            });
+            OpenWebsite("https://icons8.com/"); // 打开图标网站icons8.com
         }
 
         // 前往图标网站fontawesome.com
         private void fontawesome_com_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            OpenWebsite("https://fontawesome.com/"); // 打开图标网站fontawesome.com
+        }
+
+        /// <summary>
+        /// 打开指定网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        public void OpenWebsite(string website)
+        {
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://fontawesome.com/", // 打开图标网站fontawesome.com
+                FileName = website, // 打开指定网站
                 UseShellExecute = true // 使用外壳程序启动
             });
         }
-
 
         // 基础设置-关于Quicker-隐私声明
         private void Privacy_StatementButton_Click(object sender, RoutedEventArgs e)
@@ -843,23 +837,23 @@ namespace Quicker.Windows
         // 辅助功能
         private void Auxiliary_Functions_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle1_Click(Auxiliary_FunctionsStackPanel, Auxiliary_Functions, MainStackPanel);
+            ButtonStyle1_Click(Auxiliary_FunctionsStackPanel, Auxiliary_Functions, MainStackPanel); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
         private void Auxiliary_Functions_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle1_MouseLeave(sender, Auxiliary_FunctionsStackPanel);
+            ButtonStyle1_MouseLeave(sender, Auxiliary_FunctionsStackPanel); // 鼠标移出Button恢复Background
         }
 
         // 工具
         private void Tools_Click(object sender, RoutedEventArgs e)
         {
-            ButtonStyle1_Click(ToolsStackPanel, Tools, MainStackPanel);
+            ButtonStyle1_Click(ToolsStackPanel, Tools, MainStackPanel); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
         private void Tools_MouseLeave(object sender, MouseEventArgs e)
         {
-            ButtonStyle1_MouseLeave(sender, ToolsStackPanel);
+            ButtonStyle1_MouseLeave(sender, ToolsStackPanel); // 鼠标移出Button恢复Background
         }
 
         // 关闭窗口回收资源
@@ -867,7 +861,7 @@ namespace Quicker.Windows
         {
             base.OnClosing(e); // 调用基类的OnClosing方法
             timer.Stop(); // 停止定时器
-            GC.Collect();
+            GC.Collect(); // 回收资源
         }
 
         // 缓存对象类

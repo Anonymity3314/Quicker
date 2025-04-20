@@ -1,38 +1,40 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using System.Text;
 using System;
+using Quicker;
 
-namespace Quicker.CommonFunctions
+namespace Quicker.Managers
 {
     internal class WindowManager
     {
         // 设置窗口位置和大小
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags); // 设置窗口位置和大小
+        private static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags); // 设置窗口位置和大小
 
         // 查找窗口句柄
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName); // 查找窗口句柄
+        private static extern nint FindWindow(string lpClassName, string lpWindowName); // 查找窗口句柄
 
         // 设置前台窗口
         [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd); // 设置前台窗口
+        private static extern bool SetForegroundWindow(nint hWnd); // 设置前台窗口
 
         // 获取当前活动窗口句柄
         [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow(); // 获取当前活动窗口句柄
+        private static extern nint GetForegroundWindow(); // 获取当前活动窗口句柄
 
         // 获取窗口标题
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count); // 获取窗口标题
+        private static extern int GetWindowText(nint hWnd, StringBuilder text, int count); // 获取窗口标题
 
         // 获取窗口进程ID
         [DllImport("user32.dll", SetLastError = true)]
-        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId); // 获取窗口进程ID
+        private static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId); // 获取窗口进程ID
 
         // 窗口置顶相关常量
         private const int HWND_TOPMOST = -1; // 置顶
@@ -45,8 +47,8 @@ namespace Quicker.CommonFunctions
         /// <param name="windows"></param>
         public void SetWindowTopmost(Window windows)
         {
-            IntPtr hWnd = new WindowInteropHelper(windows).Handle; // 获取窗口句柄
-            SetWindowPos(hWnd, new IntPtr(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE); // 设置窗口置顶
+            nint hWnd = new WindowInteropHelper(windows).Handle; // 获取窗口句柄
+            SetWindowPos(hWnd, new nint(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE); // 设置窗口置顶
         }
 
         /// <summary>
@@ -54,18 +56,18 @@ namespace Quicker.CommonFunctions
         /// </summary>
         /// <param name="windowTitle">窗口标题</param>
         /// <param name="windowHandle">窗口句柄（可选）</param>
-        public void TryToOpenExitingWindow(string windowTitle, IntPtr windowHandle = default)
+        public void TryToOpenExitingWindow(string windowTitle, nint windowHandle = default)
         {           
-            if (windowHandle != IntPtr.Zero) SetForegroundWindow(windowHandle); // 如果提供了窗口句柄，则直接使用该句柄
+            if (windowHandle != nint.Zero) SetForegroundWindow(windowHandle); // 如果提供了窗口句柄，则直接使用该句柄
             else // 如果没有提供窗口句柄，则通过标题查找
             {
-                IntPtr hWnd = FindWindow(null, windowTitle);
-                if (hWnd != IntPtr.Zero) SetForegroundWindow(hWnd);
+                nint hWnd = FindWindow(null, windowTitle);
+                if (hWnd != nint.Zero) SetForegroundWindow(hWnd);
             }
         }
 
         // 获取当前前台窗口句柄
-        public IntPtr GetCurrentForegroundWindow()
+        public nint GetCurrentForegroundWindow()
         {
             return GetForegroundWindow(); // 调用静态外部方法
         }
@@ -75,7 +77,7 @@ namespace Quicker.CommonFunctions
         /// </summary>
         /// <param name="hWnd"></param>
         /// <returns></returns>
-        public string GetWindowText(IntPtr hWnd)
+        public string GetWindowText(nint hWnd)
         {
             StringBuilder text = new StringBuilder(256);
             GetWindowText(hWnd, text, text.Capacity);
@@ -87,7 +89,7 @@ namespace Quicker.CommonFunctions
         /// </summary>
         /// <param name="hWnd"></param>
         /// <returns></returns>
-        public uint GetWindowProcessId(IntPtr hWnd)
+        public uint GetWindowProcessId(nint hWnd)
         {
             GetWindowThreadProcessId(hWnd, out uint processId);
             return processId;
@@ -113,7 +115,7 @@ namespace Quicker.CommonFunctions
             if (window != null)
             {               
                 if (window.WindowState == WindowState.Minimized) window.WindowState = WindowState.Normal; // 如果窗口被最小化，则恢复窗口
-                IntPtr windowHandle = new WindowInteropHelper(window).Handle; // 获取窗口句柄
+                nint windowHandle = new WindowInteropHelper(window).Handle; // 获取窗口句柄
                 TryToOpenExitingWindow(null, windowHandle); // 将窗口置于前台
             }
             else // 如果未找到窗口，则创建并显示新窗口

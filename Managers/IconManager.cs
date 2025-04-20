@@ -3,11 +3,14 @@ using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using Quicker.Database;
+using Quicker.Managers;
 using System.Windows;
 using System.IO;
 using System;
+using Quicker;
+using Quicker;
 
-namespace Quicker.CommonFunctions
+namespace Quicker.Managers
 {
     internal class IconManager
     {
@@ -15,7 +18,7 @@ namespace Quicker.CommonFunctions
         [StructLayout(LayoutKind.Sequential)]
         private struct SHFILEINFO
         {
-            public IntPtr hIcon;
+            public nint hIcon;
             public int iIcon;
             public uint dwAttributes;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
@@ -24,7 +27,7 @@ namespace Quicker.CommonFunctions
             public string szTypeName;
         } // 文件信息结构体
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, uint uFlags); // 获取文件信息
+        private static extern nint SHGetFileInfo(string pszPath, uint dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, uint uFlags); // 获取文件信息
 
         // 文件图标相关常量
         private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080; // 文件属性
@@ -40,8 +43,8 @@ namespace Quicker.CommonFunctions
         public ImageSource GetIcon(string appPath)
         {
             uint flags = SHGFI_ICON | SHGFI_LARGEICON; // 获取大图标
-            IntPtr hIcon = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out SHFILEINFO shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags); // 获取图标句柄
-            if (hIcon != IntPtr.Zero)
+            nint hIcon = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out SHFILEINFO shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags); // 获取图标句柄
+            if (hIcon != nint.Zero)
             {
                 return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(shfi.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // 创建 BitmapSource
             }
@@ -58,15 +61,15 @@ namespace Quicker.CommonFunctions
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string iconFileName = GetIconFileName(filePath);
             string iconPath = Path.Combine(appDirectory, "LocalIcons", iconFileName);
-            if (System.IO.File.Exists(iconPath)) return iconPath;
+            if (File.Exists(iconPath)) return iconPath;
             return null;
         }
 
         /// <summary>
         /// 获取图标文件名
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <param name="filePath"> 文件路径 </param>
+        /// <returns> 图标文件名 </returns>
         public string GetIconFileName(string filePath)
         {
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(filePath); // 将文件路径转换为字节数组
@@ -78,7 +81,7 @@ namespace Quicker.CommonFunctions
         /// 保存图标到文件
         /// </summary>
         /// <param name="imageSource"></param>
-        /// <returns></returns>
+        /// <returns> 图标文件路径 </returns>
         public string SaveIconToFile(ImageSource imageSource)
         {
             byte[] imageHash = GetImageHash(imageSource); // 计算图像的哈希值
@@ -86,7 +89,7 @@ namespace Quicker.CommonFunctions
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用程序目录
             string iconFileName = BitConverter.ToString(imageHash).Replace("-", "").ToLower() + ".png"; // 使用哈希值作为文件名
             string iconPath = Path.Combine(appDirectory, "LocalIcons", iconFileName); // 拼接文件路径
-            if (System.IO.File.Exists(iconPath)) return iconPath; // 如果文件存在，直接返回路径
+            if (File.Exists(iconPath)) return iconPath; // 如果文件存在，直接返回路径
             Directory.CreateDirectory(Path.GetDirectoryName(iconPath)); // 创建目录
             try
             {
@@ -105,7 +108,7 @@ namespace Quicker.CommonFunctions
         /// 计算图像的哈希值
         /// </summary>
         /// <param name="imageSource"></param>
-        /// <returns></returns>
+        /// <returns> 图像的哈希值 </returns>
         public byte[] GetImageHash(ImageSource imageSource)
         {
             BitmapSource bitmapSource = imageSource as BitmapSource; // 将 ImageSource 转换为 BitmapSource

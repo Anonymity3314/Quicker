@@ -38,7 +38,6 @@
                     <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"></DropShadowEffect>
                 </Rectangle.Effect>
             </Rectangle>
-
             <!-- 标题栏 -->
             <Border BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3">
                 <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
@@ -100,7 +99,6 @@
                     <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF8D8D8D" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 </Grid>
             </Border>
-
             <!-- 全局动作 -->
             <Canvas x:Name="ViewGlobalCanvas" VerticalAlignment="Top" Margin="0,28,0,0" Height="232.8" Width="310.4">
                 <Button Style="{StaticResource Button}" Margin="0,0,0,0"/>
@@ -116,7 +114,6 @@
                 <Button Style="{StaticResource Button}" Margin="155.2,155.2,0,0"/>
                 <Button Style="{StaticResource Button}" Margin="232.8,155.2,0,0"/>
             </Canvas>
-
             <!-- 功能栏 -->
             <Grid VerticalAlignment="Top" Height="25" Background="#F3F3F3" Margin="0,261,0,0" >
                 <Label x:Name="CommonLabel" Content="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF8D8D8D" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
@@ -136,7 +133,6 @@
                     </Button>
                 </Border>
             </Grid>
-
             <!-- 通用动作 -->
             <Grid x:Name="CommonGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Height="310.4" Width="310.4" Margin="0,286,0,0" MouseWheel="CommonGrid_MouseWheel">
                 <Canvas x:Name="ViewCommonCanvas">

@@ -2,13 +2,14 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
-using Quicker.CommonFunctions;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
 using System.IO;
 using System;
+using Quicker;
 
 namespace Quicker.Windows
 {

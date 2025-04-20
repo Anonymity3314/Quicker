@@ -1,17 +1,18 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
-using Quicker.CommonFunctions;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Quicker.Managers;
 using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.Media;
 using System.IO;
+using Quicker;
 
 namespace Quicker
 {

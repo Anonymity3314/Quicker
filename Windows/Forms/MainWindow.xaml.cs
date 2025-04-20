@@ -1,16 +1,17 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
-using Quicker.CommonFunctions;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Input;
 using IWshRuntimeLibrary;
 using System.Diagnostics;
+using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
 using System.IO;
+using Quicker;
 
 namespace Quicker.Windows
 {
@@ -31,7 +32,6 @@ namespace Quicker.Windows
                 foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素的子元素
             }
         } // 递归查找所有指定类型的子元素
-
         private Dictionary<string, bool> pageButtonCache = new Dictionary<string, bool>(); // 缓存页面按钮状态
         private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
         private readonly CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源

@@ -2,11 +2,12 @@
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.CommonFunctions;
 using System.Windows.Input;
 using System.Windows.Media;
+using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
+using Quicker;
 
 namespace Quicker.Windows
 {
