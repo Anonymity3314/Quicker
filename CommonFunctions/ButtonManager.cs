@@ -296,9 +296,9 @@ namespace Quicker.CommonFunctions
         /// 打开指定菜单
         /// </summary>
         /// <param name="sender"> 触发菜单的按钮 </param>
-        /// <param name="e"> 事件参数 </param>
-        /// <param name="isMainWindow"> 是否为主面板 </param>
-        /// <param name="targetMenu"> 目标菜单 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        /// <param name="targetMenu"> 要打开的菜单名称 </param>
+        /// <param name="sourceWindow"> 触发菜单的窗口 </param>
         public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow)
         {
             Window menu = null;
@@ -365,9 +365,9 @@ namespace Quicker.CommonFunctions
         /// <param name="window"> 要关闭面板窗口的窗口 </param>
         public void CloseMainWindow(Window window)
         {
-            MainWindow mainWindow = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-            mainWindow?.Close();
-            window.Close();
+            MainWindow mainWindow = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 查找主窗口
+            mainWindow?.Close(); // 关闭主窗口
+            window.Close(); // 关闭面板窗口
         }
     }
 }
