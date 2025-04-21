@@ -127,7 +127,7 @@ namespace Quicker.Managers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender"> 目标Button </param>
         /// <param name="targetGrid"> 目标Grid </param>
         public void ButtonStyle2_MouseLeave(object sender, UserControl targetGrid, Grid fatherGrid)
         {
