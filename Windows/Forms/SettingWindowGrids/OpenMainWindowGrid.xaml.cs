@@ -31,10 +31,6 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置信息
             Application.Current.Dispatcher.Invoke(() =>
             {
-                //重置测试Button
-                TestButton.Content = "按键测试区";
-
-                //加载勾选框
                 OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick; // 按下中键
                 OpenMainWindowByX1MouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByX1MouseClick; // 按下X1键
                 OpenMainWindowByX2MouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByX2MouseClick; // 按下X2键

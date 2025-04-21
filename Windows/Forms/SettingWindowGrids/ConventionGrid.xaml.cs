@@ -107,7 +107,7 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
         }
 
         // 窗体关闭事件
-        public void CleanUp()
+        private void ConventionGrid_Unloaded(object sender, RoutedEventArgs e)
         {
             timer.Stop(); // 停止定时器
             totalUsageTime = 0; // 清空总使用时长

@@ -10,6 +10,8 @@
     Background="White"
     d:DesignHeight="870"
     d:DesignWidth="967"
+    
+    Unloaded="ConventionGrid_Unloaded"
 >
     <Grid>
         <Grid.ColumnDefinitions>

@@ -41,31 +41,28 @@ namespace Quicker.Managers
         // 异步加载常规设置信息
         public async Task LoadSettingsAsync()
         {
-            await Task.Run(() => // 模拟异步操作
+            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
+            settingsCache = new SettingsCache
             {
-                var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
-                var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
-                settingsCache = new SettingsCache
-                {
-                    AutoStart = Conventions.AutoStart,
-                    ShowNotification = Conventions.ShowNotification,
-                    ShowAddImage = Conventions.ShowAddImage,
-                    HideTooltip = Conventions.HideTooltip,
-                    LongPressThreshold = Conventions.LongPressThreshold,
-                    MouseMovePixels = Conventions.MouseMovePixels,
-                    LoopPageFlipping = Conventions.LoopPageFlipping,
-                    OpenMainWindowByMiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick,
-                    OpenMainWindowByX1MouseClick = OpenMainWindowConditions.OpenMainWindowByX1MouseClick,
-                    OpenMainWindowByX2MouseClick = OpenMainWindowConditions.OpenMainWindowByX2MouseClick,
-                    OpenMainWindowByCtrl_MiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick,
-                    OpenMainWindowByCtrl_RightMouseClick = OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick,
-                    OpenMainWindowByMiddleMouseClickLonger = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger,
-                    OpenMainWindowByRightMouseClickLonger = OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
-                    OpenMainWindowByRightMouseClick_Move = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
-                    OpenMainWindowByCtrl = OpenMainWindowConditions.OpenMainWindowByCtrl,
-                    WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation
-                }; // 加载设置数据到缓存
-            });
+                AutoStart = Conventions.AutoStart,
+                ShowNotification = Conventions.ShowNotification,
+                ShowAddImage = Conventions.ShowAddImage,
+                HideTooltip = Conventions.HideTooltip,
+                LongPressThreshold = Conventions.LongPressThreshold,
+                MouseMovePixels = Conventions.MouseMovePixels,
+                LoopPageFlipping = Conventions.LoopPageFlipping,
+                OpenMainWindowByMiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick,
+                OpenMainWindowByX1MouseClick = OpenMainWindowConditions.OpenMainWindowByX1MouseClick,
+                OpenMainWindowByX2MouseClick = OpenMainWindowConditions.OpenMainWindowByX2MouseClick,
+                OpenMainWindowByCtrl_MiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick,
+                OpenMainWindowByCtrl_RightMouseClick = OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick,
+                OpenMainWindowByMiddleMouseClickLonger = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger,
+                OpenMainWindowByRightMouseClickLonger = OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
+                OpenMainWindowByRightMouseClick_Move = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
+                OpenMainWindowByCtrl = OpenMainWindowConditions.OpenMainWindowByCtrl,
+                WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation
+            }; // 加载设置数据到缓存
         }
 
         /// <summary>
@@ -112,13 +109,19 @@ namespace Quicker.Managers
         /// <param name="fatherGrid"> 父级Grid </param>
         public void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
         {
-            if (targetGrid.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
+            var gridsToRemove = new List<UserControl>(); // 创建一个临时列表，用于存储需要移除的 UserControl
             foreach (var grid in fatherGrid.Children.OfType<UserControl>())
             {
-                grid.Visibility = grid == targetGrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
-            } // 设置Grid可见性
+                if (grid != targetGrid) gridsToRemove.Add(grid); // 将需要移除的 UserControl 添加到临时列表
+            }
+            foreach (var grid in gridsToRemove)// 遍历结束后，统一移除
+            {
+                fatherGrid.Children.Remove(grid); // 移除不需要的 UserControl
+            } // 移除不需要的 UserControl
+            targetGrid.SetValue(Grid.ColumnSpanProperty, 2); // 设置列跨度
+            fatherGrid.Children.Add(targetGrid); // 添加目标控件
 
-            foreach (var button in stackPanel.Children.OfType<Button>())
+            foreach (var button in stackPanel.Children.OfType<Button>())// 设置按钮样式
             {
                 button.Background = button == targetButton ?
                     new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
@@ -135,9 +138,9 @@ namespace Quicker.Managers
         public void ButtonStyle2_MouseLeave(object sender, UserControl targetGrid)
         {
             Button button = sender as Button; // 获取Button
-            button.Background = targetGrid.Visibility == Visibility.Visible ?
-                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
-                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
+            button.Background = targetGrid == null ?
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)) :
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)); // 设置Button颜色
         }
 
         // 设置Button类型3边框
@@ -282,6 +285,12 @@ namespace Quicker.Managers
                 FileName = website, // 打开指定网站
                 UseShellExecute = true // 使用外壳程序启动
             });
+        }
+
+        // 清理缓存
+        public void ClearCache()
+        {
+            settingsCache = null; // 清理缓存
         }
 
         // 缓存对象类

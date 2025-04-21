@@ -1,4 +1,5 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿using Quicker.Windows.Forms.SettingWindowGrids;
+using Microsoft.Toolkit.Uwp.Notifications;
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -43,23 +44,7 @@ namespace Quicker.Windows
         private async void InitializeWindow()
         {
             SetStackPanelVisibility(BasicSettingStackPanel); // 设置默认显示的StackPanel
-            settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置默认显示的Grid
-        }
-
-        // 加载常规设置信息
-        private void SettingWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            //var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
-            //Application.Current.Dispatcher.Invoke(() =>
-            //{
-            //    AutoStartCheckBox.IsChecked = Conventions.AutoStart; // 加载开机自启动设置
-            //    ShowNotificationCheckBox.IsChecked = Conventions.ShowNotification; // 加载显示启动完成提示设置
-            //    ShowAddImageCheckBox.IsChecked = Conventions.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
-            //    HideTooltipCheckBox.IsChecked = Conventions.HideTooltip; // 加载隐藏提示框设置
-            //    LongPressThresholdTextBox.Text = Conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
-            //    MouseMovePixelsTextBox.Text = Conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
-            //    LoopPageFlippingCheckBox.IsChecked = Conventions.LoopPageFlipping; // 加载循环翻页设置
-            //});
+            settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, new ConventionGrid(), ResultGrid); // 设置默认显示的Grid
         }
 
         /// <summary>
@@ -124,7 +109,7 @@ namespace Quicker.Windows
 
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
-                new ToastContentBuilder().AddText(message).Show();
+                new ToastContentBuilder().AddText(message).Show(); // 显示通知
             });
         }
 
@@ -165,86 +150,61 @@ namespace Quicker.Windows
         // 基础设置-常规
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
+            settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, new ConventionGrid(), ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
-
-            //// 加载常规设置信息
-            //AutoStartCheckBox.IsChecked = settingsCache.AutoStart; // 加载开机自启动设置
-            //ShowNotificationCheckBox.IsChecked = settingsCache.ShowNotification; // 加载显示启动完成提示设置
-            //ShowAddImageCheckBox.IsChecked = settingsCache.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
-            //HideTooltipCheckBox.IsChecked = settingsCache.HideTooltip; // 加载隐藏提示框设置
-            //LongPressThresholdTextBox.Text = settingsCache.LongPressThreshold.ToString(); // 加载长按阈值设置
-            //MouseMovePixelsTextBox.Text = settingsCache.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
-            //LoopPageFlippingCheckBox.IsChecked = settingsCache.LoopPageFlipping; // 加载循环翻页设置
         }
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, ConventionGrid); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new ConventionGrid()); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-弹出面板
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
+            settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, new OpenMainWindowGrid(), ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
-
-            // 重置测试Button
-            //TestButton.Content = "按键测试区";
-
-            // 加载勾选框
-            //OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = settingsCache.OpenMainWindowByMiddleMouseClick; // 按下中键
-            //OpenMainWindowByX1MouseClickCheckBox.IsChecked = settingsCache.OpenMainWindowByX1MouseClick; // 按下X1键
-            //OpenMainWindowByX2MouseClickCheckBox.IsChecked = settingsCache.OpenMainWindowByX2MouseClick; // 按下X2键
-            //OpenMainWindowByCtrl_MiddleMouseClickCheckBox.IsChecked = settingsCache.OpenMainWindowByCtrl_MiddleMouseClick; // Ctrl+中键单击
-            //OpenMainWindowByCtrl_RightMouseClickCheckBox.IsChecked = settingsCache.OpenMainWindowByCtrl_RightMouseClick; // Ctrl+右键单击
-            //OpenMainWindowByMiddleMouseClickLongerCheckBox.IsChecked = settingsCache.OpenMainWindowByMiddleMouseClickLonger; // 长按中键
-            //OpenMainWindowByRightMouseClickLongerCheckBox.IsChecked = settingsCache.OpenMainWindowByRightMouseClickLonger; // 长按右键
-            //OpenMainWindowByRightMouseClick_MoveCheckBox.IsChecked = settingsCache.OpenMainWindowByRightMouseClick_Move; // 按右键移动
-            //OpenMainWindowByCtrlCheckBox.IsChecked = settingsCache.OpenMainWindowByCtrl; // 单击Ctrl键
-            //WindowStartupLocationComboBox.SelectedIndex = settingsCache.WindowStartupLocation; // 功能面板打开位置
         }
 
         // 鼠标移出Button恢复Background
         private void OpenMainWindow_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender,new OpenMainWindowGrid()); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-黑名单
         private void Blacklist_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
+            settingManager.ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, new BlacklistGrid(), ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, BlacklistGrid); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender,new BlacklistGrid()); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-外观
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
-            //SetGridVisible(AppearanceGrid, ResultGrid); // 设置Grid可见性
+            settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, new AppearanceGrid(), ResultGrid); // 设置Button类型2样式
         }
         // 鼠标移出Button恢复Background
         private void Appearance_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, AppearanceGrid); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new AppearanceGrid()); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-关于Quicker
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
+            settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, new AboutQuickerGrid(), ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Hidden; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, AboutQuickerGrid); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new AboutQuickerGrid()); // 鼠标移出Button恢复Background
         }
 
         // 辅助功能
@@ -273,7 +233,7 @@ namespace Quicker.Windows
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e); // 调用基类的OnClosing方法
-            ConventionGrid.CleanUp(); // 清除缓存对象
+            settingManager.ClearCache(); // 清空缓存
             GC.Collect(); // 回收资源
         }
     }
