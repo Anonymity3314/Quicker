@@ -8,16 +8,6 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
 {
     public partial class ConventionGrid : UserControl
     {
-        private T FindParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            // 循环查找父元素
-            while ((child = VisualTreeHelper.GetParent(child)) != null)
-            {
-                if (child is T)
-                    return (T)child;
-            }
-            return null;
-        } // 查找父元素
         private readonly SettingDatabase db1; // 设置数据库
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
@@ -33,7 +23,15 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
             InitializeAsync(); // 异步初始化
         }
 
-        private void ConventionGrid_Loaded(object sender, RoutedEventArgs e)
+        // 异步初始化方法
+        private async void InitializeAsync()
+        {
+            await LoadSettingsAsync(); // 异步加载设置
+            await LoadUsageTimeAsync(); // 异步加载使用时长
+        }
+
+        // 异步加载设置
+        private async Task LoadSettingsAsync()
         {
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
             Application.Current.Dispatcher.Invoke(() =>
@@ -46,12 +44,6 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
                 MouseMovePixelsTextBox.Text = Conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
                 LoopPageFlippingCheckBox.IsChecked = Conventions.LoopPageFlipping; // 加载循环翻页设置
             });
-        }
-
-        // 异步初始化方法
-        private async void InitializeAsync()
-        {
-            await LoadUsageTimeAsync(); // 异步加载使用时长
         }
 
         // 异步加载使用时长
@@ -97,6 +89,7 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
             });
         }
 
+        // 打开网站检查更新
         private void CheckUpdateButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             settingManager.OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
@@ -119,6 +112,16 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
             timer.Stop(); // 停止定时器
             totalUsageTime = 0; // 清空总使用时长
             currentSessionTime = 0; // 清空当次应用使用时长
+            AutoStartCheckBox = null;
+            ShowNotificationCheckBox = null;
+            ShowAddImageCheckBox = null;
+            HideTooltipCheckBox = null;
+            LongPressThresholdTextBox = null;
+            MouseMovePixelsTextBox = null;
+            LoopPageFlippingCheckBox = null;
+            CurrentUsingTimeTextBlock = null;
+            TotalUsageTimeTextBlock = null;
+            CheckUpdateButton = null;
             GC.Collect(); // 垃圾回收
         }
     }

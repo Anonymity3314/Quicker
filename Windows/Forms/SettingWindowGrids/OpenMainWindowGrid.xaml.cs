@@ -1,17 +1,51 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
+using Quicker.Managers;
 using System.Windows;
 
 namespace Quicker.Windows.Forms.SettingWindowGrids
 {
     public partial class OpenMainWindowGrid : UserControl
     {
-        SettingWindow settingsWindow;
+        private readonly SettingDatabase db1; // 设置数据库
+        SettingManager settingManager; // 设置管理器
+
         public OpenMainWindowGrid()
         {
             InitializeComponent();
-            SettingWindow window = (SettingWindow)Application.Current.MainWindow; // 获取父窗体
-            settingsWindow = window;
+            db1 = new SettingDatabase(); // 创建设置数据库
+            settingManager = new SettingManager(); // 创建设置管理器
+
+            InitializeAsync(); // 异步初始化
+        }
+
+        // 异步初始化方法
+        private async void InitializeAsync()
+        {
+            await LoadSettingsAsync(); // 异步加载设置
+        }
+
+        // 异步加载设置
+        private async Task LoadSettingsAsync()
+        {
+            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置信息
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                //重置测试Button
+                TestButton.Content = "按键测试区";
+
+                //加载勾选框
+                OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick; // 按下中键
+                OpenMainWindowByX1MouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByX1MouseClick; // 按下X1键
+                OpenMainWindowByX2MouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByX2MouseClick; // 按下X2键
+                OpenMainWindowByCtrl_MiddleMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick; // Ctrl+中键单击
+                OpenMainWindowByCtrl_RightMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick; // Ctrl+右键单击
+                OpenMainWindowByMiddleMouseClickLongerCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger; // 长按中键
+                OpenMainWindowByRightMouseClickLongerCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger; // 长按右键
+                OpenMainWindowByRightMouseClick_MoveCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move; // 按右键移动
+                OpenMainWindowByCtrlCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByCtrl; // 单击Ctrl键
+                WindowStartupLocationComboBox.SelectedIndex = OpenMainWindowConditions.WindowStartupLocation; // 功能面板打开位置
+            });
         }
 
         // 设置Grid可见性
@@ -35,13 +69,13 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingsWindow.CheckBox_Click(sender, e); // 调用父窗体的勾选框点击事件
+            settingManager.CheckBox_Click(sender, e); // 调用父窗体的勾选框点击事件
         }
 
         // 下拉框选择改变事件
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            settingsWindow.ComboBox_SelectionChanged(sender, e); // 调用父窗体的下拉框选择改变事件
+            settingManager.ComboBox_SelectionChanged(sender, e); // 调用父窗体的下拉框选择改变事件
         }
 
         // 基础设置-弹出面板-弹出面板

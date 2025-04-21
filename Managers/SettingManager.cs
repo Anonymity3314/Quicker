@@ -1,14 +1,30 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Media;
 using System.Diagnostics;
-using System;
 using System.Windows;
+using System;
 
 namespace Quicker.Managers
 {
     internal class SettingManager
     {
+        public T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            // 循环查找父元素
+            while ((child = VisualTreeHelper.GetParent(child)) != null)
+            {
+                if (child is T)
+                    return (T)child;
+            }
+            return null;
+        } // 查找父元素
+        private const string DefaultButtonColor1 = "#FFE0E0E0"; // 默认按钮颜色
+        private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮颜色
+        private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
+        private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
+
         private readonly SettingDatabase db1; // 设置数据库
-        private SettingsCache settingsCache; // 缓存对象
+        public SettingsCache settingsCache; // 缓存对象
 
         public SettingManager()
         {
@@ -50,6 +66,103 @@ namespace Quicker.Managers
                     WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation
                 }; // 加载设置数据到缓存
             });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="targetStackPanel"> 目标StackPanel </param>
+        /// <param name="targetButton"> 目标Button </param>
+        /// <param name="fatherStackPanel"> 父级StackPanel </param>
+        public void ButtonStyle1_Click(StackPanel targetStackPanel, Button targetButton, StackPanel fatherStackPanel, Grid fathergrid, StackPanel fatherStackPanel1)
+        {
+            if (targetStackPanel.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
+            foreach (var stackpanel in fathergrid.Children.OfType<StackPanel>())
+            {
+                stackpanel.Visibility = stackpanel == targetStackPanel ? Visibility.Visible : Visibility.Hidden; // 设置StackPanel可见性
+            } // 设置StackPanel可见性
+
+            foreach (var button in fatherStackPanel1.Children.OfType<Button>())
+            {
+                button.Background = button == targetButton ?
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1)) :
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1)); // 设置Button类型1颜色
+            } // 设置Button类型1颜色
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="stackPanel"> 目标StackPanel </param>
+        public void ButtonStyle1_MouseLeave(object sender, StackPanel stackPanel)
+        {
+            Button button = sender as Button; // 获取Button
+            button.Background = stackPanel.Visibility == Visibility.Visible ?
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1)) :
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1)); // 设置Button颜色
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="targetButton"> 目标Button </param>
+        /// <param name="stackPanel"> 目标StackPanel </param>
+        /// <param name="targetGrid"> 目标Grid </param>
+        /// <param name="fatherGrid"> 父级Grid </param>
+        public void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
+        {
+            if (targetGrid.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
+            foreach (var grid in fatherGrid.Children.OfType<UserControl>())
+            {
+                grid.Visibility = grid == targetGrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
+            } // 设置Grid可见性
+
+            foreach (var button in stackPanel.Children.OfType<Button>())
+            {
+                button.Background = button == targetButton ?
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
+                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
+                button.FontWeight = button == targetButton ? FontWeights.Bold : FontWeights.Normal; // 设置字体粗细
+            } // 设置Button颜色&&字体粗细
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="targetGrid"> 目标Grid </param>
+        public void ButtonStyle2_MouseLeave(object sender, UserControl targetGrid)
+        {
+            Button button = sender as Button; // 获取Button
+            button.Background = targetGrid.Visibility == Visibility.Visible ?
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
+        }
+
+        // 设置Button类型3边框
+        public static void UpdateButtonStyle3(Button clickedButton, Grid buttonPanelGrid)
+        {
+            foreach (var button in buttonPanelGrid.Children.OfType<Button>())
+            {
+                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 1.3) : new Thickness(0); // 设置Button边框
+            }
+        }
+
+        // 下拉框选择改变事件
+        public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox comboBox)
+            {
+                string comboBoxName = comboBox.Name; // 获取ComboBox名称
+                int selectedIndex = comboBox.SelectedIndex; // 获取选中项索引
+                switch (comboBoxName)
+                {
+                    case "WindowStartupLocationComboBox":
+                        settingsCache.WindowStartupLocation = selectedIndex; // 设置窗口启动位置
+                        break; // 功能面板打开位置
+                }
+            }
         }
 
         // 勾选框点击事件
@@ -172,7 +285,7 @@ namespace Quicker.Managers
         }
 
         // 缓存对象类
-        private class SettingsCache
+        public class SettingsCache
         {
             public bool AutoStart { get; set; } // 开机自启动
             public bool ShowNotification { get; set; } // 显示启动完成提示
