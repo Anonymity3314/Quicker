@@ -109,19 +109,27 @@ namespace Quicker.Managers
         /// <param name="fatherGrid"> 父级Grid </param>
         public void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
         {
-            if (fatherGrid.Children.Contains(targetGrid)) return; // 如果目标控件已经存在，则不执行任何操作
             var existingGrid = fatherGrid.Children.OfType<UserControl>().FirstOrDefault(); // 获取第一个 UserControl 子元素
-            fatherGrid.Children.Remove(existingGrid); // 移除现有的 Grid
-            targetGrid.SetValue(Grid.ColumnSpanProperty, 2); // 设置列跨度
-            fatherGrid.Children.Add(targetGrid); // 添加目标控件
-
-            foreach (var button in stackPanel.Children.OfType<Button>()) // 设置按钮样式
+            if (existingGrid == null)
             {
-                button.Background = button == targetButton ?
-                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
-                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
-                button.FontWeight = button == targetButton ? FontWeights.Bold : FontWeights.Normal; // 设置字体粗细
-            } // 设置Button颜色&&字体粗细
+                targetGrid.SetValue(Grid.ColumnSpanProperty, 2);
+                fatherGrid.Children.Add(targetGrid);
+            }
+            else if (existingGrid.Name != targetGrid.Name)
+            {
+                fatherGrid.Children.Remove(existingGrid);
+                targetGrid.SetValue(Grid.ColumnSpanProperty, 2);
+                fatherGrid.Children.Add(targetGrid);
+            }
+            else return; // 如果目标面板已经打开，则不执行任何操作
+
+            foreach (var button in stackPanel.Children.OfType<Button>())
+            {
+                button.Background = button == targetButton
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2))
+                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button类型2颜色
+                button.FontWeight = button == targetButton ? FontWeights.Bold : FontWeights.Normal; // 设置Button类型2粗体
+            } // 设置Button类型2颜色&&粗体
         }
 
         /// <summary>
@@ -132,9 +140,9 @@ namespace Quicker.Managers
         public void ButtonStyle2_MouseLeave(object sender, UserControl targetGrid, Grid fatherGrid)
         {
             Button button = sender as Button; // 获取Button
-            button.Background = fatherGrid.Children.Contains(targetGrid) ?
-                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
-                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
+            var existingGrid = fatherGrid.Children.OfType<UserControl>().FirstOrDefault(); // 获取第一个 UserControl 子元素
+            if (existingGrid.Name == targetGrid.Name)
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)); // 设置Button颜色
         }
 
         /// <summary>
