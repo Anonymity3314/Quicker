@@ -109,19 +109,13 @@ namespace Quicker.Managers
         /// <param name="fatherGrid"> 父级Grid </param>
         public void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
         {
-            var gridsToRemove = new List<UserControl>(); // 创建一个临时列表，用于存储需要移除的 UserControl
-            foreach (var grid in fatherGrid.Children.OfType<UserControl>())
-            {
-                if (grid != targetGrid) gridsToRemove.Add(grid); // 将需要移除的 UserControl 添加到临时列表
-            }
-            foreach (var grid in gridsToRemove)// 遍历结束后，统一移除
-            {
-                fatherGrid.Children.Remove(grid); // 移除不需要的 UserControl
-            } // 移除不需要的 UserControl
+            if (fatherGrid.Children.Contains(targetGrid)) return; // 如果目标控件已经存在，则不执行任何操作
+            var existingGrid = fatherGrid.Children.OfType<UserControl>().FirstOrDefault(); // 获取第一个 UserControl 子元素
+            fatherGrid.Children.Remove(existingGrid); // 移除现有的 Grid
             targetGrid.SetValue(Grid.ColumnSpanProperty, 2); // 设置列跨度
             fatherGrid.Children.Add(targetGrid); // 添加目标控件
 
-            foreach (var button in stackPanel.Children.OfType<Button>())// 设置按钮样式
+            foreach (var button in stackPanel.Children.OfType<Button>()) // 设置按钮样式
             {
                 button.Background = button == targetButton ?
                     new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
@@ -135,12 +129,12 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="targetGrid"> 目标Grid </param>
-        public void ButtonStyle2_MouseLeave(object sender, UserControl targetGrid)
+        public void ButtonStyle2_MouseLeave(object sender, UserControl targetGrid, Grid fatherGrid)
         {
             Button button = sender as Button; // 获取Button
-            button.Background = targetGrid == null ?
-                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)) :
-                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)); // 设置Button颜色
+            button.Background = fatherGrid.Children.Contains(targetGrid) ?
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor2)) :
+                new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
         }
 
         // 设置Button类型3边框

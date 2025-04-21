@@ -18,7 +18,8 @@ namespace Quicker.Windows
         private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮颜色
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
-
+        
+        private readonly Dictionary<string, UserControl> userControlCache = new Dictionary<string, UserControl>();
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
         private readonly SettingDatabase db1; // 设置数据库
         SettingManager settingManager; // 设置管理器
@@ -47,8 +48,19 @@ namespace Quicker.Windows
             settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, new ConventionGrid(), ResultGrid); // 设置默认显示的Grid
         }
 
+        // 按需加载并显示 UserControl
+        private void LoadAndShowUserControl(string controlName, Func<UserControl> createDate, Button targetButton, StackPanel stackPanel, Grid fatherGrid)
+        {
+            if (!userControlCache.TryGetValue(controlName, out var userControl))
+            {
+                userControl = createDate(); // 创建 UserControl
+                userControlCache[controlName] = userControl; // 缓存 UserControl
+            }
+            settingManager.ButtonStyle2_Click(targetButton, stackPanel, userControl, fatherGrid); // 设置Button类型2样式
+        }
+
         /// <summary>
-        /// 
+        /// 设置Button类型1样式
         /// </summary>
         /// <param name="targetStackPanel"> 目标StackPanel </param>
         /// <param name="targetButton"> 目标Button </param>
@@ -113,7 +125,11 @@ namespace Quicker.Windows
             });
         }
 
-        // 更新开机自启动设置
+        /// <summary>
+        /// 更新开机自启动设置
+        /// </summary>
+        /// <param name="autostart"> 开机自启动设置 </param>
+        /// <returns> 保存成功标志 </returns>
         private bool UpdateAutostart(bool autostart)
         {
             try
@@ -156,7 +172,7 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, new ConventionGrid()); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new ConventionGrid(), ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-弹出面板
@@ -169,7 +185,7 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void OpenMainWindow_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender,new OpenMainWindowGrid()); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new OpenMainWindowGrid(), ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-黑名单
@@ -181,18 +197,19 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender,new BlacklistGrid()); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new BlacklistGrid(), ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-外观
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
             settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, new AppearanceGrid(), ResultGrid); // 设置Button类型2样式
+            ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Appearance_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, new AppearanceGrid()); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new AppearanceGrid(), ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-关于Quicker
@@ -204,7 +221,7 @@ namespace Quicker.Windows
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle2_MouseLeave(sender, new AboutQuickerGrid()); // 鼠标移出Button恢复Background
+            settingManager.ButtonStyle2_MouseLeave(sender, new AboutQuickerGrid(), ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 辅助功能
