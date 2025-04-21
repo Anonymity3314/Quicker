@@ -10,6 +10,8 @@
     Background="White"
     d:DesignHeight="870"
     d:DesignWidth="967"
+    
+    Unloaded="OpenMainWindowGrid_Unloaded"
 >
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>

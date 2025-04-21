@@ -312,5 +312,25 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
             SetGridVisible(DoActionKeyboardButtonGrid, MainGrid);
             UpdateButtonStyle3(DoActionKeyboardButton, MainGrid);
         }
+
+        // 清理资源
+        private void OpenMainWindowGrid_Unloaded(object sender, RoutedEventArgs e)
+        {
+            OpenMainWindowByMiddleMouseClickCheckBox = null; 
+            OpenMainWindowByX1MouseClickCheckBox = null;
+            OpenMainWindowByX2MouseClickCheckBox = null;
+            OpenMainWindowByCtrl_MiddleMouseClickCheckBox = null;
+            OpenMainWindowByCtrl_RightMouseClickCheckBox = null;
+            OpenMainWindowByMiddleMouseClickLongerCheckBox = null;
+            OpenMainWindowByRightMouseClickLongerCheckBox = null;
+            OpenMainWindowByRightMouseClick_MoveCheckBox = null;
+            OpenMainWindowByCtrlCheckBox = null;
+            WindowStartupLocationComboBox = null;
+            OpenMainWindowButton = null;
+            OpenMainWindowButtonGrid = null;
+            DoActionKeyboardButton = null;
+            DoActionKeyboardButtonGrid = null;
+            TestButton = null;
+        }
     }
 }
