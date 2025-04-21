@@ -137,7 +137,11 @@ namespace Quicker.Managers
                 new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor2)); // 设置Button颜色
         }
 
-        // 设置Button类型3边框
+        /// <summary>
+        /// 设置Button类型3边框
+        /// </summary>
+        /// <param name="clickedButton"> 被点击的Button </param>
+        /// <param name="buttonPanelGrid"> Button面板Grid </param>
         public static void UpdateButtonStyle3(Button clickedButton, Grid buttonPanelGrid)
         {
             foreach (var button in buttonPanelGrid.Children.OfType<Button>())
