@@ -118,16 +118,11 @@ namespace Quicker.Managers
         public void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
         {
             var existingGrid = fatherGrid.Children.OfType<UserControl>().FirstOrDefault(); // 获取第一个 UserControl 子元素
-            if (existingGrid == null)
+            if (existingGrid == null || existingGrid.Name != targetGrid.Name)
             {
-                targetGrid.SetValue(Grid.ColumnSpanProperty, 2);
-                fatherGrid.Children.Add(targetGrid);
-            }
-            else if (existingGrid.Name != targetGrid.Name)
-            {
-                fatherGrid.Children.Remove(existingGrid);
-                targetGrid.SetValue(Grid.ColumnSpanProperty, 2);
-                fatherGrid.Children.Add(targetGrid);
+                if (existingGrid != null) fatherGrid.Children.Remove(existingGrid); // 移除旧的 UserControl 子元素
+                targetGrid.SetValue(Grid.ColumnSpanProperty, 2); // 设置目标Grid列跨度为2
+                fatherGrid.Children.Add(targetGrid); // 添加目标Grid子元素
             }
             else return; // 如果目标面板已经打开，则不执行任何操作
 
