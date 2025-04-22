@@ -33,102 +33,102 @@
                         <Label Content="尺寸" Margin="10,50,494,822" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 尺寸-按钮大小 -->
                         <Label Content="按钮大小：" Margin="10,90,472,702" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,90,0,0" VerticalAlignment="Top" Width="120" Height="35" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="261,99,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,90,0,0" VerticalAlignment="Top" Width="120" Height="35" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                        <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="261,99,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="120" Text="{Binding ElementName=ButtonSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮间隙 -->
                         <Label Content="按钮间隙：" Margin="10,125,472,667" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,125,0,0" VerticalAlignment="Top" Width="120" Height="35" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,134,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,125,0,0" VerticalAlignment="Top" Width="120" Height="35" Minimum="-0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                        <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,134,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="120" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-边框宽度 -->
                         <Label Content="边框宽度：" Margin="10,165,472,627" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Width="120" Height="35" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="BorderWidthTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,169,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Width="120" Height="35" Minimum="0" Maximum="30" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                        <TextBox x:Name="BorderWidthTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,169,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="120" Text="{Binding ElementName=BorderWidthSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮圆角 -->
                         <Label Content="按钮圆角：" Margin="10,205,472,587" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonCornerRadiusSlider" HorizontalAlignment="Left" Margin="121,205,0,0" VerticalAlignment="Top" Width="120" Height="35" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="ButtonCornerRadiusTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,205,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <Slider x:Name="ButtonCornerRadiusSlider" HorizontalAlignment="Left" Margin="121,205,0,0" VerticalAlignment="Top" Width="120" Height="35" Minimum="0" Maximum="40" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                        <TextBox x:Name="ButtonCornerRadiusTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,205,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="120" Text="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
 
                         <!-- 颜色 -->
                         <Label Content="颜色" Margin="10,240,494,631" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 颜色-背景 -->
                         <Label Content="背景：" Margin="10,276,409,590" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="BackgroundComboBox" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-工具栏 -->
                         <Label Content="工具栏：" Margin="10,312,409,478" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,315,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="ToolbarComboBox" HorizontalAlignment="Left" Margin="167,315,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-工具栏图标 -->
                         <Label Content="工具栏图标：" Margin="10,349,409,521" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,352,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="ToolbarIconComboBox" HorizontalAlignment="Left" Margin="167,352,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-动作按钮 -->
                         <Label Content="动作按钮：" Margin="10,386,409,403" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,389,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="ActionButtonComboBox" HorizontalAlignment="Left" Margin="167,389,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-动作按钮鼠标悬浮 -->
                         <Label Content="动作按钮鼠标悬浮：" Margin="10,424,409,365" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,427,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="ActionButtonMouseOverComboBox" HorizontalAlignment="Left" Margin="167,427,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-空白按钮 -->
                         <Label Content="空白按钮：" Margin="10,462,409,326" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,462,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="BlankButtonComboBox" HorizontalAlignment="Left" Margin="167,462,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-空白按钮鼠标悬浮 -->
                         <Label Content="空白按钮鼠标悬浮：" Margin="10,501,409,287" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,504,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="BlankButtonMouseOverComboBox" HorizontalAlignment="Left" Margin="167,504,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-按钮文字 -->
                         <Label Content="按钮文字：" Margin="10,540,409,248" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,539,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="ButtonTextComboBox" HorizontalAlignment="Left" Margin="167,539,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-动作矢量图标色 -->
                         <Label Content="动作矢量图标色：" Margin="10,579,409,209" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,582,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="ActionIconComboBox" HorizontalAlignment="Left" Margin="167,582,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-触发键文字颜色 -->
                         <Label Content="触发键文字颜色：" Margin="10,618,409,170" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,621,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="TriggerKeyTextComboBox" HorizontalAlignment="Left" Margin="167,621,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 颜色-其他位置矢量图标色 -->
                         <Label Content="其他位置矢量图标色：" Margin="10,657,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left" Width="152"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="167,660,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="OtherIconComboBox" HorizontalAlignment="Left" Margin="167,660,0,0" VerticalAlignment="Top" Width="120"/>
 
                         <!-- 字体 -->
                         <Label Content="字体" Margin="16,696,488,170" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 字体-字体1 -->
                         <Label Content="字体1：" Margin="10,732,409,55" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="107,735,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="107,735,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 字体-字体2 -->
                         <Label Content="字体2：" Margin="10,772,409,15" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="107,775,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,775,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 字体-字体大小 -->
                         <Label Content="字体大小：" Margin="10,812,409,15" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="110,812,0,0" VerticalAlignment="Top" Width="120" Height="35" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,817,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="110,812,0,0" VerticalAlignment="Top" Width="120" Height="35"/>
+                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,817,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 字体-字体粗细 -->
                         <Label Content="字体粗细：" Margin="10,852,409,15" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="FontSizeTextBox复制__C_1" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="110,857,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <TextBox x:Name="FontWeightTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="110,857,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
 
                         <!-- 背景图片 -->
                         <Label Content="背景图片" Margin="15,885,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 背景图片-路径 -->
                         <Label Content="路径：" Margin="10,920,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <TextBox Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="110,925,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="176"/>
-                        <Button Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="291,923,0,0" VerticalAlignment="Top" Width="43"/>
+                        <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="110,925,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="176"/>
+                        <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="291,923,0,0" VerticalAlignment="Top" Width="43"/>
                         <!-- 背景图片-不透明度 -->
                         <Label Content="不透明度：" Margin="10,953,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider复制__C_" HorizontalAlignment="Left" Margin="107,953,0,0" VerticalAlignment="Top" Width="120" Height="36" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="FontSizeTextBox复制__C_" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,958,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,953,0,0" VerticalAlignment="Top" Width="120" Height="36" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True"/>
+                        <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,958,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text="{Binding ElementName=BackgroundImageOpacitySlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
 
                         <!-- 模糊与圆角 -->
                         <Label Content="模糊与圆角" Margin="15,986,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 模糊与圆角-模糊模式 -->
                         <Label Content="模糊模式：" Margin="10,1021,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="138,1020,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,1020,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 模糊与圆角-Win11圆角模式 -->
                         <Label Content="Win11圆角模式：" Margin="10,1054,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox HorizontalAlignment="Left" Margin="138,1057,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,1057,0,0" VerticalAlignment="Top" Width="120"/>
 
                         <!-- 选项 -->
                         <Label Content="选项" Margin="10,1087,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <CheckBox Content="自动缩小动作名称文字" HorizontalAlignment="Left" Margin="31,1122,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
-                        <CheckBox Content="鼠标悬浮在动作按钮上时，放大显示按钮" HorizontalAlignment="Left" Margin="31,1142,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
-                        <CheckBox Content="设置动作图标后隐藏动作名称" HorizontalAlignment="Left" Margin="31,1162,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
-                        <CheckBox Content="动作图标显示阴影" HorizontalAlignment="Left" Margin="31,1182,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" HorizontalAlignment="Left" Margin="31,1122,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" HorizontalAlignment="Left" Margin="31,1142,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" HorizontalAlignment="Left" Margin="31,1162,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                        <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" HorizontalAlignment="Left" Margin="31,1182,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
                     </Grid>
                 </ScrollViewer>
-                <ScrollBar x:Name="AppearanceScrollBar" Visibility="Visible" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="18" ValueChanged="AppearanceScrollBar_ValueChanged" Margin="535,20,0,20"/>
+                <ScrollBar x:Name="AppearanceScrollBar" Visibility="Visible" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="18" ValueChanged="AppearanceScrollBar_ValueChanged" Margin="535,20,0,0"/>
             </Grid>
         </Grid>
     </Grid>

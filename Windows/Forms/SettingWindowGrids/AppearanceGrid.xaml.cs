@@ -48,11 +48,6 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
             AppearanceScrollBar.Visibility = Visibility.Collapsed;
         }
 
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-
-        }
-
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             settingManager.CheckBox_Click(sender);
