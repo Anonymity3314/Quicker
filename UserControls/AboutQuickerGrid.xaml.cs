@@ -1,9 +1,10 @@
 ﻿using System.Windows.Controls;
+using Quicker.UserControls;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows;
 
-namespace Quicker.Windows.Forms.SettingWindowGrids
+namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {

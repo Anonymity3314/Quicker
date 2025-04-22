@@ -1,15 +1,15 @@
 ﻿<UserControl
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:Quicker.Windows.Forms.SettingWindowGrids"
-    x:Class="Quicker.Windows.Forms.SettingWindowGrids.AppearanceGrid"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Quicker.UserControls"
+    x:Class="Quicker.UserControls.AppearanceGrid"
     mc:Ignorable="d"
 
-    d:DesignWidth="967"
-    d:DesignHeight="870"
     Background="White"
+    d:DesignHeight="870"
+    d:DesignWidth="967"
 >
     <!--d:DesignHeight="870"-->
     <Grid>
@@ -118,7 +118,12 @@
                         <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,1020,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 模糊与圆角-Win11圆角模式 -->
                         <Label Content="Win11圆角模式：" Margin="10,1054,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,1057,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,1057,0,0" VerticalAlignment="Top" Width="120">
+                            <ComboBoxItem Content="默认"/>
+                            <ComboBoxItem Content="无"/>
+                            <ComboBoxItem Content="圆角"/>
+                            <ComboBoxItem Content="小圆角"/>
+                        </ComboBox>
 
                         <!-- 选项 -->
                         <Label Content="选项" Margin="10,1087,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>

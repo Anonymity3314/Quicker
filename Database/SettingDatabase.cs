@@ -10,10 +10,8 @@ public class SettingDatabase
     // 初始化数据库
     public void Initialize()
     {
-        if (!File.Exists("Setting.db"))
-        {
-            SQLiteConnection.CreateFile("Setting.db"); // 创建数据库文件
-        } // 如果数据库文件不存在，则创建一个新的数据库文件
+        if (File.Exists("Setting.db")) return; // 如果数据库文件存在，则直接返回
+        SQLiteConnection.CreateFile("Setting.db"); // 创建数据库文件
 
         using var connection = OpenConnection(); // 打开数据库连接
 
@@ -34,28 +32,22 @@ public class SettingDatabase
         using var createConventionCommand = new SQLiteCommand(createConventionTableQuery, connection); // 创建 SQLiteCommand 对象
         createConventionCommand.ExecuteNonQuery(); // 执行创建表的命令
 
-        // 检查 Convention 表是否为空并插入初始数据
-        string checkConventionQuery = "SELECT COUNT(*) FROM Convention;"; // 检查 Convention 表的行数
-        using var checkConventionCommand = new SQLiteCommand(checkConventionQuery, connection); // 创建 SQLiteCommand 对象
-        int conventionRowCount = Convert.ToInt32(checkConventionCommand.ExecuteScalar()); // 执行查询并获取行数
-        if (conventionRowCount == 0) // 如果表为空，则插入初始数据
-        {
-            string insertConventionQuery = @"
+        // 插入初始数据
+        string insertConventionQuery = @"
             INSERT INTO Convention 
             (AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping) 
             VALUES 
             (@AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
-            using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
-            insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
-            insertConventionCommand.Parameters.AddWithValue("@ShowNotification", true); // 是否显示通知
-            insertConventionCommand.Parameters.AddWithValue("@ShowAddImage", true); // 是否显示添加图片
-            insertConventionCommand.Parameters.AddWithValue("@TotalUsageTime", 0.0); // 总使用时长
-            insertConventionCommand.Parameters.AddWithValue("@HideTooltip", false); // 是否隐藏提示
-            insertConventionCommand.Parameters.AddWithValue("@LongPressThreshold", 300); // 长按阈值
-            insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
-            insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
-            insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
-        }
+        using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
+        insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
+        insertConventionCommand.Parameters.AddWithValue("@ShowNotification", true); // 是否显示通知
+        insertConventionCommand.Parameters.AddWithValue("@ShowAddImage", true); // 是否显示添加图片
+        insertConventionCommand.Parameters.AddWithValue("@TotalUsageTime", 0.0); // 总使用时长
+        insertConventionCommand.Parameters.AddWithValue("@HideTooltip", false); // 是否隐藏提示
+        insertConventionCommand.Parameters.AddWithValue("@LongPressThreshold", 300); // 长按阈值
+        insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
+        insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
+        insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
 
         // 创建 OpenMainWindow 表
         string createOpenMainWindowTableQuery = @"
@@ -76,30 +68,24 @@ public class SettingDatabase
         using var createOpenMainWindowCommand = new SQLiteCommand(createOpenMainWindowTableQuery, connection); // 创建 SQLiteCommand 对象
         createOpenMainWindowCommand.ExecuteNonQuery(); // 执行创建表的命令
 
-        // 检查 OpenMainWindow 表是否为空并插入初始数据
-        string checkOpenMainWindowQuery = "SELECT COUNT(*) FROM OpenMainWindow;"; // 检查 OpenMainWindow 表的行数
-        using var checkOpenMainWindowCommand = new SQLiteCommand(checkOpenMainWindowQuery, connection); // 创建 SQLiteCommand 对象
-        int openMainWindowRowCount = Convert.ToInt32(checkOpenMainWindowCommand.ExecuteScalar()); // 执行查询并获取行数
-        if (openMainWindowRowCount == 0) // 如果表为空，则插入初始数据
-        {
-            string insertOpenMainWindowQuery = @"
+        // 插入初始数据
+        string insertOpenMainWindowQuery = @"
             INSERT INTO OpenMainWindow 
             (OpenMainWindowByMiddleMouseClick, OpenMainWindowByX1MouseClick, OpenMainWindowByX2MouseClick, OpenMainWindowByCtrl_MiddleMouseClick, OpenMainWindowByCtrl_RightMouseClick, OpenMainWindowByMiddleMouseClickLonger, OpenMainWindowByRightMouseClickLonger, OpenMainWindowByRightMouseClick_Move, OpenMainWindowByCtrl, WindowStartupLocation) 
             VALUES 
             (@OpenMainWindowByMiddleMouseClick, @OpenMainWindowByX1MouseClick, @OpenMainWindowByX2MouseClick, @OpenMainWindowByCtrl_MiddleMouseClick, @OpenMainWindowByCtrl_RightMouseClick, @OpenMainWindowByMiddleMouseClickLonger, @OpenMainWindowByRightMouseClickLonger, @OpenMainWindowByRightMouseClick_Move, @OpenMainWindowByCtrl, @WindowStartupLocation);";
-            using var insertOpenMainWindowCommand = new SQLiteCommand(insertOpenMainWindowQuery, connection); // 创建 SQLiteCommand 对象
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", false); // 按下中键
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", false); // 按下X1键
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", false); // 按下X2键
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl_MiddleMouseClick", false); // Ctrl+中键单击
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl_RightMouseClick", false); // Ctrl+右键单击
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClickLonger", false); // 长按中键
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByRightMouseClickLonger", false); // 长按右键
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", false); // 按右键移动
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl", true); // 单击Ctrl键
-            insertOpenMainWindowCommand.Parameters.AddWithValue("@WindowStartupLocation", 2); // 功能面板打开位置
-            insertOpenMainWindowCommand.ExecuteNonQuery(); // 执行插入命令
-        }
+        using var insertOpenMainWindowCommand = new SQLiteCommand(insertOpenMainWindowQuery, connection); // 创建 SQLiteCommand 对象
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", false); // 按下中键
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", false); // 按下X1键
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", false); // 按下X2键
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl_MiddleMouseClick", false); // Ctrl+中键单击
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl_RightMouseClick", false); // Ctrl+右键单击
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClickLonger", false); // 长按中键
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByRightMouseClickLonger", false); // 长按右键
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", false); // 按右键移动
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl", true); // 单击Ctrl键
+        insertOpenMainWindowCommand.Parameters.AddWithValue("@WindowStartupLocation", 2); // 功能面板打开位置
+        insertOpenMainWindowCommand.ExecuteNonQuery(); // 执行插入命令
     }
 
     // 更新设置信息
@@ -250,4 +236,10 @@ public class OpenMainWindow
     public bool OpenMainWindowByRightMouseClick_Move { get; set; } // 按右键移动
     public bool OpenMainWindowByCtrl { get; set; } // 单击Ctrl键
     public int WindowStartupLocation { get; set; } // 功能面板打开位置
+}
+
+// 外观设置
+public class Appearance
+{
+
 }

@@ -1,9 +1,11 @@
 ﻿using System.Windows.Controls;
+using Quicker.UserControls;
 using System.Windows.Input;
 using Quicker.Managers;
 using System.Windows;
+using Quicker;
 
-namespace Quicker.Windows.Forms.SettingWindowGrids
+namespace Quicker.UserControls
 {
     public partial class OpenMainWindowGrid : UserControl
     {
@@ -28,19 +30,18 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
-            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置信息
             Application.Current.Dispatcher.Invoke(() =>
             {
-                OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick; // 按下中键
-                OpenMainWindowByX1MouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByX1MouseClick; // 按下X1键
-                OpenMainWindowByX2MouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByX2MouseClick; // 按下X2键
-                OpenMainWindowByCtrl_MiddleMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick; // Ctrl+中键单击
-                OpenMainWindowByCtrl_RightMouseClickCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick; // Ctrl+右键单击
-                OpenMainWindowByMiddleMouseClickLongerCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger; // 长按中键
-                OpenMainWindowByRightMouseClickLongerCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger; // 长按右键
-                OpenMainWindowByRightMouseClick_MoveCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move; // 按右键移动
-                OpenMainWindowByCtrlCheckBox.IsChecked = OpenMainWindowConditions.OpenMainWindowByCtrl; // 单击Ctrl键
-                WindowStartupLocationComboBox.SelectedIndex = OpenMainWindowConditions.WindowStartupLocation; // 功能面板打开位置
+                OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByMiddleMouseClick; // 按下中键
+                OpenMainWindowByX1MouseClickCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByX1MouseClick; // 按下X1键
+                OpenMainWindowByX2MouseClickCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByX2MouseClick; // 按下X2键
+                OpenMainWindowByCtrl_MiddleMouseClickCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByCtrl_MiddleMouseClick; // Ctrl+中键单击
+                OpenMainWindowByCtrl_RightMouseClickCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByCtrl_RightMouseClick; // Ctrl+右键单击
+                OpenMainWindowByMiddleMouseClickLongerCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByMiddleMouseClickLonger; // 长按中键
+                OpenMainWindowByRightMouseClickLongerCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByRightMouseClickLonger; // 长按右键
+                OpenMainWindowByRightMouseClick_MoveCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByRightMouseClick_Move; // 按右键移动
+                OpenMainWindowByCtrlCheckBox.IsChecked = settingManager.settingsCache.OpenMainWindowByCtrl; // 单击Ctrl键
+                WindowStartupLocationComboBox.SelectedIndex = settingManager.settingsCache.WindowStartupLocation; // 功能面板打开位置
             });
         }
 

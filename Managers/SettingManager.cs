@@ -43,15 +43,18 @@ namespace Quicker.Managers
         {
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
+            //var Appearance = db1.GetAllAppearance().FirstOrDefault(); // 获取外观设置信息
             settingsCache = new SettingsCache
             {
-                AutoStart = Conventions.AutoStart,
-                ShowNotification = Conventions.ShowNotification,
-                ShowAddImage = Conventions.ShowAddImage,
-                HideTooltip = Conventions.HideTooltip,
-                LongPressThreshold = Conventions.LongPressThreshold,
-                MouseMovePixels = Conventions.MouseMovePixels,
-                LoopPageFlipping = Conventions.LoopPageFlipping,
+                // 常规设置
+                AutoStart = Conventions.AutoStart, // 开机自启
+                ShowNotification = Conventions.ShowNotification, // 显示通知
+                ShowAddImage = Conventions.ShowAddImage, // 显示添加图片按钮
+                HideTooltip = Conventions.HideTooltip, // 隐藏工具提示
+                LongPressThreshold = Conventions.LongPressThreshold, // 长按阈值
+                MouseMovePixels = Conventions.MouseMovePixels, // 鼠标移动像素
+                LoopPageFlipping = Conventions.LoopPageFlipping, // 循环翻页
+                // 弹出面板设置
                 OpenMainWindowByMiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick,
                 OpenMainWindowByX1MouseClick = OpenMainWindowConditions.OpenMainWindowByX1MouseClick,
                 OpenMainWindowByX2MouseClick = OpenMainWindowConditions.OpenMainWindowByX2MouseClick,
@@ -61,7 +64,12 @@ namespace Quicker.Managers
                 OpenMainWindowByRightMouseClickLonger = OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
                 OpenMainWindowByRightMouseClick_Move = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
                 OpenMainWindowByCtrl = OpenMainWindowConditions.OpenMainWindowByCtrl,
-                WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation
+                WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation,
+                // 外观设置
+                //AutoHideTitleBar = Appearance.AutoHideTitleBar,
+                //ShowActionButtonMouseOver = Appearance.ShowActionButtonMouseOver,
+                //HideActionNameAfterIcon = Appearance.HideActionNameAfterIcon,
+                //ShowActionIconShadow = Appearance.ShowActionIconShadow
             }; // 加载设置数据到缓存
         }
 
@@ -224,6 +232,18 @@ namespace Quicker.Managers
                 case "OpenMainWindowByCtrlCheckBox":
                     settingsCache.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
                     break; // 单击Ctrl键
+                case "AutoHideTitleBarCheckBox":
+                    settingsCache.AutoHideTitleBar = isChecked == true; // 自动缩小动作名称文字
+                    break; // 自动缩小动作名称文字
+                case "ShowActionButtonMouseOverCheckBox":
+                    settingsCache.ShowActionButtonMouseOver = isChecked == true; // 鼠标悬浮在动作按钮上时放大显示按钮
+                    break; // 鼠标悬浮在动作按钮上时放大显示按钮
+                case "HideActionNameAfterIconCheckBox":
+                    settingsCache.HideActionNameAfterIcon = isChecked == true; // 设置动作图标后隐藏动作名称
+                    break; // 设置动作图标后隐藏动作名称
+                case "ShowActionIconShadowCheckBox":
+                    settingsCache.ShowActionIconShadow = isChecked == true; // 动作图标显示阴影
+                    break; // 动作图标显示阴影
             }
         }
 
@@ -325,6 +345,7 @@ namespace Quicker.Managers
         // 缓存对象类
         public class SettingsCache
         {
+            // 常规设置
             public bool AutoStart { get; set; } // 开机自启动
             public bool ShowNotification { get; set; } // 显示启动完成提示
             public bool ShowAddImage { get; set; } // 左键点击空白按钮时显示创建动作菜单
@@ -332,6 +353,8 @@ namespace Quicker.Managers
             public int LongPressThreshold { get; set; } // 长按阈值
             public int MouseMovePixels { get; set; } // 鼠标移动像素
             public bool LoopPageFlipping { get; set; } // 循环翻页
+
+            // 弹出面板设置
             public bool OpenMainWindowByMiddleMouseClick { get; set; } // 按下中键
             public bool OpenMainWindowByX1MouseClick { get; set; } // 按下X1键
             public bool OpenMainWindowByX2MouseClick { get; set; } // 按下X2键
@@ -342,6 +365,12 @@ namespace Quicker.Managers
             public bool OpenMainWindowByRightMouseClick_Move { get; set; } // 按右键移动
             public bool OpenMainWindowByCtrl { get; set; } // 单击Ctrl键
             public int WindowStartupLocation { get; set; } // 功能面板打开位置
+
+            // 外观设置
+            public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字
+            public bool ShowActionButtonMouseOver { get; set; } // 鼠标悬浮在动作按钮上时放大显示按钮
+            public bool HideActionNameAfterIcon { get; set; } // 设置动作图标后隐藏动作名称
+            public bool ShowActionIconShadow { get; set; } // 动作图标显示阴影
         }
     }
 }

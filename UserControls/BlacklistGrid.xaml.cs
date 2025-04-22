@@ -1,6 +1,9 @@
 ﻿using System.Windows.Controls;
+using Quicker.UserControls;
+using Quicker.Windows;
+using Quicker;
 
-namespace Quicker.Windows.Forms.SettingWindowGrids
+namespace Quicker.UserControls
 {
     public partial class BlacklistGrid : UserControl
     {

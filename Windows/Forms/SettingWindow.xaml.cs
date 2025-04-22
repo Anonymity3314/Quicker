@@ -1,10 +1,8 @@
-﻿using Quicker.Windows.Forms.SettingWindowGrids;
-using Microsoft.Toolkit.Uwp.Notifications;
-using System.Windows.Threading;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Quicker.UserControls;
 using System.Windows.Input;
-using System.Diagnostics;
 using Quicker.Database;
 using Quicker.Managers;
 using Microsoft.Win32;

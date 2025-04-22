@@ -2,6 +2,27 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"        
 >
+    <!-- 自定义 ComboBox 样式 -->
+    <Style x:Key="ComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border x:Name="border" Padding="5">
+                        <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#E6E6E6"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#D9D9D9"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <!-- 圆角 ComboBox 的样式 -->
     <!--<Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
         <Setter Property="Template">

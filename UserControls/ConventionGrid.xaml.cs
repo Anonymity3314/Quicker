@@ -3,8 +3,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Quicker.Managers;
 using System.Windows;
+using Quicker;
 
-namespace Quicker.Windows.Forms.SettingWindowGrids
+namespace Quicker.UserControls
 {
     public partial class ConventionGrid : UserControl
     {
@@ -33,16 +34,15 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
-            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
             Application.Current.Dispatcher.Invoke(() =>
             {
-                AutoStartCheckBox.IsChecked = Conventions.AutoStart; // 加载开机自启动设置
-                ShowNotificationCheckBox.IsChecked = Conventions.ShowNotification; // 加载显示启动完成提示设置
-                ShowAddImageCheckBox.IsChecked = Conventions.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
-                HideTooltipCheckBox.IsChecked = Conventions.HideTooltip; // 加载隐藏提示框设置
-                LongPressThresholdTextBox.Text = Conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
-                MouseMovePixelsTextBox.Text = Conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
-                LoopPageFlippingCheckBox.IsChecked = Conventions.LoopPageFlipping; // 加载循环翻页设置
+                AutoStartCheckBox.IsChecked = settingManager.settingsCache.AutoStart; // 加载开机自启动设置
+                ShowNotificationCheckBox.IsChecked = settingManager.settingsCache.ShowNotification; // 加载显示启动完成提示设置
+                ShowAddImageCheckBox.IsChecked = settingManager.settingsCache.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
+                HideTooltipCheckBox.IsChecked = settingManager.settingsCache.HideTooltip; // 加载隐藏提示框设置
+                LongPressThresholdTextBox.Text = settingManager.settingsCache.LongPressThreshold.ToString(); // 加载长按阈值设置
+                MouseMovePixelsTextBox.Text = settingManager.settingsCache.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
+                LoopPageFlippingCheckBox.IsChecked = settingManager.settingsCache.LoopPageFlipping; // 加载循环翻页设置
             });
         }
 
@@ -90,12 +90,12 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
         }
 
         // 打开网站检查更新
-        private void CheckUpdateButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
             settingManager.OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
         }
 
-        private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             settingManager.CheckBox_Click(sender); // 调用父类方法
         }
