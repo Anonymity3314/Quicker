@@ -133,7 +133,7 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 
+        /// 设置Button类型2背景色
         /// </summary>
         /// <param name="sender"> 目标Button </param>
         /// <param name="targetGrid"> 目标Grid </param>
@@ -159,7 +159,7 @@ namespace Quicker.Managers
         }
 
         // 下拉框选择改变事件
-        public void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void ComboBox_SelectionChanged(object sender)
         {
             if (sender is ComboBox comboBox)
             {
@@ -175,7 +175,7 @@ namespace Quicker.Managers
         }
 
         // 勾选框点击事件
-        public void CheckBox_Click(object sender, RoutedEventArgs e)
+        public void CheckBox_Click(object sender)
         {
             CheckBox checkBox = (CheckBox)sender;
             string checkBoxName = checkBox.Name; // 获取勾选框名称
@@ -228,55 +228,78 @@ namespace Quicker.Managers
         }
 
         // 文本框内容改变事件
-        public void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        public void TextBox_TextChanged(object sender)
         {
-            if (sender is TextBox textBox)
+            TextBox textBox = sender as TextBox;
+            string textBoxName = textBox.Name; // 获取文本框名称
+            string textBoxValue = textBox.Text; // 获取文本框内容
+            switch (textBoxName)
             {
-                string textBoxName = textBox.Name; // 获取文本框名称
-                string textBoxValue = textBox.Text; // 获取文本框内容
-                switch (textBoxName)
-                {
-                    case "LongPressThresholdTextBox":
-                        if (int.TryParse(textBoxValue, out int shortPressThreshold))
+                case "LongPressThresholdTextBox":
+                    if (int.TryParse(textBoxValue, out int shortPressThreshold))
+                    {
+                        if (shortPressThreshold < 30) // 长按阈值不能小于30
                         {
-                            if (shortPressThreshold < 30) // 长按阈值不能小于30
-                            {
-                                textBox.Text = "30"; // 设置最小值
-                                settingsCache.LongPressThreshold = 30; // 设置最小值
-                            }
-                            else if (shortPressThreshold > 3000) // 长按阈值不能大于3000
-                            {
-                                textBox.Text = "3000"; // 设置最大值
-                                settingsCache.LongPressThreshold = 3000; // 设置最大值
-                            }
-                            else settingsCache.LongPressThreshold = shortPressThreshold; // 设置长按阈值
+                            textBox.Text = "30"; // 设置最小值
+                            settingsCache.LongPressThreshold = 30; // 设置最小值
                         }
-                        else // 返回原来的数值
+                        else if (shortPressThreshold > 3000) // 长按阈值不能大于3000
                         {
-                            textBox.Text = settingsCache.LongPressThreshold.ToString(); // 设置原来的数值
-                        } // 设置长按阈值
-                        break; // 长按阈值
-                    case "MouseMovePixelsTextBox":
-                        if (int.TryParse(textBoxValue, out int mouseMovePixels))
-                        {
-                            if ((int)mouseMovePixels < 1) // 鼠标移动像素不能小于 1
-                            {
-                                textBox.Text = "1"; // 设置最小值
-                                settingsCache.MouseMovePixels = 1; // 设置最小值
-                            }
-                            else if ((int)mouseMovePixels > 200) // 鼠标移动像素不能大于 200
-                            {
-                                textBox.Text = "200"; // 设置最大值
-                                settingsCache.MouseMovePixels = 200; // 设置最大值
-                            }
-                            else settingsCache.MouseMovePixels = mouseMovePixels; // 设置鼠标移动像素
+                            textBox.Text = "3000"; // 设置最大值
+                            settingsCache.LongPressThreshold = 3000; // 设置最大值
                         }
-                        else // 返回原来的数值
+                        else settingsCache.LongPressThreshold = shortPressThreshold; // 设置长按阈值
+                    }
+                    else // 返回原来的数值
+                    {
+                        textBox.Text = settingsCache.LongPressThreshold.ToString(); // 设置原来的数值
+                    } // 设置长按阈值
+                    break; // 长按阈值
+                case "MouseMovePixelsTextBox":
+                    if (int.TryParse(textBoxValue, out int mouseMovePixels))
+                    {
+                        if ((int)mouseMovePixels < 1) // 鼠标移动像素不能小于 1
                         {
-                            textBox.Text = settingsCache.MouseMovePixels.ToString(); // 设置原来的数值
-                        } // 设置鼠标移动像素
-                        break; // 鼠标移动像素
-                }
+                            textBox.Text = "1"; // 设置最小值
+                            settingsCache.MouseMovePixels = 1; // 设置最小值
+                        }
+                        else if ((int)mouseMovePixels > 200) // 鼠标移动像素不能大于 200
+                        {
+                            textBox.Text = "200"; // 设置最大值
+                            settingsCache.MouseMovePixels = 200; // 设置最大值
+                        }
+                        else settingsCache.MouseMovePixels = mouseMovePixels; // 设置鼠标移动像素
+                    }
+                    else // 返回原来的数值
+                    {
+                        textBox.Text = settingsCache.MouseMovePixels.ToString(); // 设置原来的数值
+                    } // 设置鼠标移动像素
+                    break; // 鼠标移动像素
+                case "ButtonSizeTextBox":
+                    break;
+                case "ButtonGapTextBox":
+                    break;
+                case "BorderWidthTextBox":
+                    break;
+                case "ButtonCornerRadiusTextBox":
+                    break;
+            }
+        }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e, TextBox targetTextBox)
+        {
+            Slider slider = sender as Slider;
+            string sliderName = slider.Name;
+            switch(sliderName)
+            {
+                case "ButtonSizeSlider":
+                    break;
+                case "ButtonGapSlider":
+                    break;
+                case "BorderWidthSlider":
+                    break;
+                case "ButtonCornerRadiusSlider":
+                    break;
             }
         }
 

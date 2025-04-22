@@ -65,13 +65,13 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.CheckBox_Click(sender, e); // 调用父窗体的勾选框点击事件
+            settingManager.CheckBox_Click(sender); // 调用父窗体的勾选框点击事件
         }
 
         // 下拉框选择改变事件
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            settingManager.ComboBox_SelectionChanged(sender, e); // 调用父窗体的下拉框选择改变事件
+            settingManager.ComboBox_SelectionChanged(sender); // 调用父窗体的下拉框选择改变事件
         }
 
         // 基础设置-弹出面板-弹出面板

@@ -97,13 +97,13 @@ namespace Quicker.Windows.Forms.SettingWindowGrids
 
         private void CheckBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            settingManager.CheckBox_Click(sender, e); // 调用父类方法
+            settingManager.CheckBox_Click(sender); // 调用父类方法
         }
 
         // 文本框内容改变事件
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            settingManager.TextBox_TextChanged(sender, e); // 调用父类方法
+            settingManager.TextBox_TextChanged(sender); // 调用父类方法
         }
 
         // 窗体关闭事件

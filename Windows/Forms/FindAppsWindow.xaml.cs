@@ -113,9 +113,7 @@ namespace Quicker.Windows
         [Guid("00021401-0000-0000-C000-000000000046")]
         [ClassInterface(ClassInterfaceType.None)]
         [ProgId("Shell.Application")]
-        public class ShellLink
-        {
-        }
+        public class ShellLink { }
 
         public FindAppsWindow()
         {
@@ -603,18 +601,16 @@ namespace Quicker.Windows
         }
         private void ListViewScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (scrollViewer != null)
-            {
-                // 更新纵向滚动条
-                VerticalScrollBar.Maximum = scrollViewer.ScrollableHeight; // 设置最大值
-                VerticalScrollBar.ViewportSize = scrollViewer.ViewportHeight; // 设置视口大小
-                VerticalScrollBar.Value = scrollViewer.VerticalOffset; // 设置当前值
+            if (scrollViewer == null) return;
+            // 更新纵向滚动条
+            VerticalScrollBar.Maximum = scrollViewer.ScrollableHeight; // 设置最大值
+            VerticalScrollBar.ViewportSize = scrollViewer.ViewportHeight; // 设置视口大小
+            VerticalScrollBar.Value = scrollViewer.VerticalOffset; // 设置当前值
 
-                // 更新横向滚动条
-                HorizontalScrollBar.Maximum = scrollViewer.ScrollableWidth; // 设置最大值
-                HorizontalScrollBar.ViewportSize = scrollViewer.ViewportWidth; // 设置视口大小
-                HorizontalScrollBar.Value = scrollViewer.HorizontalOffset; // 设置当前值
-            }
+            // 更新横向滚动条
+            HorizontalScrollBar.Maximum = scrollViewer.ScrollableWidth; // 设置最大值
+            HorizontalScrollBar.ViewportSize = scrollViewer.ViewportWidth; // 设置视口大小
+            HorizontalScrollBar.Value = scrollViewer.HorizontalOffset; // 设置当前值
         }
 
         // 加载应用商店应用
@@ -664,6 +660,11 @@ namespace Quicker.Windows
             catch { } // 忽略异常
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageFamilyName"></param>
+        /// <returns></returns>
         private ImageSource ExtractUWPAppIcon(string packageFamilyName)
         {
             try
@@ -712,12 +713,22 @@ namespace Quicker.Windows
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packageFamilyName"></param>
+        /// <returns></returns>
         private string GetUWPAppInstallPath(string packageFamilyName)
         {
             var package = new PackageManager().FindPackageForUser("", packageFamilyName);
             return package?.InstalledLocation.Path;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         private ImageSource LoadIconFromPath(string filePath)
         {
             try
