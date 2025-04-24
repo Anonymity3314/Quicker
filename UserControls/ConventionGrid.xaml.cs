@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Quicker.Managers;
+using Quicker.Windows;
 using System.Windows;
 using Quicker;
 
@@ -19,7 +20,8 @@ namespace Quicker.UserControls
         {
             InitializeComponent();
             db1 = new SettingDatabase(); // 创建设置数据库
-            settingManager = new SettingManager(); // 创建设置管理器
+            SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+            settingManager = settingWindow.settingManager; // 创建设置管理器
 
             InitializeAsync(); // 异步初始化
         }

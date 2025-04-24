@@ -19,7 +19,7 @@ namespace Quicker.Windows
 
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
         private readonly SettingDatabase db1; // 设置数据库
-        private SettingManager settingManager; // 设置管理器
+        public SettingManager settingManager; // 设置管理器
 
         public SettingWindow()
         {
@@ -73,16 +73,11 @@ namespace Quicker.Windows
                 var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
                 bool originalAutoStart = Convention.AutoStart; // 保存原始的开机自启动设置
                 bool newAutoStart = settingManager.settingsCache.AutoStart; // 新的开机自启动设置
-
-                // 更新开机自启动设置
-                if (originalAutoStart != newAutoStart)
+                if (originalAutoStart != newAutoStart)// 更新开机自启动设置
                 {
                     succeed = UpdateAutostart(newAutoStart);
                     if (!succeed)
-                    {
-                        // 更新失败，回退到原来的设置
-                        settingManager.settingsCache.AutoStart = originalAutoStart;
-                    }
+                        settingManager.settingsCache.AutoStart = originalAutoStart; // 更新失败，回退到原来的设置
                 }
 
                 // 更新数据库中的设置

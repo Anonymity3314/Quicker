@@ -6,7 +6,7 @@ using System;
 
 namespace Quicker.Managers
 {
-    internal class SettingManager
+    public class SettingManager
     {
         public T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
@@ -33,13 +33,13 @@ namespace Quicker.Managers
         }
 
         // 初始化缓存
-        private async void InitializeCache()
+        public async void InitializeCache()
         {
             await LoadSettingsAsync(); // 异步加载常规设置信息
         }
 
         // 异步加载常规设置信息
-        public async Task LoadSettingsAsync()
+        private async Task LoadSettingsAsync()
         {
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
@@ -84,14 +84,14 @@ namespace Quicker.Managers
             if (targetStackPanel.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
             foreach (var stackpanel in fathergrid.Children.OfType<StackPanel>())
             {
-                stackpanel.Visibility = stackpanel == targetStackPanel ? Visibility.Visible : Visibility.Hidden; // 设置StackPanel可见性
+                stackpanel.Visibility = stackpanel == targetStackPanel ? Visibility.Visible : Visibility.Collapsed; // 设置StackPanel可见性
             } // 设置StackPanel可见性
 
             foreach (var button in fatherStackPanel1.Children.OfType<Button>())
             {
-                button.Background = button == targetButton ?
-                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1)) :
-                    new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1)); // 设置Button类型1颜色
+                button.Background = button == targetButton
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1))
+                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1)); // 设置Button类型1颜色
             } // 设置Button类型1颜色
         }
 
@@ -177,10 +177,13 @@ namespace Quicker.Managers
             }
         }
 
-        // 勾选框点击事件
+        /// <summary>
+        /// 勾选框点击事件
+        /// </summary>
+        /// <param name="sender"> 勾选框 </param>
         public void CheckBox_Click(object sender)
         {
-            CheckBox checkBox = (CheckBox)sender;
+            CheckBox checkBox = (CheckBox)sender; // 获取勾选框
             string checkBoxName = checkBox.Name; // 获取勾选框名称
             bool? isChecked = checkBox.IsChecked; // 获取勾选框状态
             switch (checkBoxName)

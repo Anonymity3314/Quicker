@@ -187,7 +187,11 @@ namespace Quicker
         // 按下鼠标快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue) return; // 如果按键已经被记录，停止记录
+            if (keyPressStartTime.HasValue)
+            {
+                keyPressStartTime = null; // 重置按键时间
+                return; // 返回
+            } // 如果按键已经被记录，停止记录
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
             this.Dispatcher.BeginInvoke(() =>
@@ -251,40 +255,41 @@ namespace Quicker
         private void Hook_MouseReleased(object? sender, MouseHookEventArgs e)
         {
             pressTimer?.Stop(); // 停止计时器
-            if (keyPressStartTime.HasValue)
+            if (!keyPressStartTime.HasValue) return;
+            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            TimeSpan pressDuration = DateTime.Now - keyPressStartTime.Value; // 计算按键按下和释放的时间差
+            keyPressStartTime = null;
+            switch (e.Data.Button)
             {
-                var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                TimeSpan pressDuration = DateTime.Now - keyPressStartTime.Value; // 计算按键按下和释放的时间差
-                keyPressStartTime = null;
-                switch (e.Data.Button)
-                {
-                    case SharpHook.Native.MouseButton.Button3:
-                        if (pressDuration.TotalSeconds <= 0.3 &&
-                            OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick) 
+                case SharpHook.Native.MouseButton.Button3:
+                    if (pressDuration.TotalSeconds <= 0.3 &&
+                        OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
+                    {
+                        this.Dispatcher.Invoke(CloseOrShowMainWindow);
+                    }
+                    break; // 短按中键
+                case SharpHook.Native.MouseButton.Button4: // 短按X1键
+                case SharpHook.Native.MouseButton.Button5:
+                    if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick ||
+                        OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
+                    {
+                        if (pressDuration.TotalSeconds <= 0.3)
                         {
                             this.Dispatcher.Invoke(CloseOrShowMainWindow);
                         }
-                        break; // 短按中键
-                    case SharpHook.Native.MouseButton.Button4: // 短按X1键
-                    case SharpHook.Native.MouseButton.Button5:
-                        if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick || 
-                            OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
-                        {
-                            if (pressDuration.TotalSeconds <= 0.3)
-                            {
-                                this.Dispatcher.Invoke(CloseOrShowMainWindow);
-                            }
-                        }
-                        break; // 短按X2键
-                }
+                    }
+                    break; // 短按X2键
             }
-            else keyPressStartTime = null;
         }
 
         // 按下键盘快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue) return; // 如果按键已经被记录，停止记录
+            if (keyPressStartTime.HasValue)
+            {
+                keyPressStartTime = null; // 重置按键时间
+                return; // 返回
+            } // 如果按键已经被记录，停止记录
             var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
             switch (e.Data.KeyCode)
             {
@@ -301,24 +306,22 @@ namespace Quicker
         // 松开按键满足条件弹出面板
         private void Hook_KeyReleased(object sender, KeyboardHookEventArgs e)
         {
-            if (keyPressStartTime.HasValue)
+            if (!keyPressStartTime.HasValue) return;
+            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            TimeSpan pressDuration = DateTime.Now - keyPressStartTime.Value; // 计算按键按下和释放的时间差
+            keyPressStartTime = null;
+            switch (e.Data.KeyCode)
             {
-                var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                TimeSpan pressDuration = DateTime.Now - keyPressStartTime.Value; // 计算按键按下和释放的时间差
-                keyPressStartTime = null;
-                switch (e.Data.KeyCode)
-                {
-                    case SharpHook.Native.KeyCode.VcLeftControl: // 左 Ctrl 键
-                    case SharpHook.Native.KeyCode.VcRightControl:
-                        if (OpenMainWindowConditions.OpenMainWindowByCtrl)
+                case SharpHook.Native.KeyCode.VcLeftControl: // 左 Ctrl 键
+                case SharpHook.Native.KeyCode.VcRightControl:
+                    if (OpenMainWindowConditions.OpenMainWindowByCtrl)
+                    {
+                        if (pressDuration.TotalSeconds <= 0.3) // 如果按键时间小于 0.3 秒
                         {
-                            if (pressDuration.TotalSeconds <= 0.3) // 如果按键时间小于 0.3 秒
-                            {
-                                this.Dispatcher.Invoke(CloseOrShowMainWindow);
-                            }
+                            this.Dispatcher.Invoke(CloseOrShowMainWindow);
                         }
-                        break; // 右 Ctrl 键
-                }
+                    }
+                    break; // 右 Ctrl 键
             }
         }
 
