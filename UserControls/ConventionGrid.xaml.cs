@@ -97,6 +97,7 @@ namespace Quicker.UserControls
             settingManager.OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
         }
 
+        // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             settingManager.CheckBox_Click(sender); // 调用父类方法

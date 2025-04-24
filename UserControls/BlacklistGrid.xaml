@@ -23,7 +23,20 @@
                 <ColumnDefinition Width="186*"/>
                 <ColumnDefinition Width="133*"/>
             </Grid.ColumnDefinitions>
-
+            <Label Content="禁用Quicker的应用程序" HorizontalAlignment="Left" Margin="13,41,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14"/>
+            <Border BorderBrush="Black" BorderThickness="1" Margin="0,95,0,481" CornerRadius="5,5,5,5"/>
+            <Button Content="拖动到要禁用Quicker的窗口上" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="3,351,0,0" VerticalAlignment="Top" Width="200"/>
+            <Button Content="添加..." Style="{StaticResource WhiteButton}" ToolTip="增加特殊的应用" HorizontalAlignment="Left" Margin="233,351,0,0" VerticalAlignment="Top" Width="67"/>
+            <Button Content="无法识别的应用" Style="{StaticResource WhiteButton}" ToolTip="无法识别的应用统一使用unknown-proc.exe表示。" HorizontalAlignment="Left" Margin="377,351,0,0" VerticalAlignment="Top" Width="96"/>
+            <Button Content="添加目录" Style="{StaticResource WhiteButton}" ToolTip="目录中所有程序都加入黑名单" HorizontalAlignment="Left" Margin="478,351,0,0" VerticalAlignment="Top" Width="62"/>
+            <Label Content="全屏状态禁用Quicker" HorizontalAlignment="Left" Margin="10,467,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14"/>
+            <CheckBox Content="开启全屏禁用功能" ToolTip="通常在游戏时禁用Quicker" HorizontalAlignment="Left" Margin="13,500,0,0" VerticalAlignment="Top"/>
+            <Label Content="这些进程即使全屏也启用Quicker" HorizontalAlignment="Left" Margin="34,538,0,0" VerticalAlignment="Top"/>
+            <Button Content="选择窗口" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="387,558,0,0" VerticalAlignment="Top" Width="79"/>
+            <TextBox Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="34,568,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="328"/>
+            <Label Content="全屏时仍然启用Quicker的进程(分号分隔多个)。进程名等于exe文件名除去扩展名的部分。" HorizontalAlignment="Left" Margin="36,590,0,0" VerticalAlignment="Top" FontSize="9"/>
+            <Label Content="选项" HorizontalAlignment="Left" Margin="36,646,0,0" VerticalAlignment="Top" FontSize="14" FontWeight="Bold"/>
+            <CheckBox Content="将黑名单与全屏禁用设置应用于'扩展热键'功能" HorizontalAlignment="Left" Margin="34,690,0,0" VerticalAlignment="Top"/>
         </Grid>
     </Grid>
 </UserControl>

@@ -206,7 +206,7 @@ namespace Quicker.Windows
         {
             var AboutQuickerGrid = new AboutQuickerGrid { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
             settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
-            ApplySettingsButton.Visibility = Visibility.Hidden; // 设置ApplySettingsButton可见性
+            ApplySettingsButton.Visibility = Visibility.Collapsed; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
