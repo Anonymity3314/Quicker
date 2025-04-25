@@ -355,6 +355,13 @@ namespace Quicker.Managers
                     };
                     selectActionPageMenu.Show();
                     break;
+                case "LoadingWindow":
+                    LoadingWindow loadingWindow = new()
+                    {
+                        Owner = sourceWindow
+                    }; // 创建加载窗口
+                    loadingWindow.Show(); // 显示加载窗口
+                    break;
             }
         }
 

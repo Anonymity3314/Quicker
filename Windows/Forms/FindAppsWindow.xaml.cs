@@ -175,14 +175,10 @@ namespace Quicker.Windows
                 {
                     ScrollViewer scrollViewer = child as ScrollViewer; // 尝试转换为ScrollViewer
                     if (scrollViewer != null) // 如果是ScrollViewer
-                    {
                         return scrollViewer; // 返回ScrollViewer
-                    }
                     scrollViewer = GetScrollViewer(child); // 递归查找
                     if (scrollViewer != null) // 如果找到ScrollViewer
-                    {
                         return scrollViewer; // 返回ScrollViewer
-                    }
                 }
             }
             return null; // 未找到返回空

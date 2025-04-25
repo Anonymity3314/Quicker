@@ -4,21 +4,24 @@ using System.Windows.Forms;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
-using Quicker;
 using System.IO;
+using Quicker;
 
 namespace Quicker.UserControls
 {
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
         SettingManager settingManager; // 设置管理器
+        ButtonManager buttonManager; // 按钮管理器
+        Window fatherWindow; // 父窗口
 
         public BlacklistGrid()
         {
             InitializeComponent();
-
+            buttonManager = new ButtonManager(); // 创建按钮管理器
             SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
+            fatherWindow = settingWindow; // 设置父窗口
             
             InitializeAsync(); // 异步初始化
         }
@@ -61,6 +64,11 @@ namespace Quicker.UserControls
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     string selectedPath = dialog.SelectedPath; // 获取选择的文件夹路径
+                    LoadingWindow loadingWindow = new()
+                    {
+                        Owner = fatherWindow, // 设置父窗口
+                    }; // 创建加载窗口
+                    loadingWindow.Show(); // 显示加载窗口
                     foreach (string file in Directory.GetFiles(selectedPath, "*", SearchOption.AllDirectories)) // 遍历文件夹中的所有文件
                     {
                         if (Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)) // 如果扩展名为.exe
@@ -69,6 +77,7 @@ namespace Quicker.UserControls
                             BlacklistListView.Items.Add(new TextBlock { Text = processName });
                         }
                     }
+                    loadingWindow.Close(); // 关闭加载窗口
                 }
             }
         }
