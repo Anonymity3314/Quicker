@@ -338,9 +338,9 @@ namespace Quicker
             if (mainWindow == null)
             {
                 ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return;
+                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作窗口打开，则不打开功能面板
                 SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return;
+                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，则不打开功能面板
 
                 string windowType = DetermineWindowType(); // 确定窗口类型
                 mainWindow = new MainWindow(windowType); // 创建新的功能面板
@@ -393,9 +393,7 @@ namespace Quicker
                         mainWindow.Top = Top;
                     }
                     else
-                    {
                         mainWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-                    }
                     break; // 上次弹出位置
             }
         }

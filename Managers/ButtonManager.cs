@@ -219,12 +219,10 @@ namespace Quicker.Managers
         // 鼠标左键按下时记录初始位置
         public void Button_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Button button)
-            {
-                initialMousePosition = e.GetPosition(button); // 记录初始位置
-                SourceButton = button; // 记录源按钮
-                isDragging = false; // 初始化拖拽状态
-            }
+            Button button = sender as Button;
+            initialMousePosition = e.GetPosition(button); // 记录初始位置
+            SourceButton = button; // 记录源按钮
+            isDragging = false; // 初始化拖拽状态
         }
 
         /// <summary>
