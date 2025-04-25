@@ -9,7 +9,7 @@
     
     Background="White"
     d:DesignHeight="870"
-    d:DesignWidth="967"
+    d:DesignWidth="982"
     
     Unloaded="ConventionGrid_Unloaded"
 >

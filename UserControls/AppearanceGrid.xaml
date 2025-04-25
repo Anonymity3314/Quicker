@@ -9,7 +9,7 @@
 
     Background="White"
     d:DesignHeight="870"
-    d:DesignWidth="967"
+    d:DesignWidth="982"
 >
     <!-- d:DesignHeight="870" -->
     <Grid>
@@ -28,7 +28,7 @@
                 <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
                     <Grid>
                         <Button Content="默认设置" Style="{StaticResource Button3}" Margin="7,10,0,0" Foreground="#FF0087FC" Width="70"/>
-                        <Rectangle Fill="#FF707070" VerticalAlignment="Top" Height="1" Margin="7,40,10,0"/>
+                        <Rectangle Fill="#FFD5D5D5" VerticalAlignment="Top" Height="1" Margin="7,40,10,0"/>
                         
                         <!-- 尺寸 -->
                         <Label Content="尺寸" Margin="10,50,494,822" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
