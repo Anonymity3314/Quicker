@@ -52,7 +52,7 @@ namespace Quicker.Windows
         // 弹出设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("SettingWindow");
+            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 打开动作管理窗口
@@ -103,6 +103,18 @@ namespace Quicker.Windows
         private void CustomMenu_Deactivated(object sender, EventArgs e)
         {
             this.Visibility = Visibility.Hidden;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 调用基类方法
+            showMainWindow = null; // 释放图片资源
+            openSettingWindow = null; // 释放图片资源
+            openActionPageManageWindow = null; // 释放图片资源
+            pauseQuicker = null; // 释放图片资源
+            restart = null; // 释放图片资源
+            exit = null; // 释放图片资源
+            GC.Collect(); // 垃圾回收
         }
     }
 }

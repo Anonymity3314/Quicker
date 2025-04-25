@@ -115,7 +115,7 @@ namespace Quicker.Windows
             }
 
 
-            buttonPrefixDict = new Dictionary<string, List<string>>();
+            buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
             foreach (var data in buttonDataDict.Values)
             {
                 string buttonID = data.ButtonID; // 获取按钮ID

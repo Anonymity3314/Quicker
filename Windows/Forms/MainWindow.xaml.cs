@@ -56,10 +56,7 @@ namespace Quicker.Windows
             buttonManager = new ButtonManager(); // 初始化按钮管理器
             windowManager = new WindowManager(); // 初始化窗口管理器
 
-            // 初始化数据库
             db1 = new SettingDatabase(); // 初始化设置数据库
-            db1.Initialize(); // 初始化数据库
-
             db2 = new ButtonDatabase(); // 初始化按钮数据库
             db2.Initialize(); // 初始化数据库
 
@@ -221,11 +218,9 @@ namespace Quicker.Windows
                 case "TaskBar":
                     CommonLabel.Content = "任务栏"; // 设置标签内容
                     break;
-
                 case "Desktop":
                     CommonLabel.Content = "桌面"; // 设置标签内容
                     break;
-
                 default:
                     CommonLabel.Content = $"{CommonStyle}"; // 设置标签内容
                     break;
@@ -269,13 +264,10 @@ namespace Quicker.Windows
         // 失去焦点时关闭功能面板
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            if (!app.Pause)
+            if (!app.Pause && !buttonManager.isClosing && !app.Book) 
             {
-                if (!buttonManager.isClosing && !app.Book)
-                {
-                    buttonManager.isClosing = true; // 设置关闭标志
-                    this.Close(); // 关闭窗口
-                }
+                buttonManager.isClosing = true; // 设置关闭标志
+                this.Close(); // 关闭窗口
             }
         }
 
@@ -585,8 +577,8 @@ namespace Quicker.Windows
         /// <summary>
         /// 获取当前可见的Canvas编号
         /// </summary>
-        /// <param name="isGlobal">是否是全局Canvas</param>
-        /// <returns>当前可见的Canvas编号</returns>
+        /// <param name="Style"></param>
+        /// <returns></returns>
         private int GetVisibleCanvasIndex(string Style)
         {
             var canvasCollection = Style == "Global" // 根据是否是全局Canvas选择集合

@@ -205,6 +205,7 @@ namespace Quicker
                     {
                         startPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
                         keyPressStartTime = DateTime.Now;
+                        PreLoadMainWindow();
                         pressTimer.Start();
                         break;
                     } // 右键移动
@@ -216,6 +217,7 @@ namespace Quicker
                     if (OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
                     {
                         keyPressStartTime = System.DateTime.Now;
+                        PreLoadMainWindow();
                         pressTimer.Start();
                     } // 长按右键
                     break; // 右键
@@ -228,11 +230,13 @@ namespace Quicker
                     if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
                     {
                         keyPressStartTime = DateTime.Now;
+                        PreLoadMainWindow();
                         break;
                     } // 短按中键
                     if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger)
                     {
                         keyPressStartTime = System.DateTime.Now;
+                        PreLoadMainWindow();
                         pressTimer.Start();
                     } // 长按中键
                     break; // 中键
@@ -240,12 +244,14 @@ namespace Quicker
                     if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick)
                     {
                         keyPressStartTime = DateTime.Now;
+                        PreLoadMainWindow();
                     }
                     break; // X1键
                 case SharpHook.Native.MouseButton.Button5:
                     if (OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
                     {
                         keyPressStartTime = DateTime.Now;
+                        PreLoadMainWindow();
                     }
                     break; // X2键
             }
@@ -298,6 +304,7 @@ namespace Quicker
                     if (OpenMainWindowConditions.OpenMainWindowByCtrl)
                     {
                         keyPressStartTime = DateTime.Now;
+                        PreLoadMainWindow();
                     }
                     break; // 右 Ctrl 键
             }
@@ -331,26 +338,39 @@ namespace Quicker
             CloseOrShowMainWindow(); // 关闭或重新显示主窗口
         }
 
+        // 预加载主窗口
+        private void PreLoadMainWindow()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
+                if (mainWindow == null)
+                {
+                    ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+                    if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作窗口打开，则不打开功能面板
+                    SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+                    if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，则不打开功能面板
+
+                    string windowType = DetermineWindowType(); // 确定窗口类型
+                    mainWindow = new MainWindow(windowType); // 创建新的功能面板
+
+                    var settings = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+                    SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
+                    mainWindow.Visibility = Visibility.Hidden; // 隐藏功能面板
+                    Left = (float)mainWindow.Left; // 记录功能面板位置
+                    Top = (float)mainWindow.Top; // 记录功能面板位置
+                }
+            });
+        }
+
         // 关闭或重新显示主窗口
         public void CloseOrShowMainWindow()
         {
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
-            if (mainWindow == null)
+            if (mainWindow.Visibility == Visibility.Hidden)
             {
-                ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作窗口打开，则不打开功能面板
-                SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，则不打开功能面板
-
-                string windowType = DetermineWindowType(); // 确定窗口类型
-                mainWindow = new MainWindow(windowType); // 创建新的功能面板
-
-                var settings = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                mainWindow.Show(); // 显示功能面板
+                mainWindow.Visibility = Visibility.Visible; // 显示功能面板
                 mainWindow.Activate(); // 激活功能面板
-                Left = (float)mainWindow.Left; // 记录功能面板位置
-                Top = (float)mainWindow.Top; // 记录功能面板位置
             }
             else
             {

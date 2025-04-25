@@ -242,6 +242,12 @@ namespace Quicker.Managers
                 case "ShowActionIconShadowCheckBox":
                     settingsCache.ShowActionIconShadow = isChecked == true; // 动作图标显示阴影
                     break; // 动作图标显示阴影
+                case "FullScreenDisableCheckBox":
+                    settingsCache.FullScreenDisable = isChecked == true; // 动作图标显示阴影
+                    break; // 动作图标显示阴影
+                case "ApplyBlacklistToExpandHotkeysCheckBox":
+                    settingsCache.ApplyBlacklistToExpandHotkeys = isChecked == true; // 动作图标显示阴影
+                    break; // 动作图标显示阴影
             }
         }
 
@@ -363,6 +369,10 @@ namespace Quicker.Managers
             public bool OpenMainWindowByRightMouseClick_Move { get; set; } // 按右键移动
             public bool OpenMainWindowByCtrl { get; set; } // 单击Ctrl键
             public int WindowStartupLocation { get; set; } // 功能面板打开位置
+
+            // 黑名单设置
+            public bool FullScreenDisable { get; set; } // 全屏禁用Quicker
+            public bool ApplyBlacklistToExpandHotkeys { get; set; } // 黑名单应用到热键扩展
 
             // 外观设置
             public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字

@@ -60,77 +60,74 @@
             <StackPanel Margin="-1,-1,-1,-1">
                 <Button Click="ShowMainWindow" ToolTip="弹出面板窗口" Style="{StaticResource Button}" Margin="0,5,0,0">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/OpenMainWindow1.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
-                        <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="显示面板窗口"/></TextBlock>
+                        <Image x:Name="showMainWindow" Source="/Resources/Images/Icons/OpenMainWindow1.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
+                        <TextBlock Text="显示面板窗口" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenSettingWindow" ToolTip="打开设置窗口" Style="{StaticResource Button}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/SettingImage1.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
-                        <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="设置"/></TextBlock>
+                        <Image x:Name="openSettingWindow" Source="/Resources/Images/Icons/SettingImage1.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
+                        <TextBlock Text="设置" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenActionPageManageWindow" ToolTip="打开场景与动作管理窗口" Style="{StaticResource Button}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource Image}"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="场景与动作"/></TextBlock>
+                        <Image x:Name="openActionPageManageWindow" Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Text="场景与动作" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="PauseQuicker" ToolTip="暂停和恢复Quicker触发" Style="{StaticResource Button}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/Pause.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
-                        <TextBlock x:Name="PauseQuickerTextBlock" Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="暂停"/><LineBreak/><Run Language="zh-cn"/></TextBlock>
+                        <Image x:Name="pauseQuicker" Source="/Resources/Images/Icons/Pause.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
+                        <TextBlock Text="暂停" x:Name="PauseQuickerTextBlock" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <!--<Button Click="Button_Click" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="开启文本悬浮窗"/><LineBreak/><Run Language="zh-cn"/><LineBreak/><Run/></TextBlock>
+                        <TextBlock Text="开启文本悬浮窗" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
-                <Button Click="Button_Click" Style="{StaticResource Button}">
-                    <Button.ToolTip>
-                        <ToolTip Style="{StaticResource ToolTip}" Content="录制键盘和鼠标操作并生成动作"/>
-                    </Button.ToolTip>
+                <Button Click="Button_Click" ToolTip="录制键盘和鼠标操作并生成动作" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="键盘录制工具"/><LineBreak/><Run Language="zh-cn"/><LineBreak/><Run/></TextBlock>
+                        <TextBlock Text="键盘录制工具" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="Button_Click" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="窗口检查工具"/><LineBreak/><Run/></TextBlock>
+                        <TextBlock Text="窗口检查工具" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="Button_Click" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="重新加载键鼠挂钩"/><LineBreak/><Run/></TextBlock>
+                        <TextBlock Text="重新加载键鼠挂钩" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="Button_Click" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="重置键盘状态"/><LineBreak/><Run/></TextBlock>
+                        <TextBlock Text="重置键盘状态" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="Button_Click" Style="{StaticResource Button}">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="终止动作"/><LineBreak/><Run/></TextBlock>
+                        <TextBlock Text="终止动作" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>-->
                 <Button Click="Restart" ToolTip="退出并重新启动" Style="{StaticResource Button}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/RestartQuicker.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="重启Quicker"/><LineBreak/><Run Language="zh-cn"/></TextBlock>
+                        <Image x:Name="restart" Source="/Resources/Images/Icons/RestartQuicker.ico" Style="{StaticResource Image}" Margin="7,0,0,0" Width="16"/>
+                        <TextBlock Text="重启Quicker" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="Exit" ToolTip="关闭Quicker软件" Style="{StaticResource Button}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/CloseQuicker.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
-                        <TextBlock Height="16" Width="166" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="退出"/><LineBreak/><Run Language="zh-cn"/></TextBlock>
+                        <Image x:Name="exit" Source="/Resources/Images/Icons/CloseQuicker.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
+                        <TextBlock Text="退出" Style="{StaticResource TextBlock}"/>
                     </Grid>
                 </Button>
             </StackPanel>
