@@ -74,8 +74,8 @@ namespace Quicker
                             Title = $"新动作--默认桌面动作第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
                             break; // 默认桌面动作
                         case "Common":
-                            Title = $"新动作--默认桌面动作第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
-                            break;
+                            Title = $"新动作--默认第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
+                            break; // 默认动作
                         default:
                             Title = $"新动作--{buttonName} 第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
                             break; // 默认动作
@@ -193,8 +193,10 @@ namespace Quicker
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(LocationTextBox.Text)) SaveButton.IsEnabled = true; // 启用保存按钮
-            else SaveButton.IsEnabled = false; // 禁用保存按钮
+            if (!string.IsNullOrWhiteSpace(LocationTextBox.Text)) 
+                SaveButton.IsEnabled = true; // 启用保存按钮
+            else 
+                SaveButton.IsEnabled = false; // 禁用保存按钮
         }
 
         // 处理选中的应用
@@ -326,7 +328,8 @@ namespace Quicker
         // 按下 S 键保存动作
         private void SaveAction(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.S) Save(); // 保存动作
+            if (e.Key == Key.S)
+                Save(); // 保存动作
         }
 
         // 选择已有图标
@@ -343,7 +346,8 @@ namespace Quicker
                 ButtonTitle.Visibility = Visibility.Visible; // 显示标题
                 ButtonTitle.Text = TitleTextBox.Text; // 更新标题
             }
-            else ButtonTitle.Visibility = Visibility.Collapsed; // 隐藏标题
+            else
+                ButtonTitle.Visibility = Visibility.Collapsed; // 隐藏标题
             UpdateTooltip(); // 更新提示文本
         }
 

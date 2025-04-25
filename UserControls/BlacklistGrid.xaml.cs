@@ -46,9 +46,18 @@ namespace Quicker.UserControls
 
         }
 
+        // 将选中的文件添加到黑名单
         private void BlacklistAddButton_Click(object sender, RoutedEventArgs e)
         {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "可执行程序(*.exe)|*.exe|任意文件(*.*)|*.*" // 设置文件类型过滤器
+            };
 
+            if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了“确定”
+            {
+
+            }
         }
 
         private void UnknownProcessButton_Click(object sender, RoutedEventArgs e)
@@ -74,7 +83,7 @@ namespace Quicker.UserControls
                         if (Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)) // 如果扩展名为.exe
                         {
                             string processName = Path.GetFileNameWithoutExtension(file);
-                            BlacklistStackPanel.Children.Add(new TextBlock { Text = processName });
+                            AddToBlacklist(processName); // 添加到黑名单
                         }
                     }
                     loadingWindow.Close(); // 关闭加载窗口
@@ -82,6 +91,47 @@ namespace Quicker.UserControls
             }
         }
 
+        // 向黑名单中添加进程
+        private void AddToBlacklist(string processName)
+        {
+            Grid grid = new()
+            {
+                Height = 25, // 设置高度
+                Margin = new Thickness(2, 2, 2, 2), // 设置外边距
+                Background = System.Windows.Media.Brushes.White // 设置背景色
+            }; // 创建Grid
+            TextBlock textBlock = new()
+            {
+                Text = processName,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
+                Margin = new Thickness(2, 0, 0, 0) // 设置内边距
+            }; // 创建TextBlock
+            grid.Children.Add(textBlock); // 添加进程名称
+
+            System.Windows.Controls.Button button = new()
+            {
+                Content = "删除",
+                Width = 25,
+                Margin = new Thickness(2, 2, 2, 2),
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Center
+            }; // 创建按钮
+            button.Click += DeleteFromBlacklist; // 绑定删除事件
+            grid.Children.Add(button); // 添加按钮
+
+            BlacklistStackPanel.Children.Add(grid); // 添加到父容器StackPanel
+        }
+
+        // 从黑名单中删除进程
+        private void DeleteFromBlacklist(object sender, RoutedEventArgs e)
+        {
+            var button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
+            var grid = button.Parent as Grid; // 获取按钮的父容器（Grid）
+            BlacklistStackPanel.Children.Remove(grid); // 将Grid从父容器StackPanel中移除
+        }
+
+        // 勾选框点击事件
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             settingManager.CheckBox_Click(sender);

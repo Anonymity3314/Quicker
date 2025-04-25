@@ -239,8 +239,10 @@ namespace Quicker.Windows
             app.Book = !app.Book; // 更新数据库中的设置
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
-            if (app.Book) bookimage.UriSource = new Uri("/Resources/Images/Icons/Book.ico", UriKind.Relative); // 设置为订住样式
-            else bookimage.UriSource = new Uri("/Resources/Images/Icons/Disbook.ico", UriKind.Relative); // 设置为不订住样式
+            if (app.Book)
+                bookimage.UriSource = new Uri("/Resources/Images/Icons/Book.ico", UriKind.Relative); // 设置为订住样式
+            else
+                bookimage.UriSource = new Uri("/Resources/Images/Icons/Disbook.ico", UriKind.Relative); // 设置为不订住样式
             bookimage.EndInit(); // 结束初始化
             Book.Source = bookimage; // 更新Book按钮图标
         }

@@ -75,12 +75,12 @@ namespace Quicker.Managers
                 if (e.Data.GetDataPresent(typeof(ButtonData))) // 获取拖拽数据
                 {
                     db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
+                    var SourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
+                    var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
 
-                    var TargetData = db2.GetButtonDataByID(SourceButton.Name); // 获取源按钮数据
                     RefreshButtonDisplay(SourceButton, TargetData, 60, isMainWindow); // 更新 sourceButton 的内容
                     SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
 
-                    var SourceData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
                     RefreshButtonDisplay(TargetButton, SourceData, 60, isMainWindow); // 更新 targetButton 的内容
                     TargetButton.Tag = SourceData; // 更新 targetButton 的标签
                 }
@@ -100,7 +100,6 @@ namespace Quicker.Managers
                             TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                         }
                     }
-                    SourceButton = null;
                 }
             }
         }
@@ -244,8 +243,8 @@ namespace Quicker.Managers
                     isDragging = true; // 设置拖拽状态
                     if(isMainButton)
                     {
-                        ButtonData data = button.Tag as ButtonData; // 获取按钮数据
-                        DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
+                        if (button.Tag is ButtonData data)
+                            DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
                     }
                     else
                     {
@@ -354,13 +353,6 @@ namespace Quicker.Managers
                         isClosing = false;
                     };
                     selectActionPageMenu.Show();
-                    break;
-                case "LoadingWindow":
-                    LoadingWindow loadingWindow = new()
-                    {
-                        Owner = sourceWindow
-                    }; // 创建加载窗口
-                    loadingWindow.Show(); // 显示加载窗口
                     break;
             }
         }

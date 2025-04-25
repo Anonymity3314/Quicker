@@ -13,9 +13,14 @@ public class SettingDatabase
         if (File.Exists("Setting.db")) return; // 如果数据库文件存在，则直接返回
         SQLiteConnection.CreateFile("Setting.db"); // 创建数据库文件
 
-        using var connection = OpenConnection(); // 打开数据库连接
+        InitializeConvention(); // 初始化 Convention 表
+        InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
+    }
 
-        // 创建 Convention 表
+    // 初始化 Convention 表
+    private void InitializeConvention()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
         string createConventionTableQuery = @"
         CREATE TABLE IF NOT EXISTS Convention
         (
@@ -48,7 +53,12 @@ public class SettingDatabase
         insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
         insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
         insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
+    }
 
+    // 初始化OpenMainWindow 表
+    private void InitializeOpenMainWindow()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
         // 创建 OpenMainWindow 表
         string createOpenMainWindowTableQuery = @"
         CREATE TABLE IF NOT EXISTS OpenMainWindow
@@ -240,6 +250,12 @@ public class OpenMainWindow
 
 // 外观设置
 public class Appearance
+{
+
+}
+
+// 黑名单设置
+public class Blacklist
 {
 
 }
