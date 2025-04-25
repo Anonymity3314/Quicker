@@ -15,7 +15,7 @@
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner"
     
-    Loaded="LoadingWindow_Loaded"
+    ContentRendered="LoadingWindow_ContentRendered"
 >
     <Grid>
         <Label Content="加载中，请稍等……" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"/>

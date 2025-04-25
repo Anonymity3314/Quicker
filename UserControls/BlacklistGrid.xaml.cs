@@ -74,7 +74,7 @@ namespace Quicker.UserControls
                         if (Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)) // 如果扩展名为.exe
                         {
                             string processName = Path.GetFileNameWithoutExtension(file);
-                            BlacklistListView.Items.Add(new TextBlock { Text = processName });
+                            BlacklistStackPanel.Children.Add(new TextBlock { Text = processName });
                         }
                     }
                     loadingWindow.Close(); // 关闭加载窗口
