@@ -8,11 +8,11 @@
     mc:Ignorable="d"
    
     Background="White"
-    d:DesignHeight="400"
-    d:DesignWidth="400"
+    d:DesignHeight="325"
+    d:DesignWidth="345"
 >
     <Grid>
-        <Rectangle x:Name="ColorPanel" Width="300" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,70,0,0">
+        <Rectangle x:Name="ColorPanel" Width="300" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                     <GradientStop Color="Red" Offset="0.0"/>
@@ -22,22 +22,22 @@
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        
-        <Rectangle x:Name="VerticalColorBar" Width="20" Height="150" Margin="332,70,48,180">
+
+        <Rectangle x:Name="VerticalColorBar" Width="20" HorizontalAlignment="Left" Margin="315,10,0,0" VerticalAlignment="Top" Height="174">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="Red" Offset="0.0"/>
+                    <GradientStop Color="Orange" Offset="0.0"/>
                     <GradientStop Color="Yellow" Offset="0.166"/>
-                    <GradientStop Color="Green" Offset="0.333"/>
-                    <GradientStop Color="Cyan" Offset="0.5"/>
+                    <GradientStop Color="Cyan" Offset="0.333"/>
+                    <GradientStop Color="Green" Offset="0.5"/>
                     <GradientStop Color="Blue" Offset="0.666"/>
                     <GradientStop Color="Magenta" Offset="0.833"/>
-                    <GradientStop Color="Black" Offset="1.0"/>
+                    <GradientStop Color="Red" Offset="1.0"/>
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        
-        <StackPanel Margin="10,240,10,10">
+
+        <StackPanel Margin="10,189,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
             <!-- R 值滑块 -->
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -47,10 +47,42 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="R" VerticalAlignment="Center"/>
                 <Slider x:Name="RedSlider" Minimum="0" Maximum="255" Value="204" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
-                <TextBox x:Name="RedValue" Text="204" Grid.Column="2" Margin="5,0,0,0" Width="40" TextAlignment="Right"/>
+                <TextBox x:Name="RedValue" Text="204" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
             </Grid>
-            <!-- G 值滑块、B 值滑块、A 值滑块类似 -->
+            <!-- G 值滑块 -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="G" VerticalAlignment="Center"/>
+                <Slider x:Name="GreenSlider" Minimum="0" Maximum="255" Value="204" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
+                <TextBox x:Name="GreenValue" Text="204" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+            </Grid>
+            <!-- B 值滑块 -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="B" VerticalAlignment="Center"/>
+                <Slider x:Name="BlueSlider" Minimum="0" Maximum="255" Value="204" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
+                <TextBox x:Name="BlueValue" Text="204" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+            </Grid>
+            <!-- A 值滑块 -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="A" VerticalAlignment="Center"/>
+                <Slider x:Name="AlphaSlider" Minimum="0" Maximum="255" Value="255" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
+                <TextBox x:Name="AlphaValue" Text="255" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+            </Grid>
         </StackPanel>
-        <TextBox x:Name="HexValue" Text="#FFD5D5D5" HorizontalAlignment="Left" Margin="315,334,0,21"/>
+        <TextBox x:Name="HexValue" Text="#FFD5D5D5" HorizontalAlignment="Left" Margin="151,165,0,0" Width="159" VerticalAlignment="Top" Height="19"/>
     </Grid>
 </UserControl>

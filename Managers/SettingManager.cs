@@ -79,7 +79,7 @@ namespace Quicker.Managers
         /// <param name="targetStackPanel"> 目标StackPanel </param>
         /// <param name="targetButton"> 目标Button </param>
         /// <param name="fatherStackPanel"> 父级StackPanel </param>
-        public void ButtonStyle1_Click(StackPanel targetStackPanel, Button targetButton, StackPanel fatherStackPanel, Grid fathergrid, StackPanel fatherStackPanel1)
+        public void ButtonStyle1_Click(StackPanel targetStackPanel, Button targetButton, StackPanel fatherStackPanel, Grid fathergrid)
         {
             if (targetStackPanel.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
             foreach (var stackpanel in fathergrid.Children.OfType<StackPanel>())
@@ -87,7 +87,7 @@ namespace Quicker.Managers
                 stackpanel.Visibility = stackpanel == targetStackPanel ? Visibility.Visible : Visibility.Collapsed; // 设置StackPanel可见性
             } // 设置StackPanel可见性
 
-            foreach (var button in fatherStackPanel1.Children.OfType<Button>())
+            foreach (var button in fatherStackPanel.Children.OfType<Button>())
             {
                 button.Background = button == targetButton
                     ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1))
