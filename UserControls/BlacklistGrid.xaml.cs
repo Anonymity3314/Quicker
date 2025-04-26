@@ -1,6 +1,8 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows.Media.Imaging;
+using System.Windows.Controls;
 using Quicker.UserControls;
 using System.Windows.Forms;
+using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
@@ -33,7 +35,7 @@ namespace Quicker.UserControls
         }
 
         // 异步加载设置
-        private async Task LoadSettingsAsync()
+        private async Task LoadSettingsAsync() 
         {
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
@@ -56,7 +58,9 @@ namespace Quicker.UserControls
 
             if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了“确定”
             {
-
+                string filePath = openFileDialog.FileName; // 获取选择的文件路径
+                string processName = Path.GetFileNameWithoutExtension(filePath); // 获取进程名
+                AddToBlacklist(processName); // 添加到黑名单
             }
         }
 
@@ -94,12 +98,25 @@ namespace Quicker.UserControls
         // 向黑名单中添加进程
         private void AddToBlacklist(string processName)
         {
+            Border border = new()
+            {
+                Height = 25, // 设置高度
+                Tag = false,
+                CornerRadius = new CornerRadius(3), // 设置圆角
+                Margin = new Thickness(2, 2, 2, 0), // 设置外边距
+                Background = System.Windows.Media.Brushes.Transparent // 设置背景色
+            }; // 创建Border
+            border.MouseEnter += ShowBlacklistItem; // 绑定鼠标移入事件
+            border.MouseLeave += HideBlacklistItem; // 绑定鼠标移出事件
+            border.MouseDown += SelectBlacklistItem; // 绑定鼠标按下事件
+
             Grid grid = new()
             {
                 Height = 25, // 设置高度
-                Margin = new Thickness(2, 2, 2, 2), // 设置外边距
-                Background = System.Windows.Media.Brushes.White // 设置背景色
+                Margin = new Thickness(2, 0, 2, 0), // 设置外边距
+                Background = System.Windows.Media.Brushes.Transparent // 设置背景色
             }; // 创建Grid
+            border.Child = grid; // 设置Border内容
             TextBlock textBlock = new()
             {
                 Text = processName,
@@ -111,16 +128,23 @@ namespace Quicker.UserControls
 
             System.Windows.Controls.Button button = new()
             {
-                Content = "删除",
-                Width = 25,
-                Margin = new Thickness(2, 2, 2, 2),
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Center
+                ToolTip = "删除此应用",
+                Style = (Style)System.Windows.Application.Current.Resources["DeleteBlacklistItem"] // 设置按钮样式
             }; // 创建按钮
             button.Click += DeleteFromBlacklist; // 绑定删除事件
             grid.Children.Add(button); // 添加按钮
 
-            BlacklistStackPanel.Children.Add(grid); // 添加到父容器StackPanel
+            Image image = new()
+            {
+                Source = new BitmapImage(new Uri("/Resources/Images/Icons/DeleteImage.ico", UriKind.Relative)),
+                Width = 20,
+                Height = 20,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+            }; // 创建图标
+            button.Content = image; // 添加图标
+
+            BlacklistStackPanel.Children.Add(border); // 添加到父容器StackPanel
         }
 
         // 从黑名单中删除进程
@@ -129,6 +153,36 @@ namespace Quicker.UserControls
             var button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
             var grid = button.Parent as Grid; // 获取按钮的父容器（Grid）
             BlacklistStackPanel.Children.Remove(grid); // 将Grid从父容器StackPanel中移除
+        }
+
+        // 鼠标移入Border显示黑名单项
+        private void ShowBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Border border = sender as Border; // 转换发送者为Border对象
+            if (!(bool)border.Tag) // 如果Border没有被选中
+                border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置背景色
+        }
+
+        // 鼠标移出Border隐藏黑名单项
+        private void HideBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Border border = sender as Border; // 转换发送者为Border对象
+            if (!(bool)border.Tag) // 如果Border没有被选中
+                border.Background = System.Windows.Media.Brushes.Transparent; // 设置背景色
+        }
+
+        // 鼠标按下Border选中黑名单项
+        private void SelectBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Border targetBorder = sender as Border; // 转换发送者为Border对象
+            targetBorder.Tag = true; // 标记为已选中
+            foreach (var border in BlacklistStackPanel.Children.OfType<Border>())
+            { 
+                if(border == targetBorder)
+                    border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置背景色
+                else
+                    border.Background = System.Windows.Media.Brushes.Transparent; // 设置背景色
+            }
         }
 
         // 勾选框点击事件
