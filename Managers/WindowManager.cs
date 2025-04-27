@@ -46,8 +46,6 @@ namespace Quicker.Managers
         private static extern int GetSystemMetrics(int nIndex); // 获取系统度量值
 
         // 系统度量值常量
-        private const int SM_CXSCREEN = 0; // 屏幕宽度
-        private const int SM_CYSCREEN = 1; // 屏幕高度
         private const int SM_CYTASKBAR = 0x0028; // 任务栏高度
 
         // 判断窗口是否最大化
@@ -171,8 +169,6 @@ namespace Quicker.Managers
         // 判断任务栏是否可见
         public bool IsTaskbarVisible()
         {
-            int screen_width = GetSystemMetrics(SM_CXSCREEN); // 获取屏幕宽度
-            int screen_height = GetSystemMetrics(SM_CYSCREEN); // 获取屏幕高度
             int taskbar_height = GetSystemMetrics(SM_CYTASKBAR); // 获取任务栏高度
             return taskbar_height > 0;// 如果任务栏高度大于0，说明任务栏可见
         }

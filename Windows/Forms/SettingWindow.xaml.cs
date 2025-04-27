@@ -58,16 +58,18 @@ namespace Quicker.Windows
                         settingManager.conventions.AutoStart = originalAutoStart; // 更新失败，回退到原来的设置
                 }
 
-                // 更新数据库中的设置
-                db1.ApplySettings(
-                    settingManager.conventions.AutoStart,
-                    settingManager.conventions.ShowNotification,
-                    settingManager.conventions.ShowAddImage,
-                    settingManager.conventions.HideTooltip,
-                    settingManager.conventions.LongPressThreshold,
-                    settingManager.conventions.MouseMovePixels,
-                    settingManager.conventions.LoopPageFlipping,
-                    settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
+                if (settingManager.conventions != null)
+                    db1.ApplyConventionSettings(
+                        settingManager.conventions.AutoStart,
+                        settingManager.conventions.ShowNotification,
+                        settingManager.conventions.ShowAddImage,
+                        settingManager.conventions.HideTooltip,
+                        settingManager.conventions.LongPressThreshold,
+                        settingManager.conventions.MouseMovePixels,
+                        settingManager.conventions.LoopPageFlipping); // 更新常规设置
+                if (settingManager.openMainWindowConditions != null)
+                    db1.ApplyOpenMainWindowSettings(
+                        settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
                     settingManager.openMainWindowConditions.OpenMainWindowByX1MouseClick,
                     settingManager.openMainWindowConditions.OpenMainWindowByX2MouseClick,
                     settingManager.openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick,
@@ -77,7 +79,11 @@ namespace Quicker.Windows
                     settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
                     settingManager.openMainWindowConditions.OpenMainWindowByCtrl,
                     settingManager.openMainWindowConditions.WindowStartupLocation
-                );
+                    ); // 更新弹出面板设置
+                if (settingManager.blacklistSettings != null)
+                    db1.ApplyBlacklistSettings(
+                        settingManager.blacklistSettings.FullScreenDisable,
+                        settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys); // 更新黑名单设置
 
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";

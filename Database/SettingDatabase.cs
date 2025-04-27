@@ -15,6 +15,7 @@ public class SettingDatabase
 
         InitializeConvention(); // 初始化 Convention 表
         InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
+        InitializeBlacklist(); // 初始化 Blacklist 表
     }
 
     // 初始化 Convention 表
@@ -98,8 +99,43 @@ public class SettingDatabase
         insertOpenMainWindowCommand.ExecuteNonQuery(); // 执行插入命令
     }
 
-    // 更新设置信息
-    public void ApplySettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool OpenMainWindowByMiddleMouseClick, bool OpenMainWindowByX1MouseClick, bool OpenMainWindowByX2MouseClick, bool OpenMainWindowByCtrl_MiddleMouseClick, bool OpenMainWindowByCtrl_RightMouseClick, bool OpenMainWindowByMiddleMouseClickLonger, bool OpenMainWindowByRightMouseClickLonger, bool OpenMainWindowByRightMouseClick_Move, bool OpenMainWindowByCtrl, int windowStartupLocation)
+    // 初始化 Blacklist 表
+    private void InitializeBlacklist()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        string createBlacklistTableQuery = @"
+        CREATE TABLE IF NOT EXISTS Blacklist
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            IsFullScreenDisabled BOOL,
+            IsBlacklistEnabledForExtendedHotkey BOOL
+        );"; // 创建 Blacklist 表
+        using var createBlacklistCommand = new SQLiteCommand(createBlacklistTableQuery, connection); // 创建 SQLiteCommand 对象
+        createBlacklistCommand.ExecuteNonQuery(); // 执行创建表的命令
+
+        // 插入初始数据
+        string insertBlacklistQuery = @"
+            INSERT INTO Blacklist 
+            (IsFullScreenDisabled, IsBlacklistEnabledForExtendedHotkey) 
+            VALUES 
+            (@IsFullScreenDisabled, @IsBlacklistEnabledForExtendedHotkey);";
+        using var insertBlacklistCommand = new SQLiteCommand(insertBlacklistQuery, connection); // 创建 SQLiteCommand 对象
+        insertBlacklistCommand.Parameters.AddWithValue("@IsFullScreenDisabled", false); // 是否开启全屏或最大化禁用功能
+        insertBlacklistCommand.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", false); // 是否将黑名单与全屏禁用设置应用于扩展热键功能
+        insertBlacklistCommand.ExecuteNonQuery(); // 执行插入命令
+    }
+
+    /// <summary>
+    /// 更新Convention设置信息
+    /// </summary>
+    /// <param name="autostart"> 是否开机自启 </param>
+    /// <param name="shownotification"> 是否显示通知 </param>
+    /// <param name="showaddimage"> 是否显示添加图片 </param>
+    /// <param name="hideTooltip"> 是否隐藏提示 </param>
+    /// <param name="longPressThreshold"> 长按阈值 </param>
+    /// <param name="mouseMovePixels"> 鼠标移动像素 </param>
+    /// <param name="loopPageFlipping"> 是否循环翻页 </param>
+    public void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var command = new SQLiteCommand(@"
@@ -111,8 +147,34 @@ public class SettingDatabase
             LongPressThreshold = @LongPressThreshold,
             MouseMovePixels = @MouseMovePixels,
             LoopPageFlipping = @LoopPageFlipping
-        WHERE ID = 1;
-        
+        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@AutoStart", autostart); // 是否开机自启
+        command.Parameters.AddWithValue("@ShowNotification", shownotification); // 是否显示通知
+        command.Parameters.AddWithValue("@ShowAddImage", showaddimage); // 是否显示添加图片
+        command.Parameters.AddWithValue("@HideTooltip", hideTooltip); // 是否隐藏提示
+        command.Parameters.AddWithValue("@LongPressThreshold", longPressThreshold); // 长按阈值
+        command.Parameters.AddWithValue("@MouseMovePixels", mouseMovePixels); // 鼠标移动像素
+        command.Parameters.AddWithValue("@LoopPageFlipping", loopPageFlipping); // 是否循环翻页
+        command.ExecuteNonQuery(); // 执行更新命令
+    }
+
+    /// <summary>
+    /// 更新OpenMainWindow设置信息
+    /// </summary>
+    /// <param name="OpenMainWindowByMiddleMouseClick"> 按下中键 </param>
+    /// <param name="OpenMainWindowByX1MouseClick"> 按下X1键 </param>
+    /// <param name="OpenMainWindowByX2MouseClick"> 按下X2键 </param>
+    /// <param name="OpenMainWindowByCtrl_MiddleMouseClick"> Ctrl+中键单击 </param>
+    /// <param name="OpenMainWindowByCtrl_RightMouseClick"> Ctrl+右键单击 </param>
+    /// <param name="OpenMainWindowByMiddleMouseClickLonger"> 长按中键 </param>
+    /// <param name="OpenMainWindowByRightMouseClickLonger"> 长按右键 </param>
+    /// <param name="OpenMainWindowByRightMouseClick_Move"> 按右键移动 </param>
+    /// <param name="OpenMainWindowByCtrl"> 单击Ctrl键 </param>
+    /// <param name="windowStartupLocation"> 功能面板打开位置 </param>
+    public void ApplyOpenMainWindowSettings(bool OpenMainWindowByMiddleMouseClick, bool OpenMainWindowByX1MouseClick, bool OpenMainWindowByX2MouseClick, bool OpenMainWindowByCtrl_MiddleMouseClick, bool OpenMainWindowByCtrl_RightMouseClick, bool OpenMainWindowByMiddleMouseClickLonger, bool OpenMainWindowByRightMouseClickLonger, bool OpenMainWindowByRightMouseClick_Move, bool OpenMainWindowByCtrl, int windowStartupLocation)
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        using var command = new SQLiteCommand(@"
         UPDATE OpenMainWindow SET 
             OpenMainWindowByMiddleMouseClick = @OpenMainWindowByMiddleMouseClick,
             OpenMainWindowByX1MouseClick = @OpenMainWindowByX1MouseClick,
@@ -125,13 +187,6 @@ public class SettingDatabase
             OpenMainWindowByCtrl = @OpenMainWindowByCtrl,
             WindowStartupLocation = @WindowStartupLocation 
         WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@AutoStart", autostart); // 是否开机自启
-        command.Parameters.AddWithValue("@ShowNotification", shownotification); // 是否显示通知
-        command.Parameters.AddWithValue("@ShowAddImage", showaddimage); // 是否显示添加图片
-        command.Parameters.AddWithValue("@HideTooltip", hideTooltip); // 是否隐藏提示
-        command.Parameters.AddWithValue("@LongPressThreshold", longPressThreshold); // 长按阈值
-        command.Parameters.AddWithValue("@MouseMovePixels", mouseMovePixels); // 鼠标移动像素
-        command.Parameters.AddWithValue("@LoopPageFlipping", loopPageFlipping); // 是否循环翻页
         command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", OpenMainWindowByMiddleMouseClick); // 按下中键
         command.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", OpenMainWindowByX1MouseClick); // 按下X1键
         command.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", OpenMainWindowByX2MouseClick); // 按下X2键
@@ -142,6 +197,24 @@ public class SettingDatabase
         command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", OpenMainWindowByRightMouseClick_Move); // 按右键移动
         command.Parameters.AddWithValue("@OpenMainWindowByCtrl", OpenMainWindowByCtrl); // 单击Ctrl键
         command.Parameters.AddWithValue("@WindowStartupLocation", windowStartupLocation); // 功能面板打开位置
+        command.ExecuteNonQuery(); // 执行更新命令
+    }
+
+    /// <summary>
+    /// 更新Blacklist设置信息
+    /// </summary>
+    /// <param name="isFullScreenDisabled"> 是否开启全屏或最大化禁用功能 </param>
+    /// <param name="isBlacklistEnabledForExtendedHotkey"> 是否将黑名单与全屏禁用设置应用于扩展热键功能 </param>
+    public void ApplyBlacklistSettings(bool isFullScreenDisabled, bool isBlacklistEnabledForExtendedHotkey)
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        using var command = new SQLiteCommand(@"
+        UPDATE Blacklist SET 
+            IsFullScreenDisabled = @IsFullScreenDisabled,
+            IsBlacklistEnabledForExtendedHotkey = @IsBlacklistEnabledForExtendedHotkey
+        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@IsFullScreenDisabled", isFullScreenDisabled); // 是否开启全屏或最大化禁用功能
+        command.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", isBlacklistEnabledForExtendedHotkey); // 是否将黑名单与全屏禁用设置应用于扩展热键功能
         command.ExecuteNonQuery(); // 执行更新命令
     }
 
@@ -209,6 +282,26 @@ public class SettingDatabase
         return conditions; // 返回所有 OpenMainWindow 数据
     }
 
+    // 获取黑名单设置
+    public List<Blacklist> GetAllBlacklistSettings()
+    {
+        var blacklists = new List<Blacklist>(); // 创建一个空的 Blacklist 列表
+        using var connection = OpenConnection(); // 打开数据库连接
+        string selectQuery = "SELECT * FROM Blacklist;"; // 查询所有 Blacklist 数据
+        using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+        using var reader = command.ExecuteReader(); // 执行查询并获取结果
+        while (reader.Read())
+        {
+            blacklists.Add(new Blacklist
+            {
+                ID = reader.GetInt32(0), // 主键
+                IsFullScreenDisabled = reader.GetBoolean(1), // 是否开启全屏或最大化禁用功能
+                IsBlacklistEnabledForExtendedHotkey = reader.GetBoolean(2) // 是否将黑名单与全屏禁用设置应用于扩展热键功能
+            }); // 将读取到的数据添加到列表中
+        }
+        return blacklists; // 返回所有 Blacklist 数据
+    }
+
     // 打开数据库连接
     private SQLiteConnection OpenConnection()
     {
@@ -248,14 +341,26 @@ public class OpenMainWindow
     public int WindowStartupLocation { get; set; } // 功能面板打开位置
 }
 
-// 外观设置
-public class Appearance
-{
-
-}
-
 // 黑名单设置
 public class Blacklist
+{
+    public int ID { get; set; } // 主键
+    public bool IsFullScreenDisabled { get; set; } // 是否开启全屏或最大化禁用功能
+    public bool IsBlacklistEnabledForExtendedHotkey { get; set; } // 是否将黑名单与全屏禁用设置应用于扩展热键功能
+}
+
+// 黑名单应用
+public class BlacklistApplication
+{
+    public int ID { get; set; } // 主键
+    public int BlacklistID { get; set; } // 黑名单 ID
+    public string ApplicationName { get; set; } // 应用程序名称
+    public string ProcessName { get; set; } // 进程名称
+    public string FilePath { get; set; } // 应用程序路径
+}
+
+// 外观设置
+public class Appearance
 {
 
 }

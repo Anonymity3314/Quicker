@@ -33,11 +33,11 @@
             </Border>
             <Button x:Name="BlacklistDragButton" Content="拖动到要禁用Quicker的窗口上" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click"/>
             <Button x:Name="BlacklistAddButton" Content="添加..." Style="{StaticResource WhiteButton}" ToolTip="增加特殊的应用" HorizontalAlignment="Left" Margin="228,230,0,0" VerticalAlignment="Top" Width="57" Height="27" Click="BlacklistAddButton_Click"/>
-            <Button x:Name="UnknownProcessButton" Content="无法识别的应用" Style="{StaticResource WhiteButton}" ToolTip="无法识别的应用统一使用unknown-proc.exe表示。" HorizontalAlignment="Left" Margin="295,230,0,0" VerticalAlignment="Top" Width="96" Height="27" Click="UnknownProcessButton_Click" Visibility="Collapsed"/>
-            <Button x:Name="AddDirectoryButton" Content="添加目录" Style="{StaticResource WhiteButton}" ToolTip="目录中所有程序都加入黑名单" HorizontalAlignment="Left" Margin="295,230,0,0" VerticalAlignment="Top" Width="62" Height="27" Click="AddDirectoryButton_Click"/>
+            <Button x:Name="UnknownProcessButton" Content="无法识别的应用" Style="{StaticResource WhiteButton}" ToolTip="无法识别的应用统一使用unknown-proc.exe表示。" HorizontalAlignment="Left" Margin="295,230,0,0" VerticalAlignment="Top" Width="96" Height="27" Click="UnknownProcessButton_Click"/>
+            <Button x:Name="AddDirectoryButton" Content="添加目录" Style="{StaticResource WhiteButton}" ToolTip="目录中所有程序都加入黑名单" HorizontalAlignment="Left" Margin="402,230,0,0" VerticalAlignment="Top" Width="62" Height="27" Click="AddDirectoryButton_Click"/>
             <Label Content="全屏状态禁用Quicker" HorizontalAlignment="Left" Margin="0,303,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="168"/>
-            <CheckBox x:Name="FullScreenDisableCheckBox" Content="开启全屏禁用功能" ToolTip="通常在游戏时禁用Quicker" HorizontalAlignment="Left" Margin="10,338,0,0" VerticalAlignment="Top" Height="15" Width="116" Checked="CheckBox_Checked"/>
-            <Label Content="这些进程即使全屏也启用Quicker" HorizontalAlignment="Left" Margin="4,358,0,0" VerticalAlignment="Top" Height="25" Width="186"/>
+            <CheckBox x:Name="FullScreenDisableCheckBox" Content="开启全屏或最大化禁用功能" ToolTip="通常在游戏时禁用Quicker" HorizontalAlignment="Left" Margin="10,338,0,0" VerticalAlignment="Top" Height="15" Width="174" Click="CheckBox_Click"/>
+            <Label Content="这些进程即使全屏或最大化也启用Quicker" HorizontalAlignment="Left" Margin="4,358,0,0" VerticalAlignment="Top" Height="25" Width="252"/>
             <Grid Margin="0,383,0,339">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="537*"/>
@@ -48,7 +48,7 @@
             </Grid>
             <Label Content="全屏时仍然启用Quicker的进程(分号分隔多个)。进程名等于exe文件名除去扩展名的部分。" Margin="4,407,0,334" Foreground="#FFD5D5D5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="11"/>
             <Label Content="选项" HorizontalAlignment="Left" Margin="0,458,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Height="30" Width="42"/>
-            <CheckBox x:Name="ApplyBlacklistToExpandHotkeysCheckBox" Content="将黑名单与全屏禁用设置应用于'扩展热键'功能" HorizontalAlignment="Left" Margin="10,493,0,0" VerticalAlignment="Top" Height="15" Width="266" Checked="CheckBox_Checked"/>
+            <CheckBox x:Name="ApplyBlacklistToExpandHotkeysCheckBox" Content="将黑名单与全屏禁用设置应用于'扩展热键'功能" HorizontalAlignment="Left" Margin="10,493,0,0" VerticalAlignment="Top" Height="15" Width="266" Click="CheckBox_Click"/>
         </Grid>
     </Grid>
 </UserControl>

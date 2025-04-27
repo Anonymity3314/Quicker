@@ -14,12 +14,10 @@ namespace Quicker.UserControls
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
         SettingManager settingManager; // 设置管理器
-        ButtonManager buttonManager; // 按钮管理器
 
         public BlacklistGrid()
         {
             InitializeComponent();
-            buttonManager = new ButtonManager(); // 创建按钮管理器
             SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
             
@@ -35,9 +33,11 @@ namespace Quicker.UserControls
         // 异步加载设置
         private async Task LoadSettingsAsync() 
         {
+            settingManager.LoadBlacklistSettingsAsync(); // 加载设置
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-
+                FullScreenDisableCheckBox.IsChecked = settingManager.blacklistSettings.FullScreenDisable; // 设置全屏禁用复选框
+                ApplyBlacklistToExpandHotkeysCheckBox.IsChecked = settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys; // 设置应用黑名单到快捷键扩展复选框
             });
         }
 
@@ -62,9 +62,12 @@ namespace Quicker.UserControls
             }
         }
 
+        // 添加未知应用
         private void UnknownProcessButton_Click(object sender, RoutedEventArgs e)
         {
-
+            AddDirectoryButton.Margin = new Thickness(295, 230, 0, 0); // 调整按钮位置
+            UnknownProcessButton.Visibility = Visibility.Collapsed; // 隐藏按钮
+            AddBlacklistItem("unknown-proc.exe", false); // 添加到黑名单
         }
 
         // 将选中文件夹里的 .exe 文件添加到黑名单
@@ -208,7 +211,7 @@ namespace Quicker.UserControls
         }
 
         // 勾选框点击事件
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             settingManager.CheckBox_Click(sender);
         }

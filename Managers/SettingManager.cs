@@ -26,10 +26,10 @@ namespace Quicker.Managers
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
 
         private readonly SettingDatabase db1; // 设置数据库
-        public ConventionsSettingsCache conventions; // 缓存对象
-        public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 缓存对象
-        public AppearanceConditionsSettingsCache appearanceConditions; // 缓存对象
-        //public ConventionsSettingsCache conventions; // 缓存对象
+        public ConventionsSettingsCache conventions; // 常规设置缓存对象
+        public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 弹出面板设置缓存对象
+        public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
+        public AppearanceConditionsSettingsCache appearanceConditions; // 外观设置缓存对象
 
         public SettingManager()
         {
@@ -49,7 +49,7 @@ namespace Quicker.Managers
                 HideTooltip = Conventions.HideTooltip, // 隐藏工具提示
                 LongPressThreshold = Conventions.LongPressThreshold, // 长按阈值
                 MouseMovePixels = Conventions.MouseMovePixels, // 鼠标移动像素
-                LoopPageFlipping = Conventions.LoopPageFlipping, // 循环翻页
+                LoopPageFlipping = Conventions.LoopPageFlipping // 循环翻页
             }; // 加载设置数据到缓存
         }
 
@@ -69,7 +69,19 @@ namespace Quicker.Managers
                 OpenMainWindowByRightMouseClickLonger = OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
                 OpenMainWindowByRightMouseClick_Move = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
                 OpenMainWindowByCtrl = OpenMainWindowConditions.OpenMainWindowByCtrl,
-                WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation,
+                WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation
+            }; // 加载设置数据到缓存
+        }
+
+        // 异步加载黑名单设置信息
+        public async Task LoadBlacklistSettingsAsync()
+        {
+            if (blacklistSettings != null) return; // 如果已经初始化了数据，直接返回
+            var BlacklistSettings = db1.GetAllBlacklistSettings().FirstOrDefault(); // 获取黑名单设置信息
+            blacklistSettings = new BlacklistSettingsSettingsCache // 黑名单设置
+            {
+                FullScreenDisable = BlacklistSettings.IsFullScreenDisabled, // 启用黑名单
+                ApplyBlacklistToExpandHotkeys = BlacklistSettings.IsBlacklistEnabledForExtendedHotkey // 是否将黑名单与全屏禁用设置应用于扩展热键功能
             }; // 加载设置数据到缓存
         }
 
@@ -110,9 +122,9 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 
+        /// 设置Button类型1背景色
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender"> 目标Button </param>
         /// <param name="stackPanel"> 目标StackPanel </param>
         public void ButtonStyle1_MouseLeave(object sender, StackPanel stackPanel)
         {
@@ -244,6 +256,12 @@ namespace Quicker.Managers
                 case "OpenMainWindowByCtrlCheckBox":
                     openMainWindowConditions.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
                     break; // 单击Ctrl键
+                case "FullScreenDisableCheckBox":
+                    blacklistSettings.FullScreenDisable = isChecked == true; // 全屏禁用Quicker
+                    break; // 全屏禁用Quicker
+                case "ApplyBlacklistToExpandHotkeysCheckBox":
+                    blacklistSettings.ApplyBlacklistToExpandHotkeys = isChecked == true; // 黑名单应用到热键扩展
+                    break; // 黑名单应用到热键扩展
                 //case "AutoHideTitleBarCheckBox":
                 //    settingsCache.AutoHideTitleBar = isChecked == true; // 自动缩小动作名称文字
                 //    break; // 自动缩小动作名称文字
@@ -255,12 +273,6 @@ namespace Quicker.Managers
                 //    break; // 设置动作图标后隐藏动作名称
                 //case "ShowActionIconShadowCheckBox":
                 //    settingsCache.ShowActionIconShadow = isChecked == true; // 动作图标显示阴影
-                //    break; // 动作图标显示阴影
-                //case "FullScreenDisableCheckBox":
-                //    settingsCache.FullScreenDisable = isChecked == true; // 动作图标显示阴影
-                //    break; // 动作图标显示阴影
-                //case "ApplyBlacklistToExpandHotkeysCheckBox":
-                //    settingsCache.ApplyBlacklistToExpandHotkeys = isChecked == true; // 动作图标显示阴影
                 //    break; // 动作图标显示阴影
             }
         }
@@ -389,7 +401,7 @@ namespace Quicker.Managers
         }
   
         // 黑名单设置
-        public class BlacklistSettingsCache
+        public class BlacklistSettingsSettingsCache
         {
             public bool FullScreenDisable { get; set; } // 全屏禁用Quicker
             public bool ApplyBlacklistToExpandHotkeys { get; set; } // 黑名单应用到热键扩展
