@@ -11,11 +11,10 @@
 侵权必删
 
 ## 文件结构
-Quicker
+Quicker/
 │  App.xaml
 │  App.xaml.cs
 │  AssemblyInfo.cs
-│  file_tree.txt
 │  installer.idproj
 │  Quicker.csproj
 │  Quicker.csproj.user
@@ -23,19 +22,19 @@ Quicker
 │  Quicker.sln
 │  README.md
 │
-├─Database
+├─Database/
 │  ├─ButtonDatabase.cs
 │  └─SettingDatabase.cs
 │
-├─Managers
+├─Managers/
 │  ├─ButtonManager.cs
 │  ├─IconManager.cs
 │  ├─SettingManager.cs
 │  └─WindowManager.cs
 │
-├─Resources
-│  ├─Images
-│  │  ├─Icons
+├─Resources/
+│  ├─Images/
+│  │  ├─Icons/
 │  │  │  ├─AboutQuicker.ico
 │  │  │  ├─ActionInformation.ico
 │  │  │  ├─ActionPagesManager.ico
@@ -62,7 +61,7 @@ Quicker
 │  │  │  ├─SettingWindow.ico
 │  │  │  └─UnLocked.ico
 │  │  │
-│  │  └─SourseImages
+│  │  └─SourseImages/
 │  │      ├─AboutQuicker.png
 │  │      ├─ActionInformation.png
 │  │      ├─ActionPagesManager.jpg
@@ -89,7 +88,7 @@ Quicker
 │  │      ├─SettingWindow.png
 │  │      └─UnLocked.png
 │  │
-│  └─Styles
+│  └─Styles/
 │      ├─ButtonStyles.xaml
 │      ├─CheckBoxStyle.xaml
 │      ├─ComboBoxStyle.xaml
@@ -100,7 +99,7 @@ Quicker
 │
 ├─Setup
 │
-├─UserControls
+├─UserControls/
 │  ├─AboutQuickerGrid.xaml
 │  │  AboutQuickerGrid.xaml.cs
 │  ├─AppearanceGrid.xaml
@@ -114,8 +113,8 @@ Quicker
 │  └─OpenMainWindowGrid.xaml
 │      └─OpenMainWindowGrid.xaml.cs
 │
-└─Windows
-    ├─Forms
+└─Windows/
+    ├─Forms/
     │  ├─ActionPageManageWindow.xaml
     │  │  └─ActionPageManageWindow.xaml.cs
     │  ├─AddWindow.xaml
@@ -129,16 +128,16 @@ Quicker
     │  └─SettingWindow.xaml
     │      └─SettingWindow.xaml.cs
     │
-    └─Menus
+    └─Menus/
         ├─ActionInformationShower.xaml
-            └─ActionInformationShower.xaml.cs
+        │  └─ActionInformationShower.xaml.cs
         ├─CreatActionMenu.xaml
-            └─CreatActionMenu.xaml.cs
+        │  └─CreatActionMenu.xaml.cs
         ├─CustomMenu.xaml
-            └─CustomMenu.xaml.cs
+        │  └─CustomMenu.xaml.cs
         ├─LoadingWindow.xaml
-            └─LoadingWindow.xaml.cs
+        │  └─LoadingWindow.xaml.cs
         ├─OperationMenu.xaml
-            └─OperationMenu.xaml.cs
+        │  └─OperationMenu.xaml.cs
         └─SelectActionPageMenu.xaml
             └─SelectActionPageMenu.xaml.cs
