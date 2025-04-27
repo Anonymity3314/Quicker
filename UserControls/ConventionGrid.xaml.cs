@@ -23,7 +23,6 @@ namespace Quicker.UserControls
             SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
 
-            settingManager.LoadConventionsAsync();
             InitializeAsync(); // 异步初始化
         }
 
@@ -37,6 +36,7 @@ namespace Quicker.UserControls
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
+            settingManager.LoadConventionsAsync();
             Application.Current.Dispatcher.Invoke(() =>
             {
                 AutoStartCheckBox.IsChecked = settingManager.conventions.AutoStart; // 加载开机自启动设置

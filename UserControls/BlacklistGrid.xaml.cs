@@ -117,6 +117,7 @@ namespace Quicker.UserControls
                 Background = System.Windows.Media.Brushes.Transparent // 设置背景色
             }; // 创建Grid
             border.Child = grid; // 设置Border内容
+
             StackPanel stackPanel = new()
             {
                 Margin = new Thickness(2, 0, 0, 0), // 设置内边距
@@ -232,13 +233,13 @@ namespace Quicker.UserControls
         // 同步滚动条
         private void BlacklistScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            BlacklistStackScrollViewer.ScrollToHorizontalOffset(BlacklistScrollBar.Value); // 滚动到指定位置
+            BlacklistStackScrollViewer.ScrollToVerticalOffset(BlacklistScrollBar.Value); // 滚动到指定位置
         }
         private void BlacklistStackScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            BlacklistScrollBar.Maximum = BlacklistStackScrollViewer.ExtentWidth - BlacklistStackScrollViewer.ViewportWidth; // 设置滚动条最大值
-            BlacklistScrollBar.ViewportSize = BlacklistStackScrollViewer.ViewportWidth; // 设置滚动条视口大小
-            BlacklistScrollBar.Value = BlacklistStackScrollViewer.HorizontalOffset; // 设置滚动条值
+            BlacklistScrollBar.Maximum = BlacklistStackScrollViewer.ExtentHeight - BlacklistStackScrollViewer.ViewportHeight; // 设置滚动条最大值
+            BlacklistScrollBar.ViewportSize = BlacklistStackScrollViewer.ViewportHeight; // 设置滚动条视口大小
+            BlacklistScrollBar.Value = BlacklistStackScrollViewer.VerticalOffset; // 设置滚动条值
         }
     }
 }
