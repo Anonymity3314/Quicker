@@ -23,12 +23,12 @@
                 <ColumnDefinition Width="329*"/>
             </Grid.ColumnDefinitions>
             <Label Content="禁用Quicker的应用程序" HorizontalAlignment="Left" Margin="0,16,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="184"/>
-            <Border BorderBrush="#FFD5D5D5" BorderThickness="1" Margin="10,52,3,565" CornerRadius="5,5,5,5" MouseEnter="ShowBlacklistScrollBar" MouseLeave="HideBlacklistScrollBar">
+            <Border BorderBrush="#FFD5D5D5" BorderThickness="1" Margin="10,52,3,565" CornerRadius="3" MouseEnter="ShowBlacklistScrollBar" MouseLeave="HideBlacklistScrollBar">
                 <Grid>
                     <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
                         <StackPanel x:Name="BlacklistStackPanel"/>
                     </ScrollViewer>
-                    <ScrollBar x:Name="BlacklistScrollBar" Margin="601,10,10,10" ValueChanged="BlacklistScrollBar_ValueChanged"/>
+                    <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171"/>
                 </Grid>
             </Border>
             <Button x:Name="BlacklistDragButton" Content="拖动到要禁用Quicker的窗口上" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click"/>
