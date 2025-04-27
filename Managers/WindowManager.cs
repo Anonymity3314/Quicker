@@ -23,6 +23,11 @@ namespace Quicker.Managers
         // 设置前台窗口
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(nint hWnd); // 设置前台窗口
+        
+        // 窗口置顶相关常量
+        private const int HWND_TOPMOST = -1; // 置顶
+        private const int SWP_NOSIZE = 0x0001; // 不改变大小
+        private const int SWP_NOMOVE = 0x0002; // 不改变位置
 
         // 获取当前活动窗口句柄
         [DllImport("user32.dll")]
@@ -36,10 +41,19 @@ namespace Quicker.Managers
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId); // 获取窗口进程ID
 
-        // 窗口置顶相关常量
-        private const int HWND_TOPMOST = -1; // 置顶
-        private const int SWP_NOSIZE = 0x0001; // 不改变大小
-        private const int SWP_NOMOVE = 0x0002; // 不改变位置
+        // 判断任务栏是否可见
+        [DllImport("user32.dll")]
+        private static extern int GetSystemMetrics(int nIndex); // 获取系统度量值
+
+        // 系统度量值常量
+        private const int SM_CXSCREEN = 0; // 屏幕宽度
+        private const int SM_CYSCREEN = 1; // 屏幕高度
+        private const int SM_CYTASKBAR = 0x0028; // 任务栏高度
+
+        // 判断窗口是否最大化
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsZoomed(nint hWnd);
 
         /// <summary>
         /// 设置窗口置顶
@@ -142,6 +156,25 @@ namespace Quicker.Managers
                 default:
                     throw new NotSupportedException($"不支持的窗口类型: {windowType}");
             }
+        }
+
+        /// <summary>
+        /// 判断窗口是否最大化
+        /// </summary>
+        /// <param name="hWnd"> 窗口句柄 </param>
+        /// <returns> 是否最大化 </returns>
+        public bool IsWindowMaximized(nint hWnd)
+        {
+            return IsZoomed(hWnd);
+        }
+
+        // 判断任务栏是否可见
+        public bool IsTaskbarVisible()
+        {
+            int screen_width = GetSystemMetrics(SM_CXSCREEN); // 获取屏幕宽度
+            int screen_height = GetSystemMetrics(SM_CYSCREEN); // 获取屏幕高度
+            int taskbar_height = GetSystemMetrics(SM_CYTASKBAR); // 获取任务栏高度
+            return taskbar_height > 0;// 如果任务栏高度大于0，说明任务栏可见
         }
     }
 }

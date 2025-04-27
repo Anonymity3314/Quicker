@@ -337,8 +337,14 @@ namespace Quicker
         // 是否全屏禁用Quicker
         private bool FullScreenDisable()
         {
-
-            return false;
+            nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
+            if (foregroundWindow == nint.Zero) return false; // 如果没有前台窗口，返回false
+            if (windowManager.IsWindowMaximized(foregroundWindow) ||
+                !windowManager.IsTaskbarVisible()) // 如果窗口最大化或者任务栏不可见，则禁用 Quicker
+            {
+                //return true; // 返回true表示Quicker被禁用
+            }
+            return false; // 返回false表示正常工作
         }
 
         // 弹出功能面板
