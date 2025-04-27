@@ -15,7 +15,6 @@ namespace Quicker.UserControls
     {
         SettingManager settingManager; // 设置管理器
         ButtonManager buttonManager; // 按钮管理器
-        Window fatherWindow; // 父窗口
 
         public BlacklistGrid()
         {
@@ -23,7 +22,6 @@ namespace Quicker.UserControls
             buttonManager = new ButtonManager(); // 创建按钮管理器
             SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
-            fatherWindow = settingWindow; // 设置父窗口
             
             InitializeAsync(); // 异步初始化
         }
@@ -60,7 +58,7 @@ namespace Quicker.UserControls
             {
                 string filePath = openFileDialog.FileName; // 获取选择的文件路径
                 string processName = Path.GetFileNameWithoutExtension(filePath); // 获取进程名
-                AddToBlacklist(processName); // 添加到黑名单
+                AddBlacklistItem(processName, false); // 添加到黑名单
             }
         }
 
@@ -76,27 +74,29 @@ namespace Quicker.UserControls
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    string selectedPath = dialog.SelectedPath; // 获取选择的文件夹路径
+                    SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
                     LoadingWindow loadingWindow = new()
                     {
-                        Owner = fatherWindow, // 设置父窗口
+                        Owner = settingWindow, // 设置父窗口
                     }; // 创建加载窗口
                     loadingWindow.Show(); // 显示加载窗口
+                    string selectedPath = dialog.SelectedPath; // 获取选择的文件夹路径
+                    AddBlacklistItem(selectedPath, true); // 添加完整路径到黑名单
+                    /*
                     foreach (string file in Directory.GetFiles(selectedPath, "*", SearchOption.AllDirectories)) // 遍历文件夹中的所有文件
                     {
                         if (Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)) // 如果扩展名为.exe
                         {
-                            string processName = Path.GetFileNameWithoutExtension(file);
-                            AddToBlacklist(processName); // 添加到黑名单
+
                         }
-                    }
+                    }*/
                     loadingWindow.Close(); // 关闭加载窗口
                 }
             }
         }
 
         // 向黑名单中添加进程
-        private void AddToBlacklist(string processName)
+        private void AddBlacklistItem(string process, bool isFolder)
         {
             Border border = new()
             {
@@ -106,8 +106,8 @@ namespace Quicker.UserControls
                 Margin = new Thickness(2, 2, 2, 0), // 设置外边距
                 Background = System.Windows.Media.Brushes.Transparent // 设置背景色
             }; // 创建Border
-            border.MouseEnter += ShowBlacklistItem; // 绑定鼠标移入事件
-            border.MouseLeave += HideBlacklistItem; // 绑定鼠标移出事件
+            border.MouseEnter += HightLightBlacklistItem; // 绑定鼠标移入事件
+            border.MouseLeave += FadeBlacklistItem; // 绑定鼠标移出事件
             border.MouseDown += SelectBlacklistItem; // 绑定鼠标按下事件
 
             Grid grid = new()
@@ -117,14 +117,34 @@ namespace Quicker.UserControls
                 Background = System.Windows.Media.Brushes.Transparent // 设置背景色
             }; // 创建Grid
             border.Child = grid; // 设置Border内容
+            StackPanel stackPanel = new()
+            {
+                Margin = new Thickness(2, 0, 0, 0), // 设置内边距
+                VerticalAlignment = VerticalAlignment.Center,
+                Orientation = System.Windows.Controls.Orientation.Horizontal, // 设置为横向排列
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Left
+            }; // 创建StackPanel
+            grid.Children.Add(stackPanel); // 添加StackPanel
+
             TextBlock textBlock = new()
             {
-                Text = processName,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
-                Margin = new Thickness(2, 0, 0, 0) // 设置内边距
+                Text = process,
+                VerticalAlignment = VerticalAlignment.Center
             }; // 创建TextBlock
-            grid.Children.Add(textBlock); // 添加进程名称
+            stackPanel.Children.Add(textBlock); // 添加进程名称
+
+            if(isFolder)
+            {
+                System.Windows.Controls.Label label = new()
+                {
+                    FontSize = 11,
+                    Content = "文件夹",
+                    Margin = new Thickness(2, 0, 0, 0), // 设置内边距
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = System.Windows.Media.Brushes.LightGray
+                }; // 创建Label
+                stackPanel.Children.Add(label); // 添加Label
+            }
 
             System.Windows.Controls.Button button = new()
             {
@@ -152,19 +172,20 @@ namespace Quicker.UserControls
         {
             var button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
             var grid = button.Parent as Grid; // 获取按钮的父容器（Grid）
-            BlacklistStackPanel.Children.Remove(grid); // 将Grid从父容器StackPanel中移除
+            var border = grid.Parent as Border; // 获取Grid的父容器（Border）
+            BlacklistStackPanel.Children.Remove(border); // 将Grid从父容器StackPanel中移除
         }
 
-        // 鼠标移入Border显示黑名单项
-        private void ShowBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        // 鼠标移入Border高亮显示黑名单项
+        private void HightLightBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Border border = sender as Border; // 转换发送者为Border对象
             if (!(bool)border.Tag) // 如果Border没有被选中
                 border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置背景色
         }
 
-        // 鼠标移出Border隐藏黑名单项
-        private void HideBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        // 鼠标移出Border恢复原状
+        private void FadeBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Border border = sender as Border; // 转换发送者为Border对象
             if (!(bool)border.Tag) // 如果Border没有被选中

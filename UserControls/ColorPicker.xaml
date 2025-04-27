@@ -12,7 +12,7 @@
     d:DesignWidth="345"
 >
     <Grid>
-        <Rectangle x:Name="ColorPanel" Width="300" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0">
+        <Rectangle x:Name="ColorPanel" Width="300" Height="150" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" MouseDown="ColorPanel_MouseDown">
             <Rectangle.Fill>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                     <GradientStop Color="Red" Offset="0.0"/>
@@ -46,8 +46,8 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="R" VerticalAlignment="Center"/>
-                <Slider x:Name="RedSlider" Minimum="0" Maximum="255" Value="204" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
-                <TextBox x:Name="RedValue" Text="204" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+                <Slider x:Name="RedSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <TextBox x:Name="RedValue" Text="{Binding ElementName=RedSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- G 值滑块 -->
             <Grid>
@@ -57,8 +57,8 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="G" VerticalAlignment="Center"/>
-                <Slider x:Name="GreenSlider" Minimum="0" Maximum="255" Value="204" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
-                <TextBox x:Name="GreenValue" Text="204" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+                <Slider x:Name="GreenSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <TextBox x:Name="GreenValue" Text="{Binding ElementName=GreenSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- B 值滑块 -->
             <Grid>
@@ -68,8 +68,8 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="B" VerticalAlignment="Center"/>
-                <Slider x:Name="BlueSlider" Minimum="0" Maximum="255" Value="204" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
-                <TextBox x:Name="BlueValue" Text="204" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+                <Slider x:Name="BlueSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <TextBox x:Name="BlueValue" Text="{Binding ElementName=BlueSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- A 值滑块 -->
             <Grid>
@@ -79,8 +79,8 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="A" VerticalAlignment="Center"/>
-                <Slider x:Name="AlphaSlider" Minimum="0" Maximum="255" Value="255" Grid.Column="1" TickFrequency="10" TickPlacement="BottomRight"/>
-                <TextBox x:Name="AlphaValue" Text="255" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right"/>
+                <Slider x:Name="AlphaSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <TextBox x:Name="AlphaValue" Text="{Binding ElementName=AlphaSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
         </StackPanel>
         <TextBox x:Name="HexValue" Text="#FFD5D5D5" HorizontalAlignment="Left" Margin="151,165,0,0" Width="159" VerticalAlignment="Top" Height="19"/>

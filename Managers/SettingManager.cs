@@ -1,8 +1,10 @@
 ﻿using System.Windows.Controls;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Diagnostics;
 using System.Windows;
 using System;
+using static Quicker.Managers.SettingManager;
 
 namespace Quicker.Managers
 {
@@ -24,29 +26,23 @@ namespace Quicker.Managers
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
 
         private readonly SettingDatabase db1; // 设置数据库
-        public SettingsCache settingsCache; // 缓存对象
+        public ConventionsSettingsCache conventions; // 缓存对象
+        public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 缓存对象
+        public AppearanceConditionsSettingsCache appearanceConditions; // 缓存对象
+        //public ConventionsSettingsCache conventions; // 缓存对象
 
         public SettingManager()
         {
             db1 = new SettingDatabase(); // 实例化设置数据库
-            InitializeCache(); // 初始化缓存对象
-        }
-
-        // 初始化缓存
-        public async void InitializeCache()
-        {
-            await LoadSettingsAsync(); // 异步加载常规设置信息
         }
 
         // 异步加载常规设置信息
-        private async Task LoadSettingsAsync()
+        public async Task LoadConventionsAsync()
         {
+            if (conventions != null) return; // 如果已经初始化了数据，直接返回
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
-            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
-            //var Appearance = db1.GetAllAppearance().FirstOrDefault(); // 获取外观设置信息
-            settingsCache = new SettingsCache
+            conventions = new ConventionsSettingsCache // 常规设置
             {
-                // 常规设置
                 AutoStart = Conventions.AutoStart, // 开机自启
                 ShowNotification = Conventions.ShowNotification, // 显示通知
                 ShowAddImage = Conventions.ShowAddImage, // 显示添加图片按钮
@@ -54,7 +50,16 @@ namespace Quicker.Managers
                 LongPressThreshold = Conventions.LongPressThreshold, // 长按阈值
                 MouseMovePixels = Conventions.MouseMovePixels, // 鼠标移动像素
                 LoopPageFlipping = Conventions.LoopPageFlipping, // 循环翻页
-                // 弹出面板设置
+            }; // 加载设置数据到缓存
+        }
+
+        // 异步加载弹出面板设置信息
+        public async Task LoadOpenMainWindowConditionsAsync()
+        {
+            if (openMainWindowConditions != null) return; // 如果已经初始化了数据，直接返回
+            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
+            openMainWindowConditions = new OpenMainWindowConditionsSettingsCache // 弹出面板设置
+            {
                 OpenMainWindowByMiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick,
                 OpenMainWindowByX1MouseClick = OpenMainWindowConditions.OpenMainWindowByX1MouseClick,
                 OpenMainWindowByX2MouseClick = OpenMainWindowConditions.OpenMainWindowByX2MouseClick,
@@ -65,7 +70,16 @@ namespace Quicker.Managers
                 OpenMainWindowByRightMouseClick_Move = OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
                 OpenMainWindowByCtrl = OpenMainWindowConditions.OpenMainWindowByCtrl,
                 WindowStartupLocation = OpenMainWindowConditions.WindowStartupLocation,
-                // 外观设置
+            }; // 加载设置数据到缓存
+        }
+
+        // 异步加载外观设置信息
+        public async Task LoadAppearanceAsync()
+        {
+            if (appearanceConditions != null) return; // 如果已经初始化了数据，直接返回
+            //var Appearance = db1.GetAllAppearance().FirstOrDefault(); // 获取外观设置信息
+            //settingsCache = new SettingsCache // 外观设置
+            {
                 //AutoHideTitleBar = Appearance.AutoHideTitleBar,
                 //ShowActionButtonMouseOver = Appearance.ShowActionButtonMouseOver,
                 //HideActionNameAfterIcon = Appearance.HideActionNameAfterIcon,
@@ -115,7 +129,7 @@ namespace Quicker.Managers
         /// <param name="stackPanel"> 目标StackPanel </param>
         /// <param name="targetGrid"> 目标Grid </param>
         /// <param name="fatherGrid"> 父级Grid </param>
-        public void ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
+        public async Task ButtonStyle2_Click(Button targetButton, StackPanel stackPanel, UserControl targetGrid, Grid fatherGrid)
         {
             var existingGrid = fatherGrid.Children.OfType<UserControl>().FirstOrDefault(); // 获取第一个 UserControl 子元素
             if (existingGrid == null || existingGrid.Name != targetGrid.Name)
@@ -171,7 +185,7 @@ namespace Quicker.Managers
                 switch (comboBoxName)
                 {
                     case "WindowStartupLocationComboBox":
-                        settingsCache.WindowStartupLocation = selectedIndex; // 设置窗口启动位置
+                        openMainWindowConditions.WindowStartupLocation = selectedIndex; // 设置窗口启动位置
                         break; // 功能面板打开位置
                 }
             }
@@ -189,65 +203,65 @@ namespace Quicker.Managers
             switch (checkBoxName)
             {
                 case "AutoStartCheckBox":
-                    settingsCache.AutoStart = isChecked == true;
+                    conventions.AutoStart = isChecked == true;
                     break; // 开机自启动
                 case "ShowNotificationCheckBox":
-                    settingsCache.ShowNotification = isChecked == true;
+                    conventions.ShowNotification = isChecked == true;
                     break;  // 显示启动完成提示
                 case "ShowAddImageCheckBox":
-                    settingsCache.ShowAddImage = isChecked == true;
+                    conventions.ShowAddImage = isChecked == true;
                     break; // 左键点击空白按钮时显示创建动作菜单
                 case "HideTooltipCheckBox":
-                    settingsCache.HideTooltip = isChecked == true;
+                    conventions.HideTooltip = isChecked == true;
                     break; // 隐藏提示框
                 case "LoopPageFlippingCheckBox":
-                    settingsCache.LoopPageFlipping = isChecked == true;
+                    conventions.LoopPageFlipping = isChecked == true;
                     break; // 循环翻页
                 case "OpenMainWindowByMiddleMouseClickCheckBox":
-                    settingsCache.OpenMainWindowByMiddleMouseClick = isChecked == true;
+                    openMainWindowConditions.OpenMainWindowByMiddleMouseClick = isChecked == true;
                     break; // 按下中键
                 case "OpenMainWindowByX1MouseClickCheckBox":
-                    settingsCache.OpenMainWindowByX1MouseClick = isChecked == true; // 按下X1键
+                    openMainWindowConditions.OpenMainWindowByX1MouseClick = isChecked == true; // 按下X1键
                     break; // 按下X1键
                 case "OpenMainWindowByX2MouseClickCheckBox":
-                    settingsCache.OpenMainWindowByX2MouseClick = isChecked == true; // 按下X2键
+                    openMainWindowConditions.OpenMainWindowByX2MouseClick = isChecked == true; // 按下X2键
                     break; // 按下X2键
                 case "OpenMainWindowByCtrl_MiddleMouseClickCheckBox":
-                    settingsCache.OpenMainWindowByCtrl_MiddleMouseClick = isChecked == true; // Ctrl+中键单击
+                    openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick = isChecked == true; // Ctrl+中键单击
                     break; // Ctrl+中键单击
                 case "OpenMainWindowByCtrl_RightMouseClickCheckBox":
-                    settingsCache.OpenMainWindowByCtrl_RightMouseClick = isChecked == true; // Ctrl+右键单击
+                    openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick = isChecked == true; // Ctrl+右键单击
                     break; // Ctrl+右键单击
                 case "OpenMainWindowByMiddleMouseClickLongerCheckBox":
-                    settingsCache.OpenMainWindowByMiddleMouseClickLonger = isChecked == true; // 长按中键
+                    openMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger = isChecked == true; // 长按中键
                     break; // 长按中键
                 case "OpenMainWindowByRightMouseClickLongerCheckBox":
-                    settingsCache.OpenMainWindowByRightMouseClickLonger = isChecked == true; // 长按右键
+                    openMainWindowConditions.OpenMainWindowByRightMouseClickLonger = isChecked == true; // 长按右键
                     break; // 长按右键
                 case "OpenMainWindowByRightMouseClick_MoveCheckBox":
-                    settingsCache.OpenMainWindowByRightMouseClick_Move = isChecked == true; // 按右键移动
+                    openMainWindowConditions.OpenMainWindowByRightMouseClick_Move = isChecked == true; // 按右键移动
                     break; // 按右键移动
                 case "OpenMainWindowByCtrlCheckBox":
-                    settingsCache.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
+                    openMainWindowConditions.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
                     break; // 单击Ctrl键
-                case "AutoHideTitleBarCheckBox":
-                    settingsCache.AutoHideTitleBar = isChecked == true; // 自动缩小动作名称文字
-                    break; // 自动缩小动作名称文字
-                case "ShowActionButtonMouseOverCheckBox":
-                    settingsCache.ShowActionButtonMouseOver = isChecked == true; // 鼠标悬浮在动作按钮上时放大显示按钮
-                    break; // 鼠标悬浮在动作按钮上时放大显示按钮
-                case "HideActionNameAfterIconCheckBox":
-                    settingsCache.HideActionNameAfterIcon = isChecked == true; // 设置动作图标后隐藏动作名称
-                    break; // 设置动作图标后隐藏动作名称
-                case "ShowActionIconShadowCheckBox":
-                    settingsCache.ShowActionIconShadow = isChecked == true; // 动作图标显示阴影
-                    break; // 动作图标显示阴影
-                case "FullScreenDisableCheckBox":
-                    settingsCache.FullScreenDisable = isChecked == true; // 动作图标显示阴影
-                    break; // 动作图标显示阴影
-                case "ApplyBlacklistToExpandHotkeysCheckBox":
-                    settingsCache.ApplyBlacklistToExpandHotkeys = isChecked == true; // 动作图标显示阴影
-                    break; // 动作图标显示阴影
+                //case "AutoHideTitleBarCheckBox":
+                //    settingsCache.AutoHideTitleBar = isChecked == true; // 自动缩小动作名称文字
+                //    break; // 自动缩小动作名称文字
+                //case "ShowActionButtonMouseOverCheckBox":
+                //    settingsCache.ShowActionButtonMouseOver = isChecked == true; // 鼠标悬浮在动作按钮上时放大显示按钮
+                //    break; // 鼠标悬浮在动作按钮上时放大显示按钮
+                //case "HideActionNameAfterIconCheckBox":
+                //    settingsCache.HideActionNameAfterIcon = isChecked == true; // 设置动作图标后隐藏动作名称
+                //    break; // 设置动作图标后隐藏动作名称
+                //case "ShowActionIconShadowCheckBox":
+                //    settingsCache.ShowActionIconShadow = isChecked == true; // 动作图标显示阴影
+                //    break; // 动作图标显示阴影
+                //case "FullScreenDisableCheckBox":
+                //    settingsCache.FullScreenDisable = isChecked == true; // 动作图标显示阴影
+                //    break; // 动作图标显示阴影
+                //case "ApplyBlacklistToExpandHotkeysCheckBox":
+                //    settingsCache.ApplyBlacklistToExpandHotkeys = isChecked == true; // 动作图标显示阴影
+                //    break; // 动作图标显示阴影
             }
         }
 
@@ -265,18 +279,18 @@ namespace Quicker.Managers
                         if (shortPressThreshold < 30) // 长按阈值不能小于30
                         {
                             textBox.Text = "30"; // 设置最小值
-                            settingsCache.LongPressThreshold = 30; // 设置最小值
+                            conventions.LongPressThreshold = 30; // 设置最小值
                         }
                         else if (shortPressThreshold > 3000) // 长按阈值不能大于3000
                         {
                             textBox.Text = "3000"; // 设置最大值
-                            settingsCache.LongPressThreshold = 3000; // 设置最大值
+                            conventions.LongPressThreshold = 3000; // 设置最大值
                         }
-                        else settingsCache.LongPressThreshold = shortPressThreshold; // 设置长按阈值
+                        else conventions.LongPressThreshold = shortPressThreshold; // 设置长按阈值
                     }
                     else // 返回原来的数值
                     {
-                        textBox.Text = settingsCache.LongPressThreshold.ToString(); // 设置原来的数值
+                        textBox.Text = conventions.LongPressThreshold.ToString(); // 设置原来的数值
                     } // 设置长按阈值
                     break; // 长按阈值
                 case "MouseMovePixelsTextBox":
@@ -285,18 +299,18 @@ namespace Quicker.Managers
                         if ((int)mouseMovePixels < 1) // 鼠标移动像素不能小于 1
                         {
                             textBox.Text = "1"; // 设置最小值
-                            settingsCache.MouseMovePixels = 1; // 设置最小值
+                            conventions.MouseMovePixels = 1; // 设置最小值
                         }
                         else if ((int)mouseMovePixels > 200) // 鼠标移动像素不能大于 200
                         {
                             textBox.Text = "200"; // 设置最大值
-                            settingsCache.MouseMovePixels = 200; // 设置最大值
+                            conventions.MouseMovePixels = 200; // 设置最大值
                         }
-                        else settingsCache.MouseMovePixels = mouseMovePixels; // 设置鼠标移动像素
+                        else conventions.MouseMovePixels = mouseMovePixels; // 设置鼠标移动像素
                     }
                     else // 返回原来的数值
                     {
-                        textBox.Text = settingsCache.MouseMovePixels.ToString(); // 设置原来的数值
+                        textBox.Text = conventions.MouseMovePixels.ToString(); // 设置原来的数值
                     } // 设置鼠标移动像素
                     break; // 鼠标移动像素
                 case "ButtonSizeTextBox":
@@ -341,15 +355,15 @@ namespace Quicker.Managers
         }
 
         // 清理缓存
-        public void ClearCache()
+        public void ClearCaches()
         {
-            settingsCache = null; // 清理缓存
+            conventions = null; // 清理缓存
+            openMainWindowConditions = null;
         }
 
-        // 缓存对象类
-        public class SettingsCache
+        // 常规设置
+        public class ConventionsSettingsCache
         {
-            // 常规设置
             public bool AutoStart { get; set; } // 开机自启动
             public bool ShowNotification { get; set; } // 显示启动完成提示
             public bool ShowAddImage { get; set; } // 左键点击空白按钮时显示创建动作菜单
@@ -357,8 +371,11 @@ namespace Quicker.Managers
             public int LongPressThreshold { get; set; } // 长按阈值
             public int MouseMovePixels { get; set; } // 鼠标移动像素
             public bool LoopPageFlipping { get; set; } // 循环翻页
+        }
 
-            // 弹出面板设置
+        // 弹出面板设置
+        public class OpenMainWindowConditionsSettingsCache
+        {
             public bool OpenMainWindowByMiddleMouseClick { get; set; } // 按下中键
             public bool OpenMainWindowByX1MouseClick { get; set; } // 按下X1键
             public bool OpenMainWindowByX2MouseClick { get; set; } // 按下X2键
@@ -369,12 +386,18 @@ namespace Quicker.Managers
             public bool OpenMainWindowByRightMouseClick_Move { get; set; } // 按右键移动
             public bool OpenMainWindowByCtrl { get; set; } // 单击Ctrl键
             public int WindowStartupLocation { get; set; } // 功能面板打开位置
-
-            // 黑名单设置
+        }
+  
+        // 黑名单设置
+        public class BlacklistSettingsCache
+        {
             public bool FullScreenDisable { get; set; } // 全屏禁用Quicker
             public bool ApplyBlacklistToExpandHotkeys { get; set; } // 黑名单应用到热键扩展
+        }
 
-            // 外观设置
+        // 外观设置
+        public class AppearanceConditionsSettingsCache
+        {
             public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字
             public bool ShowActionButtonMouseOver { get; set; } // 鼠标悬浮在动作按钮上时放大显示按钮
             public bool HideActionNameAfterIcon { get; set; } // 设置动作图标后隐藏动作名称

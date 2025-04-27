@@ -54,7 +54,7 @@
                         <TextBlock Text="黑名单" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
-                <Button x:Name="Appearance" ToolTip="颜色、字体等样式设置" Style="{StaticResource Button2}" Visibility="Collapsed" Click="Appearance_Click" MouseLeave="Appearance_MouseLeave">
+                <Button x:Name="Appearance" ToolTip="颜色、字体等样式设置" Style="{StaticResource Button2}" Click="Appearance_Click" MouseLeave="Appearance_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="外观" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>

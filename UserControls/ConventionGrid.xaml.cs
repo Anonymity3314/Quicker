@@ -23,6 +23,7 @@ namespace Quicker.UserControls
             SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
 
+            settingManager.LoadConventionsAsync();
             InitializeAsync(); // 异步初始化
         }
 
@@ -38,13 +39,13 @@ namespace Quicker.UserControls
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                AutoStartCheckBox.IsChecked = settingManager.settingsCache.AutoStart; // 加载开机自启动设置
-                ShowNotificationCheckBox.IsChecked = settingManager.settingsCache.ShowNotification; // 加载显示启动完成提示设置
-                ShowAddImageCheckBox.IsChecked = settingManager.settingsCache.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
-                HideTooltipCheckBox.IsChecked = settingManager.settingsCache.HideTooltip; // 加载隐藏提示框设置
-                LongPressThresholdTextBox.Text = settingManager.settingsCache.LongPressThreshold.ToString(); // 加载长按阈值设置
-                MouseMovePixelsTextBox.Text = settingManager.settingsCache.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
-                LoopPageFlippingCheckBox.IsChecked = settingManager.settingsCache.LoopPageFlipping; // 加载循环翻页设置
+                AutoStartCheckBox.IsChecked = settingManager.conventions.AutoStart; // 加载开机自启动设置
+                ShowNotificationCheckBox.IsChecked = settingManager.conventions.ShowNotification; // 加载显示启动完成提示设置
+                ShowAddImageCheckBox.IsChecked = settingManager.conventions.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
+                HideTooltipCheckBox.IsChecked = settingManager.conventions.HideTooltip; // 加载隐藏提示框设置
+                LongPressThresholdTextBox.Text = settingManager.conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
+                MouseMovePixelsTextBox.Text = settingManager.conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
+                LoopPageFlippingCheckBox.IsChecked = settingManager.conventions.LoopPageFlipping; // 加载循环翻页设置
             });
         }
 

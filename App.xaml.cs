@@ -335,6 +335,7 @@ namespace Quicker
         // 弹出功能面板
         private void ShowMainWindow(object sender, RoutedEventArgs e)
         {
+            PreLoadMainWindow(); // 预加载主窗口
             CloseOrShowMainWindow(); // 关闭或重新显示主窗口
         }
 
@@ -367,6 +368,7 @@ namespace Quicker
         public void CloseOrShowMainWindow()
         {
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
+            if(mainWindow == null) return; // 如果没有主窗口，则不处理
             if (mainWindow.Visibility == Visibility.Hidden)
             {
                 mainWindow.Visibility = Visibility.Visible; // 显示功能面板

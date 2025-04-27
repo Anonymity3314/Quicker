@@ -50,33 +50,33 @@ namespace Quicker.Windows
                 bool succeed = true; // 保存成功标志
                 var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
                 bool originalAutoStart = Convention.AutoStart; // 保存原始的开机自启动设置
-                bool newAutoStart = settingManager.settingsCache.AutoStart; // 新的开机自启动设置
+                bool newAutoStart = settingManager.conventions.AutoStart; // 新的开机自启动设置
                 if (originalAutoStart != newAutoStart)// 更新开机自启动设置
                 {
                     succeed = UpdateAutostart(newAutoStart);
                     if (!succeed)
-                        settingManager.settingsCache.AutoStart = originalAutoStart; // 更新失败，回退到原来的设置
+                        settingManager.conventions.AutoStart = originalAutoStart; // 更新失败，回退到原来的设置
                 }
 
                 // 更新数据库中的设置
                 db1.ApplySettings(
-                    settingManager.settingsCache.AutoStart,
-                    settingManager.settingsCache.ShowNotification,
-                    settingManager.settingsCache.ShowAddImage,
-                    settingManager.settingsCache.HideTooltip,
-                    settingManager.settingsCache.LongPressThreshold,
-                    settingManager.settingsCache.MouseMovePixels,
-                    settingManager.settingsCache.LoopPageFlipping,
-                    settingManager.settingsCache.OpenMainWindowByMiddleMouseClick,
-                    settingManager.settingsCache.OpenMainWindowByX1MouseClick,
-                    settingManager.settingsCache.OpenMainWindowByX2MouseClick,
-                    settingManager.settingsCache.OpenMainWindowByCtrl_MiddleMouseClick,
-                    settingManager.settingsCache.OpenMainWindowByCtrl_RightMouseClick,
-                    settingManager.settingsCache.OpenMainWindowByMiddleMouseClickLonger,
-                    settingManager.settingsCache.OpenMainWindowByRightMouseClickLonger,
-                    settingManager.settingsCache.OpenMainWindowByRightMouseClick_Move,
-                    settingManager.settingsCache.OpenMainWindowByCtrl,
-                    settingManager.settingsCache.WindowStartupLocation
+                    settingManager.conventions.AutoStart,
+                    settingManager.conventions.ShowNotification,
+                    settingManager.conventions.ShowAddImage,
+                    settingManager.conventions.HideTooltip,
+                    settingManager.conventions.LongPressThreshold,
+                    settingManager.conventions.MouseMovePixels,
+                    settingManager.conventions.LoopPageFlipping,
+                    settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
+                    settingManager.openMainWindowConditions.OpenMainWindowByX1MouseClick,
+                    settingManager.openMainWindowConditions.OpenMainWindowByX2MouseClick,
+                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick,
+                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick,
+                    settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger,
+                    settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
+                    settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
+                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl,
+                    settingManager.openMainWindowConditions.WindowStartupLocation
                 );
 
                 // 显示设置成功通知
@@ -221,7 +221,7 @@ namespace Quicker.Windows
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e); // 调用基类的OnClosing方法
-            settingManager.ClearCache(); // 清空缓存
+            settingManager.ClearCaches(); // 清空缓存
             GC.Collect(); // 回收资源
         }
     }
