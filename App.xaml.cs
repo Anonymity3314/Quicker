@@ -187,6 +187,7 @@ namespace Quicker
         // 按下鼠标快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
+            if (FullScreenDisable()) return; // 如果全屏禁用Quicker，返回
             if (keyPressStartTime.HasValue)
             {
                 keyPressStartTime = null; // 重置按键时间
@@ -291,6 +292,7 @@ namespace Quicker
         // 按下键盘快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
+            if (FullScreenDisable()) return; // 如果全屏禁用Quicker，返回
             if (keyPressStartTime.HasValue)
             {
                 keyPressStartTime = null; // 重置按键时间
@@ -330,6 +332,13 @@ namespace Quicker
                     }
                     break; // 右 Ctrl 键
             }
+        }
+
+        // 是否全屏禁用Quicker
+        private bool FullScreenDisable()
+        {
+
+            return false;
         }
 
         // 弹出功能面板
