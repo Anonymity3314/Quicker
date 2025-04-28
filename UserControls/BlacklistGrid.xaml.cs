@@ -41,6 +41,7 @@ namespace Quicker.UserControls
             });
         }
 
+        // 拖动按钮选择屏幕上要禁用的应用
         private void BlacklistDragButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -216,6 +217,7 @@ namespace Quicker.UserControls
             settingManager.CheckBox_Click(sender);
         }
 
+        // 选择在禁用Quicker时仍然能够打开Quicker的应用
         private void BlacklistSelectButton_Click(object sender, RoutedEventArgs e)
         {
 

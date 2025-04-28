@@ -45,11 +45,6 @@ namespace Quicker.UserControls
             UpdateColor();
         }
 
-        private void ColorPanel_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            Point mousePosition = e.GetPosition(ColorPanel);
-        }
-
         private void Value_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
@@ -109,5 +104,7 @@ namespace Quicker.UserControls
                     break;
             }
         }
+
+
     }
 }

@@ -218,6 +218,11 @@ public class SettingDatabase
         command.ExecuteNonQuery(); // 执行更新命令
     }
 
+    public void ApplyBlacklistApplications()
+    {
+
+    }
+
     // 保存总使用时长
     public void SaveTotalUsageTime(double totalUsageTime)
     {
@@ -353,7 +358,6 @@ public class Blacklist
 public class BlacklistApplication
 {
     public int ID { get; set; } // 主键
-    public int BlacklistID { get; set; } // 黑名单 ID
     public string ApplicationName { get; set; } // 应用程序名称
     public string ProcessName { get; set; } // 进程名称
     public string FilePath { get; set; } // 应用程序路径
@@ -362,5 +366,8 @@ public class BlacklistApplication
 // 外观设置
 public class Appearance
 {
-
+    public double ButtonSize { get; set; } // 按钮大小
+    public double ButtonGap { get; set; } // 按钮间隙
+    public double BorderWidth { get; set; } // 边框宽度
+    public double ButtonCornerRadius { get; set; } // 按钮圆角
 }
