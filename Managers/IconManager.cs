@@ -18,13 +18,13 @@ namespace Quicker.Managers
         [StructLayout(LayoutKind.Sequential)]
         private struct SHFILEINFO
         {
-            public nint hIcon;
-            public int iIcon;
-            public uint dwAttributes;
+            public nint hIcon; // 图标句柄
+            public int iIcon; // 图标索引
+            public uint dwAttributes; // 文件属性
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string szDisplayName;
+            public string szDisplayName; // 文件显示名
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-            public string szTypeName;
+            public string szTypeName; // 文件类型名
         } // 文件信息结构体
         [DllImport("shell32.dll", CharSet = CharSet.Auto)]
         private static extern nint SHGetFileInfo(string pszPath, uint dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, uint uFlags); // 获取文件信息
@@ -38,8 +38,8 @@ namespace Quicker.Managers
         /// <summary>
         /// 获取图标
         /// </summary>
-        /// <param name="appPath">文件路径</param>
-        /// <returns></returns>
+        /// <param name="appPath"> 文件路径 </param>
+        /// <returns> 图标 </returns>
         public ImageSource GetIcon(string appPath)
         {
             uint flags = SHGFI_ICON | SHGFI_LARGEICON; // 获取大图标
@@ -54,8 +54,8 @@ namespace Quicker.Managers
         /// <summary>
         /// 检查缓存的图标
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <param name="filePath"> 文件路径 </param>
+        /// <returns> 图标文件路径 </returns>
         public string CheckCachedIcon(string filePath)
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -107,7 +107,7 @@ namespace Quicker.Managers
         /// <summary>
         /// 计算图像的哈希值
         /// </summary>
-        /// <param name="imageSource"></param>
+        /// <param name="imageSource"> 图像源 </param>
         /// <returns> 图像的哈希值 </returns>
         public byte[] GetImageHash(ImageSource imageSource)
         {

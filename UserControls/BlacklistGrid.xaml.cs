@@ -1,8 +1,10 @@
-﻿using System.Windows.Media.Imaging;
+﻿using System.Runtime.InteropServices;
+using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.UserControls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
@@ -13,6 +15,8 @@ namespace Quicker.UserControls
 {
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
+        private WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private IconManager iconManager = new IconManager(); // 图标管理器
         SettingManager settingManager; // 设置管理器
 
         public BlacklistGrid()
@@ -38,7 +42,7 @@ namespace Quicker.UserControls
             {
                 FullScreenDisableCheckBox.IsChecked = settingManager.blacklistSettings.FullScreenDisable; // 设置全屏禁用复选框
                 //ApplyBlacklistToExpandHotkeysCheckBox.IsChecked = settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys; // 设置应用黑名单到快捷键扩展复选框
-            });
+            }); // 刷新UI
         }
 
         // 拖动按钮选择屏幕上要禁用的应用
@@ -49,6 +53,80 @@ namespace Quicker.UserControls
 
         // 将选中的文件添加到黑名单
         private void BlacklistAddButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExistAppsStackPanel.Children.Clear(); // 清空列表
+            ExistAppsPop.Height = 4; // 重置高度
+            Process[] processes = Process.GetProcesses(); // 获取所有进程
+            var uniqueProcesses = new Dictionary<string, Process>(); // 创建字典，用于存放唯一的进程
+            foreach (Process process in processes) // 遍历所有进程
+            {
+                try
+                {
+                    string processFileName = process.MainModule.FileName; // 获取进程文件名
+                    string fullProcessName = Path.GetFileName(processFileName); // 获取进程名
+
+                    if (!HasWindow(process)) continue; // 判断是否有窗口
+                    if (uniqueProcesses.ContainsKey(fullProcessName)) continue; // 判断是否已经存在相同的进程名
+                    uniqueProcesses[fullProcessName] = process; // 添加到字典中
+                    AddAppItems(fullProcessName); // 添加到列表中
+                }
+                catch { } // 忽略异常
+            }
+            AddAppItems("从计算机选择程序..."); // 添加到列表中
+            uniqueProcesses.Clear(); // 清空字典
+            ExistAppsPop.IsOpen = true; // 打开正在运行的程序提示框
+        }
+
+        /// <summary>
+        /// 判断进程是否有窗口（包括最小化的窗口）
+        /// </summary>
+        /// <param name="process">进程对象</param>
+        /// <returns>是否有窗口</returns>
+        private bool HasWindow(Process process)
+        {
+            return process.MainWindowHandle != IntPtr.Zero; // 判断是否有窗口句柄
+        }
+
+        /// <summary>
+        /// 添加到正在运行的程序提示框中
+        /// </summary>
+        /// <param name="appNames"> 进程名 </param>
+        private void AddAppItems(string appNames)
+        {
+            ExistAppsPop.Height += 26; // 设置高度
+            System.Windows.Controls.Button button = new()
+            {
+                Tag = appNames,
+                Height = 25, // 设置高度
+                Width = 250, // 设置宽度
+                Style = (Style)System.Windows.Application.Current.Resources["MenuButton"] // 设置按钮样式
+            }; // 创建按钮
+            button.Click += AddToBlacklistButton_Click; // 绑定按钮点击事件
+            ExistAppsStackPanel.Children.Add(button); // 添加到父容器StackPanel
+
+            StackPanel stackPanel = new()
+            {
+                Orientation = System.Windows.Controls.Orientation.Horizontal // 设置为横向排列
+            };
+            button.Content = stackPanel; // 设置按钮内容
+
+            TextBlock textBlock = new() { Text = appNames }; // 创建TextBlock
+            stackPanel.Children.Add(textBlock); // 添加进程名称
+        }
+
+        // 将选中的进程添加到黑名单
+        private void AddToBlacklistButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Controls.Button button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
+            if(button.Tag.ToString() == "从计算机选择程序...") // 如果是选择文件
+                SelectLocalFile(); // 选择本地文件
+            else
+                AddBlacklistItem(button.Tag.ToString(), false); // 添加到黑名单
+            ExistAppsPop.IsOpen = false; // 关闭提示框
+        }
+
+        // 选择本地文件
+        private void SelectLocalFile()
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
@@ -79,10 +157,7 @@ namespace Quicker.UserControls
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                    LoadingWindow loadingWindow = new()
-                    {
-                        Owner = settingWindow, // 设置父窗口
-                    }; // 创建加载窗口
+                    LoadingWindow loadingWindow = new() { Owner = settingWindow }; // 创建加载窗口
                     loadingWindow.Show(); // 显示加载窗口
                     string selectedPath = dialog.SelectedPath; // 获取选择的文件夹路径
                     AddBlacklistItem(selectedPath, true); // 添加完整路径到黑名单

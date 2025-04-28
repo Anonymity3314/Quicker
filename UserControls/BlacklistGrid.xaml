@@ -26,13 +26,25 @@
             <Border BorderBrush="#FFD5D5D5" BorderThickness="1" Margin="10,52,3,565" CornerRadius="3" MouseEnter="ShowBlacklistScrollBar" MouseLeave="HideBlacklistScrollBar">
                 <Grid>
                     <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
-                        <StackPanel x:Name="BlacklistStackPanel"/>
+                        <StackPanel x:Name="BlacklistStackPanel" Margin="0,0,0,2"/>
                     </ScrollViewer>
                     <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171"/>
                 </Grid>
             </Border>
             <Button x:Name="BlacklistDragButton" Content="拖动到要禁用Quicker的窗口上" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click"/>
             <Button x:Name="BlacklistAddButton" Content="添加..." Style="{StaticResource WhiteButton}" ToolTip="增加特殊的应用" HorizontalAlignment="Left" Margin="228,230,0,0" VerticalAlignment="Top" Width="57" Height="27" Click="BlacklistAddButton_Click"/>
+            <Popup x:Name="ExistAppsPop" PopupAnimation="Fade" Width="250" Height="4" PlacementTarget="{Binding ElementName=BlacklistAddButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                <Grid>
+                    <Rectangle Fill="White" Margin="5,7">
+                        <Rectangle.Effect>
+                            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+                        </Rectangle.Effect>
+                    </Rectangle>
+                    <Border Width="240" Background="White" BorderThickness="0" CornerRadius="3" Margin="5">
+                        <StackPanel x:Name="ExistAppsStackPanel" Margin="-1.6,2"/>
+                    </Border>
+                </Grid>
+            </Popup>
             <Button x:Name="UnknownProcessButton" Content="无法识别的应用" Style="{StaticResource WhiteButton}" ToolTip="无法识别的应用统一使用unknown-proc.exe表示。" HorizontalAlignment="Left" Margin="295,230,0,0" VerticalAlignment="Top" Width="96" Height="27" Click="UnknownProcessButton_Click"/>
             <Button x:Name="AddDirectoryButton" Content="添加目录" Style="{StaticResource WhiteButton}" ToolTip="目录中所有程序都加入黑名单" HorizontalAlignment="Left" Margin="402,230,0,0" VerticalAlignment="Top" Width="62" Height="27" Click="AddDirectoryButton_Click"/>
             <Label Content="全屏状态禁用Quicker" HorizontalAlignment="Left" Margin="0,303,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="168"/>
