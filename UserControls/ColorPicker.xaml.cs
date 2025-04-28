@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows;
 
 namespace Quicker.UserControls
@@ -12,21 +14,24 @@ namespace Quicker.UserControls
 
         private void UpdateColor()
         {
+            if(RedSlider == null || GreenSlider == null || BlueSlider == null || AlphaSlider == null || HexValue == null) return;
             int r = (int)RedSlider.Value;
             int g = (int)GreenSlider.Value;
             int b = (int)BlueSlider.Value;
             byte a = (byte)AlphaSlider.Value;
-            string hexColor = $"#{a:X2}{r:X2}{g:X2}{b:X2}";// 更新十六进制颜色值
+            string hexColor = $"#{a:X2}{r:X2}{g:X2}{b:X2}";
             HexValue.Text = hexColor;
-            // 更新颜色预览
         }
 
         private void Slider_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
         {
             var slider = sender as Slider;
+            if (slider == null) return;
+
             int value = (int)slider.Value;
             string sliderName = slider.Name;
-            switch (sliderName) // 根据滑块的名称更新相应的文本框
+
+            switch (sliderName)
             {
                 case "RedSlider":
                     RedValue.Text = value.ToString();
@@ -48,63 +53,83 @@ namespace Quicker.UserControls
         private void Value_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
-            switch(textBox.Name)
+            int value = 0;
+
+            if (!int.TryParse(textBox.Text, out value))
+            {
+                value = 0;
+            }
+
+            if (value < 0) value = 0;
+            if (value > 255) value = 255;
+
+            switch (textBox.Name)
             {
                 case "RedValue":
-                    if(int.TryParse(RedValue.Text,out int r)) // 如果r的值为数字
-                    {
-                        if (0 <= r && r <= 255)
-                        {
-                            return;
-                        } // 如果r的值在设计范围之内，缓存后直接返回
-                    }
-                    else // 如果r的值不是数字，那么将TextBox的值改为缓存中的值
-                    {
-
-                    }
+                    RedSlider.Value = value;
                     break;
                 case "GreenValue":
-                    if (int.TryParse(RedValue.Text, out int g)) // 如果g的值为数字
-                    {
-                        if (0 <= g && g <= 255)
-                        {
-                            return;
-                        } // 如果g的值在设计范围之内，缓存后直接返回
-                    }
-                    else // 如果g的值不是数字，那么将TextBox的值改为缓存中的值
-                    {
-
-                    }
+                    GreenSlider.Value = value;
                     break;
                 case "BlueValue":
-                    if (int.TryParse(RedValue.Text, out int b)) // 如果b的值为数字
-                    {
-                        if (0 <= b && b <= 255)
-                        {
-                            return;
-                        } // 如果b的值在设计范围之内，缓存后直接返回
-                    }
-                    else // 如果b的值不是数字，那么将TextBox的值改为缓存中的值
-                    {
-
-                    }
+                    BlueSlider.Value = value;
                     break;
                 case "AlphaValue":
-                    if (int.TryParse(RedValue.Text, out int a)) // 如果a的值为数字
-                    {
-                        if (0 <= a && a <= 255)
-                        {
-                            return;
-                        } // 如果a的值在设计范围之内，缓存后直接返回
-                    }
-                    else // 如果a的值不是数字，那么将TextBox的值改为缓存中的值
-                    {
-
-                    }
+                    AlphaSlider.Value = value;
                     break;
+            }
+
+            UpdateColor();
+        }
+
+        private void HueSlider_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
+        {
+            var hue = ((Slider)sender).Value;
+            var hsvColor = Color.FromScRgb(1, (float)hue / 360, 1, 1);
+            var rgbColor = Color.FromArgb(255, (byte)(hsvColor.R * 255), (byte)(hsvColor.G * 255), (byte)(hsvColor.B * 255));
+            ColorCanvas.Background = new SolidColorBrush(rgbColor);
+        }
+
+        private void ColorCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var position = e.GetPosition(ColorCanvas);
+                ColorThumb.SetValue(Canvas.LeftProperty, position.X - ColorThumb.Width / 2);
+                ColorThumb.SetValue(Canvas.TopProperty, position.Y - ColorThumb.Height / 2);
+                UpdateColorFromCanvas();
             }
         }
 
+        private void ColorCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var position = e.GetPosition(ColorCanvas);
+                ColorThumb.SetValue(Canvas.LeftProperty, position.X - ColorThumb.Width / 2);
+                ColorThumb.SetValue(Canvas.TopProperty, position.Y - ColorThumb.Height / 2);
+                UpdateColorFromCanvas();
+            }
+        }
 
+        private void ColorCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            UpdateColorFromCanvas();
+        }
+
+        private void UpdateColorFromCanvas()
+        {
+            var x = (double)ColorThumb.GetValue(Canvas.LeftProperty);
+            var y = (double)ColorThumb.GetValue(Canvas.TopProperty);
+
+            var saturation = x / ColorCanvas.Width;
+            var value = 1 - y / ColorCanvas.Height;
+
+            RedSlider.Value = (int)(saturation * 255);
+            GreenSlider.Value = (int)(value * 255);
+            BlueSlider.Value = (int)(saturation * value * 255);
+            AlphaSlider.Value = 255;
+            UpdateColor();
+        }
     }
 }

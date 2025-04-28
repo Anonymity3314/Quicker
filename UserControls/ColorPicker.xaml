@@ -12,16 +12,30 @@
     d:DesignWidth="345"
 >
     <Grid>
-        <Canvas x:Name="ColorCanvas" Margin="8,10,35,165">
-            <Canvas.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Transparent" Offset="0"/>
-                    <GradientStop Color="Black" Offset="1"/>
-                </LinearGradientBrush>
-            </Canvas.Background>
+        <Border Margin="8,10,35,110" BorderBrush="LightGray" BorderThickness="1">
+            <Canvas x:Name="ColorCanvas" MouseMove="ColorCanvas_MouseMove" MouseUp="ColorCanvas_MouseUp" MouseDown="ColorCanvas_MouseDown">
+                <!-- 水平渐变：从白色到红色 -->
+                <Rectangle Width="{Binding ActualWidth, ElementName=ColorCanvas}" Height="{Binding ActualHeight, ElementName=ColorCanvas}">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="White" Offset="0"/>
+                            <GradientStop Color="Red" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <!-- 垂直渐变：从透明到黑色 -->
+                <Rectangle Width="{Binding ActualWidth, ElementName=ColorCanvas}" Height="{Binding ActualHeight, ElementName=ColorCanvas}" Panel.ZIndex="1">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="Transparent" Offset="0"/>
+                            <GradientStop Color="Black" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
 
-            <!-- 可拖动的圆形 -->
-            <Border x:Name="ColorThumb" 
+                
+                <!-- 可拖动的圆形 -->
+                <Border x:Name="ColorThumb" 
                     Width="16"
                     Height="16" 
                     Canvas.Left="{Binding X, Mode=TwoWay}" 
@@ -30,13 +44,11 @@
                     BorderBrush="White"
                     BorderThickness="3.5"
                     CornerRadius="8"/>
-            <!--                    MouseLeftButtonDown="Circle_MouseDown"
-                    MouseMove="Circle_MouseMove"
-                    MouseLeftButtonUp="Circle_MouseUp"-->
-        </Canvas>
+            </Canvas>
+        </Border>
 
         <!-- 颜色选择器滑块 -->
-        <Slider x:Name="HueSlider" Value="{Binding H, Mode=TwoWay}" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Margin="319,10,10,0" Height="174">
+        <Slider x:Name="HueSlider" Value="{Binding H, Mode=TwoWay}" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Margin="319,10,10,0" Height="174" ValueChanged="HueSlider_ValueChanged">
             <Slider.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                     <GradientStop Color="#FF0000" />

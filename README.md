@@ -1,6 +1,6 @@
 ﻿# 声明
 
-由于正版的免费版图标提取功能受限，作者重构了一个WPF应用Quicker
+这是作者重构的WPF应用Quicker
 
 有能力或想体验更多功能请支持正版：https://getquicker.net/
 

@@ -47,8 +47,8 @@
                 <TextBox x:Name="BlacklistProcessTextBox" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" HorizontalContentAlignment="Stretch" Margin="10,0,1,0"/>
             </Grid>
             <Label Content="全屏时仍然启用Quicker的进程(分号分隔多个)。进程名等于exe文件名除去扩展名的部分。" Margin="4,407,0,334" Foreground="#FFD5D5D5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="11"/>
-            <Label Content="选项" HorizontalAlignment="Left" Margin="0,458,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Height="30" Width="42"/>
-            <CheckBox x:Name="ApplyBlacklistToExpandHotkeysCheckBox" Content="将黑名单与全屏禁用设置应用于'扩展热键'功能" HorizontalAlignment="Left" Margin="10,493,0,0" VerticalAlignment="Top" Height="15" Width="266" Click="CheckBox_Click"/>
+            <!--<Label Content="选项" HorizontalAlignment="Left" Margin="0,458,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Height="30" Width="42"/>
+            <CheckBox x:Name="ApplyBlacklistToExpandHotkeysCheckBox" Content="将黑名单与全屏禁用设置应用于'扩展热键'功能" HorizontalAlignment="Left" Margin="10,493,0,0" VerticalAlignment="Top" Height="15" Width="266" Click="CheckBox_Click"/>-->
         </Grid>
     </Grid>
 </UserControl>
