@@ -55,6 +55,7 @@
   <ItemGroup>
     <None Remove=".gitattributes" />
     <None Remove=".gitignore" />
+    <None Remove=".gitignore~RF3e5ebf6d.TMP" />
     <None Remove="App.xaml.cs~RF119692ff.TMP" />
     <None Remove="Quicker.ico" />
     <None Remove="Resources\Images\AboutQuicker.ico" />

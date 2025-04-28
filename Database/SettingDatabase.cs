@@ -16,6 +16,7 @@ public class SettingDatabase
         InitializeConvention(); // 初始化 Convention 表
         InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
         InitializeBlacklist(); // 初始化 Blacklist 表
+        InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
     }
 
     // 初始化 Convention 表
@@ -125,6 +126,23 @@ public class SettingDatabase
         insertBlacklistCommand.ExecuteNonQuery(); // 执行插入命令
     }
 
+    // 初始化 BlacklistApplication 表
+    private void InitializeBlacklistApplication()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        string createBlacklistApplicationTableQuery = @"
+        CREATE TABLE IF NOT EXISTS BlacklistApplication
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ApplicationName TEXT,
+            ProcessName TEXT,
+            IsInBlacklist BOOL,
+            IsFolder BOOL
+        );"; // 创建 BlacklistApplication 表
+        using var createBlacklistApplicationCommand = new SQLiteCommand(createBlacklistApplicationTableQuery, connection); // 创建 SQLiteCommand 对象
+        createBlacklistApplicationCommand.ExecuteNonQuery(); // 执行创建表的命令
+    }
+
     /// <summary>
     /// 更新Convention设置信息
     /// </summary>
@@ -218,9 +236,39 @@ public class SettingDatabase
         command.ExecuteNonQuery(); // 执行更新命令
     }
 
-    public void ApplyBlacklistApplications()
+    /// <summary>
+    /// 添加黑名单应用
+    /// </summary>
+    /// <param name="applicationName"> 应用名称 </param>
+    /// <param name="processName"> 进程名称 </param>
+    /// <param name="isInBlacklist"> 是否在黑名单中 </param>
+    /// <param name="isFolder"> 是否是文件夹 </param>
+    public void ApplyBlacklistApplication(string applicationName, string processName, bool isInBlacklist, bool isFolder)
     {
+        using var connection = OpenConnection(); // 打开数据库连接
+        string insertQuery = @"INSERT INTO BlacklistApplication 
+            (ApplicationName, ProcessName, IsInBlacklist, IsFolder)
+            VALUES 
+            (@ApplicationName, @ProcessName, @IsInBlacklist, @IsFolder);";
+        using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@ApplicationName", applicationName); // 应用名称
+        command.Parameters.AddWithValue("@ProcessName", processName); // 进程名称
+        command.Parameters.AddWithValue("@IsInBlacklist", isInBlacklist); // 是否在黑名单中
+        command.Parameters.AddWithValue("@IsFolder", isFolder); // 是否是文件夹
+        command.ExecuteNonQuery(); // 执行插入命令
+    }
 
+    /// <summary>
+    /// 通过应用名称删除黑名单应用
+    /// </summary>
+    /// <param name="applicationName"> 应用名称 </param>
+    public void DeleteBlacklistApplication(string applicationName)
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        string deleteQuery = "DELETE FROM BlacklistApplication WHERE ApplicationName = @ApplicationName;"; // 删除黑名单应用
+        using var command = new SQLiteCommand(deleteQuery, connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@ApplicationName", applicationName); // 设置参数
+        command.ExecuteNonQuery(); // 执行删除命令
     }
 
     // 保存总使用时长
@@ -307,6 +355,28 @@ public class SettingDatabase
         return blacklists; // 返回所有 Blacklist 数据
     }
 
+    // 获取黑名单应用
+    public List<BlacklistApplication> GetAllBlacklistApplications()
+    {
+        var applications = new List<BlacklistApplication>(); // 创建一个空的 BlacklistApplication 列表
+        using var connection = OpenConnection(); // 打开数据库连接
+        string selectQuery = "SELECT * FROM BlacklistApplication;"; // 查询所有 BlacklistApplication 数据
+        using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+        using var reader = command.ExecuteReader(); // 执行查询并获取结果
+        while (reader.Read())
+        {
+            applications.Add(new BlacklistApplication
+            {
+                ID = reader.GetInt32(0), // 主键
+                ApplicationName = reader.GetString(1), // 应用名称
+                ProcessName = reader.GetString(2), // 进程名称
+                IsInBlacklist = reader.GetBoolean(3), // 是否在黑名单中
+                IsFolder = reader.GetBoolean(4) // 是否是文件夹
+            }); // 将读取到的数据添加到列表中
+        }
+        return applications; // 返回所有 BlacklistApplication 数据
+    }
+
     // 打开数据库连接
     private SQLiteConnection OpenConnection()
     {
@@ -357,10 +427,18 @@ public class Blacklist
 // 黑名单应用
 public class BlacklistApplication
 {
+    /* ApplicationName 与 ProcessName 字段的含义如下：
+     * ApplicationName: 黑名单列表显示的文字，可以是文件夹路径，也可以是应用程序名称。
+     * ProcessName: 确切的应用程序进程名称，应用程序的可执行文件名称。
+     * 
+     * 一个ApplicationName可以对应多个ProcessName，例如，一个文件夹路径可以对应多个应用程序的进程名称。
+     * 但是一个ProcessName只能对应一个ApplicationName。
+     */
     public int ID { get; set; } // 主键
     public string ApplicationName { get; set; } // 应用程序名称
     public string ProcessName { get; set; } // 进程名称
-    public string FilePath { get; set; } // 应用程序路径
+    public bool IsInBlacklist { get; set; } // 是否在黑名单中
+    public bool IsFolder { get; set; } // 是否是文件夹
 }
 
 // 外观设置

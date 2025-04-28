@@ -18,7 +18,6 @@ Quicker/
 │   AssemblyInfo.cs
 │   installer.idproj
 │   Quicker.csproj
-│   Quicker.csproj.user
 │   Quicker.ico
 │   Quicker.sln
 │
@@ -97,8 +96,6 @@ Quicker/
 │       ├─TextBoxStyle.xaml                      # 文本框样式
 │       └─TooltipStyle.xaml                      # 提示框样式
 │
-├─Setup                                           # 安装Quicker
-│
 ├─UserControls/                                   # 自定义控件
 │   ├─AboutQuickerGrid.xaml                      # 设置窗口中关于Quicker界面
 │   │   └─AboutQuickerGrid.xaml.cs
@@ -115,7 +112,7 @@ Quicker/
 │
 └─Windows/                                        # 界面
     ├─Forms/                                      # 窗口
-    │   ├─ActionPageManageWindow.xaml            #编辑动作页窗口
+    │   ├─ActionPageManageWindow.xaml            # 编辑动作页窗口
     │   │   └─ActionPageManageWindow.xaml.cs
     │   ├─AddWindow.xaml                         # 添加动作窗口
     │   │   └─AddWindow.xaml.cs
