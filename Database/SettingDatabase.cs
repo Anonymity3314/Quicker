@@ -10,13 +10,92 @@ public class SettingDatabase
     // 初始化数据库
     public void Initialize()
     {
-        if (File.Exists("Setting.db")) return; // 如果数据库文件存在，则直接返回
+        if (File.Exists("Setting.db"))
+        {
+            CheckAndUpgradeDatabase(); // 检查并升级数据库
+            return;
+        } // 如果数据库存在，则检查并升级数据库
         SQLiteConnection.CreateFile("Setting.db"); // 创建数据库文件
 
         InitializeConvention(); // 初始化 Convention 表
         InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
         InitializeBlacklist(); // 初始化 Blacklist 表
         InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
+    }
+
+    // 检查数据库版本并进行升级
+    public void CheckAndUpgradeDatabase()
+    {
+        var currentVersion = GetCurrentConventionVersion(); // 当前版本
+        var targetVersion = "2.1.1"; // 目标版本
+        if (currentVersion == targetVersion)
+            return; // 数据库版本已是最新，直接返回
+        else
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+
+            // 创建一个新表，将 Version 字段放在 AutoStart 之前
+            string createNewTableQuery = @"
+                CREATE TABLE IF NOT EXISTS ConventionTemp
+                (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Version TEXT,
+                    AutoStart BOOL,
+                    ShowNotification BOOL,
+                    ShowAddImage BOOL,
+                    TotalUsageTime REAL,
+                    HideTooltip BOOL,
+                    LongPressThreshold INTEGER,
+                    MouseMovePixels INTEGER,
+                    LoopPageFlipping BOOL
+                );";
+            using var createNewTableCommand = new SQLiteCommand(createNewTableQuery, connection);
+            createNewTableCommand.ExecuteNonQuery();
+
+            // 将旧表的数据复制到新表
+            string insertOldDataQuery = @"INSERT INTO ConventionTemp 
+                (ID, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
+                SELECT ID, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping
+                FROM Convention;";
+            using var insertOldDataCommand = new SQLiteCommand(insertOldDataQuery, connection);
+            insertOldDataCommand.ExecuteNonQuery();
+
+            // 删除旧表
+            string dropOldTableQuery = "DROP TABLE Convention;";
+            using var dropOldTableCommand = new SQLiteCommand(dropOldTableQuery, connection);
+            dropOldTableCommand.ExecuteNonQuery();
+
+            // 将新表重命名为旧表的名称
+            string renameNewTableQuery = "ALTER TABLE ConventionTemp RENAME TO Convention;";
+            using var renameNewTableCommand = new SQLiteCommand(renameNewTableQuery, connection);
+            renameNewTableCommand.ExecuteNonQuery();
+
+            // 初始化 Version 字段
+            string updateVersionQuery = @"UPDATE Convention SET Version = '2.1.1';"; // 设置默认值
+            using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection);
+            updateVersionCommand.ExecuteNonQuery();
+
+            InitializeBlacklist(); // 初始化 Blacklist 表
+            InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
+        }
+    }
+
+    // 获取Convention表中的版本号
+    private string GetCurrentConventionVersion()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        try
+        {
+            string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
+            using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
+            using var reader = command.ExecuteReader(); // 执行查询命令
+            if (reader.Read())
+            {
+                return reader.GetString(1); // 返回版本号
+            }
+        }
+        catch { }
+        return "2.0.1"; // 数据库中没有版本号，返回默认值
     }
 
     // 初始化 Convention 表
@@ -27,6 +106,7 @@ public class SettingDatabase
         CREATE TABLE IF NOT EXISTS Convention
         (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            Version TEXT,
             AutoStart BOOL,
             ShowNotification BOOL,
             ShowAddImage BOOL,
@@ -42,10 +122,11 @@ public class SettingDatabase
         // 插入初始数据
         string insertConventionQuery = @"
             INSERT INTO Convention 
-            (AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping) 
+            (Version, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
             VALUES 
-            (@AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
+            (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
         using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
+        insertConventionCommand.Parameters.AddWithValue("@Version", "2.1.1"); // 版本号
         insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
         insertConventionCommand.Parameters.AddWithValue("@ShowNotification", true); // 是否显示通知
         insertConventionCommand.Parameters.AddWithValue("@ShowAddImage", true); // 是否显示添加图片
@@ -54,6 +135,7 @@ public class SettingDatabase
         insertConventionCommand.Parameters.AddWithValue("@LongPressThreshold", 300); // 长按阈值
         insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
         insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
+
         insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
     }
 
@@ -294,14 +376,15 @@ public class SettingDatabase
             conventions.Add(new Convention
             {
                 ID = reader.GetInt32(0), // 主键
-                AutoStart = reader.GetBoolean(1), // 是否开机自启
-                ShowNotification = reader.GetBoolean(2), // 是否显示通知
-                ShowAddImage = reader.GetBoolean(3), // 是否显示添加图片
-                TotalUsageTime = reader.GetDouble(4), // 总使用时长
-                HideTooltip = reader.GetBoolean(5), // 是否隐藏提示
-                LongPressThreshold = reader.GetInt32(6), // 长按阈值
-                MouseMovePixels = reader.GetInt32(7), // 鼠标移动像素
-                LoopPageFlipping = reader.GetBoolean(8) // 是否循环翻页
+                Version = reader.GetString(1), // 版本号
+                AutoStart = reader.GetBoolean(2), // 是否开机自启
+                ShowNotification = reader.GetBoolean(3), // 是否显示通知
+                ShowAddImage = reader.GetBoolean(4), // 是否显示添加图片
+                TotalUsageTime = reader.GetDouble(5), // 总使用时长
+                HideTooltip = reader.GetBoolean(6), // 是否隐藏提示
+                LongPressThreshold = reader.GetInt32(7), // 长按阈值
+                MouseMovePixels = reader.GetInt32(8), // 鼠标移动像素
+                LoopPageFlipping = reader.GetBoolean(9) // 是否循环翻页
             }); // 将读取到的数据添加到列表中
         }
         return conventions; // 返回所有 Convention 数据
@@ -390,6 +473,7 @@ public class SettingDatabase
 public class Convention
 {
     public int ID { get; set; } // 主键
+    public string Version { get; set; } // 版本号
     public bool AutoStart { get; set; } // 是否开机自启
     public bool ShowNotification { get; set; } // 是否显示通知
     public bool ShowAddImage { get; set; } // 是否显示添加图片

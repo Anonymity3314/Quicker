@@ -25,16 +25,11 @@ namespace Quicker.Managers
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
 
-        private readonly SettingDatabase db1; // 设置数据库
-        public ConventionsSettingsCache conventions; // 常规设置缓存对象
         public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 弹出面板设置缓存对象
-        public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
         public AppearanceConditionsSettingsCache appearanceConditions; // 外观设置缓存对象
-
-        public SettingManager()
-        {
-            db1 = new SettingDatabase(); // 实例化设置数据库
-        }
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
+        public ConventionsSettingsCache conventions; // 常规设置缓存对象
 
         // 异步加载常规设置信息
         public async Task LoadConventionsAsync()
@@ -43,6 +38,7 @@ namespace Quicker.Managers
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
             conventions = new ConventionsSettingsCache // 常规设置
             {
+                Version = Conventions.Version, // 版本号
                 AutoStart = Conventions.AutoStart, // 开机自启
                 ShowNotification = Conventions.ShowNotification, // 显示通知
                 ShowAddImage = Conventions.ShowAddImage, // 显示添加图片按钮
@@ -376,6 +372,7 @@ namespace Quicker.Managers
         // 常规设置
         public class ConventionsSettingsCache
         {
+            public string Version { get; set; } // 版本号
             public bool AutoStart { get; set; } // 开机自启动
             public bool ShowNotification { get; set; } // 显示启动完成提示
             public bool ShowAddImage { get; set; } // 左键点击空白按钮时显示创建动作菜单

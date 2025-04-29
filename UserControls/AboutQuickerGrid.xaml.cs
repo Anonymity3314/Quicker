@@ -3,17 +3,21 @@ using Quicker.UserControls;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
+using Quicker.Windows;
 using System.Windows;
 
 namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {
-        SettingManager settingManager = new SettingManager();
+        SettingManager settingManager; // 读取设置的管理器
 
         public AboutQuickerGrid()
         {
             InitializeComponent();
+            SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+            settingManager = settingWindow.settingManager; // 创建设置管理器
+            VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
         }
 
         private static void SetGridVisible(Grid childrengrid, Grid fathergrid)

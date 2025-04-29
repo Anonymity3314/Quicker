@@ -39,6 +39,7 @@ namespace Quicker.UserControls
             settingManager.LoadConventionsAsync();
             Application.Current.Dispatcher.Invoke(() =>
             {
+                VersionLabel.Content = $"当前版本：{settingManager.conventions.Version}"; // 加载版本信息
                 AutoStartCheckBox.IsChecked = settingManager.conventions.AutoStart; // 加载开机自启动设置
                 ShowNotificationCheckBox.IsChecked = settingManager.conventions.ShowNotification; // 加载显示启动完成提示设置
                 ShowAddImageCheckBox.IsChecked = settingManager.conventions.ShowAddImage; // 加载左键点击空白按钮时显示创建动作菜单设置
