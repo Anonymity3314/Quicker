@@ -30,54 +30,13 @@ public class SettingDatabase
         var targetVersion = "2.1.1"; // 目标版本
         if (currentVersion == targetVersion)
             return; // 数据库版本已是最新，直接返回
-        else
-        {
-            using var connection = OpenConnection(); // 打开数据库连接
 
-            // 创建一个新表，将 Version 字段放在 AutoStart 之前
-            string createNewTableQuery = @"
-                CREATE TABLE IF NOT EXISTS ConventionTemp
-                (
-                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Version TEXT,
-                    AutoStart BOOL,
-                    ShowNotification BOOL,
-                    ShowAddImage BOOL,
-                    TotalUsageTime REAL,
-                    HideTooltip BOOL,
-                    LongPressThreshold INTEGER,
-                    MouseMovePixels INTEGER,
-                    LoopPageFlipping BOOL
-                );";
-            using var createNewTableCommand = new SQLiteCommand(createNewTableQuery, connection);
-            createNewTableCommand.ExecuteNonQuery();
+        using var connection = OpenConnection(); // 打开数据库连接
+        string updateVersionQuery = @"UPDATE Convention SET TotaUsageTime = 180000.0;"; // 设置默认值
+        using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
+        updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
 
-            // 将旧表的数据复制到新表
-            string insertOldDataQuery = @"INSERT INTO ConventionTemp 
-                (ID, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
-                SELECT ID, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping
-                FROM Convention;";
-            using var insertOldDataCommand = new SQLiteCommand(insertOldDataQuery, connection);
-            insertOldDataCommand.ExecuteNonQuery();
-
-            // 删除旧表
-            string dropOldTableQuery = "DROP TABLE Convention;";
-            using var dropOldTableCommand = new SQLiteCommand(dropOldTableQuery, connection);
-            dropOldTableCommand.ExecuteNonQuery();
-
-            // 将新表重命名为旧表的名称
-            string renameNewTableQuery = "ALTER TABLE ConventionTemp RENAME TO Convention;";
-            using var renameNewTableCommand = new SQLiteCommand(renameNewTableQuery, connection);
-            renameNewTableCommand.ExecuteNonQuery();
-
-            // 初始化 Version 字段
-            string updateVersionQuery = @"UPDATE Convention SET Version = '2.1.1';"; // 设置默认值
-            using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection);
-            updateVersionCommand.ExecuteNonQuery();
-
-            InitializeBlacklist(); // 初始化 Blacklist 表
-            InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
-        }
+        //UpdateDatabase(); // 升级数据库
     }
 
     // 获取Convention表中的版本号
@@ -96,6 +55,18 @@ public class SettingDatabase
         }
         catch { }
         return "2.0.1"; // 数据库中没有版本号，返回默认值
+    }
+
+    // 升级数据库
+    private void UpdateDatabase()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        string updateVersionQuery = @"UPDATE Convention SET Version = '2.1.1';"; // 设置默认值
+        using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
+        updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
+
+        // 其它的升级操作...
+
     }
 
     // 初始化 Convention 表
