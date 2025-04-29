@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Windows.Input;
+using System.Diagnostics;
 using Quicker.Database;
 using Quicker.Managers;
 using Quicker.Windows;
@@ -59,23 +60,8 @@ namespace Quicker
             db1.Initialize(); // 创建数据库表
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
-            ShowNotification(); // 弹出消息提醒
             InitializeHookAsync(); // 初始化钩子
-            EventManager.RegisterClassHandler(typeof(Window), Window.PreviewMouseDownEvent, new MouseButtonEventHandler(OnPreviewMouseDown)); // 注册鼠标按下事件
-        }
-
-        // 鼠标按下事件
-        static void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            var windowManager = new WindowManager(); // 创建窗口管理器
-            IntPtr hWnd = windowManager.GetCurrentForegroundWindow(); // 调用封装方法
-            if (hWnd != IntPtr.Zero)
-            {
-                string windowTitle = windowManager.GetWindowText(hWnd); // 获取窗口标题
-                uint processId = windowManager.GetWindowProcessId(hWnd); // 获取进程ID
-
-                // 处理逻辑
-            }
+            ShowNotification(); // 弹出消息提醒
         }
 
         // 初始化托盘图标
@@ -99,9 +85,7 @@ namespace Quicker
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置
             if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
-            {
                 new ToastContentBuilder().AddText("成功启动！").Show(); // 弹出消息提醒
-            }
         }
 
         // 初始化定时器
@@ -184,6 +168,7 @@ namespace Quicker
         // 按下鼠标快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
+            if (IsBannedFormQuicker()) return; // 如果禁用Quicker，返回
             if (FullScreenDisable()) return; // 如果全屏禁用Quicker，返回
             if (keyPressStartTime.HasValue)
             {
@@ -289,6 +274,7 @@ namespace Quicker
         // 按下键盘快捷键时如果按键尚未被记录，记录按键按下的时间
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
+            if (IsBannedFormQuicker()) return; // 如果禁用Quicker，返回
             if (FullScreenDisable()) return; // 如果全屏禁用Quicker，返回
             if (keyPressStartTime.HasValue)
             {
@@ -337,11 +323,33 @@ namespace Quicker
             var blacklistSettings = db1.GetAllBlacklistSettings().FirstOrDefault(); // 获取黑名单设置
             if (!blacklistSettings.IsFullScreenDisabled) return false; // 如果没有启用全屏禁用Quicker，返回false
             nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
-            if (windowManager.IsWindowMaximized(foregroundWindow) ||
-                !windowManager.IsTaskbarVisible()) // 如果窗口最大化或者任务栏不可见，则禁用 Quicker
+            if (foregroundWindow == IntPtr.Zero) return false; // 没有前台窗口，返回false
+            if (windowManager.IsFullScreen()) // 窗口最大化
             {
-                return true; // 返回true表示Quicker被禁用
+                uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+                Process process = Process.GetProcessById((int)processId); // 获取进程
+                string processName = process.ProcessName; // 获取进程名
+                var blacklistApplications = db1.GetAllBlacklistApplications(); // 获取黑名单进程
+                if (blacklistApplications.Count == 0) return true; // 没有黑名单进程，返回true表示Quicker被禁用
+                if (blacklistApplications.Any(p => p.ProcessName == processName && !p.IsInBlacklist)) // 如果进程名在黑名单中
+                    return false; // 返回false表示正常工作
             }
+            return false; // 返回false表示正常工作
+        }
+
+        // 是否禁用Quicker
+        private bool IsBannedFormQuicker()
+        {
+            nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
+            if (foregroundWindow == IntPtr.Zero) return false; // 没有前台窗口，返回false
+
+            uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+            Process process = Process.GetProcessById((int)processId); // 获取进程
+            string processName = process.ProcessName; // 获取进程名
+
+            var blacklistedProcesses = db1.GetAllBlacklistApplications(); // 获取黑名单进程
+            if (blacklistedProcesses.Any(p => p.ProcessName == processName && p.IsInBlacklist)) // 如果进程名在黑名单中
+                return true; // 返回true表示Quicker被禁用
             return false; // 返回false表示正常工作
         }
 

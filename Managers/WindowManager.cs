@@ -41,17 +41,37 @@ namespace Quicker.Managers
         [DllImport("user32.dll", SetLastError = true)]
         private static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId); // 获取窗口进程ID
 
-        // 判断任务栏是否可见
-        [DllImport("user32.dll")]
-        private static extern int GetSystemMetrics(int nIndex); // 获取系统度量值
-
-        // 系统度量值常量
-        private const int SM_CYTASKBAR = 0x0028; // 任务栏高度
-
         // 判断窗口是否最大化
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool IsZoomed(nint hWnd);
+
+        // 获取窗口样式
+        [DllImport("user32.dll")]
+        public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+        // 获取系统参数
+        [DllImport("user32.dll")]
+        public static extern uint GetSystemMetrics(int nIndex); // 获取系统参数
+
+        // 判断是否全屏
+        [DllImport("user32.dll")]
+        public static extern bool GetClientRect(IntPtr hWnd, out RECT rect); // 获取窗口客户区大小
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int left; // 左边
+            public int top; // 上边
+            public int right; // 右边
+            public int bottom; // 下边
+        }
+
+        private const int GWL_STYLE = -20; // 窗口样式偏移量
+        private const uint WS_POPUP = 0x80000000; // 弹出窗口样式
+        private const uint WS_CAPTION = 0x00C00000; // 窗口有标题栏样式
+        private const int SM_CXSCREEN = 0; // 屏幕宽度索引
+        private const int SM_CYSCREEN = 1; // 屏幕高度索引
 
         /// <summary>
         /// 设置窗口置顶
@@ -156,21 +176,26 @@ namespace Quicker.Managers
             }
         }
 
-        /// <summary>
-        /// 判断窗口是否最大化
-        /// </summary>
-        /// <param name="hWnd"> 窗口句柄 </param>
-        /// <returns> 是否最大化 </returns>
-        public bool IsWindowMaximized(nint hWnd)
+        // 判断是否全屏
+        public bool IsFullScreen()
         {
-            return IsZoomed(hWnd);
-        }
+            IntPtr hWnd = GetForegroundWindow();
+            uint style = GetWindowLong(hWnd, GWL_STYLE);
+            int screenWidth = (int)GetSystemMetrics(SM_CXSCREEN);
+            int screenHeight = (int)GetSystemMetrics(SM_CYSCREEN);
 
-        // 判断任务栏是否可见
-        public bool IsTaskbarVisible()
-        {
-            int taskbar_height = GetSystemMetrics(SM_CYTASKBAR); // 获取任务栏高度
-            return taskbar_height > 0;// 如果任务栏高度大于0，说明任务栏可见
+            // 获取窗口客户区大小
+            if (!GetClientRect(hWnd, out RECT rect))
+                return false; // 获取客户区大小失败
+            int windowWidth = rect.right - rect.left; // 窗口宽度
+            int windowHeight = rect.bottom - rect.top; // 窗口高度
+
+            // 判断是否符合全屏的条件
+            bool isFullScreenCondition1 = (style & WS_POPUP) == WS_POPUP && (style & WS_CAPTION) != WS_CAPTION; // 窗口没有标题栏
+            bool isFullScreenCondition2 = windowWidth == screenWidth && windowHeight == screenHeight; // 窗口大小等于屏幕大小
+            bool isFullScreenCondition3 = IsZoomed(hWnd); // 窗口是否被最大化
+
+            return isFullScreenCondition1 || isFullScreenCondition2 || isFullScreenCondition3;
         }
     }
 }

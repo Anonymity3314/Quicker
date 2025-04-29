@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.UserControls;
@@ -180,7 +181,7 @@ namespace Quicker.UserControls
                 SelectLocalFile(); // 选择本地文件
             else
             {
-                db1.ApplyBlacklistApplication(button.Tag.ToString(), button.Tag.ToString(), true, false); // 添加到设置中
+                db1.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), true, false); // 添加到设置中
                 AddBlacklistItem(button.Tag.ToString(), false); // 添加到黑名单
             }
             AddBlacklistAppsPop.IsOpen = false; // 关闭提示框
@@ -194,7 +195,7 @@ namespace Quicker.UserControls
                 SelectLocalFile(false); // 选择本地文件
             else
             {
-                db1.ApplyBlacklistApplication(button.Tag.ToString(), button.Tag.ToString(), false, false); // 添加到设置中
+                db1.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), false, false); // 添加到设置中
                 AddWhitelistItem(button.Tag.ToString()); // 添加到白名单
             }
             AddWhitelistAppsPop.IsOpen = false; // 关闭提示框
@@ -205,8 +206,15 @@ namespace Quicker.UserControls
         {
             AddDirectoryButton.Margin = new Thickness(295, 230, 0, 0); // 调整按钮位置
             UnknownProcessButton.Visibility = Visibility.Collapsed; // 隐藏按钮
-            db1.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中
-            AddBlacklistItem("unknown-proc.exe", false); // 添加到黑名单
+            var blacklistprocess = db1.GetAllBlacklistApplications(); // 获取黑名单进程
+            if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
+                new ToastContentBuilder().AddText("应用已添加过：unknown-proc.exe").Show(); // 弹出消息提醒
+            else
+            {
+                db1.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中
+                AddBlacklistItem("unknown-proc.exe", false); // 添加到黑名单
+            }
+
         }
 
         // 将选中文件夹里的 .exe 文件添加到黑名单
@@ -224,8 +232,8 @@ namespace Quicker.UserControls
                     foreach (string file in Directory.GetFiles(selectedPath, "*", SearchOption.AllDirectories)) // 遍历文件夹中的所有文件
                     {
                         if (!Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)) continue; // 如果不是.exe文件, 跳过
-                        string processName = file.Substring(selectedPath.Length + 1); // 获取进程名
-                        db1.ApplyBlacklistApplication(selectedPath, processName, true, true); // 添加到设置中
+                        string fileName = Path.GetFileNameWithoutExtension(file); // 获取无后缀的文件名
+                        db1.ApplyBlacklistApplication(selectedPath, fileName, true, true); // 添加到设置中
                     }
                     loadingWindow.Close(); // 关闭加载窗口
                 }
