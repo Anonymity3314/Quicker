@@ -32,16 +32,14 @@ namespace Quicker.Windows
                 foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素的子元素
             }
         } // 递归查找所有指定类型的子元素
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // 取消后台任务的令牌源
         private Dictionary<string, bool> pageButtonCache = new Dictionary<string, bool>(); // 缓存页面按钮状态
-        private int TotalGlobalAntionPageIndex, TotalCommonActionPageIndex; // 总的页面序列号
-        private readonly CancellationTokenSource cancellationTokenSource; // 取消后台任务的令牌源
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly IconManager iconManager = new IconManager(); // 图标管理器
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
-        private readonly ButtonManager buttonManager; // 按钮管理器
-        private readonly WindowManager windowManager; // 窗口管理器
-        private readonly IconManager iconManager; // 图标管理器
-        private readonly SettingDatabase db1; // 设置数据库
-        private readonly ButtonDatabase db2; // 按钮数据库
-        private bool shouldHideTooltip; // 隐藏提示标志
         private string CommonStyle; // 样式
         private readonly App app; // App实例
 
@@ -51,16 +49,7 @@ namespace Quicker.Windows
             InitializeComponent(); // 初始化窗口组件
             MainGrid.Children.Remove(ViewGlobalCanvas); // 从主网格中移除
             CommonGrid.Children.Remove(ViewCommonCanvas); // 从主网格中移除
-
-            iconManager = new IconManager(); // 初始化图标管理器
-            buttonManager = new ButtonManager(); // 初始化按钮管理器
-            windowManager = new WindowManager(); // 初始化窗口管理器
-
-            db1 = new SettingDatabase(); // 初始化设置数据库
-            db2 = new ButtonDatabase(); // 初始化按钮数据库
             db2.Initialize(); // 初始化数据库
-
-            cancellationTokenSource = new CancellationTokenSource(); // 初始化CancellationTokenSource
             app = (App.Current as App); // 获取当前 App 实例
         }
 
@@ -75,8 +64,6 @@ namespace Quicker.Windows
                 bool haveCommonStyleButton = buttonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 是否存在通用样式按钮
                 if (!haveCommonStyleButton) CommonStyle = "Common"; // 如果不存在通用样式按钮，设置为默认样式
                 GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
-
-                GetTotalAntionPageIndex(); // 获取总的页面数
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
 
@@ -90,20 +77,15 @@ namespace Quicker.Windows
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
-            // 获取配置信息
-            var convention = db1.GetAllConventions().FirstOrDefault();
-            shouldHideTooltip = convention?.HideTooltip ?? false;
-
             // 设置窗口置顶
             windowManager.SetWindowTopmost(this);
             EditCommonLabel(); // 编辑通用标签
         }
 
         // 获取总的页面数
-        private void GetTotalAntionPageIndex()
+        private int GetTotalAntionPageIndex(string targetStyle)
         {
-            TotalGlobalAntionPageIndex = 0; // 重置页面索引
-            TotalCommonActionPageIndex = 0; // 重置页面索引
+            int TotalAntionPageIndex = 0; // 重置页面索引
             var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
             foreach (var data in buttonData)
             {
@@ -114,23 +96,20 @@ namespace Quicker.Windows
                     string style = match.Groups[1].Value; // 获取按钮名称
                     string numbersStr = match.Groups[2].Value; // 获取3个数字
                     int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-                    if (style == "Global") // 如果是全局按钮
+                    if (style == targetStyle) // 如果是全局按钮
                     {
-                        if (numbers[0] > TotalGlobalAntionPageIndex) TotalGlobalAntionPageIndex = numbers[0]; // 更新全局页面索引
-                    }
-                    else if (style == CommonStyle)
-                    {
-                        if (numbers[0] > TotalCommonActionPageIndex) TotalCommonActionPageIndex = numbers[0]; // 更新通用页面索引
+                        if (numbers[0] > TotalAntionPageIndex) TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
                     }
                 }
             }
+            return TotalAntionPageIndex;
         }
 
         // 生成页面切换 Button
         private void GenerateButtons()
         {
-            GeneratePageButtons("Global", TotalGlobalAntionPageIndex, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
-            GeneratePageButtons(CommonStyle, TotalCommonActionPageIndex, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
+            GeneratePageButtons("Global", GetTotalAntionPageIndex("Global"), SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
+            GeneratePageButtons(CommonStyle, GetTotalAntionPageIndex(CommonStyle), SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
         }
 
         /// <summary>
@@ -301,6 +280,14 @@ namespace Quicker.Windows
                 button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变背景颜色
             } // 如果Button的目标地址不存在
         }
+        private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            PageChangeButton_MouseEnter(sender, e, "Global", "#FFB9B9B9"); // 改变按钮颜色
+        }
+        private void CommonActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            PageChangeButton_MouseEnter(sender, e, CommonStyle, "#FFB9B9B9"); // 改变按钮颜色
+        }
 
         // 鼠标移出Button还原外观
         private void Button_MouseLeave(object sender, MouseEventArgs e)
@@ -318,26 +305,10 @@ namespace Quicker.Windows
                 button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 还原背景颜色
             }
         }
-
-        // 鼠标移入Button改变外观
-        private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            PageChangeButton_MouseEnter(sender, e, "Global", "#FFB9B9B9"); // 改变按钮颜色
-        }
-
-        // 鼠标移出Button还原外观
         private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
         {
             PageChangeButton_MouseLeave(sender, e, "Global", "#FFD3D3D3"); // 还原按钮颜色
         }
-
-        // 鼠标移入Button改变外观
-        private void CommonActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            PageChangeButton_MouseEnter(sender, e, CommonStyle, "#FFB9B9B9"); // 改变按钮颜色
-        }
-
-        // 鼠标移出Button还原外观
         private void CommonActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
         {
             PageChangeButton_MouseLeave(sender, e, CommonStyle, "#FFD3D3D3"); // 还原按钮颜色
@@ -648,11 +619,11 @@ namespace Quicker.Windows
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
             int targetCanvasIndex = isNext ? currentCanvasIndex + 1 : currentCanvasIndex - 1; // 计算目标Canvas编号
-            if ((isNext && targetCanvasIndex > (style == "Global" ? TotalGlobalAntionPageIndex : TotalCommonActionPageIndex)) || (!isNext && targetCanvasIndex < 0)) // 如果目标Canvas编号超出范围
+            if ((isNext && targetCanvasIndex > GetTotalAntionPageIndex(style)) || (!isNext && targetCanvasIndex < 0)) // 如果目标Canvas编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
                 {
-                    targetCanvasIndex = isNext ? 0 : TotalCommonActionPageIndex; // 循环到第一页或最后一页
+                    targetCanvasIndex = isNext ? 0 : GetTotalAntionPageIndex(style); // 循环到第一页或最后一页
                 }
                 else return; // 如果不循环翻页，直接返回
             }
@@ -871,7 +842,7 @@ namespace Quicker.Windows
         // 右键锁定 Button 切换菜单
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
-            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
+            //buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
         }
 
         // 窗口关闭时强制垃圾回收
@@ -884,9 +855,68 @@ namespace Quicker.Windows
             this.Deactivated -= MainWindow_Deactivated; // 解除窗口失去焦点事件绑定
             Book.Source = null; // 释放图像资源
             Lock.Source = null; // 释放图像资源
+            CleanUpEventHandlers(); // 清理动态添加的事件处理器
+            CleanUpCanvas(MainGrid); // 清理主网格中的Canvas及其子元素
+            CleanUpCanvas(CommonGrid); // 清理公共网格中的Canvas及其子元素
+
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待所有终结器完成
             GC.Collect(); // 再次强制垃圾回收
+        }
+
+        /// <summary>
+        /// 清理指定Grid中的所有Canvas及其子元素
+        /// </summary>
+        /// <param name="grid"> 要清理的Grid </param>
+        private void CleanUpCanvas(Grid grid)
+        {
+            foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 遍历所有Canvas
+            {
+                foreach (Button button in FindVisualChildren<Button>(canvas)) // 遍历Canvas中的所有按钮
+                {
+                    button.Click -= DoAction; // 移除左键点击事件
+                    button.Drop -= Button_Drop; // 移除拖拽事件
+                    button.MouseEnter -= Button_MouseEnter; // 移除鼠标移入事件
+                    button.MouseLeave -= Button_MouseLeave; // 移除鼠标移出事件
+                    button.PreviewDragOver -= Button_PreviewDragOver; // 移除拖拽事件
+                    button.MouseRightButtonDown -= OpenCreatActionMenu; // 移除右键点击事件
+                    button.PreviewMouseMove -= Button_PreviewMouseMove; // 移除鼠标移动事件
+                    button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 移除鼠标左键释放事件
+                    button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 移除鼠标左键按下事件
+
+                    button.Content = null; // 清理按钮内容
+                    button.Tag = null; // 清理按钮附加数据
+                    button.Background = null; // 清理按钮背景
+                }
+
+                canvas.MouseWheel -= GolbalCanvas_MouseWheel; // 移除鼠标滚轮事件
+                canvas.MouseWheel -= CommonGrid_MouseWheel; // 移除鼠标滚轮事件
+                canvas.IsVisibleChanged -= GlobalCanvas_IsVisibleChanged; // 移除可见性变化事件
+                canvas.IsVisibleChanged -= CommonCanvas_IsVisibleChanged; // 移除可见性变化事件
+
+                canvas.Children.Clear(); // 清空Canvas子元素
+            }
+            grid.Children.Clear(); // 清空Grid子元素
+        }
+
+        // 清理所有动态添加的事件处理器
+        private void CleanUpEventHandlers()
+        {
+            // 清理全局按钮面板事件
+            foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 遍历所有按钮
+            {
+                button.Click -= SwitchToGlobalCanvas; // 移除点击事件
+                button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter; // 移除鼠标移入事件
+                button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave; // 移除鼠标移出事件
+            }
+
+            // 清理公共按钮面板事件
+            foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 遍历所有按钮
+            {
+                button.Click -= SwitchToCommonCanvas; // 移除点击事件
+                button.MouseEnter -= CommonActionPageChangeButton_MouseEnter; // 移除鼠标移入事件
+                button.MouseLeave -= CommonActionPageChangeButton_MouseLeave; // 移除鼠标移出事件
+            }
         }
     }
 }

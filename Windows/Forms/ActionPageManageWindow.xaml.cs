@@ -38,23 +38,14 @@ namespace Quicker.Windows
 
         private Dictionary<string, List<string>> buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
         private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
-        private readonly ButtonManager buttonManager; // 按钮管理器
-        private readonly SettingDatabase db1; // 设置数据库
-        private readonly ButtonDatabase db2; // 按钮数据库
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
-        private bool shouldHideTooltip; // 是否隐藏提示
 
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
-
-            db1 = new SettingDatabase(); // 初始化设置数据库
-            db1.Initialize(); // 初始化设置数据库
-
-            db2 = new ButtonDatabase(); // 初始化按钮数据库
-            db2.Initialize(); // 初始化按钮数据库
-
-            buttonManager = new ButtonManager(); // 初始化按钮管理器
         }
 
         // 窗口加载事件
@@ -62,11 +53,7 @@ namespace Quicker.Windows
         {
             var buttonDataList = db2.GetAllButtonData(); // 获取所有按钮数据
             buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 将按钮数据转换为字典
-
             LoadCanvas("Global"); // 加载全局画布
-
-            var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取约定
-            shouldHideTooltip = Convention.HideTooltip; // 是否隐藏工具提示
         }
 
         // 加载动作页按钮
@@ -522,11 +509,53 @@ namespace Quicker.Windows
             }
         }
 
-        // 关闭窗口释放图标资源
+        // 关闭窗口释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 关闭窗口释放图标资源
-            GC.Collect(); // 释放图标资源
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+
+            // 清理主列表视图中的所有画布及其子元素
+            foreach (var item in MainListView.Items)
+            {
+                if (item is Canvas canvas)
+                {
+                    foreach (var child in canvas.Children) // 移除所有事件处理程序
+                    {
+                        if (child is Button button)
+                        {
+                            button.Drop -= Button_Drop;
+                            button.Click -= ShowCreatActionMenu;
+                            button.MouseEnter -= Button_MouseEnter;
+                            button.MouseLeave -= Button_MouseLeave;
+                            button.MouseDoubleClick -= ShowEditWindow;
+                            button.PreviewMouseMove -= Button_PreviewMouseMove;
+                            button.MouseRightButtonDown -= OpenMenu;
+                            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
+                            button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp;
+                            button.Content = null; // 清空按钮内容
+                        }
+                    }
+                    canvas.Children.Clear(); // 清空画布中的所有子元素
+                }
+            }
+            MainListView.Items.Clear(); // 清空主列表视图
+
+            foreach (var child in ActionPagesButtonPanel.Children) // 清理动作页按钮面板中的所有按钮
+            {
+                if (child is Button button)
+                {
+                    button.Click -= GlobalButton_Click; // 移除点击事件处理程序
+                    button.Content = null; // 清空按钮内容
+                }
+            }
+            ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
+
+            // 清理其他资源
+            buttonPrefixDict.Clear(); // 清空按钮前缀字典
+            buttonDataDict?.Clear(); // 清空按钮数据字典
+            buttonDataDict = null; // 释放字典引用
+
+            GC.Collect(); // 强制垃圾回收
         }
     }
 }

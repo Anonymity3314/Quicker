@@ -2,12 +2,15 @@
 using Quicker.UserControls;
 using System.Windows.Input;
 using System.Diagnostics;
+using Quicker.Managers;
 using System.Windows;
 
 namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {
+        SettingManager settingManager = new SettingManager();
+
         public AboutQuickerGrid()
         {
             InitializeComponent();
@@ -18,14 +21,6 @@ namespace Quicker.UserControls
             foreach (var grid in fathergrid.Children.OfType<Grid>())
             {
                 grid.Visibility = grid == childrengrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
-            }
-        }
-        // 设置Button类型3边框
-        private static void UpdateButtonStyle3(Button clickedButton, Grid buttonPanelGrid)
-        {
-            foreach (var button in buttonPanelGrid.Children.OfType<Button>())
-            {
-                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 1.3) : new Thickness(0); // 设置Button边框
             }
         }
 
@@ -45,7 +40,7 @@ namespace Quicker.UserControls
         private void AboutQuickerButton_Click(object sender, RoutedEventArgs e)
         {
             SetGridVisible(AboutQuickerButtonGrid, MainGrid); // 设置Grid可见性
-            UpdateButtonStyle3(AboutQuickerButton, MainGrid); // 设置Button类型3边框
+            settingManager.ButtonStyle3_Click(AboutQuickerButton, MainGrid); // 保存Button类型3边框设置
         }
 
         // 打开更新历史文件
@@ -89,7 +84,7 @@ namespace Quicker.UserControls
         private void Privacy_StatementButton_Click(object sender, RoutedEventArgs e)
         {
             SetGridVisible(Privacy_StatementButtonGrid, MainGrid); // 设置Grid可见性
-            UpdateButtonStyle3(Privacy_StatementButton, MainGrid); // 设置Button类型3边框
+            settingManager.ButtonStyle3_Click(Privacy_StatementButton, MainGrid); // 保存Button类型3边框设置
         }
     }
 }

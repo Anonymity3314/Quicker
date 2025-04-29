@@ -16,7 +16,7 @@
             <ColumnDefinition Width="15*"/>
             <ColumnDefinition Width="952*"/>
         </Grid.ColumnDefinitions>
-        <Button x:Name="BlacklistButton"  Content="黑名单应用" ToolTip="设定需要禁用Quicker的软件" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="91" Grid.Column="1" Height="30"/>
+        <Button x:Name="BlacklistButton"  Content="黑名单应用" ToolTip="设定需要禁用Quicker的软件" Style="{StaticResource Button3}" Margin="1,14,0,0" Width="91" Grid.Column="1" Height="30" BorderThickness="0,0,0,2"/>
         <Grid x:Name="BlacklistButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="643*"/>

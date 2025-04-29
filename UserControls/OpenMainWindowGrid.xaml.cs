@@ -10,13 +10,12 @@ namespace Quicker.UserControls
 {
     public partial class OpenMainWindowGrid : UserControl
     {
-        private readonly SettingDatabase db1; // 设置数据库
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         SettingManager settingManager; // 设置管理器
 
         public OpenMainWindowGrid()
         {
             InitializeComponent();
-            db1 = new SettingDatabase(); // 创建设置数据库
             SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
 
@@ -57,15 +56,6 @@ namespace Quicker.UserControls
             }
         }
 
-        // 设置Button类型3边框
-        private static void UpdateButtonStyle3(Button clickedButton, Grid buttonPanelGrid)
-        {
-            foreach (var button in buttonPanelGrid.Children.OfType<Button>())
-            {
-                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 1.3) : new Thickness(0); // 设置Button边框
-            }
-        }
-
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
@@ -82,7 +72,7 @@ namespace Quicker.UserControls
         private void OpenMainWindowButton_Click(object sender, RoutedEventArgs e)
         {
             SetGridVisible(OpenMainWindowButtonGrid, MainGrid); // 设置Grid可见性
-            UpdateButtonStyle3(OpenMainWindowButton, MainGrid); // 设置Button类型3边框
+            settingManager.ButtonStyle3_Click(OpenMainWindowButton, MainGrid); // 设置Button样式
         }
 
         // 测试鼠标按键名称
@@ -313,8 +303,8 @@ namespace Quicker.UserControls
         // 基础设置-弹出面板-动作触发按键
         private void DoActionKeyboard_Click(object sender, RoutedEventArgs e)
         {
-            SetGridVisible(DoActionKeyboardButtonGrid, MainGrid);
-            UpdateButtonStyle3(DoActionKeyboardButton, MainGrid);
+            SetGridVisible(DoActionKeyboardButtonGrid, MainGrid); // 设置Grid可见性
+            settingManager.ButtonStyle3_Click(DoActionKeyboardButton, MainGrid); // 设置Button样式
         }
 
         // 清理资源

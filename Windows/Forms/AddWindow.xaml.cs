@@ -18,11 +18,11 @@ namespace Quicker
 {
     public partial class AddWindow : Window
     {
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
+        private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
+        private readonly ButtonDatabase db2 = new ButtonDatabase(); // ButtonDatabase
         public static SelectImageWindow SelectImageWindow; // SelectImageWindow 的静态引用
-        private readonly ButtonManager buttonManager; // 按钮管理器接口
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
-        private readonly IconManager iconManager; // 图标管理器接口
-        private readonly ButtonDatabase db2; // ButtonDatabase
         private TextBlock ButtonTitle; // ButtonTitle
         private Image ButtonImage; // ButtonImage
         private string iconPath; // 图标路径
@@ -33,14 +33,8 @@ namespace Quicker
         public AddWindow(string currentbutton, int choice)
         {
             InitializeComponent(); // 初始化窗口组件
-
-            iconManager = new IconManager(); // 初始化图标管理器
-            buttonManager = new ButtonManager(); // 初始化按钮管理器
-
             CurrentButton = currentbutton; // 当前按钮
             Choice = choice; // 选择添加动作类型
-
-            db2 = new ButtonDatabase(); // 初始化数据库
         }
 
         // 初始化标题和Button视图，并根据上个窗口数据执行对应命令

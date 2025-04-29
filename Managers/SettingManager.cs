@@ -179,11 +179,11 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="clickedButton"> 被点击的Button </param>
         /// <param name="buttonPanelGrid"> Button面板Grid </param>
-        public static void UpdateButtonStyle3(Button clickedButton, Grid buttonPanelGrid)
+        public void ButtonStyle3_Click(Button clickedButton, Grid buttonPanelGrid)
         {
             foreach (var button in buttonPanelGrid.Children.OfType<Button>())
             {
-                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 1.3) : new Thickness(0); // 设置Button边框
+                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 2) : new Thickness(0); // 设置Button边框
             }
         }
 

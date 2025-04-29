@@ -17,7 +17,7 @@
             <ColumnDefinition Width="952*"/>
         </Grid.ColumnDefinitions>
         <!-- 基础设置-关于Quicker-关于Quicker -->
-        <Button x:Name="AboutQuickerButton" Content="关于Quicker" ToolTip="基础信息" Style="{StaticResource Button3}" Margin="1,13,0,0" Width="99" Click="AboutQuickerButton_Click" Grid.Column="1"/>
+        <Button x:Name="AboutQuickerButton" Content="关于Quicker" ToolTip="基础信息" Style="{StaticResource Button3}" Margin="1,14,0,0" Width="99" Click="AboutQuickerButton_Click" Grid.Column="1" BorderThickness="0,0,0,2"/>
         <Grid x:Name="AboutQuickerButtonGrid" Margin="10,43,0,0" Visibility="Visible" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="647*"/>
@@ -42,7 +42,7 @@
         </Grid>
 
         <!-- 基础设置-关于Quicker-隐私声明 -->
-        <Button x:Name="Privacy_StatementButton" Content="隐私声明" ToolTip="隐私声明" Style="{StaticResource Button3}" Margin="100,13,0,0" Width="74" Click="Privacy_StatementButton_Click" BorderThickness="0" Grid.Column="1"/>
+        <Button x:Name="Privacy_StatementButton" Content="隐私声明" ToolTip="隐私声明" Style="{StaticResource Button3}" Margin="100,14,0,0" Width="74" Click="Privacy_StatementButton_Click" BorderThickness="0" Grid.Column="1"/>
         <Grid x:Name="Privacy_StatementButtonGrid" Margin="10,43,317,0" Visibility="Hidden" Grid.ColumnSpan="2">
             <Label Content="键盘钩子(HOOK):" HorizontalAlignment="Left" Margin="16,43,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
             <Label Content="隐私声明" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="18"/>

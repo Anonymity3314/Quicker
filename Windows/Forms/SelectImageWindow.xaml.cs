@@ -36,41 +36,37 @@ namespace Quicker.Windows
         private void UpdateScrollBarProperties()
         {
             if (listViewScrollViewer == null || VerticalScrollBar == null) return; // 如果 ScrollViewer 或 VerticalScrollBar 为 null，返回
-
-            // 获取 WrapPanel
             var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
             if (itemsPanel == null) return;// 计算每行显示的项数
 
-            // 计算 WrapPanel 的内容高度
-            double contentHeight = 0;
-            int itemsPerRow = CalculateItemsPerRow(itemsPanel);
+            double contentHeight = 0; // WrapPanel 的内容高度
+            int itemsPerRow = CalculateItemsPerRow(itemsPanel); // 计算每行显示的项数
             for (int i = 0; i < itemsPanel.Children.Count; i++)
             {
-                var child = itemsPanel.Children[i];
+                var child = itemsPanel.Children[i]; // 获取子元素
                 if (child is FrameworkElement element)
-                {
-                    contentHeight = Math.Max(contentHeight, element.DesiredSize.Height);
-                }
+                    contentHeight = Math.Max(contentHeight, element.DesiredSize.Height); // 计算 WrapPanel 的内容高度
             }
-            contentHeight *= Math.Ceiling((double)itemsPanel.Children.Count / itemsPerRow);
+            contentHeight *= Math.Ceiling((double)itemsPanel.Children.Count / itemsPerRow); // 计算 WrapPanel 的内容高度
 
-            // 确保 WrapPanel 的高度正确
-            itemsPanel.Height = contentHeight;
+            itemsPanel.Height = contentHeight; // 确保 WrapPanel 的高度正确
 
-            // 更新滚动条的属性
-            VerticalScrollBar.Maximum = contentHeight;
-            VerticalScrollBar.ViewportSize = listViewScrollViewer.ViewportHeight;
-            VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset;
+            VerticalScrollBar.Maximum = contentHeight; // 设置滚动条的最大值
+            VerticalScrollBar.ViewportSize = listViewScrollViewer.ViewportHeight; // 设置滚动条的视窗大小
+            VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset; // 设置滚动条的当前值
         }
 
         // 计算每行显示的项数
         private int CalculateItemsPerRow(WrapPanel itemsPanel)
         {
-            if (itemsPanel == null || itemsPanel.Children.Count == 0) return 1; // 如果 WrapPanel 为空，返回 1
+            if (itemsPanel == null || itemsPanel.Children.Count == 0)
+                return 1; // 如果 WrapPanel 为空，返回 1
             double panelWidth = itemsPanel.ActualWidth; // 获取 WrapPanel 的宽度
-            if (panelWidth == 0)  return 1; // 如果 WrapPanel 的宽度为 0，返回 1
+            if (panelWidth == 0)
+                return 1; // 如果 WrapPanel 的宽度为 0，返回 1
             double itemWidth = ((FrameworkElement)itemsPanel.Children[0]).ActualWidth; // 假设所有项的宽度相同
-            if (itemWidth == 0) return 1; // 如果项的宽度为 0，返回 1
+            if (itemWidth == 0)
+                return 1; // 如果项的宽度为 0，返回 1
             return (int)(panelWidth / itemWidth); // 计算每行显示的项数
         }
 
@@ -84,10 +80,7 @@ namespace Quicker.Windows
         private void ListViewScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (listViewScrollViewer == null || VerticalScrollBar == null)
-            {
-                return;
-            }
-
+                return; // 如果 ScrollViewer 或 VerticalScrollBar 为 null，返回
             VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset; // 更新滚动条的值
         }
 
@@ -110,16 +103,12 @@ namespace Quicker.Windows
             {
                 DependencyObject child = VisualTreeHelper.GetChild(parent, i); // 获取子元素
                 if (child is ScrollViewer)
-                {
                     return (ScrollViewer)child; // 返回 ScrollViewer
-                }
                 else
                 {
                     ScrollViewer scrollViewer = FindScrollViewer(child); // 递归查找
                     if (scrollViewer != null) // 如果找到 ScrollViewer
-                    {
                         return scrollViewer; // 返回 ScrollViewer
-                    }
                 }
             }
             return null; // 未找到返回空
@@ -165,25 +154,19 @@ namespace Quicker.Windows
             try
             {
                 if (!File.Exists(filePath))
-                {
-                    return null;
-                }
+                    return null; // 如果文件不存在，返回空
 
-                BitmapImage bi = new BitmapImage();
+                BitmapImage bi = new BitmapImage(); // 创建 BitmapImage 对象
                 using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    bi.BeginInit();
-                    bi.CacheOption = BitmapCacheOption.OnLoad;
-                    bi.StreamSource = stream;
-                    bi.EndInit();
+                    bi.BeginInit(); // 开始初始化图片
+                    bi.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
+                    bi.StreamSource = stream; // 设置图片流
+                    bi.EndInit(); // 加载图片
                 }
-                return bi;
+                return bi; // 返回图片
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"加载图片失败: {ex.Message}");
-                return null;
-            }
+            catch{ return null; }
         }
 
         // 关闭窗口
@@ -209,12 +192,9 @@ namespace Quicker.Windows
             }; // 创建文件选择对话框
             if (openFileDialog.ShowDialog() == true)
             {
-                // 如果没有选择文件，返回
-                if (openFileDialog.FileNames.Length == 0) return;
+                if (openFileDialog.FileNames.Length == 0) return; // 如果没有选择文件，返回
                 else
-                {
-                    SelectedImagePath = openFileDialog.FileName; // 获取用户选择的文件路径
-                } // 如果选择了文件，获取文件路径
+                    SelectedImagePath = openFileDialog.FileName; // 设置选中的图片路径
             }
         }
 
@@ -228,7 +208,7 @@ namespace Quicker.Windows
         private void AddIcon(object sender, RoutedEventArgs e)
         {
             ImageConfirmed?.Invoke(this, SelectedImagePath); // 触发图片确认事件
-            this.Close();
+            this.Close(); // 关闭窗口
         }
 
         // 双击确认图片
@@ -238,7 +218,7 @@ namespace Quicker.Windows
             if (selectedImage != null)
             {
                 SelectedImagePath = selectedImage.FilePath; // 设置选中的图片路径
-                AddIcon(sender, e);
+                AddIcon(sender, e); // 触发图片确认事件
             }
         }
 
@@ -260,15 +240,11 @@ namespace Quicker.Windows
             {
                 DependencyObject child = VisualTreeHelper.GetChild(parent, i); // 获取子元素
                 if (child is T t)
-                {
                     return t; // 返回匹配的子元素
-                }
 
                 T foundChild = FindVisualChild<T>(child); // 递归查找
                 if (foundChild != null)
-                {
                     return foundChild; // 返回匹配的子元素
-                }
             }
             return null; // 未找到返回空
         }
@@ -276,12 +252,12 @@ namespace Quicker.Windows
         // 鼠标移入视图显示 Scrollbar
         private void Grid_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            VerticalScrollBar.Visibility = Visibility.Visible;
+            VerticalScrollBar.Visibility = Visibility.Visible; // 显示滚动条
         }
          // 鼠标移出视图隐藏 Scrollbar
         private void Grid_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            VerticalScrollBar.Visibility = Visibility.Collapsed;
+            VerticalScrollBar.Visibility = Visibility.Collapsed; // 隐藏滚动条
         }
 
         private int CalculateRowCount()
@@ -365,6 +341,22 @@ namespace Quicker.Windows
             }
             UpdateScrollBarProperties(); // 更新滚动条的属性
         }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            foreach (var imageItem in ImageItems)
+            {
+                imageItem.ImageSource = null; // 释放图片资源
+            }
+            ImageItems.Clear(); // 清空集合
+
+            // 清理其他资源
+            listViewScrollViewer = null; // 清理 ScrollViewer
+            ImageListView.ItemsSource = null; // 清理数据源
+            SelectedImagePath = null; // 清理选中图片路径
+            ImageConfirmed = null; // 清理事件
+        } 
     }
 
     // 图片项的数据模型

@@ -29,9 +29,9 @@ namespace Quicker.Windows
         private ConcurrentDictionary<string, string> fileHashCache = new ConcurrentDictionary<string, string>(); // 文件哈希缓存
         public delegate void ApplicationSelectedEventHandler(object sender, ApplicationSelectedEventArgs e);
         private ObservableCollection<AppInfo> _allApplications = new ObservableCollection<AppInfo>(); // 所有应用
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(); // 取消令牌源,管理异步任务
         public event ApplicationSelectedEventHandler ApplicationSelected; // 选中应用事件
         private List<AppInfo> _searchResults = new List<AppInfo>(); // 搜索结果
-        private CancellationTokenSource _cancellationTokenSource; // 取消令牌源,管理异步任务
         private ICollectionView _applicationView; // ICollectionView接口
         private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
         private ScrollViewer scrollViewer; // 滚动条
@@ -48,14 +48,12 @@ namespace Quicker.Windows
             get
             {
                 if (_findAppsWindowRef.TryGetTarget(out var window))
-                {
-                    return window;
-                }
-                return null;
+                    return window; // 如果弱引用有效，返回窗口
+                return null; // 弱引用无效，返回null
             }
             set
             {
-                _findAppsWindowRef = new WeakReference<FindAppsWindow>(value);
+                _findAppsWindowRef = new WeakReference<FindAppsWindow>(value); // 设置弱引用
             }
         } // 避免内存泄漏
         public class ApplicationSelectedEventArgs : EventArgs
@@ -121,11 +119,9 @@ namespace Quicker.Windows
 
             SearchTextBox.Focus(); // 让搜索框获得焦点
             AddWindow.FindAppsWindow = this; // 设置静态字段，方便在其他窗口中引用
-            _cancellationTokenSource = new CancellationTokenSource(); // 初始化 CancellationTokenSource
 
-            // 绑定 ItemsSource 并创建视图
-            _applicationView = CollectionViewSource.GetDefaultView(_allApplications);
-            ApplicationsListView.ItemsSource = _applicationView;
+            _applicationView = CollectionViewSource.GetDefaultView(_allApplications); // 创建视图
+            ApplicationsListView.ItemsSource = _applicationView; // 绑定 ItemsSource
         }
 
         // UI加载完成后加载应用
