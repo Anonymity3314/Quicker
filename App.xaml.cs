@@ -38,28 +38,25 @@ namespace Quicker
     */
     public partial class App : System.Windows.Application
     {
+        private ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private WindowManager windowManager = new WindowManager(); // 窗口管理器
         public bool Book = false, Pause = false, Locked = false; // 是否订住、暂停、锁定
+        private SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         public static DateTime RecordedTime { get; set; } // 记录时间
         public static DateTime StartTime { get; set; } // 启动时间
         private DateTime? keyPressStartTime = null; // 按键按下时的时间
         private System.Windows.Point startPosition; // 鼠标位置
-        private  ButtonManager buttonManager; // 按钮管理器
-        private WindowManager windowManager; // 窗口管理器
         private DispatcherTimer pressTimer; // 按键计时器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
         private DispatcherTimer timer; // 定时器
-        private SettingDatabase db1; // 设置数据库
         public string CommonState; // 通用状态
         private float Left, Top; // 窗口位置
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e); // 调用基类的 OnStartup 方法
-            db1 = new SettingDatabase(); // 创建数据库
             db1.Initialize(); // 创建数据库表
-            windowManager = new WindowManager(); // 创建窗口管理器
-            buttonManager = new ButtonManager(); // 创建按钮管理器
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
             ShowNotification(); // 弹出消息提醒

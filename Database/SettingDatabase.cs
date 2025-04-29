@@ -5,7 +5,7 @@ using System.IO;
 // SQLite数据库操作类
 public class SettingDatabase
 {
-    private readonly string dbPath1 = "Data Source=Setting.db;Pooling=true;Max Pool Size=100;";
+    private readonly string dbPath1 = "Data Source=Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
 
     // 初始化数据库
     public void Initialize()
@@ -431,8 +431,8 @@ public class BlacklistApplication
      * ApplicationName: 黑名单列表显示的文字，可以是文件夹路径，也可以是应用程序名称。
      * ProcessName: 确切的应用程序进程名称，应用程序的可执行文件名称。
      * 
-     * 一个ApplicationName可以对应多个ProcessName，例如，一个文件夹路径可以对应多个应用程序的进程名称。
-     * 但是一个ProcessName只能对应一个ApplicationName。
+     * 一个 ApplicationName 可以对应多个 ProcessName，例如，一个文件夹路径可以对应多个应用程序的进程名称。
+     * 但是一个 ProcessName 只能对应一个 ApplicationName。
      */
     public int ID { get; set; } // 主键
     public string ApplicationName { get; set; } // 应用程序名称

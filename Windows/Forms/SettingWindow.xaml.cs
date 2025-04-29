@@ -12,21 +12,18 @@ namespace Quicker.Windows
 {
     public partial class SettingWindow : Window
     {
-        private const string DefaultButtonColor1 = "#FFE0E0E0"; // 默认按钮颜色
-        private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮颜色
-        private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
-        private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
+        private const string DefaultButtonColor1 = "#FFE0E0E0"; // 默认按钮类型1颜色
+        private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮类型1颜色
+        private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮类型2颜色
+        private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        public SettingManager settingManager = new SettingManager(); // 设置管理器
         private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
-        private readonly SettingDatabase db1; // 设置数据库
-        public SettingManager settingManager; // 设置管理器
 
         public SettingWindow()
         {
-            db1 = new SettingDatabase(); // 创建设置数据库
-            InitializeComponent(); // 初始化窗口
-            settingManager = new SettingManager(); // 创建设置管理器
-
+            InitializeComponent(); // 初始化xaml文件
             InitializeWindow(); // 初始化窗口
         }
 
