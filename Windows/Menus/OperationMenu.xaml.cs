@@ -93,7 +93,6 @@ namespace Quicker.Windows
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件
-            buttonManager.CloseMainWindow(this); // 关闭主窗口并释放引用
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

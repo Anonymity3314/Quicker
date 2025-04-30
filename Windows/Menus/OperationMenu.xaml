@@ -9,6 +9,7 @@
 
     Height="121" 
     Width="204"
+    Topmost="True"
     WindowStyle="None" 
     ShowInTaskbar="False" 
     ResizeMode="NoResize"

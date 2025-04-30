@@ -8,7 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
     Width="178"   
-    Height="110" 
+    Height="110"
+    Topmost="True"
     WindowStyle="None" 
     Background="{x:Null}" 
     ResizeMode="NoResize" 
