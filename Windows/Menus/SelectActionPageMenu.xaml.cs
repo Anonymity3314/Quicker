@@ -17,5 +17,16 @@ namespace Quicker.Windows.Menus
             ClosingOrHiding?.Invoke();
             this.Visibility = Visibility.Hidden; // 失去焦点关闭窗口
         }
+
+        // 关闭窗口前释放资源
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+            ClosingOrHiding = null; // 清理事件处理器
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
     }
 }

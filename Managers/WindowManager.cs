@@ -197,5 +197,13 @@ namespace Quicker.Managers
 
             return isFullScreenCondition1 || isFullScreenCondition2 || isFullScreenCondition3;
         }
+
+        // 手动释放资源
+        public void Dispose()
+        {
+            GC.Collect(); // 强制回收资源
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次收集资源
+        }
     }
 }

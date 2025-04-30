@@ -342,21 +342,35 @@ namespace Quicker.Windows
             UpdateScrollBarProperties(); // 更新滚动条的属性
         }
 
+        // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e);
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+
+            // 清理图片资源
             foreach (var imageItem in ImageItems)
             {
-                imageItem.ImageSource = null; // 释放图片资源
+                if (imageItem.ImageSource != null)
+                {
+                    imageItem.ImageSource = null; // 释放图片资源
+                }
             }
-            ImageItems.Clear(); // 清空集合
+            ImageItems.Clear(); // 清空图片项集合
 
-            // 清理其他资源
-            listViewScrollViewer = null; // 清理 ScrollViewer
-            ImageListView.ItemsSource = null; // 清理数据源
+            // 清理事件订阅
+            ImageConfirmed = null; // 清空事件
+
+            // 释放其他资源
+            listViewScrollViewer = null; // 清理 ScrollViewer 引用
+            ImageListView.ItemsSource = null; // 清空 ListView 数据源
             SelectedImagePath = null; // 清理选中图片路径
-            ImageConfirmed = null; // 清理事件
-        } 
+            listViewScrollViewer = null; // 清理 ScrollViewer 引用
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
     }
 
     // 图片项的数据模型

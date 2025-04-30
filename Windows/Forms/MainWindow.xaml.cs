@@ -33,13 +33,12 @@ namespace Quicker.Windows
             }
         } // 递归查找所有指定类型的子元素
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // 取消后台任务的令牌源
-        private Dictionary<string, bool> pageButtonCache = new Dictionary<string, bool>(); // 缓存页面按钮状态
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
         private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly ActionManager actionManager = new ActionManager(); // 动作管理器
         private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-        ActionManager actionManager = new ActionManager(); // 动作管理器
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
         private string CommonStyle; // 样式
         private readonly App app; // App实例
@@ -60,11 +59,16 @@ namespace Quicker.Windows
             Application.Current.Dispatcher.Invoke(() =>
             {
                 GenerateCanvas(0, "Global"); // 生成全局 Canvas
-                if (db2.TableExists(CommonStyle)) // 如果存在通用样式按钮数据表
+                if (db2.TableExists(CommonStyle))
                 {
-                    var commonButtonData = db2.GetButtonDataByPrefix(CommonStyle); // 从数据库中获取通用按钮数据
-                    bool haveCommonStyleButton = commonButtonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 是否存在通用样式按钮
-                    if (haveCommonStyleButton) GenerateCanvas(0, CommonStyle); // 如果存在页面按钮，生成通用 Canvas
+                    var commonButtonData = db2.GetButtonDataByPrefix(CommonStyle); // 从数据库中获取通用样式按钮数据
+                    bool hasCommonButtons = commonButtonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 判断是否有通用样式按钮数据
+                    if (hasCommonButtons) GenerateCanvas(0, CommonStyle); // 如果有按钮，生成通用 Canvas
+                }
+                else if (CommonStyle == "TaskBar" || CommonStyle == "Desktop")
+                {
+                    CommonStyle = "Common"; // 设置样式为通用样式
+                    GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
                 }
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
@@ -247,7 +251,7 @@ namespace Quicker.Windows
         // 失去焦点时关闭功能面板
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            if (!app.Pause && !buttonManager.isClosing && !app.Book) 
+            if (!app.Pause && !buttonManager.isClosing && !app.Book)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
@@ -258,7 +262,7 @@ namespace Quicker.Windows
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData data && data.Location != null) 
+            if (button.Tag is ButtonData data && data.Location != null)
             {
                 button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BEE6FD")); // 改变背景颜色
                 button.RenderTransform = new ScaleTransform(1.05, 1.05); // 改变按钮大小
@@ -330,7 +334,7 @@ namespace Quicker.Windows
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData data && data.Location != null) 
+            if (button.Tag is ButtonData data && data.Location != null)
             {
                 Canvas.SetZIndex(button, 0); // 还原按钮层级
                 button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
@@ -387,83 +391,23 @@ namespace Quicker.Windows
         }
 
         /// <summary>
-        /// 获取快捷方式目标路径
-        /// </summary>
-        /// <param name="shortcutFilePath">快捷方式路径</param>
-        /// <returns>返回快捷方式目标路径</returns>
-        public string GetShortcutTargetPath(string shortcutFilePath)
-        {
-            WshShell shell = new WshShell(); // 创建WshShell对象
-            IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutFilePath); // 创建快捷方式对象
-            return shortcut.TargetPath; // 返回快捷方式目标路径
-        }
-
-        /// <summary>
         /// 左键点击按钮时执行动作
         /// </summary>
         /// <param name="sender">按钮</param>
         /// <param name="e">事件参数</param>
+        // 左键点击按钮时执行动作
         private void DoAction(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button; // 获取Button对象
+            Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
-                if (data.TryToOpenExitingWindow)
-                {
-                    string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location); // 获取目标窗口标题
-                    windowManager.TryToOpenExitingWindow(windowTitle); // 调用窗口管理器打开已存在的目标窗口实例
-                } // 如果尝试打开已存在的窗口
-
-                if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) ||
-                    Path.GetExtension(data.Location).Equals(".exe", StringComparison.OrdinalIgnoreCase)) // 如果是快捷方式或者可执行文件
-                {
-                    string targetPath = Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
-                        ? GetShortcutTargetPath(data.Location)
-                        : data.Location; // 获取快捷方式目标路径
-
-                    try
-                    {
-                        ProcessStartInfo processStartInfo = new ProcessStartInfo
-                        {
-                            FileName = targetPath, // 设置启动文件路径
-                            UseShellExecute = data.RunByMessager, // 是否使用系统默认方式运行
-                            Verb = data.RunByMessager ? "runas" : null, // 管理员权限运行
-                            WindowStyle = data.WindowState switch
-                            {
-                                0 => ProcessWindowStyle.Normal,
-                                1 => ProcessWindowStyle.Minimized,
-                                2 => ProcessWindowStyle.Maximized
-                            } // 设置窗口状态
-                        }; // 创建进程启动信息
-                        Process.Start(processStartInfo); // 启动进程
-                    }
-                    catch (Exception ex)
-                    {
-                        new ToastContentBuilder().AddText($"打开失败：{ex}").Show();
-                    }
-                } // 如果是快捷方式或者可执行文件
-                else
-                {
-                    try
-                    {
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = data.Location,
-                            UseShellExecute = true
-                        }; // 创建进程启动信息
-                        Process.Start(startInfo);
-                    }
-                    catch (Exception ex)
-                    {
-                        new ToastContentBuilder().AddText($"打开失败：{ex}").Show();
-                    }
-                } // 使用系统默认方式打开文件
+                actionManager.OpenFile(data); // 调用 ActionManager 的 OpenFile 方法打开文件
             }
             else
             {
-                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
-                if (!Convention.ShowAddImage) return; // 如果加载图标
-                buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 打开创建动作菜单
+                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
+                if (Convention.ShowAddImage) // 如果不显示添加按钮，直接返回
+                    buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 打开菜单
             }
         }
 
@@ -850,73 +794,83 @@ namespace Quicker.Windows
         {
             base.OnClosed(e); // 调用基类的关闭事件
             cancellationTokenSource.Cancel(); // 取消所有后台任务
-            this.Loaded -= MainWindow_Loaded; // 解除窗口加载事件绑定
-            this.Closing -= MainWindow_Closing; // 解除窗口关闭事件绑定
-            this.Deactivated -= MainWindow_Deactivated; // 解除窗口失去焦点事件绑定
-            Book.Source = null; // 释放图像资源
-            Lock.Source = null; // 释放图像资源
-            CleanUpEventHandlers(); // 清理动态添加的事件处理器
-            CleanUpCanvas(MainGrid); // 清理主网格中的Canvas及其子元素
-            CleanUpCanvas(CommonGrid); // 清理公共网格中的Canvas及其子元素
+            cancellationTokenSource.Dispose();
+            CleanUpEventHandlers(); // 清理事件处理器
+            CleanUpCanvas(MainGrid); // 清理全局网格
+            CleanUpCanvas(CommonGrid); // 清理通用网格
+            Book.Source = null; // 订住按钮图片
+            Lock.Source = null; // 锁定按钮图片
 
-            GC.Collect(); // 强制垃圾回收
-            GC.WaitForPendingFinalizers(); // 等待所有终结器完成
-            GC.Collect(); // 再次强制垃圾回收
+            actionManager.Dispose(); // 释放动作管理器资源
+            windowManager.Dispose(); // 释放窗口管理器资源
+            iconManager.Dispose(); // 释放图标管理器资源
+            buttonManager.Dispose(); // 释放按钮管理器资源
+
+            GC.Collect(); // 强制回收内存
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次强制回收内存
         }
 
         /// <summary>
         /// 清理指定Grid中的所有Canvas及其子元素
         /// </summary>
-        /// <param name="grid"> 要清理的Grid </param>
+        /// <param name="grid">要清理的Grid</param>
         private void CleanUpCanvas(Grid grid)
         {
-            foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 遍历所有Canvas
+            foreach (Canvas canvas in FindVisualChildren<Canvas>(grid))
             {
-                foreach (Button button in FindVisualChildren<Button>(canvas)) // 遍历Canvas中的所有按钮
+                foreach (Button button in FindVisualChildren<Button>(canvas))
                 {
-                    button.Click -= DoAction; // 移除左键点击事件
-                    button.Drop -= Button_Drop; // 移除拖拽事件
-                    button.MouseEnter -= Button_MouseEnter; // 移除鼠标移入事件
-                    button.MouseLeave -= Button_MouseLeave; // 移除鼠标移出事件
-                    button.PreviewDragOver -= Button_PreviewDragOver; // 移除拖拽事件
-                    button.MouseRightButtonDown -= OpenCreatActionMenu; // 移除右键点击事件
-                    button.PreviewMouseMove -= Button_PreviewMouseMove; // 移除鼠标移动事件
-                    button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 移除鼠标左键释放事件
-                    button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 移除鼠标左键按下事件
+                    // 移除所有事件处理器
+                    button.Click -= DoAction;
+                    button.Drop -= Button_Drop;
+                    button.MouseEnter -= Button_MouseEnter;
+                    button.MouseLeave -= Button_MouseLeave;
+                    button.PreviewDragOver -= Button_PreviewDragOver;
+                    button.MouseRightButtonDown -= OpenCreatActionMenu;
+                    button.PreviewMouseMove -= Button_PreviewMouseMove;
+                    button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp;
+                    button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
 
-                    button.Content = null; // 清理按钮内容
-                    button.Tag = null; // 清理按钮附加数据
-                    button.Background = null; // 清理按钮背景
+                    // 清理按钮内容和资源
+                    button.Content = null;
+                    button.Tag = null;
+                    button.Background = null;
                 }
 
-                canvas.MouseWheel -= GolbalCanvas_MouseWheel; // 移除鼠标滚轮事件
-                canvas.MouseWheel -= CommonGrid_MouseWheel; // 移除鼠标滚轮事件
-                canvas.IsVisibleChanged -= GlobalCanvas_IsVisibleChanged; // 移除可见性变化事件
-                canvas.IsVisibleChanged -= CommonCanvas_IsVisibleChanged; // 移除可见性变化事件
+                // 移除Canvas事件
+                canvas.MouseWheel -= GolbalCanvas_MouseWheel;
+                canvas.MouseWheel -= CommonGrid_MouseWheel;
+                canvas.IsVisibleChanged -= GlobalCanvas_IsVisibleChanged;
+                canvas.IsVisibleChanged -= CommonCanvas_IsVisibleChanged;
 
-                canvas.Children.Clear(); // 清空Canvas子元素
+                canvas.Children.Clear(); // 清空Canvas
             }
-            grid.Children.Clear(); // 清空Grid子元素
+            grid.Children.Clear(); // 清空Grid
         }
 
         // 清理所有动态添加的事件处理器
         private void CleanUpEventHandlers()
         {
-            // 清理全局按钮面板事件
-            foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 遍历所有按钮
+            foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 清理全局按钮面板事件
             {
-                button.Click -= SwitchToGlobalCanvas; // 移除点击事件
-                button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter; // 移除鼠标移入事件
-                button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave; // 移除鼠标移出事件
+                button.Click -= SwitchToGlobalCanvas;
+                button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter;
+                button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave;
             }
 
-            // 清理公共按钮面板事件
-            foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 遍历所有按钮
+            foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 清理公共按钮面板事件
             {
-                button.Click -= SwitchToCommonCanvas; // 移除点击事件
-                button.MouseEnter -= CommonActionPageChangeButton_MouseEnter; // 移除鼠标移入事件
-                button.MouseLeave -= CommonActionPageChangeButton_MouseLeave; // 移除鼠标移出事件
+                button.Click -= SwitchToCommonCanvas;
+                button.MouseEnter -= CommonActionPageChangeButton_MouseEnter;
+                button.MouseLeave -= CommonActionPageChangeButton_MouseLeave;
             }
+
+            // 移除窗口事件
+            this.Loaded -= MainWindow_Loaded;
+            this.Closing -= MainWindow_Closing;
+            this.Deactivated -= MainWindow_Deactivated;
+            this.MouseLeftButtonDown -= MoveMainWindow;
         }
     }
 }

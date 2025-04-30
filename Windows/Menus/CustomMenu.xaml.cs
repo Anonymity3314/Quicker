@@ -105,16 +105,13 @@ namespace Quicker.Windows
             this.Visibility = Visibility.Hidden;
         }
 
+        // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 调用基类方法
-            showMainWindow = null; // 释放图片资源
-            openSettingWindow = null; // 释放图片资源
-            openActionPageManageWindow = null; // 释放图片资源
-            pauseQuicker = null; // 释放图片资源
-            restart = null; // 释放图片资源
-            exit = null; // 释放图片资源
-            GC.Collect(); // 垃圾回收
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+            GC.Collect(); // 强制回收非托管资源
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次强制回收非托管资源
         }
     }
 }

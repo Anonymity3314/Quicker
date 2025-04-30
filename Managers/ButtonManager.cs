@@ -359,5 +359,14 @@ namespace Quicker.Managers
             mainWindow?.Close(); // 关闭主窗口
             window.Close(); // 关闭面板窗口
         }
+
+        // 手动释放资源
+        public void Dispose()
+        {
+            iconManager?.Dispose(); // 清理图标管理器资源
+            GC.Collect(); // 强制垃圾回收
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次强制垃圾回收
+        }
     }
 }

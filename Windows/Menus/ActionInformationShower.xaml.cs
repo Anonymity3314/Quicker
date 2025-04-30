@@ -15,19 +15,15 @@ namespace Quicker.Windows
 {
     public partial class ActionInformationWindow : Window
     {
+        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private WindowManager windowManager = new WindowManager(); // 窗口管理器
         public string CurrentButton { get; private set; } // 当前按钮ID
-        private readonly ButtonDatabase db2; // 按钮数据库
-        private WindowManager windowManager; // 窗口管理器
 
         public ActionInformationWindow(string currentbutton)
         {
             InitializeComponent();
             CurrentButton = currentbutton;
-
-            db2 = new ButtonDatabase();
             InitializeWindow(); // 初始化窗口
-
-            windowManager = new WindowManager();
             windowManager.SetWindowTopmost(this);
         }
 
@@ -66,6 +62,22 @@ namespace Quicker.Windows
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close(); // 关闭窗口
+        }
+
+        // 关闭窗口前，释放资源
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+            Image.Source = null; // 释放图像资源
+
+            // 清理事件处理器
+            CopyButton.Click -= CopyButton_Click;
+            CloseButton.Click -= CloseButton_Click;
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 }

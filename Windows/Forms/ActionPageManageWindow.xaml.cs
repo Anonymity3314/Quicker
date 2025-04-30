@@ -506,30 +506,35 @@ namespace Quicker.Windows
             }
         }
 
-        // 关闭窗口释放资源
+        // 关闭窗口时释放资源
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
-
-            // 清理主列表视图中的所有画布及其子元素
-            foreach (var item in MainListView.Items)
+            foreach (var item in MainListView.Items) // 清理主列表视图中的所有画布及其子元素
             {
                 if (item is Canvas canvas)
                 {
-                    foreach (var child in canvas.Children) // 移除所有事件处理程序
+                    var childrenList = canvas.Children.Cast<UIElement>().ToList(); // 将 UIElementCollection 转换为列表
+                    foreach (var child in childrenList) // 移除所有事件处理程序并清理子元素
                     {
                         if (child is Button button)
                         {
+                            // 移除所有事件处理程序
                             button.Drop -= Button_Drop;
                             button.Click -= ShowCreatActionMenu;
                             button.MouseEnter -= Button_MouseEnter;
                             button.MouseLeave -= Button_MouseLeave;
+                            button.MouseRightButtonDown -= OpenMenu;
                             button.MouseDoubleClick -= ShowEditWindow;
                             button.PreviewMouseMove -= Button_PreviewMouseMove;
-                            button.MouseRightButtonDown -= OpenMenu;
-                            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
+                            button.PreviewDragOver -= ListView_PreviewDragOver;
                             button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp;
-                            button.Content = null; // 清空按钮内容
+                            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
+
+                            // 清理按钮内容
+                            button.Content = null;
+                            button.Tag = null;
+                            button.Background = null;
                         }
                     }
                     canvas.Children.Clear(); // 清空画布中的所有子元素
@@ -537,19 +542,31 @@ namespace Quicker.Windows
             }
             MainListView.Items.Clear(); // 清空主列表视图
 
-            foreach (var child in ActionPagesButtonPanel.Children) // 清理动作页按钮面板中的所有按钮
+            // 清理动作页按钮面板中的所有按钮
+            var actionPagesButtonPanelList = ActionPagesButtonPanel.Children.Cast<UIElement>().ToList();
+            foreach (var child in actionPagesButtonPanelList)
             {
                 if (child is Button button)
                 {
-                    button.Click -= GlobalButton_Click; // 移除点击事件处理程序
-                    button.Content = null; // 清空按钮内容
+                    // 移除所有事件处理程序
+                    button.Click -= GlobalButton_Click;
+                    button.Click -= CommonButton_Click;
+                    button.Click -= TaskBarButton_Click;
+                    button.Click -= DesktopButton_Click;
+
+                    // 清理按钮内容
+                    button.Content = null;
+                    button.Tag = null;
+                    button.Background = null;
                 }
             }
             ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
-
-            // 清理其他资源
             buttonPrefixDict.Clear(); // 清空按钮前缀字典
-            GC.Collect(); // 强制垃圾回收
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 }

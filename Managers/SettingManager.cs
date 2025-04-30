@@ -362,11 +362,19 @@ namespace Quicker.Managers
             });
         }
 
-        // 清理缓存
-        public void ClearCaches()
+        // 手动释放资源
+        public void Dispose()
         {
-            conventions = null; // 清理缓存
+            // 清理缓存
+            conventions = null;
             openMainWindowConditions = null;
+            blacklistSettings = null;
+            appearanceConditions = null;
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         // 常规设置

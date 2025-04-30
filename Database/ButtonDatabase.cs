@@ -48,121 +48,77 @@ namespace Quicker.Database
         {
             try
             {
-                // 创建一个新的数据库连接
-                var connection = new SQLiteConnection(dbPath2);
+                using var connection = new SQLiteConnection(dbPath2);
                 connection.Open();
 
+                // 如果不存在 ButtonData 表，直接返回，避免出错
+                if (!TableExists("ButtonData"))
+                    return;
+
+                // 将旧表重命名为临时表
+                using var renameCommand = new SQLiteCommand("ALTER TABLE ButtonData RENAME TO Temp_ButtonData", connection);
+                renameCommand.ExecuteNonQuery();
+
+                // 获取旧表ButtonData中的所有按钮数据
+                var oldButtonData = new List<ButtonData>();
+                using var oldCommand = new SQLiteCommand("SELECT * FROM Temp_ButtonData", connection);
+                using var oldReader = oldCommand.ExecuteReader();
+                while (oldReader.Read())
+                {
+                    oldButtonData.Add(new ButtonData
+                    {
+                        ButtonID = oldReader.GetString(0),
+                        ButtonName = oldReader.GetString(1),
+                        Location = oldReader.GetString(2),
+                        ImagePath = oldReader.GetString(3),
+                        RunByMessager = oldReader.GetBoolean(4),
+                        TryToOpenExitingWindow = oldReader.GetBoolean(5),
+                        WindowState = oldReader.GetInt32(6),
+                        Usage = oldReader.GetString(7),
+                        CreateTime = oldReader.GetDateTime(8),
+                        LatestEditTime = oldReader.GetDateTime(9),
+                        Type = "OpenFile"
+                    });
+                }
+                connection.Close(); // 关闭数据库连接
+                connection.Dispose(); // 释放数据库连接
+
+                var newconnection = OpenConnection(); // 打开数据库连接
+                using var transaction = newconnection.BeginTransaction(); // 开始事务
                 try
                 {
-                    // 检测数据库中是否存在 ButtonData 表
-                    using var checkCommand = new SQLiteCommand(
-                        "SELECT name FROM sqlite_master WHERE type='table' AND name='ButtonData'",
-                        connection);
-                    using var checkReader = checkCommand.ExecuteReader();
-                    if (!checkReader.Read())
+                    foreach (var buttonData in oldButtonData) // 将每个按钮数据迁移到对应的新表中
                     {
-                        // 如果不存在 ButtonData 表，直接返回，避免出错
-                        Console.WriteLine("ButtonData 表不存在，无需迁移。");
-                        return;
+                        string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+                        CheckAndCreateTable(tableName, newconnection); // 检查表是否存在，不存在则创建
+
+                        string insertQuery = $@"INSERT INTO {tableName} 
+                            (ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime, Type) 
+                            VALUES 
+                            (@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime, @Type)";
+                        using var insertCommand = new SQLiteCommand(insertQuery, newconnection);
+                        insertCommand.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID);
+                        insertCommand.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName);
+                        insertCommand.Parameters.AddWithValue("@Location", buttonData.Location);
+                        insertCommand.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath);
+                        insertCommand.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager);
+                        insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow);
+                        insertCommand.Parameters.AddWithValue("@WindowState", buttonData.WindowState);
+                        insertCommand.Parameters.AddWithValue("@Usage", buttonData.Usage);
+                        insertCommand.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime);
+                        insertCommand.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime);
+                        insertCommand.Parameters.AddWithValue("@Type", buttonData.Type);
+
+                        insertCommand.ExecuteNonQuery(); // 执行插入语句
                     }
 
-                    // 将旧表重命名为临时表
-                    using var renameCommand = new SQLiteCommand("ALTER TABLE ButtonData RENAME TO Temp_ButtonData", connection);
-                    renameCommand.ExecuteNonQuery();
-
-                    // 获取旧表ButtonData中的所有按钮数据
-                    var oldButtonData = new List<ButtonData>();
-                    using var oldCommand = new SQLiteCommand("SELECT * FROM Temp_ButtonData", connection);
-                    using var oldReader = oldCommand.ExecuteReader();
-                    while (oldReader.Read())
-                    {
-                        oldButtonData.Add(new ButtonData
-                        {
-                            ButtonID = oldReader.GetString(0),
-                            ButtonName = oldReader.GetString(1),
-                            Location = oldReader.GetString(2),
-                            ImagePath = oldReader.GetString(3),
-                            RunByMessager = oldReader.GetBoolean(4),
-                            TryToOpenExitingWindow = oldReader.GetBoolean(5),
-                            WindowState = oldReader.GetInt32(6),
-                            Usage = oldReader.GetString(7),
-                            CreateTime = oldReader.GetDateTime(8),
-                            LatestEditTime = oldReader.GetDateTime(9),
-                            Type = "OpenFile"
-                        });
-                    }
-
-                    // 提交到目前为止的操作，释放锁
-                    connection.Close();
-                    connection.Dispose();
-
-                    // 重新打开数据库连接以执行后续操作
-                    connection = new SQLiteConnection(dbPath2);
-                    connection.Open();
-
-                    using var transaction = connection.BeginTransaction(); // 开始事务
-
-                    try
-                    {
-                        // 将每个按钮数据迁移到对应的新表中
-                        foreach (var buttonData in oldButtonData)
-                        {
-                            string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
-                            CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
-
-                            string insertQuery = $@"INSERT INTO {tableName} 
-                        (ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime, Type) 
-                        VALUES 
-                        (@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime, @Type)";
-
-                            using var insertCommand = new SQLiteCommand(insertQuery, connection);
-                            insertCommand.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID);
-                            insertCommand.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName);
-                            insertCommand.Parameters.AddWithValue("@Location", buttonData.Location);
-                            insertCommand.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath);
-                            insertCommand.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager);
-                            insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow);
-                            insertCommand.Parameters.AddWithValue("@WindowState", buttonData.WindowState);
-                            insertCommand.Parameters.AddWithValue("@Usage", buttonData.Usage);
-                            insertCommand.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime);
-                            insertCommand.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime);
-                            insertCommand.Parameters.AddWithValue("@Type", buttonData.Type);
-
-                            insertCommand.ExecuteNonQuery(); // 执行插入语句
-                        }
-
-                        transaction.Commit(); // 提交事务
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback(); // 回滚事务
-                        throw new Exception("迁移数据失败: " + ex.Message);
-                    }
-
-                    // 删除临时表
-                    using var dropCommand = new SQLiteCommand("DROP TABLE Temp_ButtonData", connection);
-                    dropCommand.ExecuteNonQuery();
-
-                    Console.WriteLine("迁移成功，旧表已删除。");
+                    transaction.Commit(); // 提交事务
                 }
-                catch (Exception ex)
-                {
-                    throw new Exception("迁移失败: " + ex.Message);
-                }
-                finally
-                {
-                    // 确保连接被关闭和释放
-                    if (connection.State == System.Data.ConnectionState.Open)
-                    {
-                        connection.Close();
-                    }
-                    connection.Dispose();
-                }
+                catch { transaction.Rollback(); } // 回滚事务
+                using var dropCommand = new SQLiteCommand("DROP TABLE Temp_ButtonData", newconnection); // 删除临时表
+                dropCommand.ExecuteNonQuery();
             }
-            catch (Exception ex)
-            {
-                throw new Exception("迁移失败: " + ex.Message);
-            }
+            catch { }
         }
 
         /// <summary>
@@ -428,59 +384,34 @@ namespace Quicker.Database
         /// 根据输入的字符串和数字 A1、A2，交换符合条件的 ButtonID 的 A 部分
         /// </summary>
         /// <param name="inputString">Button的字符串索引</param>
-        /// <param name="a1"></param>
-        /// <param name="a2"></param>
+        /// <param name="a1"> A1 部分 </param>
+        /// <param name="a2"> A2 部分 </param>
         public void SwapButtonAValues(string inputString, int a1, int a2)
         {
-            List<ButtonData> allButtons = GetButtonDataByPrefix(inputString); // 获取所有 Button 数据
-            var buttonIDMap = allButtons
-                .Select(b => new { ButtonID = b.ButtonID, Data = b })
-                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$") &&
-                            Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[1].Value == inputString &&
-                            (int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == a1 ||
-                             int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == a2))
-                .ToDictionary(b => b.ButtonID, b => b.Data); // 筛选出符合条件的 ButtonID
-
             using var connection = OpenConnection(); // 打开连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
-            string tableName = GetTableNameFromButtonID(buttonIDMap.First().Key); // 获取表名
-            foreach (var pair in buttonIDMap.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
+
+            var buttonDataList = GetButtonDataByPrefix(inputString);// 获取所有符合条件的按钮数据
+            var buttonsToUpdate = new List<(string ButtonID, int OriginalA, string BcPart)>(); // 存储需要更新的按钮信息
+            foreach (var buttonData in buttonDataList)
             {
-                string buttonID = pair.Key; // 原 ButtonID
-                Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
-                if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a1)
-                {
-                    string newButtonID = $"{tempPrefix}{match.Groups[2].Value}"; // 新 ButtonID
-                    UpdateButtonID(connection, tableName, buttonID, newButtonID); // 更新 ButtonID
-                    buttonIDMap.Remove(buttonID); // 从字典中删除原数据
-                    buttonIDMap[newButtonID] = pair.Value; // 添加新数据
-                }
+                Match match = Regex.Match(buttonData.ButtonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID 中的 A、B、C 部分
+                if (!match.Success) continue; // 格式不匹配，跳过
+
+                string aPart = match.Groups[1].Value; // A 部分
+                string bcPart = match.Groups[2].Value; // B、C 部分
+                if (aPart != inputString) continue; // 表名不匹配，跳过
+
+                int currentA = int.Parse(bcPart[0].ToString()); // 获取当前 A 部分
+                if (currentA == a1 || currentA == a2) // 如果 A 部分符合条件，则添加到待更新列表
+                    buttonsToUpdate.Add((buttonData.ButtonID, currentA, bcPart)); // 添加到待更新列表
             }
 
-            foreach (var pair in buttonIDMap.ToList())// 更新 A2 部分的 ButtonID 为目标 ID
+            foreach (var (buttonID, originalA, bcPart) in buttonsToUpdate) // 为需要更新的按钮生成新的 ButtonID
             {
-                string buttonID = pair.Key; // 原 ButtonID
-                Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
-                if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a2)
-                {
-                    string bcPart = match.Groups[2].Value.Substring(1); // 目标 ID 的 B 和 C 部分
-                    string newButtonID = $"{inputString}{a1}{bcPart}"; // 新 ButtonID
-                    UpdateButtonID(connection, tableName, buttonID, newButtonID); // 更新 ButtonID
-                    buttonIDMap.Remove(buttonID); // 从字典中删除原数据
-                    buttonIDMap[newButtonID] = pair.Value; // 添加新数据
-                }
-            }
-
-            foreach (var pair in buttonIDMap.ToList())// 更新临时标识符的 ButtonID 为目标 ID
-            {
-                string buttonID = pair.Key; // 原 ButtonID
-                if (buttonID.StartsWith(tempPrefix))
-                {
-                    string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 目标 ID 的 B 和 C 部分
-                    string newButtonID = $"{inputString}{a2}{bcPart}"; // 新 ButtonID
-                    UpdateButtonID(connection, tableName, buttonID, newButtonID); // 更新 ButtonID
-                }
+                int newA = originalA == a1 ? a2 : a1; // 交换 A 部分
+                string newButtonID = $"{inputString}{newA}{bcPart.Substring(1)}"; // 生成新的 ButtonID
+                UpdateButtonID(connection, GetTableNameFromButtonID(buttonID), buttonID, newButtonID); // 更新 ButtonID
             }
             transaction.Commit(); // 提交事务
         }

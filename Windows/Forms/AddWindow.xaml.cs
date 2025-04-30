@@ -23,8 +23,8 @@ namespace Quicker
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // ButtonDatabase
         public static SelectImageWindow SelectImageWindow; // SelectImageWindow 的静态引用
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
-        private TextBlock ButtonTitle; // ButtonTitle
-        private Image ButtonImage; // ButtonImage
+        private TextBlock ButtonTitle; // 按钮标题
+        private Image ButtonImage; // 按钮图片
         private string iconPath; // 图标路径
 
         public string CurrentButton { get; private set; } // 当前按钮
@@ -436,24 +436,41 @@ namespace Quicker
             UpdateTooltip(); // 更新提示文本
         }
 
-        // 关闭窗口前，取消事件订阅
+        // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
+
             if (FindAppsWindow != null)
             {
-                FindAppsWindow.ApplicationSelected -= OnApplicationSelected;
-            } // 取消事件订阅
+                FindAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
+                FindAppsWindow = null; // 清理静态引用
+            }
             if (SelectImageWindow != null)
             {
-                SelectImageWindow.ImageConfirmed -= OnImageConfirmed;
-            } // 取消事件订阅
-            ButtonImage.Source = null; // 释放图标资源
-            ButtonTitle = null; // 释放托管资源
-            ButtonImage = null; // 释放托管资源
-            FindAppsWindow = null; // 释放托管资源
+                SelectImageWindow.ImageConfirmed -= OnImageConfirmed; // 取消事件订阅
+                SelectImageWindow = null; // 清理静态引用
+            }
+
+            // 清理控件资源
+            if (ButtonImage != null)
+            {
+                ButtonImage.Source = null; // 释放图片资源
+                ButtonImage = null; // 清理引用
+            }
+            if (ButtonTitle != null)
+                ButtonTitle = null; // 清理引用
+            iconPath = null;
+
+            iconManager.Dispose(); // 释放图标管理器资源
+            buttonManager.Dispose(); // 释放按钮管理器资源
+
+            ButtonView.Content = null; // 清空 ButtonView 的内容
+            Popup.IsOpen = false; // 关闭弹出菜单
+            Popup.Child = null; // 清理弹出菜单的内容
+
             GC.Collect(); // 强制垃圾回收
-            GC.WaitForPendingFinalizers(); // 等待所有终止线程完成
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
         }
     }

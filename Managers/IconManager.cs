@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
+using System.Windows.Interop;
 using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Managers;
@@ -14,6 +15,10 @@ namespace Quicker.Managers
 {
     internal class IconManager
     {
+        // 释放图标资源
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern bool DestroyIcon(IntPtr hIcon); // 释放图标资源
+
         // 获取文件图标
         [StructLayout(LayoutKind.Sequential)]
         private struct SHFILEINFO
@@ -42,13 +47,15 @@ namespace Quicker.Managers
         /// <returns> 图标 </returns>
         public ImageSource GetIcon(string appPath)
         {
-            uint flags = SHGFI_ICON | SHGFI_LARGEICON; // 获取大图标
-            nint hIcon = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out SHFILEINFO shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags); // 获取图标句柄
+            uint flags = SHGFI_ICON | SHGFI_LARGEICON;
+            nint hIcon = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out SHFILEINFO shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags);
             if (hIcon != nint.Zero)
             {
-                return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(shfi.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // 创建 BitmapSource
+                ImageSource iconSource = Imaging.CreateBitmapSourceFromHIcon(shfi.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                DestroyIcon(shfi.hIcon); // 显式释放图标资源
+                return iconSource;
             }
-            return null; // 如果获取失败，返回 null
+            return null;
         }
 
         /// <summary>
@@ -120,6 +127,15 @@ namespace Quicker.Managers
                 encoder.Save(stream); // 保存图像到内存流
                 return SHA256.HashData(stream.ToArray()); // 计算内存流的哈希值
             }
+        }
+
+        // 手动释放资源
+        public void Dispose()
+        {
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 }

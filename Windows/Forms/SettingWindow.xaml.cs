@@ -220,12 +220,46 @@ namespace Quicker.Windows
             settingManager.ButtonStyle1_MouseLeave(sender, ToolsStackPanel); // 鼠标移出Button恢复Background
         }
 
-        // 关闭窗口回收资源
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        // 关闭窗口前，释放资源
+        protected override void OnClosed(EventArgs e)
         {
-            base.OnClosing(e); // 调用基类的OnClosing方法
-            settingManager.ClearCaches(); // 清空缓存
-            GC.Collect(); // 回收资源
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+
+            settingManager.Dispose(); // 清空缓存
+            settingManager = null; // 清理引用
+            ShortcutKeys.Clear(); // 清空快捷键列表
+
+            foreach (var child in MenuGrid.Children.OfType<StackPanel>()) // 清理用户控件
+            {
+                child.Children.Clear(); // 清空 StackPanel 的子元素
+            }
+            ResultGrid.Children.Clear(); // 清空 ResultGrid 的子元素
+
+            foreach (var button in MenuGrid.Children.OfType<Button>()) // 清理事件处理器
+            {
+                button.Click -= BasicSetting_Click;
+                button.Click -= Auxiliary_Functions_Click;
+                button.Click -= Tools_Click;
+                button.Click -= Convention_Click;
+                button.Click -= OpenMainWindow_Click;
+                button.Click -= Blacklist_Click;
+                button.Click -= Appearance_Click;
+                button.Click -= AboutQuicker_Click;
+                button.MouseLeave -= BasicSetting_MouseLeave;
+                button.MouseLeave -= Auxiliary_Functions_MouseLeave;
+                button.MouseLeave -= Tools_MouseLeave;
+                button.MouseLeave -= Convention_MouseLeave;
+                button.MouseLeave -= OpenMainWindow_MouseLeave;
+                button.MouseLeave -= Blacklist_MouseLeave;
+                button.MouseLeave -= Appearance_MouseLeave;
+                button.MouseLeave -= AboutQuicker_MouseLeave;
+            }
+            this.Icon = null; // 清理窗口图标
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 }

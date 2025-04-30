@@ -20,5 +20,17 @@ namespace Quicker.Windows
                 this.Close();
             }
         }
+
+        // 关闭窗口前释放资源
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+            this.ContentRendered -= LoadingWindow_ContentRendered; // 清理事件处理器
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
     }
 }

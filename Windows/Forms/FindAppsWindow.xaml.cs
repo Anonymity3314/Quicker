@@ -742,31 +742,27 @@ namespace Quicker.Windows
             }
         }
 
-        // 关闭该窗口时清除内存占用
+        // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 调用基类方法
-            _allApplications.Clear(); // 清空应用列表
-            iconCache.Clear(); // 清空图标缓存
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
             ApplicationSelected = null; // 清空事件
-            AddWindow.FindAppsWindow = null; // 清空静态字段
-
-            // 释放其他资源
-            foreach (var icon in iconCache.Values)
+            _allApplications.Clear(); // 清空应用列表
+            foreach (var icon in iconCache.Values) // 清理图片资源
             {
                 if (icon is IDisposable disposableIcon)
-                {
                     disposableIcon.Dispose(); // 释放图标资源
-                }
             }
+            iconCache.Clear(); // 清空图标缓存
+            AddWindow.FindAppsWindow = null;
+            linkTargetCache.Clear(); // 清空快捷方式目标路径缓存
+            fileHashCache.Clear(); // 清空文件哈希缓存
+            findAppsWindow = null; // 清空静态引用
 
-            foreach (var app in _allApplications)
-            {
-                if (app.Icon is IDisposable disposableAppIcon)
-                {
-                    disposableAppIcon.Dispose(); // 释放应用图标资源
-                }
-            }
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 

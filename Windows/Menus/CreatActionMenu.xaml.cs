@@ -9,20 +9,16 @@ namespace Quicker.Windows
 {
     public partial class CreatActionMenu : Window
     {
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         public string CurrentButton { get; private set; } // 当前按钮
-        private readonly ButtonManager buttonManager; // 按钮管理器
-        private readonly WindowManager windowManager; // 窗口管理器
-        private readonly SettingDatabase db1; // 设置数据库
         public event Action? ClosingOrHiding; // 事件
 
         public CreatActionMenu(string currentbutton)
         {
             InitializeComponent();
             CurrentButton = currentbutton;
-
-            db1 = new SettingDatabase(); // 初始化设置数据库
-            buttonManager = new ButtonManager(); // 初始化按钮管理器
-            windowManager = new WindowManager(); // 初始化窗口管理器
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
@@ -63,6 +59,19 @@ namespace Quicker.Windows
         {
             ClosingOrHiding?.Invoke();
             this.Visibility = Visibility.Hidden;
+        }
+
+        // 关闭窗口前释放资源
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+            ClosingOrHiding = null; // 清理事件
+            buttonManager.CloseMainWindow(this); // 关闭主窗口并释放引用
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 }
