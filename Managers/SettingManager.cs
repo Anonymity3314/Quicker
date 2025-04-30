@@ -4,7 +4,6 @@ using System.Windows.Media;
 using System.Diagnostics;
 using System.Windows;
 using System;
-using static Quicker.Managers.SettingManager;
 
 namespace Quicker.Managers
 {
@@ -96,7 +95,7 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 
+        /// 改变Button类型1样式
         /// </summary>
         /// <param name="targetStackPanel"> 目标StackPanel </param>
         /// <param name="targetButton"> 目标Button </param>
@@ -131,7 +130,7 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 
+        /// 改变Button类型2样式
         /// </summary>
         /// <param name="targetButton"> 目标Button </param>
         /// <param name="stackPanel"> 目标StackPanel </param>

@@ -44,6 +44,7 @@ namespace Quicker.UserControls
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 FullScreenDisableCheckBox.IsChecked = settingManager.blacklistSettings.FullScreenDisable; // 设置全屏禁用复选框
+                //ApplyBlacklistToExpandHotkeysCheckBox.IsChecked = settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys; // 设置展开快捷键复选框
             }); // 刷新UI
 
             LoadBlacklistAppsIntoCache(); // 加载黑名单应用到缓存
@@ -72,7 +73,6 @@ namespace Quicker.UserControls
                 AddWhitelistItem(KeyValuePair.Value.ApplicationName); // 添加到白名单列表
             }
             whitelistDict.Clear(); // 清空字典
-
             isLoading = false; // 加载完成
         }
 

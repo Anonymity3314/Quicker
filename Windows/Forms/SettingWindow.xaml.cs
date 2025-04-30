@@ -41,8 +41,7 @@ namespace Quicker.Windows
         // 应用设置
         private async void ApplySettings(object sender, RoutedEventArgs e)
         {
-            // 在后台线程中执行保存操作
-            await Task.Run(() =>
+            await Task.Run(() => // 在后台线程中执行保存操作
             {
                 bool succeed = true; // 保存成功标志
                 var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
@@ -104,8 +103,10 @@ namespace Quicker.Windows
                 {
                     if (localMachine != null)
                     {
-                        if (autostart) localMachine.SetValue(keyName, appPath); // 设置开机自启动
-                        else localMachine.DeleteValue(keyName, false); // 移除开机自启动
+                        if (autostart)
+                            localMachine.SetValue(keyName, appPath); // 设置开机自启动
+                        else
+                            localMachine.DeleteValue(keyName, false); // 移除开机自启动
                     }
                     else return false; // 如果无法打开注册表，返回失败
                 }
