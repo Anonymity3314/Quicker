@@ -39,6 +39,7 @@ namespace Quicker.Windows
         private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        ActionManager actionManager = new ActionManager(); // 动作管理器
         private System.Windows.Point initialMousePosition; // 鼠标初始位置
         private string CommonStyle; // 样式
         private readonly App app; // App实例
@@ -59,11 +60,12 @@ namespace Quicker.Windows
             Application.Current.Dispatcher.Invoke(() =>
             {
                 GenerateCanvas(0, "Global"); // 生成全局 Canvas
-
-                var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
-                bool haveCommonStyleButton = buttonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 是否存在通用样式按钮
-                if (!haveCommonStyleButton) CommonStyle = "Common"; // 如果不存在通用样式按钮，设置为默认样式
-                GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
+                if (db2.TableExists(CommonStyle)) // 如果存在通用样式按钮数据表
+                {
+                    var commonButtonData = db2.GetButtonDataByPrefix(CommonStyle); // 从数据库中获取通用按钮数据
+                    bool haveCommonStyleButton = commonButtonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 是否存在通用样式按钮
+                    if (haveCommonStyleButton) GenerateCanvas(0, CommonStyle); // 如果存在页面按钮，生成通用 Canvas
+                }
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
 
@@ -77,8 +79,7 @@ namespace Quicker.Windows
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
-            // 设置窗口置顶
-            windowManager.SetWindowTopmost(this);
+            windowManager.SetWindowTopmost(this);// 设置窗口置顶
             EditCommonLabel(); // 编辑通用标签
         }
 
@@ -86,7 +87,8 @@ namespace Quicker.Windows
         private int GetTotalAntionPageIndex(string targetStyle)
         {
             int TotalAntionPageIndex = 0; // 重置页面索引
-            var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
+            if (!db2.TableExists(targetStyle)) return TotalAntionPageIndex; // 如果不存在该样式的按钮数据表，返回
+            var buttonData = db2.GetButtonDataByPrefix(targetStyle); // 从数据库中获取按钮数据
             foreach (var data in buttonData)
             {
                 string buttonID = data.ButtonID; // 获取按钮ID
@@ -288,32 +290,6 @@ namespace Quicker.Windows
         {
             PageChangeButton_MouseEnter(sender, e, CommonStyle, "#FFB9B9B9"); // 改变按钮颜色
         }
-
-        // 鼠标移出Button还原外观
-        private void Button_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData data && data.Location != null) 
-            {
-                Canvas.SetZIndex(button, 0); // 还原按钮层级
-                button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 还原背景颜色
-            }
-            else
-            {
-                button.Content = null; // 清空按钮内容
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 还原背景颜色
-            }
-        }
-        private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            PageChangeButton_MouseLeave(sender, e, "Global", "#FFD3D3D3"); // 还原按钮颜色
-        }
-        private void CommonActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            PageChangeButton_MouseLeave(sender, e, CommonStyle, "#FFD3D3D3"); // 还原按钮颜色
-        }
-
         /// <summary>
         /// 鼠标移入Button改变外观
         /// </summary>
@@ -350,6 +326,30 @@ namespace Quicker.Windows
             }
         }
 
+        // 鼠标移出Button还原外观
+        private void Button_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Button button = sender as Button; // 获取Button对象
+            if (button.Tag is ButtonData data && data.Location != null) 
+            {
+                Canvas.SetZIndex(button, 0); // 还原按钮层级
+                button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
+                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 还原背景颜色
+            }
+            else
+            {
+                button.Content = null; // 清空按钮内容
+                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 还原背景颜色
+            }
+        }
+        private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            PageChangeButton_MouseLeave(sender, e, "Global", "#FFD3D3D3"); // 还原按钮颜色
+        }
+        private void CommonActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            PageChangeButton_MouseLeave(sender, e, CommonStyle, "#FFD3D3D3"); // 还原按钮颜色
+        }
         /// <summary>
         /// 鼠标移出Button还原外观
         /// </summary>
@@ -670,7 +670,7 @@ namespace Quicker.Windows
             if (canvasIndex == 0) return true;
             string pattern = $@"^{style}{canvasIndex}(\d)(\d)(\d)$"; // 正则表达式模式
             Regex regex = new Regex(pattern); // 创建正则表达式对象
-            var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
+            var buttonData = db2.GetButtonDataByPrefix(style); // 从数据库中获取按钮数据
             foreach (var data in buttonData) // 遍历按钮数据字典
             {
                 string buttonID = data.ButtonID; // 获取按钮ID
@@ -739,7 +739,7 @@ namespace Quicker.Windows
                     Button button = CreateButton(buttonName, styleResource, Margin, row, col); // 创建按钮
                     newCanvas.Children.Add(button); // 添加按钮到Canvas
 
-                    var buttonData = db2.GetAllButtonData(); // 从数据库中获取按钮数据
+                    var buttonData = db2.GetButtonDataByPrefix(style); // 从数据库中获取按钮数据
                     foreach (var data in buttonData)
                     {
                         if (data.ButtonID == button.Name)

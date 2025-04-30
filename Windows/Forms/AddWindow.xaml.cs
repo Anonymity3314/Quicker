@@ -307,7 +307,8 @@ namespace Quicker
                 WindowState = windowState,
                 Usage = UsageTextBox.Text,
                 CreateTime = DateTime.Now,
-                LatestEditTime = DateTime.Now
+                LatestEditTime = DateTime.Now,
+                Type = "OpenFile"
             }; // 创建按钮数据对象
             (Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
             this.Close(); // 关闭窗口

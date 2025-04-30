@@ -37,7 +37,6 @@ namespace Quicker.Windows
         } // 查找父级控件
 
         private Dictionary<string, List<string>> buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
-        private Dictionary<string, ButtonData> buttonDataDict; // 按钮数据字典
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
@@ -51,8 +50,6 @@ namespace Quicker.Windows
         // 窗口加载事件
         private async void ActionPageManageWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var buttonDataList = db2.GetAllButtonData(); // 获取所有按钮数据
-            buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 将按钮数据转换为字典
             LoadCanvas("Global"); // 加载全局画布
         }
 
@@ -103,19 +100,19 @@ namespace Quicker.Windows
 
 
             buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
-            foreach (var data in buttonDataDict.Values)
-            {
-                string buttonID = data.ButtonID; // 获取按钮ID
-                Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
-                if (match.Success)
-                {
-                    string style = match.Groups[1].Value; // 获取按钮名称
-                    if (!buttonPrefixDict.ContainsKey(style))
-                    {
-                        buttonPrefixDict.Add(style, new List<string>());
-                    }
-                }
-            }
+            //foreach (var data in buttonDataDict.Values)
+            //{
+            //    string buttonID = data.ButtonID; // 获取按钮ID
+            //    Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
+            //    if (match.Success)
+            //    {
+            //        string style = match.Groups[1].Value; // 获取按钮名称
+            //        if (!buttonPrefixDict.ContainsKey(style))
+            //        {
+            //            buttonPrefixDict.Add(style, new List<string>());
+            //        }
+            //    }
+            //}
         }
 
         // 生成动作页按钮
@@ -145,19 +142,17 @@ namespace Quicker.Windows
                     AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
                     break; // 普通动作页
                 default:
-                    bool haveCommonStyleButton = db2.GetAllButtonData().Any(data => data.ButtonID.StartsWith($"{style}")); // 是否有 style 样式的按钮
-                    if (!haveCommonStyleButton) // 如果没有 style 样式的按钮
-                    {
-                        MainBorder.Height = 224; // 设置主边框高度
-                        ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
-                        AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
-                        return;
-                    }
-                    else
+                    if (db2.TableExists(style)) // 如果存在通用样式按钮数据表
                     {
                         MainBorder.Height = 289; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
                         AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
+                    }
+                    else
+                    {
+                        MainBorder.Height = 224; // 设置主边框高度
+                        ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
+                        AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
                     }
                     break;
             }
@@ -176,8 +171,10 @@ namespace Quicker.Windows
         private int GetTotalAntionPageIndex(string style)
         {
             int actionPageIndex = 0; // 动作页索引
-            if (buttonDataDict == null || buttonDataDict.Count == 0) return 0; // 如果按钮数据字典为空，则返回
-            foreach (var data in buttonDataDict.Values)
+            if (!db2.TableExists(style)) return 0; // 如果按钮数据字典为空，则返回
+            var buttonData = db2.GetButtonDataByPrefix(style); // 获取按钮数据
+            if (buttonData == null) return 0; // 如果按钮数据为空，则返回
+            foreach (var data in buttonData)
             {
                 if (data.ButtonID.StartsWith(style))
                 {
@@ -197,6 +194,7 @@ namespace Quicker.Windows
         /// <param name="style"></param>
         private void GenerateCanvas(int canvasIndex, string style)
         {
+            if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
             string canvasName = $"{style}{canvasIndex}"; // 画布名称
             Canvas dynamicCanvas = new Canvas // 创建画布
             {
@@ -263,8 +261,9 @@ namespace Quicker.Windows
 
                     dynamicCanvas.Children.Add(button); // 将按钮添加到画布
 
-                    if (buttonDataDict != null && buttonDataDict.TryGetValue(buttonName, out ButtonData data))
+                    if (db2.TableExists(style))
                     {
+                        var data = db2.GetButtonDataByID(buttonName); // 获取按钮数据
                         buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
                     }
                 }
@@ -492,8 +491,6 @@ namespace Quicker.Windows
                     string style = matchButton.Groups[1].Value; // 动作页样式
 
                     db2.SwapButtonAValues(style, sourceIndex, targetIndex); // 更新数据库 Button A 值
-                    var buttonDataList = db2.GetAllButtonData(); // 获取所有按钮数据
-                    buttonDataDict = buttonDataList.ToDictionary(data => data.ButtonID); // 转换为字典
                     LoadCanvas(style); // 刷新界面
                 }
             }
@@ -552,9 +549,6 @@ namespace Quicker.Windows
 
             // 清理其他资源
             buttonPrefixDict.Clear(); // 清空按钮前缀字典
-            buttonDataDict?.Clear(); // 清空按钮数据字典
-            buttonDataDict = null; // 释放字典引用
-
             GC.Collect(); // 强制垃圾回收
         }
     }
