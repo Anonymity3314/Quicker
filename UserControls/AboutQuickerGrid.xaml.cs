@@ -10,6 +10,7 @@ namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {
+        ActionManager actionManager = new ActionManager(); // 创建动作管理器
         SettingManager settingManager; // 读取设置的管理器
 
         public AboutQuickerGrid()
@@ -54,34 +55,21 @@ namespace Quicker.UserControls
         }
 
         // 前往图标网站www.iconfont.cn
-        private void www_iconfont_cn_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void www_iconfont_cn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OpenWebsite("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
+            actionManager.OpenWebsite("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
         }
 
         // 前往图标网站icons8.com
-        private void icons8_com_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void icons8_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OpenWebsite("https://icons8.com/"); // 打开图标网站icons8.com
+            actionManager.OpenWebsite("https://icons8.com/"); // 打开图标网站icons8.com
         }
 
         // 前往图标网站fontawesome.com
-        private void fontawesome_com_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void fontawesome_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OpenWebsite("https://fontawesome.com/"); // 打开图标网站fontawesome.com
-        }
-
-        /// <summary>
-        /// 打开指定网站
-        /// </summary>
-        /// <param name="website"> 网站地址 </param>
-        private void OpenWebsite(string website)
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = website, // 打开指定网站
-                UseShellExecute = true // 使用外壳程序启动
-            });
+            actionManager.OpenWebsite("https://fontawesome.com/"); // 打开图标网站fontawesome.com
         }
 
         // 基础设置-关于Quicker-隐私声明

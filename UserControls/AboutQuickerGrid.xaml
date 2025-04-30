@@ -29,16 +29,16 @@
             <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
             <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
             <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
-            <Label Content="更新历史" HorizontalAlignment="Left" Margin="95,65,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseDoubleClick="OpenUpdateLog">
-                <Label.ToolTip>
-                    <ToolTip Content="双击查看" FontSize="12" Foreground="Black"/>
-                </Label.ToolTip>
-            </Label>
+            <TextBlock Text="更新历史" HorizontalAlignment="Left" Margin="96,70,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseLeftButtonDown="OpenUpdateLog">
+                <TextBlock.ToolTip>
+                    <ToolTip Content="点击查看" FontSize="12" Foreground="Black"/>
+                </TextBlock.ToolTip>
+            </TextBlock>
             <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
             <Label HorizontalAlignment="Left" Margin="9,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
-            <Label x:Name="www_iconfont_cn" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Content="www.iconfont.cn" MouseDoubleClick="www_iconfont_cn_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <Label x:Name="fontawesome_com" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Content="fontawesome.com" MouseDoubleClick="fontawesome_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <Label x:Name="icons8_com" ToolTip="双击前往" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Content="icons8.com" MouseDoubleClick="icons8_com_MouseDoubleClick" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="icons8_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
         </Grid>
 
         <!-- 基础设置-关于Quicker-隐私声明 -->

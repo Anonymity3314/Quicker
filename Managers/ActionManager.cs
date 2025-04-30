@@ -80,6 +80,19 @@ namespace Quicker.Managers
             return shortcut.TargetPath; // 获取快捷方式的目标路径
         }
 
+        /// <summary>
+        /// 打开指定网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        public void OpenWebsite(string website)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = website, // 打开指定网站
+                UseShellExecute = true // 使用外壳程序启动
+            });
+        }
+
         // 手动释放资源
         public void Dispose()
         {

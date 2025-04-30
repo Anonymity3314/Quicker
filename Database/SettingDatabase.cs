@@ -30,18 +30,21 @@ public class SettingDatabase
         //UpdateDatabase(); // 升级数据库
     }
 
+    // 判断数据库是否是最新版本
     public bool IsNewVersion()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
         using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询命令
-        var currentVersion = reader.GetString(1); // 返回版本号
-
-        var targetVersion = "2.1.1"; // 目标版本
-        if (currentVersion == targetVersion)
-            return true; // 数据库版本已是最新，返回true
-        return false; // 数据库版本不是最新，返回false
+        if (reader.Read()) // 检查是否有数据
+        {
+            var currentVersion = reader.GetString(0); // 返回版本号
+            var targetVersion = "2.1.1"; // 目标版本
+            if (currentVersion == targetVersion)
+                return true; // 数据库版本已是最新，返回true
+        }
+        return false; // 数据库版本不是最新，或者没有数据，返回false
     }
 
     // 升级数据库
@@ -93,7 +96,6 @@ public class SettingDatabase
         insertConventionCommand.Parameters.AddWithValue("@LongPressThreshold", 300); // 长按阈值
         insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
         insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
-
         insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
     }
 
