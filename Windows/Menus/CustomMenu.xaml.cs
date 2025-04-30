@@ -44,6 +44,7 @@ namespace Quicker.Windows
         {
             this.Dispatcher.Invoke(() =>
             {
+                app.PreLoadMainWindow(); // 调用App类中的PreLoadMainWindow方法
                 app.CloseOrShowMainWindow(); // 调用App类中的CloseOrShowMainWindow方法
             });
             this.Visibility = Visibility.Hidden;

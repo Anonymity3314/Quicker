@@ -21,24 +21,8 @@ namespace Quicker.Database
             }
 
             SQLiteConnection.CreateFile("Button.db"); // 创建数据库文件
-            using var connection = OpenConnection(); // 打开数据库连接
-            string createTableQuery = @"
-            CREATE TABLE IF NOT EXISTS [ButtonData]
-            (
-                ButtonID TEXT PRIMARY KEY,
-                ButtonName TEXT,
-                Location TEXT,
-                ImagePath TEXT,
-                RunByMessager BOOL,
-                TryToOpenExitingWindow BOOL,
-                WindowState INT,
-                Usage TEXT,
-                CreateTime DATETIME,
-                LatestEditTime DATETIME,
-                Type TEXT
-            );";
-            using var command = new SQLiteCommand(createTableQuery, connection); // 创建命令对象
-            command.ExecuteNonQuery(); // 执行创建表格语句
+            CreateButtonTable("Global"); // 创建全局表格
+            CreateButtonTable("Common"); // 创建通用表格
         }
 
         /// <summary>

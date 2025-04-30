@@ -363,7 +363,7 @@ namespace Quicker
         }
 
         // 预加载主窗口
-        private void PreLoadMainWindow()
+        public void PreLoadMainWindow()
         {
             this.Dispatcher.Invoke(() =>
             {
