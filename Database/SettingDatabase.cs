@@ -30,12 +30,6 @@ public class SettingDatabase
         var targetVersion = "2.1.1"; // 目标版本
         if (currentVersion == targetVersion)
             return; // 数据库版本已是最新，直接返回
-
-        using var connection = OpenConnection(); // 打开数据库连接
-        string updateVersionQuery = @"UPDATE Convention SET TotaUsageTime = 180000.0;"; // 设置默认值
-        using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
-        updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
-
         //UpdateDatabase(); // 升级数据库
     }
 

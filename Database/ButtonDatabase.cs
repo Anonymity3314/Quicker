@@ -9,17 +9,19 @@ namespace Quicker.Database
 {
     public class ButtonDatabase
     {
-        private readonly string dbPath2 = "Data Source=Button.db;Pooling=true;Max Pool Size=100;";
+        private readonly string dbPath2 = "Data Source=Button.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
 
         // 初始化数据库
         public void Initialize()
         {
-            if (File.Exists("Button.db")) return;
-            SQLiteConnection.CreateFile("Button.db");
+            if (File.Exists("Button.db")) 
+            {
+                MigrateOldData();
+                return; // 数据库已存在，不再初始化
+            }
 
-            using var connection = new SQLiteConnection(dbPath2);
-            connection.Open();
-
+            SQLiteConnection.CreateFile("Button.db"); // 创建数据库文件
+            using var connection = OpenConnection(); // 打开数据库连接
             string createTableQuery = @"
             CREATE TABLE IF NOT EXISTS [ButtonData]
             (
@@ -32,10 +34,283 @@ namespace Quicker.Database
                 WindowState INT,
                 Usage TEXT,
                 CreateTime DATETIME,
-                LatestEditTime DATETIME
+                LatestEditTime DATETIME,
+                Type TEXT
             );";
-            using var command = new SQLiteCommand(createTableQuery, connection);
-            command.ExecuteNonQuery();
+            using var command = new SQLiteCommand(createTableQuery, connection); // 创建命令对象
+            command.ExecuteNonQuery(); // 执行创建表格语句
+        }
+
+        /// <summary>
+        /// 将旧表中的所有按钮迁移到对应的新表并删除旧表
+        /// </summary>
+        public void MigrateOldData()
+        {
+            try
+            {
+                // 检测数据库文件是否存在
+                if (!File.Exists("Button.db"))
+                {
+                    Console.WriteLine("数据库文件不存在，无需迁移。");
+                    return;
+                }
+
+                // 创建一个新的数据库连接
+                var connection = new SQLiteConnection(dbPath2);
+                connection.Open();
+
+                try
+                {
+                    // 检测数据库中是否存在 ButtonData 表
+                    using var checkCommand = new SQLiteCommand(
+                        "SELECT name FROM sqlite_master WHERE type='table' AND name='ButtonData'",
+                        connection);
+                    using var checkReader = checkCommand.ExecuteReader();
+                    if (!checkReader.Read())
+                    {
+                        // 如果不存在 ButtonData 表，直接返回，避免出错
+                        Console.WriteLine("ButtonData 表不存在，无需迁移。");
+                        return;
+                    }
+
+                    // 将旧表重命名为临时表
+                    using var renameCommand = new SQLiteCommand("ALTER TABLE ButtonData RENAME TO Temp_ButtonData", connection);
+                    renameCommand.ExecuteNonQuery();
+
+                    // 获取旧表ButtonData中的所有按钮数据
+                    var oldButtonData = new List<ButtonData>();
+                    using var oldCommand = new SQLiteCommand("SELECT * FROM Temp_ButtonData", connection);
+                    using var oldReader = oldCommand.ExecuteReader();
+                    while (oldReader.Read())
+                    {
+                        oldButtonData.Add(new ButtonData
+                        {
+                            ButtonID = oldReader.GetString(0),
+                            ButtonName = oldReader.GetString(1),
+                            Location = oldReader.GetString(2),
+                            ImagePath = oldReader.GetString(3),
+                            RunByMessager = oldReader.GetBoolean(4),
+                            TryToOpenExitingWindow = oldReader.GetBoolean(5),
+                            WindowState = oldReader.GetInt32(6),
+                            Usage = oldReader.GetString(7),
+                            CreateTime = oldReader.GetDateTime(8),
+                            LatestEditTime = oldReader.GetDateTime(9),
+                            Type = "OpenFile"
+                        });
+                    }
+
+                    // 提交到目前为止的操作，释放锁
+                    connection.Close();
+                    connection.Dispose();
+
+                    // 重新打开数据库连接以执行后续操作
+                    connection = new SQLiteConnection(dbPath2);
+                    connection.Open();
+
+                    using var transaction = connection.BeginTransaction(); // 开始事务
+
+                    try
+                    {
+                        // 将每个按钮数据迁移到对应的新表中
+                        foreach (var buttonData in oldButtonData)
+                        {
+                            string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+                            CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
+
+                            string insertQuery = $@"INSERT INTO {tableName} 
+                        (ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime, Type) 
+                        VALUES 
+                        (@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime, @Type)";
+
+                            using var insertCommand = new SQLiteCommand(insertQuery, connection);
+                            insertCommand.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID);
+                            insertCommand.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName);
+                            insertCommand.Parameters.AddWithValue("@Location", buttonData.Location);
+                            insertCommand.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath);
+                            insertCommand.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager);
+                            insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow);
+                            insertCommand.Parameters.AddWithValue("@WindowState", buttonData.WindowState);
+                            insertCommand.Parameters.AddWithValue("@Usage", buttonData.Usage);
+                            insertCommand.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime);
+                            insertCommand.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime);
+                            insertCommand.Parameters.AddWithValue("@Type", buttonData.Type);
+
+                            insertCommand.ExecuteNonQuery(); // 执行插入语句
+                        }
+
+                        transaction.Commit(); // 提交事务
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback(); // 回滚事务
+                        throw new Exception("迁移数据失败: " + ex.Message);
+                    }
+
+                    // 删除临时表
+                    using var dropCommand = new SQLiteCommand("DROP TABLE Temp_ButtonData", connection);
+                    dropCommand.ExecuteNonQuery();
+
+                    Console.WriteLine("迁移成功，旧表已删除。");
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("迁移失败: " + ex.Message);
+                }
+                finally
+                {
+                    // 确保连接被关闭和释放
+                    if (connection.State == System.Data.ConnectionState.Open)
+                    {
+                        connection.Close();
+                    }
+                    connection.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("迁移失败: " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 创建Button表格
+        /// </summary>
+        /// <param name="tableName"> 要创建的表格名称 </param>
+        public void CreatButttonTable(string tableName)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            string createTableQuery = @"CREATE TABLE IF NOT EXISTS [" + tableName + @"]
+            (
+                ButtonID TEXT PRIMARY KEY,
+                ButtonName TEXT,
+                Location TEXT,
+                ImagePath TEXT,
+                RunByMessager BOOL,
+                TryToOpenExitingWindow BOOL,
+                WindowState INT,
+                Usage TEXT,
+                CreateTime DATETIME,
+                LatestEditTime DATETIME,
+                Type TEXT
+            );";
+            using var command = new SQLiteCommand(createTableQuery, connection); // 创建命令对象
+            command.ExecuteNonQuery(); // 执行创建表格语句
+        }
+
+        /// <summary>
+        /// 添加新动作
+        /// </summary>
+        /// <param name="buttonData"> 要添加的动作数据 </param>
+        /// <summary>
+        /// 添加新动作到对应表中
+        /// </summary>
+        /// <param name="buttonData">要添加的动作数据</param>
+        public void newAddAction(ButtonData buttonData)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
+            string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+            CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
+            string query = $@"INSERT INTO {tableName} 
+            (ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime, Type) 
+            VALUES 
+            (@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime, @Type)"; // 创建SQL语句
+            using var command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
+            command.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName); // 动作名称
+            command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
+            command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
+            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager); // 是否用管理员身份运行
+            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow); // 是否尝试打开已有窗口
+            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState); // 窗口状态
+            command.Parameters.AddWithValue("@Usage", buttonData.Usage); // 用途
+            command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
+            command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
+            command.Parameters.AddWithValue("@Type", buttonData.Type); // 类型
+            command.ExecuteNonQuery(); // 执行插入语句
+            transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 通过ButtonID从对应表中获取数据
+        /// </summary>
+        /// <param name="buttonID"> 要获取数据的ButtonID </param>
+        /// <returns> ButtonData对象，如果找不到则返回null </returns>
+        public ButtonData newGetButtonDataByID(string buttonID)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            string tableName = GetTableNameFromButtonID(buttonID); // 从ButtonID解析表名
+            using var command = new SQLiteCommand($"SELECT * FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令对象
+            command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
+            using var reader = command.ExecuteReader(); // 执行查询语句
+            if (reader.Read())
+            {
+                return new ButtonData
+                {
+                    ButtonID = reader.GetString(0), // 动作ID
+                    ButtonName = reader.GetString(1), // 动作名称
+                    Location = reader.GetString(2), // 位置
+                    ImagePath = reader.GetString(3), // 图片路径
+                    RunByMessager = reader.GetBoolean(4), // 是否用管理员身份运行
+                    TryToOpenExitingWindow = reader.GetBoolean(5), // 是否尝试打开已有窗口
+                    WindowState = reader.GetInt32(6), // 窗口状态
+                    Usage = reader.GetString(7), // 用途
+                    CreateTime = reader.GetDateTime(8), // 创建时间
+                    LatestEditTime = reader.GetDateTime(9), // 最近修改时间
+                    Type = reader.IsDBNull(10) ? null : reader.GetString(10) // 类型
+                };
+            }
+            return null; // 没有找到数据
+        }
+
+        /// <summary>
+        /// 更新对应表中的动作数据
+        /// </summary>
+        /// <param name="buttonData"> 要更新的动作数据 </param>
+        public void newUpdateAction(ButtonData buttonData)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
+            string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+            string query = $@"UPDATE {tableName} SET 
+            ButtonName = @ButtonName, 
+            Location = @Location, 
+            ImagePath = @ImagePath, 
+            RunByMessager = @RunByMessager, 
+            TryToOpenExitingWindow = @TryToOpenExitingWindow, 
+            WindowState = @WindowState, 
+            Usage = @Usage, 
+            CreateTime = @CreateTime, 
+            LatestEditTime = @LatestEditTime 
+            WHERE ButtonID = @ButtonID"; // 更新指定表中的数据
+            using var command = new SQLiteCommand(query, connection); // 创建命令对象
+            command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
+            command.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName); // 动作名称
+            command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
+            command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
+            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager); // 是否用管理员身份运行
+            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow); // 是否尝试打开已有窗口
+            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState); // 窗口状态
+            command.Parameters.AddWithValue("@Usage", buttonData.Usage); // 用途
+            command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
+            command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
+            command.ExecuteNonQuery(); // 执行更新语句
+            transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 从对应表中删除动作数据
+        /// </summary>
+        /// <param name="buttonID"> 要删除的动作ID </param>
+        public void newDeleteAction(string buttonID)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
+            string tableName = GetTableNameFromButtonID(buttonID); // 从ButtonID解析表名
+            using var command = new SQLiteCommand($"DELETE FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令对象
+            command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
+            command.ExecuteNonQuery(); // 执行删除语句
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>
@@ -45,8 +320,7 @@ namespace Quicker.Database
         /// <returns>动作信息</returns>
         public ButtonData GetButtonDataByID(string buttonID)
         {
-            using var connection = new SQLiteConnection(dbPath2);
-            connection.Open();
+            using var connection = OpenConnection(); // 打开数据库连接
             using var command = new SQLiteCommand("SELECT * FROM ButtonData WHERE ButtonID = @ButtonID", connection);
             command.Parameters.AddWithValue("@ButtonID", buttonID);
             using var reader = command.ExecuteReader();
@@ -64,6 +338,7 @@ namespace Quicker.Database
                     Usage = reader.GetString(7),
                     CreateTime = reader.GetDateTime(8),
                     LatestEditTime = reader.GetDateTime(9),
+                    Type = reader.IsDBNull(10) ? null : reader.GetString(10)
                 };
             }
             return null;
@@ -91,36 +366,35 @@ namespace Quicker.Database
                     Usage = reader.IsDBNull(7) ? null : reader.GetString(7),
                     CreateTime = reader.IsDBNull(8) ? DateTime.MinValue : reader.GetDateTime(8),
                     LatestEditTime = reader.IsDBNull(9) ? DateTime.MinValue : reader.GetDateTime(9),
+                    Type = reader.IsDBNull(10) ? null : reader.GetString(10)
                 });
             }
             return contents;
         }
-
+        
         /// <summary>
         /// 添加动作
         /// </summary>
         /// <param name="buttonData">要添加的动作ID</param>
         public void AddAction(ButtonData buttonData)
         {
-            using var connection = new SQLiteConnection(dbPath2);
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-            using var command = new SQLiteCommand(
-            "INSERT INTO ButtonData " +
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
+            using var command = new SQLiteCommand("INSERT INTO ButtonData " +
                 "(ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime) " +
                 "VALUES " +
                 "(@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime)",
             connection);
-            command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID);
-            command.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName);
-            command.Parameters.AddWithValue("@Location", buttonData.Location);
-            command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath);
-            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager);
-            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow);
-            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState);
-            command.Parameters.AddWithValue("@Usage", buttonData.Usage);
-            command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime);
-            command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime);
+            command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
+            command.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName); // 动作名称
+            command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
+            command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
+            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager); // 是否用管理员身份运行
+            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow); // 是否尝试打开已有窗口
+            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState); // 窗口状态
+            command.Parameters.AddWithValue("@Usage", buttonData.Usage); // 用途
+            command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
+            command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
             command.ExecuteNonQuery();
             transaction.Commit();
         }
@@ -131,8 +405,7 @@ namespace Quicker.Database
         /// <param name="buttonData">要更新的动作ID</param>
         public void UpdateAction(ButtonData buttonData)
         {
-            using var connection = new SQLiteConnection(dbPath2);
-            connection.Open();
+            using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction();
             using var command = new SQLiteCommand(
             "UPDATE ButtonData SET " +
@@ -166,13 +439,12 @@ namespace Quicker.Database
         /// <param name="buttonID">要删除的动作ID</param>
         public void DeleteAction(string buttonID)
         {
-            using var connection = new SQLiteConnection(dbPath2);
-            connection.Open();
-            using var transaction = connection.BeginTransaction();
-            using var command = new SQLiteCommand("DELETE FROM ButtonData WHERE ButtonID = @ButtonID", connection);
-            command.Parameters.AddWithValue("@ButtonID", buttonID);
-            command.ExecuteNonQuery();
-            transaction.Commit();
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
+            using var command = new SQLiteCommand("DELETE FROM ButtonData WHERE ButtonID = @ButtonID", connection); // 创建命令
+            command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
+            command.ExecuteNonQuery(); // 执行命令
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>
@@ -182,9 +454,7 @@ namespace Quicker.Database
         /// <param name="buttonID2"></param>
         public void ExchangeButtonID(string buttonID1, string buttonID2)
         {
-            using var connection = new SQLiteConnection(dbPath2); // 连接数据库
-            connection.Open(); // 打开连接
-
+            using var connection = OpenConnection(); // 打开连接
             var data1 = GetButtonDataByID(buttonID1); // 获取 ButtonID1 的数据
             var data2 = GetButtonDataByID(buttonID2); // 获取 ButtonID2 的数据
             using var transaction = connection.BeginTransaction(); // 开始事务
@@ -295,20 +565,65 @@ namespace Quicker.Database
                 }
             }
         }
+
+        /// <summary>
+        /// 使用正则表达式从 ButtonID 提取表名
+        /// </summary>
+        /// <param name="buttonID"> ButtonID </param>
+        /// <returns> 表名 </returns>
+        private string GetTableNameFromButtonID(string buttonID)
+        {
+            Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID 格式
+            return match.Groups[1].Value; // 返回表名
+        }
+
+        /// <summary>
+        /// 检查表是否存在，不存在则创建
+        /// </summary>
+        /// <param name="tableName"> 要检查的表名 </param>
+        /// <param name="connection"> 数据库连接 </param>
+        private void CheckAndCreateTable(string tableName, SQLiteConnection connection)
+        {
+            string createTableQuery = $@"CREATE TABLE IF NOT EXISTS [{tableName}]
+            (
+                ButtonID TEXT PRIMARY KEY,
+                ButtonName TEXT,
+                Location TEXT,
+                ImagePath TEXT,
+                RunByMessager BOOL,
+                TryToOpenExitingWindow BOOL,
+                WindowState INT,
+                Usage TEXT,
+                CreateTime DATETIME,
+                LatestEditTime DATETIME,
+                Type TEXT
+            );"; // 创建表
+            using var command = new SQLiteCommand(createTableQuery, connection); // 创建命令对象
+            command.ExecuteNonQuery(); // 执行创建表语句
+        }
+
+        // 打开数据库连接
+        private SQLiteConnection OpenConnection()
+        {
+            var connection = new SQLiteConnection(dbPath2); // 创建 SQLiteConnection 对象
+            connection.Open(); // 打开数据库连接
+            return connection; // 返回打开的连接
+        }
     }
 
     // ButtonData 类
     public class ButtonData
     {
-        public string ButtonID { get; set; }
-        public string ButtonName { get; set; }
-        public string Location { get; set; }
-        public string ImagePath { get; set; }
-        public bool RunByMessager { get; set; }
-        public bool TryToOpenExitingWindow { get; set; }
-        public int WindowState { get; set; }
-        public string Usage { get; set; }
-        public DateTime CreateTime { get; set; }
-        public DateTime LatestEditTime { get; set; }
+        public string ButtonID { get; set; } // 动作ID
+        public string ButtonName { get; set; } // 动作名称
+        public string Location { get; set; } // 位置
+        public string ImagePath { get; set; } // 图片路径
+        public bool RunByMessager { get; set; } // 是否用管理员身份运行
+        public bool TryToOpenExitingWindow { get; set; } // 是否尝试打开已有窗口
+        public int WindowState { get; set; } // 窗口状态
+        public string Usage { get; set; } // 用途
+        public DateTime CreateTime { get; set; } // 创建时间
+        public DateTime LatestEditTime { get; set; } // 最近修改时间
+        public string Type { get; set; } // 类型
     }
 }
