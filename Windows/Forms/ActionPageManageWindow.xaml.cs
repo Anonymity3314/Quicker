@@ -41,6 +41,7 @@ namespace Quicker.Windows
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
+        private string type = "Global"; // 动作页类型
 
         public ActionPageManageWindow()
         {
@@ -50,7 +51,7 @@ namespace Quicker.Windows
         // 窗口加载事件
         private async void ActionPageManageWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadCanvas("Global"); // 加载全局画布
+            LoadCanvas(type); // 加载全局画布
         }
 
         // 加载动作页按钮
@@ -384,17 +385,19 @@ namespace Quicker.Windows
         {
             int canvasIndex = MainListView.Items.Count; // 获取画布索引
             if (canvasIndex > 9) return; // 如果索引大于9，则返回
-
-            string canvasName = null; // 画布名称
-            foreach (var item in MainListView.Items)
+            if (canvasIndex == 0)
             {
-                if (item is Canvas canvas)
+                db2.CreateButtonTable(type); // 创建按钮数据表
+                GenerateCanvas(0, type); // 如果画布索引为0，则生成画布
+                if(type != "Global")
                 {
-                    canvasName = canvas.Name; // 获取 Canvas 的名称
-                    break;
+                    MainBorder.Height = 289; // 设置主边框高度
+                    ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                    AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
                 }
+                return;
             }
-            Match matchCanvas = Regex.Match(canvasName, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
+            Match matchCanvas = Regex.Match(type, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
             string style = matchCanvas.Groups[1].Value; // 动作页样式
             GenerateCanvas(canvasIndex, style); // 生成画布
         }
@@ -411,7 +414,8 @@ namespace Quicker.Windows
         private void GlobalButton_Click(object sender, RoutedEventArgs e)
         {
             MainListView.Items.Clear(); // 清空全局列表视图
-            LoadCanvas("Global"); // 加载全局画布
+            type = "Global"; // 设置类型为全局动作页
+            LoadCanvas(type); // 加载全局画布
             MainBorder.Height = 224; // 设置主边框高度
             ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
             AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
@@ -430,19 +434,22 @@ namespace Quicker.Windows
         // 加载CommonCanvas
         private void LoadCommonCanvas()
         {
-            LoadCanvas("Common"); // 加载 Common 画布
+            type = "Common";
+            LoadCanvas(type); // 加载 Common 画布
         }
 
         // 加载任务栏动作页
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadCanvas("TaskBar"); // 加载任务栏动作页
+            type = "TaskBar"; // 设置类型为任务栏动作页
+            LoadCanvas(type); // 加载任务栏动作页
         }
 
         // 加载桌面动作页
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadCanvas("Desktop"); // 加载桌面动作页
+            type = "Desktop"; // 设置类型为桌面动作页
+            LoadCanvas(type); // 加载桌面动作页
         }
 
         // 打开创建动作菜单

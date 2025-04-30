@@ -125,8 +125,9 @@ namespace Quicker.Database
         /// 创建Button表格
         /// </summary>
         /// <param name="tableName"> 要创建的表格名称 </param>
-        public void CreateButtonTable(string tableName, SQLiteConnection connection)
+        public void CreateButtonTable(string tableName)
         {
+            var connection = OpenConnection(); // 打开数据库连接
             string createTableQuery = @"CREATE TABLE IF NOT EXISTS [" + tableName + @"]
             (
                 ButtonID TEXT PRIMARY KEY,
@@ -435,7 +436,7 @@ namespace Quicker.Database
         private void CheckAndCreateTable(string tableName, SQLiteConnection connection)
         {
             if (TableExists(tableName)) return; // 表存在，直接返回
-            CreateButtonTable(tableName, connection); // 创建表
+            CreateButtonTable(tableName); // 创建表
         }
 
         /// <summary>
