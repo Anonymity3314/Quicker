@@ -67,10 +67,8 @@
                     </Grid>
                 </Button>
             </StackPanel>
-
             <!-- 辅助功能 -->
             <StackPanel x:Name="Auxiliary_FunctionsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
-
             <!-- 工具 -->
             <StackPanel x:Name="ToolsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
         </Grid>

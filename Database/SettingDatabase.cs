@@ -26,29 +26,22 @@ public class SettingDatabase
     // 检查数据库版本并进行升级
     public void CheckAndUpgradeDatabase()
     {
-        var currentVersion = GetCurrentConventionVersion(); // 当前版本
-        var targetVersion = "2.1.1"; // 目标版本
-        if (currentVersion == targetVersion)
-            return; // 数据库版本已是最新，直接返回
+        if (IsNewVersion()) return; // 如果数据库是最新版本，则直接返回
         //UpdateDatabase(); // 升级数据库
     }
 
-    // 获取Convention表中的版本号
-    private string GetCurrentConventionVersion()
+    public bool IsNewVersion()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        try
-        {
-            string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
-            using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
-            using var reader = command.ExecuteReader(); // 执行查询命令
-            if (reader.Read())
-            {
-                return reader.GetString(1); // 返回版本号
-            }
-        }
-        catch { }
-        return "2.0.1"; // 数据库中没有版本号，返回默认值
+        string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
+        using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
+        using var reader = command.ExecuteReader(); // 执行查询命令
+        var currentVersion = reader.GetString(1); // 返回版本号
+
+        var targetVersion = "2.1.1"; // 目标版本
+        if (currentVersion == targetVersion)
+            return true; // 数据库版本已是最新，返回true
+        return false; // 数据库版本不是最新，返回false
     }
 
     // 升级数据库

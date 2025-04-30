@@ -28,9 +28,7 @@ namespace Quicker.Windows
             while (child != null)
             {
                 if (child is T parent)
-                {
                     return parent; // 找到父级控件
-                }
                 child = VisualTreeHelper.GetParent(child); // 获取父级控件
             }
             return null;
@@ -41,7 +39,8 @@ namespace Quicker.Windows
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
-        private string type = "Global"; // 动作页类型
+        private bool isDarkModle = false; // 是否为暗黑模式
+        private string type; // 动作页类型
 
         public ActionPageManageWindow()
         {
@@ -51,7 +50,17 @@ namespace Quicker.Windows
         // 窗口加载事件
         private async void ActionPageManageWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadCanvas(type); // 加载全局画布
+            TypeChanged("Global"); // 加载全局动作页
+        }
+
+        /// <summary>
+        /// 类型改变事件
+        /// </summary>
+        /// <param name="targetType"> 目标类型 </param>
+        private void TypeChanged(string targetType)
+        {
+            type = targetType;
+            LoadCanvas(type); // 加载动作页画布
         }
 
         // 加载动作页按钮
@@ -189,10 +198,10 @@ namespace Quicker.Windows
         }
 
         /// <summary>
-        /// 生成画布
+        /// 生成动作页
         /// </summary>
-        /// <param name="canvasIndex"></param>
-        /// <param name="style"></param>
+        /// <param name="canvasIndex"> 动作页索引 </param>
+        /// <param name="style"> 动作页类型</param>
         private void GenerateCanvas(int canvasIndex, string style)
         {
             if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
@@ -278,26 +287,30 @@ namespace Quicker.Windows
             ScrollViewer.ScrollToHorizontalOffset(ScrollBar.Value); // 滚动到指定位置
         }
 
-        // 滚动条鼠标左键按下事件
+        // 鼠标移入按钮改变背景色
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
             Button button = sender as Button; // 获取按钮
-            if (button.Tag is ButtonData data)
-            {
-                if (data.Location != null) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
-                else button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置按钮背景颜色
-            }
+            if (button.Tag is ButtonData data) // 如果按钮数据存在
+                if(isDarkModle)
+                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("LightGray")); // 设置按钮背景颜色
+                else
+                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
+            else
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置按钮背景颜色
         }
 
-        // 滚动条鼠标左键抬起事件
+        // 鼠标移出按钮还原背景色
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data)
-            {
-                if (data.Location != null) button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
-                else button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
-            }
+                if (isDarkModle)
+                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
+                else
+                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+            else
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
         }
 
         /// <summary>
@@ -413,43 +426,25 @@ namespace Quicker.Windows
         // 全局按钮点击事件
         private void GlobalButton_Click(object sender, RoutedEventArgs e)
         {
-            MainListView.Items.Clear(); // 清空全局列表视图
-            type = "Global"; // 设置类型为全局动作页
-            LoadCanvas(type); // 加载全局画布
-            MainBorder.Height = 224; // 设置主边框高度
-            ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
-            AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+            TypeChanged("Global"); // 切换类型为全局动作页
         }
 
         // 公共按钮点击事件
         private void CommonButton_Click(object sender, RoutedEventArgs e)
         {
-            MainListView.Items.Clear(); // 清空全局列表视图
-            LoadCommonCanvas(); // 加载公共画布
-            MainBorder.Height = 289; // 设置主边框高度
-            ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-            AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
-        }
-
-        // 加载CommonCanvas
-        private void LoadCommonCanvas()
-        {
-            type = "Common";
-            LoadCanvas(type); // 加载 Common 画布
+            TypeChanged("Common"); // 加载通用动作页
         }
 
         // 加载任务栏动作页
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            type = "TaskBar"; // 设置类型为任务栏动作页
-            LoadCanvas(type); // 加载任务栏动作页
+            TypeChanged("TaskBar"); // 设置类型为任务栏动作页
         }
 
         // 加载桌面动作页
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
         {
-            type = "Desktop"; // 设置类型为桌面动作页
-            LoadCanvas(type); // 加载桌面动作页
+            TypeChanged("Desktop"); // 设置类型为桌面动作页
         }
 
         // 打开创建动作菜单
@@ -510,6 +505,29 @@ namespace Quicker.Windows
             if (string.IsNullOrEmpty(searchText))
             {
                 ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
+            }
+        }
+
+        // 双击标签切换动作按钮背景色
+        private void ChangeActionButtonBakground(object sender, MouseButtonEventArgs e)
+        {
+            isDarkModle = !isDarkModle; // 切换模式
+            foreach (var item in MainListView.Items)
+            {
+                if (item is Canvas canvas)
+                {
+                    var childrenList = canvas.Children.Cast<UIElement>().ToList(); // 将 UIElementCollection 转换为列表
+                    foreach (var child in childrenList)
+                    {
+                        if (child is Button button && button.Tag is ButtonData data)
+                        {
+                            if (isDarkModle)
+                                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
+                            else
+                                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                        }
+                    }
+                }
             }
         }
 

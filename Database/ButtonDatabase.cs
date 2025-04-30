@@ -10,13 +10,14 @@ namespace Quicker.Database
     public class ButtonDatabase
     {
         private readonly string dbPath2 = "Data Source=Button.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
 
         // 初始化数据库
         public void Initialize()
         {
-            if (File.Exists("Button.db")) 
+            if (File.Exists("Button.db")) // 如果数据库存在
             {
-                MigrateOldData();
+                CheckAndUpdateDatabase(); // 检查并更新数据库
                 return; // 数据库已存在，不再初始化
             }
 
@@ -25,84 +26,10 @@ namespace Quicker.Database
             CreateButtonTable("Common"); // 创建通用表格
         }
 
-        /// <summary>
-        /// 将旧表中的所有按钮迁移到对应的新表并删除旧表
-        /// </summary>
-        public void MigrateOldData()
+        // 检查并更新数据库
+        private void CheckAndUpdateDatabase()
         {
-            try
-            {
-                using var connection = new SQLiteConnection(dbPath2);
-                connection.Open();
-
-                // 如果不存在 ButtonData 表，直接返回，避免出错
-                if (!TableExists("ButtonData"))
-                    return;
-
-                // 将旧表重命名为临时表
-                using var renameCommand = new SQLiteCommand("ALTER TABLE ButtonData RENAME TO Temp_ButtonData", connection);
-                renameCommand.ExecuteNonQuery();
-
-                // 获取旧表ButtonData中的所有按钮数据
-                var oldButtonData = new List<ButtonData>();
-                using var oldCommand = new SQLiteCommand("SELECT * FROM Temp_ButtonData", connection);
-                using var oldReader = oldCommand.ExecuteReader();
-                while (oldReader.Read())
-                {
-                    oldButtonData.Add(new ButtonData
-                    {
-                        ButtonID = oldReader.GetString(0),
-                        ButtonName = oldReader.GetString(1),
-                        Location = oldReader.GetString(2),
-                        ImagePath = oldReader.GetString(3),
-                        RunByMessager = oldReader.GetBoolean(4),
-                        TryToOpenExitingWindow = oldReader.GetBoolean(5),
-                        WindowState = oldReader.GetInt32(6),
-                        Usage = oldReader.GetString(7),
-                        CreateTime = oldReader.GetDateTime(8),
-                        LatestEditTime = oldReader.GetDateTime(9),
-                        Type = "OpenFile"
-                    });
-                }
-                connection.Close(); // 关闭数据库连接
-                connection.Dispose(); // 释放数据库连接
-
-                var newconnection = OpenConnection(); // 打开数据库连接
-                using var transaction = newconnection.BeginTransaction(); // 开始事务
-                try
-                {
-                    foreach (var buttonData in oldButtonData) // 将每个按钮数据迁移到对应的新表中
-                    {
-                        string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
-                        CheckAndCreateTable(tableName, newconnection); // 检查表是否存在，不存在则创建
-
-                        string insertQuery = $@"INSERT INTO {tableName} 
-                            (ButtonID, ButtonName, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Usage, CreateTime, LatestEditTime, Type) 
-                            VALUES 
-                            (@ButtonID, @ButtonName, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Usage, @CreateTime, @LatestEditTime, @Type)";
-                        using var insertCommand = new SQLiteCommand(insertQuery, newconnection);
-                        insertCommand.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID);
-                        insertCommand.Parameters.AddWithValue("@ButtonName", buttonData.ButtonName);
-                        insertCommand.Parameters.AddWithValue("@Location", buttonData.Location);
-                        insertCommand.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath);
-                        insertCommand.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager);
-                        insertCommand.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow);
-                        insertCommand.Parameters.AddWithValue("@WindowState", buttonData.WindowState);
-                        insertCommand.Parameters.AddWithValue("@Usage", buttonData.Usage);
-                        insertCommand.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime);
-                        insertCommand.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime);
-                        insertCommand.Parameters.AddWithValue("@Type", buttonData.Type);
-
-                        insertCommand.ExecuteNonQuery(); // 执行插入语句
-                    }
-
-                    transaction.Commit(); // 提交事务
-                }
-                catch { transaction.Rollback(); } // 回滚事务
-                using var dropCommand = new SQLiteCommand("DROP TABLE Temp_ButtonData", newconnection); // 删除临时表
-                dropCommand.ExecuteNonQuery();
-            }
-            catch { }
+            if (db1.IsNewVersion()) return; // 如果是新版本，则不更新数据库
         }
 
         /// <summary>
@@ -234,8 +161,8 @@ namespace Quicker.Database
         /// <summary>
         /// 通过Button前缀读取对应表格中所有ButtonData
         /// </summary>
-        /// <param name="prefix">Button前缀</param>
-        /// <returns>ButtonData列表</returns>
+        /// <param name="prefix"> Button前缀 </param>
+        /// <returns> ButtonData列表 </returns>
         public List<ButtonData> GetButtonDataByPrefix(string prefix)
         {
             var buttonDataList = new List<ButtonData>();
@@ -280,8 +207,8 @@ namespace Quicker.Database
         /// <summary>
         /// 根据不同情况更改 Button 数据库
         /// </summary>
-        /// <param name="buttonID1"></param>
-        /// <param name="buttonID2"></param>
+        /// <param name="buttonID1"> ButtonID1 </param>
+        /// <param name="buttonID2"> ButtonID2 </param>
         public void ExchangeButtonID(string buttonID1, string buttonID2)
         {
             using var connection = OpenConnection(); // 打开连接
