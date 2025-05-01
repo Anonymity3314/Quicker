@@ -20,7 +20,7 @@ namespace Quicker.UserControls
         private IconManager iconManager = new IconManager(); // 图标管理器
         SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         SettingManager settingManager; // 设置管理器
-        bool isLoading = true; // 是否全屏禁用
+        private bool isLoading = true; // 是否全屏禁用
 
         public BlacklistGrid(SettingWindow settingWindow)
         {
@@ -485,6 +485,33 @@ namespace Quicker.UserControls
                 BlacklistProcessTextBox.Text = string.Join(";", currentWhitelistApps); // 更新文本框内容，避免无限递归
             else
                 BlacklistProcessTextBox.Text = string.Empty; // 清空文本框内容
+        }
+
+        // 控件关闭释放资源
+        private void BlacklistGrid_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // 清理UI元素
+            BlacklistStackPanel.Children.Clear();
+            AddBlacklistAppsStackPanel.Children.Clear();
+            AddWhitelistAppsStackPanel.Children.Clear();
+            BlacklistStackScrollViewer.Content = null;
+
+            // 清理解绑事件处理程序
+            BlacklistButton.Click -= BlacklistAddButton_Click;
+            BlacklistAddButton.Click -= BlacklistAddButton_Click;
+            WhitelistSelectButton.Click -= WhitelistSelectButton_Click;
+            UnknownProcessButton.Click -= UnknownProcessButton_Click;
+            AddDirectoryButton.Click -= AddDirectoryButton_Click;
+            BlacklistDragButton.Click -= BlacklistDragButton_Click;
+            BlacklistScrollBar.ValueChanged -= BlacklistScrollBar_ValueChanged;
+            BlacklistStackScrollViewer.ScrollChanged -= BlacklistStackScrollViewer_ScrollChanged;
+
+            // 清理外部资源
+            windowManager?.Dispose();
+            iconManager?.Dispose();
+            db1 = null;
+            settingManager = null;
+            blacklistAppsCache.Clear(); // 清理缓存和变量
         }
     }
 }

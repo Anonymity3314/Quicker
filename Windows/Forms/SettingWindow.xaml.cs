@@ -140,14 +140,14 @@ namespace Quicker.Windows
         // 基础设置-弹出面板
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
-            var OpenMainWindowGrid = new OpenMainWindowGrid { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
+            var OpenMainWindowGrid = new OpenMainWindowGrid(this) { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
             settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void OpenMainWindow_MouseLeave(object sender, MouseEventArgs e)
         {
-            var OpenMainWindowGrid = new OpenMainWindowGrid { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
+            var OpenMainWindowGrid = new OpenMainWindowGrid(this) { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
             settingManager.ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 

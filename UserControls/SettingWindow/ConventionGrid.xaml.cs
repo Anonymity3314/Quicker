@@ -110,7 +110,7 @@ namespace Quicker.UserControls
             settingManager.TextBox_TextChanged(sender); // 调用父类方法
         }
 
-        // 窗体关闭事件
+        // 窗体关闭释放资源
         private void ConventionGrid_Unloaded(object sender, RoutedEventArgs e)
         {
             actionManager.Dispose();

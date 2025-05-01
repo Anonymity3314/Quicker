@@ -456,9 +456,7 @@ namespace Quicker.Windows
         public void Button_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
-            {
                 buttonManager.Button_PreviewMouseMove(sender, e, true); // 检查拖拽条件
-            }
         }
 
         // 鼠标左键释放时重置状态
@@ -566,9 +564,7 @@ namespace Quicker.Windows
             if ((isNext && targetCanvasIndex > GetTotalAntionPageIndex(style)) || (!isNext && targetCanvasIndex < 0)) // 如果目标Canvas编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
-                {
                     targetCanvasIndex = isNext ? 0 : GetTotalAntionPageIndex(style); // 循环到第一页或最后一页
-                }
                 else return; // 如果不循环翻页，直接返回
             }
 

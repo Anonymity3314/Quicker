@@ -10,13 +10,12 @@ namespace Quicker.UserControls
 {
     public partial class OpenMainWindowGrid : UserControl
     {
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        private SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         SettingManager settingManager; // 设置管理器
 
-        public OpenMainWindowGrid()
+        public OpenMainWindowGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
 
             InitializeAsync(); // 异步初始化
@@ -31,7 +30,7 @@ namespace Quicker.UserControls
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
-            settingManager.LoadOpenMainWindowConditionsAsync(); // 初始化数据库数据
+            settingManager.LoadOpenMainWindowConditionsAsync(); // 初始化数据库缓存
             Application.Current.Dispatcher.Invoke(() =>
             {
                 OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick; // 按下中键
@@ -316,6 +315,9 @@ namespace Quicker.UserControls
             DoActionKeyboardButton = null;
             DoActionKeyboardButtonGrid = null;
             TestButton = null; // 清理测试按钮
+
+            settingManager = null; // 释放设置管理器资源
+            db1 = null; // 释放设置数据库资源
         }
     }
 }

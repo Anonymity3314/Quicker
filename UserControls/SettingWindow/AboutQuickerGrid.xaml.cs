@@ -75,5 +75,30 @@ namespace Quicker.UserControls
             settingManager.SetGridVisible(Privacy_StatementButtonGrid, MainGrid); // 设置Grid可见性
             settingManager.ButtonStyle3_Click(Privacy_StatementButton, MainGrid); // 保存Button类型3边框设置
         }
+
+        // 控件关闭释放资源
+        private void AboutQuickerGrid_Unloaded(object sender, RoutedEventArgs e)
+        {
+            MainGrid.Children.Clear(); // 清理UI元素
+
+            // 清理事件处理程序
+            AboutQuickerButton.Click -= AboutQuickerButton_Click;
+            Privacy_StatementButton.Click -= Privacy_StatementButton_Click;
+            UpdateHistory.MouseLeftButtonDown -= OpenUpdateLog;
+            www_iconfont_cn.MouseLeftButtonDown -= www_iconfont_cn_MouseLeftButtonDown;
+            icons8_com.MouseLeftButtonDown -= icons8_com_MouseLeftButtonDown;
+            fontawesome_com.MouseLeftButtonDown -= fontawesome_com_MouseLeftButtonDown;
+            FeedBack.MouseLeftButtonDown -= FeedBack_MouseLeftButtonDown;
+            VersionLabel.MouseEnter -= Event_MouseEnter;
+            VersionLabel.MouseLeave -= Event_MouseLeave;
+
+            // 清理外部资源
+            actionManager?.Dispose();
+            actionManager = null;
+            settingManager = null;
+
+            VersionLabel.Content = string.Empty; // 清理文本内容
+            MainGrid.Background = null;
+        }
     }
 }

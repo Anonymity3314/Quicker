@@ -68,30 +68,8 @@
                 </Grid>
             </ComboBoxItem>
         </ComboBox>
-        <Label x:Name="LocationLabel" Content="路径/命令" HorizontalAlignment="Left" Margin="95,89,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="LocationTextBox" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="162,89,0,0" TextChanged="LocationTextBox_TextChanged">
-            <TextBox.Style>
-                <Style TargetType="TextBox">
-                    <Style.Setters>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate>
-                                    <Border x:Name="border" CornerRadius="3,0,0,3" BorderThickness="1" BorderBrush="#FFABADB3">
-                                        <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="{x:Null}" VerticalAlignment="Center" Margin="2,0"/>
-                                    </Border>
-
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="BorderBrush" TargetName="border" Value="#FF5B5B5B"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style.Setters>
-                </Style>
-            </TextBox.Style>
-        </TextBox>
+        <Label x:Name="LocationLabel" Content="路径/命令" Margin="95,89,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="162,89,0,0" TextChanged="LocationTextBox_TextChanged"/>
         <Label Content="窗口风格" HorizontalAlignment="Left" Margin="98,129,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="162,129,0,0" VerticalAlignment="Top" Width="270" Height="26" Background="White">
             <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>
@@ -101,8 +79,8 @@
         <Button x:Name="SaveButton" Style="{StaticResource BlueButton}" Content="保存(S)" HorizontalAlignment="Left" Margin="256,374,0,0" VerticalAlignment="Top" BorderBrush="{x:Null}" Width="81" Height="30" Click="SaveAction" IsEnabled="False"/>
         <Button Style="{StaticResource WhiteButton}" Content="取消(C)" HorizontalAlignment="Left" Margin="348,374,0,0" VerticalAlignment="Top" Click="CloseAddWindow" Height="30" Width="81"/>
         <Button Style="{StaticResource ImageButton}"  HorizontalAlignment="Left" Margin="587,113,0,0" VerticalAlignment="Top" Click="ManageLocalIcons"/>
-        <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,355,0,0" Stroke="LightGray" VerticalAlignment="Top" Width="648"/>
-        <Rectangle HorizontalAlignment="Left" Height="340" Margin="493,10,0,0" Stroke="LightGray" VerticalAlignment="Top" Width="1"/>
+        <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,0,0,79" Stroke="LightGray" VerticalAlignment="Bottom" Width="648"/>
+        <Rectangle HorizontalAlignment="Left" Margin="493,10,0,85" Stroke="LightGray" Width="1"/>
         <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="161,205,0,0" VerticalAlignment="Top"/>
         <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="161,242,0,0" VerticalAlignment="Top"/>
         <Label Content="选项" HorizontalAlignment="Left" Margin="110,200,0,0" VerticalAlignment="Top"/>
@@ -160,5 +138,8 @@
             <Image Source="/Resources/Images/Icons/SelectLocalImage.ico" Width="16" Height="16"/>
         </Button>
         <Button x:Name="ButtonView" Width="78" Height="78" BorderBrush="#FF707070" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="1.5,1.5,1.5,1.5" Margin="557,30,0,0" Background="White" Click="SelectImage"/>
+        <Grid Margin="0,66,207,80" Visibility="Collapsed">
+
+        </Grid>
     </Grid>
 </Window>

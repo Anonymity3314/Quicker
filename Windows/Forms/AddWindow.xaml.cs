@@ -24,9 +24,9 @@ namespace Quicker
         public static SelectImageWindow SelectImageWindow; // SelectImageWindow 的静态引用
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
         private bool isLoading = true; // 是否正在加载
-        private TextBlock ButtonTitle; // 按钮标题
-        private Image ButtonImage; // 按钮图片
-        private string iconPath; // 图标路径
+        public TextBlock ButtonTitle; // 按钮标题
+        public Image ButtonImage; // 按钮图片
+        public string iconPath; // 图标路径
 
         public string CurrentButton { get; private set; } // 当前按钮
         public int Choice { get; private set; } // 选择添加动作类型
@@ -188,9 +188,8 @@ namespace Quicker
         // 选择本地应用
         private void ChooseApplications(object sender, RoutedEventArgs e)
         {
-            FindAppsWindow = new(); // 创建 FindAppsWindow 实例
+            FindAppsWindow = new() { Owner = this }; // 创建 FindAppsWindow 实例，并设置所有者为当前窗口
             FindAppsWindow.ApplicationSelected += OnApplicationSelected; // 订阅 ApplicationSelected 事件
-            FindAppsWindow.Owner = this; // 设置所有者为当前窗口
             FindAppsWindow.ShowDialog(); // 显示为模式对话框
         }
 
