@@ -13,20 +13,11 @@ namespace Quicker.UserControls
         ActionManager actionManager = new ActionManager(); // 创建动作管理器
         SettingManager settingManager; // 读取设置的管理器
 
-        public AboutQuickerGrid()
+        public AboutQuickerGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
-        }
-
-        private static void SetGridVisible(Grid childrengrid, Grid fathergrid)
-        {
-            foreach (var grid in fathergrid.Children.OfType<Grid>())
-            {
-                grid.Visibility = grid == childrengrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
-            }
         }
 
         // 当鼠标移入事件文本框时，改变鼠标样式为手型
@@ -44,7 +35,7 @@ namespace Quicker.UserControls
         // 基础设置-关于Quicker-关于Quicker
         private void AboutQuickerButton_Click(object sender, RoutedEventArgs e)
         {
-            SetGridVisible(AboutQuickerButtonGrid, MainGrid); // 设置Grid可见性
+            settingManager.SetGridVisible(AboutQuickerButtonGrid, MainGrid); // 设置Grid可见性
             settingManager.ButtonStyle3_Click(AboutQuickerButton, MainGrid); // 保存Button类型3边框设置
         }
 
@@ -72,10 +63,16 @@ namespace Quicker.UserControls
             actionManager.OpenWebsite("https://fontawesome.com/"); // 打开图标网站fontawesome.com
         }
 
+        // BUG反馈、需求
+        private void FeedBack_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            actionManager.OpenWebsite("https://github.com/Anonymity3314/Quicker/issues"); // 前往Github反馈
+        }
+
         // 基础设置-关于Quicker-隐私声明
         private void Privacy_StatementButton_Click(object sender, RoutedEventArgs e)
         {
-            SetGridVisible(Privacy_StatementButtonGrid, MainGrid); // 设置Grid可见性
+            settingManager.SetGridVisible(Privacy_StatementButtonGrid, MainGrid); // 设置Grid可见性
             settingManager.ButtonStyle3_Click(Privacy_StatementButton, MainGrid); // 保存Button类型3边框设置
         }
     }

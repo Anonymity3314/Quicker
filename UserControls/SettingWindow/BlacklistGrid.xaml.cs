@@ -22,10 +22,9 @@ namespace Quicker.UserControls
         SettingManager settingManager; // 设置管理器
         bool isLoading = true; // 是否全屏禁用
 
-        public BlacklistGrid()
+        public BlacklistGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
 
             InitializeAsync(); // 异步初始化

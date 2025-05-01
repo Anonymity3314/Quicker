@@ -40,7 +40,7 @@ public class SettingDatabase
         if (reader.Read()) // 检查是否有数据
         {
             var currentVersion = reader.GetString(0); // 返回版本号
-            var targetVersion = "2.1.1"; // 目标版本
+            var targetVersion = "2.1.2"; // 目标版本
             if (currentVersion == targetVersion)
                 return true; // 数据库版本已是最新，返回true
         }
@@ -51,7 +51,7 @@ public class SettingDatabase
     private void UpdateDatabase()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string updateVersionQuery = @"UPDATE Convention SET Version = '2.1.1';"; // 设置默认值
+        string updateVersionQuery = @"UPDATE Convention SET Version = '2.1.2';"; // 设置默认值
         using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
         updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
 
@@ -79,8 +79,13 @@ public class SettingDatabase
         );"; // 创建 Convention 表
         using var createConventionCommand = new SQLiteCommand(createConventionTableQuery, connection); // 创建 SQLiteCommand 对象
         createConventionCommand.ExecuteNonQuery(); // 执行创建表的命令
+        InsertDefaultConventionData(); // 插入默认数据
+    }
 
-        // 插入初始数据
+    // 插入默认数据
+    private void InsertDefaultConventionData()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
         string insertConventionQuery = @"
             INSERT INTO Convention 
             (Version, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
@@ -121,11 +126,16 @@ public class SettingDatabase
         );"; // 创建 OpenMainWindow 表
         using var createOpenMainWindowCommand = new SQLiteCommand(createOpenMainWindowTableQuery, connection); // 创建 SQLiteCommand 对象
         createOpenMainWindowCommand.ExecuteNonQuery(); // 执行创建表的命令
+        InsertDefaultOpenMainWindowData(); // 插入默认数据
+    }
 
-        // 插入初始数据
+    // 插入默认数据
+    private void InsertDefaultOpenMainWindowData()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
         string insertOpenMainWindowQuery = @"
             INSERT INTO OpenMainWindow 
-            (OpenMainWindowByMiddleMouseClick, OpenMainWindowByX1MouseClick, OpenMainWindowByX2MouseClick, OpenMainWindowByCtrl_MiddleMouseClick, OpenMainWindowByCtrl_RightMouseClick, OpenMainWindowByMiddleMouseClickLonger, OpenMainWindowByRightMouseClickLonger, OpenMainWindowByRightMouseClick_Move, OpenMainWindowByCtrl, WindowStartupLocation) 
+            (OpenMainWindowByMiddleMouseClick, OpenMainWindowByX1MouseClick, OpenMainWindowByX2MouseClick, OpenMainWindowByCtrl_MiddleMouseClick, OpenMainWindowByCtrl_RightMouseClick, OpenMainWindowByMiddleMouseClickLonger, OpenMainWindowByRightMouseClickLonger, OpenMainWindowByRightMouseClick_Move, OpenMainWindowByCtrl, WindowStartupLocation)
             VALUES 
             (@OpenMainWindowByMiddleMouseClick, @OpenMainWindowByX1MouseClick, @OpenMainWindowByX2MouseClick, @OpenMainWindowByCtrl_MiddleMouseClick, @OpenMainWindowByCtrl_RightMouseClick, @OpenMainWindowByMiddleMouseClickLonger, @OpenMainWindowByRightMouseClickLonger, @OpenMainWindowByRightMouseClick_Move, @OpenMainWindowByCtrl, @WindowStartupLocation);";
         using var insertOpenMainWindowCommand = new SQLiteCommand(insertOpenMainWindowQuery, connection); // 创建 SQLiteCommand 对象
@@ -155,8 +165,13 @@ public class SettingDatabase
         );"; // 创建 Blacklist 表
         using var createBlacklistCommand = new SQLiteCommand(createBlacklistTableQuery, connection); // 创建 SQLiteCommand 对象
         createBlacklistCommand.ExecuteNonQuery(); // 执行创建表的命令
+        InsertDefaultBlacklistData(); // 插入默认数据
+    }
 
-        // 插入初始数据
+    // 插入默认数据
+    private void InsertDefaultBlacklistData()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
         string insertBlacklistQuery = @"
             INSERT INTO Blacklist 
             (IsFullScreenDisabled, IsBlacklistEnabledForExtendedHotkey) 

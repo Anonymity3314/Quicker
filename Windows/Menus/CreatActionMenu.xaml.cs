@@ -18,47 +18,47 @@ namespace Quicker.Windows
         public CreatActionMenu(string currentbutton)
         {
             InitializeComponent();
-            CurrentButton = currentbutton;
+            CurrentButton = currentbutton; // 设置当前按钮
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 启动软件
         private void StartApp(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = new(CurrentButton, 1);
-            addWindow.Show();
-            buttonManager.CloseMainWindow(this);
+            AddWindow addWindow = new(CurrentButton, 1); // 传递当前按钮和类型
+            addWindow.Show(); // 显示窗口
+            buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
 
         // 打开文件
         private void OpenDocument(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = new(CurrentButton, 2);
-            addWindow.Show();
-            buttonManager.CloseMainWindow(this);
+            AddWindow addWindow = new(CurrentButton, 2); // 传递当前按钮和类型
+            addWindow.Show(); // 显示窗口
+            buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
 
         // 打开文件夹
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = new(CurrentButton, 3);
-            addWindow.Show();
-            buttonManager.CloseMainWindow(this);
+            AddWindow addWindow = new(CurrentButton, 3); // 传递当前按钮和类型
+            addWindow.Show(); // 显示窗口
+            buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
 
         // 打开网址
         private void OpenWebsite(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = new(CurrentButton, 4);
-            addWindow.Show();
-            buttonManager.CloseMainWindow(this);
+            AddWindow addWindow = new(CurrentButton, 4); // 传递当前按钮和类型
+            addWindow.Show(); // 显示窗口
+            buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
 
         // 失去焦点时隐藏
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            ClosingOrHiding?.Invoke();
-            this.Visibility = Visibility.Hidden;
+            ClosingOrHiding?.Invoke(); // 调用事件
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
         }
 
         // 关闭窗口前释放资源
@@ -67,10 +67,9 @@ namespace Quicker.Windows
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件
 
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            GC.Collect(); // 强制垃圾回收
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次强制垃圾回收
         }
     }
 }

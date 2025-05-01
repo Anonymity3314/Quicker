@@ -23,6 +23,7 @@ namespace Quicker
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // ButtonDatabase
         public static SelectImageWindow SelectImageWindow; // SelectImageWindow 的静态引用
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
+        private bool isLoading = true; // 是否正在加载
         private TextBlock ButtonTitle; // 按钮标题
         private Image ButtonImage; // 按钮图片
         private string iconPath; // 图标路径
@@ -40,9 +41,10 @@ namespace Quicker
         // 初始化标题和Button视图，并根据上个窗口数据执行对应命令
         private void AddWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeTitle();
-            InitializeButtonView();
-            ExecuteChoiceAction();
+            InitializeTitle(); // 初始化标题
+            InitializeButtonView(); // 初始化Button视图
+            ExecuteChoiceAction(); // 执行对应命令
+            isLoading = false; // 加载完成
         }
 
         // 初始化标题
@@ -124,22 +126,22 @@ namespace Quicker
         // 根据上个窗口数据执行对应命令
         private void ExecuteChoiceAction()
         {
-            switch (Choice)
+            switch (Choice) // 根据选择执行对应命令
             {
                 case 0:
-                    LoadButtonInformation();
+                    LoadButtonInformation(); // 编辑动作，加载动作信息
                     break; // 加载动作信息
                 case 1:
-                    ChooseApplications(null, null);
+                    ChooseApplications(null, null); // 选择本地应用
                     break; // 选择应用程序
                 case 2:
-                    ChooseProcess(null, null);
+                    ChooseProcess(null, null); // 选择打开程序
                     break; // 选择文件
                 case 3:
-                    ChooseFolder(null, null);
+                    ChooseFolder(null, null); // 选择文件夹
                     break; // 选择文件夹
                 case 4:
-                    ChooseWebsite();
+                    ChooseWebsite(); // 选择网址
                     break; // 选择网址
             }
         }
@@ -169,10 +171,18 @@ namespace Quicker
             ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
         }
 
-        // 打开选择菜单
+        // 根据不同选择打开对应菜单
         private void OpenContextMenu(object sender, RoutedEventArgs e)
         {
-            Popup.IsOpen = true; // 打开弹出菜单
+            switch(ChoiceComboBox.SelectedIndex)
+            {
+                case 0: // 选择本地应用
+                    OpenFilePopup.IsOpen = true; // 打开弹出菜单
+                    break; // 选择本地应用
+                case 1: // 选择打开网址
+                    OpenFilePopup.IsOpen = true; // 打开弹出菜单
+                    break; // 选择打开网址
+            }
         }
 
         // 选择本地应用
@@ -284,6 +294,9 @@ namespace Quicker
         private void ChooseWebsite()
         {
             ChoiceComboBox.SelectedIndex = 1; // 设置选择框为网址
+            LocationLabel.Content = "网址"; // 设置标签文本
+            LocationTextBox.Text = "http://"; // 设置地址栏文本
+            SelectButton.Content = "..."; // 设置选择按钮内容
         }
 
         // 保存动作
@@ -436,6 +449,21 @@ namespace Quicker
             UpdateTooltip(); // 更新提示文本
         }
 
+        // 下拉框选项改变时，执行对应命令
+        private void ChoiceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (isLoading) return; // 如果正在加载，则不执行命令
+            switch (ChoiceComboBox.SelectedIndex)
+            {
+                case 0:
+                    ChooseProcess(null, null); // 选择打开程序
+                    break; // 编辑动作
+                case 1:
+                    ChooseWebsite();
+                    break; // 选择应用程序
+            }
+        }
+
         // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
@@ -466,8 +494,10 @@ namespace Quicker
             buttonManager.Dispose(); // 释放按钮管理器资源
 
             ButtonView.Content = null; // 清空 ButtonView 的内容
-            Popup.IsOpen = false; // 关闭弹出菜单
-            Popup.Child = null; // 清理弹出菜单的内容
+            OpenFilePopup.Child = null; // 清理弹出菜单的内容
+            OpenFilePopup = null; // 清理弹出菜单的引用
+            OpenWebsitePopup.Child = null; // 清理弹出菜单的内容
+            OpenWebsitePopup = null; // 清理弹出菜单的引用
 
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

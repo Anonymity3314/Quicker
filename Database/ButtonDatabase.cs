@@ -58,10 +58,6 @@ namespace Quicker.Database
         }
 
         /// <summary>
-        /// 添加新动作
-        /// </summary>
-        /// <param name="buttonData"> 要添加的动作数据 </param>
-        /// <summary>
         /// 添加新动作到对应表中
         /// </summary>
         /// <param name="buttonData">要添加的动作数据</param>

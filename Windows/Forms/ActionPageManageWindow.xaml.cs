@@ -335,27 +335,21 @@ namespace Quicker.Windows
         private void Button_Drop(object sender, DragEventArgs e)
         {
             if (sender is Button TargetButton)
-            {
                 buttonManager.Button_Drop(sender, e, false); // 处理拖放事件
-            }
         }
 
         // 鼠标左键按下事件
         private void Button_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Button button)
-            {
                 buttonManager.Button_PreviewMouseLeftButtonDown(sender, e); // 处理鼠标左键按下事件
-            }
         }
 
         // 鼠标移动事件
         private void Button_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed) // 如果鼠标左键按下
-            {
                 buttonManager.Button_PreviewMouseMove(sender, e, true); // 处理鼠标移动事件
-            }
         }
 
         // 鼠标左键抬起事件
@@ -451,17 +445,17 @@ namespace Quicker.Windows
         private void OpenMenu(object sender, MouseButtonEventArgs e)
         {
             Button button = sender as Button; // 获取按钮
-            if (button.Tag is ButtonData data && button != null) buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
-            else buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
+            if (button.Tag is ButtonData data && button != null)
+                buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
+            else
+                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
         }
 
         // 鼠标移动时检查是否满足拖拽条件
         public void Button1_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
-            {
                 buttonManager.Button_PreviewMouseMove(sender, e, false); // 处理鼠标移动事件
-            }
         }
 
         // 拖拽经过目标项
@@ -503,9 +497,7 @@ namespace Quicker.Windows
         {
             string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写
             if (string.IsNullOrEmpty(searchText))
-            {
                 ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
-            }
         }
 
         // 双击标签切换动作按钮背景色

@@ -10,17 +10,16 @@ namespace Quicker.UserControls
 {
     public partial class ConventionGrid : UserControl
     {
-        private readonly SettingDatabase db1; // 设置数据库
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        ActionManager actionManager = new ActionManager(); // 动作管理器
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
         private double totalUsageTime; // 总使用时长
         private DispatcherTimer timer; // 定时器
 
-        public ConventionGrid()
+        public ConventionGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            db1 = new SettingDatabase(); // 创建设置数据库
-            SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
             settingManager = settingWindow.settingManager; // 创建设置管理器
 
             InitializeAsync(); // 异步初始化
@@ -36,7 +35,7 @@ namespace Quicker.UserControls
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
-            settingManager.LoadConventionsAsync();
+            settingManager.LoadConventionsAsync(); // 初始化缓存数据
             Application.Current.Dispatcher.Invoke(() =>
             {
                 VersionLabel.Content = $"当前版本：{settingManager.conventions.Version}"; // 加载版本信息
@@ -96,7 +95,7 @@ namespace Quicker.UserControls
         // 打开网站检查更新
         private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
+            actionManager.OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
         }
 
         // 勾选框点击事件
@@ -114,6 +113,7 @@ namespace Quicker.UserControls
         // 窗体关闭事件
         private void ConventionGrid_Unloaded(object sender, RoutedEventArgs e)
         {
+            actionManager.Dispose();
             timer.Stop(); // 停止定时器
             totalUsageTime = 0; // 清空总使用时长
             currentSessionTime = 0; // 清空当次应用使用时长

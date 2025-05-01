@@ -94,6 +94,15 @@ namespace Quicker.Managers
             }; // 加载设置数据到缓存
         }
 
+        // 设置Grid可见性
+        public void SetGridVisible(Grid childrengrid, Grid fathergrid)
+        {
+            foreach (var grid in fathergrid.Children.OfType<Grid>())
+            {
+                grid.Visibility = grid == childrengrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
+            }
+        }
+
         /// <summary>
         /// 改变Button类型1样式
         /// </summary>
@@ -346,19 +355,6 @@ namespace Quicker.Managers
                 case "ButtonCornerRadiusSlider":
                     break;
             }
-        }
-
-        /// <summary>
-        /// 打开指定网站
-        /// </summary>
-        /// <param name="website"> 网站地址 </param>
-        public void OpenWebsite(string website)
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = website, // 打开指定网站
-                UseShellExecute = true // 使用外壳程序启动
-            });
         }
 
         // 手动释放资源

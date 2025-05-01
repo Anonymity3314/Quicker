@@ -35,10 +35,12 @@
                 </TextBlock.ToolTip>
             </TextBlock>
             <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
-            <Label HorizontalAlignment="Left" Margin="9,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" HorizontalAlignment="Left" Margin="9,80,0,0" VerticalAlignment="Top" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="9,136,0,0" VerticalAlignment="Top" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <TextBlock x:Name="icons8_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="9,108,0,0" VerticalAlignment="Top" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
+            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,134,0,0" VerticalAlignment="Top" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="icons8_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,110,0,0" VerticalAlignment="Top" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <Label HorizontalAlignment="Left" Margin="0,186,0,0" VerticalAlignment="Top" Content="支持" Foreground="Black" FontSize="16" Grid.Column="1"/>
+            <TextBlock x:Name="FeedBack" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
         </Grid>
 
         <!-- 基础设置-关于Quicker-隐私声明 -->

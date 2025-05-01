@@ -30,12 +30,8 @@ namespace Quicker.Windows
         // 初始化窗口
         private async void InitializeWindow()
         {
-            foreach (var stackpanel in MenuGrid.Children.OfType<StackPanel>())
-            {
-                stackpanel.Visibility = stackpanel == BasicSettingStackPanel ? Visibility.Visible : Visibility.Hidden; // 设置StackPanel可见性
-            } // 设置默认显示的StackPanel
-            UserControl ConventionGrid = new ConventionGrid { Name = "ConventionGrid" }; // 创建常规设置Grid
-            settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置默认显示的Grid
+            BasicSetting_Click(null, null); // 显示常规设置面板
+            Convention_Click(null, null); // 显示常规设置
         }
 
         // 应用设置
@@ -130,14 +126,14 @@ namespace Quicker.Windows
         // 基础设置-常规
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
-            var ConventionGrid = new ConventionGrid { Name = "ConventionGrid" }; // 创建常规设置Grid            
+            var ConventionGrid = new ConventionGrid(this) { Name = "ConventionGrid" }; // 创建常规设置Grid            
             settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
-            var ConventionGrid = new ConventionGrid { Name = "ConventionGrid" }; // 创建常规设置Grid  
+            var ConventionGrid = new ConventionGrid(this) { Name = "ConventionGrid" }; // 创建常规设置Grid  
             settingManager.ButtonStyle2_MouseLeave(sender, ConventionGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
@@ -158,42 +154,42 @@ namespace Quicker.Windows
         // 基础设置-黑名单
         private void Blacklist_Click(object sender, RoutedEventArgs e)
         {
-            var BlacklistGrid = new BlacklistGrid { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
+            var BlacklistGrid = new BlacklistGrid(this) { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
             settingManager.ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
         {
-            var BlacklistGrid = new BlacklistGrid { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
+            var BlacklistGrid = new BlacklistGrid(this) { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
             settingManager.ButtonStyle2_MouseLeave(sender, BlacklistGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-外观
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
-            var AppearanceGrid = new AppearanceGrid { Name = "AppearanceGrid" }; // 创建外观设置Grid
+            var AppearanceGrid = new AppearanceGrid(this) { Name = "AppearanceGrid" }; // 创建外观设置Grid
             settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Appearance_MouseLeave(object sender, MouseEventArgs e)
         {
-            var AppearanceGrid = new AppearanceGrid { Name = "AppearanceGrid" }; // 创建外观设置Grid
+            var AppearanceGrid = new AppearanceGrid(this) { Name = "AppearanceGrid" }; // 创建外观设置Grid
             settingManager.ButtonStyle2_MouseLeave(sender, AppearanceGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-关于Quicker
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
-            var AboutQuickerGrid = new AboutQuickerGrid { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
+            var AboutQuickerGrid = new AboutQuickerGrid(this) { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
             settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Collapsed; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
         {
-            var AboutQuickerGrid = new AboutQuickerGrid { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
+            var AboutQuickerGrid = new AboutQuickerGrid(this) { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
             settingManager.ButtonStyle2_MouseLeave(sender, AboutQuickerGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 

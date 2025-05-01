@@ -31,7 +31,7 @@ namespace Quicker.UserControls
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
-            settingManager.LoadOpenMainWindowConditionsAsync();
+            settingManager.LoadOpenMainWindowConditionsAsync(); // 初始化数据库数据
             Application.Current.Dispatcher.Invoke(() =>
             {
                 OpenMainWindowByMiddleMouseClickCheckBox.IsChecked = settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick; // 按下中键
@@ -45,15 +45,6 @@ namespace Quicker.UserControls
                 OpenMainWindowByCtrlCheckBox.IsChecked = settingManager.openMainWindowConditions.OpenMainWindowByCtrl; // 单击Ctrl键
                 WindowStartupLocationComboBox.SelectedIndex = settingManager.openMainWindowConditions.WindowStartupLocation; // 功能面板打开位置
             });
-        }
-
-        // 设置Grid可见性
-        private static void SetGridVisible(Grid childrengrid, Grid fathergrid)
-        {
-            foreach (var grid in fathergrid.Children.OfType<Grid>())
-            {
-                grid.Visibility = grid == childrengrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
-            }
         }
 
         // 勾选框点击事件
@@ -71,7 +62,7 @@ namespace Quicker.UserControls
         // 基础设置-弹出面板-弹出面板
         private void OpenMainWindowButton_Click(object sender, RoutedEventArgs e)
         {
-            SetGridVisible(OpenMainWindowButtonGrid, MainGrid); // 设置Grid可见性
+            settingManager.SetGridVisible(OpenMainWindowButtonGrid, MainGrid); // 设置Grid可见性
             settingManager.ButtonStyle3_Click(OpenMainWindowButton, MainGrid); // 设置Button样式
         }
 
@@ -303,14 +294,14 @@ namespace Quicker.UserControls
         // 基础设置-弹出面板-动作触发按键
         private void DoActionKeyboard_Click(object sender, RoutedEventArgs e)
         {
-            SetGridVisible(DoActionKeyboardButtonGrid, MainGrid); // 设置Grid可见性
+            settingManager.SetGridVisible(DoActionKeyboardButtonGrid, MainGrid); // 设置Grid可见性
             settingManager.ButtonStyle3_Click(DoActionKeyboardButton, MainGrid); // 设置Button样式
         }
 
         // 清理资源
         private void OpenMainWindowGrid_Unloaded(object sender, RoutedEventArgs e)
         {
-            OpenMainWindowByMiddleMouseClickCheckBox = null; 
+            OpenMainWindowByMiddleMouseClickCheckBox = null;
             OpenMainWindowByX1MouseClickCheckBox = null;
             OpenMainWindowByX2MouseClickCheckBox = null;
             OpenMainWindowByCtrl_MiddleMouseClickCheckBox = null;
@@ -324,7 +315,7 @@ namespace Quicker.UserControls
             OpenMainWindowButtonGrid = null;
             DoActionKeyboardButton = null;
             DoActionKeyboardButtonGrid = null;
-            TestButton = null;
+            TestButton = null; // 清理测试按钮
         }
     }
 }

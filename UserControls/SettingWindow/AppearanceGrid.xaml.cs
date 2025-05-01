@@ -1,19 +1,19 @@
 ﻿using System.Windows.Controls;
 using Quicker.UserControls;
 using Quicker.Managers;
+using Quicker.Windows;
 using System.Windows;
 
 namespace Quicker.UserControls
 {
     public partial class AppearanceGrid : UserControl
     {
-        private readonly SettingDatabase db1; // 设置数据库
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         SettingManager settingManager; // 设置管理器
 
-        public AppearanceGrid()
+        public AppearanceGrid(SettingWindow settingWindow)
         {
-            db1 = new SettingDatabase(); // 初始化设置数据库
-            settingManager = new SettingManager(); // 初始化设置管理器
+            settingManager = settingWindow.settingManager; // 初始化设置管理器
             InitializeComponent(); // 初始化xaml界面
             InitializeAsync(); // 异步初始化
         }
