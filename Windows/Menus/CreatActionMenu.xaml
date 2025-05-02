@@ -13,6 +13,8 @@
     Background="{x:Null}"
     WindowStyle="None"
     Topmost="True"
+    Height="440"
+    Width="758"
     
     Deactivated="Window_Deactivated"
 >
@@ -50,32 +52,40 @@
         </Style>
     </Window.Resources>
 
-    <Border Width="178" Height="110" CornerRadius="3" Padding="1" Background="White">
-        <StackPanel Margin="-1,-1,-1,-1">
-            <Button Click="StartApp" Style="{StaticResource Button}" Margin="0,5,0,0">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Style="{StaticResource TextBlock}" Margin="30,0,0,0" Width="144" Text="启动软件"/>
-                </Grid>
-            </Button>
-            <Button Click="OpenDocument" Style="{StaticResource Button}">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Style="{StaticResource TextBlock}" Margin="30,0,0,0" Width="144"><Run Language="zh-cn" Text="打开文件"/></TextBlock>
-                </Grid>
-            </Button>
-            <Button Click="OpenFolder" Style="{StaticResource Button}">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Height="16" Width="144" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="打开文件夹"/></TextBlock>
-                </Grid>
-            </Button>
-            <Button Click="OpenWebsite" Style="{StaticResource Button}">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
-                    <TextBlock Height="16" Width="144" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="打开网址"/><LineBreak/><Run Language="zh-cn"/></TextBlock>
-                </Grid>
-            </Button>
-        </StackPanel>
-    </Border>
+    <Grid Width="178" Height="110">
+        <!-- 窗口阴影 -->
+        <Rectangle Fill="White" Margin="5,7">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Border CornerRadius="3" Background="White">
+            <StackPanel>
+                <Button Click="StartApp" Style="{StaticResource Button}" Margin="0,5,0,0">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Style="{StaticResource TextBlock}" Margin="30,0,0,0" Width="144" Text="启动软件"/>
+                    </Grid>
+                </Button>
+                <Button Click="OpenDocument" Style="{StaticResource Button}">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Style="{StaticResource TextBlock}" Margin="30,0,0,0" Width="144"><Run Language="zh-cn" Text="打开文件"/></TextBlock>
+                    </Grid>
+                </Button>
+                <Button Click="OpenFolder" Style="{StaticResource Button}">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Height="16" Width="144" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="打开文件夹"/></TextBlock>
+                    </Grid>
+                </Button>
+                <Button Click="OpenWebsite" Style="{StaticResource Button}">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/Quicker1.ico" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Width="16" Margin="7,0,7,0"/>
+                        <TextBlock Height="16" Width="144" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0"><Run Language="zh-cn" Text="打开网址"/><LineBreak/><Run Language="zh-cn"/></TextBlock>
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>

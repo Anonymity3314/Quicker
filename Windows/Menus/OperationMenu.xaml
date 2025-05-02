@@ -13,6 +13,8 @@
     WindowStyle="None"
     Background="{x:Null}"
     Topmost="True"
+    Height="451"
+    Width="784"
     
     Deactivated="OperationMenu_Deactivated"
 >
@@ -50,33 +52,41 @@
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="5" Height="121" Width="204" Background="White">
-        <StackPanel>
-            <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,5" Click="EditeInformation_Click">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/EditButton.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="编辑"/></TextBlock>
-                </Grid>
-            </Button>
-            <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
-            <Button x:Name="DeleteAction" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,0" Click="DeleteAction_Click">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="删除"/></TextBlock>
-                </Grid>
-            </Button>
-            <Button x:Name="CheckImformation" ToolTip="查看动作信息" Style="{StaticResource Button}" Click="CheckImformation_Click">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/ActionInformation.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="查看信息"/></TextBlock>
-                </Grid>
-            </Button>
-            <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource Button}" Margin="0,0,0,5" Click="OpenLocation_Click">
-                <Grid>
-                    <Image Source="/Resources/Images/Icons/OpenFile.ico" Style="{StaticResource Image}"/>
-                    <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="打开所在位置"/></TextBlock>
-                </Grid>
-            </Button>
-        </StackPanel>
-    </Border>
+    <Grid Height="121" Width="204">
+        <!-- 窗口阴影 -->
+        <Rectangle Fill="White" Margin="5,7">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Border CornerRadius="5" Background="White">
+            <StackPanel>
+                <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,5" Click="EditeInformation_Click">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/EditButton.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="编辑"/></TextBlock>
+                    </Grid>
+                </Button>
+                <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
+                <Button x:Name="DeleteAction" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,0" Click="DeleteAction_Click">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="删除"/></TextBlock>
+                    </Grid>
+                </Button>
+                <Button x:Name="CheckImformation" ToolTip="查看动作信息" Style="{StaticResource Button}" Click="CheckImformation_Click">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/ActionInformation.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="查看信息"/></TextBlock>
+                    </Grid>
+                </Button>
+                <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource Button}" Margin="0,0,0,5" Click="OpenLocation_Click">
+                    <Grid>
+                        <Image Source="/Resources/Images/Icons/OpenFile.ico" Style="{StaticResource Image}"/>
+                        <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="打开所在位置"/></TextBlock>
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>

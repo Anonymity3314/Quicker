@@ -14,20 +14,18 @@
     ResizeMode="NoResize"
     WindowStyle="None"
     Topmost="True"
-    Width="310.4"
-    Height="596"
     
     MouseLeftButtonDown="MoveMainWindow"
     Deactivated="MainWindow_Deactivated"
     Closing="MainWindow_Closing"
     Loaded="MainWindow_Loaded"
 >
-    <Border CornerRadius="5">
+    <Border CornerRadius="5" Width="310.4" Height="596">
         <Grid x:Name="MainGrid">
             <!-- 窗口阴影 -->
             <Rectangle Fill="White" Margin="5,7">
                 <Rectangle.Effect>
-                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"></DropShadowEffect>
+                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
                 </Rectangle.Effect>
             </Rectangle>
             <!-- 标题栏 -->
