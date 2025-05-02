@@ -19,7 +19,8 @@ namespace Quicker
 {
     public partial class AddWindow : Window
     {
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // ButtonDatabase
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private SelectImageWindow selectImageWindow; // SelectImageWindow 的实例引用
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
@@ -43,6 +44,7 @@ namespace Quicker
             InitializeTitle(); // 初始化标题
             InitializeButtonView(); // 初始化Button视图
             ExecuteChoiceAction(); // 执行对应命令
+            SetWindowHeight(ChoiceComboBox.SelectedIndex); // 设置窗口高度
             isLoading = false; // 加载完成
         }
 
@@ -224,6 +226,7 @@ namespace Quicker
             {
                 ButtonTitle.Visibility = Visibility.Visible; // 显示标题
                 ButtonTitle.Text = TitleTextBox.Text; // 更新标题
+                buttonManager.AutoEllipsisTextBlock(ButtonTitle, 70); // 更新按钮名称
             }
             else
                 ButtonTitle.Visibility = Visibility.Collapsed; // 隐藏标题
@@ -287,9 +290,11 @@ namespace Quicker
             {
                 case 0:
                     ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加控件
+                    SetWindowHeight(0); // 设置窗口高度
                     break; // 编辑动作
                 case 1:
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加控件
+                    SetWindowHeight(1); // 设置窗口高度
                     break; // 选择应用程序
             }
         }
@@ -304,6 +309,20 @@ namespace Quicker
             ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
             ButtonTitle.Visibility = Visibility.Collapsed; // 隐藏标题
             UpdateTooltip(); // 更新提示文本
+        }
+
+        // 设置窗口高度
+        private void SetWindowHeight(int choice)
+        {
+            switch(choice)
+            {
+                case 0:
+                    this.Height = 450; // 打开文件的窗口高度
+                    break; // 打开文件
+                case 1:
+                    this.Height = 370; // 打开网址的窗口高度
+                    break; // 打开网站
+            }
         }
 
         // 关闭窗口前，释放资源

@@ -27,7 +27,7 @@ public class SettingDatabase
     public void CheckAndUpgradeDatabase()
     {
         if (IsNewVersion()) return; // 如果数据库是最新版本，则直接返回
-        //UpdateDatabase(); // 升级数据库
+        UpdateDatabase(); // 升级数据库
     }
 
     // 判断数据库是否是最新版本

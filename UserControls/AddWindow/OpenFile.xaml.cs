@@ -13,7 +13,7 @@ namespace Quicker.UserControls.AddWindow
 {
     public partial class OpenFile : UserControl
     {
-        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
         private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
         private ButtonDatabase db2 = new ButtonDatabase(); // 初始换按钮数据库
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的静态引用
@@ -149,7 +149,6 @@ namespace Quicker.UserControls.AddWindow
             {
                 LocationTextBox.Text = folderDialog.SelectedPath; // 获取文件夹路径
                 AddWindow.TitleTextBox.Text = Path.GetFileName(folderDialog.SelectedPath); // 获取文件夹名称
-                buttonManager.AutoEllipsisTextBlock(AddWindow.ButtonTitle, 70); // 调整字体大小
 
                 string cachedIconPath = iconManager.CheckCachedIcon(folderDialog.SelectedPath); // 检查缓存图标
                 if (!string.IsNullOrEmpty(cachedIconPath))
