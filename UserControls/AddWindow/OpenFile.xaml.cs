@@ -1,4 +1,5 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,12 +16,76 @@ namespace Quicker.UserControls.AddWindow
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
         private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
         public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
+        private ButtonDatabase db2 = new ButtonDatabase(); // 初始换按钮数据库
         private Quicker.AddWindow AddWindow; // AddWindow 的静态引用
 
         public OpenFile(Quicker.AddWindow addWindow)
         {
             InitializeComponent();
             AddWindow = addWindow; // 保存 AddWindow 的静态引用
+            ExecuteChoiceAction();
+        }
+
+        // 根据上个窗口数据执行对应命令
+        private void ExecuteChoiceAction()
+        {
+            switch (AddWindow.Choice) // 根据选择执行对应命令
+            {
+                case 0:
+                    LoadButtonInformation(); // 编辑动作，加载动作信息
+                    break; // 加载动作信息
+                case 1:
+                    ChooseApplications(null, null); // 选择本地应用
+                    break; // 选择应用程序
+                case 2:
+                    ChooseProcess(null, null); // 选择打开程序
+                    break; // 选择文件
+                case 3:
+                    ChooseFolder(null, null); // 选择文件夹
+                    break; // 选择文件夹
+            }
+        }
+
+        // 编辑动作 加载动作信息
+        private void LoadButtonInformation()
+        {
+            Match buttonid = Regex.Match(AddWindow.CurrentButton, @"\d+"); // 获取按钮ID
+            ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
+
+            if (!string.IsNullOrWhiteSpace(buttonData.ButtonName))
+            {
+                AddWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
+                AddWindow.ButtonTitle.Text = buttonData.ButtonName; // 显示按钮名称
+            } // 如果按钮名称不为空
+            AddWindow.TitleTextBox.Text = buttonData.ButtonName; // 设置按钮名称
+            LocationTextBox.Text = buttonData.Location; // 设置文件地址
+            if (buttonData.ImagePath != "none")
+            {
+                try
+                {
+                    AddWindow.ButtonImage.Visibility = Visibility.Visible;
+                    AddWindow.ButtonImage.Source = new BitmapImage(new Uri(buttonData.ImagePath));
+                }
+                catch
+                {
+                    AddWindow.ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
+                }
+            } // 如果图标路径不为默认值
+            RunByMessager.IsChecked = buttonData.RunByMessager; // 设置是否通过管理员身份运行
+            TryToOpenExitingWindow.IsChecked = buttonData.TryToOpenExitingWindow; // 设置是否尝试打开已存在的窗口
+            switch (buttonData.WindowState)
+            {
+                case 0:
+                    break; // 默认
+                case 1:
+                    WindowStateComboBox.SelectedIndex = 1;
+                    break; // 最大化
+                case 2:
+                    WindowStateComboBox.SelectedIndex = 2;
+                    break; // 最小化
+            } // 设置窗口状态
+            AddWindow.UsageTextBox.Text = buttonData.Usage; // 设置用途
+            AddWindow.UpdateTooltip(); // 更新提示文本
         }
 
         // 打开菜单
@@ -124,7 +189,6 @@ namespace Quicker.UserControls.AddWindow
             LocationTextBox.Text = clipboardText; // 设置地址栏文本
         }
 
-
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -135,23 +199,35 @@ namespace Quicker.UserControls.AddWindow
         }
 
         // 保存动作
-        private void Save()
+        public void Save()
         {
             bool runbymessager = RunByMessager.IsChecked == true; // 是否通过管理员身份运行
             bool trytoopenexitingwindow = TryToOpenExitingWindow.IsChecked == true; // 是否尝试打开已存在的窗口
             int windowState = 0; // 窗口状态
             if (WindowStateComboBox.SelectedIndex != -1) windowState = WindowStateComboBox.SelectedIndex; // 获取窗口状态
 
+            // 处理图标路径
+            AddWindow.iconPath = AddWindow.ButtonImage.Visibility == Visibility.Visible ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source) : "none"; // 如果图标可见，则保存图标，否则设置为默认值
             var buttonData = new ButtonData
             {
+                ButtonID = AddWindow.CurrentButton,
+                ButtonName = AddWindow.TitleTextBox.Text,
                 Location = LocationTextBox.Text,
+                ImagePath = AddWindow.iconPath,
                 RunByMessager = runbymessager,
                 TryToOpenExitingWindow = trytoopenexitingwindow,
                 WindowState = windowState,
+                Usage = AddWindow.UsageTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
                 Type = "OpenFile"
             }; // 创建按钮数据对象
+            (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
+        }
+
+        private void OpenFile_Unloaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

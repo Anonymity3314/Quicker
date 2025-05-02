@@ -10,15 +10,17 @@
     Background="White"
     d:DesignHeight="289"
     d:DesignWidth="493"
+    
+    Unloaded="OpenFile_Unloaded"
 >
     <UserControl.Resources>
         <!-- 菜单按钮上的图像样式 -->
         <Style x:Key="ImageStyle" TargetType="Image">
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Margin" Value="3,0,0,0"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="3,0,0,0"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Width" Value="20"/>
         </Style>
         <!-- “选择图片”的按钮样式 -->
         <Style x:Key="ImageButton" TargetType="Button">
@@ -47,57 +49,55 @@
     </UserControl.Resources>
 
     <Grid>
-        <Label x:Name="LocationLabel" Content="路径/命令" Margin="54,29,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,29,0,0" TextChanged="LocationTextBox_TextChanged"/>
-        <Label Content="窗口风格" HorizontalAlignment="Left" Margin="59,69,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="130,69,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White">
+        <Label x:Name="LocationLabel" Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="233" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged"/>
+        <Label Content="窗口风格" Margin="96,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="58"/>
+        <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="161,52,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White">
             <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>
             <ComboBoxItem Content="最小化(Minimized)" VerticalAlignment="Center"/>
             <ComboBoxItem Content="最大化(Maximized)" VerticalAlignment="Center"/>
         </ComboBox>
-        <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="136,132,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="136,152,0,0" VerticalAlignment="Top"/>
-        <Label Content="选项" HorizontalAlignment="Left" Margin="83,119,0,0" VerticalAlignment="Top"/>
-        <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="130,100,0,0" VerticalAlignment="Top" Foreground="#FF8C8C8C" Width="284"/>
-        <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="362,29,0,0" VerticalAlignment="Top" Height="25" Width="40" Click="OpenContextMenu"/>
-        <Button Style="{StaticResource Select}" x:Name="SelectButton复制__C_" HorizontalAlignment="Left" Margin="388,111,0,0" VerticalAlignment="Top" Height="1" Width="1" Visibility="Hidden"/>
-        <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="103" PlacementTarget="{Binding ElementName=SelectButton复制__C_}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+        <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="159,110,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="159,130,0,0" VerticalAlignment="Top"/>
+        <Label Content="选项" HorizontalAlignment="Left" Margin="120,105,0,0" VerticalAlignment="Top"/>
+        <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="155,78,0,0" VerticalAlignment="Top" Foreground="#FF8C8C8C" Width="284"/>
+        <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="25" Width="40" Click="OpenContextMenu"/>
+        <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="112" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
             <Grid>
-                <Rectangle Fill="White" Margin="5,7">
+                <Rectangle Fill="White" Margin="3,5">
                     <Rectangle.Effect>
                         <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
                     </Rectangle.Effect>
                 </Rectangle>
-                <Border Width="170" Background="White" BorderBrush="{x:Null}" BorderThickness="0" CornerRadius="3" Margin="5">
-                    <StackPanel>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications" Margin="-1,3,0,0">
-                            <Grid Width="180">
+                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                    <StackPanel Background="{x:Null}" Margin="0,3">
+                        <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications">
+                            <Grid Width="174" Height="20">
                                 <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
-                                <TextBlock Text="已安装的软件..." TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                                <TextBlock Text="已安装的软件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess" Margin="-1,0">
-                            <Grid Width="180">
+                        <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess">
+                            <Grid Width="174" Height="20">
                                 <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
-                                <TextBlock Text="文件..." TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                                <TextBlock Text="文件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder" Margin="-1,0">
-                            <Grid Width="180">
+                        <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder">
+                            <Grid Width="174" Height="20">
                                 <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
-                                <TextBlock Text="文件夹..." TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                                <TextBlock Text="文件夹..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation" Margin="-1,0,0,3">
-                            <Grid Width="180">
+                        <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation">
+                            <Grid Width="174" Height="20">
                                 <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
-                                <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                                <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                     </StackPanel>
                 </Border>
             </Grid>
         </Popup>
-        <Grid Margin="0,66,0,-66" Visibility="Collapsed"/>
     </Grid>
 </UserControl>

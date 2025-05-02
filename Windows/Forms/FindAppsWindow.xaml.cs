@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using Quicker.UserControls.AddWindow;
 using Windows.Management.Deployment;
 using System.Collections.Concurrent;
 using System.Windows.Media.Imaging;
@@ -493,7 +494,8 @@ namespace Quicker.Windows
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
             AddWindow addWindow = Application.Current.Windows.OfType<AddWindow>().FirstOrDefault(); // 获取AddWindow实例
-            addWindow.ChooseProcess(sender, e); // 调用选择进程的方法
+            OpenFile openFile = addWindow.openFile; // 获取OpenFile控件
+            openFile.ChooseProcess(null, null); // 调用选择进程的方法
         }
 
         // 拖动到正在运行的窗口上定位应用

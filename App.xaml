@@ -11,6 +11,8 @@
         <!--合并资源词典-->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- 图片样式 -->
+                <ResourceDictionary Source="Resources/Styles/ImageStyle.xaml"/>
                 <!-- 标签样式 -->
                 <ResourceDictionary Source="Resources/Styles/SliderStyle.xaml"/>
                 <!-- 输入框样式 -->

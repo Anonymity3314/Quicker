@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
 using System.Text.RegularExpressions;
+using Quicker.UserControls.AddWindow;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,6 +28,9 @@ namespace Quicker
         public TextBlock ButtonTitle; // 按钮标题
         public Image ButtonImage; // 按钮图片
         public string iconPath; // 图标路径
+
+        public OpenFile openFile; // 添加 OpenFile 的实例引用
+        private OpenWebsite openWebsite; // 添加 OpenWebsite 的实例引用
 
         public string CurrentButton { get; private set; } // 当前按钮
         public int Choice { get; private set; } // 选择添加动作类型
@@ -128,20 +132,16 @@ namespace Quicker
         {
             switch (Choice) // 根据选择执行对应命令
             {
-                case 0:
-                    LoadButtonInformation(); // 编辑动作，加载动作信息
-                    break; // 加载动作信息
-                case 1:
-                    ChooseApplications(null, null); // 选择本地应用
-                    break; // 选择应用程序
-                case 2:
-                    ChooseProcess(null, null); // 选择打开程序
+                case 0: // 编辑动作
+                case 1: // 启动软件
+                case 2: // 打开文件
+                case 3: // 打开文件夹
+                    openFile = new OpenFile(this); // 创建 OpenFile 实例并保存引用
+                    ActionInfoGrid.Children.Add(openFile); // 添加 OpenFile 控件到布局中
                     break; // 选择文件
-                case 3:
-                    ChooseFolder(null, null); // 选择文件夹
-                    break; // 选择文件夹
                 case 4:
-                    ChooseWebsite(); // 选择网址
+                    openWebsite = new OpenWebsite(this); // 创建 OpenWebsite 实例并保存引用
+                    ActionInfoGrid.Children.Add(openWebsite); // 添加 OpenWebsite 控件到布局中
                     break; // 选择网址
             }
         }
@@ -171,35 +171,12 @@ namespace Quicker
             ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
         }
 
-        // 根据不同选择打开对应菜单
-        private void OpenContextMenu(object sender, RoutedEventArgs e)
-        {
-            switch(ChoiceComboBox.SelectedIndex)
-            {
-                case 0: // 选择本地应用
-                    OpenFilePopup.IsOpen = true; // 打开弹出菜单
-                    break; // 选择本地应用
-                case 1: // 选择打开网址
-                    OpenFilePopup.IsOpen = true; // 打开弹出菜单
-                    break; // 选择打开网址
-            }
-        }
-
         // 选择本地应用
         private void ChooseApplications(object sender, RoutedEventArgs e)
         {
             FindAppsWindow = new() { Owner = this }; // 创建 FindAppsWindow 实例，并设置所有者为当前窗口
             FindAppsWindow.ApplicationSelected += OnApplicationSelected; // 订阅 ApplicationSelected 事件
             FindAppsWindow.ShowDialog(); // 显示为模式对话框
-        }
-
-        // 如果地址栏不为空，则启用保存按钮
-        private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (!string.IsNullOrWhiteSpace(LocationTextBox.Text)) 
-                SaveButton.IsEnabled = true; // 启用保存按钮
-            else 
-                SaveButton.IsEnabled = false; // 禁用保存按钮
         }
 
         // 处理选中的应用
@@ -210,7 +187,6 @@ namespace Quicker
             {
                 // 更新控件数据
                 TitleTextBox.Text = selectedApp.Name; // 设置标题
-                LocationTextBox.Text = selectedApp.Location; // 设置地址
 
                 // 设置图标
                 ButtonImage.Source = selectedApp.Icon; // 设置图标
@@ -219,117 +195,31 @@ namespace Quicker
             }
         }
 
-        // 选择打开程序
-        public void ChooseProcess(object sender, RoutedEventArgs e)
-        {
-            var openFileDialog = new Microsoft.Win32.OpenFileDialog
-            {
-                Filter = "任意文件(*.*)|*.*|可执行程序(*.exe)|*.exe" // 设置文件类型过滤器
-            };
-
-            if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了“确定”
-            {
-                LocationTextBox.Text = openFileDialog.FileName; // 获取文件路径
-                TitleTextBox.Text = Path.GetFileNameWithoutExtension(openFileDialog.FileName); // 获取文件名
-                ButtonTitle.Text = Path.GetFileNameWithoutExtension(openFileDialog.FileName); // 设置按钮标题
-                buttonManager.AutoEllipsisTextBlock(ButtonTitle, 70); // 调整字体大小
-
-                string cachedIconPath = iconManager.CheckCachedIcon(openFileDialog.FileName); // 检查缓存图标
-                if (!string.IsNullOrEmpty(cachedIconPath)) // 如果缓存图标存在
-                {
-                    ButtonImage.Source = new BitmapImage(new Uri(cachedIconPath)); // 设置图标
-                    ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                }
-                else
-                {
-                    ImageSource iconSource = iconManager.GetIcon(openFileDialog.FileName); // 获取图标
-                    if (iconSource != null)
-                    {
-                        ButtonImage.Source = iconSource; // 设置图标
-                        ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                    }
-                    else new ToastContentBuilder().AddText("图标提取失败!").Show(); // 显示通知
-                }
-            }
-        }
-
-        // 选择打开文件夹
-        private void ChooseFolder(object sender, RoutedEventArgs e)
-        {
-            using FolderBrowserDialog folderDialog = new(); // 创建文件夹选择对话框
-            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                LocationTextBox.Text = folderDialog.SelectedPath; // 获取文件夹路径
-                TitleTextBox.Text = Path.GetFileName(folderDialog.SelectedPath); // 获取文件夹名称
-                buttonManager.AutoEllipsisTextBlock(ButtonTitle, 70); // 调整字体大小
-
-                string cachedIconPath = iconManager.CheckCachedIcon(folderDialog.SelectedPath); // 检查缓存图标
-                if (!string.IsNullOrEmpty(cachedIconPath))
-                {
-                    ButtonImage.Source = new BitmapImage(new Uri(cachedIconPath)); // 设置图标
-                    ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                }
-                else
-                {
-                    ImageSource folderIcon = iconManager.GetIcon(folderDialog.SelectedPath); // 获取文件夹图标
-                    if (folderIcon != null)
-                    {
-                        ButtonImage.Source = folderIcon; // 设置图标
-                        ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                    }
-                    else new ToastContentBuilder().AddText("图标提取失败!").Show(); // 显示通知
-                }
-            }
-        }
-
-        // 复制地址
-        private void CopyLocation(object sender, RoutedEventArgs e)
-        {
-            string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
-            LocationTextBox.Text = clipboardText; // 设置地址栏文本
-        }
-
-        // 选择打开网址
-        private void ChooseWebsite()
-        {
-            ChoiceComboBox.SelectedIndex = 1; // 设置选择框为网址
-            LocationLabel.Content = "网址"; // 设置标签文本
-            LocationTextBox.Text = "http://"; // 设置地址栏文本
-            SelectButton.Content = "..."; // 设置选择按钮内容
-        }
-
         // 保存动作
         private void Save()
         {
-            bool runbymessager = RunByMessager.IsChecked == true; // 是否通过管理员身份运行
-            bool trytoopenexitingwindow = TryToOpenExitingWindow.IsChecked == true; // 是否尝试打开已存在的窗口
-            int windowState = 0; // 窗口状态
-            if (WindowStateComboBox.SelectedIndex != -1) windowState = WindowStateComboBox.SelectedIndex; // 获取窗口状态
-
-            // 处理图标路径
-            iconPath = ButtonImage.Visibility == Visibility.Visible ? iconManager.SaveIconToFile(ButtonImage.Source) : "none"; // 如果图标可见，则保存图标，否则设置为默认值
-            var buttonData = new ButtonData
+            switch(ChoiceComboBox.SelectedIndex)
             {
-                ButtonID = CurrentButton,
-                ButtonName = TitleTextBox.Text,
-                Location = LocationTextBox.Text,
-                ImagePath = iconPath,
-                RunByMessager = runbymessager,
-                TryToOpenExitingWindow = trytoopenexitingwindow,
-                WindowState = windowState,
-                Usage = UsageTextBox.Text,
-                CreateTime = DateTime.Now,
-                LatestEditTime = DateTime.Now,
-                Type = "OpenFile"
-            }; // 创建按钮数据对象
-            (Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
+                case 0:
+                    openFile.Save(); // 保存打开文件动作
+                    break;
+                case 1:
+                    break;
+            }
             this.Close(); // 关闭窗口
         }
 
         // 点击保存按钮保存动作
         private void SaveAction(object sender, RoutedEventArgs e)
         {
-            Save(); // 保存动作
+            switch (ChoiceComboBox.SelectedIndex)
+            {
+                case 0:
+                    Save(); // 保存动作
+                    break;
+                case 1:
+                    break;
+            }
         }
 
         // 按下 S 键保存动作
@@ -358,50 +248,8 @@ namespace Quicker
             UpdateTooltip(); // 更新提示文本
         }
 
-        // 编辑动作 加载动作信息
-        private void LoadButtonInformation()
-        {
-            Match buttonid = Regex.Match(CurrentButton, @"\d+"); // 获取按钮ID
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
-
-            if (!string.IsNullOrWhiteSpace(buttonData.ButtonName))
-            {
-                ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
-                ButtonTitle.Text = buttonData.ButtonName; // 显示按钮名称
-            } // 如果按钮名称不为空
-            TitleTextBox.Text = buttonData.ButtonName; // 设置按钮名称
-            LocationTextBox.Text = buttonData.Location; // 设置文件地址
-            if (buttonData.ImagePath != "none")
-            {
-                try
-                {
-                    ButtonImage.Visibility = Visibility.Visible;
-                    ButtonImage.Source = new BitmapImage(new Uri(buttonData.ImagePath));
-                }
-                catch
-                {
-                    ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
-                }
-            } // 如果图标路径不为默认值
-            RunByMessager.IsChecked = buttonData.RunByMessager; // 设置是否通过管理员身份运行
-            TryToOpenExitingWindow.IsChecked = buttonData.TryToOpenExitingWindow; // 设置是否尝试打开已存在的窗口
-            switch (buttonData.WindowState)
-            {
-                case 0:
-                    break; // 默认
-                case 1:
-                    WindowStateComboBox.SelectedIndex = 1;
-                    break; // 最大化
-                case 2:
-                    WindowStateComboBox.SelectedIndex = 2;
-                    break; // 最小化
-            } // 设置窗口状态
-            UsageTextBox.Text = buttonData.Usage; // 设置用途
-            UpdateTooltip(); // 更新提示文本
-        }
-
         // 更新提示文本
-        private void UpdateTooltip()
+        public void UpdateTooltip()
         {
             string toolTipText = null; // 提示文本
             if (!string.IsNullOrWhiteSpace(TitleTextBox.Text) || !string.IsNullOrWhiteSpace(UsageTextBox.Text))
@@ -452,13 +300,14 @@ namespace Quicker
         private void ChoiceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (isLoading) return; // 如果正在加载，则不执行命令
+            ActionInfoGrid.Children.Clear(); // 清除子控件
             switch (ChoiceComboBox.SelectedIndex)
             {
                 case 0:
-                    ChooseProcess(null, null); // 选择打开程序
+                    ActionInfoGrid.Children.Add(openFile); // 添加控件
                     break; // 编辑动作
                 case 1:
-                    ChooseWebsite();
+                    ActionInfoGrid.Children.Add(openWebsite); // 添加控件
                     break; // 选择应用程序
             }
         }
@@ -493,10 +342,6 @@ namespace Quicker
             buttonManager.Dispose(); // 释放按钮管理器资源
 
             ButtonView.Content = null; // 清空 ButtonView 的内容
-            OpenFilePopup.Child = null; // 清理弹出菜单的内容
-            OpenFilePopup = null; // 清理弹出菜单的引用
-            OpenWebsitePopup.Child = null; // 清理弹出菜单的内容
-            OpenWebsitePopup = null; // 清理弹出菜单的引用
 
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

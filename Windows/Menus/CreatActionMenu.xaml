@@ -7,11 +7,11 @@
     x:Class="Quicker.Windows.CreatActionMenu"
     mc:Ignorable="d"
 
-    AllowsTransparency="True" 
-    ShowInTaskbar="False" 
-    ResizeMode="NoResize" 
-    Background="{x:Null}" 
-    WindowStyle="None" 
+    AllowsTransparency="True"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
+    Background="{x:Null}"
+    WindowStyle="None"
     Topmost="True"
     
     Deactivated="Window_Deactivated"
