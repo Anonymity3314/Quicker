@@ -17,41 +17,6 @@
     Loaded="AddWindow_Loaded"
     KeyDown="SaveAction"
 >
-    <Window.Resources>
-        <!-- 菜单按钮上的图像样式 -->
-        <Style x:Key="ImageStyle" TargetType="Image">
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="3,0,0,0"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Width" Value="20"/>
-        </Style>
-        <!-- “选择图片”的按钮样式 -->
-        <Style x:Key="ImageButton" TargetType="Button">
-            <Setter Property="Width" Value="24"/>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Margin" Value="0,0,0,0"/>
-            <Setter Property="BorderBrush" Value="{x:Null}"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="White" BorderBrush="White" BorderThickness="1" CornerRadius="3">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#FFF3F3F3"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
     <Grid x:Name="MainGrid">
         <Label Content="动作类型" HorizontalAlignment="Left" Margin="98,40,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="ChoiceComboBox" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top" Width="270" SelectedIndex="0" BorderBrush="#FFFBFBFB" Height="26" Background="White" SelectionChanged="ChoiceComboBox_SelectionChanged">

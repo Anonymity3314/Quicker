@@ -111,40 +111,34 @@ namespace Quicker
         // 按键计时器的回调
         private void PressTimer_Tick(object sender, EventArgs e)
         {
-            if (keyPressStartTime.HasValue)
+            if (!keyPressStartTime.HasValue) // 如果没有按下时间
             {
-                var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置
-                double LongPressThreshold = Conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
-                var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger ||
-                    OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger) 
-                {
-                    if(!keyPressStartTime.HasValue) // 如果没有按下时间
-                    {
-                        pressTimer.Stop(); // 停止计时器
-                        return; // 如果没有按下时间，停止计时器
-                    }
-
-                    TimeSpan pressDuration = DateTime.Now - keyPressStartTime.Value; // 计算按键按下时间
-                    if (pressDuration.TotalSeconds >= LongPressThreshold)
-                    {
-                        this.Dispatcher.Invoke(CloseOrShowMainWindow); // 如果按键时间超过阈值，触发功能
-                        keyPressStartTime = null; // 重置按键时间
-                        pressTimer.Stop(); // 停止计时器
-                    }
-                } // 长按中键或右键
-                else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
-                {
-                    System.Windows.Point currentPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
-                    double offsetX = currentPosition.X - startPosition.X; // 计算水平偏移量
-                    double offsetY = currentPosition.Y - startPosition.Y; // 计算垂直偏移量
-                    double distance = Math.Sqrt(offsetX * offsetX + offsetY * offsetY); // 计算移动距离
-                    if (distance > Conventions.MouseMovePixels) // 如果移动距离大于设置像素值
-                    {
-                        this.Dispatcher.Invoke(CloseOrShowMainWindow); // 关闭或显示主窗口
-                    }
-                } // 右键移动
+                pressTimer.Stop(); // 停止计时器
+                return; // 如果没有按下时间，停止计时器
             }
+            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置
+            double LongPressThreshold = Conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
+            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger ||
+                OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
+            {
+                TimeSpan pressDuration = DateTime.Now - keyPressStartTime.Value; // 计算按键按下时间
+                if (pressDuration.TotalSeconds >= LongPressThreshold)
+                {
+                    this.Dispatcher.Invoke(CloseOrShowMainWindow); // 如果按键时间超过阈值，触发功能
+                    keyPressStartTime = null; // 重置按键时间
+                    pressTimer.Stop(); // 停止计时器
+                }
+            } // 长按中键或右键
+            else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
+            {
+                System.Windows.Point currentPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
+                double offsetX = currentPosition.X - startPosition.X; // 计算水平偏移量
+                double offsetY = currentPosition.Y - startPosition.Y; // 计算垂直偏移量
+                double distance = Math.Sqrt(offsetX * offsetX + offsetY * offsetY); // 计算移动距离
+                if (distance > Conventions.MouseMovePixels) // 如果移动距离大于设置像素值
+                    this.Dispatcher.Invoke(CloseOrShowMainWindow); // 关闭或显示主窗口
+            } // 右键移动
         }
 
         // 定时器每5min保存使用时长

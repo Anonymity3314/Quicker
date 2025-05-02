@@ -390,18 +390,21 @@ namespace Quicker.Windows
             }
         }
 
-        /// <summary>
-        /// 左键点击按钮时执行动作
-        /// </summary>
-        /// <param name="sender">按钮</param>
-        /// <param name="e">事件参数</param>
         // 左键点击按钮时执行动作
         private void DoAction(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
-                actionManager.OpenFile(data); // 调用 ActionManager 的 OpenFile 方法打开文件
+                switch(data.Type)
+                {
+                    case "OpenFile":
+                        actionManager.OpenFile(data); // 调用 ActionManager 的 OpenFile 方法打开文件
+                        break; // 打开文件、文件夹
+                    case "OpenWebsite":
+                        actionManager.OpenWebsite(data.Location); // 调用 ActionManager 的 OpenFolder 方法打开文件夹
+                        break; // 打开网站
+                }
             }
             else
             {

@@ -22,17 +22,6 @@
     Closing="MainWindow_Closing"
     Loaded="MainWindow_Loaded"
 >
-    <Window.Resources>
-        <!-- 菜单按钮上的图像样式 -->
-        <Style x:Key="ImageStyle" TargetType="Image">
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Margin" Value="3,0,0,0"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-    </Window.Resources>
-
     <Border CornerRadius="5">
         <Grid x:Name="MainGrid">
             <!-- 窗口阴影 -->

@@ -119,7 +119,6 @@ namespace Quicker.Windows
             InitializeComponent(); // 初始化窗口的UI组件
 
             SearchTextBox.Focus(); // 让搜索框获得焦点
-            AddWindow.FindAppsWindow = this; // 设置静态字段，方便在其他窗口中引用
 
             _applicationView = CollectionViewSource.GetDefaultView(_allApplications); // 创建视图
             ApplicationsListView.ItemsSource = _applicationView; // 绑定 ItemsSource
@@ -494,7 +493,7 @@ namespace Quicker.Windows
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
             AddWindow addWindow = Application.Current.Windows.OfType<AddWindow>().FirstOrDefault(); // 获取AddWindow实例
-            OpenFile openFile = addWindow.openFile; // 获取OpenFile控件
+            OpenFile openFile = addWindow.ActionInfoGrid.Children[0] as OpenFile;
             openFile.ChooseProcess(null, null); // 调用选择进程的方法
         }
 
@@ -756,7 +755,6 @@ namespace Quicker.Windows
                     disposableIcon.Dispose(); // 释放图标资源
             }
             iconCache.Clear(); // 清空图标缓存
-            AddWindow.FindAppsWindow = null;
             linkTargetCache.Clear(); // 清空快捷方式目标路径缓存
             fileHashCache.Clear(); // 清空文件哈希缓存
             findAppsWindow = null; // 清空静态引用

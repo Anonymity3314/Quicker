@@ -19,18 +19,13 @@ namespace Quicker
 {
     public partial class AddWindow : Window
     {
-        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
-        private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // ButtonDatabase
-        public static SelectImageWindow SelectImageWindow; // SelectImageWindow 的静态引用
-        public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
+        private SelectImageWindow selectImageWindow; // SelectImageWindow 的实例引用
+        private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
         public TextBlock ButtonTitle; // 按钮标题
         public Image ButtonImage; // 按钮图片
         public string iconPath; // 图标路径
-
-        public OpenFile openFile; // 添加 OpenFile 的实例引用
-        private OpenWebsite openWebsite; // 添加 OpenWebsite 的实例引用
 
         public string CurrentButton { get; private set; } // 当前按钮
         public int Choice { get; private set; } // 选择添加动作类型
@@ -136,12 +131,11 @@ namespace Quicker
                 case 1: // 启动软件
                 case 2: // 打开文件
                 case 3: // 打开文件夹
-                    openFile = new OpenFile(this); // 创建 OpenFile 实例并保存引用
-                    ActionInfoGrid.Children.Add(openFile); // 添加 OpenFile 控件到布局中
+                    ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
                     break; // 选择文件
                 case 4:
-                    openWebsite = new OpenWebsite(this); // 创建 OpenWebsite 实例并保存引用
-                    ActionInfoGrid.Children.Add(openWebsite); // 添加 OpenWebsite 控件到布局中
+                    ChoiceComboBox.SelectedIndex = 1;
+                    ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
                     break; // 选择网址
             }
         }
@@ -171,14 +165,6 @@ namespace Quicker
             ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
         }
 
-        // 选择本地应用
-        private void ChooseApplications(object sender, RoutedEventArgs e)
-        {
-            FindAppsWindow = new() { Owner = this }; // 创建 FindAppsWindow 实例，并设置所有者为当前窗口
-            FindAppsWindow.ApplicationSelected += OnApplicationSelected; // 订阅 ApplicationSelected 事件
-            FindAppsWindow.ShowDialog(); // 显示为模式对话框
-        }
-
         // 处理选中的应用
         private void OnApplicationSelected(object sender, FindAppsWindow.ApplicationSelectedEventArgs e)
         {
@@ -191,7 +177,7 @@ namespace Quicker
                 // 设置图标
                 ButtonImage.Source = selectedApp.Icon; // 设置图标
                 ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                FindAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
+                findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
             }
         }
 
@@ -201,9 +187,12 @@ namespace Quicker
             switch(ChoiceComboBox.SelectedIndex)
             {
                 case 0:
+                    OpenFile openFile = (OpenFile)ActionInfoGrid.Children[0]; // 获取 OpenFile 控件
                     openFile.Save(); // 保存打开文件动作
                     break;
                 case 1:
+                    OpenWebsite openWebsite = (OpenWebsite)ActionInfoGrid.Children[0]; // 获取 OpenWebsite 控件
+                    openWebsite.Save(); // 保存打开网址动作
                     break;
             }
             this.Close(); // 关闭窗口
@@ -212,14 +201,7 @@ namespace Quicker
         // 点击保存按钮保存动作
         private void SaveAction(object sender, RoutedEventArgs e)
         {
-            switch (ChoiceComboBox.SelectedIndex)
-            {
-                case 0:
-                    Save(); // 保存动作
-                    break;
-                case 1:
-                    break;
-            }
+            Save(); // 保存动作
         }
 
         // 按下 S 键保存动作
@@ -264,17 +246,17 @@ namespace Quicker
         // 如果FindAppsWindow存在，则闪烁窗口并响起提示音
         private void AddWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (FindAppsWindow != null)
+            if (findAppsWindow != null)
             {
                 SystemSounds.Beep.Play(); // 播放提示音
-                FindAppsWindow.Focus(); // 设置焦点
+                findAppsWindow.Focus(); // 设置焦点
             }
         }
 
         // 选择本地图片
         private void SelectImage(object sender, RoutedEventArgs e)
         {
-            SelectImageWindow selectImageWindow = new(); // 创建 SelectImageWindow 实例
+            selectImageWindow = new SelectImageWindow(); // 创建 SelectImageWindow 实例
             selectImageWindow.ImageConfirmed += OnImageConfirmed; // 订阅 ImageConfirmed 事件
             selectImageWindow.Owner = this; // 设置所有者为当前窗口
             selectImageWindow.ShowDialog(); // 显示为模式对话框
@@ -300,16 +282,28 @@ namespace Quicker
         private void ChoiceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (isLoading) return; // 如果正在加载，则不执行命令
-            ActionInfoGrid.Children.Clear(); // 清除子控件
+            ResetInfo(); // 清空控件数据
             switch (ChoiceComboBox.SelectedIndex)
             {
                 case 0:
-                    ActionInfoGrid.Children.Add(openFile); // 添加控件
+                    ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加控件
                     break; // 编辑动作
                 case 1:
-                    ActionInfoGrid.Children.Add(openWebsite); // 添加控件
+                    ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加控件
                     break; // 选择应用程序
             }
+        }
+
+        // 清空控件数据
+        private void ResetInfo()
+        {
+            ActionInfoGrid.Children.Clear(); // 清除子控件
+            TitleTextBox.Text = ""; // 清空标题
+            UsageTextBox.Text = ""; // 清空用途
+            ButtonImage.Source = null; // 清空图标
+            ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
+            ButtonTitle.Visibility = Visibility.Collapsed; // 隐藏标题
+            UpdateTooltip(); // 更新提示文本
         }
 
         // 关闭窗口前，释放资源
@@ -317,15 +311,15 @@ namespace Quicker
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
 
-            if (FindAppsWindow != null)
+            if (findAppsWindow != null)
             {
-                FindAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
-                FindAppsWindow = null; // 清理静态引用
+                findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
+                findAppsWindow = null; // 清理静态引用
             }
-            if (SelectImageWindow != null)
+            if (selectImageWindow != null)
             {
-                SelectImageWindow.ImageConfirmed -= OnImageConfirmed; // 取消事件订阅
-                SelectImageWindow = null; // 清理静态引用
+                selectImageWindow.ImageConfirmed -= OnImageConfirmed; // 取消事件订阅
+                selectImageWindow = null; // 清理静态引用
             }
 
             // 清理控件资源
@@ -337,9 +331,6 @@ namespace Quicker
             if (ButtonTitle != null)
                 ButtonTitle = null; // 清理引用
             iconPath = null;
-
-            iconManager.Dispose(); // 释放图标管理器资源
-            buttonManager.Dispose(); // 释放按钮管理器资源
 
             ButtonView.Content = null; // 清空 ButtonView 的内容
 

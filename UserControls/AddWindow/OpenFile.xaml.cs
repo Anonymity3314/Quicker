@@ -15,14 +15,14 @@ namespace Quicker.UserControls.AddWindow
     {
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
         private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
-        public static FindAppsWindow FindAppsWindow; // FindAppsWindow 的静态引用
         private ButtonDatabase db2 = new ButtonDatabase(); // 初始换按钮数据库
+        public FindAppsWindow findAppsWindow; // FindAppsWindow 的静态引用
         private Quicker.AddWindow AddWindow; // AddWindow 的静态引用
 
         public OpenFile(Quicker.AddWindow addWindow)
         {
-            InitializeComponent();
             AddWindow = addWindow; // 保存 AddWindow 的静态引用
+            InitializeComponent();
             ExecuteChoiceAction();
         }
 
@@ -49,9 +49,7 @@ namespace Quicker.UserControls.AddWindow
         // 编辑动作 加载动作信息
         private void LoadButtonInformation()
         {
-            Match buttonid = Regex.Match(AddWindow.CurrentButton, @"\d+"); // 获取按钮ID
             ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
-
             if (!string.IsNullOrWhiteSpace(buttonData.ButtonName))
             {
                 AddWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
@@ -73,17 +71,7 @@ namespace Quicker.UserControls.AddWindow
             } // 如果图标路径不为默认值
             RunByMessager.IsChecked = buttonData.RunByMessager; // 设置是否通过管理员身份运行
             TryToOpenExitingWindow.IsChecked = buttonData.TryToOpenExitingWindow; // 设置是否尝试打开已存在的窗口
-            switch (buttonData.WindowState)
-            {
-                case 0:
-                    break; // 默认
-                case 1:
-                    WindowStateComboBox.SelectedIndex = 1;
-                    break; // 最大化
-                case 2:
-                    WindowStateComboBox.SelectedIndex = 2;
-                    break; // 最小化
-            } // 设置窗口状态
+            WindowStateComboBox.SelectedIndex = buttonData.WindowState;
             AddWindow.UsageTextBox.Text = buttonData.Usage; // 设置用途
             AddWindow.UpdateTooltip(); // 更新提示文本
         }
@@ -97,9 +85,9 @@ namespace Quicker.UserControls.AddWindow
         // 选择本地应用
         private void ChooseApplications(object sender, RoutedEventArgs e)
         {
-            FindAppsWindow = new() { Owner = AddWindow }; // 创建 FindAppsWindow 实例，并设置所有者为当前窗口
-            FindAppsWindow.ApplicationSelected += OnApplicationSelected; // 订阅 ApplicationSelected 事件
-            FindAppsWindow.ShowDialog(); // 显示为模式对话框
+            findAppsWindow = new() { Owner = AddWindow }; // 创建 FindAppsWindow 实例，并设置所有者为当前窗口
+            findAppsWindow.ApplicationSelected += OnApplicationSelected; // 订阅 ApplicationSelected 事件
+            findAppsWindow.ShowDialog(); // 显示为模式对话框
         }
 
         // 处理选中的应用
@@ -115,7 +103,7 @@ namespace Quicker.UserControls.AddWindow
                 // 设置图标
                 AddWindow.ButtonImage.Source = selectedApp.Icon; // 设置图标
                 AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                FindAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
+                findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
             }
         }
 
@@ -205,9 +193,10 @@ namespace Quicker.UserControls.AddWindow
             bool trytoopenexitingwindow = TryToOpenExitingWindow.IsChecked == true; // 是否尝试打开已存在的窗口
             int windowState = 0; // 窗口状态
             if (WindowStateComboBox.SelectedIndex != -1) windowState = WindowStateComboBox.SelectedIndex; // 获取窗口状态
+            AddWindow.iconPath = AddWindow.ButtonImage.Visibility == Visibility.Visible
+                ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source)
+                : "none"; // 如果图标可见，则保存图标，否则设置为默认值
 
-            // 处理图标路径
-            AddWindow.iconPath = AddWindow.ButtonImage.Visibility == Visibility.Visible ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source) : "none"; // 如果图标可见，则保存图标，否则设置为默认值
             var buttonData = new ButtonData
             {
                 ButtonID = AddWindow.CurrentButton,
@@ -227,7 +216,16 @@ namespace Quicker.UserControls.AddWindow
 
         private void OpenFile_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (findAppsWindow != null) // 取消事件订阅
+            {
+                findAppsWindow.ApplicationSelected -= OnApplicationSelected;
+                findAppsWindow = null;
+            }
 
+            if (AddWindow.ButtonImage != null) // 清理图片资源
+                AddWindow.ButtonImage.Source = null;
+
+            AddWindow = null;
         }
     }
 }
