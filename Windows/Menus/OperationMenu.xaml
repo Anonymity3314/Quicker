@@ -68,7 +68,7 @@
                     </Grid>
                 </Button>
                 <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
-                <Button x:Name="DeleteAction" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,0" Click="DeleteAction_Click">
+                <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource Button}" Margin="0,5,0,0" Click="DeleteAction_Click">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource Image}"/>
                         <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="删除"/></TextBlock>

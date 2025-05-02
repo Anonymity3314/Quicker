@@ -10,11 +10,13 @@
     Background="White"
     d:DesignHeight="289"
     d:DesignWidth="493"
+    
+    Unloaded="OpenWebsite_Unloaded"
 >
     <Grid>
         <Label Content="网址" Margin="122,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="34"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="233" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" Text="https://"/>
-        <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="···" HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="25" Width="39" Click="OpenContextMenu" FontSize="16" FontWeight="Bold"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="231" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" Text="https://"/>
+        <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="···" HorizontalAlignment="Left" Margin="392,15,0,0" VerticalAlignment="Top" Height="25" Width="40" Click="OpenContextMenu" FontSize="16" FontWeight="Bold" Foreground="#FFA9A6A6"/>
         <Popup x:Name="OpenWebsitePopup" PopupAnimation="Fade" Width="180" Height="35" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
             <Grid>
                 <Rectangle Fill="White" Margin="3,5">
@@ -33,5 +35,22 @@
             </Grid>
         </Popup>
         <Button x:Name="GetWebsiteIconButton" Content="获取网站图标" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="161,45,0,0" VerticalAlignment="Top" Width="85" Height="25" Click="GetWebsiteIconButton_Click"/>
+        <Label Margin="116,75,0,0" Content="浏览器" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <ComboBox x:Name="BrowserComboBox" Margin="161,75,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="138" Height="25" SelectedIndex="0" VerticalContentAlignment="Center" SelectionChanged="BrowserComboBox_SelectionChanged">
+            <ComboBoxItem Content="（系统默认浏览器）"/>
+            <ComboBoxItem Content="IE浏览器"/>
+            <ComboBoxItem Content="Edge"/>
+            <ComboBoxItem Content="Edge App模式"/>
+            <ComboBoxItem Content="Edge InPrivate窗口"/>
+            <ComboBoxItem Content="Chorme"/>
+            <ComboBoxItem Content="Chrome App模式"/>
+            <ComboBoxItem Content="Chrome 无痕窗口"/>
+            <ComboBoxItem Content="自定义浏览器程序"/>
+        </ComboBox>
+        <Grid x:Name="UserControlGrid" Margin="0,105,0,0" Visibility="Collapsed">
+            <Label Content="自定义浏览器" HorizontalAlignment="Left" Margin="74,4,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="BrowserLocation" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="161,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="312" Height="25"/>
+            <Label Content="使用自定义浏览器时，指定该浏览器的完整路径" HorizontalAlignment="Left" Margin="161,29,0,0" VerticalAlignment="Top" FontSize="11"/>
+        </Grid>
     </Grid>
 </UserControl>

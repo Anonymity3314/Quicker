@@ -48,25 +48,25 @@ namespace Quicker.UserControls
         // 前往图标网站www.iconfont.cn
         private void www_iconfont_cn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            actionManager.OpenWebsite("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
+            actionManager.LaunchDefaultBrowser("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
         }
 
         // 前往图标网站icons8.com
         private void icons8_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            actionManager.OpenWebsite("https://icons8.com/"); // 打开图标网站icons8.com
+            actionManager.LaunchDefaultBrowser("https://icons8.com/"); // 打开图标网站icons8.com
         }
 
         // 前往图标网站fontawesome.com
         private void fontawesome_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            actionManager.OpenWebsite("https://fontawesome.com/"); // 打开图标网站fontawesome.com
+            actionManager.LaunchDefaultBrowser("https://fontawesome.com/"); // 打开图标网站fontawesome.com
         }
 
         // BUG反馈、需求
         private void FeedBack_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            actionManager.OpenWebsite("https://github.com/Anonymity3314/Quicker/issues"); // 前往Github反馈
+            actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker/issues"); // 前往Github反馈
         }
 
         // 基础设置-关于Quicker-隐私声明

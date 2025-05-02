@@ -402,7 +402,7 @@ namespace Quicker.Windows
                         actionManager.OpenFile(data); // 调用 ActionManager 的 OpenFile 方法打开文件
                         break; // 打开文件、文件夹
                     case "OpenWebsite":
-                        actionManager.OpenWebsite(data.Location); // 调用 ActionManager 的 OpenFolder 方法打开文件夹
+                        actionManager.OpenWebsite(data); // 调用 ActionManager 的 OpenFolder 方法打开文件夹
                         break; // 打开网站
                 }
             }

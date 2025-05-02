@@ -19,7 +19,7 @@
 >
     <Grid x:Name="MainGrid">
         <Label Content="动作类型" HorizontalAlignment="Left" Margin="98,40,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="ChoiceComboBox" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top" Width="270" SelectedIndex="0" BorderBrush="#FFFBFBFB" Height="26" Background="White" SelectionChanged="ChoiceComboBox_SelectionChanged">
+        <ComboBox x:Name="ChoiceComboBox" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top" Width="270" SelectedIndex="0" BorderBrush="#FFFBFBFB" Height="26" Background="White" SelectionChanged="ChoiceComboBox_SelectionChanged" VerticalContentAlignment="Center">
             <ComboBoxItem VerticalAlignment="Center">
                 <Grid>
                     <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>

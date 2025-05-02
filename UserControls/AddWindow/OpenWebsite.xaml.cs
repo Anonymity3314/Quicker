@@ -39,7 +39,15 @@ namespace Quicker.UserControls.AddWindow
                 AddWindow.ButtonTitle.Text = buttonData.ButtonName; // 显示按钮名称
             } // 如果按钮名称不为空
             AddWindow.TitleTextBox.Text = buttonData.ButtonName; // 设置按钮名称
-            LocationTextBox.Text = buttonData.Location; // 设置文件地址
+            if (buttonData.WindowState == 8) // 如果是自定义浏览器
+            {
+                string[] locationAndBrowser = GetLocationAndBrowser(buttonData.Location); // 解析地址和浏览器
+                LocationTextBox.Text = locationAndBrowser[0]; // 设置地址栏文本
+                BrowserLocation.Text = locationAndBrowser[1]; // 设置浏览器地址
+            }
+            else
+                LocationTextBox.Text = buttonData.Location; // 设置文件地址
+
             if (buttonData.ImagePath != "none")
             {
                 try
@@ -52,8 +60,20 @@ namespace Quicker.UserControls.AddWindow
                     AddWindow.ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
                 }
             } // 如果图标路径不为默认值
+            BrowserComboBox.SelectedIndex = buttonData.WindowState; // 设置浏览器类型
             AddWindow.UsageTextBox.Text = buttonData.Usage; // 设置用途
             AddWindow.UpdateTooltip(); // 更新提示文本
+        }
+
+        /// <summary>
+        /// 解析网站地址和浏览器地址
+        /// </summary>
+        /// <param name="info"> 地址和浏览器地址 </param>
+        /// <returns> 网站地址和浏览器地址数组 </returns>
+        private string[] GetLocationAndBrowser(string info)
+        {
+            string[] locationAndBrowser = info.Split(';'); // 将文本内容按照分号分隔
+            return locationAndBrowser;
         }
 
         // 打开菜单
@@ -143,14 +163,37 @@ namespace Quicker.UserControls.AddWindow
             {
                 ButtonID = AddWindow.CurrentButton,
                 ButtonName = AddWindow.TitleTextBox.Text,
-                Location = LocationTextBox.Text,
+                Location = BrowserComboBox.SelectedIndex == 8
+                    ? LocationTextBox.Text + ";" + BrowserLocation.Text
+                    : LocationTextBox.Text,
                 ImagePath = AddWindow.iconPath,
+                WindowState = BrowserComboBox.SelectedIndex,
                 Usage = AddWindow.UsageTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
-                Type = "OpenFile"
+                Type = "OpenWebsite"
             }; // 创建按钮数据对象
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
+        }
+
+        // 如果是自定义浏览器，显示相关控件进行相关设置
+        private void BrowserComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (BrowserComboBox.SelectedIndex != 8) return; // 如果不是自定义浏览器，则不显示相关控件
+            UserControlGrid.Visibility = Visibility.Visible;
+        }
+
+        // 关闭控件释放资源
+        private void OpenWebsite_Unloaded(object sender, RoutedEventArgs e)
+        {
+            iconManager.Dispose(); // 释放图标管理器资源
+            AddWindow = null; // 清空静态引用
+            OpenWebsitePopup.IsOpen = false; // 关闭弹出菜单
+            OpenWebsitePopup.Child = null; // 清空弹出菜单内容
+            OpenWebsitePopup.IsOpen = false; // 关闭弹出菜单
+            OpenWebsitePopup = null; // 清空弹出菜单对象
+            LocationTextBox = null; // 清空地址栏对象
+            GetWebsiteIconButton = null; // 清空获取图标按钮对象
         }
     }
 }

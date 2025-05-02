@@ -2,6 +2,7 @@
 using IWshRuntimeLibrary;
 using System.Diagnostics;
 using Quicker.Database;
+using Microsoft.Win32;
 using System.IO;
 
 namespace Quicker.Managers
@@ -81,16 +82,211 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 打开指定网站
+        /// 用指定方式打开指定网站
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public void OpenWebsite(ButtonData data)
+        {
+            try
+            {
+                switch (data.WindowState)
+                {
+                    case 0:
+                        LaunchDefaultBrowser(data.Location);
+                        break; // 打开默认浏览器
+                    case 1:
+                        LaunchInternetExplorer(data.Location);
+                        break; // 打开IE浏览器
+                    case 2:
+                        LaunchMicrosoftEdge(data.Location);
+                        break; // 打开Edge浏览器
+                    case 3:
+                        LaunchEdgeAppMode(data.Location);
+                        break; // 打开Edge浏览器，并以App模式打开
+                    case 4:
+                        LaunchEdgeInPrivateMode(data.Location);
+                        break; // 打开Edge浏览器，并以InPrivate模式打开
+                    case 5:
+                        LaunchChrome(data.Location);
+                        break; // 打开Chrome浏览器
+                    case 6:
+                        LaunchChromeAppMode(data.Location);
+                        break; // 打开Chrome浏览器，并以APP模式打开
+                    case 7:
+                        LaunchChromeIncognitoMode(data.Location);
+                        break; // 打开Chrome浏览器,并以无痕模式打开
+                    case 8:
+                        LaunchCustomBrowser(data.Location);
+                        break; // 通过用户指定浏览器打开
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowErrorToast($"打开失败：{ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 打开默认浏览器
         /// </summary>
         /// <param name="website"> 网站地址 </param>
-        public void OpenWebsite(string website)
+        public void LaunchDefaultBrowser(string website)
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = website, // 打开指定网站
-                UseShellExecute = true // 使用外壳程序启动
+                FileName = website,
+                UseShellExecute = true
             });
+        }
+
+        /// <summary>
+        /// 打开IE浏览器
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchInternetExplorer(string website)
+        {
+            Process.Start("iexplore.exe", website);
+        }
+
+        /// <summary>
+        /// 打开Microsoft Edge浏览器
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchMicrosoftEdge(string website)
+        {
+            Process.Start("microsoft-edge:" + website);
+        }
+
+        /// <summary>
+        /// 打开Edge浏览器，并以App模式打开指定网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchEdgeAppMode(string website)
+        {
+            string edgePath = GetEdgeBrowserPath();
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = edgePath,
+                Arguments = $"--app={website}",
+                UseShellExecute = true
+            });
+        }
+
+        /// <summary>
+        /// 打开Edge浏览器，并以InPrivate模式打开指定网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchEdgeInPrivateMode(string website)
+        {
+            string edgePath = GetEdgeBrowserPath();
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = edgePath,
+                Arguments = $"--inprivate {website}",
+                UseShellExecute = true
+            });
+        }
+
+        /// <summary>
+        /// 打开Chrome浏览器
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchChrome(string website)
+        {
+            string chromePath = GetChromeBrowserPath();
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = chromePath,
+                Arguments = website,
+                UseShellExecute = true
+            });
+        }
+
+        /// <summary>
+        /// 打开Chrome浏览器，并以App模式打开指定网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchChromeAppMode(string website)
+        {
+            string chromePath = GetChromeBrowserPath();
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = chromePath,
+                Arguments = $"--app={website}",
+                UseShellExecute = true
+            });
+        }
+
+        /// <summary>
+        /// 打开Chrome浏览器，并以无痕模式打开指定网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchChromeIncognitoMode(string website)
+        {
+            string chromePath = GetChromeBrowserPath();
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = chromePath,
+                Arguments = $"-incognito {website}",
+                UseShellExecute = true
+            });
+        }
+
+        /// <summary>
+        /// 通过用户指定浏览器打开网站
+        /// </summary>
+        /// <param name="website"> 网站地址 </param>
+        private void LaunchCustomBrowser(string location)
+        {
+            string[] processNames = location.Split(';'); // 将文本内容按照分号分隔
+            string website = processNames[0]; // 获取网站地址
+            string browserPath = processNames[1]; // 获取浏览器路径
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = browserPath,
+                Arguments = website,
+                UseShellExecute = true
+            });
+        }
+
+        // 获取Edge浏览器路径
+        private string GetEdgeBrowserPath()
+        {
+            try // 通过注册表获取Edge浏览器路径
+            {
+                RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"Local Settings\Software\Microsoft\Windows\CurrentVersion\App Model}");
+
+                if (key != null)
+                {
+                    object value = key.GetValue("Edge");
+                    if (value != null)
+                    {
+                        return value.ToString();
+                    }
+                }
+            }
+            catch { }
+            return @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"; // 如果注册表中找不到，使用默认路径
+        }
+
+        // 获取Chrome浏览器路径
+        private string GetChromeBrowserPath()
+        {
+            string chromePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe"; // 默认路径
+            if (!System.IO.File.Exists(chromePath))
+            {
+                chromePath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"; // 32位路径
+            }
+            return chromePath;
+        }
+
+        /// <summary>
+        /// 显示错误提示
+        /// </summary>
+        /// <param name="message"> 错误信息 </param>
+        private static void ShowErrorToast(string message)
+        {
+            new ToastContentBuilder().AddText(message).Show();
         }
 
         // 手动释放资源

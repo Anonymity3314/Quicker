@@ -16,6 +16,10 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="BorderBrush" TargetName="border" Value="#FFABADB3"/>
                             </Trigger>
+
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF326CF3"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -36,6 +40,10 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="BorderBrush" TargetName="border" Value="#FFABADB3"/>
+                            </Trigger>
+                            
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF326CF3"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

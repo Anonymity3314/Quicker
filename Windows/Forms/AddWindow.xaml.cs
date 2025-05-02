@@ -130,6 +130,8 @@ namespace Quicker
             switch (Choice) // 根据选择执行对应命令
             {
                 case 0: // 编辑动作
+                    LoadActionInfo(); // 加载动作信息
+                    break; // 编辑动作, 加载动作信息
                 case 1: // 启动软件
                 case 2: // 打开文件
                 case 3: // 打开文件夹
@@ -139,6 +141,22 @@ namespace Quicker
                     ChoiceComboBox.SelectedIndex = 1;
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
                     break; // 选择网址
+            }
+        }
+
+        // 编辑动作，加载动作信息
+        private void LoadActionInfo()
+        {
+            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
+            switch (buttonData.Type)
+            {
+                case "OpenFile":
+                    ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
+                    break;
+                case "OpenWebsite":
+                    ChoiceComboBox.SelectedIndex = 1;
+                    ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
+                    break;
             }
         }
 

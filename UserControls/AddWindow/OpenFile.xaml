@@ -15,9 +15,9 @@
 >
     <Grid>
         <Label x:Name="LocationLabel" Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="233" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged"/>
         <Label Content="窗口风格" Margin="96,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="58"/>
-        <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="161,52,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White">
+        <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="161,52,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White" VerticalContentAlignment="Center">
             <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>
             <ComboBoxItem Content="最小化(Minimized)" VerticalAlignment="Center"/>
             <ComboBoxItem Content="最大化(Maximized)" VerticalAlignment="Center"/>

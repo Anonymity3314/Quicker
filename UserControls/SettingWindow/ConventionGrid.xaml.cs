@@ -95,7 +95,7 @@ namespace Quicker.UserControls
         // 打开网站检查更新
         private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            actionManager.OpenWebsite("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
+            actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker"); // 打开更新页面
         }
 
         // 勾选框点击事件
