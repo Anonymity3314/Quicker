@@ -23,7 +23,7 @@ namespace Quicker.UserControls.AddWindow
         {
             AddWindow = addWindow; // 保存 AddWindow 的静态引用
             InitializeComponent();
-            ExecuteChoiceAction();
+            ExecuteChoiceAction(); // 根据上个窗口数据执行对应命令
         }
 
         // 根据上个窗口数据执行对应命令
@@ -214,6 +214,7 @@ namespace Quicker.UserControls.AddWindow
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
         }
 
+        // 移除控件清理资源
         private void OpenFile_Unloaded(object sender, RoutedEventArgs e)
         {
             if (findAppsWindow != null) // 取消事件订阅
@@ -221,6 +222,12 @@ namespace Quicker.UserControls.AddWindow
                 findAppsWindow.ApplicationSelected -= OnApplicationSelected;
                 findAppsWindow = null;
             }
+            buttonManager.Dispose(); // 释放资源
+            iconManager.Dispose(); // 释放资源
+            LocationTextBox.Text = ""; // 清空地址栏
+            WindowStateComboBox.SelectedIndex = -1; // 清空窗口状态下拉框
+            RunByMessager.IsChecked = false; // 取消勾选
+            TryToOpenExitingWindow.IsChecked = false; // 取消勾选
             AddWindow = null; // 清空引用
         }
     }

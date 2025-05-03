@@ -10,7 +10,6 @@ namespace Quicker.Database
     public class ButtonDatabase
     {
         private readonly string dbPath2 = "Data Source=Button.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
 
         // 初始化数据库
         public void Initialize()
@@ -29,7 +28,7 @@ namespace Quicker.Database
         // 检查并更新数据库
         private void CheckAndUpdateDatabase()
         {
-            if (db1.IsNewVersion()) return; // 如果是新版本，则不更新数据库
+
         }
 
         /// <summary>
@@ -372,14 +371,14 @@ namespace Quicker.Database
     // ButtonData 类
     public class ButtonData
     {
-        public string ButtonID { get; set; } // 动作ID
+        public string ButtonID { get; set; } // 动作ID，通常为Button的名称
         public string ButtonName { get; set; } // 动作名称
         public string Location { get; set; } // 位置
         public string ImagePath { get; set; } // 图片路径
         public bool RunByMessager { get; set; } // 是否用管理员身份运行
         public bool TryToOpenExitingWindow { get; set; } // 是否尝试打开已有窗口
         public int WindowState { get; set; } // 窗口状态
-        public string Usage { get; set; } // 用途
+        public string Usage { get; set; } // 用途(对动作的描述)
         public DateTime CreateTime { get; set; } // 创建时间
         public DateTime LatestEditTime { get; set; } // 最近修改时间
         public string Type { get; set; } // 类型
