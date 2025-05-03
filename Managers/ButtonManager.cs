@@ -61,9 +61,9 @@ namespace Quicker.Managers
         /// <param name="e">拖拽事件参数</param>
         public void Button_Drop(object sender, DragEventArgs e, bool isMainWindow)
         {
-            if (sender is Button TargetButton && (TargetButton != SourceButton || SourceButton != null))
+            if (sender is Button TargetButton)
             {
-                if (TargetButton == SourceButton || SourceButton == null) return; // 如果目标按钮和源按钮相同，直接返回
+                if (TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
                 if (e.Data.GetDataPresent(typeof(ButtonData))) // 获取拖拽数据
                 {
                     db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
