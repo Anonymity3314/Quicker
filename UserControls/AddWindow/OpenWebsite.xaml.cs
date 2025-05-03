@@ -179,6 +179,7 @@ namespace Quicker.UserControls.AddWindow
         // 如果是自定义浏览器，显示相关控件进行相关设置
         private void BrowserComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (UserControlGrid == null) return;
             if (BrowserComboBox.SelectedIndex == 8)
                 UserControlGrid.Visibility = Visibility.Visible; // 如果是自定义浏览器，则显示相关控件
             else
