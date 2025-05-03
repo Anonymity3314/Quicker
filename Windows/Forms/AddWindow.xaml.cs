@@ -303,7 +303,7 @@ namespace Quicker
         private void ChoiceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (isLoading) return; // 如果正在加载，则不执行命令
-            ResetInfo(); // 清空控件数据
+            ActionInfoGrid.Children.Clear(); // 清除子控件
             switch (ChoiceComboBox.SelectedIndex)
             {
                 case 0:
@@ -315,18 +315,6 @@ namespace Quicker
                     SetWindowHeight(1); // 设置窗口高度
                     break; // 选择应用程序
             }
-        }
-
-        // 清空控件数据
-        private void ResetInfo()
-        {
-            ActionInfoGrid.Children.Clear(); // 清除子控件
-            TitleTextBox.Text = ""; // 清空标题
-            UsageTextBox.Text = ""; // 清空用途
-            ButtonImage.Source = null; // 清空图标
-            ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
-            ButtonTitle.Visibility = Visibility.Collapsed; // 隐藏标题
-            UpdateTooltip(); // 更新提示文本
         }
 
         // 设置窗口高度

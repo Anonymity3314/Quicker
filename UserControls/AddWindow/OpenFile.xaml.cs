@@ -56,7 +56,8 @@ namespace Quicker.UserControls.AddWindow
                 AddWindow.ButtonTitle.Text = buttonData.ButtonName; // 显示按钮名称
             } // 如果按钮名称不为空
             AddWindow.TitleTextBox.Text = buttonData.ButtonName; // 设置按钮名称
-            LocationTextBox.Text = buttonData.Location; // 设置文件地址
+            if (buttonData.Type == "OpenFile")
+                LocationTextBox.Text = buttonData.Location; // 设置文件地址
             if (buttonData.ImagePath != "none")
             {
                 try
@@ -220,11 +221,7 @@ namespace Quicker.UserControls.AddWindow
                 findAppsWindow.ApplicationSelected -= OnApplicationSelected;
                 findAppsWindow = null;
             }
-
-            if (AddWindow.ButtonImage != null) // 清理图片资源
-                AddWindow.ButtonImage.Source = null;
-
-            AddWindow = null;
+            AddWindow = null; // 清空引用
         }
     }
 }
