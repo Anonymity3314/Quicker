@@ -1,21 +1,13 @@
 ﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using System.Windows.Interop;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Input;
-using IWshRuntimeLibrary;
-using System.Diagnostics;
-using System.Threading;
-using Quicker.Managers;
 using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
-using Quicker;
-using System.Text.RegularExpressions;
 
 namespace Quicker.Managers
 {
@@ -294,8 +286,7 @@ namespace Quicker.Managers
         {
             Window menu = null;
             Button button = sender as Button;
-            GeneralTransform transform = button.TransformToVisual(sourceWindow);
-            Point position = transform.Transform(new Point(0, 0));
+            Point mousePosition = Mouse.GetPosition(sourceWindow); // 获取鼠标位置
             if (isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
             switch (targetMenu)
             {
@@ -304,8 +295,8 @@ namespace Quicker.Managers
                     operationMenu?.Close(); // 关闭操作菜单
                     operationMenu = new(button.Name)
                     {
-                        Left = position.X,
-                        Top = position.Y
+                        Left = mousePosition.X,
+                        Top = mousePosition.Y
                     }; // 设置菜单位置
                     if (isMainWindow)
                     {
@@ -321,8 +312,8 @@ namespace Quicker.Managers
                     creatActionMenu?.Close(); // 关闭创建动作菜单
                     creatActionMenu = new(button.Name)
                     {
-                        Left = position.X,
-                        Top = position.Y
+                        Left = mousePosition.X,
+                        Top = mousePosition.Y
                     }; // 设置菜单位置
                     if (isMainWindow)
                     {
@@ -338,8 +329,8 @@ namespace Quicker.Managers
                     selectActionPageMenu?.Close();
                     selectActionPageMenu = new()
                     {
-                        Left = position.X,
-                        Top = position.Y
+                        Left = mousePosition.X,
+                        Top = mousePosition.Y
                     };
                     selectActionPageMenu.ClosingOrHiding += () =>
                     {

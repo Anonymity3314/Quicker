@@ -325,8 +325,8 @@ namespace Quicker.Windows
             button.MouseEnter += Button_MouseEnter; // 鼠标进入事件
             button.MouseLeave += Button_MouseLeave; // 鼠标离开事件
             button.MouseDoubleClick += ShowEditWindow; // 双击事件
+            button.PreviewMouseRightButtonDown += OpenMenu; // 右键点击事件
             button.PreviewMouseMove += Button_PreviewMouseMove; // 鼠标移动事件
-            button.MouseRightButtonDown += OpenMenu; // 右键点击事件
             button.PreviewMouseLeftButtonDown += Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
             button.PreviewMouseLeftButtonUp += Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
         }
@@ -362,18 +362,7 @@ namespace Quicker.Windows
         private void ShowCreatActionMenu(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag == null)
-            {
-                Point mousePosition = Mouse.GetPosition(this); // 获取鼠标位置
-                double left = mousePosition.X + 310.4, top = mousePosition.Y + 596 / 3; // 计算菜单位置
-                CreatActionMenu creatActionMenu = Application.Current.Windows.OfType<CreatActionMenu>().FirstOrDefault(); // 查找创建动作菜单
-                creatActionMenu?.Close(); // 关闭已有菜单
-                creatActionMenu = new(button.Name)
-                {
-                    Left = left,
-                    Top = top
-                }; // 创建新的菜单
-                creatActionMenu.Show(); // 显示菜单
-            }
+                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
         }
 
         // 显示编辑窗口
@@ -444,6 +433,7 @@ namespace Quicker.Windows
         // 打开创建动作菜单
         private void OpenMenu(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true; // 阻止默认右键菜单
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data && button != null)
                 buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
