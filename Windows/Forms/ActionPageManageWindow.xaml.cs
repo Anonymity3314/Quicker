@@ -467,7 +467,29 @@ namespace Quicker.Windows
         // 拖拽完成
         private void ListView_Drop(object sender, DragEventArgs e)
         {
-            buttonManager.Button_Drop(sender, e, false);
+            if (e.Data.GetDataPresent("ButtonData"))
+            {
+                string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
+                if (!string.IsNullOrEmpty(sourceButtonName))
+                {
+                    Point point = e.GetPosition(MainListView); // 获取鼠标位置
+                    var hitTestResult = VisualTreeHelper.HitTest(MainListView, point); // 获取鼠标位置的项
+                    DependencyObject targetItem = hitTestResult.VisualHit; // 获取鼠标位置的项
+                    Canvas targetCanvas = FindParent<Canvas>(targetItem);// 查找目标 Canvas
+
+                    if (targetCanvas == null) return; // 如果目标 Canvas 为 null，则返回
+                    string targetCanvasName = targetCanvas.Name; // 获取目标 Canvas 的 Name
+                    if (sourceButtonName == targetCanvasName) return; // 如果目标 Canvas 与源 Canvas 相同，则返回
+
+                    int sourceIndex = int.Parse(sourceButtonName.Substring(sourceButtonName.Length - 1)); // 获取源 Button 索引
+                    int targetIndex = int.Parse(targetCanvasName.Substring(targetCanvasName.Length - 1)); // 获取目标 Button 索引
+                    Match matchButton = Regex.Match(sourceButtonName, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
+                    string style = matchButton.Groups[1].Value; // 动作页样式
+
+                    db2.SwapButtonAValues(style, sourceIndex, targetIndex); // 更新数据库 Button A 值
+                    LoadCanvas(style); // 刷新界面
+                }
+            }
         }
 
         // 查找动作页按钮

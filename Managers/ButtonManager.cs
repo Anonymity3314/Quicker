@@ -15,6 +15,7 @@ using Quicker.Windows;
 using System.Windows;
 using System.IO;
 using Quicker;
+using System.Text.RegularExpressions;
 
 namespace Quicker.Managers
 {
