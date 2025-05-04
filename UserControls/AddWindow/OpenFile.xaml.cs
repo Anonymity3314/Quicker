@@ -50,13 +50,13 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
-            if (!string.IsNullOrWhiteSpace(buttonData.ButtonName))
+            if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
                 AddWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
-                AddWindow.ButtonTitle.Text = buttonData.ButtonName; // 显示按钮名称
+                AddWindow.ButtonTitle.Text = buttonData.Title; // 显示按钮名称
             } // 如果按钮名称不为空
-            AddWindow.TitleTextBox.Text = buttonData.ButtonName; // 设置按钮名称
-            if (buttonData.Type == "OpenFile")
+            AddWindow.TitleTextBox.Text = buttonData.Title; // 设置按钮名称
+            if (buttonData.ActionType == "OpenFile")
                 LocationTextBox.Text = buttonData.Location; // 设置文件地址
             if (buttonData.ImagePath != "none")
             {
@@ -73,7 +73,7 @@ namespace Quicker.UserControls.AddWindow
             RunByMessager.IsChecked = buttonData.RunByMessager; // 设置是否通过管理员身份运行
             TryToOpenExitingWindow.IsChecked = buttonData.TryToOpenExitingWindow; // 设置是否尝试打开已存在的窗口
             WindowStateComboBox.SelectedIndex = buttonData.WindowState;
-            AddWindow.UsageTextBox.Text = buttonData.Usage; // 设置用途
+            AddWindow.DescriptionTextBox.Text = buttonData.Description; // 设置用途
             AddWindow.UpdateTooltip(); // 更新提示文本
         }
 
@@ -200,16 +200,16 @@ namespace Quicker.UserControls.AddWindow
             var buttonData = new ButtonData
             {
                 ButtonID = AddWindow.CurrentButton,
-                ButtonName = AddWindow.TitleTextBox.Text,
+                Title = AddWindow.TitleTextBox.Text,
                 Location = LocationTextBox.Text,
                 ImagePath = AddWindow.iconPath,
                 RunByMessager = runbymessager,
                 TryToOpenExitingWindow = trytoopenexitingwindow,
                 WindowState = windowState,
-                Usage = AddWindow.UsageTextBox.Text,
+                Description = AddWindow.DescriptionTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
-                Type = "OpenFile"
+                ActionType = "OpenFile"
             }; // 创建按钮数据对象
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
         }

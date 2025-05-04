@@ -65,7 +65,7 @@ namespace Quicker.Windows
                     bool hasCommonButtons = commonButtonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 判断是否有通用样式按钮数据
                     if (hasCommonButtons) GenerateCanvas(0, CommonStyle); // 如果有按钮，生成通用 Canvas
                 }
-                else if (CommonStyle == "TaskBar" || CommonStyle == "Desktop")
+                else if (CommonStyle == "Taskbar" || CommonStyle == "Desktop")
                 {
                     CommonStyle = "Common"; // 设置样式为通用样式
                     GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
@@ -200,7 +200,7 @@ namespace Quicker.Windows
             {
                 case "Common":
                     break; // 不设置标签内容
-                case "TaskBar":
+                case "Taskbar":
                     CommonLabel.Content = "任务栏"; // 设置标签内容
                     break;
                 case "Desktop":
@@ -396,7 +396,7 @@ namespace Quicker.Windows
             Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
-                switch(data.Type)
+                switch(data.ActionType)
                 {
                     case "OpenFile":
                         actionManager.OpenFile(data); // 调用 ActionManager 的 OpenFile 方法打开文件

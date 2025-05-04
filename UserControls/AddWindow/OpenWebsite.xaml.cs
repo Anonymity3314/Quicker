@@ -33,12 +33,12 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
-            if (!string.IsNullOrWhiteSpace(buttonData.ButtonName))
+            if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
                 AddWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
-                AddWindow.ButtonTitle.Text = buttonData.ButtonName; // 显示按钮名称
+                AddWindow.ButtonTitle.Text = buttonData.Title; // 显示按钮名称
             } // 如果按钮名称不为空
-            AddWindow.TitleTextBox.Text = buttonData.ButtonName; // 设置按钮名称
+            AddWindow.TitleTextBox.Text = buttonData.Title; // 设置按钮名称
             if (buttonData.WindowState == 8) // 如果是自定义浏览器
             {
                 string[] locationAndBrowser = GetLocationAndBrowser(buttonData.Location); // 解析地址和浏览器
@@ -61,7 +61,7 @@ namespace Quicker.UserControls.AddWindow
                 }
             } // 如果图标路径不为默认值
             BrowserComboBox.SelectedIndex = buttonData.WindowState; // 设置浏览器类型
-            AddWindow.UsageTextBox.Text = buttonData.Usage; // 设置用途
+            AddWindow.DescriptionTextBox.Text = buttonData.Description; // 设置用途
             AddWindow.UpdateTooltip(); // 更新提示文本
         }
 
@@ -162,16 +162,16 @@ namespace Quicker.UserControls.AddWindow
             var buttonData = new ButtonData
             {
                 ButtonID = AddWindow.CurrentButton,
-                ButtonName = AddWindow.TitleTextBox.Text,
+                Title = AddWindow.TitleTextBox.Text,
                 Location = BrowserComboBox.SelectedIndex == 8
                     ? LocationTextBox.Text + ";" + BrowserLocation.Text
                     : LocationTextBox.Text,
                 ImagePath = AddWindow.iconPath,
                 WindowState = BrowserComboBox.SelectedIndex,
-                Usage = AddWindow.UsageTextBox.Text,
+                Description = AddWindow.DescriptionTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
-                Type = "OpenWebsite"
+                ActionType = "OpenWebsite"
             }; // 创建按钮数据对象
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
         }

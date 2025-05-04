@@ -118,13 +118,13 @@ namespace Quicker.Managers
             ButtonData buttonData = new ButtonData
             {
                 ButtonID = button.Name, // 获取按钮ID
-                ButtonName = fileName, // 设置按钮名称
+                Title = fileName, // 设置按钮名称
                 Location = filePath, // 设置文件路径
                 ImagePath = iconPath, // 设置图标路径
                 RunByMessager = false, // 是否使用管理员身份运行
                 TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
                 WindowState = 0, // 设置窗口状态
-                Usage = $"打开文件: {fileName}", // 设置用途
+                Description = $"打开文件: {fileName}", // 设置用途
                 CreateTime = DateTime.Now, // 设置创建时间
                 LatestEditTime = DateTime.Now // 设置最新编辑时间
             };
@@ -165,16 +165,16 @@ namespace Quicker.Managers
                     }
                     catch // 如果失败，发送信息提示
                     {
-                        new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonInformation.ButtonName}的图标被移动或删除").Show();
+                        new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除").Show();
                     }
                 } // 如果图标路径不为none
 
-                if (!string.IsNullOrEmpty(buttonInformation.ButtonName))
+                if (!string.IsNullOrEmpty(buttonInformation.Title))
                 {
                     grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
                     TextBlock textBlock = new()
                     {
-                        Text = buttonInformation.ButtonName, // 设置文本
+                        Text = buttonInformation.Title, // 设置文本
                         TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
                         VerticalAlignment = VerticalAlignment.Center, // 垂直居中
                         HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
@@ -189,10 +189,10 @@ namespace Quicker.Managers
                 if (!shouldHideTooltip)
                 {
                     string toolTipText = null; // 提示文本
-                    if (!string.IsNullOrWhiteSpace(buttonInformation.ButtonName) || !string.IsNullOrWhiteSpace(buttonInformation.Usage))
+                    if (!string.IsNullOrWhiteSpace(buttonInformation.Title) || !string.IsNullOrWhiteSpace(buttonInformation.Description))
                     {
-                        string name = !string.IsNullOrWhiteSpace(buttonInformation.ButtonName) ? buttonInformation.ButtonName : null; // 获取按钮名称
-                        string usage = !string.IsNullOrWhiteSpace(buttonInformation.Usage) ? buttonInformation.Usage : null; // 获取按钮用途
+                        string name = !string.IsNullOrWhiteSpace(buttonInformation.Title) ? buttonInformation.Title : null; // 获取按钮名称
+                        string usage = !string.IsNullOrWhiteSpace(buttonInformation.Description) ? buttonInformation.Description : null; // 获取按钮用途
                         toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
                     } // 如果按钮名称或用途不为空
                     button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本

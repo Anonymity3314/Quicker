@@ -148,7 +148,7 @@ namespace Quicker
         private void LoadActionInfo()
         {
             ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
-            switch (buttonData.Type)
+            switch (buttonData.ActionType)
             {
                 case "OpenFile":
                     ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
@@ -255,10 +255,10 @@ namespace Quicker
         public void UpdateTooltip()
         {
             string toolTipText = null; // 提示文本
-            if (!string.IsNullOrWhiteSpace(TitleTextBox.Text) || !string.IsNullOrWhiteSpace(UsageTextBox.Text))
+            if (!string.IsNullOrWhiteSpace(TitleTextBox.Text) || !string.IsNullOrWhiteSpace(DescriptionTextBox.Text))
             {
                 string name = !string.IsNullOrWhiteSpace(TitleTextBox.Text) ? TitleTextBox.Text : null; // 获取按钮名称
-                string usage = !string.IsNullOrWhiteSpace(UsageTextBox.Text) ? UsageTextBox.Text : null; // 获取按钮用途
+                string usage = !string.IsNullOrWhiteSpace(DescriptionTextBox.Text) ? DescriptionTextBox.Text : null; // 获取按钮用途
                 toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
             } // 如果按钮名称或用途不为空
             ButtonView.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本

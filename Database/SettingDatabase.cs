@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Data.SQLite;
+using Quicker.Database;
 using System.IO;
 
 // SQLite数据库操作类
 public class SettingDatabase
 {
-    private readonly string dbPath1 = "Data Source=Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+    private readonly string db1 = "Data Source=Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+    private ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+    private readonly string newVersion = "2.1.3"; // 最新版本号
 
     // 初始化数据库
     public void Initialize()
@@ -40,7 +43,7 @@ public class SettingDatabase
         if (reader.Read()) // 检查是否有数据
         {
             var currentVersion = reader.GetString(0); // 返回版本号
-            var targetVersion = "2.1.2"; // 目标版本
+            var targetVersion = newVersion; // 目标版本
             if (currentVersion == targetVersion)
                 return true; // 数据库版本已是最新，返回true
         }
@@ -51,12 +54,12 @@ public class SettingDatabase
     private void UpdateDatabase()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string updateVersionQuery = @"UPDATE Convention SET Version = '2.1.2';"; // 设置默认值
+        string updateVersionQuery = @$"UPDATE Convention SET Version = '{newVersion}';"; // 设置默认值
         using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
         updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
 
         // 其它的升级操作...
-
+        db2.UpdateDatabase(); // 升级按钮数据库
     }
 
     // 初始化 Convention 表
@@ -92,7 +95,7 @@ public class SettingDatabase
             VALUES 
             (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
         using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
-        insertConventionCommand.Parameters.AddWithValue("@Version", "2.1.1"); // 版本号
+        insertConventionCommand.Parameters.AddWithValue("@Version", newVersion); // 版本号
         insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
         insertConventionCommand.Parameters.AddWithValue("@ShowNotification", true); // 是否显示通知
         insertConventionCommand.Parameters.AddWithValue("@ShowAddImage", true); // 是否显示添加图片
@@ -328,7 +331,10 @@ public class SettingDatabase
         command.ExecuteNonQuery(); // 执行删除命令
     }
 
-    // 保存总使用时长
+    /// <summary>
+    /// 保存总使用时长
+    /// </summary>
+    /// <param name="totalUsageTime"> 总使用时长 </param>
     public void SaveTotalUsageTime(double totalUsageTime)
     {
         using var connection = OpenConnection(); // 打开数据库连接
@@ -438,7 +444,7 @@ public class SettingDatabase
     // 打开数据库连接
     private SQLiteConnection OpenConnection()
     {
-        var connection = new SQLiteConnection(dbPath1); // 创建 SQLiteConnection 对象
+        var connection = new SQLiteConnection(db1); // 创建 SQLiteConnection 对象
         connection.Open(); // 打开数据库连接
         return connection; // 返回打开的连接
     }
