@@ -6,6 +6,7 @@ using System.Windows;
 using System.Text;
 using System;
 using Quicker;
+using System.Diagnostics;
 
 namespace Quicker.Managers
 {
@@ -179,10 +180,10 @@ namespace Quicker.Managers
         // 判断是否全屏
         public bool IsFullScreen()
         {
-            IntPtr hWnd = GetForegroundWindow();
-            uint style = GetWindowLong(hWnd, GWL_STYLE);
-            int screenWidth = (int)GetSystemMetrics(SM_CXSCREEN);
-            int screenHeight = (int)GetSystemMetrics(SM_CYSCREEN);
+            IntPtr hWnd = GetForegroundWindow(); // 获取当前活动窗口句柄
+            uint style = GetWindowLong(hWnd, GWL_STYLE); // 获取窗口样式
+            int screenWidth = (int)GetSystemMetrics(SM_CXSCREEN); // 获取屏幕宽度
+            int screenHeight = (int)GetSystemMetrics(SM_CYSCREEN); // 获取屏幕高度
 
             // 获取窗口客户区大小
             if (!GetClientRect(hWnd, out RECT rect))
@@ -195,7 +196,16 @@ namespace Quicker.Managers
             bool isFullScreenCondition2 = windowWidth == screenWidth && windowHeight == screenHeight; // 窗口大小等于屏幕大小
             bool isFullScreenCondition3 = IsZoomed(hWnd); // 窗口是否被最大化
 
-            return isFullScreenCondition1 || isFullScreenCondition2 || isFullScreenCondition3;
+            return isFullScreenCondition1 || isFullScreenCondition2 || isFullScreenCondition3; // 返回是否全屏
+        }
+
+        // 获取进程名称
+        public string GetProcessName()
+        {
+            nint foregroundWindow = GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
+            uint processId = GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+            Process process = Process.GetProcessById((int)processId); // 获取进程
+            return process.ProcessName; // 获取进程名
         }
 
         // 手动释放资源

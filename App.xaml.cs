@@ -315,17 +315,14 @@ namespace Quicker
         {
             var blacklistSettings = db1.GetAllBlacklistSettings().FirstOrDefault(); // 获取黑名单设置
             if (!blacklistSettings.IsFullScreenDisabled) return false; // 如果没有启用全屏禁用Quicker，返回false
-            nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
-            if (foregroundWindow == IntPtr.Zero) return false; // 没有前台窗口，返回false
             if (windowManager.IsFullScreen()) // 窗口最大化
             {
-                uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
-                Process process = Process.GetProcessById((int)processId); // 获取进程
-                string processName = process.ProcessName; // 获取进程名
+                string processName = windowManager.GetProcessName(); // 获取进程名
                 var blacklistApplications = db1.GetAllBlacklistApplications(); // 获取黑名单进程
                 if (blacklistApplications.Count == 0) return true; // 没有黑名单进程，返回true表示Quicker被禁用
                 if (blacklistApplications.Any(p => p.ProcessName == processName && !p.IsInBlacklist)) // 如果进程名在黑名单中
                     return false; // 返回false表示正常工作
+                return true; // 返回true表示Quicker被禁用
             }
             return false; // 返回false表示正常工作
         }
