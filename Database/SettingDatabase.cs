@@ -10,6 +10,11 @@ public class SettingDatabase
     private ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
     private readonly string newVersion = "2.1.3"; // 最新版本号
 
+    public SettingDatabase()
+    {
+        Initialize(); // 初始化数据库
+    }
+
     // 初始化数据库
     public void Initialize()
     {
