@@ -193,8 +193,8 @@ namespace Quicker.Windows
             if (openFileDialog.ShowDialog() == true)
             {
                 if (openFileDialog.FileNames.Length == 0) return; // 如果没有选择文件，返回
-                else
-                    SelectedImagePath = openFileDialog.FileName; // 设置选中的图片路径
+                SelectedImagePath = openFileDialog.FileName; // 设置选中的图片路径
+                AddIcon(sender, e); // 触发图片确认事件
             }
         }
 
