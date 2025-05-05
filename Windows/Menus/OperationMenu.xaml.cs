@@ -18,20 +18,30 @@ namespace Quicker.Windows
         [DllImport("shell32.dll")]
         private static extern int SHOpenFolderAndSelectItems(IntPtr pidlList, uint cild, IntPtr children, uint dwFlags); // 打开文件夹并选中文件
         public string CurrentButton { get; private set; } // 当前按钮
-        private readonly ButtonManager buttonManager; // 按钮管理器
-        private readonly WindowManager windowManager; // 窗口管理器
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
-        private readonly ButtonDatabase db2; // 按钮数据库
 
         public OperationMenu(string currentbutton)
         {
             InitializeComponent(); // 初始化窗口
             CurrentButton = currentbutton; // 设置当前按钮
-
-            db2 = new ButtonDatabase(); // 初始化按钮数据库
-            buttonManager = new ButtonManager(); // 初始化按钮管理器
-            windowManager = new WindowManager(); // 初始化窗口管理器
+            InitializeMenu(); // 初始化菜单
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
+        }
+
+        // 初始化菜单
+        private void InitializeMenu()
+        {
+            db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
+            if(buttonData.ActionType == "OpenWebsite")
+            {
+                MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
+                MainStackPanel.Height -= 25; // 设置窗口高度
+                MainGrid.Height -= 25; // 设置网格高度
+            }
         }
 
         // 编辑动作信息

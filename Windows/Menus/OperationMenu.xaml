@@ -52,7 +52,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid Height="121" Width="204">
+    <Grid x:Name="MainGrid" Height="121" Width="204">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>
@@ -60,7 +60,7 @@
             </Rectangle.Effect>
         </Rectangle>
         <Border CornerRadius="5" Background="White">
-            <StackPanel>
+            <StackPanel x:Name="MainStackPanel">
                 <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,5" Click="EditeInformation_Click">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/EditButton.ico" Style="{StaticResource Image}"/>
