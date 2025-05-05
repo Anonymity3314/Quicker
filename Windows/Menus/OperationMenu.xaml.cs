@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Interop;
 using Quicker.Database;
@@ -34,7 +35,6 @@ namespace Quicker.Windows
         // 初始化菜单
         private void InitializeMenu()
         {
-            db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
             ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
             if(buttonData.ActionType == "OpenWebsite")
             {
@@ -72,9 +72,8 @@ namespace Quicker.Windows
         // 在资源管理器中打开文件或文件夹
         private void OpenLocation_Click(object sender, RoutedEventArgs e)
         {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton);
+            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
             string filePath = buttonData.Location; // 指定文件路径
-            filePath = System.IO.Path.GetFullPath(filePath); // 获取文件的绝对路径
             IntPtr pidlList = ILCreateFromPathW(filePath); // 打开文件夹并选中文件
             if (pidlList != IntPtr.Zero)
             {
@@ -82,12 +81,15 @@ namespace Quicker.Windows
                 {
                     Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0));
                 }
+                catch (System.Exception ex) // 打开失败
+                {
+                    new ToastContentBuilder().AddText("打开文件或文件夹失败：系统找不到指定的文件。").Show(); // 弹出消息提醒
+                }
                 finally // 释放资源
                 {
                     ILFree(pidlList);
                 }
             }
-
             buttonManager.CloseMainWindow(this);
         }
 
