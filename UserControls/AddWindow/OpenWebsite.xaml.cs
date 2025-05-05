@@ -6,6 +6,8 @@ using Quicker.Managers;
 using System.Windows;
 using System.Net;
 using System.IO;
+using Microsoft.Toolkit.Uwp.Notifications;
+using System.Windows.Media;
 
 namespace Quicker.UserControls.AddWindow
 {
@@ -105,29 +107,70 @@ namespace Quicker.UserControls.AddWindow
             AddWindow.TitleTextBox.Text = GetWebsiteNameFromUrl(LocationTextBox.Text); // 获取网站名称
         }
 
-        // 获取网站名称
+        /// <summary>
+        /// 获取网站名称
+        /// </summary>
+        /// <param name="url"> 网站地址 </param>
+        /// <returns> 网站名称 </returns>
         private string GetWebsiteNameFromUrl(string url)
         {
             try
             {
-                var uri = new Uri(url);
-                return uri.Host;
+                var uri = new Uri(url); // 尝试解析URL
+                string host = uri.Host; // 获取主机名
+                if (host.Contains('.')) // 如果主机名包含子域名，则只保留顶级域名
+                {
+                    string[] parts = host.Split('.');
+                    if (parts.Length > 1)
+                    {
+                        // 移除常见的顶级域名后缀
+                        string[] commonTlds = { "com", "cn", "net", "org", "gov", "edu", "info", "biz", "co", "me", "io", "app" };
+                        bool hasCommonTld = false;
+
+                        foreach (string tld in commonTlds)
+                        {
+                            if (parts[parts.Length - 1].Equals(tld, StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasCommonTld = true;
+                                break;
+                            }
+                        }
+
+                        if (hasCommonTld) // 如果包含常见的顶级域名后缀
+                        {
+                            if (parts.Length > 2)
+                                host = string.Join(".", parts, parts.Length - 2, 2); // 保留二级域名
+                            else
+                                host = parts[0]; // 如果只有顶级域名，如 example.com
+                        }
+                        else
+                            host = parts[0]; // 如果不包含常见的顶级域名后缀，则取第一个部分
+                    }
+                }
+
+                return host;
             }
-            catch { Debug.WriteLine("无效的URI：未能解析主机名。"); }
-            return null;
+            catch
+            {
+                new ToastContentBuilder().AddText("无效的URI：未能解析主机名。").Show(); // 处理无效的URL
+                return null;
+            }
         }
 
-        // 获取网站图标
+        /// <summary>
+        /// 获取网站图标
+        /// </summary>
+        /// <param name="websiteUrl"> 网站地址 </param>
         private void GetWebsiteIcon(string websiteUrl)
         {
             Uri uri; // 提取域名部分
             try
             {
-                uri = new Uri(websiteUrl);
+                uri = new Uri(websiteUrl); // 尝试解析URL
             }
             catch
             {
-                Debug.WriteLine("无效的URI：未能解析主机名。"); // 处理无效的URL
+                new ToastContentBuilder().AddText("无效的URI：未能解析主机名。").Show(); // 处理无效的URL
                 return;
             }
 
@@ -145,11 +188,43 @@ namespace Quicker.UserControls.AddWindow
                         bitmapImage.StreamSource = stream; // 设置流为BitmapImage的源
                         bitmapImage.EndInit(); // 结束初始化BitmapImage
                     }
+                    if (IsImageEmpty(bitmapImage)) return; // 如果图标为空，则不显示
                     AddWindow.ButtonImage.Source = bitmapImage; // 使用BitmapImage作为图像源
                     AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示按钮的图像
                 }
-                catch{ Debug.WriteLine("获取站点信息失败"); }
+                catch{ new ToastContentBuilder().AddText("获取站点信息失败").Show(); }
             }
+        }
+
+        // 判断获取的网站图片是否为空图片
+        private bool IsImageEmpty(BitmapImage bitmapImage)
+        {
+            if (bitmapImage == null || bitmapImage.PixelWidth == 0 || bitmapImage.PixelHeight == 0)
+                return true; // 如果图片为空，则返回true
+
+            try
+            {
+                int stride = bitmapImage.PixelWidth * 4; // 计算每行的字节数
+                byte[] pixels = new byte[bitmapImage.PixelHeight * stride]; // 创建一个字节数组来存储像素数据
+
+                // 确保图片是 32 位的 RGBA 格式
+                FormatConvertedBitmap formatConvertedBitmap = new FormatConvertedBitmap(); // 创建FormatConvertedBitmap对象
+                formatConvertedBitmap.BeginInit(); // 开始初始化FormatConvertedBitmap
+                formatConvertedBitmap.Source = bitmapImage; // 设置源为BitmapImage
+                formatConvertedBitmap.DestinationFormat = PixelFormats.Pbgra32; // 转换为 32 位的 RGBA 格式
+                formatConvertedBitmap.EndInit(); // 结束初始化FormatConvertedBitmap
+
+                // 检查图片是否为空
+                formatConvertedBitmap.CopyPixels(pixels, stride, 0);
+                for (int i = 0; i < pixels.Length; i += 4)
+                {
+                    byte alpha = pixels[i + 3];
+                    if (alpha != 0)
+                        return false;
+                }
+                return true;
+            }
+            catch{ return true; } // 如果发生异常，假设图片为空
         }
 
         // 保存动作
@@ -193,7 +268,7 @@ namespace Quicker.UserControls.AddWindow
             AddWindow = null; // 清空静态引用
             OpenWebsitePopup.IsOpen = false; // 关闭弹出菜单
             OpenWebsitePopup.Child = null; // 清空弹出菜单内容
-            OpenWebsitePopup.IsOpen = false; // 关闭弹出菜单
+            OpenWebsitePopup.IsOpen = false; // 再次关闭弹出菜单
             OpenWebsitePopup = null; // 清空弹出菜单对象
             LocationTextBox = null; // 清空地址栏对象
             GetWebsiteIconButton = null; // 清空获取图标按钮对象
