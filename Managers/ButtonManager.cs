@@ -119,7 +119,8 @@ namespace Quicker.Managers
                 WindowState = 0, // 设置窗口状态
                 Description = $"打开文件: {fileName}", // 设置用途
                 CreateTime = DateTime.Now, // 设置创建时间
-                LatestEditTime = DateTime.Now // 设置最新编辑时间
+                LatestEditTime = DateTime.Now, // 设置最新编辑时间，
+                ActionType = "OpenFile", // 设置动作类型
             };
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 更新按钮内容
             db2.AddAction(buttonData); // 添加按钮数据到数据库
