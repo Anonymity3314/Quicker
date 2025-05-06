@@ -8,6 +8,7 @@ using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
+using System.Diagnostics;
 
 namespace Quicker.Managers
 {
@@ -54,57 +55,83 @@ namespace Quicker.Managers
         /// <param name="e">拖拽事件参数</param>
         public void Button_Drop(object sender, DragEventArgs e, bool isMainWindow)
         {
-            if (sender is Button TargetButton)
+            Button TargetButton = sender as Button; // 获取目标按钮
+            if (TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
+            if (e.Data.GetDataPresent(typeof(ButtonData))) // 如果拖拽的是按钮
             {
-                if (TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
-                if (e.Data.GetDataPresent(typeof(ButtonData))) // 获取拖拽数据
+                ProcessButtonDrop(TargetButton, isMainWindow); // 处理按钮拖拽
+            }
+            else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
+            {
+                string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+                if (filePaths.Length <= 0) return; // 如果没有文件，直接返回
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+                if (files.Length == 1) // 如果只有一个文件
                 {
-                    db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
-                    var SourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
-                    var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
+                    string filePath = files[0]; // 直接获取文件路径
+                    ProcessSingleFileDrop(TargetButton, filePath, isMainWindow); // 处理文件拖拽
 
-                    RefreshButtonDisplay(SourceButton, TargetData, 60, isMainWindow); // 更新 sourceButton 的内容
-                    SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
-
-                    RefreshButtonDisplay(TargetButton, SourceData, 60, isMainWindow); // 更新 targetButton 的内容
-                    TargetButton.Tag = SourceData; // 更新 targetButton 的标签
+                    var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
+                    RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
+                    TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                 }
-                else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
+                else // 如果有多个文件
                 {
-                    string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-                    if (filePaths.Length > 0)
-                    {
-                        string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-                        if (files.Length > 0)
-                        {
-                            string filePath = files[0]; // 获取第一个文件的路径
-                            ProcessFileDrop(TargetButton, filePath, isMainWindow); // 处理文件拖拽
+                    string filePath = files[0]; // 获取第一个文件的路径
+                    ProcessSingleFileDrop(TargetButton, filePath, isMainWindow); // 处理文件拖拽
 
-                            var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                            RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
-                            TargetButton.Tag = TargetData; // 更新 targetButton 的标签
-                        }
-                    }
+                    var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
+                    RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
+                    TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                 }
+            }
+            else if (e.Data.GetDataPresent(typeof(Uri))) // 如果拖拽的是 URL
+            {
+                Uri url = (Uri)e.Data.GetData(typeof(Uri)); // 获取 URL
+                ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow); // 处理 URL 拖拽
+            }
+            else if (e.Data.GetDataPresent(DataFormats.Text)) // 如果拖拽的是文本（可能是 URL）
+            {
+                string text = (string)e.Data.GetData(DataFormats.Text); // 获取文本
+                if (Uri.TryCreate(text, UriKind.Absolute, out Uri url))
+                    ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow); // 处理 URL 拖拽
             }
         }
 
         /// <summary>
-        /// 处理文件拖拽
+        /// 处理按钮拖拽到其他按钮上
+        /// </summary>
+        /// <param name="TargetButton"> 目标按钮 </param>
+        /// <param name="buttonData"> 按钮数据 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void ProcessButtonDrop(Button TargetButton, bool isMainWindow)
+        {
+            db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
+            var SourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
+            var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
+
+            RefreshButtonDisplay(SourceButton, TargetData, 60, isMainWindow); // 更新 sourceButton 的内容
+            SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
+
+            RefreshButtonDisplay(TargetButton, SourceData, 60, isMainWindow); // 更新 targetButton 的内容
+            TargetButton.Tag = SourceData; // 更新 targetButton 的标签
+            SourceButton = null; // 清空源按钮
+        }
+
+        /// <summary>
+        /// 处理单个文件拖拽
         /// </summary>
         /// <param name="button"> 目标按钮 </param>
         /// <param name="filePath"> 文件路径 </param>
-        private void ProcessFileDrop(Button button, string filePath, bool isMainWindow)
+        private void ProcessSingleFileDrop(Button button, string filePath, bool isMainWindow)
         {
             ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
             string iconPath = "none"; // 默认图标路径
-            if (iconSource != null)
+            if (iconSource != null) // 如果图标存在
             {
-                iconPath = iconManager.CheckCachedIcon(filePath); // 检查缓存的图标
-                if (string.IsNullOrEmpty(iconPath))
-                {
+                iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
+                if (string.IsNullOrEmpty(iconPath)) // 如果不存在保存的图标
                     iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
-                }
             }
 
             string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
@@ -121,10 +148,132 @@ namespace Quicker.Managers
                 CreateTime = DateTime.Now, // 设置创建时间
                 LatestEditTime = DateTime.Now, // 设置最新编辑时间，
                 ActionType = "OpenFile", // 设置动作类型
-            };
-            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 更新按钮内容
+            }; // 设置按钮数据
+            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.AddAction(buttonData); // 添加按钮数据到数据库
         }
+
+        /// <summary>
+        /// 处理多个文件拖拽
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="filePaths"></param>
+        /// <param name="isMainWindow"></param>
+        private void ProcessMultipleFileDrop(Button button, string[] filePaths, bool isMainWindow)
+        {
+            // 用“；”分隔文件路径
+            string filePath = string.Join(";", filePaths);
+            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
+            string iconPath = "none"; // 默认图标路径
+            if (iconSource != null) // 如果图标存在
+            {
+                iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
+                if (string.IsNullOrEmpty(iconPath)) // 如果不存在保存的图标
+                    iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
+            }
+
+            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            ButtonData buttonData = new ButtonData
+            {
+                ButtonID = button.Name, // 获取按钮ID
+                Title = fileName, // 设置按钮名称
+                Location = filePath, // 设置文件路径
+                ImagePath = iconPath, // 设置图标路径
+                RunByMessager = false, // 是否使用管理员身份运行
+                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
+                WindowState = 0, // 设置窗口状态
+                Description = $"打开以{fileName}为首的多个文件:", // 设置用途
+                CreateTime = DateTime.Now, // 设置创建时间
+                LatestEditTime = DateTime.Now, // 设置最新编辑时间，
+                ActionType = "OpenFiles", // 设置动作类型
+            }; // 设置按钮数据
+            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
+            db2.AddAction(buttonData); // 添加按钮数据到数据库
+        }
+
+        /// <summary>
+        /// 处理 URL 拖拽
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="e"> 拖拽事件参数 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void ProcessUrlDrop(Button button, string url, bool isMainWindow)
+        {
+            ImageSource iconSource = iconManager.GetWebsiteIcon(url); // 获取图标
+            string iconPath = "none"; // 默认图标路径
+            if (iconSource != null) // 如果图标存在
+            {
+                iconPath = iconManager.CheckCachedIcon(url); // 检查已经保存的图标
+                if (string.IsNullOrEmpty(iconPath)) // 如果不存在保存的图标
+                    iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
+            }
+
+            ButtonData buttonData = new ButtonData
+            {
+                ButtonID = button.Name,
+                Title = GetWebsiteNameFromUrl(url),
+                Location = url,
+                ImagePath = iconPath,
+                WindowState = 0,
+                Description = $"打开网页: {url}",
+                CreateTime = DateTime.Now,
+                LatestEditTime = DateTime.Now,
+                ActionType = "OpenWebsite",
+            };
+            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
+            db2.AddAction(buttonData); // 添加按钮数据到数据库
+        }
+
+        /// <summary>
+        /// 获取网站名称
+        /// </summary>
+        /// <param name="url"> 网站地址 </param>
+        /// <returns> 网站名称 </returns>
+        private string GetWebsiteNameFromUrl(string url)
+        {
+            try
+            {
+                var uri = new Uri(url); // 尝试解析URL
+                string host = uri.Host; // 获取主机名
+                if (host.Contains('.')) // 如果主机名包含子域名，则只保留顶级域名
+                {
+                    string[] parts = host.Split('.');
+                    if (parts.Length > 1)
+                    {
+                        // 移除常见的顶级域名后缀
+                        string[] commonTlds = { "com", "cn", "net", "org", "gov", "edu", "info", "biz", "co", "me", "io", "app" };
+                        bool hasCommonTld = false;
+
+                        foreach (string tld in commonTlds)
+                        {
+                            if (parts[parts.Length - 1].Equals(tld, StringComparison.OrdinalIgnoreCase))
+                            {
+                                hasCommonTld = true;
+                                break;
+                            }
+                        }
+
+                        if (hasCommonTld) // 如果包含常见的顶级域名后缀
+                        {
+                            if (parts.Length > 2)
+                                host = string.Join(".", parts, parts.Length - 2, 2); // 保留二级域名
+                            else
+                                host = parts[0]; // 如果只有顶级域名，如 example.com
+                        }
+                        else
+                            host = parts[0]; // 如果不包含常见的顶级域名后缀，则取第一个部分
+                    }
+                }
+
+                return host;
+            }
+            catch
+            {
+                new ToastContentBuilder().AddText("无效的URI：未能解析主机名。").Show(); // 处理无效的URL
+                return null;
+            }
+        }
+
 
         /// <summary>
         /// 刷新按钮显示内容

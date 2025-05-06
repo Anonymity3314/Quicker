@@ -1,15 +1,15 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
+using System.Net;
 using System.IO;
-using System;
-using Quicker;
-using Quicker;
 
 namespace Quicker.Managers
 {
@@ -126,6 +126,81 @@ namespace Quicker.Managers
                 encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 转换为 BitmapFrame
                 encoder.Save(stream); // 保存图像到内存流
                 return SHA256.HashData(stream.ToArray()); // 计算内存流的哈希值
+            }
+        }
+
+        /// <summary>
+        /// 获取网站图标
+        /// </summary>
+        /// <param name="websiteUrl"> 网站地址 </param>
+        /// <returns> 网站图标 </returns>
+        public ImageSource GetWebsiteIcon(string websiteUrl)
+        {
+            Uri uri; // 提取域名部分
+            try
+            {
+                uri = new Uri(websiteUrl); // 尝试解析URL
+            }
+            catch
+            {
+                return null; // 处理无效的URL
+            }
+
+            string apiFaviconUrl = $"https://icon.bqb.cool?url={uri.Host}"; // 拼接第三方API的URL
+            using (WebClient client = new WebClient()) // 创建一个WebClient对象来下载图标
+            {
+                try
+                {
+                    byte[] iconData = client.DownloadData(apiFaviconUrl); // 下载图标的字节数组
+                    BitmapImage bitmapImage = new BitmapImage(); // 将字节数组转换为BitmapImage
+                    using (MemoryStream stream = new MemoryStream(iconData))
+                    {
+                        bitmapImage.BeginInit(); // 开始初始化BitmapImage
+                        stream.Seek(0, SeekOrigin.Begin); // 定位到流的开始位置
+                        bitmapImage.StreamSource = stream; // 设置流为BitmapImage的源
+                        bitmapImage.EndInit(); // 结束初始化BitmapImage
+                    }
+                    if (IsImageEmpty(bitmapImage)) return null; // 如果图标为空，则返回 null
+                    return bitmapImage; // 返回图标
+                }
+                catch
+                {
+                    return null; // 处理下载失败的情况
+                }
+            }
+        }
+
+        // 判断获取的网站图片是否为空图片
+        private bool IsImageEmpty(BitmapImage bitmapImage)
+        {
+            if (bitmapImage == null || bitmapImage.PixelWidth == 0 || bitmapImage.PixelHeight == 0)
+                return true; // 如果图片为空，则返回true
+
+            try
+            {
+                int stride = bitmapImage.PixelWidth * 4; // 计算每行的字节数
+                byte[] pixels = new byte[bitmapImage.PixelHeight * stride]; // 创建一个字节数组来存储像素数据
+
+                // 确保图片是 32 位的 RGBA 格式
+                FormatConvertedBitmap formatConvertedBitmap = new FormatConvertedBitmap(); // 创建FormatConvertedBitmap对象
+                formatConvertedBitmap.BeginInit(); // 开始初始化FormatConvertedBitmap
+                formatConvertedBitmap.Source = bitmapImage; // 设置源为BitmapImage
+                formatConvertedBitmap.DestinationFormat = PixelFormats.Pbgra32; // 转换为 32 位的 RGBA 格式
+                formatConvertedBitmap.EndInit(); // 结束初始化FormatConvertedBitmap
+
+                // 检查图片是否为空
+                formatConvertedBitmap.CopyPixels(pixels, stride, 0);
+                for (int i = 0; i < pixels.Length; i += 4)
+                {
+                    byte alpha = pixels[i + 3];
+                    if (alpha != 0)
+                        return false;
+                }
+                return true;
+            }
+            catch
+            {
+                return true; // 如果发生异常，假设图片为空
             }
         }
 
