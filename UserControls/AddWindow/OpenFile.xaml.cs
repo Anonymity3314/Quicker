@@ -209,9 +209,28 @@ namespace Quicker.UserControls.AddWindow
                 Description = AddWindow.DescriptionTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
-                ActionType = "OpenFile"
+                ActionType = LocationTextBox.Text.Contains(";") ? "OpenFiles" : "OpenFile"
             }; // 创建按钮数据对象
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
+        }
+        private void LocationTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if(LocationTextBox.Text == "可以用英文分号隔开不同路径来添加多个文件")
+            {
+                LocationTextBox.Text = "";
+                LocationTextBox.Foreground = new SolidColorBrush(Colors.Black);
+                LocationTextBox.FontSize = 12;
+            }
+        }
+
+        private void LocationTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(LocationTextBox.Text))
+            {
+                LocationTextBox.Text = "可以用英文分号隔开不同路径来添加多个文件";
+                LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
+                LocationTextBox.FontSize = 11;
+            }
         }
 
         // 移除控件清理资源

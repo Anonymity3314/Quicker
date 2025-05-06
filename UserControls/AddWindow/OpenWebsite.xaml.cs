@@ -13,6 +13,7 @@ namespace Quicker.UserControls.AddWindow
 {
     public partial class OpenWebsite : UserControl
     {
+        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
         private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
         private ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private Quicker.AddWindow AddWindow; // AddWindow 的静态引用
@@ -105,61 +106,11 @@ namespace Quicker.UserControls.AddWindow
         {
             if (string.IsNullOrEmpty(LocationTextBox.Text)) return; // 如果地址栏为空，则不执行操作
             ImageSource icon = iconManager.GetWebsiteIcon(LocationTextBox.Text); // 获取网站图标
-            AddWindow.TitleTextBox.Text = GetWebsiteNameFromUrl(LocationTextBox.Text); // 获取网站名称
+            AddWindow.TitleTextBox.Text = buttonManager.GetWebsiteNameFromUrl(LocationTextBox.Text); // 获取网站名称
             if (icon == null) return; // 如果图标为空，则不执行操作
             AddWindow.ButtonImage.Source = icon; // 使用图标
             AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示按钮的图像
             AddWindow.iconPath = iconManager.SaveIconToFile(icon); // 保存图标
-        }
-
-        /// <summary>
-        /// 获取网站名称
-        /// </summary>
-        /// <param name="url"> 网站地址 </param>
-        /// <returns> 网站名称 </returns>
-        private string GetWebsiteNameFromUrl(string url)
-        {
-            try
-            {
-                var uri = new Uri(url); // 尝试解析URL
-                string host = uri.Host; // 获取主机名
-                if (host.Contains('.')) // 如果主机名包含子域名，则只保留顶级域名
-                {
-                    string[] parts = host.Split('.');
-                    if (parts.Length > 1)
-                    {
-                        // 移除常见的顶级域名后缀
-                        string[] commonTlds = { "com", "cn", "net", "org", "gov", "edu", "info", "biz", "co", "me", "io", "app" };
-                        bool hasCommonTld = false;
-
-                        foreach (string tld in commonTlds)
-                        {
-                            if (parts[parts.Length - 1].Equals(tld, StringComparison.OrdinalIgnoreCase))
-                            {
-                                hasCommonTld = true;
-                                break;
-                            }
-                        }
-
-                        if (hasCommonTld) // 如果包含常见的顶级域名后缀
-                        {
-                            if (parts.Length > 2)
-                                host = string.Join(".", parts, parts.Length - 2, 2); // 保留二级域名
-                            else
-                                host = parts[0]; // 如果只有顶级域名，如 example.com
-                        }
-                        else
-                            host = parts[0]; // 如果不包含常见的顶级域名后缀，则取第一个部分
-                    }
-                }
-
-                return host;
-            }
-            catch
-            {
-                new ToastContentBuilder().AddText("无效的URI：未能解析主机名。").Show(); // 处理无效的URL
-                return null;
-            }
         }
 
         // 保存动作

@@ -404,6 +404,9 @@ namespace Quicker.Windows
                     case "OpenWebsite":
                         actionManager.OpenWebsite(data); // 调用 ActionManager 的 OpenFolder 方法打开文件夹
                         break; // 打开网站
+                    case "OpenFiles":
+                        actionManager.OpenFiles(data); // 调用 ActionManager 的 OpenFiles 方法打开多个文件
+                        break; // 打开多个文件
                 }
             }
             else

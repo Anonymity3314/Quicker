@@ -281,6 +281,19 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 打开多个文件
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public void OpenFiles(ButtonData data)
+        {
+            string[] files = data.Location.Split(';'); // 将文本内容按照分号分隔
+            foreach (string file in files)
+            {
+                OpenFile(new ButtonData { Location = file, TryToOpenExitingWindow = false });
+            }
+        }
+
+        /// <summary>
         /// 显示错误提示
         /// </summary>
         /// <param name="message"> 错误信息 </param>

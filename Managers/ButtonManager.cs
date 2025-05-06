@@ -73,16 +73,13 @@ namespace Quicker.Managers
 
                     var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
                     RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
-                    TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                 }
                 else // 如果有多个文件
                 {
-                    string filePath = files[0]; // 获取第一个文件的路径
-                    ProcessSingleFileDrop(TargetButton, filePath, isMainWindow); // 处理文件拖拽
+                    ProcessMultipleFileDrop(TargetButton, files, isMainWindow); // 处理多个文件拖拽
 
                     var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
                     RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
-                    TargetButton.Tag = TargetData; // 更新 targetButton 的标签
                 }
             }
             else if (e.Data.GetDataPresent(typeof(Uri))) // 如果拖拽的是 URL
@@ -111,10 +108,7 @@ namespace Quicker.Managers
             var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
 
             RefreshButtonDisplay(SourceButton, TargetData, 60, isMainWindow); // 更新 sourceButton 的内容
-            SourceButton.Tag = TargetData; // 更新 sourceButton 的标签
-
             RefreshButtonDisplay(TargetButton, SourceData, 60, isMainWindow); // 更新 targetButton 的内容
-            TargetButton.Tag = SourceData; // 更新 targetButton 的标签
             SourceButton = null; // 清空源按钮
         }
 
@@ -163,20 +157,20 @@ namespace Quicker.Managers
         {
             // 用“；”分隔文件路径
             string filePath = string.Join(";", filePaths);
-            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
+            ImageSource iconSource = iconManager.GetIcon(filePaths[0]); // 获取图标
             string iconPath = "none"; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {
-                iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
+                iconPath = iconManager.CheckCachedIcon(filePaths[0]); // 检查已经保存的图标
                 if (string.IsNullOrEmpty(iconPath)) // 如果不存在保存的图标
                     iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
             }
 
-            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            string fileName = Path.GetFileNameWithoutExtension(filePaths[0]); // 获取文件名
             ButtonData buttonData = new ButtonData
             {
                 ButtonID = button.Name, // 获取按钮ID
-                Title = fileName, // 设置按钮名称
+                Title = $"{fileName}等{filePaths.Length}个文件(夹)", // 设置按钮名称
                 Location = filePath, // 设置文件路径
                 ImagePath = iconPath, // 设置图标路径
                 RunByMessager = false, // 是否使用管理员身份运行
@@ -229,7 +223,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="url"> 网站地址 </param>
         /// <returns> 网站名称 </returns>
-        private string GetWebsiteNameFromUrl(string url)
+        public string GetWebsiteNameFromUrl(string url)
         {
             try
             {
@@ -273,7 +267,6 @@ namespace Quicker.Managers
                 return null;
             }
         }
-
 
         /// <summary>
         /// 刷新按钮显示内容

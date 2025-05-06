@@ -15,15 +15,15 @@
 >
     <Grid>
         <Label Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" GotFocus="LocationTextBox_GotFocus" LostFocus="LocationTextBox_LostFocus" Text="可以用英文分号隔开不同路径来添加多个文件" FontSize="11" Foreground="#FF8C8C8C"/>
         <Label Content="窗口风格" Margin="96,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="58"/>
         <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="161,52,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White" VerticalContentAlignment="Center">
             <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>
             <ComboBoxItem Content="最小化(Minimized)" VerticalAlignment="Center"/>
             <ComboBoxItem Content="最大化(Maximized)" VerticalAlignment="Center"/>
         </ComboBox>
-        <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="159,110,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="159,130,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="161,110,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="161,130,0,0" VerticalAlignment="Top"/>
         <Label Content="选项" HorizontalAlignment="Left" Margin="120,105,0,0" VerticalAlignment="Top"/>
         <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="155,78,0,0" VerticalAlignment="Top" Foreground="#FF8C8C8C" Width="284"/>
         <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="25" Width="40" Click="OpenContextMenu"/>

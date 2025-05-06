@@ -5,6 +5,7 @@ using System.Windows.Interop;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
+using System.IO;
 using Quicker;
 
 namespace Quicker.Windows
@@ -73,24 +74,132 @@ namespace Quicker.Windows
         private void OpenLocation_Click(object sender, RoutedEventArgs e)
         {
             ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
-            string filePath = buttonData.Location; // 指定文件路径
-            IntPtr pidlList = ILCreateFromPathW(filePath); // 打开文件夹并选中文件
-            if (pidlList != IntPtr.Zero)
+            List<string> paths = new List<string>(); // 文件或文件夹路径列表
+
+            if (buttonData.ActionType == "OpenFile")
             {
-                try // 打开文件夹并选中文件
+                paths.Add(buttonData.Location);
+            }
+            else if (buttonData.ActionType == "OpenFiles")
+            {
+                paths.AddRange(buttonData.Location.Split(';').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)));
+            }
+            else
+            {
+                new ToastContentBuilder().AddText("不支持此动作类型").Show();
+                return;
+            }
+
+            try // 检查是否所有文件都在同一个目录下
+            {
+                string commonDirectory = null;
+                bool sameDirectory = true;
+                foreach (string path in paths)
                 {
-                    Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0));
+                    string directory = Path.GetDirectoryName(path);
+                    if (commonDirectory == null)
+                        commonDirectory = directory;
+                    else if (commonDirectory != directory)
+                    {
+                        sameDirectory = false;
+                        break;
+                    }
                 }
-                catch (System.Exception ex) // 打开失败
+
+                if (sameDirectory && paths.Count > 0)
+                    // 如果所有文件在同一个目录下，打开一个资源管理器窗口并选中所有文件
+                    OpenMultipleFilesInSameDirectory(paths);
+                else
+                    // 如果文件不在同一个目录下，分别打开多个资源管理器窗口并选中相应文件
+                    OpenMultipleFilesInDifferentDirectories(paths);
+            }
+            catch (Exception ex)
+            {
+                new ToastContentBuilder().AddText($"打开路径失败：{ex.Message}").Show();
+            }
+            finally
+            {
+                buttonManager.CloseMainWindow(this);
+            }
+        }
+
+        // 打开同一目录下的多个文件并在资源管理器中选中
+        private void OpenMultipleFilesInSameDirectory(List<string> paths)
+        {
+            try
+            {
+                string commonDirectory = Path.GetDirectoryName(paths[0]);
+                IntPtr pidlFolder = ILCreateFromPathW(commonDirectory);
+                try
                 {
-                    new ToastContentBuilder().AddText("打开文件或文件夹失败：系统找不到指定的文件。").Show(); // 弹出消息提醒
+                    List<IntPtr> pidlItems = new List<IntPtr>();
+                    foreach (string path in paths)
+                    {
+                        IntPtr pidlItem = ILCreateFromPathW(path);
+                        if (pidlItem == IntPtr.Zero)
+                        {
+                            new ToastContentBuilder().AddText($"无法获取文件的 PIDL：{path}").Show();
+                            continue;
+                        }
+                        pidlItems.Add(pidlItem);
+                    }
+
+                    IntPtr pidlArray = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * pidlItems.Count);
+                    try
+                    {
+                        for (int i = 0; i < pidlItems.Count; i++)
+                        {
+                            Marshal.WriteIntPtr(pidlArray, i * Marshal.SizeOf(typeof(IntPtr)), pidlItems[i]);
+                        }
+
+                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlFolder, (uint)pidlItems.Count, pidlArray, 0));
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(pidlArray);
+                        foreach (IntPtr pidlItem in pidlItems)
+                        {
+                            ILFree(pidlItem);
+                        }
+                    }
                 }
-                finally // 释放资源
+                finally
                 {
-                    ILFree(pidlList);
+                    ILFree(pidlFolder);
                 }
             }
-            buttonManager.CloseMainWindow(this);
+            catch (Exception ex)
+            {
+                new ToastContentBuilder().AddText($"打开路径失败：{ex.Message}").Show();
+            }
+        }
+
+        // 分别打开不同目录下的文件并在各自的资源管理器窗口中选中
+        private void OpenMultipleFilesInDifferentDirectories(List<string> paths)
+        {
+            try
+            {
+                foreach (string path in paths)
+                {
+                    IntPtr pidlList = ILCreateFromPathW(path);
+                    try
+                    {
+                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0));
+                    }
+                    catch (Exception ex)
+                    {
+                        new ToastContentBuilder().AddText($"打开路径失败：{ex.Message}").Show();
+                    }
+                    finally
+                    {
+                        ILFree(pidlList);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ToastContentBuilder().AddText($"打开路径失败：{ex.Message}").Show();
+            }
         }
 
         // 失去焦点时关闭操作菜单

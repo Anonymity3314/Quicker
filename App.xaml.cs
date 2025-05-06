@@ -45,7 +45,7 @@ namespace Quicker
         public bool Book = false, Pause = false, Locked = false; // 是否订住、暂停、锁定
         public static DateTime RecordedTime { get; set; } // 记录时间
         public static DateTime StartTime { get; set; } // 启动时间
-        private DateTime? keyPressStartTime = null; // 按键按下时的时间
+        private DateTime? keyPressStartTime = null; // 按键按下时间
         private System.Windows.Point startPosition; // 鼠标位置
         private DispatcherTimer pressTimer; // 按键计时器
         private TaskbarIcon? taskbarIcon; // 托盘图标
@@ -394,10 +394,14 @@ namespace Quicker
         // 确定窗口类型
         private string DetermineWindowType()
         {
-            if (Locked && CommonState != null) return CommonState; // 窗口类型为锁定状态
-            else if (IsMouseOnTaskbar()) return "Taskbar"; // 鼠标在任务栏上
-            else if (IsMouseOnDesktop()) return "Desktop"; // 鼠标在桌面上
-            else return "Common"; // 鼠标在其他窗口上
+            if (Locked && CommonState != null)
+                return CommonState; // 窗口类型为锁定状态
+            else if
+                 (IsMouseOnTaskbar()) return "Taskbar"; // 鼠标在任务栏上
+            else if
+                (IsMouseOnDesktop()) return "Desktop"; // 鼠标在桌面上
+            else
+                return "Common"; // 鼠标在其他窗口上
         }
 
         // 设置窗口位置
