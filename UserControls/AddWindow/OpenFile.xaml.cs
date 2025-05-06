@@ -185,7 +185,7 @@ namespace Quicker.UserControls.AddWindow
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(LocationTextBox.Text))
+            if (LocationTextBox.Text != "可以用英文分号隔开不同路径来添加多个文件")
                 AddWindow.SaveButton.IsEnabled = true; // 启用保存按钮
             else
                 AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
@@ -218,6 +218,8 @@ namespace Quicker.UserControls.AddWindow
             }; // 创建按钮数据对象
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
         }
+
+        // 获得焦点时隐藏提示
         private void LocationTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if(LocationTextBox.Text == "可以用英文分号隔开不同路径来添加多个文件")
@@ -228,6 +230,7 @@ namespace Quicker.UserControls.AddWindow
             }
         }
 
+        // 失去焦点时显示提示
         private void LocationTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(LocationTextBox.Text))
