@@ -29,9 +29,10 @@ namespace Quicker
 
         public AddWindow(string currentbutton, int choice)
         {
-            InitializeComponent(); // 初始化窗口组件
             CurrentButton = currentbutton; // 当前按钮
             Choice = choice; // 选择添加动作类型
+            InitializeComponent(); // 初始化窗口组件
+            ExecuteChoiceAction(); // 执行对应命令
         }
 
         // 初始化标题和Button视图，并根据上个窗口数据执行对应命令
@@ -39,7 +40,6 @@ namespace Quicker
         {
             InitializeTitle(); // 初始化标题
             InitializeButtonView(); // 初始化Button视图
-            ExecuteChoiceAction(); // 执行对应命令
             SetWindowHeight(ChoiceComboBox.SelectedIndex); // 设置窗口高度
             isLoading = false; // 加载完成
         }
@@ -131,6 +131,7 @@ namespace Quicker
                 case 1: // 启动软件
                 case 2: // 打开文件
                 case 3: // 打开文件夹
+                    ChoiceComboBox.SelectedIndex = 0;
                     ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
                     break; // 选择文件
                 case 4:
@@ -147,6 +148,7 @@ namespace Quicker
             switch (buttonData.ActionType)
             {
                 case "OpenFile":
+                    ChoiceComboBox.SelectedIndex = 0;
                     ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
                     break;
                 case "OpenWebsite":

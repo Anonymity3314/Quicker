@@ -11,6 +11,7 @@
     d:DesignHeight="289"
     d:DesignWidth="493"
     
+    Loaded="OpenFile_Loaded"
     Unloaded="OpenFile_Unloaded"
 >
     <Grid>

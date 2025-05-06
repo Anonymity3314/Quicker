@@ -136,8 +136,13 @@ namespace Quicker.Windows
             iconCache.Clear();
             _allApplications.Clear(); // 清空原始数据源
             LoadingWindow loadingWindow = new(); // 显示加载窗口
-            loadingWindow.Owner = this; // 设置加载窗口的所有者
-            loadingWindow.ShowDialog(); // 显示加载窗口
+            loadingWindow.Show(); // 显示加载窗口
+
+            LoadFromRegistry(); // 从注册表加载应用
+            //LoadFromCommonPaths(); // 从常见路径加载应用
+            //LoadUWPApps(); // 从UWP应用商店加载应用
+
+            loadingWindow.Close(); // 关闭加载窗口
             Application.Current.Dispatcher.Invoke(() =>
             {
                 _applicationView.Refresh();

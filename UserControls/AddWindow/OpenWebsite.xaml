@@ -11,6 +11,7 @@
     d:DesignHeight="289"
     d:DesignWidth="493"
     
+    Loaded="OpenWebsite_Loaded"
     Unloaded="OpenWebsite_Unloaded"
 >
     <Grid>

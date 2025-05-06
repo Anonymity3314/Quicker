@@ -10,6 +10,7 @@ using Quicker.Managers;
 using System.Windows;
 using System.Net;
 using System.IO;
+using Quicker.Windows;
 
 namespace Quicker.Managers
 {
@@ -136,6 +137,9 @@ namespace Quicker.Managers
         /// <returns> 网站图标 </returns>
         public ImageSource GetWebsiteIcon(string websiteUrl)
         {
+            LoadingWindow loadingWindow = new(); // 显示加载窗口
+            loadingWindow.Show(); // 显示加载窗口
+
             Uri uri; // 提取域名部分
             try
             {
@@ -160,11 +164,13 @@ namespace Quicker.Managers
                         bitmapImage.StreamSource = stream; // 设置流为BitmapImage的源
                         bitmapImage.EndInit(); // 结束初始化BitmapImage
                     }
+                    loadingWindow.Close(); // 关闭加载窗口
                     if (IsImageEmpty(bitmapImage)) return null; // 如果图标为空，则返回 null
                     return bitmapImage; // 返回图标
                 }
                 catch
                 {
+                    loadingWindow.Close(); // 关闭加载窗口
                     return null; // 处理下载失败的情况
                 }
             }

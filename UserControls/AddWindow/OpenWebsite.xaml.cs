@@ -22,7 +22,12 @@ namespace Quicker.UserControls.AddWindow
         {
             AddWindow = addWindow; // 保存 AddWindow 的引用
             InitializeComponent();
-            ExecuteChoiceAction();
+        }
+
+        // UI 加载完成后执行
+        private void OpenWebsite_Loaded(object sender, RoutedEventArgs e)
+        {
+            ExecuteChoiceAction(); // 执行对应命令
         }
 
         // 根据上个窗口数据执行对应命令

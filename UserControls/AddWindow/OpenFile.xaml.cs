@@ -23,6 +23,11 @@ namespace Quicker.UserControls.AddWindow
         {
             AddWindow = addWindow; // 保存 AddWindow 的静态引用
             InitializeComponent();
+        }
+
+        // UI 加载完成后执行
+        private void OpenFile_Loaded(object sender, RoutedEventArgs e)
+        {
             ExecuteChoiceAction(); // 根据上个窗口数据执行对应命令
         }
 
