@@ -103,17 +103,13 @@ namespace Quicker.UserControls.AddWindow
         // 点击按钮获取网站图标
         private void GetWebsiteIconButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(LocationTextBox.Text))
-            {
-                ImageSource icon = iconManager.GetWebsiteIcon(LocationTextBox.Text); // 获取网站图标
-                if (icon != null)
-                {
-                    AddWindow.ButtonImage.Source = icon; // 使用图标
-                    AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示按钮的图像
-                    AddWindow.iconPath = iconManager.SaveIconToFile(icon); // 保存图标
-                }
-                AddWindow.TitleTextBox.Text = GetWebsiteNameFromUrl(LocationTextBox.Text); // 获取网站名称
-            }
+            if (string.IsNullOrEmpty(LocationTextBox.Text)) return; // 如果地址栏为空，则不执行操作
+            ImageSource icon = iconManager.GetWebsiteIcon(LocationTextBox.Text); // 获取网站图标
+            AddWindow.TitleTextBox.Text = GetWebsiteNameFromUrl(LocationTextBox.Text); // 获取网站名称
+            if (icon == null) return; // 如果图标为空，则不执行操作
+            AddWindow.ButtonImage.Source = icon; // 使用图标
+            AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示按钮的图像
+            AddWindow.iconPath = iconManager.SaveIconToFile(icon); // 保存图标
         }
 
         /// <summary>

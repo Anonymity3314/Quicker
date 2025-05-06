@@ -185,12 +185,12 @@ namespace Quicker
                         pressTimer.Start();
                         break;
                     } // 右键移动
-                    if (isCtrlPressed && OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick)
+                    else if (isCtrlPressed && OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick)
                     {
                         CloseOrShowMainWindow();
                         break;
                     } // Ctrl + 右键
-                    if (OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
+                    else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
                     {
                         keyPressStartTime = System.DateTime.Now;
                         PreLoadMainWindow();
@@ -203,13 +203,13 @@ namespace Quicker
                         CloseOrShowMainWindow();
                         break;
                     } // Ctrl + 中键
-                    if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
+                    else if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
                     {
                         keyPressStartTime = DateTime.Now;
                         PreLoadMainWindow();
                         break;
                     } // 短按中键
-                    if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger)
+                    else if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger)
                     {
                         keyPressStartTime = System.DateTime.Now;
                         PreLoadMainWindow();
