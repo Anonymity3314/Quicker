@@ -189,13 +189,19 @@ namespace Quicker.UserControls.AddWindow
             {
                 LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
                 LocationTextBox.FontSize = 11;
-                AddWindow.SaveButton.IsEnabled = true; // 启用保存按钮
+                AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
+            }
+            else if (string.IsNullOrWhiteSpace(LocationTextBox.Text))
+            {
+                LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
+                LocationTextBox.FontSize = 11;
+                AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
             }
             else
             {
                 LocationTextBox.Foreground = new SolidColorBrush(Colors.Black);
                 LocationTextBox.FontSize = 12;
-                AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
+                AddWindow.SaveButton.IsEnabled = true; // 启用保存按钮
             }
         }
 

@@ -8,7 +8,6 @@ using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
-using System.Diagnostics;
 
 namespace Quicker.Managers
 {
@@ -17,7 +16,6 @@ namespace Quicker.Managers
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {
             if (obj == null) yield break; // 如果对象为空，停止枚举
-
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
                 DependencyObject child = VisualTreeHelper.GetChild(obj, i); // 获取子元素
@@ -53,6 +51,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="sender">目标按钮</param>
         /// <param name="e">拖拽事件参数</param>
+        /// <param name="isMainWindow">是否为主窗口</param>
         public void Button_Drop(object sender, DragEventArgs e, bool isMainWindow)
         {
             Button TargetButton = sender as Button; // 获取目标按钮
@@ -63,33 +62,11 @@ namespace Quicker.Managers
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
             {
-                string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-                if (filePaths.Length <= 0) return; // 如果没有文件，直接返回
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-                if (files.Length == 1) // 如果只有一个文件
-                {
-                    string filePath = files[0]; // 直接获取文件路径
-                    ProcessSingleFileDrop(TargetButton, filePath, isMainWindow); // 处理文件拖拽
-
-                    var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                    RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
-                }
-                else // 如果有多个文件
-                {
-                    ProcessMultipleFileDrop(TargetButton, files, isMainWindow); // 处理多个文件拖拽
-
-                    var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
-                    RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
-                }
-            }
-            else if (e.Data.GetDataPresent(typeof(Uri))) // 如果拖拽的是 URL
-            {
-                Uri url = (Uri)e.Data.GetData(typeof(Uri)); // 获取 URL
-                ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow); // 处理 URL 拖拽
+                ProcessFileDrop(e, TargetButton, isMainWindow); // 处理文件拖拽
             }
             else if (e.Data.GetDataPresent(DataFormats.Text)) // 如果拖拽的是文本（可能是 URL）
             {
-                string text = (string)e.Data.GetData(DataFormats.Text); // 获取文本
+                string text = (string)e.Data.GetData(DataFormats.Text).ToString(); // 获取文本
                 if (Uri.TryCreate(text, UriKind.Absolute, out Uri url))
                     ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow); // 处理 URL 拖拽
             }
@@ -113,12 +90,39 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 处理文件拖拽
+        /// </summary>
+        /// <param name="e"> 拖拽事件参数 </param>
+        /// <param name="TargetButton"> 目标按钮 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void ProcessFileDrop(DragEventArgs e, Button TargetButton, bool isMainWindow)
+        {
+            string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+            if (filePaths.Length <= 0) return; // 如果没有文件，直接返回
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+
+            if (files.Length == 1) // 如果只有一个文件
+                ProcessSingleFileDrop(TargetButton, files[0], isMainWindow); // 处理文件拖拽
+            else // 如果有多个文件
+                ProcessMultipleFileDrop(TargetButton, files, isMainWindow); // 处理多个文件拖拽
+
+            var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
+            RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
+        }
+
+        /// <summary>
         /// 处理单个文件拖拽
         /// </summary>
         /// <param name="button"> 目标按钮 </param>
         /// <param name="filePath"> 文件路径 </param>
         private void ProcessSingleFileDrop(Button button, string filePath, bool isMainWindow)
         {
+            if (IsImaeg(filePath)) // 如果是图片文件
+            {
+                ProcessImageDrop(filePath, button, isMainWindow); // 处理图片拖拽
+                return; // 直接返回
+            }
+
             ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
             string iconPath = "none"; // 默认图标路径
             if (iconSource != null) // 如果图标存在
@@ -143,6 +147,53 @@ namespace Quicker.Managers
                 LatestEditTime = DateTime.Now, // 设置最新编辑时间，
                 ActionType = "OpenFile", // 设置动作类型
             }; // 设置按钮数据
+            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
+            db2.AddAction(buttonData); // 添加按钮数据到数据库
+        }
+
+        /// <summary>
+        /// 判断是否为图片文件
+        /// </summary>
+        /// <param name="filePath"> 文件路径 </param>
+        /// <returns> 是否为图片文件 </returns>
+        private bool IsImaeg(string filePath)
+        {
+            string extension = Path.GetExtension(filePath);
+            return extension.ToLower() == ".jpg" || extension.ToLower() == ".jpeg" || extension.ToLower() == ".png" || extension.ToLower() == ".gif";
+        }
+
+        /// <summary>
+        /// 处理图片拖拽
+        /// </summary>
+        /// <param name="e"> 拖拽事件参数 </param>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void ProcessImageDrop(string filePath, Button button, bool isMainWindow)
+        {
+            BitmapImage bitmap = new BitmapImage(new Uri(filePath)); // 创建 BitmapImage 对象
+            string iconPath = "none"; // 默认图标路径
+            if (bitmap != null) // 如果图标存在
+            {
+                iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
+                if (string.IsNullOrEmpty(iconPath)) // 如果不存在保存的图标
+                    iconPath = iconManager.SaveIconToFile(bitmap); // 保存图标到文件
+            }
+
+            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            ButtonData buttonData = new ButtonData
+            {
+                ButtonID = button.Name,
+                Title = fileName,
+                Location = filePath,
+                ImagePath = iconPath,
+                RunByMessager = false, // 是否使用管理员身份运行
+                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
+                WindowState = 0,
+                Description = $"打开图片: {fileName}",
+                CreateTime = DateTime.Now,
+                LatestEditTime = DateTime.Now,
+                ActionType = "OpenFile",
+            };
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.AddAction(buttonData); // 添加按钮数据到数据库
         }
