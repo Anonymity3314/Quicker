@@ -5,18 +5,19 @@ namespace Quicker.Database
 {
     internal class ActionPageDatabase
     {
-        private readonly string dbPath3 = "Data Source=ActionPage.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-        private readonly ButtonDatabase db2 = new ButtonDatabase();
+        // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
+        private readonly string dbPath3 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "ActionPage.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;"; private readonly ButtonDatabase db2 = new ButtonDatabase();
 
         // 初始化数据库
         public void Initialize()
         {
-            if (File.Exists("ActionPage.db")) // 如果数据库存在
-            {
-                return; // 数据库已存在，不再初始化
-            }
+            string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
+            if (!Directory.Exists(dbFolder))
+                Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
+            string dbFilePath = Path.Combine(dbFolder, "ActionPage.db"); // 设置数据库文件路径
+            if (File.Exists(dbFilePath)) return; // 如果数据库文件已存在，则直接返回
+            SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
 
-            SQLiteConnection.CreateFile("ActionPage.db"); // 创建数据库文件
             CreateButtonTable("Global");
             CreateButtonTable("Common");
             if(db2.TableExists("Desktop"))

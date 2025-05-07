@@ -6,7 +6,8 @@ using System.IO;
 // SQLite数据库操作类
 public class SettingDatabase
 {
-    private readonly string db1 = "Data Source=Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+    // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
+    private readonly string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
     private ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
     private readonly string newVersion = "2.1.3"; // 最新版本号
 
@@ -18,12 +19,16 @@ public class SettingDatabase
     // 初始化数据库
     public void Initialize()
     {
-        if (File.Exists("Setting.db"))
+        string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
+        if (!Directory.Exists(dbFolder))
+            Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
+        string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
+        if (File.Exists(dbFilePath))
         {
             CheckAndUpgradeDatabase(); // 检查并升级数据库
             return;
         } // 如果数据库存在，则检查并升级数据库
-        SQLiteConnection.CreateFile("Setting.db"); // 创建数据库文件
+        SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
 
         InitializeConvention(); // 初始化 Convention 表
         InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
