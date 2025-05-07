@@ -88,6 +88,7 @@
     <None Remove="Resources\Images\SettingWindow.ico" />
     <None Remove="Resources\Images\SourseImages\MoreSelection.png" />
     <None Remove="Resources\Images\SourseImages\Quicker1.png" />
+    <None Remove="UpdateHistory.txt" />
     <None Remove="Windows\MainWindow.xaml.cs~RF56f46fe.TMP" />
     <None Remove="Windows\MainWindow.xaml.cs~RFc4626a.TMP" />
     <None Remove="Windows\okjxncmm.k0p~" />
@@ -107,6 +108,12 @@
 
   <ItemGroup>
     <Content Include="Quicker.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="UpdateHistory.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

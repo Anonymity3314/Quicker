@@ -31,7 +31,7 @@
             <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
             <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
             <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
-            <TextBlock x:Name="UpdateHistory" Text="更新历史" HorizontalAlignment="Left" Margin="96,70,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseLeftButtonDown="OpenUpdateLog">
+            <TextBlock x:Name="UpdateHistory" Text="更新历史" HorizontalAlignment="Left" Margin="96,70,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseLeftButtonDown="OpenUpdateHistory">
                 <TextBlock.ToolTip>
                     <ToolTip Content="点击查看" FontSize="12" Foreground="Black"/>
                 </TextBlock.ToolTip>

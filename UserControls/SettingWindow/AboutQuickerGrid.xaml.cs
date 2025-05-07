@@ -5,6 +5,9 @@ using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
+using System.IO;
+using System.Reflection;
+using System.Windows.Shell;
 
 namespace Quicker.UserControls
 {
@@ -40,9 +43,22 @@ namespace Quicker.UserControls
         }
 
         // 打开更新历史文件
-        private void OpenUpdateLog(object sender, MouseButtonEventArgs e)
+        private void OpenUpdateHistory(object sender, MouseButtonEventArgs e)
         {
-            Process.Start("notepad.exe", "UpdateLog.txt"); // 打开更新历史文件
+            Assembly assembly = Assembly.GetExecutingAssembly(); // 获取当前程序集
+            string resourceName = "Quicker.UpdateHistory.txt"; // 获取更新历史文件名
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName)) // 打开资源流
+            {
+                if (stream == null) return; // 资源不存在则返回
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    string content = reader.ReadToEnd(); // 读取资源内容
+                    string tempPath = Path.GetTempPath(); // 获取系统临时文件夹路径
+                    string tempFilePath = Path.Combine(tempPath, "更新历史.txt"); // 更改临时文件名
+                    File.WriteAllText(tempFilePath, content); // 将内容写入临时文件
+                    System.Diagnostics.Process.Start("notepad.exe", tempFilePath); // 使用系统默认文本编辑器打开临时文件
+                }
+            }
         }
 
         // 前往图标网站www.iconfont.cn
@@ -84,7 +100,7 @@ namespace Quicker.UserControls
             // 清理事件处理程序
             AboutQuickerButton.Click -= AboutQuickerButton_Click;
             Privacy_StatementButton.Click -= Privacy_StatementButton_Click;
-            UpdateHistory.MouseLeftButtonDown -= OpenUpdateLog;
+            UpdateHistory.MouseLeftButtonDown -= OpenUpdateHistory;
             www_iconfont_cn.MouseLeftButtonDown -= www_iconfont_cn_MouseLeftButtonDown;
             icons8_com.MouseLeftButtonDown -= icons8_com_MouseLeftButtonDown;
             fontawesome_com.MouseLeftButtonDown -= fontawesome_com_MouseLeftButtonDown;
