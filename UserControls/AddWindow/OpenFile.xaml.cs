@@ -185,10 +185,18 @@ namespace Quicker.UserControls.AddWindow
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (LocationTextBox.Text != "可以用英文分号隔开不同路径来添加多个文件")
+            if (LocationTextBox.Text == "可以用英文分号隔开不同路径来添加多个文件")
+            {
+                LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
+                LocationTextBox.FontSize = 11;
                 AddWindow.SaveButton.IsEnabled = true; // 启用保存按钮
+            }
             else
+            {
+                LocationTextBox.Foreground = new SolidColorBrush(Colors.Black);
+                LocationTextBox.FontSize = 12;
                 AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
+            }
         }
 
         // 保存动作
@@ -223,11 +231,9 @@ namespace Quicker.UserControls.AddWindow
         private void LocationTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if(LocationTextBox.Text == "可以用英文分号隔开不同路径来添加多个文件")
-            {
                 LocationTextBox.Text = "";
-                LocationTextBox.Foreground = new SolidColorBrush(Colors.Black);
-                LocationTextBox.FontSize = 12;
-            }
+            LocationTextBox.Foreground = new SolidColorBrush(Colors.Black);
+            LocationTextBox.FontSize = 12;
         }
 
         // 失去焦点时显示提示

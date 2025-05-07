@@ -505,9 +505,9 @@ namespace Quicker
             Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
             db1.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
 
-            timer?.Stop(); // 停止定时器            
-            hook?.Dispose(); // 释放钩子           
-            taskbarIcon?.Dispose(); // 释放托盘图标                      
+            timer?.Stop(); // 停止定时器
+            hook?.Dispose(); // 释放钩子
+            taskbarIcon?.Dispose(); // 释放托盘图标
             MainWindow?.Close(); // 关闭主窗口
 
             base.OnExit(e); // 调用基类的 OnExit 方法
