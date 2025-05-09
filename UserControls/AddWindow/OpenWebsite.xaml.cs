@@ -41,6 +41,8 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
+            if (buttonData.ActionType != "OpenWebsite") return; // 如果不是打开网站动作，则不执行操作
+
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
                 AddWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
@@ -94,16 +96,13 @@ namespace Quicker.UserControls.AddWindow
         private void CopyLocation(object sender, RoutedEventArgs e)
         {
             string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
-            LocationTextBox.Text = clipboardText; // 设置地址栏文本
+            LocationTextBox.Text = buttonManager.ProcessLocation(clipboardText); // 设置地址栏文本
         }
 
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(LocationTextBox.Text))
-                AddWindow.SaveButton.IsEnabled = true; // 启用保存按钮
-            else
-                AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
+            AddWindow.SaveButton.IsEnabled = LocationTextBox.Text.Trim() != "https://"; // 如果地址不为协议，则启用保存按钮
         }
 
         // 点击按钮获取网站图标

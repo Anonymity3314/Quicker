@@ -55,14 +55,15 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
+            if (buttonData.ActionType != "OpenFile" && buttonData.ActionType != "OpenFiles") return; // 如果不是打开文件动作，则退出
+
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
                 AddWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮名称
                 AddWindow.ButtonTitle.Text = buttonData.Title; // 显示按钮名称
             } // 如果按钮名称不为空
             AddWindow.TitleTextBox.Text = buttonData.Title; // 设置按钮名称
-            if (buttonData.ActionType == "OpenFile")
-                LocationTextBox.Text = buttonData.Location; // 设置文件地址
+            LocationTextBox.Text = buttonData.Location; // 设置文件地址
             if (buttonData.ImagePath != "none")
             {
                 try
@@ -179,30 +180,24 @@ namespace Quicker.UserControls.AddWindow
         private void CopyLocation(object sender, RoutedEventArgs e)
         {
             string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
-            LocationTextBox.Text = clipboardText; // 设置地址栏文本
+            LocationTextBox.Text = buttonManager.ProcessLocation(clipboardText); // 设置地址栏文本
         }
 
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (LocationTextBox.Text == "可以用英文分号隔开不同路径来添加多个文件")
+            if (LocationTextBox.Text == "可以用英文分号隔开不同路径来添加多个文件" || string.IsNullOrWhiteSpace(LocationTextBox.Text)) 
             {
                 LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
                 LocationTextBox.FontSize = 11;
                 AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
-            }
-            else if (string.IsNullOrWhiteSpace(LocationTextBox.Text))
-            {
-                LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
-                LocationTextBox.FontSize = 11;
-                AddWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
-            }
+            } // 如果地址栏为空或默认提示，则禁用保存按钮
             else
             {
                 LocationTextBox.Foreground = new SolidColorBrush(Colors.Black);
                 LocationTextBox.FontSize = 12;
                 AddWindow.SaveButton.IsEnabled = true; // 启用保存按钮
-            }
+            } // 否则启用保存按钮
         }
 
         // 保存动作

@@ -148,6 +148,7 @@ namespace Quicker
             switch (buttonData.ActionType)
             {
                 case "OpenFile":
+                case "OpenFiles":
                     ChoiceComboBox.SelectedIndex = 0;
                     ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
                     break;

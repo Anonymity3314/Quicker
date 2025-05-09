@@ -546,6 +546,20 @@ namespace Quicker.Managers
             window.Close(); // 关闭面板窗口
         }
 
+        /// <summary>
+        /// 处理地址文本内容
+        /// </summary>
+        /// <param name="location"> 地址文本内容 </param>
+        public string ProcessLocation(string location)
+        {
+            // 如果文本含有“”符号，则去掉
+            if (location.StartsWith("\"") && location.EndsWith("\""))
+            {
+                return location = location.Substring(1, location.Length - 2); // 去掉“”符号
+            }
+            return location; // 返回处理后的地址文本内容
+        }
+
         // 手动释放资源
         public void Dispose()
         {
