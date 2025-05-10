@@ -791,6 +791,14 @@ namespace Quicker.Windows
             //buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
         }
 
+        // 窗口可见时激活窗口
+        private void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.Visibility != Visibility.Visible) return; // 如果窗口不可见，则不处理
+            this.Activate(); // 激活窗口
+            this.Focus(); // 聚焦窗口
+        }
+
         // 窗口关闭时强制垃圾回收
         protected override void OnClosed(EventArgs e)
         {

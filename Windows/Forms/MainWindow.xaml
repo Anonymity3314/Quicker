@@ -15,6 +15,7 @@
     WindowStyle="None"
     Topmost="True"
     
+    IsVisibleChanged="MainWindow_IsVisibleChanged"
     MouseLeftButtonDown="MoveMainWindow"
     Deactivated="MainWindow_Deactivated"
     Closing="MainWindow_Closing"

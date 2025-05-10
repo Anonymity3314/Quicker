@@ -48,6 +48,7 @@ namespace Quicker
         public static DateTime StartTime { get; set; } // 启动时间
         private DateTime? keyPressStartTime = null; // 按键按下时间
         private System.Windows.Point startPosition; // 鼠标位置
+        private MainWindow? preLoadMainWindow; // 主窗口
         private DispatcherTimer pressTimer; // 按键计时器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
@@ -325,29 +326,19 @@ namespace Quicker
                 keyPressStartTime = DateTime.Now; // 记录按键按下时间
                 if (startTimer) pressTimer.Start(); // 启动按键计时器
 
-                var allMainWindows = Application.Current.Windows.OfType<MainWindow>().ToList();
-                if (allMainWindows.Count > 1)
-                {
-                    foreach (var window in allMainWindows)
-                    {
-                        if (window.Visibility == Visibility.Visible) continue; // 跳过可见的面板窗口
-                        window.Close();
-                    }
-                }
-
                 ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
                 if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作窗口打开，则不打开功能面板
                 SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
                 if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，则不打开功能面板
 
                 string windowType = DetermineWindowType(); // 确定窗口类型
-                MainWindow mainWindow = new MainWindow(windowType); // 创建新的功能面板
+                preLoadMainWindow = new MainWindow(windowType); // 创建新的功能面板
 
                 var settings = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                mainWindow.Visibility = Visibility.Hidden; // 隐藏功能面板
-                Left = (float)mainWindow.Left; // 记录功能面板位置
-                Top = (float)mainWindow.Top; // 记录功能面板位置
+                SetMainWindowPosition(preLoadMainWindow, settings.WindowStartupLocation); // 设置窗口位置
+                preLoadMainWindow.Visibility = Visibility.Hidden; // 隐藏功能面板
+                Left = (float)preLoadMainWindow.Left; // 记录功能面板位置
+                Top = (float)preLoadMainWindow.Top; // 记录功能面板位置
             });
         }
 
@@ -356,17 +347,7 @@ namespace Quicker
         {
             this.Dispatcher.Invoke(() =>
             {
-                MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
-                if (mainWindow == null) return; // 如果没有主窗口，则不处理
-                if (mainWindow.Visibility == Visibility.Hidden)
-                {
-                    mainWindow.Visibility = Visibility.Visible; // 显示功能面板
-                    mainWindow.Activate(); // 激活功能面板
-                }
-                else
-                {
-                    if (!Book) mainWindow.Close(); // 关闭功能面板
-                }
+                preLoadMainWindow.Visibility = Visibility.Visible; // 显示功能面板
             });
         }
 
