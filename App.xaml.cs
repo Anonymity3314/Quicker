@@ -46,9 +46,9 @@ namespace Quicker
         public bool Book = false, Pause = false, Locked = false; // 是否订住、暂停、锁定
         public static DateTime RecordedTime { get; set; } // 记录时间
         public static DateTime StartTime { get; set; } // 启动时间
+        private MainWindow? preLoadMainWindow = null; // 主窗口
         private DateTime? keyPressStartTime = null; // 按键按下时间
         private System.Windows.Point startPosition; // 鼠标位置
-        private MainWindow? preLoadMainWindow; // 主窗口
         private DispatcherTimer pressTimer; // 按键计时器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
@@ -349,6 +349,7 @@ namespace Quicker
             {
                 if (preLoadMainWindow == null) return; // 如果没有预加载窗口，返回
                 preLoadMainWindow.Visibility = Visibility.Visible; // 显示功能面板
+                preLoadMainWindow = null; // 清空预加载窗口
             });
         }
 
