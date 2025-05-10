@@ -307,9 +307,8 @@ namespace Quicker.Managers
         {
             if (windowManager != null) // 释放COM对象
             {
-                // 释放窗口管理器中的资源
-                windowManager.Dispose();
-                windowManager = null;
+                windowManager.Dispose(); // 释放窗口管理器
+                windowManager = null; // 置空引用
             }
 
             GC.Collect(); // 强制垃圾回收

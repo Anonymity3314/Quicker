@@ -881,6 +881,7 @@ namespace Quicker.Windows
             this.Closing -= MainWindow_Closing;
             this.Deactivated -= MainWindow_Deactivated;
             this.MouseLeftButtonDown -= MoveMainWindow;
+            this.IsVisibleChanged -= MainWindow_IsVisibleChanged;
         }
     }
 }

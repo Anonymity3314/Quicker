@@ -12,7 +12,6 @@ using System.Windows;
 using System.Text;
 using SharpHook;
 using Quicker;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Quicker
 {
@@ -54,15 +53,33 @@ namespace Quicker
         private TaskPoolGlobalHook? hook; // 钩子
         private DispatcherTimer timer; // 定时器
         public string CommonState; // 通用状态
+        private Mutex mutex = null; // 互斥锁
         private float Left, Top; // 窗口位置
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e); // 调用基类的 OnStartup 方法
-            InitializeTimer(); // 初始化定时器
-            InitializeTaskbar(); // 初始化托盘图标
-            InitializeHookAsync(); // 初始化钩子
-            ShowNotification(); // 弹出消息提醒
+            base.OnStartup(e); // 调用基类方法
+
+            string mutexName = "Quicker 2.1.4"; // 互斥锁唯一标识
+            bool isNewInstance = false; // 是否是新实例
+            if (!SingleInstanceManager.CheckForOtherInstances(mutexName, out isNewInstance))
+            {
+                Application.Current.Shutdown(); // 关闭当前实例
+                return; // 退出程序
+            }
+
+            // 如果是新实例，继续启动程序
+            if (isNewInstance)
+            {
+                InitializeTimer(); // 初始化定时器
+                InitializeTaskbar(); // 初始化托盘图标
+                InitializeHookAsync(); // 初始化钩子
+                ShowNotification(); // 弹出消息提醒
+            }
+            else
+            {
+                Application.Current.Shutdown(); // 关闭当前实例
+            }
         }
 
         // 初始化托盘图标
@@ -471,6 +488,8 @@ namespace Quicker
             hook?.Dispose(); // 释放钩子
             taskbarIcon?.Dispose(); // 释放托盘图标
             MainWindow?.Close(); // 关闭主窗口
+
+            SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
 
             base.OnExit(e); // 调用基类的 OnExit 方法
         }
