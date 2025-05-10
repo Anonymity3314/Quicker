@@ -347,6 +347,7 @@ namespace Quicker
         {
             this.Dispatcher.Invoke(() =>
             {
+                if (preLoadMainWindow == null) return; // 如果没有预加载窗口，返回
                 preLoadMainWindow.Visibility = Visibility.Visible; // 显示功能面板
             });
         }
