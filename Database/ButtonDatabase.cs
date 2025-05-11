@@ -13,6 +13,11 @@ namespace Quicker.Database
         // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
         private readonly string db2 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Button.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
 
+        public ButtonDatabase()
+        {
+            Initialize(); // 初始化数据库
+        }
+
         // 初始化数据库
         public void Initialize()
         {

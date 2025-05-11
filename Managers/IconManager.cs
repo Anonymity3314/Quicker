@@ -170,7 +170,7 @@ namespace Quicker.Managers
                 }
                 catch
                 {
-                    loadingWindow.Close(); // 关闭加载窗口
+                    loadingWindow?.Close(); // 关闭加载窗口
                     return null; // 处理下载失败的情况
                 }
             }

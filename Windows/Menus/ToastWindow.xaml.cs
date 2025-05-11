@@ -32,9 +32,9 @@ namespace Quicker.Windows.Menus
                 Width = 400,
                 Height = 100,
                 CornerRadius = new CornerRadius(5),
-            };
+            }; // 创建消息边框
 
-            string color = "";
+            string color = ""; // 根据消息类型设置边框颜色
             switch (toastType)
             {
                 case "Common":
@@ -44,9 +44,8 @@ namespace Quicker.Windows.Menus
                 case "Warning":
                     break;
             }
-            border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
-
-            ToastStackPanel.Children.Add(border);
+            border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 设置边框颜色
+            ToastStackPanel.Children.Add(border); // 添加消息边框到消息面板
         }
 
         /// <summary>
