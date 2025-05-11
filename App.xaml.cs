@@ -19,6 +19,14 @@ namespace Quicker
         public AppStateManager _appStateManager = new AppStateManager(); // 应用状态管理器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
+        private BitmapImage _trayIcon1;
+        private BitmapImage _trayIcon2;
+
+        public App()
+        {
+            _trayIcon1 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative)); // 运行时的图标
+            _trayIcon2 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker2.ico", UriKind.Relative)); // 暂停时的图标
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -91,7 +99,7 @@ namespace Quicker
             }
             var Conventions = _appStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
             double LongPressThreshold = Conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
-            var OpenMainWindowConditions = _appStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger ||
                 OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
             {
@@ -144,7 +152,7 @@ namespace Quicker
                 _appStateManager.KeyPressStartTime = null; // 重置按键时间
                 return; // 返回
             } // 如果按键已经被记录，停止记录
-            var OpenMainWindowConditions = _appStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
             this.Dispatcher.BeginInvoke(() =>
             {
@@ -187,7 +195,7 @@ namespace Quicker
         {
             _appStateManager.PressTimer?.Stop(); // 停止计时器
             if (!_appStateManager.KeyPressStartTime.HasValue) return;
-            var OpenMainWindowConditions = _appStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = DateTime.Now - _appStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
             _appStateManager.KeyPressStartTime = null;
             switch (e.Data.Button)
@@ -219,7 +227,7 @@ namespace Quicker
                 _appStateManager.KeyPressStartTime = null; // 重置按键时间
                 return; // 返回
             } // 如果按键已经被记录，停止记录
-            var OpenMainWindowConditions = _appStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             switch (e.Data.KeyCode)
             {
                 case SharpHook.Native.KeyCode.VcLeftControl: // 左 Ctrl 键
@@ -234,7 +242,7 @@ namespace Quicker
         private void Hook_KeyReleased(object sender, KeyboardHookEventArgs e)
         {
             if (!_appStateManager.KeyPressStartTime.HasValue) return;
-            var OpenMainWindowConditions = _appStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+            var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = DateTime.Now - _appStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
             _appStateManager.KeyPressStartTime = null;
             switch (e.Data.KeyCode)
@@ -410,11 +418,9 @@ namespace Quicker
         {
             var toastMessage = _appStateManager.Pause ? "Quicker已恢复" : "Quicker已暂停"; // 消息提醒
             var text = _appStateManager.Pause ? "暂停" : "恢复"; // 消息提醒
-            var icon1 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative));
-            var icon2 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker2.ico", UriKind.Relative));
             CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
             customMenu.PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
-            ChangeTrayIcon(_appStateManager.Pause ? icon1 : icon2); // 切换托盘图标
+            ChangeTrayIcon(_appStateManager.Pause); // 切换托盘图标
 
             hook?.Dispose(); // 销毁当前钩子
             hook = null; // 清空钩子
@@ -424,10 +430,13 @@ namespace Quicker
             new ToastContentBuilder().AddText(toastMessage).Show(); // 弹出消息提醒
         }
 
-        // 切换托盘图标
-        public void ChangeTrayIcon(BitmapImage newIcon)
+        /// <summary>
+        /// 切换托盘图标
+        /// </summary>
+        /// <param name="isPaused"> 是否暂停 </param>
+        public void ChangeTrayIcon(bool isPaused)
         {
-            taskbarIcon.IconSource = newIcon; // 切换托盘图标
+            taskbarIcon.IconSource = isPaused ? _trayIcon1 : _trayIcon2; // 切换托盘图标
         }
 
         // 退出应用释放资源

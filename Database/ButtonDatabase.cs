@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Text;
 using System.IO;
+using System.Data.Common;
 
 namespace Quicker.Database
 {
     public class ButtonDatabase
     {
         // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
-        private readonly string dbPath2 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Button.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+        private readonly string db2 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Button.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
 
         // 初始化数据库
         public void Initialize()
@@ -336,7 +337,7 @@ namespace Quicker.Database
 
             if (buttonIDMap.Count == 0) return; // 没有符合条件的 ButtonID，直接返回
 
-            using (var connection = new SQLiteConnection(dbPath2))
+            using (var connection = new SQLiteConnection(db2))
 
 
             {
@@ -426,9 +427,9 @@ namespace Quicker.Database
         // 打开数据库连接
         private SQLiteConnection OpenConnection()
         {
-            var connection = new SQLiteConnection(dbPath2); // 创建 SQLiteConnection 对象
+            var connection = new SQLiteConnection(db2); // 打开数据库连接
             connection.Open(); // 打开数据库连接
-            return connection; // 返回打开的连接
+            return connection; // 返回数据库连接
         }
     }
 

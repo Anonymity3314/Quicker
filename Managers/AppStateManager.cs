@@ -13,6 +13,8 @@ namespace Quicker
         public ButtonManager ButtonManager { get; set; } // 按钮管理器
         public WindowManager WindowManager { get; set; } // 窗口管理器
 
+        public OpenMainWindow OpenMainWindowConditions { get; set; } // 缓存 OpenMainWindowConditions
+
         // 窗口状态
         public bool Locked { get; set; } // 是否锁定通用动作页
         public bool Pause { get; set; } // 是否暂停Quicker
@@ -55,6 +57,16 @@ namespace Quicker
             CommonState = string.Empty; // 通用状态
             Left = 0; // 窗口与屏幕左边距离
             Top = 0; // 窗口与屏幕上边距离
+
+            // 在构造函数中初始化 OpenMainWindowConditions
+            LoadOpenMainWindowConditions();
+        }
+
+        // 从数据库加载 OpenMainWindowConditions
+        public void LoadOpenMainWindowConditions()
+        {
+            var conditionsList = Db.GetAllOpenMainWindowConditions();
+            OpenMainWindowConditions = conditionsList[0]; // 只有一条记录
         }
     }
 }

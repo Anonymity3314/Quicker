@@ -77,6 +77,9 @@ namespace Quicker.Windows
                         settingManager.blacklistSettings.FullScreenDisable,
                         settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys); // 更新黑名单设置
 
+                App currentApp = (App)Application.Current; // 将 Application.Current 转换为 App 类型
+                currentApp._appStateManager.LoadOpenMainWindowConditions(); // 刷新弹出面板设置
+
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
                 new ToastContentBuilder().AddText(message).Show(); // 显示通知

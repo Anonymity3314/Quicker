@@ -6,7 +6,7 @@ namespace Quicker.Database
     internal class ActionPageDatabase
     {
         // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
-        private readonly string dbPath3 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "ActionPage.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;"; private readonly ButtonDatabase db2 = new ButtonDatabase();
+        private readonly string db3 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "ActionPage.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;"; private readonly ButtonDatabase db2 = new ButtonDatabase();
 
         // 初始化数据库
         public void Initialize()
@@ -71,9 +71,9 @@ namespace Quicker.Database
         // 打开数据库连接
         private SQLiteConnection OpenConnection()
         {
-            var connection = new SQLiteConnection(dbPath3); // 创建 SQLiteConnection 对象
+            var connection = new SQLiteConnection(db3); // 创建数据库连接对象
             connection.Open(); // 打开数据库连接
-            return connection; // 返回打开的连接
+            return connection; // 返回数据库连接对象
         }
     }
 }
