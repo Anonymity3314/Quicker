@@ -11,7 +11,7 @@ using System.IO;
 
 namespace Quicker.Managers
 {
-    internal class ButtonManager
+    public class ButtonManager
     {
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {

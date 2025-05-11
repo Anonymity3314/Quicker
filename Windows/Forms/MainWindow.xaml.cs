@@ -74,12 +74,12 @@ namespace Quicker.Windows
             }); // 在主线程中执行
 
             // 加载BookButton图标
-            string iconPath = app.Book ? BookIconPath : DisBookIconPath; // 获取图标路径
+            string iconPath = app._appStateManager.Book ? BookIconPath : DisBookIconPath; // 获取图标路径
             BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
             Book.Source = bookImage; // 设置Book按钮的图标
 
             // 加载LockButton图标
-            string lockIconPath = app.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
+            string lockIconPath = app._appStateManager.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
@@ -221,10 +221,10 @@ namespace Quicker.Windows
         // 订住功能面板
         private void BookQuicker(object sender, EventArgs e)
         {
-            app.Book = !app.Book; // 更新数据库中的设置
+            app._appStateManager.Book = !app._appStateManager.Book; // 更新数据库中的设置
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
-            if (app.Book)
+            if (app._appStateManager.Book)
                 bookimage.UriSource = new Uri("/Resources/Images/Icons/Book.ico", UriKind.Relative); // 设置为订住样式
             else
                 bookimage.UriSource = new Uri("/Resources/Images/Icons/Disbook.ico", UriKind.Relative); // 设置为不订住样式
@@ -251,7 +251,7 @@ namespace Quicker.Windows
         // 失去焦点时关闭功能面板
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            if (!app.Pause && !buttonManager.isClosing && !app.Book)
+            if (!app._appStateManager.Pause && !buttonManager.isClosing && !app._appStateManager.Book)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
@@ -757,11 +757,11 @@ namespace Quicker.Windows
         // 锁定通用动作页
         private void LockCommonActionPage(object sender, RoutedEventArgs e)
         {
-            app.Locked = !app.Locked; // 切换锁定状态
-            string lockIconPath = app.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
+            app._appStateManager.Locked = !app._appStateManager.Locked; // 切换锁定状态
+            string lockIconPath = app._appStateManager.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建 BitmapImage 对象
             Lock.Source = lockImage; // 设置图标
-            if (app.Locked) app.CommonState = CommonStyle; // 设置锁定状态
+            if (app._appStateManager.Locked) app._appStateManager.CommonState = CommonStyle; // 设置锁定状态
         }
 
         // 滚轮进行通用动作页翻页
@@ -789,14 +789,8 @@ namespace Quicker.Windows
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
             //buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
-        }
-
-        // 窗口可见时激活窗口
-        private void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (this.Visibility != Visibility.Visible) return; // 如果窗口不可见，则不处理
-            this.Activate(); // 激活窗口
-            this.Focus(); // 聚焦窗口
+            //ToastWindow toast = new ToastWindow();
+            //toast.Show();
         }
 
         // 窗口关闭时强制垃圾回收
@@ -881,7 +875,6 @@ namespace Quicker.Windows
             this.Closing -= MainWindow_Closing;
             this.Deactivated -= MainWindow_Deactivated;
             this.MouseLeftButtonDown -= MoveMainWindow;
-            this.IsVisibleChanged -= MainWindow_IsVisibleChanged;
         }
     }
 }

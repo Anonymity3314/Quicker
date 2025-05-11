@@ -7,15 +7,13 @@
     x:Class="Quicker.Windows.MainWindow"
     mc:Ignorable="d"
     
-    HorizontalContentAlignment="Stretch"
     AllowsTransparency="True"
     ShowInTaskbar="False"
     Background="{x:Null}"
-    ResizeMode="NoResize"
+    ShowActivated="True"
     WindowStyle="None"
     Topmost="True"
     
-    IsVisibleChanged="MainWindow_IsVisibleChanged"
     MouseLeftButtonDown="MoveMainWindow"
     Deactivated="MainWindow_Deactivated"
     Closing="MainWindow_Closing"

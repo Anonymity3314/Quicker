@@ -1,16 +1,16 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using System.Text;
 using System;
 using Quicker;
-using System.Diagnostics;
 
 namespace Quicker.Managers
 {
-    internal class WindowManager
+    public class WindowManager
     {
         // 设置窗口位置和大小
         [DllImport("user32.dll")]

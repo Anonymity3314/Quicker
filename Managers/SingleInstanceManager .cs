@@ -8,16 +8,6 @@ namespace Quicker.Managers
 {
     internal class SingleInstanceManager
     {
-        // 用于窗口操作的本地方法
-        private static class NativeMethods
-        {
-            [DllImport("user32.dll")]
-            public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-            [DllImport("user32.dll")]
-            public static extern bool SetForegroundWindow(IntPtr hWnd);
-        }
-
         private static Mutex? _mutex = null; // 互斥锁
 
         /// <summary>
