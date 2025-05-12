@@ -26,8 +26,8 @@ namespace Quicker.Database
                 Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
             string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
             if (File.Exists(dbFilePath)) return; // 如果数据库文件已存在，则直接返回
-            SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
 
+            SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
             CreateButtonTable("Global"); // 创建全局表格
             CreateButtonTable("Common"); // 创建通用表格
         }

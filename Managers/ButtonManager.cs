@@ -13,7 +13,13 @@ namespace Quicker.Managers
 {
     public class ButtonManager
     {
-        private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
+        private static readonly SolidColorBrush HasActionBrush =
+            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White"));
+        private static readonly SolidColorBrush NoActionBrush =
+            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3"));
+
+
+        public IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {
             if (obj == null) yield break; // 如果对象为空，停止枚举
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
@@ -287,13 +293,13 @@ namespace Quicker.Managers
                     {
                         // 移除常见的顶级域名后缀
                         string[] commonTlds = { "com", "cn", "net", "org", "gov", "edu", "info", "biz", "co", "me", "io", "app" };
-                        bool hasCommonTld = false;
+                        bool hasCommonTld = false; // 是否包含常见的顶级域名后缀
 
                         foreach (string tld in commonTlds)
                         {
                             if (parts[parts.Length - 1].Equals(tld, StringComparison.OrdinalIgnoreCase))
                             {
-                                hasCommonTld = true;
+                                hasCommonTld = true; // 发现常见的顶级域名后缀
                                 break;
                             }
                         }
@@ -333,7 +339,7 @@ namespace Quicker.Managers
                 button.Tag = buttonInformation; // 更新按钮标签
 
                 Grid grid = new(); // 创建Grid对象
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景
+                button.Background = HasActionBrush; // 设置按钮背景
                 if (buttonInformation.ImagePath != "none")
                 {
                     try
@@ -390,7 +396,7 @@ namespace Quicker.Managers
                 button.Content = null; // 清空按钮内容
                 button.ToolTip = null; // 清空按钮提示文本
                 button.Tag = null; // 清空按钮标签
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 重置按钮背景
+                button.Background = NoActionBrush; // 重置按钮背景
             }
         }
 
@@ -541,8 +547,9 @@ namespace Quicker.Managers
         /// <param name="window"> 要关闭面板窗口的窗口 </param>
         public void CloseMainWindow(Window window)
         {
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 查找主窗口
-            mainWindow?.Close(); // 关闭主窗口
+            var windowList = Application.Current.Windows.OfType<MainWindow>(); // 查找所有主窗口
+            foreach (var w in windowList)
+                w.Close(); // 关闭所有主窗口
             window.Close(); // 关闭面板窗口
         }
 
@@ -552,11 +559,8 @@ namespace Quicker.Managers
         /// <param name="location"> 地址文本内容 </param>
         public string ProcessLocation(string location)
         {
-            // 如果文本含有“”符号，则去掉
-            if (location.StartsWith("\"") && location.EndsWith("\""))
-            {
-                return location = location.Substring(1, location.Length - 2); // 去掉“”符号
-            }
+            if (location.StartsWith("\"") && location.EndsWith("\"")) // 如果文本含有“”符号，则去掉
+                return location = location.Substring(1, location.Length - 2);
             return location; // 返回处理后的地址文本内容
         }
 

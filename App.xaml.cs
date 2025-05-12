@@ -50,7 +50,7 @@ namespace Quicker
         // 初始化托盘图标
         private void InitializeTaskbar()
         {
-            var icon = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative)); // 设置托盘图标
+            var icon = _trayIcon1; // 设置托盘图标
             Current.Resources["AppIcon"] = icon; // 设置应用图标
             taskbarIcon = new TaskbarIcon // 创建托盘图标
             {

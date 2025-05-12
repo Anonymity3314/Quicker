@@ -12,10 +12,30 @@ namespace Quicker.Managers
         WindowManager windowManager = new WindowManager(); // 窗口管理器
 
         /// <summary>
+        /// 执行按钮动作
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public void DoAction(ButtonData data)
+        {
+            switch (data.ActionType)
+            {
+                case "OpenFile":
+                    OpenFile(data); // 打开文件
+                    break; // 打开文件、文件夹
+                case "OpenWebsite":
+                    OpenWebsite(data); // 打开网站
+                    break; // 打开网站
+                case "OpenFiles":
+                    OpenFiles(data); // 打开多个文件
+                    break; // 打开多个文件
+            }
+        }
+
+        /// <summary>
         /// 打开文件
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        public void OpenFile(ButtonData data)
+        private void OpenFile(ButtonData data)
         {
             if (data.TryToOpenExitingWindow) // 如果尝试打开已存在的窗口
             {
@@ -85,7 +105,7 @@ namespace Quicker.Managers
         /// 用指定方式打开指定网站
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        public void OpenWebsite(ButtonData data)
+        private void OpenWebsite(ButtonData data)
         {
             try
             {
@@ -284,7 +304,7 @@ namespace Quicker.Managers
         /// 打开多个文件
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        public void OpenFiles(ButtonData data)
+        private void OpenFiles(ButtonData data)
         {
             string[] files = data.Location.Split(';'); // 将文本内容按照分号分隔
             foreach (string file in files)

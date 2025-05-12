@@ -147,6 +147,7 @@ namespace Quicker.Managers
             }
             catch
             {
+                new ToastContentBuilder().AddText("无效的Uri。").Show(); // 处理无效的URL
                 return null; // 处理无效的URL
             }
 
@@ -170,8 +171,9 @@ namespace Quicker.Managers
                 }
                 catch
                 {
+                    new ToastContentBuilder().AddText("获取网站图标失败。").Show(); // 处理下载失败的情况
                     loadingWindow?.Close(); // 关闭加载窗口
-                    return null; // 处理下载失败的情况
+                    return null; // 返回空图标
                 }
             }
         }

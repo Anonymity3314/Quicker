@@ -10,6 +10,7 @@
     AllowsTransparency="True"
     ShowInTaskbar="False"
     Background="{x:Null}"
+    ResizeMode="NoResize"
     ShowActivated="True"
     WindowStyle="None"
     Topmost="True"

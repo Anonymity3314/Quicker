@@ -22,23 +22,14 @@ namespace Quicker.Windows
         private const string LockIconPath = "/Resources/Images/Icons/Locked.ico"; // 锁定图标路径
         private const string UnLockIconPath = "/Resources/Images/Icons/UnLocked.ico"; // 解锁图标路径
 
-        private const string SelectedPageButtonColor = "#FF8D8D8D"; // 选中页面按钮颜色
-        private const string UnSelectedPageButtonColor = "#FFD3D3D3"; // 未选中页面按钮颜色
+        private static readonly SolidColorBrush SelectedBrush = // 选中页面按钮颜色
+            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D"));
+        private static readonly SolidColorBrush UnSelectedBrush = // 未选中页面按钮颜色
+            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD3D3D3"));
 
-        private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
-        {
-            if (obj == null) yield break; // 如果对象为空，停止枚举
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i); // 获取子元素
-                if (child is T tChild) yield return tChild; // 如果是目标类型，返回
-                foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素的子元素
-            }
-        } // 递归查找所有指定类型的子元素
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // 取消后台任务的令牌源
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
         private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
-        private readonly ActionManager actionManager = new ActionManager(); // 动作管理器
         private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
@@ -104,9 +95,8 @@ namespace Quicker.Windows
                     string numbersStr = match.Groups[2].Value; // 获取3个数字
                     int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
                     if (style == targetStyle) // 如果是全局按钮
-                    {
-                        if (numbers[0] > TotalAntionPageIndex) TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
-                    }
+                        if (numbers[0] > TotalAntionPageIndex) // 如果数字大于当前最大索引
+                            TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
                 }
             }
             return TotalAntionPageIndex;
@@ -139,7 +129,7 @@ namespace Quicker.Windows
                     Margin = new Thickness(2.5, 0, 2.5, 0), // 设置按钮边距
                     Style = FindResource("ActionPageChangeButton") as Style // 设置按钮样式
                 };
-                if (i == 0) button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D")); // 设置当前按钮颜色
+                if (i == 0) button.Background = SelectedBrush; // 设置当前按钮颜色
 
                 // 添加事件处理程序
                 button.Click += clickHandler;
@@ -175,16 +165,16 @@ namespace Quicker.Windows
             {
                 int canvasIndex = int.Parse(clickedButton.Name.Replace($"{Style}", "")); // 获取Canvas索引
                 string targetCanvasName = $"{Style}{canvasIndex}"; // 生成目标Canvas名称
-                Canvas targetCanvas = FindVisualChildren<Canvas>(targetGrid).FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
+                Canvas targetCanvas = buttonManager.FindVisualChildren<Canvas>(targetGrid).FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
 
                 // 如果目标Canvas不存在，动态生成
                 if (targetCanvas == null)
                 {
                     GenerateCanvas(canvasIndex, Style); // 动态生成Canvas
-                    targetCanvas = FindVisualChildren<Canvas>(targetGrid).FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
+                    targetCanvas = buttonManager.FindVisualChildren<Canvas>(targetGrid).FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
                 }
                 targetCanvas.Visibility = Visibility.Visible; // 设置目标Canvas可见
-                foreach (Canvas canvas in FindVisualChildren<Canvas>(targetGrid)) // 隐藏其他Canvas
+                foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(targetGrid)) // 隐藏其他Canvas
                 {
                     if (canvas.Name.StartsWith($"{Style}") && canvas != targetCanvas)
                         canvas.Visibility = Visibility.Collapsed; // 隐藏其他Canvas
@@ -309,7 +299,7 @@ namespace Quicker.Windows
                 Canvas targetCanvas = null; // 初始化目标Canvas
 
                 var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
-                foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
+                foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
                 {
                     if (canvas.Name == targetCanvasName)
                     {
@@ -347,20 +337,18 @@ namespace Quicker.Windows
         }
         private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseLeave(sender, e, "Global", "#FFD3D3D3"); // 还原按钮颜色
+            PageChangeButton_MouseLeave(sender, "Global"); // 还原按钮颜色
         }
         private void CommonActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseLeave(sender, e, CommonStyle, "#FFD3D3D3"); // 还原按钮颜色
+            PageChangeButton_MouseLeave(sender, CommonStyle); // 还原按钮颜色
         }
         /// <summary>
         /// 鼠标移出Button还原外观
         /// </summary>
         /// <param name="sender">按钮</param>
-        /// <param name="e">事件参数</param>
         /// <param name="prefix">按钮名称前缀</param>
-        /// <param name="color">按钮颜色</param>
-        private void PageChangeButton_MouseLeave(object sender, MouseEventArgs e, string prefix, string color)
+        private void PageChangeButton_MouseLeave(object sender, string prefix)
         {
             if (sender is Button button)
             {
@@ -369,23 +357,17 @@ namespace Quicker.Windows
                 Canvas targetCanvas = null; // 初始化目标Canvas
 
                 var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
-                foreach (Canvas canvas in FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
+                foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
                 {
-                    if (canvas.Name == targetCanvasName)
-                    {
-                        targetCanvas = canvas; // 找到目标Canvas
-                        break;
-                    }
+                    if (canvas.Name != targetCanvasName) continue; // 如果不是目标Canvas，跳过
+                    targetCanvas = canvas; // 找到目标Canvas
+                    break;
                 }
 
-                if (targetCanvas == null)
-                {
-                    button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
-                    return;
-                }
-
-                if (targetCanvas.Visibility != Visibility.Visible)
-                    button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
+                if (targetCanvas == null) // 如果目标Canvas不存在
+                    button.Background = UnSelectedBrush; // 还原按钮背景颜色
+                else if (targetCanvas.Visibility != Visibility.Visible) // 如果目标Canvas不可见
+                    button.Background = UnSelectedBrush; // 还原按钮背景颜色
             }
         }
 
@@ -395,24 +377,15 @@ namespace Quicker.Windows
             Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
-                switch(data.ActionType)
-                {
-                    case "OpenFile":
-                        actionManager.OpenFile(data); // 调用 ActionManager 的 OpenFile 方法打开文件
-                        break; // 打开文件、文件夹
-                    case "OpenWebsite":
-                        actionManager.OpenWebsite(data); // 调用 ActionManager 的 OpenFolder 方法打开文件夹
-                        break; // 打开网站
-                    case "OpenFiles":
-                        actionManager.OpenFiles(data); // 调用 ActionManager 的 OpenFiles 方法打开多个文件
-                        break; // 打开多个文件
-                }
+                var actionManager = new ActionManager(); // 创建 ActionManager 的实例
+                actionManager.DoAction(data); // 执行动作
+                actionManager.Dispose(); // 释放动作管理器资源
             }
             else
             {
                 var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
-                if (Convention.ShowAddImage) // 如果不显示添加按钮，直接返回
-                    buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 打开菜单
+                if (Convention.ShowAddImage) // 如果显示添加按钮
+                    buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 点击打开菜单
             }
         }
 
@@ -443,18 +416,14 @@ namespace Quicker.Windows
         public void Button_Drop(object sender, DragEventArgs e)
         {
             if (sender is Button TargetButton)
-            {
                 buttonManager.Button_Drop(sender, e, true); // 处理拖拽事件
-            }
         }
 
         // 鼠标左键按下时记录初始位置
         public void Button_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Button button)
-            {
                 buttonManager.Button_PreviewMouseLeftButtonDown(sender, e); // 记录初始位置
-            }
         }
 
         // 鼠标移动时检查是否满足拖拽条件
@@ -502,8 +471,8 @@ namespace Quicker.Windows
         private int GetVisibleCanvasIndex(string Style)
         {
             var canvasCollection = Style == "Global" // 根据是否是全局Canvas选择集合
-                ? FindVisualChildren<Canvas>(MainGrid) // 查找MainGrid下的Canvas集合
-                : FindVisualChildren<Canvas>(CommonGrid); // 查找CommonGrid下的Canvas集合
+                ? buttonManager.FindVisualChildren<Canvas>(MainGrid) // 查找MainGrid下的Canvas集合
+                : buttonManager.FindVisualChildren<Canvas>(CommonGrid); // 查找CommonGrid下的Canvas集合
             string canvasPrefix = $"{Style}"; // Canvas前缀
             string pattern = $@"^{Style}(\d+)$"; // 正则表达式模式
             Regex regex = new Regex(pattern); // 创建正则表达式对象
@@ -571,19 +540,19 @@ namespace Quicker.Windows
             }
 
             string targetCanvasName = $"{style}{targetCanvasIndex}"; // 生成目标Canvas名称
-            Canvas targetCanvas = FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
+            Canvas targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
                 .FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
 
             if (targetCanvas == null) // 如果目标Canvas不存在
             {
                 GenerateCanvas(targetCanvasIndex, style); // 动态生成Canvas
-                targetCanvas = FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
+                targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
                     .FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
             }
 
             targetCanvas.Visibility = Visibility.Visible; // 设置目标Canvas可见
             string currentCanvasName = $"{style}{currentCanvasIndex}"; // 生成当前Canvas名称
-            Canvas currentCanvas = FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
+            Canvas currentCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
                 .FirstOrDefault(c => c.Name == currentCanvasName); // 查找当前Canvas
             currentCanvas.Visibility = Visibility.Collapsed; // 隐藏当前Canvas
         }
@@ -653,9 +622,9 @@ namespace Quicker.Windows
             Panel ParentPanel = style == "Global" ? GlobalButtonPanel : CommonButtonPanel; // 根据样式选择父面板
             foreach (var button in ParentPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
             {
-                button.Background = button.Name.Contains($"{canvasIndex}")
-                    ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(SelectedPageButtonColor))
-                    : new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(UnSelectedPageButtonColor)); // 设置当前按钮颜色
+                button.Background = button.Name.Contains($"{canvasIndex}") // 判断是否是当前按钮
+                    ? SelectedBrush
+                    : UnSelectedBrush; // 设置当前按钮颜色
             }
 
             double buttonSpacing = 77.6; // 按钮间距
@@ -733,8 +702,8 @@ namespace Quicker.Windows
                 foreach (var button in GlobalButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
                 {
                     button.Background = button.Name.Contains($"{canvasIndex}") // 判断是否是当前按钮
-                        ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(SelectedPageButtonColor))
-                        : new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(UnSelectedPageButtonColor)); // 设置当前按钮颜色
+                        ? SelectedBrush
+                        : UnSelectedBrush; // 设置当前按钮颜色
                 } // 设置所有按钮的颜色
             }
         }
@@ -764,8 +733,8 @@ namespace Quicker.Windows
                 foreach (var button in CommonButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
                 {
                     button.Background = button.Name.Contains($"{canvasIndex}") // 判断是否是当前按钮
-                        ? new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(SelectedPageButtonColor))
-                        : new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(UnSelectedPageButtonColor)); // 设置当前按钮颜色
+                        ? SelectedBrush
+                        : UnSelectedBrush; // 设置当前按钮颜色
                 } // 设置所有按钮的颜色
             }
         }
@@ -790,7 +759,6 @@ namespace Quicker.Windows
             Book.Source = null; // 订住按钮图片
             Lock.Source = null; // 锁定按钮图片
 
-            actionManager.Dispose(); // 释放动作管理器资源
             windowManager.Dispose(); // 释放窗口管理器资源
             iconManager.Dispose(); // 释放图标管理器资源
             buttonManager.Dispose(); // 释放按钮管理器资源
@@ -806,9 +774,9 @@ namespace Quicker.Windows
         /// <param name="grid">要清理的Grid</param>
         private void CleanUpCanvas(Grid grid)
         {
-            foreach (Canvas canvas in FindVisualChildren<Canvas>(grid))
+            foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(grid))
             {
-                foreach (Button button in FindVisualChildren<Button>(canvas))
+                foreach (Button button in buttonManager.FindVisualChildren<Button>(canvas))
                 {
                     // 移除所有事件处理器
                     button.Click -= DoAction;
