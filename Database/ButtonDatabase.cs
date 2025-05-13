@@ -1,10 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.Text;
 using System.IO;
-using System.Data.Common;
 
 namespace Quicker.Database
 {
@@ -398,7 +398,7 @@ namespace Quicker.Database
         /// </summary>
         /// <param name="buttonID"> ButtonID </param>
         /// <returns> 表名 </returns>
-        private string GetTableNameFromButtonID(string buttonID)
+        public string GetTableNameFromButtonID(string buttonID)
         {
             Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID 格式
             return match.Groups[1].Value; // 返回表名
@@ -409,7 +409,7 @@ namespace Quicker.Database
         /// </summary>
         /// <param name="tableName"> 要检查的表名 </param>
         /// <param name="connection"> 数据库连接 </param>
-        private void CheckAndCreateTable(string tableName, SQLiteConnection connection)
+        public void CheckAndCreateTable(string tableName, SQLiteConnection connection)
         {
             if (TableExists(tableName)) return; // 表存在，直接返回
             CreateButtonTable(tableName); // 创建表

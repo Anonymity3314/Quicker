@@ -8,7 +8,7 @@ public class SettingDatabase
 {
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
     private readonly string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-    private ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+    private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
     private readonly string newVersion = "2.1.3"; // 最新版本号
 
     public SettingDatabase()
