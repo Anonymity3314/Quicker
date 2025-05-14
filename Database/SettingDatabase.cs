@@ -8,8 +8,8 @@ public class SettingDatabase
 {
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
     private readonly string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-    private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-    private readonly string newVersion = "2.1.3"; // 最新版本号
+    private readonly static ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+    private readonly string currentVersion = "2.1.3"; // 当前版本号
 
     public SettingDatabase()
     {
@@ -24,16 +24,15 @@ public class SettingDatabase
             Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
         string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
         if (File.Exists(dbFilePath))
+            CheckAndUpgradeDatabase(); // 如果数据库存在，则检查并升级数据库
+        else
         {
-            CheckAndUpgradeDatabase(); // 检查并升级数据库
-            return;
-        } // 如果数据库存在，则检查并升级数据库
-        SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
-
-        InitializeConvention(); // 初始化 Convention 表
-        InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
-        InitializeBlacklist(); // 初始化 Blacklist 表
-        InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
+            SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
+            InitializeConvention(); // 初始化 Convention 表
+            InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
+            InitializeBlacklist(); // 初始化 Blacklist 表
+            InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
+        }
     }
 
     // 检查数据库版本并进行升级
@@ -52,10 +51,8 @@ public class SettingDatabase
         using var reader = command.ExecuteReader(); // 执行查询命令
         if (reader.Read()) // 检查是否有数据
         {
-            var currentVersion = reader.GetString(0); // 返回版本号
-            var targetVersion = newVersion; // 目标版本
-            if (currentVersion == targetVersion)
-                return true; // 数据库版本已是最新，返回true
+            var thisVersion = reader.GetString(0); // 返回版本号
+            if (thisVersion == currentVersion) return true; // 数据库版本已是最新，返回true
         }
         return false; // 数据库版本不是最新，或者没有数据，返回false
     }
@@ -64,7 +61,7 @@ public class SettingDatabase
     private void UpdateDatabase()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string updateVersionQuery = @$"UPDATE Convention SET Version = '{newVersion}';"; // 设置默认值
+        string updateVersionQuery = @$"UPDATE Convention SET Version = '{currentVersion}';"; // 设置默认值
         using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
         updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
 
@@ -105,7 +102,7 @@ public class SettingDatabase
             VALUES 
             (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
         using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
-        insertConventionCommand.Parameters.AddWithValue("@Version", newVersion); // 版本号
+        insertConventionCommand.Parameters.AddWithValue("@Version", currentVersion); // 版本号
         insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
         insertConventionCommand.Parameters.AddWithValue("@ShowNotification", true); // 是否显示通知
         insertConventionCommand.Parameters.AddWithValue("@ShowAddImage", true); // 是否显示添加图片
@@ -166,7 +163,7 @@ public class SettingDatabase
     }
 
     // 初始化 Blacklist 表
-    private void InitializeBlacklist()
+    public void InitializeBlacklist()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string createBlacklistTableQuery = @"
@@ -197,7 +194,7 @@ public class SettingDatabase
     }
 
     // 初始化 BlacklistApplication 表
-    private void InitializeBlacklistApplication()
+    public void InitializeBlacklistApplication()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string createBlacklistApplicationTableQuery = @"
@@ -354,7 +351,10 @@ public class SettingDatabase
         command.ExecuteNonQuery(); // 执行更新命令
     }
 
-    // 获取设置信息
+    /// <summary>
+    /// 获取常规设置信息
+    /// </summary>
+    /// <returns> Convention 类 </returns>
     public List<Convention> GetAllConventions()
     {
         var conventions = new List<Convention>(); // 创建一个空的 Convention 列表
@@ -381,7 +381,10 @@ public class SettingDatabase
         return conventions; // 返回所有 Convention 数据
     }
 
-    // 获取OpenMainWindow设置信息
+    /// <summary>
+    /// 获取OpenMainWindow设置信息
+    /// </summary>
+    /// <returns> OpenMainWindow 类 </returns>
     public List<OpenMainWindow> GetAllOpenMainWindowConditions()
     {
         var conditions = new List<OpenMainWindow>(); // 创建一个空的 OpenMainWindow 列表
@@ -409,7 +412,10 @@ public class SettingDatabase
         return conditions; // 返回所有 OpenMainWindow 数据
     }
 
-    // 获取黑名单设置
+    /// <summary>
+    /// 获取黑名单设置
+    /// </summary>
+    /// <returns> Blacklist 类 </returns>
     public List<Blacklist> GetAllBlacklistSettings()
     {
         var blacklists = new List<Blacklist>(); // 创建一个空的 Blacklist 列表
@@ -429,7 +435,10 @@ public class SettingDatabase
         return blacklists; // 返回所有 Blacklist 数据
     }
 
-    // 获取黑名单应用
+    /// <summary>
+    /// 获取黑名单应用
+    /// </summary>
+    /// <returns> BlacklistApplication 类 </returns>
     public List<BlacklistApplication> GetAllBlacklistApplications()
     {
         var applications = new List<BlacklistApplication>(); // 创建一个空的 BlacklistApplication 列表
@@ -451,8 +460,11 @@ public class SettingDatabase
         return applications; // 返回所有 BlacklistApplication 数据
     }
 
-    // 打开数据库连接
-    private SQLiteConnection OpenConnection()
+    /// <summary>
+    /// 打开数据库连接
+    /// </summary>
+    /// <returns> SQLiteConnection 对象 </returns>
+    public SQLiteConnection OpenConnection()
     {
         var connection = new SQLiteConnection(db1); // 创建 SQLiteConnection 对象
         connection.Open(); // 打开数据库连接

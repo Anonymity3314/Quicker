@@ -19,12 +19,12 @@ namespace Quicker.Database
         }
 
         // 初始化数据库
-        public void Initialize()
+        private void Initialize()
         {
             string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
-            if (!Directory.Exists(dbFolder))
-                Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
             string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
+
+            if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
             if (File.Exists(dbFilePath)) return; // 如果数据库文件已存在，则直接返回
 
             SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
@@ -342,55 +342,48 @@ namespace Quicker.Database
 
             if (buttonIDMap.Count == 0) return; // 没有符合条件的 ButtonID，直接返回
 
-            using (var connection = new SQLiteConnection(db2))
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
 
-
+            string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
+            foreach (var pair in buttonIDMap.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
             {
-                connection.Open(); // 打开数据库连接
-                using (var transaction = connection.BeginTransaction())
-
+                string buttonID = pair.Key; // 原 ButtonID
+                Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
+                if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a1)
                 {
-                    string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
-                    foreach (var pair in buttonIDMap.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
-                    {
-                        string buttonID = pair.Key; // 原 ButtonID
-                        Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
-                        if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a1)
-                        {
-                            string newButtonID = $"{tempPrefix}{match.Groups[2].Value}"; // 新 ButtonID
-                            UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
-                            buttonIDMap.Remove(buttonID); // 从字典中删除原数据
-                            buttonIDMap[newButtonID] = pair.Value; // 添加新数据
-                        }
-                    }
-
-                    foreach (var pair in buttonIDMap.ToList())// 更新 A2 部分的 ButtonID 为目标 ID
-                    {
-                        string buttonID = pair.Key; // 原 ButtonID
-                        Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
-                        if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a2)
-                        {
-                            string bcPart = match.Groups[2].Value.Substring(1); // 目标 ID 的 B 和 C 部分
-                            string newButtonID = $"{inputString}{a1}{bcPart}"; // 新 ButtonID
-                            UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
-                            buttonIDMap.Remove(buttonID); // 从字典中删除原数据
-                            buttonIDMap[newButtonID] = pair.Value; // 添加新数据
-                        }
-                    }
-
-                    foreach (var pair in buttonIDMap.ToList())// 更新临时标识符的 ButtonID 为目标 ID
-                    {
-                        string buttonID = pair.Key; // 原 ButtonID
-                        if (buttonID.StartsWith(tempPrefix))
-                        {
-                            string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 目标 ID 的 B 和 C 部分
-                            string newButtonID = $"{inputString}{a2}{bcPart}"; // 新 ButtonID
-                            UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
-                        }
-                    }
-                    transaction.Commit(); // 提交事务
+                    string newButtonID = $"{tempPrefix}{match.Groups[2].Value}"; // 新 ButtonID
+                    UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
+                    buttonIDMap.Remove(buttonID); // 从字典中删除原数据
+                    buttonIDMap[newButtonID] = pair.Value; // 添加新数据
                 }
             }
+
+            foreach (var pair in buttonIDMap.ToList())// 更新 A2 部分的 ButtonID 为目标 ID
+            {
+                string buttonID = pair.Key; // 原 ButtonID
+                Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
+                if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a2)
+                {
+                    string bcPart = match.Groups[2].Value.Substring(1); // 目标 ID 的 B 和 C 部分
+                    string newButtonID = $"{inputString}{a1}{bcPart}"; // 新 ButtonID
+                    UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
+                    buttonIDMap.Remove(buttonID); // 从字典中删除原数据
+                    buttonIDMap[newButtonID] = pair.Value; // 添加新数据
+                }
+            }
+
+            foreach (var pair in buttonIDMap.ToList())// 更新临时标识符的 ButtonID 为目标 ID
+            {
+                string buttonID = pair.Key; // 原 ButtonID
+                if (buttonID.StartsWith(tempPrefix))
+                {
+                    string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 目标 ID 的 B 和 C 部分
+                    string newButtonID = $"{inputString}{a2}{bcPart}"; // 新 ButtonID
+                    UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
+                }
+            }
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>
@@ -429,8 +422,11 @@ namespace Quicker.Database
             return reader.Read();
         }
 
-        // 打开数据库连接
-        private SQLiteConnection OpenConnection()
+        /// <summary>
+        /// 打开数据库连接
+        /// </summary>
+        /// <returns> 数据库连接 </returns>
+        public SQLiteConnection OpenConnection()
         {
             var connection = new SQLiteConnection(db2); // 打开数据库连接
             connection.Open(); // 打开数据库连接

@@ -448,6 +448,7 @@ namespace Quicker.Windows
         // 退出Quicker
         private void QuitQuicker(object sender, RoutedEventArgs e)
         {
+            this.Visibility = Visibility.Collapsed; // 隐藏窗口
             System.Windows.Application.Current.Shutdown(); // 退出程序
         }
 

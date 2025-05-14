@@ -195,13 +195,14 @@ namespace Quicker
         {
             _appStateManager.PressTimer?.Stop(); // 停止计时器
             if (!_appStateManager.KeyPressStartTime.HasValue) return;
+            var Conventions = _appStateManager.Conventions; // 获取设置
             var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = DateTime.Now - _appStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
             _appStateManager.KeyPressStartTime = null;
             switch (e.Data.Button)
             {
                 case SharpHook.Native.MouseButton.Button3:
-                    if (pressDuration.TotalSeconds <= 0.3 &&
+                    if (pressDuration.TotalSeconds <= Conventions.LongPressThreshold &&
                         OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
                         CloseOrShowMainWindow();
                     break; // 短按中键
@@ -210,7 +211,7 @@ namespace Quicker
                     if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick ||
                         OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
                     {
-                        if (pressDuration.TotalSeconds <= 0.3)
+                        if (pressDuration.TotalSeconds <= Conventions.LongPressThreshold)
                             CloseOrShowMainWindow();
                     }
                     break; // 短按X2键
@@ -242,6 +243,7 @@ namespace Quicker
         private void Hook_KeyReleased(object sender, KeyboardHookEventArgs e)
         {
             if (!_appStateManager.KeyPressStartTime.HasValue) return;
+            var Conventions = _appStateManager.Conventions; // 获取设置
             var OpenMainWindowConditions = _appStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = DateTime.Now - _appStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
             _appStateManager.KeyPressStartTime = null;
@@ -249,12 +251,10 @@ namespace Quicker
             {
                 case SharpHook.Native.KeyCode.VcLeftControl: // 左 Ctrl 键
                 case SharpHook.Native.KeyCode.VcRightControl:
-                    if (OpenMainWindowConditions.OpenMainWindowByCtrl)
+                    if (OpenMainWindowConditions.OpenMainWindowByCtrl &&
+                        pressDuration.TotalSeconds <= Conventions.LongPressThreshold) 
                     {
-                        if (pressDuration.TotalSeconds <= 0.3) // 如果按键时间小于 0.3 秒
-                        {
-                            CloseOrShowMainWindow();
-                        }
+                        CloseOrShowMainWindow();
                     }
                     break; // 右 Ctrl 键
             }
