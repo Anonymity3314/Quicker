@@ -45,9 +45,9 @@ namespace Quicker.Database
                 Title TEXT,
                 Location TEXT,
                 ImagePath TEXT,
-                RunByMessager BOOL,
-                TryToOpenExitingWindow BOOL,
-                WindowState INT,
+                Data1 TEXT,
+                Data2 TEXT,
+                Data3 TEXT,
                 Description TEXT,
                 CreateTime DATETIME,
                 LatestEditTime DATETIME,
@@ -68,17 +68,17 @@ namespace Quicker.Database
             string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
             CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
             string query = $@"INSERT INTO {tableName} 
-            (ButtonID, Title, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Description, CreateTime, LatestEditTime, ActionType) 
+            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType) 
             VALUES 
-            (@ButtonID, @Title, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Description, @CreateTime, @LatestEditTime, @ActionType)"; // 创建SQL语句
+            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType)"; // 创建SQL语句
             using var command = new SQLiteCommand(query, connection);
             command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager); // 是否用管理员身份运行
-            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow); // 是否尝试打开已有窗口
-            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState); // 窗口状态
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 是否用管理员身份运行
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 是否尝试打开已有窗口
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 窗口状态
             command.Parameters.AddWithValue("@Description", buttonData.Description); // 用途
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
@@ -107,9 +107,9 @@ namespace Quicker.Database
                     Title = reader.GetString(1), // 动作名称
                     Location = reader.GetString(2), // 位置
                     ImagePath = reader.GetString(3), // 图片路径
-                    RunByMessager = reader.GetBoolean(4), // 是否用管理员身份运行
-                    TryToOpenExitingWindow = reader.GetBoolean(5), // 是否尝试打开已有窗口
-                    WindowState = reader.GetInt32(6), // 窗口状态
+                    Data1 = reader.GetString(4), // 是否用管理员身份运行
+                    Data2 = reader.GetString(5), // 是否尝试打开已有窗口
+                    Data3 = reader.GetString(6), // 窗口状态
                     Description = reader.GetString(7), // 用途
                     CreateTime = reader.GetDateTime(8), // 创建时间
                     LatestEditTime = reader.GetDateTime(9), // 最近修改时间
@@ -132,9 +132,9 @@ namespace Quicker.Database
                 Title = @Title, 
                 Location = @Location, 
                 ImagePath = @ImagePath, 
-                RunByMessager = @RunByMessager, 
-                TryToOpenExitingWindow = @TryToOpenExitingWindow, 
-                WindowState = @WindowState, 
+                Data1 = @Data1, 
+                Data2 = @Data2, 
+                Data3 = @Data3, 
                 Description = @Description, 
                 CreateTime = @CreateTime, 
                 LatestEditTime = @LatestEditTime 
@@ -144,9 +144,9 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager); // 是否用管理员身份运行
-            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow); // 是否尝试打开已有窗口
-            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState); // 窗口状态
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 是否用管理员身份运行
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 是否尝试打开已有窗口
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 窗口状态
             command.Parameters.AddWithValue("@Description", buttonData.Description); // 用途
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
@@ -173,9 +173,9 @@ namespace Quicker.Database
                     Title = reader.GetString(1),
                     Location = reader.GetString(2),
                     ImagePath = reader.GetString(3),
-                    RunByMessager = reader.GetBoolean(4),
-                    TryToOpenExitingWindow = reader.GetBoolean(5),
-                    WindowState = reader.GetInt32(6),
+                    Data1 = reader.GetString(4),
+                    Data2 = reader.GetString(5),
+                    Data3 = reader.GetString(6),
                     Description = reader.GetString(7),
                     CreateTime = reader.GetDateTime(8),
                     LatestEditTime = reader.GetDateTime(9),
@@ -264,17 +264,17 @@ namespace Quicker.Database
 
             // 插入数据到目标表
             string query = $@"INSERT INTO {targetTable} 
-            (ButtonID, Title, Location, ImagePath, RunByMessager, TryToOpenExitingWindow, WindowState, Description, CreateTime, LatestEditTime, ActionType) 
+            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType) 
             VALUES 
-            (@ButtonID, @Title, @Location, @ImagePath, @RunByMessager, @TryToOpenExitingWindow, @WindowState, @Description, @CreateTime, @LatestEditTime, @ActionType)"; // 创建SQL语句
+            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType)"; // 创建SQL语句
             using var command = new SQLiteCommand(query, connection);
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@RunByMessager", buttonData.RunByMessager); // 是否用管理员身份运行
-            command.Parameters.AddWithValue("@TryToOpenExitingWindow", buttonData.TryToOpenExitingWindow); // 是否尝试打开已有窗口
-            command.Parameters.AddWithValue("@WindowState", buttonData.WindowState); // 窗口状态
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 是否用管理员身份运行
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 是否尝试打开已有窗口
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 窗口状态
             command.Parameters.AddWithValue("@Description", buttonData.Description); // 用途
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
@@ -406,9 +406,9 @@ namespace Quicker.Database
         public string Title { get; set; } // 动作名称
         public string Location { get; set; } // 位置
         public string ImagePath { get; set; } // 图片路径
-        public bool RunByMessager { get; set; } // 是否用管理员身份运行
-        public bool TryToOpenExitingWindow { get; set; } // 是否尝试打开已有窗口
-        public int WindowState { get; set; } // 窗口状态
+        public string Data1 { get; set; } // 替代 RunByMessager
+        public string Data2 { get; set; } // 替代 TryToOpenExitingWindow
+        public string Data3 { get; set; } // 替代 WindowState
         public string Description { get; set; } // 对动作的描述
         public DateTime CreateTime { get; set; } // 创建时间
         public DateTime LatestEditTime { get; set; } // 最近修改时间

@@ -49,7 +49,7 @@ namespace Quicker.UserControls.AddWindow
                 AddWindow.ButtonTitle.Text = buttonData.Title; // 显示按钮名称
             } // 如果按钮名称不为空
             AddWindow.TitleTextBox.Text = buttonData.Title; // 设置按钮名称
-            if (buttonData.WindowState == 8) // 如果是自定义浏览器
+            if (buttonData.Data3 == 8.ToString()) // 如果是自定义浏览器
             {
                 string[] locationAndBrowser = GetLocationAndBrowser(buttonData.Location); // 解析地址和浏览器
                 LocationTextBox.Text = locationAndBrowser[0]; // 设置地址栏文本
@@ -70,7 +70,7 @@ namespace Quicker.UserControls.AddWindow
                     AddWindow.ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
                 }
             } // 如果图标路径不为默认值
-            BrowserComboBox.SelectedIndex = buttonData.WindowState; // 设置浏览器类型
+            BrowserComboBox.SelectedIndex = int.Parse(buttonData.Data3); // 设置浏览器类型
             AddWindow.DescriptionTextBox.Text = buttonData.Description; // 设置用途
             AddWindow.UpdateTooltip(); // 更新提示文本
         }
@@ -83,7 +83,7 @@ namespace Quicker.UserControls.AddWindow
         private string[] GetLocationAndBrowser(string info)
         {
             string[] locationAndBrowser = info.Split(';'); // 将文本内容按照分号分隔
-            return locationAndBrowser;
+            return locationAndBrowser; // 返回网站地址和浏览器数组地址
         }
 
         // 打开菜单
@@ -97,6 +97,7 @@ namespace Quicker.UserControls.AddWindow
         {
             string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
             LocationTextBox.Text = buttonManager.ProcessLocation(clipboardText); // 设置地址栏文本
+            OpenWebsitePopup.IsOpen = false; // 关闭弹出菜单
         }
 
         // 如果地址栏不为空，则启用保存按钮
@@ -132,7 +133,7 @@ namespace Quicker.UserControls.AddWindow
                     ? LocationTextBox.Text + ";" + BrowserLocation.Text
                     : LocationTextBox.Text,
                 ImagePath = AddWindow.iconPath,
-                WindowState = BrowserComboBox.SelectedIndex,
+                Data3 = BrowserComboBox.SelectedIndex.ToString(),
                 Description = AddWindow.DescriptionTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,

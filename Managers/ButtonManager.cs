@@ -145,9 +145,9 @@ namespace Quicker.Managers
                 Title = fileName, // 设置按钮名称
                 Location = filePath, // 设置文件路径
                 ImagePath = iconPath, // 设置图标路径
-                RunByMessager = false, // 是否使用管理员身份运行
-                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
-                WindowState = 0, // 设置窗口状态
+                Data1 = false.ToString(), // 是否使用管理员身份运行
+                Data2 = true.ToString(), // 尝试打开已存在的窗口
+                Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开文件: {fileName}", // 设置用途
                 CreateTime = DateTime.Now, // 设置创建时间
                 LatestEditTime = DateTime.Now, // 设置最新编辑时间，
@@ -192,9 +192,9 @@ namespace Quicker.Managers
                 Title = fileName,
                 Location = filePath,
                 ImagePath = iconPath,
-                RunByMessager = false, // 是否使用管理员身份运行
-                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
-                WindowState = 0,
+                Data1 = false.ToString(), // 是否使用管理员身份运行
+                Data2 = true.ToString(), // 尝试打开已存在的窗口
+                Data3 = 0.ToString(),
                 Description = $"打开图片: {fileName}",
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
@@ -230,9 +230,9 @@ namespace Quicker.Managers
                 Title = $"{fileName}等{filePaths.Length}个文件(夹)", // 设置按钮名称
                 Location = filePath, // 设置文件路径
                 ImagePath = iconPath, // 设置图标路径
-                RunByMessager = false, // 是否使用管理员身份运行
-                TryToOpenExitingWindow = true, // 尝试打开已存在的窗口
-                WindowState = 0, // 设置窗口状态
+                Data1 = false.ToString(), // 是否使用管理员身份运行
+                Data2 = true.ToString(), // 尝试打开已存在的窗口
+                Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开以{fileName}为首的多个文件:", // 设置用途
                 CreateTime = DateTime.Now, // 设置创建时间
                 LatestEditTime = DateTime.Now, // 设置最新编辑时间，
@@ -265,7 +265,7 @@ namespace Quicker.Managers
                 Title = GetWebsiteNameFromUrl(url),
                 Location = url,
                 ImagePath = iconPath,
-                WindowState = 0,
+                Data3 = 0.ToString(),
                 Description = $"打开网页: {url}",
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,

@@ -37,7 +37,7 @@ namespace Quicker.Managers
         /// <param name="data"> 按钮数据 </param>
         private void OpenFile(ButtonData data)
         {
-            if (data.TryToOpenExitingWindow) // 如果尝试打开已存在的窗口
+            if (data.Data2 == "true") // 如果尝试打开已存在的窗口
             {
                 string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
                 windowManager.TryToOpenExitingWindow(windowTitle);
@@ -55,9 +55,9 @@ namespace Quicker.Managers
                     ProcessStartInfo processStartInfo = new ProcessStartInfo
                     {
                         FileName = targetPath, // 设置启动文件路径
-                        UseShellExecute = data.RunByMessager, // 是否使用系统默认方式运行
-                        Verb = data.RunByMessager ? "runas" : null, // 管理员权限运行
-                        WindowStyle = data.WindowState switch
+                        UseShellExecute = data.Data1 == "true", // 是否使用系统默认方式运行
+                        Verb = data.Data1 == "true" ? "runas" : null, // 管理员权限运行
+                        WindowStyle = int.Parse(data.Data3) switch
                         {
                             0 => ProcessWindowStyle.Normal,
                             1 => ProcessWindowStyle.Minimized,
@@ -109,7 +109,7 @@ namespace Quicker.Managers
         {
             try
             {
-                switch (data.WindowState)
+                switch (int.Parse(data.Data3))
                 {
                     case 0:
                         LaunchDefaultBrowser(data.Location);
@@ -309,7 +309,7 @@ namespace Quicker.Managers
             string[] files = data.Location.Split(';'); // 将文本内容按照分号分隔
             foreach (string file in files)
             {
-                OpenFile(new ButtonData { Location = file, TryToOpenExitingWindow = false });
+                OpenFile(new ButtonData { Location = file, Data2 = false.ToString() }); // 打开文件
             }
         }
 

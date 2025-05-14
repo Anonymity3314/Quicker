@@ -7,10 +7,10 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Managers;
+using Quicker.Windows;
 using System.Windows;
 using System.Net;
 using System.IO;
-using Quicker.Windows;
 
 namespace Quicker.Managers
 {
@@ -109,7 +109,10 @@ namespace Quicker.Managers
                 }
                 return iconPath; // 返回文件路径
             }
-            catch { return null; } // 如果保存失败，返回 null
+            catch
+            {
+                return null; // 如果保存失败，返回 null
+            }
         }
 
         /// <summary>
@@ -148,6 +151,7 @@ namespace Quicker.Managers
             catch
             {
                 new ToastContentBuilder().AddText("无效的Uri。").Show(); // 处理无效的URL
+                loadingWindow?.Close(); // 关闭加载窗口
                 return null; // 处理无效的URL
             }
 
@@ -165,15 +169,18 @@ namespace Quicker.Managers
                         bitmapImage.StreamSource = stream; // 设置流为BitmapImage的源
                         bitmapImage.EndInit(); // 结束初始化BitmapImage
                     }
-                    loadingWindow.Close(); // 关闭加载窗口
                     if (IsImageEmpty(bitmapImage)) return null; // 如果图标为空，则返回 null
                     return bitmapImage; // 返回图标
                 }
                 catch
                 {
                     new ToastContentBuilder().AddText("获取网站图标失败。").Show(); // 处理下载失败的情况
-                    loadingWindow?.Close(); // 关闭加载窗口
                     return null; // 返回空图标
+                }
+                finally
+                {
+                    client.Dispose(); // 释放WebClient资源
+                    loadingWindow?.Close(); // 关闭加载窗口
                 }
             }
         }
@@ -200,9 +207,8 @@ namespace Quicker.Managers
                 formatConvertedBitmap.CopyPixels(pixels, stride, 0);
                 for (int i = 0; i < pixels.Length; i += 4)
                 {
-                    byte alpha = pixels[i + 3];
-                    if (alpha != 0)
-                        return false;
+                    byte alpha = pixels[i + 3]; // 获取透明度值
+                    if(alpha == 0) return alpha == 0; // 如果透明度值为 0，则返回 true
                 }
                 return true;
             }
@@ -215,10 +221,9 @@ namespace Quicker.Managers
         // 手动释放资源
         public void Dispose()
         {
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            GC.Collect(); // 强制垃圾回收
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次强制垃圾回收
         }
     }
 }

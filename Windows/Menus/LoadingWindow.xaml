@@ -10,8 +10,8 @@
     WindowStartupLocation="CenterScreen"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
-    Title="请稍等"
     Topmost="True"
+    Title="请稍等"
     Height="150"
     Width="400"
 >

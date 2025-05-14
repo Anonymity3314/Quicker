@@ -7,9 +7,9 @@ using System.IO;
 public class SettingDatabase
 {
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
-    private readonly string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+    private readonly static string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
     private readonly static ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-    private readonly string currentVersion = "2.1.3"; // 当前版本号
+    public readonly string currentVersion = "2.1.4"; // 当前版本号
 
     public SettingDatabase()
     {

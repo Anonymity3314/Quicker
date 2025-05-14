@@ -76,9 +76,9 @@ namespace Quicker.UserControls.AddWindow
                     AddWindow.ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
                 }
             } // 如果图标路径不为默认值
-            RunByMessager.IsChecked = buttonData.RunByMessager; // 设置是否通过管理员身份运行
-            TryToOpenExitingWindow.IsChecked = buttonData.TryToOpenExitingWindow; // 设置是否尝试打开已存在的窗口
-            WindowStateComboBox.SelectedIndex = buttonData.WindowState;
+            RunByMessager.IsChecked = buttonData.Data1 == "true"; // 设置是否通过管理员身份运行
+            TryToOpenExitingWindow.IsChecked = buttonData.Data2 == "true"; // 设置是否尝试打开已存在的窗口
+            WindowStateComboBox.SelectedIndex = int.Parse(buttonData.Data3);
             AddWindow.DescriptionTextBox.Text = buttonData.Description; // 设置用途
             AddWindow.UpdateTooltip(); // 更新提示文本
         }
@@ -217,9 +217,9 @@ namespace Quicker.UserControls.AddWindow
                 Title = AddWindow.TitleTextBox.Text,
                 Location = LocationTextBox.Text,
                 ImagePath = AddWindow.iconPath,
-                RunByMessager = runbymessager,
-                TryToOpenExitingWindow = trytoopenexitingwindow,
-                WindowState = windowState,
+                Data1 = runbymessager.ToString(),
+                Data2 = trytoopenexitingwindow.ToString(),
+                Data3 = windowState.ToString(),
                 Description = AddWindow.DescriptionTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
