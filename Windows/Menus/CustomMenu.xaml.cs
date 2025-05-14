@@ -11,31 +11,14 @@ namespace Quicker.Windows
 {
     public partial class CustomMenu : Window
     {
-        private readonly WindowManager windowManager; // 窗口管理器
-        private readonly SettingDatabase db1; // 数据库实例
-        private readonly App app; // App实例
+        private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly SettingDatabase db1 = new SettingDatabase(); // 数据库实例
+        private readonly App app = (App.Current as App); // App实例
 
         public CustomMenu()
         {
             InitializeComponent();
             this.Visibility = Visibility.Hidden; // 隐藏窗口
-
-            app = (App.Current as App); // 获取App实例
-
-            db1 = new SettingDatabase();
-            db1.Initialize();
-
-            windowManager = new WindowManager();
-        }
-
-        // 后台加载数据库
-        private void CustomMenu_Loaded(object sender, RoutedEventArgs e)
-        {
-            Task.Run(() =>
-            {
-                SettingDatabase db1 = new();
-                db1.Initialize();
-            });
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 

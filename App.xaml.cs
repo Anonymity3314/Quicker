@@ -16,6 +16,7 @@ namespace Quicker
 {
     public partial class App : System.Windows.Application
     {
+        private readonly UpdateManager updateManager = new UpdateManager(); // 更新管理器
         public AppStateManager _appStateManager = new AppStateManager(); // 应用状态管理器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子

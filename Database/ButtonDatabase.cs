@@ -23,48 +23,13 @@ namespace Quicker.Database
         {
             string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
             string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
-
             if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
-            if (File.Exists(dbFilePath)) return; // 如果数据库文件已存在，则直接返回
-
-            SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
-            CreateButtonTable("Global"); // 创建全局表格
-            CreateButtonTable("Common"); // 创建通用表格
-        }
-
-        // 检查并更新数据库
-        public void UpdateDatabase()
-        {
-            RenameColumn("Global"); // 重命名表格中的列名
-            RenameColumn("Common"); // 重命名表格中的列名
-            if(TableExists("Desktop")) RenameColumn("Desktop"); // 如果存在桌面表格，则重命名列名
-            if (TableExists("Taskbar")) RenameColumn("Taskbar"); // 如果存在任务栏表格，则重命名列名
-        }
-
-        /// <summary>
-        /// 重命名表格中的列名
-        /// </summary>
-        /// <param name="tableName"></param>
-        public void RenameColumn(string tableName)
-        {
-            var connection = OpenConnection(); // 打开数据库连接
-
-            // 重命名第一个列：Location → Path
-            string renameQuery1 = $"ALTER TABLE {tableName} RENAME COLUMN ButtonName TO Title;";
-            using var command1 = new SQLiteCommand(renameQuery1, connection);
-            command1.ExecuteNonQuery();
-
-            // 重命名第二个列：Type → ActionType
-            string renameQuery2 = $"ALTER TABLE {tableName} RENAME COLUMN Type TO ActionType;";
-            using var command2 = new SQLiteCommand(renameQuery2, connection);
-            command2.ExecuteNonQuery();
-
-            // 重命名第三个列：Usage → Description
-            string renameQuery3 = $"ALTER TABLE {tableName} RENAME COLUMN Usage TO Description;";
-            using var command3 = new SQLiteCommand(renameQuery3, connection);
-            command3.ExecuteNonQuery();
-
-            connection.Close(); // 关闭数据库连接
+            if (!File.Exists(dbFilePath))
+            {
+                SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
+                CreateButtonTable("Global"); // 创建全局表格
+                CreateButtonTable("Common"); // 创建通用表格
+            }
         }
 
         /// <summary>

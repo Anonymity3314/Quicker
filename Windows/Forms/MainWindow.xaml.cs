@@ -33,8 +33,8 @@ namespace Quicker.Windows
         private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private readonly App app = (App.Current as App); // App实例
         private string CommonStyle; // 样式
-        private readonly App app; // App实例
 
         public MainWindow(string Style)
         {
@@ -42,7 +42,6 @@ namespace Quicker.Windows
             InitializeComponent(); // 初始化窗口组件
             GlobalGrid.Children.Remove(ViewGlobalCanvas); // 从主网格中移除
             CommonGrid.Children.Remove(ViewCommonCanvas); // 从主网格中移除
-            app = (App.Current as App); // 获取当前 App 实例
         }
 
         // 加载数据库和Button

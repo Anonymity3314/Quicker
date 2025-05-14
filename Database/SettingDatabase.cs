@@ -20,12 +20,9 @@ public class SettingDatabase
     public void Initialize()
     {
         string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
-        if (!Directory.Exists(dbFolder))
-            Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
         string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
-        if (File.Exists(dbFilePath))
-            CheckAndUpgradeDatabase(); // 如果数据库存在，则检查并升级数据库
-        else
+        if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
+        if (!File.Exists(dbFilePath))
         {
             SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
             InitializeConvention(); // 初始化 Convention 表
@@ -33,40 +30,6 @@ public class SettingDatabase
             InitializeBlacklist(); // 初始化 Blacklist 表
             InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
         }
-    }
-
-    // 检查数据库版本并进行升级
-    public void CheckAndUpgradeDatabase()
-    {
-        if (IsNewVersion()) return; // 如果数据库是最新版本，则直接返回
-        UpdateDatabase(); // 升级数据库
-    }
-
-    // 判断数据库是否是最新版本
-    public bool IsNewVersion()
-    {
-        using var connection = OpenConnection(); // 打开数据库连接
-        string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
-        using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
-        using var reader = command.ExecuteReader(); // 执行查询命令
-        if (reader.Read()) // 检查是否有数据
-        {
-            var thisVersion = reader.GetString(0); // 返回版本号
-            if (thisVersion == currentVersion) return true; // 数据库版本已是最新，返回true
-        }
-        return false; // 数据库版本不是最新，或者没有数据，返回false
-    }
-
-    // 升级数据库
-    private void UpdateDatabase()
-    {
-        using var connection = OpenConnection(); // 打开数据库连接
-        string updateVersionQuery = @$"UPDATE Convention SET Version = '{currentVersion}';"; // 设置默认值
-        using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
-        updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
-
-        // 其它的升级操作...
-        db2.UpdateDatabase(); // 升级按钮数据库
     }
 
     // 初始化 Convention 表

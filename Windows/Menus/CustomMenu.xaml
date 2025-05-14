@@ -18,7 +18,6 @@
     AllowsTransparency="True"
     WindowStartupLocation="Manual"
     
-    Loaded="CustomMenu_Loaded"
     Deactivated="CustomMenu_Deactivated"
 >
     <Window.Resources>
