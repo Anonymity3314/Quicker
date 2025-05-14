@@ -1,9 +1,9 @@
 ﻿<Application
-    x:Class="Quicker.App"
-    xmlns:local="clr-namespace:Quicker"
-    StartupUri="Windows/Menus/CustomMenu.xaml"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    StartupUri="Windows/Menus/CustomMenu.xaml"
+    xmlns:local="clr-namespace:Quicker"
+    x:Class="Quicker.App"
     
     ShutdownMode="OnMainWindowClose"
 >

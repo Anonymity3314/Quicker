@@ -224,9 +224,7 @@ namespace Quicker.Managers
             }
         }
 
-        /// <summary>
-        /// 迁移数据库文件到Database文件夹
-        /// </summary>
+        // 迁移数据库文件到Database文件夹
         private void MigrateDatabaseFiles()
         {
             // 源文件路径
@@ -290,7 +288,10 @@ namespace Quicker.Managers
                 if (File.Exists(sourceButtonDbPath)) Update2_1_0ButtonDatabase(); // 将旧表中的所有按钮迁移到对应的新表并删除旧表
                 SetCurrentVersion("2.1.0"); // 设置数据库版本为2.1.0
             }
-            catch { }
+            catch
+            {
+                new ToastContentBuilder().AddText("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。").Show(); // 弹出消息提醒用户
+            }
         }
 
         /// <summary>
