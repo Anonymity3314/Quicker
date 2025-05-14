@@ -1,25 +1,35 @@
-﻿# 声明
+﻿# 项目简介
+这是由作者重构的 WPF 应用Quicker，主要功能包括动作管理、应用状态管理、按钮管理等。
 
-这是作者重构的WPF应用Quicker
+该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
 
-有能力或想体验更多功能请支持正版：https://getquicker.net/
+# 声明
+本项目为开源项目，作者非计算机专业，项目仍有很多地方需要优化。
 
-作者非计算机专业，项目很多地方待优化
+项目仍在持续更新中，如有侵权，请联系作者删除。
 
-项目仍在更新中
+如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
 
-侵权必删
+# NuGet 程序包
 
-## 文件结构
+| 程序包                                 | 说明                              |
+| :-----------------------------------: | :------------------------------: |
+| DK.WshRuntime                         | 提供 Windows 脚本主机运行时功能     |
+| Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
+| Microsoft.Toolkit.Uwp.Notifications   | 提供 UWP 样式的通知功能             |
+| SharpHook                             | 提供键盘和鼠标钩子功能               |
+| System.Data.SQLite                    | 提供 SQLite 数据库支持              |
+
+# 文件结构
 ```
 Quicker/
-│   App.xaml
-│   App.xaml.cs
-│   AssemblyInfo.cs
-│   installer.idproj
-│   Quicker.csproj
+│   App.xaml                                      # 应用入口点
+│   App.xaml.cs                                   # 应用入口点的代码后台
+│   AssemblyInfo.cs                               # 项目的属性和版本信息
+│   installer.idproj                              # 安装程序项目文件
+│   Quicker.csproj                                # 项目的核心配置文件
 │   Quicker.ico                                   # 应用图标
-│   Quicker.sln
+│   Quicker.sln                                   # 项目解决方案文件
 │
 ├─Database/                                       # 数据库
 │   ├─ActionPageDatabase.cs                       # 动作页数据库
@@ -155,3 +165,18 @@ Quicker/
         └─ToastWindow.xaml                        # 消息弹窗
              └─ToastWindow.xaml.cs
 ```
+
+# 快速开始指南
+克隆项目仓库：https://github.com/Anonymity3314/Quicker.git
+
+安装必要的依赖项，包括上述列出的 NuGet 程序包。
+
+打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
+
+# 贡献指南
+如果你发现项目中有问题或有改进建议，可以通过提交 issue 的方式告知作者。
+
+你可以 Fork 项目仓库，在本地进行开发后，通过 Pull Request 的方式提交你的代码贡献。
+
+# 致谢
+感谢为该项目提供参考的 [Quicker 软件](https://getquicker.net/ "访问 Quicker 官方网站")。
