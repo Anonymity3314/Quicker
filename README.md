@@ -14,10 +14,12 @@
 
 | 程序包                                 | 说明                              |
 | :-----------------------------------: | :------------------------------: |
-| DK.WshRuntime                         | 提供 Windows 脚本主机运行时功能     |
+| Autoupdater.NET.Official              | 提供自动更新功能                    |
+| DK.WshRuntime                         | 提供 Windows 脚本主机运行时功能      |
 | Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
 | Microsoft.Toolkit.Uwp.Notifications   | 提供 UWP 样式的通知功能             |
 | SharpHook                             | 提供键盘和鼠标钩子功能               |
+| Svg                                   | 提供加载、解析和渲染 SVG 图像的功能   |
 | System.Data.SQLite                    | 提供 SQLite 数据库支持              |
 
 # 文件结构
@@ -31,12 +33,12 @@ Quicker/
 │   Quicker.ico                                   # 应用图标
 │   Quicker.sln                                   # 项目解决方案文件
 │
-├─Database/                                       # 数据库
+├─Database/                                       # 数据库文件夹
 │   ├─ActionPageDatabase.cs                       # 动作页数据库
 │   ├─ButtonDatabase.cs                           # 按钮数据库
 │   └─SettingDatabase.cs                          # 设置数据库
 │
-├─Managers/                                       # 管理器
+├─Managers/                                       # 管理器文件夹
 │   ├─ActionManager.cs                            # 动作管理器
 │   ├─AppStateManager.cs                          # 应用状态管理器
 │   ├─ButtonManager.cs                            # 按钮管理器
@@ -47,9 +49,9 @@ Quicker/
 │   ├─ToastManager.cs                             # 消息管理器
 │   └─WindowManager.cs                            # 窗口管理器
 │
-├─Resources/                                      # 资源
-│   ├─Images/                                     # 图像资源
-│   │   ├─Icons/                                  # 图标资源
+├─Resources/                                      # 资源文件夹
+│   ├─Images/                                     # 图像资源文件夹
+│   │   ├─Icons/                                  # 图标资源文件夹
 │   │   │   ├─AboutQuicker.ico                    # 关于Quicker的图标
 │   │   │   ├─ActionInformation.ico               # 动作信息的图标
 │   │   │   ├─ActionPagesManager.ico              # 动作场景的图标
@@ -76,7 +78,7 @@ Quicker/
 │   │   │   ├─SettingWindow.ico                   # 设置面板的图标
 │   │   │   └─UnLocked.ico                        # 不锁住通用动作页的图标
 │   │   │
-│   │   └─SourseImages/                           # 图标的原图
+│   │   └─SourseImages/                           # 图标的原图文件夹
 │   │       ├─AboutQuicker.png                    # 关于Quicker的图标原图
 │   │       ├─ActionInformation.png               # 动作信息的图标原图
 │   │       ├─ActionPagesManager.jpg              # 动作场景的图标原图
@@ -103,7 +105,7 @@ Quicker/
 │   │       ├─SettingWindow.png                   # 设置面板的图标原图
 │   │       └─UnLocked.png                        # 不锁住通用动作页的图标原图
 │   │
-│   └─Styles/                                     # 样式资源
+│   └─Styles/                                     # 样式资源文件夹
 │       ├─ButtonStyles.xaml                       # 按钮样式
 │       ├─CheckBoxStyle.xaml                      # 勾选框样式
 │       ├─ComboBoxStyle.xaml                      # 下拉框样式
@@ -113,14 +115,13 @@ Quicker/
 │       ├─TextBoxStyle.xaml                       # 文本框样式
 │       └─TooltipStyle.xaml                       # 提示框样式
 │
-├─UserControls/                                   # 自定义控件
-│   │
-│   ├─AddWindow/
+├─UserControls/                                   # 自定义控件文件夹
+│   ├─AddWindow/                                  # 添加窗口的自定义控件文件夹
 │   │   ├─OpenFile.xaml                           # 添加窗口中添加打开文件动作的界面
 │   │   │   └─OpenFile.xaml.cs
 │   │   └─OpenWebsite.xaml                        # 添加窗口中添加打开网站动作的界面
 │   │       └─OpenWebsite.xaml.cs
-│   └─SettingWindow/
+│   └─SettingWindow/                              # 设置窗口的自定义控件文件夹
 │       ├─AboutQuickerGrid.xaml                   # 设置窗口中关于Quicker界面
 │       │   └─AboutQuickerGrid.xaml.cs
 │       ├─AppearanceGrid.xaml                     # 设置窗口中外观设置界面
@@ -134,22 +135,22 @@ Quicker/
 │       └─OpenMainWindowGrid.xaml                 # 设置窗口中弹出面板设置界面
 │           └─OpenMainWindowGrid.xaml.cs
 │
-└─Windows/                                        # 界面
-    ├─Forms/                                      # 窗口
+└─Windows/                                        # 界面文件夹
+    ├─Forms/                                      # 窗口文件夹
     │   ├─ActionPageManageWindow.xaml             # 编辑动作页窗口
     │   │   └─ActionPageManageWindow.xaml.cs
     │   ├─AddWindow.xaml                          # 添加动作窗口
     │   │   └─AddWindow.xaml.cs
     │   ├─FindAppsWindow.xaml                     # 查找应用窗口
     │   │   └─FindAppsWindow.xaml.cs
-    │   ├─MainWindow.xaml                         # 主面板
+    │   ├─MainWindow.xaml                         # 功能面板
     │   │   └─MainWindow.xaml.cs
     │   ├─SelectImageWindow.xaml                  # 选择图片窗口
     │   │   └─SelectImageWindow.xaml.cs
     │   └─SettingWindow.xaml                      # 设置窗口
     │        └─SettingWindow.xaml.cs
     │
-    └─Menus/                                      # 菜单
+    └─Menus/                                      # 菜单文件夹
         ├─ActionInformationShower.xaml            # 动作信息菜单
         │   └─ActionInformationShower.xaml.cs
         ├─CreatActionMenu.xaml                    # 创建动作菜单

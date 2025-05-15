@@ -18,7 +18,6 @@ namespace Quicker
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
         private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-        private SelectImageWindow selectImageWindow; // SelectImageWindow 的实例引用
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
         public TextBlock ButtonTitle; // 按钮标题
@@ -277,7 +276,7 @@ namespace Quicker
         // 选择本地图片
         private void SelectImage(object sender, RoutedEventArgs e)
         {
-            selectImageWindow = new SelectImageWindow(); // 创建 SelectImageWindow 实例
+            SelectImageWindow selectImageWindow = new SelectImageWindow(); // 创建 SelectImageWindow 实例
             selectImageWindow.ImageConfirmed += OnImageConfirmed; // 订阅 ImageConfirmed 事件
             selectImageWindow.Owner = this; // 设置所有者为当前窗口
             selectImageWindow.ShowDialog(); // 显示为模式对话框
@@ -340,11 +339,6 @@ namespace Quicker
             {
                 findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
                 findAppsWindow = null; // 清理静态引用
-            }
-            if (selectImageWindow != null)
-            {
-                selectImageWindow.ImageConfirmed -= OnImageConfirmed; // 取消事件订阅
-                selectImageWindow = null; // 清理静态引用
             }
 
             // 清理控件资源

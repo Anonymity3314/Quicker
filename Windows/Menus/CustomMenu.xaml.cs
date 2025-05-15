@@ -62,7 +62,7 @@ namespace Quicker.Windows
         }
 
         // 重启应用
-        private void Restart(object sender, RoutedEventArgs e)
+        public void Restart(object sender, RoutedEventArgs e)
         {
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location; // 获取当前应用程序的完整路径
             string directory = Path.GetDirectoryName(exePath); // 获取可执行文件的目录
