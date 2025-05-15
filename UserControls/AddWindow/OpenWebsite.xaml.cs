@@ -58,7 +58,7 @@ namespace Quicker.UserControls.AddWindow
             else
                 LocationTextBox.Text = buttonData.Location; // 设置文件地址
 
-            if (buttonData.ImagePath != "none")
+            if (!string.IsNullOrEmpty(buttonData.ImagePath))
             {
                 try
                 {
@@ -123,7 +123,7 @@ namespace Quicker.UserControls.AddWindow
         {
             AddWindow.iconPath = AddWindow.ButtonImage.Visibility == Visibility.Visible
                 ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source)
-                : "none"; // 如果图标可见，则保存图标，否则设置为默认值
+                : ""; // 如果图标可见，则保存图标，否则设置为默认值
 
             var buttonData = new ButtonData
             {

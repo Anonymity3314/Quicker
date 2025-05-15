@@ -44,26 +44,22 @@ namespace Quicker.Database
             switch (tableName)
             {
                 case "Global":
-                    actionPageIconPath = "none";
-                    actionPageTag = "_global";
+                    actionPageIconPath = "none"; // 设置全局动作页图标路径
+                    actionPageTag = "_global"; // 设置全局动作页标签
                     break;
                 case "Common":
-                    actionPageIconPath = "none";
-                    actionPageTag = "common";
+                    actionPageIconPath = "none"; // 设置常用动作页图标路径
+                    actionPageTag = "common"; // 设置常用动作页标签
                     break;
                 case "Desktop":
-                    actionPageIconPath = "none";
-                    actionPageTag = "desktop";
+                    actionPageIconPath = "none"; // 设置桌面动作页图标路径
+                    actionPageTag = "desktop"; // 设置桌面动作页标签
                     break;
                 case "Taskbar":
-                    actionPageIconPath = "none";
-                    actionPageTag = "taskbar";
+                    actionPageIconPath = "none"; // 设置任务栏动作页图标路径
+                    actionPageTag = "taskbar"; // 设置任务栏动作页标签
                     break;
                 default:
-                    if(string.IsNullOrEmpty(actionPageIconPath))
-                        actionPageIconPath = "none";
-                    if(string.IsNullOrEmpty(actionPageTag))
-                        actionPageTag = "none";
                     break;
             }
             UpdateActionPageTable(tableName, tableName, actionPageIconPath, buttonManager.GetTotalAntionPageIndex(tableName), actionPageTag); // 初始化动作页数据表

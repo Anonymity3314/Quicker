@@ -64,7 +64,7 @@ namespace Quicker.UserControls.AddWindow
             } // 如果按钮名称不为空
             AddWindow.TitleTextBox.Text = buttonData.Title; // 设置按钮名称
             LocationTextBox.Text = buttonData.Location; // 设置文件地址
-            if (buttonData.ImagePath != "none")
+            if (!string.IsNullOrEmpty(buttonData.ImagePath))
             {
                 try
                 {
@@ -209,7 +209,7 @@ namespace Quicker.UserControls.AddWindow
             if (WindowStateComboBox.SelectedIndex != -1) windowState = WindowStateComboBox.SelectedIndex; // 获取窗口状态
             AddWindow.iconPath = AddWindow.ButtonImage.Visibility == Visibility.Visible
                 ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source)
-                : "none"; // 如果图标可见，则保存图标，否则设置为默认值
+                : ""; // 如果图标可见，则保存图标，否则设置为默认值
 
             var buttonData = new ButtonData
             {

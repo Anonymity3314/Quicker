@@ -341,7 +341,7 @@ namespace Quicker.Managers
 
                 Grid grid = new(); // 创建Grid对象
                 button.Background = HasActionBrush; // 设置按钮背景
-                if (buttonInformation.ImagePath != "none")
+                if (!string.IsNullOrEmpty(buttonInformation.ImagePath))
                 {
                     try
                     {

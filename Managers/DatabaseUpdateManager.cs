@@ -211,10 +211,11 @@ namespace Quicker.Managers
                 MigrateDatabaseFiles(); // 迁移数据库文件
                 if (ExistButtonDatabase()) // 如果存在按钮数据库
                 {
-                    RenameColumn("Global");
-                    RenameColumn("Common");
-                    if (db2.TableExists("Desktop")) RenameColumn("Desktop");
-                    if (db2.TableExists("Taskbar")) RenameColumn("Taskbar");
+                    var tableName = db2.GetAllTableNames(); // 获取所有表名
+                    foreach (var name in tableName) // 遍历所有表名
+                    {
+                        RenameColumn(name); // 重命名表格中的列名
+                    }
                 } // 重命名表格中的列名
                 transaction.Commit(); // 提交事务
             }
