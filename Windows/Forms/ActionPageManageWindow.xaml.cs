@@ -13,16 +13,6 @@ namespace Quicker.Windows
 {
     public partial class ActionPageManageWindow : Window
     {
-        private IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
-        {
-            if (obj == null) yield break; // 空对象返回空序列
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i); // 获取子元素
-                if (child is T tChild) yield return tChild; // 找到类型为 T 的子元素
-                foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素
-            }
-        } // 查找子元素
         private static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             while (child != null)
@@ -36,6 +26,7 @@ namespace Quicker.Windows
 
         private Dictionary<string, List<string>> buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly ActionPageDatabase db3 = new ActionPageDatabase(); // 动作页数据库
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
@@ -45,12 +36,7 @@ namespace Quicker.Windows
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
-        }
-
-        // 窗口加载事件
-        private async void ActionPageManageWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            TypeChanged("Global"); // 加载全局动作页
+            TypeChanged("Global"); // 默认加载全局动作页
         }
 
         /// <summary>
@@ -71,7 +57,7 @@ namespace Quicker.Windows
             {
                 new { Name = "Global", Text = "全局" },
                 new { Name = "Common", Text = "通用" },
-                new { Name = "TaskBar", Text = "任务栏" },
+                new { Name = "Taskbar", Text = "任务栏" },
                 new { Name = "Desktop", Text = "桌面" }
             };
 
@@ -138,7 +124,6 @@ namespace Quicker.Windows
         private void LoadCanvas(string style)
         {
             MainListView.Items.Clear(); // 清空总列表视图
-            int TotalAntionPageIndex = GetTotalAntionPageIndex(style); // 获取总动作页索引
             switch (style)
             {
                 case "Global":
@@ -167,34 +152,12 @@ namespace Quicker.Windows
                     break;
             }
 
-            for (int i = 0; i <= TotalAntionPageIndex; i++)
+            if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
+            var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 获取动作页数据
+            for (int i = 0; i <= actionPageData.ActionPageCount; i++)
             {
                 GenerateCanvas(i, style); // 生成动作页
             }
-        }
-
-        /// <summary>
-        /// 获取总动作页索引
-        /// </summary>
-        /// <param name="style">动作页样式</param>
-        /// <returns>总动作页索引</returns>
-        private int GetTotalAntionPageIndex(string style)
-        {
-            int actionPageIndex = 0; // 动作页索引
-            if (!db2.TableExists(style)) return 0; // 如果按钮数据字典为空，则返回
-            var buttonData = db2.GetButtonDataByPrefix(style); // 获取按钮数据
-            if (buttonData == null) return 0; // 如果按钮数据为空，则返回
-            foreach (var data in buttonData)
-            {
-                if (data.ButtonID.StartsWith(style))
-                {
-                    Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 正则表达式匹配
-                    string numbersStr = match.Groups[2].Value; // 数字字符串
-                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 将数字字符串转换为整数数组
-                    if (numbers[0] > actionPageIndex) actionPageIndex = numbers[0]; // 更新全局动作页索引
-                }
-            }
-            return actionPageIndex;
         }
 
         /// <summary>
@@ -204,7 +167,6 @@ namespace Quicker.Windows
         /// <param name="style"> 动作页类型</param>
         private void GenerateCanvas(int canvasIndex, string style)
         {
-            if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
             string canvasName = $"{style}{canvasIndex}"; // 画布名称
             Canvas dynamicCanvas = new Canvas // 创建画布
             {
@@ -271,11 +233,8 @@ namespace Quicker.Windows
 
                     dynamicCanvas.Children.Add(button); // 将按钮添加到画布
 
-                    if (db2.TableExists(style))
-                    {
-                        var data = db2.GetButtonDataByID(buttonName); // 获取按钮数据
-                        buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
-                    }
+                    var data = db2.GetButtonDataByID(buttonName); // 获取按钮数据
+                    buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
                 }
             }
             MainListView.Items.Add(dynamicCanvas); // 将画布添加到全局列表视图
@@ -380,22 +339,27 @@ namespace Quicker.Windows
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
             int canvasIndex = MainListView.Items.Count; // 获取画布索引
-            if (canvasIndex > 9) return; // 如果索引大于9，则返回
-            if (canvasIndex == 0)
+            if (canvasIndex > 9) // 如果画布索引大于9
+            {
+                new ToastContentBuilder().AddText("当前动作页数量已达上限。").Show(); // 弹出消息提醒
+            }
+            else if (canvasIndex == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
-                GenerateCanvas(0, type); // 如果画布索引为0，则生成画布
+                db3.CreatAndInitTable(type,"",""); // 创建动作页数据表
+                GenerateCanvas(canvasIndex, type); // 如果画布索引为0，则生成画布
                 if(type != "Global")
                 {
                     MainBorder.Height = 289; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
                     AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
                 }
-                return;
             }
-            Match matchCanvas = Regex.Match(type, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
-            string style = matchCanvas.Groups[1].Value; // 动作页样式
-            GenerateCanvas(canvasIndex, style); // 生成画布
+            else
+            {
+                db3.UpdateActionPageTable(type, type, "", canvasIndex++, ""); // 更新动作页数据表
+                GenerateCanvas(canvasIndex, type); // 生成画布
+            }
         }
 
         // 滚动条滚动事件
@@ -421,7 +385,7 @@ namespace Quicker.Windows
         // 加载任务栏动作页
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            TypeChanged("TaskBar"); // 设置类型为任务栏动作页
+            TypeChanged("Taskbar"); // 设置类型为任务栏动作页
         }
 
         // 加载桌面动作页

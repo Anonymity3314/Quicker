@@ -300,7 +300,7 @@ namespace Quicker.Managers
         /// <param name="tableName"> 表格名 </param>
         public void RenameColumn(string tableName)
         {
-            var connection = db2.OpenConnection(); // 打开数据库连接
+            using var connection = db2.OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
             try
             {
@@ -393,7 +393,7 @@ namespace Quicker.Managers
             try
             {
                 // 创建一个新的数据库连接
-                var connection = db2.OpenConnection();
+                using var connection = db2.OpenConnection();
                 using var transaction = connection.BeginTransaction(); // 开始事务
                 try
                 {

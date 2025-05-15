@@ -30,6 +30,7 @@ namespace Quicker.Windows
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // 取消后台任务的令牌源
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
         private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly ActionPageDatabase db3 = new ActionPageDatabase(); // 动作页面数据库
         private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
@@ -53,10 +54,9 @@ namespace Quicker.Windows
                 if (db2.TableExists(CommonStyle))
                 {
                     var commonButtonData = db2.GetButtonDataByPrefix(CommonStyle); // 从数据库中获取通用样式按钮数据
-                    bool hasCommonButtons = commonButtonData.Any(data => data.ButtonID.StartsWith(CommonStyle)); // 判断是否有通用样式按钮数据
-                    if (hasCommonButtons) GenerateCanvas(0, CommonStyle); // 如果有按钮，生成通用 Canvas
+                    GenerateCanvas(0, CommonStyle); // 如果有按钮，生成通用 Canvas
                 }
-                else if (CommonStyle == "Taskbar" || CommonStyle == "Desktop")
+                else
                 {
                     CommonStyle = "Common"; // 设置样式为通用样式
                     GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
@@ -78,34 +78,13 @@ namespace Quicker.Windows
             SetCommonLabel(); // 设置通用标签
         }
 
-        // 获取总的页面数
-        private int GetTotalAntionPageIndex(string targetStyle)
-        {
-            int TotalAntionPageIndex = 0; // 重置页面索引
-            if (!db2.TableExists(targetStyle)) return TotalAntionPageIndex; // 如果不存在该样式的按钮数据表，返回
-            var buttonData = db2.GetButtonDataByPrefix(targetStyle); // 从数据库中获取按钮数据
-            foreach (var data in buttonData)
-            {
-                string buttonID = data.ButtonID; // 获取按钮ID
-                Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
-                if (match.Success)
-                {
-                    string style = match.Groups[1].Value; // 获取按钮名称
-                    string numbersStr = match.Groups[2].Value; // 获取3个数字
-                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-                    if (style == targetStyle) // 如果是全局按钮
-                        if (numbers[0] > TotalAntionPageIndex) // 如果数字大于当前最大索引
-                            TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
-                }
-            }
-            return TotalAntionPageIndex;
-        }
-
         // 生成页面切换 Button
         private void GenerateButtons()
         {
-            GeneratePageButtons("Global", GetTotalAntionPageIndex("Global"), SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
-            GeneratePageButtons(CommonStyle, GetTotalAntionPageIndex(CommonStyle), SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
+            var globalActionPageData = db3.GetActionPageData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
+            var commonActionPageData = db3.GetActionPageData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
+            GeneratePageButtons("Global", globalActionPageData.ActionPageCount, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
+            GeneratePageButtons(CommonStyle, commonActionPageData.ActionPageCount, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
         }
 
         /// <summary>
@@ -376,6 +355,7 @@ namespace Quicker.Windows
             Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
+                if(!app._appStateManager.Book) this.Visibility = Visibility.Collapsed; // 如果不订住，隐藏窗口
                 var actionManager = new ActionManager(); // 创建 ActionManager 的实例
                 actionManager.DoAction(data); // 执行动作
                 actionManager.Dispose(); // 释放动作管理器资源
@@ -532,10 +512,11 @@ namespace Quicker.Windows
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
             int targetCanvasIndex = isNext ? currentCanvasIndex + 1 : currentCanvasIndex - 1; // 计算目标Canvas编号
-            if ((isNext && targetCanvasIndex > GetTotalAntionPageIndex(style)) || (!isNext && targetCanvasIndex < 0)) // 如果目标Canvas编号超出范围
+            var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 从数据库中获取动作页数据
+            if ((isNext && targetCanvasIndex > actionPageData.ActionPageCount || (!isNext && targetCanvasIndex < 0))) // 如果目标Canvas编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
-                    targetCanvasIndex = isNext ? 0 : GetTotalAntionPageIndex(style); // 循环到第一页或最后一页
+                    targetCanvasIndex = isNext ? 0 : actionPageData.ActionPageCount; // 循环到第一页或最后一页
                 else return; // 如果不循环翻页，直接返回
             }
 
@@ -563,47 +544,6 @@ namespace Quicker.Windows
         /// <param name="canvasIndex"> 要生成的页面索引 </param>
         /// <param name="style"> Canvas 类型 </param>
         private void GenerateCanvas(int canvasIndex, string style)
-        {
-            string canvasName = $"{style}{canvasIndex}"; // Canvas名称
-            bool haveButton = CheckActionPageHasButton(canvasIndex, style); // 检查页面是否有按钮
-            if (haveButton) GenerateButtons(new Canvas(), canvasIndex, style); // 如果动作页有按钮，生成按钮
-        }
-
-        /// <summary>
-        /// 检查页面是否有按钮
-        /// </summary>
-        /// <param name="canvasIndex"> 要检查的页面索引 </param>
-        /// <param name="style"> Canvas 类型 </param>
-        /// <returns> 页面是否有按钮 </returns>
-        private bool CheckActionPageHasButton(int canvasIndex, string style)
-        {
-            if (canvasIndex == 0) return true;
-            string pattern = $@"^{style}{canvasIndex}(\d)(\d)(\d)$"; // 正则表达式模式
-            Regex regex = new Regex(pattern); // 创建正则表达式对象
-            var buttonData = db2.GetButtonDataByPrefix(style); // 从数据库中获取按钮数据
-            foreach (var data in buttonData) // 遍历按钮数据字典
-            {
-                string buttonID = data.ButtonID; // 获取按钮ID
-                Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
-                if (match.Success)
-                {
-                    string numbersStr = match.Groups[2].Value; // 获取3个数字
-                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-
-                    int b = numbers[0]; // 提取 b 值
-                    if (b >= canvasIndex) return true; // 如果 b 值大于等于当前页面索引，则表示该页面有按钮
-                }
-            }
-            return false; // 如果没有找到符合条件的按钮，返回 false
-        }
-
-        /// <summary>
-        /// 生成按钮
-        /// </summary>
-        /// <param name="canvas"> Canvas 对象 </param>
-        /// <param name="canvasIndex"> Canvas 索引 </param>
-        /// <param name="style"> Canvas 类型 </param>
-        private void GenerateButtons(Canvas canvas, int canvasIndex, string style)
         {
             string canvasName = $"{style}{canvasIndex}"; // Canvas名称
             Canvas newCanvas = new Canvas { Name = canvasName }; // 创建Canvas对象

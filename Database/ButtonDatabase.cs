@@ -58,6 +58,23 @@ namespace Quicker.Database
         }
 
         /// <summary>
+        /// 获取数据库中所有表名
+        /// </summary>
+        /// <returns> 表名列表 </returns>
+        public List<string> GetAllTableNames()
+        {
+            var tableNames = new List<string>();
+            using var connection = OpenConnection();
+            using var command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table';", connection);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                tableNames.Add(reader.GetString(0));
+            }
+            return tableNames;
+        }
+
+        /// <summary>
         /// 添加新动作到对应表中
         /// </summary>
         /// <param name="buttonData">要添加的动作数据</param>

@@ -11,8 +11,6 @@
     Title="场景与动作管理"
     Height="850"
     Width="1200"
-    
-    Loaded="ActionPageManageWindow_Loaded"
 >
     <Window.Resources>
         <Style x:Key="ActionPageButton" TargetType="Button">

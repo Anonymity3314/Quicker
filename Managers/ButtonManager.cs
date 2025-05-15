@@ -8,6 +8,7 @@ using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Quicker.Managers
 {
@@ -562,6 +563,33 @@ namespace Quicker.Managers
             if (location.StartsWith("\"") && location.EndsWith("\"")) // 如果文本含有“”符号，则去掉
                 return location = location.Substring(1, location.Length - 2);
             return location; // 返回处理后的地址文本内容
+        }
+
+        /// <summary>
+        /// 获取总的页面数
+        /// </summary>
+        /// <param name="targetStyle"> 目标样式名称 </param>
+        /// <returns> 总页面数 </returns>
+        public int GetTotalAntionPageIndex(string targetStyle)
+        {
+            int TotalAntionPageIndex = 0; // 重置页面索引
+            if (!db2.TableExists(targetStyle)) return TotalAntionPageIndex; // 如果不存在该样式的按钮数据表，返回
+            var buttonData = db2.GetButtonDataByPrefix(targetStyle); // 从数据库中获取按钮数据
+            foreach (var data in buttonData)
+            {
+                string buttonID = data.ButtonID; // 获取按钮ID
+                Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
+                if (match.Success)
+                {
+                    string style = match.Groups[1].Value; // 获取按钮名称
+                    string numbersStr = match.Groups[2].Value; // 获取3个数字
+                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
+                    if (style == targetStyle) // 如果是全局按钮
+                        if (numbers[0] > TotalAntionPageIndex) // 如果数字大于当前最大索引
+                            TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
+                }
+            }
+            return TotalAntionPageIndex;
         }
 
         // 手动释放资源

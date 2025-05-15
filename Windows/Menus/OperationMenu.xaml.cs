@@ -48,16 +48,16 @@ namespace Quicker.Windows
         // 编辑动作信息
         private void EditeInformation_Click(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = new AddWindow(CurrentButton, 0);
-            addWindow.Show();
-            buttonManager.CloseMainWindow(this);
+            AddWindow addWindow = new AddWindow(CurrentButton, 0); // 创建添加动作窗口
+            addWindow.Show(); // 显示添加动作窗口
+            buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
 
         // 删除动作
         private async void DeleteAction_Click(object sender, RoutedEventArgs e)
         {
-            db2.DeleteAction(CurrentButton);
-            buttonManager.CloseMainWindow(this);
+            db2.DeleteAction(CurrentButton); // 删除动作
+            buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
 
         // 查看动作信息
