@@ -6,13 +6,11 @@ using Windows.Management.Deployment;
 using System.Collections.Concurrent;
 using System.Windows.Media.Imaging;
 using System.Security.Cryptography;
-using Windows.ApplicationModel;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Data;
-using System.Diagnostics;
 using Quicker.Database;
 using System.Xml.Linq;
 using Microsoft.Win32;
@@ -133,7 +131,7 @@ namespace Quicker.Windows
         // 加载应用
         private void LoadApplications()
         {
-            iconCache.Clear();
+            iconCache.Clear(); // 清空图标缓存
             _allApplications.Clear(); // 清空原始数据源
             LoadingWindow loadingWindow = new(); // 显示加载窗口
             loadingWindow.Show(); // 显示加载窗口
@@ -142,12 +140,12 @@ namespace Quicker.Windows
             //LoadFromCommonPaths(); // 从常见路径加载应用
             //LoadUWPApps(); // 从UWP应用商店加载应用
 
-            loadingWindow.Close(); // 关闭加载窗口
             Application.Current.Dispatcher.Invoke(() =>
             {
                 _applicationView.Refresh();
             }); // 刷新视图
             InitializeScrollBar(); // 初始化滚动条
+            loadingWindow?.Close(); // 关闭加载窗口
         }
 
         // 初始化滚动条
@@ -166,7 +164,11 @@ namespace Quicker.Windows
             HorizontalScrollBar.Value = scrollViewer.HorizontalOffset; // 设置当前值
         }
 
-        // 获取ScrollViewer
+        /// <summary>
+        /// 获取Visual的ScrollViewer
+        /// </summary>
+        /// <param name="visual"> 要查找的Visual </param>
+        /// <returns> ScrollViewer</returns>
         private ScrollViewer GetScrollViewer(Visual visual)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(visual); i++)
@@ -210,7 +212,7 @@ namespace Quicker.Windows
                                             if (File.Exists(path))
                                             {
                                                 string appName = Path.GetFileNameWithoutExtension(path); // 获取文件名（去掉扩展名）
-                                                _allApplications.Add(new AppInfo { Name = appName, Location = path, Icon = await GetIconAsync(path) }); // 添加到应用列表
+                                                _allApplications.Add(new AppInfo { Name = appName, Location = path, Icon = await GetIconAsync(path), Tag = path }); // 添加到应用列表
                                             }
                                         }
                                     }
@@ -321,7 +323,7 @@ namespace Quicker.Windows
                     return; // 跳过无效的文件
                 }
 
-                _allApplications.Add(new AppInfo { Name = appName, Location = location, Icon = icon }); // 添加到应用列表
+                _allApplications.Add(new AppInfo { Name = appName, Location = location, Icon = icon, Tag = location }); // 添加到应用列表
             }
             catch { } // 忽略异常
         }
@@ -332,26 +334,26 @@ namespace Quicker.Windows
             // 检查缓存
             if (linkTargetCache.TryGetValue(linkFilePath, out var targetPath))
             {
-                return targetPath;
+                return targetPath; // 如果缓存中有目标路径，直接返回
             }
 
             try
             {
-                IShellLink shellLink = (IShellLink)new ShellLink();
-                shellLink.SetPath(linkFilePath);
+                IShellLink shellLink = (IShellLink)new ShellLink(); // 创建ShellLink实例
+                shellLink.SetPath(linkFilePath); // 设置快捷方式路径
 
-                StringBuilder path = new StringBuilder(260);
-                int flags = 0;
-                shellLink.GetPath(path, path.Capacity, out flags, SLR_NO_UI);
-                targetPath = path.ToString();
+                StringBuilder path = new StringBuilder(260); // 目标路径缓冲区
+                int flags = 0; // 解析标志
+                shellLink.GetPath(path, path.Capacity, out flags, SLR_NO_UI); // 获取目标路径
+                targetPath = path.ToString(); // 获取目标路径
 
                 // 缓存解析结果
-                linkTargetCache[linkFilePath] = targetPath;
-                return targetPath;
+                linkTargetCache[linkFilePath] = targetPath; // 添加到缓存
+                return targetPath; // 返回目标路径
             }
             catch
             {
-                return null;
+                return null; // 解析失败返回空
             }
         }
 
@@ -649,7 +651,8 @@ namespace Quicker.Windows
                         {
                             Name = displayName,
                             Location = packageFamilyName,
-                            Icon = icon
+                            Icon = icon,
+                            Tag = "[Windows 商店应用]" // 保存包ID
                         }); // 添加到应用列表
                     }
                     catch { } // 忽略单个包的错误
@@ -659,10 +662,10 @@ namespace Quicker.Windows
         }
 
         /// <summary>
-        /// 
+        /// 获取 UWP 应用的图标
         /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <returns></returns>
+        /// <param name="packageFamilyName"> 包名 </param>
+        /// <returns> 图标 </returns>
         private ImageSource ExtractUWPAppIcon(string packageFamilyName)
         {
             try
@@ -670,63 +673,63 @@ namespace Quicker.Windows
                 // 获取 UWP 应用的安装目录路径
                 string installPath = GetUWPAppInstallPath(packageFamilyName);
                 if (string.IsNullOrEmpty(installPath))
-                {
                     return null;
-                }
 
                 // 从 AppxManifest.xml 文件中提取图标路径
                 string manifestPath = Path.Combine(installPath, "AppxManifest.xml");
                 if (!File.Exists(manifestPath))
-                {
                     return null;
-                }
 
                 XDocument doc = XDocument.Load(manifestPath);
                 XNamespace ns = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
                 var visualElements = doc.Descendants(ns + "VisualElements").FirstOrDefault();
                 if (visualElements == null)
-                {
                     return null;
-                }
 
                 string iconPath = visualElements.Attribute("Square150x150Logo")?.Value
                                ?? visualElements.Attribute("Square44x44Logo")?.Value
-                               ?? visualElements.Attribute("Logo")?.Value;
+                               ?? visualElements.Attribute("Logo")?.Value; // 优先使用 150x150 图标，其次使用 44x44 图标，最后使用 Logo 图标
+
                 if (string.IsNullOrEmpty(iconPath))
-                {
-                    return null;
-                }
+                    return null; // 图标路径为空
 
                 // 构建完整的图标文件路径
-                iconPath = iconPath.Replace('/', '\\');
-                string fullIconPath = Path.Combine(installPath, iconPath);
-
-                // 加载图标
-                return LoadIconFromPath(fullIconPath);
+                iconPath = iconPath.Replace('/', '\\'); // 统一使用反斜杠作为路径分隔符
+                string fullIconPath = Path.Combine(installPath, iconPath); // 构建完整的图标文件路径
+                return LoadIconFromPath(fullIconPath);// 加载图标
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine("Error extracting UWP app icon: " + ex.Message);
-                return null;
+                return null; // 忽略图标加载错误
             }
         }
 
         /// <summary>
-        /// 
+        /// 获取 UWP 应用的安装目录路径
         /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <returns></returns>
+        /// <param name="packageFamilyName"> 包名 </param>
+        /// <returns> 安装目录路径 </returns>
         private string GetUWPAppInstallPath(string packageFamilyName)
         {
-            var package = new PackageManager().FindPackageForUser("", packageFamilyName);
-            return package?.InstalledLocation.Path;
+            try
+            {
+                var packageManager = new PackageManager(); // 创建包管理器实例
+                var package = packageManager.FindPackageForUser("", packageFamilyName); // 获取包信息
+                if (package == null)
+                    return null; // 包不存在
+                return package.InstalledLocation.Path; // 获取包的安装目录路径
+            }
+            catch
+            {
+                return null; // 包不存在或其他错误
+            }
         }
 
         /// <summary>
-        /// 
+        /// 从文件路径加载图标
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
+        /// <param name="filePath"> 文件路径 </param>
+        /// <returns> 图标 </returns>
         private ImageSource LoadIconFromPath(string filePath)
         {
             try
@@ -777,5 +780,6 @@ namespace Quicker.Windows
         public string Name { get; set; } // 应用名称
         public string Location { get; set; } // 应用路径
         public ImageSource Icon { get; set; } // 应用图标
+        public string Tag { get; set; } // 自定义数据
     }
 }

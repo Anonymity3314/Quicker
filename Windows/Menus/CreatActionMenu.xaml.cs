@@ -25,6 +25,7 @@ namespace Quicker.Windows
         // 启动软件
         private void StartApp(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, 1); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
@@ -33,6 +34,7 @@ namespace Quicker.Windows
         // 打开文件
         private void OpenDocument(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, 2); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
@@ -41,6 +43,7 @@ namespace Quicker.Windows
         // 打开文件夹
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, 3); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
@@ -49,6 +52,7 @@ namespace Quicker.Windows
         // 打开网址
         private void OpenWebsite(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, 4); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口

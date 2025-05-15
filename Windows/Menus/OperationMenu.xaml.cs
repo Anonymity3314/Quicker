@@ -48,6 +48,7 @@ namespace Quicker.Windows
         // 编辑动作信息
         private void EditeInformation_Click(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new AddWindow(CurrentButton, 0); // 创建添加动作窗口
             addWindow.Show(); // 显示添加动作窗口
             buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
@@ -56,6 +57,7 @@ namespace Quicker.Windows
         // 删除动作
         private async void DeleteAction_Click(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             db2.DeleteAction(CurrentButton); // 删除动作
             buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
@@ -73,6 +75,7 @@ namespace Quicker.Windows
         // 在资源管理器中打开文件或文件夹
         private void OpenLocation_Click(object sender, RoutedEventArgs e)
         {
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
             List<string> paths = new List<string>(); // 文件或文件夹路径列表
 

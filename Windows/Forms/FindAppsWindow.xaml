@@ -69,7 +69,7 @@
                         <GridViewColumn Width="350" HeaderContainerStyle="{StaticResource LeftAlignedHeader}" Header="地址">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Location, IsAsync=True}" ToolTip="右键项目复制所在文件夹地址"/>
+                                    <TextBlock Text="{Binding Tag, IsAsync=True}" ToolTip="右键项目复制所在文件夹地址"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
