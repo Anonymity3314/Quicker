@@ -34,13 +34,16 @@ namespace Quicker.Windows
             IDLabel.Content = buttonData.ButtonID; // 初始化动作ID
             TitleLabel.Content = buttonData.Title; // 初始化动作名称
             UsageLabel.Content = buttonData.Description; // 初始化动作用途
-            try
+            if(!string.IsNullOrEmpty(buttonData.ImagePath))
             {
-                Image.Source = new BitmapImage(new Uri(buttonData.ImagePath)); // 初始化动作图像
-            }
-            catch
-            {
-                new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除").Show(); // 显示图标加载失败的通知
+                try
+                {
+                    Image.Source = new BitmapImage(new Uri(buttonData.ImagePath)); // 初始化动作图像
+                }
+                catch
+                {
+                    new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除").Show(); // 显示图标加载失败的通知
+                }
             }
             CreatTimeLabel.Content = buttonData.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化创建时间
             LatestEditTimeLabel.Content = buttonData.LatestEditTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化最后编辑时间

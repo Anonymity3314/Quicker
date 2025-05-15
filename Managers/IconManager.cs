@@ -212,7 +212,11 @@ namespace Quicker.Managers
             }
         }
 
-        // 判断获取的网站图片是否为空图片
+        /// <summary>
+        /// 判断获取的网站图片是否为空图片
+        /// </summary>
+        /// <param name="bitmapImage"> 网站图标 </param>
+        /// <returns> 是否为空图片 </returns>
         private bool IsImageEmpty(BitmapImage bitmapImage)
         {
             try

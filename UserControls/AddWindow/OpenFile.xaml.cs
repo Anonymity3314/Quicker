@@ -55,7 +55,15 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
-            if (buttonData.ActionType != "OpenFile" && buttonData.ActionType != "OpenFiles") return; // 如果不是打开文件动作，则退出
+            switch(buttonData.ActionType)
+            {
+                case "OpenFile":
+                case "OpenFiles":
+                case "OpenUwpApp":
+                    break; // 加载打开文件动作信息
+                default:
+                    return; // 其他动作类型不加载
+            }
 
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
@@ -100,6 +108,7 @@ namespace Quicker.UserControls.AddWindow
         // 处理选中的应用
         private void OnApplicationSelected(object sender, FindAppsWindow.ApplicationSelectedEventArgs e)
         {
+            findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
             AppInfo selectedApp = e.SelectedApp; // 获取选中的应用信息
             if (selectedApp != null)
             {
@@ -107,10 +116,11 @@ namespace Quicker.UserControls.AddWindow
                 AddWindow.TitleTextBox.Text = selectedApp.Name; // 设置标题
                 LocationTextBox.Text = selectedApp.Location; // 设置地址
 
-                // 设置图标
-                AddWindow.ButtonImage.Source = selectedApp.Icon; // 设置图标
-                AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
+                if(selectedApp.Icon!= null)
+                {
+                    AddWindow.ButtonImage.Source = selectedApp.Icon; // 设置图标
+                    AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
+                }
             }
         }
 
@@ -211,6 +221,19 @@ namespace Quicker.UserControls.AddWindow
                 ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source)
                 : ""; // 如果图标可见，则保存图标，否则设置为默认值
 
+            string actionType = "OpenFile"; // 默认动作类型
+            if(LocationTextBox.Text.Contains(";"))
+            {
+                actionType = "OpenFiles"; // 如果地址栏包含分号，则设置为打开多个文件动作
+            }
+            else
+            {
+                string pattern = @"^[A-Za-z]:\\(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]*$"; // 正则表达式，用于检查地址是否为有效路径
+                bool isValidPath = Regex.IsMatch(LocationTextBox.Text, pattern); // 检查地址是否为有效路径
+                if (!isValidPath)
+                    actionType = "OpenUwpApp"; // 如果地址栏不是有效路径，则设置为打开 UWP 应用
+            }
+
             var buttonData = new ButtonData
             {
                 ButtonID = AddWindow.CurrentButton,
@@ -223,7 +246,7 @@ namespace Quicker.UserControls.AddWindow
                 Description = AddWindow.DescriptionTextBox.Text,
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
-                ActionType = LocationTextBox.Text.Contains(";") ? "OpenFiles" : "OpenFile"
+                ActionType = actionType
             }; // 创建按钮数据对象
             (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
         }

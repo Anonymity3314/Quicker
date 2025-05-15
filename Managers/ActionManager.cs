@@ -28,6 +28,9 @@ namespace Quicker.Managers
                 case "OpenFiles":
                     OpenFiles(data); // 打开多个文件
                     break; // 打开多个文件
+                case "OpenUwpApp":
+                    OpenUwpApp(data); // 打开UWP应用
+                    break; // 打开UWP应用
             }
         }
 
@@ -320,6 +323,27 @@ namespace Quicker.Managers
         private static void ShowErrorToast(string message)
         {
             new ToastContentBuilder().AddText(message).Show();
+        }
+
+        /// <summary>
+        /// 打开UWP应用
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        private void OpenUwpApp(ButtonData data)
+        {
+            try
+            {
+                string appProtocol = $"microsoft-{data.Location}://"; // UWP应用的协议
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = appProtocol,
+                    UseShellExecute = true
+                }); // 启动UWP应用
+            }
+            catch (Exception ex)
+            {
+                ShowErrorToast($"打开UWP应用失败：{ex.Message}"); // 显示错误提示
+            }
         }
 
         // 手动释放资源

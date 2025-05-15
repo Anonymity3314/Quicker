@@ -614,6 +614,7 @@ namespace Quicker.Windows
         }
 
         // 加载应用商店应用
+        // 加载应用商店应用
         public void LoadUWPApps()
         {
             try
@@ -626,22 +627,22 @@ namespace Quicker.Windows
                     {
                         if (package.IsFramework || package.IsResourcePackage || package.IsBundle)
                         {
-                            continue;// 跳过框架包、资源包和系统组件
-                        } // 跳过框架包、资源包和系统组件
+                            continue; // 跳过框架包、资源包和系统组件
+                        }
                         if (string.IsNullOrWhiteSpace(package.DisplayName) ||
                             package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             continue; // 跳过没有显示名称或显示名称是包ID的应用
-                        } // 跳过没有显示名称或显示名称是包ID的应用
+                        }
                         if (package.IsDevelopmentMode)
                         {
                             continue; // 跳过开发模式安装的应用
-                        } // 跳过开发模式安装的应用
+                        }
                         if (package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
                             package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase))
                         {
                             continue; // 跳过Microsoft系统应用
-                        } // 跳过Microsoft系统应用
+                        }
 
                         // 获取显示名称
                         var displayName = package.DisplayName;
@@ -650,7 +651,7 @@ namespace Quicker.Windows
                         _allApplications.Add(new AppInfo
                         {
                             Name = displayName,
-                            Location = packageFamilyName,
+                            Location = package.Id.Name, // 使用包名
                             Icon = icon,
                             Tag = "[Windows 商店应用]" // 保存包ID
                         }); // 添加到应用列表
