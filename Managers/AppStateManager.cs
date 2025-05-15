@@ -7,7 +7,7 @@ using System;
 
 namespace Quicker
 {
-    public class AppStateManager
+    public class AppStateManager : IDisposable
     {
         public SettingDatabase Db { get; set; } = new SettingDatabase(); // 数据库操作对象
         public WindowManager WindowManager { get; set; } = new WindowManager(); // 窗口管理器
@@ -16,7 +16,7 @@ namespace Quicker
         public OpenMainWindow OpenMainWindowConditions { get; set; } = new OpenMainWindow(); // 缓存 OpenMainWindowConditions
 
         // 窗口状态
-        public bool Locked { get; set; } = false;// 是否锁定通用动作页
+        public bool Locked { get; set; } = false; // 是否锁定通用动作页
         public bool Pause { get; set; } = false; // 是否暂停Quicker
         public bool Book { get; set; } = false; // 是否订住主面板
 
@@ -40,6 +40,8 @@ namespace Quicker
         public float Left { get; set; } = 0; // 窗口与屏幕左边距离
         public float Top { get; set; } = 0; // 窗口与屏幕上边距离
 
+        private bool disposed = false; // 标记是否已释放资源
+
         public AppStateManager()
         {
             LoadSettings(); // 加载基础设置
@@ -52,6 +54,56 @@ namespace Quicker
             Conventions = conventions[0]; // 只有一条记录
             var conditionsList = Db.GetAllOpenMainWindowConditions(); // 获取所有 OpenMainWindowConditions
             OpenMainWindowConditions = conditionsList[0]; // 只有一条记录
+        }
+
+        // 实现IDisposable接口，用于自动释放资源
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // 保护方法，用于释放资源
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    if (PressTimer != null)
+                    {
+                        PressTimer.Stop();
+                        PressTimer = null;
+                    }
+                    if (Timer != null)
+                    {
+                        Timer.Stop();
+                        Timer = null;
+                    }
+                    if (PreLoadMainWindow != null)
+                    {
+                        PreLoadMainWindow.Close();
+                        PreLoadMainWindow = null;
+                    }
+                    if (WindowManager != null)
+                    {
+                        WindowManager.Dispose();
+                        WindowManager = null;
+                    }
+                    if (Db != null)
+                    {
+                        Db = null;
+                    }
+                }
+                disposed = true;
+            }
+        }
+
+        // 析构函数，用于释放非托管资源
+        ~AppStateManager()
+        {
+            Dispose(false);
         }
     }
 }

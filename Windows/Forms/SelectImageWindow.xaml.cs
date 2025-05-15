@@ -192,16 +192,19 @@ namespace Quicker.Windows
             }; // 创建文件选择对话框
             if (openFileDialog.ShowDialog() == true)
             {
-                if (openFileDialog.FileNames.Length == 0) return; // 如果没有选择文件，返回
-                SelectedImagePath = openFileDialog.FileName; // 设置选中的图片路径
-                AddIcon(sender, e); // 触发图片确认事件
+                if (openFileDialog.FileNames.Length != 0)
+                {
+                    SelectedImagePath = openFileDialog.FileName; // 设置选中的图片路径
+                    AddIcon(sender, e); // 触发图片确认事件
+                }
             }
         }
 
         // 按下键盘事件
         private void SelectImageWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.S) AddIcon(sender, e); // 按下 S 键添加图标
+            if (e.Key == System.Windows.Input.Key.S)
+                AddIcon(sender, e); // 按下 S 键添加图标
         }
 
         // 添加图标

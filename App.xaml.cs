@@ -448,10 +448,9 @@ namespace Quicker
             Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
             _appStateManager.Db.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
 
-            _appStateManager.Timer?.Stop(); // 停止定时器
+            _appStateManager.Dispose(); // 释放数据库资源
             hook?.Dispose(); // 释放钩子
             taskbarIcon?.Dispose(); // 释放托盘图标
-            _appStateManager.PreLoadMainWindow?.Close(); // 关闭主窗口
 
             SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
 

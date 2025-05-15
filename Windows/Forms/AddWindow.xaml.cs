@@ -16,6 +16,7 @@ namespace Quicker
     public partial class AddWindow : Window
     {
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
+        private readonly IconManager iconManager = new IconManager(); // 图标管理器
         private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
         private SelectImageWindow selectImageWindow; // SelectImageWindow 的实例引用
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
@@ -283,11 +284,11 @@ namespace Quicker
         }
 
         // 处理选择的图片
-        private void OnImageConfirmed(object sender, string e)
+        private void OnImageConfirmed(object sender, string selectedImagePath)
         {           
-            if (!string.IsNullOrEmpty(e))
+            if (!string.IsNullOrEmpty(selectedImagePath))
             {
-                ButtonImage.Source = new BitmapImage(new Uri(e)); // 设置图标
+                ButtonImage.Source = iconManager.ProcessIcon(selectedImagePath); // 设置图标
                 ButtonImage.Visibility = Visibility.Visible; // 显示图标
             }
         }

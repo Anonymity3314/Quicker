@@ -76,13 +76,13 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 是否用管理员身份运行
-            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 是否尝试打开已有窗口
-            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 窗口状态
-            command.Parameters.AddWithValue("@Description", buttonData.Description); // 用途
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 动作数据1
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 动作数据2
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 动作数据3
+            command.Parameters.AddWithValue("@Description", buttonData.Description); // 对动作的描述
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
-            command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 类型
+            command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
             command.ExecuteNonQuery(); // 执行插入语句
             transaction.Commit(); // 提交事务
         }
@@ -107,13 +107,13 @@ namespace Quicker.Database
                     Title = reader.GetString(1), // 动作名称
                     Location = reader.GetString(2), // 位置
                     ImagePath = reader.GetString(3), // 图片路径
-                    Data1 = reader.GetString(4), // 是否用管理员身份运行
-                    Data2 = reader.GetString(5), // 是否尝试打开已有窗口
-                    Data3 = reader.GetString(6), // 窗口状态
-                    Description = reader.GetString(7), // 用途
+                    Data1 = reader.IsDBNull(4) ? null : reader.GetString(4), // 动作数据1
+                    Data2 = reader.IsDBNull(5) ? null : reader.GetString(5), // 动作数据2
+                    Data3 = reader.IsDBNull(6) ? null : reader.GetString(6), // 动作数据3
+                    Description = reader.GetString(7), // 对动作的描述
                     CreateTime = reader.GetDateTime(8), // 创建时间
                     LatestEditTime = reader.GetDateTime(9), // 最近修改时间
-                    ActionType = reader.IsDBNull(10) ? null : reader.GetString(10) // 类型
+                    ActionType = reader.IsDBNull(10) ? null : reader.GetString(10) // 动作类型
                 };
             }
             return null; // 没有找到数据
@@ -137,19 +137,21 @@ namespace Quicker.Database
                 Data3 = @Data3, 
                 Description = @Description, 
                 CreateTime = @CreateTime, 
-                LatestEditTime = @LatestEditTime 
+                LatestEditTime = @LatestEditTime, 
+                ActionType = @ActionType 
             WHERE ButtonID = @ButtonID"; // 更新指定表中的数据
             using var command = new SQLiteCommand(query, connection); // 创建命令对象
             command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 是否用管理员身份运行
-            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 是否尝试打开已有窗口
-            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 窗口状态
-            command.Parameters.AddWithValue("@Description", buttonData.Description); // 用途
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 动作数据1
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 动作数据2
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 动作数据3
+            command.Parameters.AddWithValue("@Description", buttonData.Description); // 对动作的描述
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
+            command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
             command.ExecuteNonQuery(); // 执行更新语句
             transaction.Commit(); // 提交事务
         }
@@ -169,17 +171,17 @@ namespace Quicker.Database
             {
                 buttonDataList.Add(new ButtonData
                 {
-                    ButtonID = reader.GetString(0),
-                    Title = reader.GetString(1),
-                    Location = reader.GetString(2),
-                    ImagePath = reader.GetString(3),
-                    Data1 = reader.GetString(4),
-                    Data2 = reader.GetString(5),
-                    Data3 = reader.GetString(6),
-                    Description = reader.GetString(7),
-                    CreateTime = reader.GetDateTime(8),
-                    LatestEditTime = reader.GetDateTime(9),
-                    ActionType = reader.GetString(10)
+                    ButtonID = reader.GetString(0), // 动作ID
+                    Title = reader.GetString(1), // 动作名称
+                    Location = reader.GetString(2), // 位置
+                    ImagePath = reader.GetString(3), // 图片路径
+                    Data1 = reader.IsDBNull(4) ? null : reader.GetString(4), // 动作数据1
+                    Data2 = reader.IsDBNull(5) ? null : reader.GetString(5), // 动作数据2
+                    Data3 = reader.IsDBNull(6) ? null : reader.GetString(6), // 动作数据3
+                    Description = reader.GetString(7), // 对动作的描述
+                    CreateTime = reader.GetDateTime(8), // 创建时间
+                    LatestEditTime = reader.GetDateTime(9), // 最近修改时间
+                    ActionType = reader.GetString(10) // 动作类型
                 });
             }
             return buttonDataList; // 返回ButtonData列表
@@ -246,9 +248,9 @@ namespace Quicker.Database
         private void UpdateButtonID(SQLiteConnection connection, string tableName, string oldButtonID, string newButtonID)
         {
             using var command = new SQLiteCommand($@"UPDATE {tableName} SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
-            command.Parameters.AddWithValue("@NewButtonID", newButtonID);
-            command.Parameters.AddWithValue("@OldButtonID", oldButtonID);
-            command.ExecuteNonQuery();
+            command.Parameters.AddWithValue("@NewButtonID", newButtonID); // 绑定参数
+            command.Parameters.AddWithValue("@OldButtonID", oldButtonID); // 绑定参数
+            command.ExecuteNonQuery(); // 执行更新语句
         }
 
         /// <summary>
@@ -272,20 +274,20 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 是否用管理员身份运行
-            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 是否尝试打开已有窗口
-            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 窗口状态
-            command.Parameters.AddWithValue("@Description", buttonData.Description); // 用途
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 动作数据1
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 动作数据2
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 动作数据3
+            command.Parameters.AddWithValue("@Description", buttonData.Description); // 对动作的描述
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
-            command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 类型
+            command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
             command.ExecuteNonQuery(); // 执行插入语句
             transaction.Commit(); // 提交事务
 
             // 从源表删除数据
-            using var deleteCommand = new SQLiteCommand($@"DELETE FROM {sourceTable} WHERE ButtonID = @ButtonID", connection);
-            deleteCommand.Parameters.AddWithValue("@ButtonID", buttonID);
-            deleteCommand.ExecuteNonQuery();
+            using var deleteCommand = new SQLiteCommand($@"DELETE FROM {sourceTable} WHERE ButtonID = @ButtonID", connection); // 创建命令
+            deleteCommand.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
+            deleteCommand.ExecuteNonQuery(); // 执行删除语句
         }
 
         /// <summary>
@@ -382,9 +384,9 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name = @TableName;",connection);
-            command.Parameters.AddWithValue("@TableName", tableName);
-            using var reader = command.ExecuteReader();
-            return reader.Read();
+            command.Parameters.AddWithValue("@TableName", tableName); // 绑定参数
+            using var reader = command.ExecuteReader(); // 执行查询语句
+            return reader.Read(); // 返回是否存在
         }
 
         /// <summary>
@@ -406,12 +408,12 @@ namespace Quicker.Database
         public string Title { get; set; } // 动作名称
         public string Location { get; set; } // 位置
         public string ImagePath { get; set; } // 图片路径
-        public string Data1 { get; set; } // 替代 RunByMessager
-        public string Data2 { get; set; } // 替代 TryToOpenExitingWindow
-        public string Data3 { get; set; } // 替代 WindowState
+        public string Data1 { get; set; } // 动作数据1
+        public string Data2 { get; set; } // 动作数据2
+        public string Data3 { get; set; } // 动作数据3
         public string Description { get; set; } // 对动作的描述
         public DateTime CreateTime { get; set; } // 创建时间
         public DateTime LatestEditTime { get; set; } // 最近修改时间
-        public string ActionType { get; set; } // 类型
+        public string ActionType { get; set; } // 动作类型
     }
 }
