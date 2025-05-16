@@ -35,7 +35,7 @@ namespace Quicker.Windows
         private readonly App app = (App.Current as App); // App实例
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
-        private string CommonStyle; // 样式
+        private string CommonStyle = "Common"; // 样式
 
         public MainWindow(string Style)
         {
@@ -43,6 +43,33 @@ namespace Quicker.Windows
             InitializeComponent(); // 初始化窗口组件
             GlobalGrid.Children.Remove(ViewGlobalCanvas); // 从主网格中移除
             CommonGrid.Children.Remove(ViewCommonCanvas); // 从主网格中移除
+        }
+
+        /// <summary>
+        /// 通用类型改变事件
+        /// </summary>
+        /// <param name="style"> 通用类型</param>
+        public void OpenActionPage(ButtonData data)
+        {
+            string[] actionInfo = data.Location.Split(';'); // 获取动作信息
+            string style = actionInfo[0];
+            int index = int.Parse(actionInfo[1]);
+            buttonManager.isClosing = false; // 取消关闭窗口
+            if (style != "Global") CommonStyle = style; // 设置样式
+            int currentCanvasIndex = GetVisibleCanvasIndex(style); // 获取当前可见Canvas索引
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (currentCanvasIndex > index)
+                {
+                    for (int i = currentCanvasIndex; i > index; i--)
+                        SwitchToPreviousCanvas(i, style); // 切换到上一个Canvas
+                }
+                else
+                {
+                    for (int i = currentCanvasIndex; i < index; i++)
+                        SwitchToNextCanvas(i, style); // 切换到下一个Canvas
+                }
+            }); // 在主线程中执行
         }
 
         // 加载数据库和Button
@@ -53,7 +80,6 @@ namespace Quicker.Windows
                 GenerateCanvas(0, "Global"); // 生成全局 Canvas
                 if (db2.TableExists(CommonStyle))
                 {
-                    var commonButtonData = db2.GetButtonDataByPrefix(CommonStyle); // 从数据库中获取通用样式按钮数据
                     GenerateCanvas(0, CommonStyle); // 如果有按钮，生成通用 Canvas
                 }
                 else
@@ -208,11 +234,8 @@ namespace Quicker.Windows
         // 关闭功能面板
         private void CloseMainWindow(object sender, EventArgs e)
         {
-            if (!buttonManager.isClosing)
-            {
-                buttonManager.isClosing = true; // 设置关闭标志
-                this.Close(); // 关闭窗口
-            }
+            buttonManager.isClosing = true; // 设置关闭标志
+            this.Close(); // 关闭窗口
         }
 
         // 失去焦点时关闭功能面板
@@ -356,9 +379,7 @@ namespace Quicker.Windows
             if (button.Tag is ButtonData data)
             {
                 if(!app._appStateManager.Book) this.Visibility = Visibility.Collapsed; // 如果不订住，隐藏窗口
-                var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-                actionManager.DoAction(data); // 执行动作
-                actionManager.Dispose(); // 释放动作管理器资源
+                DoAction(data); // 执行动作
             }
             else
             {
@@ -366,6 +387,34 @@ namespace Quicker.Windows
                 if (Convention.ShowAddImage) // 如果显示添加按钮
                     buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 点击打开菜单
             }
+        }
+
+        /// <summary>
+        /// 执行按钮动作
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        private void DoAction(ButtonData data)
+        {
+            var actionManager = new ActionManager(); // 创建 ActionManager 的实例
+            switch (data.ActionType)
+            {
+                case "OpenFile":
+                    actionManager.OpenFile(data); // 打开文件
+                    break; // 打开文件、文件夹
+                case "OpenWebsite":
+                    actionManager.OpenWebsite(data); // 打开网站
+                    break; // 打开网站
+                case "OpenFiles":
+                    actionManager.OpenFiles(data); // 打开多个文件
+                    break; // 打开多个文件
+                case "OpenUwpApp":
+                    actionManager.OpenUwpApp(data); // 打开UWP应用
+                    break; // 打开UWP应用
+                case "OpenActionPage":
+                    OpenActionPage(data); // 打开动作页
+                    break; // 打开动作页
+            }
+            actionManager.Dispose(); // 释放动作管理器资源
         }
 
         // 右键按钮打开菜单
@@ -449,11 +498,11 @@ namespace Quicker.Windows
         /// 获取当前可见的Canvas编号
         /// </summary>
         /// <param name="Style"></param>
-        /// <returns></returns>
+        /// <returns> 当前可见的Canvas编号 </returns>
         private int GetVisibleCanvasIndex(string Style)
         {
             var canvasCollection = Style == "Global" // 根据是否是全局Canvas选择集合
-                ? buttonManager.FindVisualChildren<Canvas>(MainGrid) // 查找MainGrid下的Canvas集合
+                ? buttonManager.FindVisualChildren<Canvas>(GlobalGrid) // 查找GlobalGrid下的Canvas集合
                 : buttonManager.FindVisualChildren<Canvas>(CommonGrid); // 查找CommonGrid下的Canvas集合
             string canvasPrefix = $"{Style}"; // Canvas前缀
             string pattern = $@"^{Style}(\d+)$"; // 正则表达式模式
@@ -523,19 +572,19 @@ namespace Quicker.Windows
             }
 
             string targetCanvasName = $"{style}{targetCanvasIndex}"; // 生成目标Canvas名称
-            Canvas targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
+            Canvas targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? GlobalGrid : CommonGrid)
                 .FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
 
             if (targetCanvas == null) // 如果目标Canvas不存在
             {
                 GenerateCanvas(targetCanvasIndex, style); // 动态生成Canvas
-                targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
+                targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? GlobalGrid : CommonGrid)
                     .FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
             }
 
             targetCanvas.Visibility = Visibility.Visible; // 设置目标Canvas可见
             string currentCanvasName = $"{style}{currentCanvasIndex}"; // 生成当前Canvas名称
-            Canvas currentCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? MainGrid : CommonGrid)
+            Canvas currentCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? GlobalGrid : CommonGrid)
                 .FirstOrDefault(c => c.Name == currentCanvasName); // 查找当前Canvas
             currentCanvas.Visibility = Visibility.Collapsed; // 隐藏当前Canvas
         }
@@ -545,7 +594,7 @@ namespace Quicker.Windows
         /// </summary>
         /// <param name="canvasIndex"> 要生成的页面索引 </param>
         /// <param name="style"> Canvas 类型 </param>
-        private void GenerateCanvas(int canvasIndex, string style)
+        public void GenerateCanvas(int canvasIndex, string style)
         {
             string canvasName = $"{style}{canvasIndex}"; // Canvas名称
             Canvas newCanvas = new Canvas { Name = canvasName }; // 创建Canvas对象

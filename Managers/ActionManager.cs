@@ -1,7 +1,9 @@
 ﻿using IWshRuntimeLibrary;
 using System.Diagnostics;
+using Quicker.Windows;
 using Quicker.Database;
 using Microsoft.Win32;
+using System.Windows;
 using System.IO;
 
 namespace Quicker.Managers
@@ -12,33 +14,10 @@ namespace Quicker.Managers
         private readonly ToastManager toastManager = new(); // 通知管理器
 
         /// <summary>
-        /// 执行按钮动作
-        /// </summary>
-        /// <param name="data"> 按钮数据 </param>
-        public void DoAction(ButtonData data)
-        {
-            switch (data.ActionType)
-            {
-                case "OpenFile":
-                    OpenFile(data); // 打开文件
-                    break; // 打开文件、文件夹
-                case "OpenWebsite":
-                    OpenWebsite(data); // 打开网站
-                    break; // 打开网站
-                case "OpenFiles":
-                    OpenFiles(data); // 打开多个文件
-                    break; // 打开多个文件
-                case "OpenUwpApp":
-                    OpenUwpApp(data); // 打开UWP应用
-                    break; // 打开UWP应用
-            }
-        }
-
-        /// <summary>
         /// 打开文件
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        private void OpenFile(ButtonData data)
+        public void OpenFile(ButtonData data)
         {
             if (data.Data2 == "true") // 如果尝试打开已存在的窗口
             {
@@ -108,7 +87,7 @@ namespace Quicker.Managers
         /// 用指定方式打开指定网站
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        private void OpenWebsite(ButtonData data)
+        public void OpenWebsite(ButtonData data)
         {
             try
             {
@@ -307,7 +286,7 @@ namespace Quicker.Managers
         /// 打开多个文件
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        private void OpenFiles(ButtonData data)
+        public void OpenFiles(ButtonData data)
         {
             string[] files = data.Location.Split(';'); // 将文本内容按照分号分隔
             foreach (string file in files)
@@ -320,7 +299,7 @@ namespace Quicker.Managers
         /// 打开UWP应用
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        private void OpenUwpApp(ButtonData data)
+        public void OpenUwpApp(ButtonData data)
         {
             try
             {

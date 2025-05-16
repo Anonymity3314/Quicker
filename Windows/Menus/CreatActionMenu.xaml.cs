@@ -70,7 +70,7 @@ namespace Quicker.Windows
             ButtonData buttonData = new()
             {
                 ButtonID = CurrentButton,
-                Title = actionInfo[1],
+                Title = actionInfo[1] + actionInfo[2],
                 Location = actionInfo[1] + ";" + actionInfo[2],
                 ImagePath = "",
                 Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
