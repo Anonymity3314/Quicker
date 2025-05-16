@@ -9,15 +9,17 @@
     
     WindowStartupLocation="CenterScreen"
     Title="编辑动作页信息"
-    Height="450"
-    Width="800"
+    Height="250"
+    Width="400"
+    
+    Loaded="EditActionPageInfoWindow_Loaded"
 >
     <Grid>
-        <Label Content="应用程序：" HorizontalAlignment="Left" Margin="254,134,0,0" VerticalAlignment="Top"/>
-        <TextBlock x:Name="ActionPageTag" HorizontalAlignment="Left" Margin="361,147,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Label Content="动作页名称：" HorizontalAlignment="Left" Margin="254,200,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="ActionPageName" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="361,204,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="SaveButton" Content="保存(S)" Style="{StaticResource BlueButton}" HorizontalAlignment="Left" Margin="274,271,0,0" VerticalAlignment="Top" Width="87" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton" Content="取消" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="400,271,0,0" VerticalAlignment="Top" Width="69" Click="CancelButton_Click"/>
+        <Label Content="应用程序：" HorizontalAlignment="Left" Margin="77,52,0,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="ActionPageTag" HorizontalAlignment="Left" Margin="188,57,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" Width="120"/>
+        <Label Content="动作页名称：" HorizontalAlignment="Left" Margin="77,99,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ActionPageName" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="188,103,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="SaveButton" Content="保存(S)" Style="{StaticResource BlueButton}" HorizontalAlignment="Left" Margin="85,163,0,0" VerticalAlignment="Top" Width="87" Click="SaveButton_Click"/>
+        <Button x:Name="CancelButton" Content="取消" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="231,163,0,0" VerticalAlignment="Top" Width="69" Click="CancelButton_Click"/>
     </Grid>
 </Window>

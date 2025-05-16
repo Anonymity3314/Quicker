@@ -9,6 +9,10 @@ namespace Quicker.Windows.Menus
 {
     public partial class ToastWindow : Window
     {
+        private const string commonColor = "#FF326CF3";
+        private const string errorColor = "#FFFF6700";
+        private const string warningColor = "Red";
+
         private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
         private Queue<Message> messageQueue = new(); // 创建消息队列
 
@@ -103,13 +107,13 @@ namespace Quicker.Windows.Menus
             switch (toastType)
             {
                 case "Common":
-                    color = "#FF326CF3";
+                    color = commonColor;
                     break;
                 case "Error":
-                    color = "#FFFF6700"; // 示例错误颜色
+                    color = errorColor; // 示例错误颜色
                     break;
                 case "Warning":
-                    color = "Red"; // 示例警告颜色
+                    color = warningColor; // 示例警告颜色
                     break;
             }
             border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 设置边框颜色

@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Managers;
@@ -409,7 +410,7 @@ namespace Quicker.Windows
             }
             else
             {
-                db3.UpdateActionPageTable(type, type, "", canvasIndex++, ""); // 更新动作页数据表
+                db3.UpdateActionPageTable(type, type, "", canvasIndex++, "",""); // 更新动作页数据表
                 GenerateCanvas(canvasIndex, type); // 生成画布
             }
         }
@@ -527,6 +528,16 @@ namespace Quicker.Windows
             }
         }
 
+        /// <summary>
+        /// 获取绑定按钮
+        /// </summary>
+        /// <returns> 绑定按钮 </returns>
+        private Button GetBingdingButton()
+        {
+            EditActionPagePopup.IsOpen = false; // 关闭编辑动作页弹出菜单
+            return EditActionPagePopup.PlacementTarget as Button; // 获取弹出菜单所绑定按钮
+        }
+
         // 点击按钮查看动作页信息
         private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
@@ -536,13 +547,29 @@ namespace Quicker.Windows
         // 点击按钮复制动作页 ID
         private void CopyActionPageIDButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
+            Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
+            toastManager.AddToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 显示复制成功的通知
         }
 
         // 点击按钮编辑动作页信息
         private void EditActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
+            switch (type)
+            {
+                case "Global":
+                    toastManager.AddToast("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    break;
+                case "Common":
+                    toastManager.AddToast("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    break;
+                default:
+                    string canvasIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取画布索引
+                    EditActionPageInfoWindow editActionPageInfoWindow = new(type, canvasIndex); // 创建编辑动作页信息窗口
+                    editActionPageInfoWindow.Show(); // 显示编辑动作页信息窗口
+                    break;
+            }
         }
 
         // 点击按钮创建打开动作页动作
@@ -554,18 +581,17 @@ namespace Quicker.Windows
         // 点击按钮删除动作页
         private void DeleteActionPageButton_Click(object sender, RoutedEventArgs e)
         {
-            EditActionPagePopup.IsOpen = false; // 关闭编辑动作页弹出菜单
+            Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             // 移除画布
-            Button bingdingButton = EditActionPagePopup.PlacementTarget as Button; // 获取弹出菜单所绑定按钮
-            string targetButtonName = bingdingButton.Name.Replace("Edit", ""); // 获取目标按钮名称
             Grid targetGrid = bingdingButton.Parent as Grid; // 获取目标画布
             MainListView.Items.Remove(targetGrid.Parent); // 从主列表视图中移除画布
             // 删除按钮数据页
+            string targetButtonName = bingdingButton.Name.Replace("Edit", ""); // 获取目标按钮名称
             int canvadIndex = int.Parse(targetButtonName.Replace(type, "")); // 获取画布索引
             db2.DeletePageOfButtons(type, canvadIndex); // 删除按钮数据页
             // 更新动作页数据表
             var actionPageData = db3.GetActionPageData(type).FirstOrDefault(); // 获取动作页数据
-            db3.UpdateActionPageTable(type, type, actionPageData.ActionPageIconPath, MainListView.Items.Count, actionPageData.ActionPageTag);
+            db3.UpdateActionPageTable(type, type, actionPageData.ActionPageIconPath, MainListView.Items.Count, actionPageData.ActionPageTag, ""); // 更新动作页数据表
             if(MainListView.Items.Count == 0)
             {
                 db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表

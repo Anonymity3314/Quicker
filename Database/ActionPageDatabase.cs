@@ -40,7 +40,6 @@ namespace Quicker.Database
         public void CreatAndInitTable(string tableName, string actionPageIconPath, string actionPageTag)
         {
             CreateActionPageTable(tableName); // 创建动作页数据表
-            ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
             switch (tableName)
             {
                 case "Global":
@@ -62,8 +61,7 @@ namespace Quicker.Database
                 default:
                     break;
             }
-            UpdateActionPageTable(tableName, tableName, actionPageIconPath, db2.GetTotalAntionPageIndex(tableName), actionPageTag); // 初始化动作页数据表
-            buttonManager.Dispose(); // 释放按钮管理器
+            UpdateActionPageTable(tableName, tableName, actionPageIconPath, db2.GetTotalAntionPageIndex(tableName), actionPageTag,""); // 初始化动作页数据表
         }
 
         /// <summary>
@@ -75,10 +73,11 @@ namespace Quicker.Database
             using var connection = OpenConnection(); // 打开数据库连接
             string createTableQuery = $@"CREATE TABLE IF NOT EXISTS [{tableName}]
             (
-                ActionPageName TEXT PRIMARY KEY,
+                ActionPageType TEXT PRIMARY KEY,
                 ActionPageIconPath TEXT,
                 ActionPageCount INTEGER,
-                ActionPageTag TEXT
+                ActionPageTag TEXT,
+                ActionPageName TEXT
             );"; // 创建动作页数据表的SQL语句
             using var command = new SQLiteCommand(createTableQuery, connection); // 创建SQLiteCommand对象
             command.ExecuteNonQuery(); // 执行创建表的SQL语句
@@ -88,22 +87,23 @@ namespace Quicker.Database
         /// 更新动作页数据表
         /// </summary>
         /// <param name="tableName"> 动作页数据表名称 </param>
-        /// <param name="actionPageName"> 动作页名称 </param>
+        /// <param name="actionPageType"> 动作页名称 </param>
         /// <param name="actionPageIconPath"> 动作页图标路径 </param>
         /// <param name="actionPageCount"> 动作页数量 </param>
-        public void UpdateActionPageTable(string tableName, string actionPageName, string actionPageIconPath, int actionPageCount, string actionPageTag)
+        public void UpdateActionPageTable(string tableName, string actionPageType, string actionPageIconPath, int actionPageCount, string actionPageTag, string actionPageName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             string query = $@"INSERT OR REPLACE INTO {tableName}
-            (ActionPageName, ActionPageIconPath, ActionPageCount, ActionPageTag)
+            (ActionPageType, ActionPageIconPath, ActionPageCount, ActionPageTag, ActionPageName)
             VALUES
-            (@ActionPageName, @ActionPageIconPath, @ActionPageCount, @ActionPageTag)"; // 更新动作页数据表的SQL语句
+            (@ActionPageType, @ActionPageIconPath, @ActionPageCount, @ActionPageTag, @ActionPageName)"; // 更新动作页数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@ActionPageName", actionPageName); // 动作页名称
+            command.Parameters.AddWithValue("@ActionPageType", actionPageType); // 动作页类型
             command.Parameters.AddWithValue("@ActionPageIconPath", actionPageIconPath); // 动作页图标路径
             command.Parameters.AddWithValue("@ActionPageCount", actionPageCount); // 动作页数量
             command.Parameters.AddWithValue("@ActionPageTag", actionPageTag); // 动作页标签
+            command.Parameters.AddWithValue("@ActionPageName", actionPageName); // 动作页名称
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -112,14 +112,14 @@ namespace Quicker.Database
         /// 删除动作页数据表
         /// </summary>
         /// <param name="tableName"> 动作页数据表名称 </param>
-        /// <param name="actionPageName"> 动作页名称 </param>
-        public void DeleteActionPageTable(string tableName, string actionPageName)
+        /// <param name="actionPageType"> 动作页类型 </param>
+        public void DeleteActionPageTable(string tableName, string actionPageType)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"DELETE FROM {tableName} WHERE ActionPageName = @ActionPageName"; // 删除动作页数据表的SQL语句
+            string query = $@"DELETE FROM {tableName} WHERE ActionPageType = @ActionPageType"; // 删除动作页数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@ActionPageName", actionPageName); // 添加参数
+            command.Parameters.AddWithValue("@ActionPageType", actionPageType); // 添加参数
             command.ExecuteNonQuery(); // 执行删除表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -140,10 +140,11 @@ namespace Quicker.Database
             {
                 conditions.Add(new ActionPageData
                 {
-                    ActionPageName = reader.GetString(0), // 动作页名称
+                    ActionPageType = reader.GetString(0), // 动作页类型
                     ActionPageIconPath = reader.GetString(1), // 动作页图标路径
                     ActionPageCount = reader.GetInt32(2), // 动作页数量
-                    ActionPageTag = reader.GetString(3) // 动作页标签
+                    ActionPageTag = reader.GetString(3), // 动作页标签
+                    ActionPageName = reader.GetString(4) // 动作页名称
                 });
             }
             return conditions; // 返回动作页数据表
@@ -178,9 +179,10 @@ namespace Quicker.Database
     // 动作页数据
     public class ActionPageData
     {
-        public string ActionPageName { get; set; } // 动作页名称
+        public string ActionPageType { get; set; } // 动作页类型
         public string ActionPageIconPath { get; set; } // 动作页图标路径
         public int ActionPageCount { get; set; } // 动作页数量
         public string ActionPageTag { get; set; } // 动作页标签
+        public string ActionPageName { get; set; } // 动作页名称，各个动作页名称用";"隔开
     }
 }
