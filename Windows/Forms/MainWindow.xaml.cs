@@ -435,6 +435,7 @@ namespace Quicker.Windows
         // 打开动作管理窗口
         private void OpenActionPageManageWindow(object sender, RoutedEventArgs e)
         {
+            TitlePop.IsOpen = false; // 关闭菜单
             windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 

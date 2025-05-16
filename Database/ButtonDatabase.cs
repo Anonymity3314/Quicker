@@ -97,8 +97,8 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 动作数据2
             command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 动作数据3
             command.Parameters.AddWithValue("@Description", buttonData.Description); // 对动作的描述
-            command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
-            command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
+            command.Parameters.AddWithValue("@CreateTime", DateTime.Now); // 创建时间
+            command.Parameters.AddWithValue("@LatestEditTime", DateTime.Now); // 最近修改时间
             command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
             command.ExecuteNonQuery(); // 执行插入语句
             transaction.Commit(); // 提交事务

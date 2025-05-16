@@ -124,6 +124,9 @@ namespace Quicker.UserControls.AddWindow
                 ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source)
                 : ""; // 如果图标可见，则保存图标，否则设置为默认值
 
+            var oldData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取旧数据
+            DateTime createdTime = DateTime.Now;
+            if (oldData != null) createdTime = oldData.CreateTime; // 获取创建时间
             var buttonData = new ButtonData
             {
                 ButtonID = AddWindow.CurrentButton,
@@ -134,7 +137,7 @@ namespace Quicker.UserControls.AddWindow
                 ImagePath = AddWindow.iconPath,
                 Data3 = BrowserComboBox.SelectedIndex.ToString(),
                 Description = AddWindow.DescriptionTextBox.Text,
-                CreateTime = DateTime.Now,
+                CreateTime = AddWindow.Choice != 0 ? DateTime.Now : createdTime,
                 LatestEditTime = DateTime.Now,
                 ActionType = "OpenWebsite"
             }; // 创建按钮数据对象

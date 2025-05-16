@@ -236,6 +236,9 @@ namespace Quicker.UserControls.AddWindow
                     actionType = "OpenUwpApp"; // 如果地址栏不是有效路径，则设置为打开 UWP 应用
             }
 
+            var oldData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取旧数据
+            DateTime createdTime = DateTime.Now;
+            if (oldData != null)  createdTime= oldData.CreateTime; // 获取创建时间
             var buttonData = new ButtonData
             {
                 ButtonID = AddWindow.CurrentButton,
@@ -246,7 +249,7 @@ namespace Quicker.UserControls.AddWindow
                 Data2 = trytoopenexitingwindow.ToString(),
                 Data3 = windowState.ToString(),
                 Description = AddWindow.DescriptionTextBox.Text,
-                CreateTime = DateTime.Now,
+                CreateTime = AddWindow.Choice != 0 ? DateTime.Now : createdTime,
                 LatestEditTime = DateTime.Now,
                 ActionType = actionType
             }; // 创建按钮数据对象

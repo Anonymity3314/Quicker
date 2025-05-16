@@ -541,7 +541,7 @@ namespace Quicker.Windows
         // 点击按钮查看动作页信息
         private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
         }
 
         // 点击按钮复制动作页 ID
@@ -575,7 +575,11 @@ namespace Quicker.Windows
         // 点击按钮创建打开动作页动作
         private void CreatOpenActionPageActionButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
+            string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取动作页名称
+            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开动作页指令
+            Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
+            toastManager.AddToast("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 显示创建成功的通知
         }
 
         // 点击按钮删除动作页

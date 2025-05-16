@@ -12,6 +12,7 @@ namespace Quicker.Windows.Menus
         private const string commonColor = "#FF326CF3";
         private const string errorColor = "#FFFF6700";
         private const string warningColor = "Red";
+        private const string successColor = "LightGreen";
 
         private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
         private Queue<Message> messageQueue = new(); // 创建消息队列
@@ -115,6 +116,9 @@ namespace Quicker.Windows.Menus
                 case "Warning":
                     color = warningColor; // 示例警告颜色
                     break;
+                case "Success":
+                    color = successColor; // 示例成功颜色
+                    break;
             }
             border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 设置边框颜色
             ToastStackPanel.Children.Add(border); // 添加消息边框到消息面板
@@ -131,10 +135,9 @@ namespace Quicker.Windows.Menus
             {
                 FontSize = 16,
                 Text = message,
-                Margin = new Thickness(0, 20, 0, 20),
+                Margin = new Thickness(20, 20, 20, 20),
                 VerticalAlignment = VerticalAlignment.Center,
-                Foreground = new SolidColorBrush(Colors.White),
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+                Foreground = new SolidColorBrush(Colors.White)
             };
             return textBlock; // 返回消息
         }

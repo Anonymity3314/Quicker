@@ -52,7 +52,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid x:Name="MainGrid" Height="121" Width="204">
+    <Grid x:Name="MainGrid" Height="117" Width="204">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>
@@ -61,14 +61,14 @@
         </Rectangle>
         <Border CornerRadius="5" Background="White">
             <StackPanel x:Name="MainStackPanel">
-                <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,5" Click="EditeInformation_Click">
+                <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource Button}" Margin="0,5,0,3" Click="EditeInformation_Click">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/EditButton.ico" Style="{StaticResource Image}"/>
                         <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="编辑"/></TextBlock>
                     </Grid>
                 </Button>
                 <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
-                <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource Button}" Margin="0,5,0,0" Click="DeleteAction_Click">
+                <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource Button}" Margin="0,3,0,0" Click="DeleteAction_Click">
                     <Grid>
                         <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource Image}"/>
                         <TextBlock Style="{StaticResource TextBlock}"><Run Language="zh-cn" Text="删除"/></TextBlock>

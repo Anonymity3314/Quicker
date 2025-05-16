@@ -30,8 +30,8 @@ namespace Quicker
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e); // 调用基类方法
-
-            string mutexName = "Quicker 2.1.4"; // 互斥锁唯一标识
+            var version = _appStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取数据库版本
+            string mutexName = version.Version ; // 互斥锁唯一标识
             bool isNewInstance = SingleInstanceManager.CheckForOtherInstances(mutexName, out _); // 检查是否是新实例
             if (!isNewInstance)
             {
@@ -427,7 +427,7 @@ namespace Quicker
             if (_appStateManager.Pause) await InitializeHookAsync(); // 重新初始化钩子
 
             _appStateManager.Pause = !_appStateManager.Pause; // 切换暂停状态
-            _appStateManager.ToastManager.AddToast(toastMessage, "Common"); // 弹出消息提醒
+            _appStateManager.ToastManager.AddToast(toastMessage, _appStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
         }
 
         /// <summary>

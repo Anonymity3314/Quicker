@@ -150,8 +150,6 @@ namespace Quicker.Managers
                 Data2 = true.ToString(), // 尝试打开已存在的窗口
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开文件: {fileName}", // 设置用途
-                CreateTime = DateTime.Now, // 设置创建时间
-                LatestEditTime = DateTime.Now, // 设置最新编辑时间，
                 ActionType = "OpenFile", // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
@@ -197,8 +195,6 @@ namespace Quicker.Managers
                 Data2 = true.ToString(), // 尝试打开已存在的窗口
                 Data3 = 0.ToString(),
                 Description = $"打开图片: {fileName}",
-                CreateTime = DateTime.Now,
-                LatestEditTime = DateTime.Now,
                 ActionType = "OpenFile",
             };
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
@@ -235,8 +231,6 @@ namespace Quicker.Managers
                 Data2 = true.ToString(), // 尝试打开已存在的窗口
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开以{fileName}为首的多个文件:", // 设置用途
-                CreateTime = DateTime.Now, // 设置创建时间
-                LatestEditTime = DateTime.Now, // 设置最新编辑时间，
                 ActionType = "OpenFiles", // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
@@ -268,8 +262,6 @@ namespace Quicker.Managers
                 ImagePath = iconPath,
                 Data3 = 0.ToString(),
                 Description = $"打开网页: {url}",
-                CreateTime = DateTime.Now,
-                LatestEditTime = DateTime.Now,
                 ActionType = "OpenWebsite",
             };
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
