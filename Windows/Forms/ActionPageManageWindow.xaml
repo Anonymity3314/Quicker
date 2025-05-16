@@ -39,28 +39,7 @@
     <Grid>
         <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28" TextChanged="SearchTextBox_TextChanged"/>
         <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">
-            <StackPanel x:Name="ActionPagesButtonPanel">
-                <Button x:Name="Global" Style="{StaticResource ActionPageButton}" Click="GlobalButton_Click">
-                    <Grid>
-                        <TextBlock Text="全局" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
-                    </Grid>
-                </Button>
-                <Button x:Name="Common" Style="{StaticResource ActionPageButton}" Click="CommonButton_Click">
-                    <Grid>
-                        <TextBlock Text="通用" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
-                    </Grid>
-                </Button>
-                <Button x:Name="TaskBar" Style="{StaticResource ActionPageButton}" Click="TaskBarButton_Click">
-                    <Grid>
-                        <TextBlock Text="任务栏" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
-                    </Grid>
-                </Button>
-                <Button x:Name="Desktop" Style="{StaticResource ActionPageButton}" Click="DesktopButton_Click">
-                    <Grid>
-                        <TextBlock Text="桌面" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
-                    </Grid>
-                </Button>
-            </StackPanel>
+            <StackPanel x:Name="ActionPagesButtonPanel"/>
         </Border>
         <Label Content="提示：将窗口最大化可以方便排序动作页。" Foreground="#FFABADB3" Margin="0,5,10,0" VerticalAlignment="Top" FontSize="11" HorizontalAlignment="Right" Width="229" MouseDoubleClick="ChangeActionButtonBakground">
             <Label.ToolTip>
@@ -80,7 +59,49 @@
             </ScrollViewer>
         </Border>
         <ScrollBar x:Name="ScrollBar" Margin="240,250,10,0" VerticalAlignment="Top" Orientation="Horizontal" ValueChanged="ScrollBar_ValueChanged"/>
-
+        <Popup x:Name="EditActionPagePopup" PopupAnimation="Fade" Height="137" Width="180" AllowsTransparency="True" StaysOpen="False">
+            <Grid>
+                <Rectangle Fill="White" Margin="3,5">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                    <StackPanel Background="{x:Null}">
+                        <Button x:Name="CheckActionPageInfoButton" Style="{StaticResource MenuButton}" ToolTip="查看动作页信息" Margin="0,3,0,0" Click="CheckActionPageInfoButton_Click">
+                            <Grid Width="176">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="信息" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="CopyActionPageIDButton" Style="{StaticResource MenuButton}" ToolTip="复制动作页ID" Click="CopyActionPageIDButton_Click">
+                            <Grid Width="176">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="复制ID" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="EditActionPageInfoButton" Style="{StaticResource MenuButton}" ToolTip="编辑动作页信息" Click="EditActionPageInfoButton_Click">
+                            <Grid Width="176">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="编辑" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="CreatOpenActionPageActionButton" Style="{StaticResource MenuButton}" ToolTip="创建一个切换到此动作页的动作并复制到剪贴板" Click="CreatOpenActionPageActionButton_Click">
+                            <Grid Width="176">
+                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="生成加载动作页的动作" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="DeleteActionPageButton" Style="{StaticResource MenuButton}" ToolTip="删除动作页" Click="DeleteActionPageButton_Click">
+                            <Grid Width="176">
+                                <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource ImageStyle}"/>
+                                <TextBlock Text="删除动作页" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Popup>
         <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="240,272,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
     </Grid>
 </Window>

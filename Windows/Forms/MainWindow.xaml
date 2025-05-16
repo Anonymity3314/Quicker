@@ -60,7 +60,7 @@
                             <Image Source="/Resources/Images/Icons/MoreSelection.ico" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         </Button>
                     </Border>
-                    <Popup x:Name="TitlePop" PopupAnimation="Fade" Width="180" Height="70" PlacementTarget="{Binding ElementName=ActionPageManager}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                    <Popup x:Name="TitlePop" PopupAnimation="Fade" Width="180" Height="70" PlacementTarget="{Binding ElementName=ActionPageManager}" AllowsTransparency="True" StaysOpen="False">
                         <Grid>
                             <Rectangle Fill="White" Margin="3,5">
                                 <Rectangle.Effect>

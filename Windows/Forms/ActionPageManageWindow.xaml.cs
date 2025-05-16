@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Windows.Controls.Primitives;
+using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,6 +13,9 @@ namespace Quicker.Windows
 {
     public partial class ActionPageManageWindow : Window
     {
+        private const string changeActionPageButtonImage = "/Resources/Images/Icons/Quicker1.ico";
+        private const string editActionPageButtonImage = "/Resources/Images/Icons/Quicker1.ico";
+
         private static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             while (child != null)
@@ -23,7 +27,6 @@ namespace Quicker.Windows
             return null;
         } // 查找父级控件
 
-        private Dictionary<string, List<string>> buttonPrefixDict = new(); // 按钮前缀字典
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
@@ -37,6 +40,7 @@ namespace Quicker.Windows
         {
             InitializeComponent(); // 初始化窗口
             TypeChanged("Global"); // 默认加载全局动作页
+            LoadBasicButtonPrefixes(); // 加载按钮前缀
         }
 
         /// <summary>
@@ -50,7 +54,7 @@ namespace Quicker.Windows
         }
 
         // 加载动作页按钮
-        private void LoadButtonPrefixes()
+        private void LoadBasicButtonPrefixes()
         {
             // 定义按钮名称和文本的映射
             var buttonInfo = new[]
@@ -93,22 +97,6 @@ namespace Quicker.Windows
                 // 将按钮添加到StackPanel
                 ActionPagesButtonPanel.Children.Add(button);
             }
-
-
-            buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
-            //foreach (var data in buttonDataDict.Values)
-            //{
-            //    string buttonID = data.ButtonID; // 获取按钮ID
-            //    Match match = Regex.Match(buttonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
-            //    if (match.Success)
-            //    {
-            //        string style = match.Groups[1].Value; // 获取按钮名称
-            //        if (!buttonPrefixDict.ContainsKey(style))
-            //        {
-            //            buttonPrefixDict.Add(style, new List<string>());
-            //        }
-            //    }
-            //}
         }
 
         // 生成动作页按钮
@@ -167,50 +155,16 @@ namespace Quicker.Windows
         /// <param name="style"> 动作页类型</param>
         private void GenerateCanvas(int canvasIndex, string style)
         {
-            string canvasName = $"{style}{canvasIndex}"; // 画布名称
-            Canvas dynamicCanvas = new Canvas // 创建画布
-            {
-                Width = 260, // 画布宽度
-                AllowDrop = true,
-                Name = canvasName, // 画布名称
-                Height = style == "Global" ? 215 : 280, // 画布高度
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
-            }; // 创建画布
-
-            Grid grid = new Grid
-            {
-                Height = 20, // 网格高度
-                Width = 260, // 网格宽度
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Left, // 水平对齐方式
-                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")) // 背景颜色
-            }; // 创建网格
-
+            Canvas dynamicCanvas = GenerateCanva(canvasIndex, style); // 生成画布
+            Grid grid = GenerateTitle(canvasIndex, style); // 生成标题
             dynamicCanvas.Children.Add(grid); // 将网格添加到画布
-
-            Button pageButton = new Button
-            {
-                Width = 17.24,
-                Tag = $"{style}{canvasIndex}",
-                Name = $"{style}{canvasIndex}",
-                Margin = new Thickness(3, 0, 0, 0),
-                BorderThickness = new Thickness(0, 0, 0, 0),
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
-            };
-
-            pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
-            pageButton.PreviewMouseMove += Button1_PreviewMouseMove; // 鼠标移动事件
-            pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
-
-            Image image = new Image
-            {
-                Source = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative))
-            };
-
-            pageButton.Content = image;
+            Button pageButton = GenerateChangePageButton(canvasIndex, style); // 生成标题按钮
             grid.Children.Add(pageButton);
+            pageButton.Content = GenerateImage(changeActionPageButtonImage); // 生成标题按钮图片
+
+            Button editPageButton = GenerateEditActionPageButton(canvasIndex, style); // 生成编辑动作页按钮
+            grid.Children.Add(editPageButton);
+            editPageButton.Content = GenerateImage(editActionPageButtonImage); // 生成编辑动作页按钮图片
 
             double buttonSpacing = 65; // 按钮间距
             int rows = style == "Global" ? 3 : 4; // 行数
@@ -238,6 +192,108 @@ namespace Quicker.Windows
                 }
             }
             MainListView.Items.Add(dynamicCanvas); // 将画布添加到全局列表视图
+        }
+
+        /// <summary>
+        /// 生成画布
+        /// </summary>
+        /// <param name="canvasIndex"> 画布索引 </param>
+        /// <param name="style"> 画布类型 </param>
+        /// <returns> 画布 </returns>
+        private Canvas GenerateCanva(int canvasIndex, string style)
+        {
+            string canvasName = $"{style}{canvasIndex}"; // 画布名称
+            Canvas dynamicCanvas = new Canvas // 创建画布
+            {
+                Width = 260, // 画布宽度
+                AllowDrop = true,
+                Name = canvasName, // 画布名称
+                Height = style == "Global" ? 215 : 280, // 画布高度
+                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
+                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
+            }; // 创建画布
+            return dynamicCanvas; // 返回画布
+        }
+
+        /// <summary>
+        /// 生成标题
+        /// </summary>
+        /// <param name="canvasIndex"> 画布索引 </param>
+        /// <param name="style"> 画布类型 </param>
+        /// <returns> 标题 </returns>
+        private Grid GenerateTitle(int canvasIndex, string style)
+        {
+            Grid grid = new Grid
+            {
+                Height = 20, // 网格高度
+                Width = 260, // 网格宽度
+                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
+                HorizontalAlignment = HorizontalAlignment.Left, // 水平对齐方式
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")) // 背景颜色
+            }; // 创建网格
+            return grid; // 返回网格
+        }
+
+        /// <summary>
+        /// 生成编辑标题按钮
+        /// </summary>
+        /// <param name="canvasIndex"></param>
+        /// <param name="style"></param>
+        /// <returns></returns>
+        private Button GenerateChangePageButton(int canvasIndex, string style)
+        {
+            Button pageButton = new Button
+            {
+                Width = 17.24, // 按钮宽度
+                Tag = $"{style}{canvasIndex}", // 按钮标签
+                Name = $"{style}{canvasIndex}", // 按钮名称
+                Margin = new Thickness(3, 0, 0, 0), // 按钮边距
+                BorderThickness = new Thickness(0, 0, 0, 0), // 按钮边框
+                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
+                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
+            };
+            pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
+            pageButton.PreviewMouseMove += Button1_PreviewMouseMove; // 鼠标移动事件
+            pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
+            return pageButton; // 返回按钮
+        }
+
+        /// <summary>
+        /// 生成编辑动作页按钮
+        /// </summary>
+        /// <param name="canvasIndex"> 画布索引 </param>
+        /// <param name="style"> 画布类型 </param>
+        /// <returns> 编辑动作页按钮 </returns>
+        private Button GenerateEditActionPageButton(int canvasIndex, string style)
+        {
+            Button editPageButton = new Button
+            {
+                Width = 17.24, // 按钮宽度
+                Name = $"Edit{style}{canvasIndex}", // 按钮名称
+                Margin = new Thickness(0, 0, 3, 0), // 按钮边距
+                BorderThickness = new Thickness(0, 0, 0, 0), // 按钮边框
+                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
+                HorizontalAlignment = HorizontalAlignment.Right // 水平对齐方式
+            };
+            editPageButton.Click += OpenEditPopup; // 点击事件
+            return editPageButton; // 返回按钮
+        }
+
+        /// <summary>
+        /// 生成图片
+        /// </summary>
+        /// <returns> 图片 </returns>
+        private Image GenerateImage(string imagePath)
+        {
+            Image image = new Image { Source = new BitmapImage(new Uri(imagePath, UriKind.Relative)) };
+            return image; // 返回图片
+        }
+
+        // 点击按钮编辑动作页
+        private void OpenEditPopup(object sender, RoutedEventArgs e)
+        {
+            EditActionPagePopup.PlacementTarget = sender as Button; // 设置弹出菜单位置
+            EditActionPagePopup.IsOpen = true; // 显示弹出菜单
         }
 
         // 滚动条值改变事件
@@ -475,6 +531,36 @@ namespace Quicker.Windows
             }
         }
 
+        // 点击按钮查看动作页信息
+        private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // 点击按钮复制动作页 ID
+        private void CopyActionPageIDButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // 点击按钮编辑动作页信息
+        private void EditActionPageInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // 点击按钮创建打开动作页动作
+        private void CreatOpenActionPageActionButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // 点击按钮删除动作页
+        private void DeleteActionPageButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         // 关闭窗口时释放资源
         protected override void OnClosed(EventArgs e)
         {
@@ -530,7 +616,6 @@ namespace Quicker.Windows
                 }
             }
             ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
-            buttonPrefixDict.Clear(); // 清空按钮前缀字典
             toastManager.Dispose(); // 释放消息管理器资源
 
             // 强制垃圾回收
