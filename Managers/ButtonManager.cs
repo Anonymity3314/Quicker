@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
+﻿using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
@@ -8,7 +8,6 @@ using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace Quicker.Managers
 {
@@ -31,9 +30,10 @@ namespace Quicker.Managers
             }
         } // 递归查找所有指定类型的子元素
         public bool isClosing = false, isDragging, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
-        private readonly IconManager iconManager = new IconManager(); // 图标管理器
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        private readonly IconManager iconManager = new(); // 图标管理器
+        private readonly SettingDatabase db1 = new(); // 设置数据库
+        private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 鼠标初始位置
         private Button SourceButton; // 源按钮
 
@@ -321,7 +321,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                new ToastContentBuilder().AddText("无效的URI：未能解析主机名。").Show(); // 处理无效的URL
+                toastManager.AddToast("无效的URI：未能解析主机名。", "Error"); // 处理无效的URL
                 return null;
             }
         }
@@ -359,7 +359,7 @@ namespace Quicker.Managers
                     }
                     catch // 如果失败，发送信息提示
                     {
-                        new ToastContentBuilder().AddText($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除").Show();
+                        toastManager.AddToast($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除", "Error");
                     }
                 } // 如果图标路径不为none
 
@@ -608,6 +608,7 @@ namespace Quicker.Managers
         public void Dispose()
         {
             iconManager?.Dispose(); // 清理图标管理器资源
+            toastManager?.Dispose(); // 清理通知管理器资源
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

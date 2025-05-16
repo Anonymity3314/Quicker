@@ -206,7 +206,6 @@
     <PackageReference Include="Autoupdater.NET.Official" Version="1.9.2" />
     <PackageReference Include="DK.WshRuntime" Version="4.1.3.201115164" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="SharpHook" Version="5.3.9" />
     <PackageReference Include="Svg" Version="3.4.7" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />

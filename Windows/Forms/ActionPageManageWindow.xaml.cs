@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -24,11 +23,12 @@ namespace Quicker.Windows
             return null;
         } // 查找父级控件
 
-        private Dictionary<string, List<string>> buttonPrefixDict = new Dictionary<string, List<string>>(); // 按钮前缀字典
-        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
-        private readonly ActionPageDatabase db3 = new ActionPageDatabase(); // 动作页数据库
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private Dictionary<string, List<string>> buttonPrefixDict = new(); // 按钮前缀字典
+        private readonly ButtonManager buttonManager = new(); // 按钮管理器
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        private readonly ActionPageDatabase db3 = new(); // 动作页数据库
+        private readonly SettingDatabase db1 = new(); // 设置数据库
+        private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
         private bool isDarkModle = false; // 是否为暗黑模式
         private string type; // 动作页类型
@@ -340,9 +340,7 @@ namespace Quicker.Windows
         {
             int canvasIndex = MainListView.Items.Count; // 获取画布索引
             if (canvasIndex > 9) // 如果画布索引大于9
-            {
-                new ToastContentBuilder().AddText("当前动作页数量已达上限。").Show(); // 弹出消息提醒
-            }
+                toastManager.AddToast("当前动作页数量已达上限。", "Error"); // 弹出消息提醒
             else if (canvasIndex == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
@@ -533,6 +531,7 @@ namespace Quicker.Windows
             }
             ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
             buttonPrefixDict.Clear(); // 清空按钮前缀字典
+            toastManager.Dispose(); // 释放消息管理器资源
 
             // 强制垃圾回收
             GC.Collect();

@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using Quicker.UserControls;
 using System.Windows.Input;
@@ -17,9 +16,10 @@ namespace Quicker.Windows
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮类型2颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
-        public SettingManager settingManager = new SettingManager(); // 设置管理器
-        private List<string> ShortcutKeys = new List<string>(); // 保存快捷键
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        public  SettingManager settingManager = new(); // 设置管理器
+        private List<string> ShortcutKeys = new(); // 保存快捷键
+        private  SettingDatabase db1 = new(); // 设置数据库
 
         public SettingWindow()
         {
@@ -44,15 +44,13 @@ namespace Quicker.Windows
                 bool originalAutoStart = Convention.AutoStart; // 保存原始的开机自启动设置
                 bool newAutoStart = settingManager.conventions.AutoStart; // 新的开机自启动设置
                 if (originalAutoStart != newAutoStart)// 更新开机自启动设置
-                {
                     succeed = UpdateAutostart(newAutoStart);
-                    if (!succeed)
-                        settingManager.conventions.AutoStart = originalAutoStart; // 更新失败，回退到原来的设置
-                }
 
                 if (settingManager.conventions != null)
                     db1.ApplyConventionSettings(
-                        settingManager.conventions.AutoStart,
+                        succeed
+                            ? settingManager.conventions.AutoStart
+                            : Convention.AutoStart,
                         settingManager.conventions.ShowNotification,
                         settingManager.conventions.ShowAddImage,
                         settingManager.conventions.HideTooltip,
@@ -82,7 +80,7 @@ namespace Quicker.Windows
 
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
-                new ToastContentBuilder().AddText(message).Show(); // 显示通知
+                toastManager.AddToast(message, "Common"); // 添加通知
             });
         }
 
@@ -227,6 +225,7 @@ namespace Quicker.Windows
 
             settingManager.Dispose(); // 清空缓存
             settingManager = null; // 清理引用
+            toastManager.Dispose(); // 清理通知管理器
             ShortcutKeys.Clear(); // 清空快捷键列表
 
             foreach (var child in MenuGrid.Children.OfType<StackPanel>()) // 清理用户控件

@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,11 +12,12 @@ namespace Quicker.UserControls.AddWindow
 {
     public partial class OpenFile : UserControl
     {
-        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
-        private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
-        private ButtonDatabase db2 = new ButtonDatabase(); // 初始换按钮数据库
+        private readonly ButtonManager buttonManager = new(); // 按钮管理器
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        private readonly IconManager iconManager = new(); // 图标管理器接口
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的静态引用
         private Quicker.AddWindow AddWindow; // AddWindow 的静态引用
+        private ButtonDatabase db2 = new(); // 初始换按钮数据库
 
         public OpenFile(Quicker.AddWindow addWindow)
         {
@@ -153,7 +153,8 @@ namespace Quicker.UserControls.AddWindow
                         AddWindow.ButtonImage.Source = iconSource; // 设置图标
                         AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
                     }
-                    else new ToastContentBuilder().AddText("图标提取失败!").Show(); // 显示通知
+                    else
+                        toastManager.AddToast("图标提取失败!","Error"); // 显示通知
                 }
             }
         }
@@ -181,7 +182,8 @@ namespace Quicker.UserControls.AddWindow
                         AddWindow.ButtonImage.Source = folderIcon; // 设置图标
                         AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
                     }
-                    else new ToastContentBuilder().AddText("图标提取失败!").Show(); // 显示通知
+                    else
+                        toastManager.AddToast("图标提取失败!","Error"); // 显示通知
                 }
             }
         }
@@ -281,6 +283,7 @@ namespace Quicker.UserControls.AddWindow
             }
             buttonManager.Dispose(); // 释放资源
             iconManager.Dispose(); // 释放资源
+            toastManager.Dispose(); // 释放资源
             LocationTextBox.Text = ""; // 清空地址栏
             WindowStateComboBox.SelectedIndex = -1; // 清空窗口状态下拉框
             RunByMessager.IsChecked = false; // 取消勾选

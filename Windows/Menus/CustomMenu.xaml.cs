@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using System.Windows.Interop;
 using Quicker.Database;
 using Quicker.Managers;
@@ -11,9 +10,10 @@ namespace Quicker.Windows
 {
     public partial class CustomMenu : Window
     {
-        private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 数据库实例
+        private readonly WindowManager windowManager = new(); // 窗口管理器
         private readonly App app = (App.Current as App); // App实例
+        private readonly SettingDatabase db1 = new(); // 数据库实例
+        private ToastManager toastManager = new(); // 通知管理器
 
         public CustomMenu()
         {
@@ -93,6 +93,7 @@ namespace Quicker.Windows
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
+            toastManager.Dispose(); // 释放通知管理器资源
             GC.Collect(); // 强制回收非托管资源
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制回收非托管资源

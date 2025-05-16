@@ -17,7 +17,6 @@
 | Autoupdater.NET.Official              | 提供自动更新功能                    |
 | DK.WshRuntime                         | 提供 Windows 脚本主机运行时功能      |
 | Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
-| Microsoft.Toolkit.Uwp.Notifications   | 提供 UWP 样式的通知功能             |
 | SharpHook                             | 提供键盘和鼠标钩子功能               |
 | Svg                                   | 提供加载、解析和渲染 SVG 图像的功能   |
 | System.Data.SQLite                    | 提供 SQLite 数据库支持              |

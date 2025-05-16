@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using IWshRuntimeLibrary;
+﻿using IWshRuntimeLibrary;
 using System.Diagnostics;
 using Quicker.Database;
 using Microsoft.Win32;
@@ -9,7 +8,8 @@ namespace Quicker.Managers
 {
     internal class ActionManager
     {
-        WindowManager windowManager = new WindowManager(); // 窗口管理器
+        private readonly WindowManager windowManager = new(); // 窗口管理器
+        private readonly ToastManager toastManager = new(); // 通知管理器
 
         /// <summary>
         /// 执行按钮动作
@@ -71,7 +71,7 @@ namespace Quicker.Managers
                 }
                 catch (Exception ex)
                 {
-                    new ToastContentBuilder().AddText($"打开失败：{ex}").Show(); // 显示错误提示
+                    toastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
                 }
             } // 如果是快捷方式或者可执行文件
             else
@@ -87,7 +87,7 @@ namespace Quicker.Managers
                 }
                 catch (Exception ex)
                 {
-                    new ToastContentBuilder().AddText($"打开失败：{ex}").Show();
+                    toastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
                 }
             } // 使用系统默认方式打开文件
         }
@@ -145,7 +145,7 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                ShowErrorToast($"打开失败：{ex.Message}");
+                toastManager.AddToast($"打开网站失败：{ex.Message}", "Error"); // 显示错误提示
             }
         }
 
@@ -317,15 +317,6 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 显示错误提示
-        /// </summary>
-        /// <param name="message"> 错误信息 </param>
-        private static void ShowErrorToast(string message)
-        {
-            new ToastContentBuilder().AddText(message).Show();
-        }
-
-        /// <summary>
         /// 打开UWP应用
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
@@ -342,18 +333,15 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                ShowErrorToast($"打开UWP应用失败：{ex.Message}"); // 显示错误提示
+                toastManager.AddToast($"打开UWP应用失败：{ex.Message}", "Error"); // 显示错误提示
             }
         }
 
         // 手动释放资源
         public void Dispose()
         {
-            if (windowManager != null) // 释放COM对象
-            {
-                windowManager.Dispose(); // 释放窗口管理器
-                windowManager = null; // 置空引用
-            }
+            windowManager.Dispose(); // 释放窗口管理器
+            toastManager.Dispose(); // 释放通知管理器
 
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

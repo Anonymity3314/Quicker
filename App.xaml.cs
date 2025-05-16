@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using Hardcodet.Wpf.TaskbarNotification;
+﻿using Hardcodet.Wpf.TaskbarNotification;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -16,7 +15,6 @@ namespace Quicker
 {
     public partial class App : System.Windows.Application
     {
-        private readonly DatabaseUpdateManager databaseUpdateManager = new DatabaseUpdateManager(); // 更新管理器
         public AppStateManager _appStateManager = new AppStateManager(); // 应用状态管理器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
@@ -37,6 +35,7 @@ namespace Quicker
             bool isNewInstance = SingleInstanceManager.CheckForOtherInstances(mutexName, out _); // 检查是否是新实例
             if (!isNewInstance)
             {
+                _appStateManager.ToastManager.AddToast("Quicker 已经启动", "Common"); // 弹出消息提醒
                 Application.Current.Shutdown(); // 如果不是新实例，关闭当前实例
                 return; // 退出程序
             }
@@ -69,7 +68,7 @@ namespace Quicker
         {
             var Convention = _appStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
             if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
-                new ToastContentBuilder().AddText("成功启动！").Show(); // 弹出消息提醒
+                _appStateManager.ToastManager.AddToast("成功启动！", "Common"); // 弹出消息提醒
         }
 
         // 初始化定时器
@@ -428,7 +427,7 @@ namespace Quicker
             if (_appStateManager.Pause) await InitializeHookAsync(); // 重新初始化钩子
 
             _appStateManager.Pause = !_appStateManager.Pause; // 切换暂停状态
-            new ToastContentBuilder().AddText(toastMessage).Show(); // 弹出消息提醒
+            _appStateManager.ToastManager.AddToast(toastMessage, "Common"); // 弹出消息提醒
         }
 
         /// <summary>

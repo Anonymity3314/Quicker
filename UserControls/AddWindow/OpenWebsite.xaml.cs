@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Diagnostics;

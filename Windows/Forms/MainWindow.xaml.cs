@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
@@ -27,14 +26,15 @@ namespace Quicker.Windows
         private static readonly SolidColorBrush UnSelectedBrush = // 未选中页面按钮颜色
             new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD3D3D3"));
 
-        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(); // 取消后台任务的令牌源
-        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
-        private readonly WindowManager windowManager = new WindowManager(); // 窗口管理器
-        private readonly ActionPageDatabase db3 = new ActionPageDatabase(); // 动作页面数据库
-        private readonly IconManager iconManager = new IconManager(); // 图标管理器
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
+        private readonly ButtonManager buttonManager = new(); // 按钮管理器
+        private readonly WindowManager windowManager = new(); // 窗口管理器
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        private readonly IconManager iconManager = new(); // 图标管理器
+        private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
         private readonly App app = (App.Current as App); // App实例
+        private readonly SettingDatabase db1 = new(); // 设置数据库
+        private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string CommonStyle; // 样式
 
         public MainWindow(string Style)
@@ -427,6 +427,7 @@ namespace Quicker.Windows
         // 退出Quicker
         private void QuitQuicker(object sender, RoutedEventArgs e)
         {
+            TitlePop.IsOpen = false; // 关闭菜单
             this.Visibility = Visibility.Collapsed; // 隐藏窗口
             System.Windows.Application.Current.Shutdown(); // 退出程序
         }
@@ -683,8 +684,6 @@ namespace Quicker.Windows
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
             //buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
-            //ToastWindow toast = new ToastWindow();
-            //toast.Show();
         }
 
         // 窗口关闭时强制垃圾回收
@@ -702,6 +701,7 @@ namespace Quicker.Windows
             windowManager.Dispose(); // 释放窗口管理器资源
             iconManager.Dispose(); // 释放图标管理器资源
             buttonManager.Dispose(); // 释放按钮管理器资源
+            toastManager.Dispose(); // 释放消息管理器资源
 
             GC.Collect(); // 强制回收内存
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

@@ -8,15 +8,17 @@
     mc:Ignorable="d"
     
     WindowStartupLocation="CenterScreen"
+    Background="Transparent"
     AllowsTransparency="True"
     ShowInTaskbar="False"
     WindowStyle="None"
+    Topmost="True"
     Height="500"
     Width="480"
 >
     <Grid>
-        <Border Background="Black" Margin="10,0,10,0">
-            <StackPanel x:Name="ToastStackPanel"/>
+        <Border Margin="10,0,10,0" VerticalAlignment="Bottom">
+            <StackPanel x:Name="ToastStackPanel" VerticalAlignment="Bottom"/>
         </Border>
     </Grid>
 </Window>

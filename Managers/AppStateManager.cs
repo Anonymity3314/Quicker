@@ -7,13 +7,15 @@ using System;
 
 namespace Quicker
 {
-    public class AppStateManager : IDisposable
+    public class AppStateManager
     {
-        public SettingDatabase Db { get; set; } = new SettingDatabase(); // 数据库操作对象
-        public WindowManager WindowManager { get; set; } = new WindowManager(); // 窗口管理器
+        public SettingDatabase Db { get; set; } = new(); // 数据库操作对象
+        public  DatabaseUpdateManager DatabaseUpdateManager { get; set; } = new(); // 更新管理器
+        public WindowManager WindowManager { get; set; } = new(); // 窗口管理器
+        public ToastManager ToastManager { get; set; } = new(); // 通知管理器
 
-        public Convention Conventions { get; set; } = new Convention(); // 缓存基础设置
-        public OpenMainWindow OpenMainWindowConditions { get; set; } = new OpenMainWindow(); // 缓存 OpenMainWindowConditions
+        public Convention Conventions { get; set; } = new(); // 缓存基础设置
+        public OpenMainWindow OpenMainWindowConditions { get; set; } = new(); // 缓存 OpenMainWindowConditions
 
         // 窗口状态
         public bool Locked { get; set; } = false; // 是否锁定通用动作页
@@ -32,15 +34,14 @@ namespace Quicker
         public DateTime? KeyPressStartTime { get; set; } = null; // 鼠标按下时间
 
         // 定时器
-        public DispatcherTimer PressTimer { get; set; } = new DispatcherTimer(); // 鼠标按下定时器
-        public DispatcherTimer Timer { get; set; } = new DispatcherTimer(); // 计时器
+        public DispatcherTimer PressTimer { get; set; } = new(); // 鼠标按下定时器
+        public DispatcherTimer Timer { get; set; } = new(); // 计时器
 
         // 其他状态
         public string CommonState { get; set; } = string.Empty; // 通用状态
         public float Left { get; set; } = 0; // 窗口与屏幕左边距离
         public float Top { get; set; } = 0; // 窗口与屏幕上边距离
 
-        private bool disposed = false; // 标记是否已释放资源
 
         public AppStateManager()
         {
@@ -56,54 +57,44 @@ namespace Quicker
             OpenMainWindowConditions = conditionsList[0]; // 只有一条记录
         }
 
-        // 实现IDisposable接口，用于自动释放资源
+        // 释放资源
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // 保护方法，用于释放资源
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
+            // 释放托管资源
+            if (PressTimer != null)
             {
-                if (disposing)
-                {
-                    // 释放托管资源
-                    if (PressTimer != null)
-                    {
-                        PressTimer.Stop();
-                        PressTimer = null;
-                    }
-                    if (Timer != null)
-                    {
-                        Timer.Stop();
-                        Timer = null;
-                    }
-                    if (PreLoadMainWindow != null)
-                    {
-                        PreLoadMainWindow.Close();
-                        PreLoadMainWindow = null;
-                    }
-                    if (WindowManager != null)
-                    {
-                        WindowManager.Dispose();
-                        WindowManager = null;
-                    }
-                    if (Db != null)
-                    {
-                        Db = null;
-                    }
-                }
-                disposed = true;
+                PressTimer.Stop(); // 停止鼠标按下定时器
+                PressTimer = null; // 清空鼠标按下定时器
             }
-        }
-
-        // 析构函数，用于释放非托管资源
-        ~AppStateManager()
-        {
-            Dispose(false);
+            if (Timer != null)
+            {
+                Timer.Stop(); // 停止计时器
+                Timer = null; // 清空计时器
+            }
+            if (PreLoadMainWindow != null)
+            {
+                PreLoadMainWindow.Close(); // 关闭预加载窗口
+                PreLoadMainWindow = null; // 清空预加载窗口
+            }
+            if (WindowManager != null)
+            {
+                WindowManager.Dispose(); // 释放窗口管理器资源
+                WindowManager = null; // 清空窗口管理器
+            }
+            if (ToastManager != null)
+            {
+                ToastManager.Dispose(); // 释放通知管理器资源
+                ToastManager = null; // 清空通知管理器
+            }
+            if (DatabaseUpdateManager != null)
+            {
+                DatabaseUpdateManager.Dispose(); // 释放更新管理器资源
+                DatabaseUpdateManager = null; // 清空更新管理器
+            }
+            if (Db != null)
+            {
+                Db = null; // 清空数据库操作对象
+            }
         }
     }
 }

@@ -1,15 +1,15 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using Quicker.Database;
 using System.Windows;
 using System.IO;
 
 namespace Quicker.Managers
 {
-    internal class DatabaseUpdateManager
+    public class DatabaseUpdateManager
     {
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        private readonly SettingDatabase db1 = new(); // 设置数据库
+        private readonly ButtonDatabase db2 = new(); // 按钮数据库
 
         public DatabaseUpdateManager()
         {
@@ -117,7 +117,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                new ToastContentBuilder().AddText("数据库更新失败，请删除数据库文件后重试。").Show(); // 弹出消息提醒用户
+                toastManager.AddToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒用户
             }
         }
 
@@ -261,7 +261,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                new ToastContentBuilder().AddText("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。").Show(); // 弹出消息提醒用户
+                toastManager.AddToast("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error"); // 弹出消息提醒用户
             }
         }
 
@@ -291,7 +291,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                new ToastContentBuilder().AddText("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。").Show(); // 弹出消息提醒用户
+                toastManager.AddToast("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒用户
             }
         }
 
@@ -476,6 +476,13 @@ namespace Quicker.Managers
                 }
             }
             catch { }
+        }
+
+        // 释放资源
+        public void Dispose()
+        {
+            toastManager.Dispose(); // 释放资源
+            GC.Collect(); // 回收资源
         }
     }
 }

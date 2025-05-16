@@ -1,5 +1,4 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using Quicker.UserControls.AddWindow;
 using Windows.Management.Deployment;
@@ -12,6 +11,7 @@ using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Data;
 using Quicker.Database;
+using Quicker.Managers;
 using System.Xml.Linq;
 using Microsoft.Win32;
 using System.Windows;
@@ -22,15 +22,16 @@ namespace Quicker.Windows
 {
     public partial class FindAppsWindow : Window
     {
-        private static readonly ConcurrentDictionary<string, ImageSource> iconCache = new ConcurrentDictionary<string, ImageSource>(); // 图标缓存
-        private ConcurrentDictionary<string, string> linkTargetCache = new ConcurrentDictionary<string, string>(); // 快捷方式目标路径缓存
-        private static WeakReference<FindAppsWindow> _findAppsWindowRef = new WeakReference<FindAppsWindow>(null); // 避免内存泄漏
-        private ConcurrentDictionary<string, string> fileHashCache = new ConcurrentDictionary<string, string>(); // 文件哈希缓存
-        public delegate void ApplicationSelectedEventHandler(object sender, ApplicationSelectedEventArgs e);
-        private ObservableCollection<AppInfo> _allApplications = new ObservableCollection<AppInfo>(); // 所有应用
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource(); // 取消令牌源,管理异步任务
+        public delegate void ApplicationSelectedEventHandler(object sender, ApplicationSelectedEventArgs e); // 选中应用事件
+        private static readonly ConcurrentDictionary<string, ImageSource> iconCache = new(); // 图标缓存
+        private static WeakReference<FindAppsWindow> _findAppsWindowRef = new(null); // 避免内存泄漏
+        private ConcurrentDictionary<string, string> linkTargetCache = new(); // 快捷方式目标路径缓存
+        private ConcurrentDictionary<string, string> fileHashCache = new(); // 文件哈希缓存
+        private CancellationTokenSource _cancellationTokenSource = new(); // 取消令牌源,管理异步任务
         public event ApplicationSelectedEventHandler ApplicationSelected; // 选中应用事件
-        private List<AppInfo> _searchResults = new List<AppInfo>(); // 搜索结果
+        private ObservableCollection<AppInfo> _allApplications = new(); // 所有应用
+        private readonly ToastManager toastManager = new(); // 通知管理器
+        private List<AppInfo> _searchResults = new(); // 搜索结果
         private ICollectionView _applicationView; // ICollectionView接口
         private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
         private ScrollViewer scrollViewer; // 滚动条
@@ -583,8 +584,8 @@ namespace Quicker.Windows
                     string directoryPath = Path.GetDirectoryName(selectedApp.Location); // 提取文件所在目录路径
                     if (!string.IsNullOrEmpty(directoryPath))
                     {                        
-                        Clipboard.SetText(directoryPath); // 复制目录路径到剪贴板                        
-                        new ToastContentBuilder().AddText("文件夹路径已复制到剪贴板！").Show(); // 通知用户已复制
+                        Clipboard.SetText(directoryPath); // 复制目录路径到剪贴板
+                        toastManager.AddToast("文件夹路径已复制到剪贴板！", "Common"); // 通知用户已复制
                     }
                 }
             }
@@ -613,7 +614,6 @@ namespace Quicker.Windows
             HorizontalScrollBar.Value = scrollViewer.HorizontalOffset; // 设置当前值
         }
 
-        // 加载应用商店应用
         // 加载应用商店应用
         public void LoadUWPApps()
         {
@@ -767,6 +767,7 @@ namespace Quicker.Windows
             linkTargetCache.Clear(); // 清空快捷方式目标路径缓存
             fileHashCache.Clear(); // 清空文件哈希缓存
             findAppsWindow = null; // 清空静态引用
+            toastManager.Dispose(); // 释放 ToastManager 资源
 
             // 强制垃圾回收
             GC.Collect();
