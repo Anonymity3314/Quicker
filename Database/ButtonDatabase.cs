@@ -205,6 +205,92 @@ namespace Quicker.Database
         }
 
         /// <summary>
+        /// 删除按钮数据表
+        /// </summary>
+        /// <param name="tableName"> 要删除的表名 </param>
+        public void DeleteButtonTable(string tableName)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS {tableName}", connection); // 创建命令对象
+            command.ExecuteNonQuery(); // 执行删除表格语句
+        }
+
+        /// <summary>
+        /// 删除一整页的按钮
+        /// </summary>
+        /// <param name="prefix"> Button前缀 </param>
+        /// <param name="pageIndex"> 页码 </param>
+        public void DeletePageOfButtons(string prefix, int pageIndex)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
+
+            List<ButtonData> allButtons = GetButtonDataByPrefix(prefix); // 获取所有按钮数据
+            var currentButtons = allButtons
+                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$"))
+                .Select(b => new { ButtonID = b.ButtonID, Data = b })
+                .Where(b => int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == pageIndex)
+                .ToDictionary(b => b.ButtonID, b => b.Data); // 当前页的按钮
+
+            // 删除当前页的按钮
+            foreach (var buttonData in currentButtons.Values)
+            {
+                DeleteAction(buttonData.ButtonID); // 删除动作
+            }
+
+            // 筛选并更新后续页的按钮编号
+            var subsequentButtons = allButtons
+                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$"))
+                .Select(b => new { ButtonID = b.ButtonID, Data = b })
+                .Where(b => int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) > pageIndex)
+                .ToList(); // 后续页的按钮
+
+            foreach (var item in subsequentButtons)
+            {
+                string buttonID = item.ButtonID; // 原 ButtonID
+                string newButtonID = UpdateButtonPageNumber(connection, buttonID, pageIndex); // 更新按钮的页码编号
+                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
+            }
+
+            transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 更新按钮的页码编号
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="buttonID">原 ButtonID </param>
+        /// <param name="pageIndex">原页码</param>
+        /// <returns>新的 ButtonID</returns>
+        private string UpdateButtonPageNumber(SQLiteConnection connection, string buttonID, int pageIndex)
+        {
+            Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$");
+            if (match.Success)
+            {
+                string prefix = match.Groups[1].Value; // 获取前缀部分
+                string pagePart = match.Groups[2].Value; // 获取三位数字部分
+
+                // 将三位数字部分拆分为页码、行号和列号
+                int page = int.Parse(pagePart[0].ToString());
+                int row = int.Parse(pagePart[1].ToString());
+                int column = int.Parse(pagePart[2].ToString());
+
+                // 如果页码大于原页码，则页码减一
+                if (page > pageIndex)
+                {
+                    page--;
+                }
+
+                // 重新组合新的三位数字部分
+                string newPagePart = $"{page}{row}{column}";
+                string newButtonID = $"{prefix}{newPagePart}";
+
+                return newButtonID;
+            }
+            return buttonID; // 如果格式不匹配，返回原 ButtonID
+        }
+
+        /// <summary>
         /// 删除动作
         /// </summary>
         /// <param name="buttonID">要删除的动作ID</param>
@@ -368,6 +454,32 @@ namespace Quicker.Database
                 }
             }
             transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 获取总的页面数
+        /// </summary>
+        /// <param name="targetStyle"> 目标样式名称 </param>
+        /// <returns> 总页面数 </returns>
+        public int GetTotalAntionPageIndex(string targetStyle)
+        {
+            int TotalAntionPageIndex = 1; // 重置页面索引
+            var buttonData = GetButtonDataByPrefix(targetStyle); // 从数据库中获取按钮数据
+            foreach (var data in buttonData)
+            {
+                string buttonID = data.ButtonID; // 获取按钮ID
+                Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
+                if (match.Success)
+                {
+                    string style = match.Groups[1].Value; // 获取按钮名称
+                    string numbersStr = match.Groups[2].Value; // 获取3个数字
+                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
+                    if (style == targetStyle) // 如果是全局按钮
+                        if (numbers[0] > TotalAntionPageIndex) // 如果数字大于当前最大索引
+                            TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
+                }
+            }
+            return TotalAntionPageIndex;
         }
 
         /// <summary>

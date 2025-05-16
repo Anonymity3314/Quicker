@@ -62,7 +62,7 @@ namespace Quicker.Database
                 default:
                     break;
             }
-            UpdateActionPageTable(tableName, tableName, actionPageIconPath, buttonManager.GetTotalAntionPageIndex(tableName), actionPageTag); // 初始化动作页数据表
+            UpdateActionPageTable(tableName, tableName, actionPageIconPath, db2.GetTotalAntionPageIndex(tableName), actionPageTag); // 初始化动作页数据表
             buttonManager.Dispose(); // 释放按钮管理器
         }
 

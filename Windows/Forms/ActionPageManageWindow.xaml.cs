@@ -30,7 +30,6 @@ namespace Quicker.Windows
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
-        private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
         private bool isDarkModle = false; // 是否为暗黑模式
@@ -56,23 +55,20 @@ namespace Quicker.Windows
         // 加载动作页按钮
         private void LoadBasicButtonPrefixes()
         {
-            // 定义按钮名称和文本的映射
             var buttonInfo = new[]
             {
-                new { Name = "Global", Text = "全局" },
-                new { Name = "Common", Text = "通用" },
-                new { Name = "Taskbar", Text = "任务栏" },
-                new { Name = "Desktop", Text = "桌面" }
-            };
-
-            // 为每个按钮创建事件处理方法
+                new { Name = "Global", Text = "全局" }, // 全局动作页按钮
+                new { Name = "Common", Text = "通用" }, // 通用动作页按钮
+                new { Name = "Taskbar", Text = "任务栏" }, // 任务栏动作页按钮
+                new { Name = "Desktop", Text = "桌面" } // 桌面动作页按钮
+            }; // 定义按钮名称和文本的映射
             var buttonClickHandlers = new[]
             {
-                new RoutedEventHandler(GlobalButton_Click),
-                new RoutedEventHandler(CommonButton_Click),
-                new RoutedEventHandler(TaskBarButton_Click),
-                new RoutedEventHandler(DesktopButton_Click)
-            };
+                new RoutedEventHandler(GlobalButton_Click), // 全局动作页按钮点击事件
+                new RoutedEventHandler(CommonButton_Click), // 通用动作页按钮点击事件
+                new RoutedEventHandler(TaskBarButton_Click), // 任务栏动作页按钮点击事件
+                new RoutedEventHandler(DesktopButton_Click) // 桌面动作页按钮点击事件
+            }; // 为每个按钮创建事件处理方法
 
             // 动态生成按钮
             for (int i = 0; i < buttonInfo.Length; i++)
@@ -82,12 +78,14 @@ namespace Quicker.Windows
                 button.Style = FindResource("ActionPageButton") as Style; // 应用样式
 
                 // 创建按钮内容
-                Grid buttonContent = new Grid();
-                TextBlock textBlock = new TextBlock();
-                textBlock.Text = buttonInfo[i].Text;
-                textBlock.HorizontalAlignment = HorizontalAlignment.Center;
-                textBlock.VerticalAlignment = VerticalAlignment.Center;
-                textBlock.FontSize = 14;
+                Grid buttonContent = new();
+                TextBlock textBlock = new()
+                {
+                    FontSize = 14,
+                    Text = buttonInfo[i].Text,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                }; // 创建 TextBlock
                 buttonContent.Children.Add(textBlock);
                 button.Content = buttonContent;
 
@@ -142,7 +140,7 @@ namespace Quicker.Windows
 
             if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
             var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 获取动作页数据
-            for (int i = 0; i <= actionPageData.ActionPageCount; i++)
+            for (int i = 0; i < actionPageData.ActionPageCount; i++)
             {
                 GenerateCanvas(i, style); // 生成动作页
             }
@@ -152,7 +150,7 @@ namespace Quicker.Windows
         /// 生成动作页
         /// </summary>
         /// <param name="canvasIndex"> 动作页索引 </param>
-        /// <param name="style"> 动作页类型</param>
+        /// <param name="style"> 动作页类型 </param>
         private void GenerateCanvas(int canvasIndex, string style)
         {
             Canvas dynamicCanvas = GenerateCanva(canvasIndex, style); // 生成画布
@@ -558,7 +556,24 @@ namespace Quicker.Windows
         // 点击按钮删除动作页
         private void DeleteActionPageButton_Click(object sender, RoutedEventArgs e)
         {
-
+            EditActionPagePopup.IsOpen = false; // 关闭编辑动作页弹出菜单
+            // 移除画布
+            Button bingdingButton = EditActionPagePopup.PlacementTarget as Button; // 获取弹出菜单所绑定按钮
+            string targetButtonName = bingdingButton.Name.Replace("Edit", ""); // 获取目标按钮名称
+            Grid targetGrid = bingdingButton.Parent as Grid; // 获取目标画布
+            MainListView.Items.Remove(targetGrid.Parent); // 从主列表视图中移除画布
+            // 删除按钮数据页
+            int canvadIndex = int.Parse(targetButtonName.Replace(type, "")); // 获取画布索引
+            db2.DeletePageOfButtons(type, canvadIndex); // 删除按钮数据页
+            // 更新动作页数据表
+            var actionPageData = db3.GetActionPageData(type).FirstOrDefault(); // 获取动作页数据
+            db3.UpdateActionPageTable(type, type, actionPageData.ActionPageIconPath, MainListView.Items.Count, actionPageData.ActionPageTag);
+            if(MainListView.Items.Count == 0)
+            {
+                db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
+                db3.DeleteActionPageTable(type, type); // 如果没有画布，则删除动作页数据表
+            }
+            LoadCanvas(type); // 刷新界面
         }
 
         // 关闭窗口时释放资源

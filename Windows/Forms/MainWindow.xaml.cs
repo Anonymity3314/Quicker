@@ -98,8 +98,8 @@ namespace Quicker.Windows
         /// <param name="panel">按钮所属的面板</param>
         private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, MouseEventHandler mouseEnterHandler, MouseEventHandler mouseLeaveHandler, Panel panel)
         {
-            if (totalPages <= 0) return; // 如果没有页面，直接返回
-            for (int i = 0; i <= totalPages; i++)
+            if (totalPages == 1) return; // 如果只有一个页面，不生成按钮
+            for (int i = 0; i < totalPages; i++)
             {
                 Button button = new Button
                 {
@@ -514,7 +514,7 @@ namespace Quicker.Windows
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
             int targetCanvasIndex = isNext ? currentCanvasIndex + 1 : currentCanvasIndex - 1; // 计算目标Canvas编号
             var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 从数据库中获取动作页数据
-            if ((isNext && targetCanvasIndex > actionPageData.ActionPageCount || (!isNext && targetCanvasIndex < 0))) // 如果目标Canvas编号超出范围
+            if (targetCanvasIndex == actionPageData.ActionPageCount || targetCanvasIndex < 0) // 如果目标Canvas编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
                     targetCanvasIndex = isNext ? 0 : actionPageData.ActionPageCount; // 循环到第一页或最后一页
