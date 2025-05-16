@@ -393,7 +393,7 @@ namespace Quicker.Windows
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
             int canvasIndex = MainListView.Items.Count; // 获取画布索引
-            if (canvasIndex > 9) // 如果画布索引大于9
+            if (canvasIndex == 9) // 如果画布索引等于9
                 toastManager.AddToast("当前动作页数量已达上限。", "Error"); // 弹出消息提醒
             else if (canvasIndex == 0)
             {
@@ -512,18 +512,16 @@ namespace Quicker.Windows
             isDarkModle = !isDarkModle; // 切换模式
             foreach (var item in MainListView.Items)
             {
-                if (item is Canvas canvas)
+                Canvas canvas = item as Canvas; // 获取画布
+                var childrenList = canvas.Children.Cast<UIElement>().ToList(); // 将 UIElementCollection 转换为列表
+                foreach (var child in childrenList)
                 {
-                    var childrenList = canvas.Children.Cast<UIElement>().ToList(); // 将 UIElementCollection 转换为列表
-                    foreach (var child in childrenList)
+                    if (child is Button button && button.Tag is ButtonData data)
                     {
-                        if (child is Button button && button.Tag is ButtonData data)
-                        {
-                            if (isDarkModle)
-                                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
-                            else
-                                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
-                        }
+                        if (isDarkModle)
+                            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
+                        else
+                            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
                     }
                 }
             }
