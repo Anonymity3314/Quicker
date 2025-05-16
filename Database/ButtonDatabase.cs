@@ -476,7 +476,7 @@ namespace Quicker.Database
                     int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
                     if (style == targetStyle) // 如果是全局按钮
                         if (numbers[0] > TotalAntionPageIndex) // 如果数字大于当前最大索引
-                            TotalAntionPageIndex = numbers[0]; // 更新全局页面索引
+                            TotalAntionPageIndex = numbers[0] + 1; // 更新全局页面索引
                 }
             }
             return TotalAntionPageIndex;

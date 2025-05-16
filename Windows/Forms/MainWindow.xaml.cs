@@ -37,9 +37,9 @@ namespace Quicker.Windows
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string CommonStyle = "Common"; // 样式
 
-        public MainWindow(string Style)
+        public MainWindow(string style)
         {
-            CommonStyle = Style; // 设置样式
+            CommonStyle = style; // 设置样式
             InitializeComponent(); // 初始化窗口组件
             GlobalGrid.Children.Remove(ViewGlobalCanvas); // 从主网格中移除
             CommonGrid.Children.Remove(ViewCommonCanvas); // 从主网格中移除
@@ -48,28 +48,12 @@ namespace Quicker.Windows
         /// <summary>
         /// 通用类型改变事件
         /// </summary>
-        /// <param name="style"> 通用类型</param>
-        public void OpenActionPage(ButtonData data)
+        /// <param name="style"> 样式名称 </param>
+        private void OnCommonStyleChanged(string style)
         {
-            string[] actionInfo = data.Location.Split(';'); // 获取动作信息
-            string style = actionInfo[0];
-            int index = int.Parse(actionInfo[1]);
-            buttonManager.isClosing = false; // 取消关闭窗口
-            if (style != "Global") CommonStyle = style; // 设置样式
-            int currentCanvasIndex = GetVisibleCanvasIndex(style); // 获取当前可见Canvas索引
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (currentCanvasIndex > index)
-                {
-                    for (int i = currentCanvasIndex; i > index; i--)
-                        SwitchToPreviousCanvas(i, style); // 切换到上一个Canvas
-                }
-                else
-                {
-                    for (int i = currentCanvasIndex; i < index; i++)
-                        SwitchToNextCanvas(i, style); // 切换到下一个Canvas
-                }
-            }); // 在主线程中执行
+            CommonStyle = style; // 设置样式
+            CommonGrid.Children.Clear(); // 清空通用网格
+            SetCommonLabel(); // 设置通用标签
         }
 
         // 加载数据库和Button
@@ -192,7 +176,8 @@ namespace Quicker.Windows
             switch (CommonStyle)
             {
                 case "Common":
-                    break; // 如果是通用类型，不设置标签内容
+                    CommonLabel.Content = "默认";
+                    break; // 如果是通用类型，设置标签内容为默认
                 case "Taskbar":
                     CommonLabel.Content = "任务栏"; // 设置标签内容
                     break; // 如果是任务栏类型，设置标签内容为任务栏
@@ -251,30 +236,29 @@ namespace Quicker.Windows
         // 鼠标移入Button改变外观
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData data && data.Location != null)
+            Button button = sender as Button;
+            if (button.Tag is ButtonData data && !string.IsNullOrEmpty(data.Location))
             {
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BEE6FD")); // 改变背景颜色
-                button.RenderTransform = new ScaleTransform(1.05, 1.05); // 改变按钮大小
-                Canvas.SetZIndex(button, 1); // 改变按钮层级
+                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BEE6FD"));
+                button.RenderTransform = new ScaleTransform(1.05, 1.05);
+                Canvas.SetZIndex(button, 1);
             }
             else
             {
-                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
-                if (Convention.ShowAddImage)
+                var Convention = db1.GetAllConventions().FirstOrDefault();
+                if (Convention?.ShowAddImage == true)
                 {
-                    System.Windows.Controls.Image image = new()
+                    button.Content = new System.Windows.Controls.Image
                     {
-                        Source = new BitmapImage(new Uri("/Resources/Images/Icons/Add.ico", UriKind.Relative)), // 设置图像源
-                        Width = 36, // 宽为36
-                        Height = 36, // 高为36
-                        VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                        HorizontalAlignment = HorizontalAlignment.Center // 水平居中
+                        Source = new BitmapImage(new Uri("/Resources/Images/Icons/Add.ico", UriKind.Relative)),
+                        Width = 36,
+                        Height = 36,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
-                    button.Content = image; // 设置按钮内容
                 }
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变背景颜色
-            } // 如果Button的目标地址不存在
+                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA"));
+            }
         }
         private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -415,6 +399,35 @@ namespace Quicker.Windows
                     break; // 打开动作页
             }
             actionManager.Dispose(); // 释放动作管理器资源
+        }
+
+        /// <summary>
+        /// 切换动作页
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public async void OpenActionPage(ButtonData data)
+        {
+            string[] actionInfo = data.Location.Split(';'); // 解析数据
+            string style = actionInfo[0]; // 获取动作页类型
+            int index = int.Parse(actionInfo[1]);
+            buttonManager.isClosing = false;
+            if (style != "Global") OnCommonStyleChanged(style); // 如果切换到非全局动作页，更新样式
+            int currentCanvasIndex = GetVisibleCanvasIndex(style);
+
+            // 使用异步调度来减少UI线程阻塞
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                if (currentCanvasIndex > index)
+                {
+                    for (int i = currentCanvasIndex; i > index; i--)
+                        SwitchToPreviousCanvas(i, style);
+                }
+                else
+                {
+                    for (int i = currentCanvasIndex; i < index; i++)
+                        SwitchToNextCanvas(i, style);
+                }
+            });
         }
 
         // 右键按钮打开菜单

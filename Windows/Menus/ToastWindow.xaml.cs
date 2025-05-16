@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows;
 
@@ -9,10 +10,10 @@ namespace Quicker.Windows.Menus
 {
     public partial class ToastWindow : Window
     {
-        private const string commonColor = "#FF326CF3";
-        private const string errorColor = "#FFFF6700";
-        private const string warningColor = "Red";
-        private const string successColor = "LightGreen";
+        private const string commonColor = "#FF326CF3"; // 示例通用颜色
+        private const string errorColor = "#F5A300"; // 示例错误颜色
+        private const string warningColor = "Red"; // 示例警告颜色
+        private const string successColor = "#11AD45"; // 示例成功颜色
 
         private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
         private Queue<Message> messageQueue = new(); // 创建消息队列
@@ -64,22 +65,24 @@ namespace Quicker.Windows.Menus
         /// 显示消息
         /// </summary>
         /// <param name="msg"> 消息内容 </param>
+        /// <summary>
+        /// 显示消息
+        /// </summary>
+        /// <param name="msg"> 消息内容 </param>
         private void ShowToast(Message msg)
         {
             var border = InitializeBoarder(msg.Type); // 初始化边框
             var textblock = InitalizeToast(msg.Content); // 初始化消息
-            border.Child = textblock; // 将消息添加到边框中
+            Grid grid = new Grid();
+            border.Child = grid; // 将消息添加到边框中
+            grid.Children.Add(textblock); // 将消息添加到网格中
 
-            // 设置初始透明度为0
-            border.Opacity = 0;
+            // 初始化关闭按钮，并传入边框对象
+            var closeToastButton = InitalizeCloseButton(border);
+            closeToastButton.Click += (s, e) => DeleteToast(border); // 关闭按钮点击事件
+            grid.Children.Add(closeToastButton); // 将关闭按钮添加到网格中
 
-            // 创建淡入动画
-            DoubleAnimation fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(0.2)));
-            Storyboard.SetTarget(fadeIn, border);
-            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(UIElement.OpacityProperty));
-            Storyboard fadeInStoryboard = new Storyboard();
-            fadeInStoryboard.Children.Add(fadeIn);
-            fadeInStoryboard.Begin();
+            InitializeAnimation(border); // 初始化动画
 
             // 为每个消息创建一个独立的计时器
             DispatcherTimer timer = new DispatcherTimer();
@@ -99,16 +102,17 @@ namespace Quicker.Windows.Menus
         {
             Border border = new Border()
             {
-                Width = 400,
-                Margin = new Thickness(0, 5, 0, 5),
-                CornerRadius = new CornerRadius(5)
+                Width = 400, // 设置边框宽度
+                Opacity = 0, // 设置初始不透明度
+                Margin = new Thickness(0, 5, 0, 5), // 设置边距
+                CornerRadius = new CornerRadius(5) // 设置边框圆角
             }; // 创建消息边框
 
             string color = ""; // 根据消息类型设置边框颜色
             switch (toastType)
             {
                 case "Common":
-                    color = commonColor;
+                    color = commonColor; // 示例通用颜色
                     break;
                 case "Error":
                     color = errorColor; // 示例错误颜色
@@ -126,6 +130,54 @@ namespace Quicker.Windows.Menus
         }
 
         /// <summary>
+        /// 初始化关闭按钮
+        /// </summary>
+        /// <returns> 关闭按钮 </returns>
+        private Button InitalizeCloseButton(Border border)
+        {
+            Button button = new Button()
+            {
+                Style = (Style)FindResource("CloseToastButton"), // 设置按钮样式
+            };
+
+            Path path = new Path()
+            {
+                StrokeThickness = 2, // 设置边框宽度
+                Stroke = Brushes.White, // 设置边框颜色
+                Margin = new Thickness(1), // 设置边距
+                Stretch = Stretch.Uniform, // 设置图片拉伸方式
+                VerticalAlignment = VerticalAlignment.Center, // 设置垂直居中
+                HorizontalAlignment = HorizontalAlignment.Center, // 设置水平居中
+                Data = Geometry.Parse("M 0 0 L 10 10 M 10 0 L 0 10") // 设置关闭按钮图标
+            };
+            button.Content = path;
+
+            // 添加鼠标进入和离开事件处理程序
+            button.MouseEnter += (s, e) =>
+            {
+                e.Handled = true; // 阻止事件冒泡
+                if (border.Background is SolidColorBrush borderBrush)
+                {
+                    Color originalColor = borderBrush.Color;
+                    // 使背景颜色更深
+                    Color darkerColor = Color.FromRgb(
+                        (byte)(originalColor.R * 0.9),
+                        (byte)(originalColor.G * 0.9),
+                        (byte)(originalColor.B * 0.9)
+                    );
+                    button.Background = new SolidColorBrush(darkerColor); // 设置按钮的背景色
+                }
+            };
+
+            button.MouseLeave += (s, e) =>
+            {
+                button.Background = new SolidColorBrush(Colors.Transparent); // 恢复按钮的背景色
+            };
+
+            return button;
+        }
+
+        /// <summary>
         /// 初始化消息
         /// </summary>
         /// <param name="message"> 消息内容 </param>
@@ -133,13 +185,25 @@ namespace Quicker.Windows.Menus
         {
             TextBlock textBlock = new TextBlock()
             {
-                FontSize = 16,
-                Text = message,
-                Margin = new Thickness(20, 20, 20, 20),
-                VerticalAlignment = VerticalAlignment.Center,
-                Foreground = new SolidColorBrush(Colors.White)
+                FontSize = 16, // 设置字体大小
+                Text = message, // 设置消息内容
+                TextWrapping = TextWrapping.Wrap, // 设置消息内容自动换行
+                Margin = new Thickness(20, 20, 20, 20), // 设置边距
+                VerticalAlignment = VerticalAlignment.Center, // 设置垂直对齐方式
+                Foreground = new SolidColorBrush(Colors.White) // 设置字体颜色
             };
             return textBlock; // 返回消息
+        }
+
+        // 初始化动画
+        private void InitializeAnimation(Border border)
+        {
+            DoubleAnimation fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(0.2))); // 设置淡入动画
+            Storyboard.SetTarget(fadeIn, border); // 设置动画目标为边框
+            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(UIElement.OpacityProperty)); // 设置动画目标属性
+            Storyboard fadeInStoryboard = new Storyboard(); // 创建动画播放器
+            fadeInStoryboard.Children.Add(fadeIn); // 添加动画到播放器中
+            fadeInStoryboard.Begin(); // 开始播放动画
         }
 
         // 计时器事件

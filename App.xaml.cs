@@ -416,15 +416,15 @@ namespace Quicker
         // 暂停Quicker
         public async void PauseQuicker(object sender, RoutedEventArgs e)
         {
+            hook?.Dispose(); // 销毁当前钩子
+            hook = null; // 清空钩子
+            if (_appStateManager.Pause) InitializeHookAsync(); // 重新初始化钩子
+
             var toastMessage = _appStateManager.Pause ? "Quicker已恢复" : "Quicker已暂停"; // 消息提醒
             var text = _appStateManager.Pause ? "暂停" : "恢复"; // 消息提醒
             CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
             customMenu.PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
             ChangeTrayIcon(_appStateManager.Pause); // 切换托盘图标
-
-            hook?.Dispose(); // 销毁当前钩子
-            hook = null; // 清空钩子
-            if (_appStateManager.Pause) await InitializeHookAsync(); // 重新初始化钩子
 
             _appStateManager.Pause = !_appStateManager.Pause; // 切换暂停状态
             _appStateManager.ToastManager.AddToast(toastMessage, _appStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒

@@ -39,8 +39,8 @@ namespace Quicker.Windows
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
-            TypeChanged("Global"); // 默认加载全局动作页
             LoadBasicButtonPrefixes(); // 加载按钮前缀
+            TypeChanged("Global"); // 默认加载全局动作页
         }
 
         /// <summary>
@@ -49,8 +49,41 @@ namespace Quicker.Windows
         /// <param name="targetType"> 目标类型 </param>
         private void TypeChanged(string targetType)
         {
-            type = targetType;
+            type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
+            SetButtonBackground(); // 设置动作页按钮背景色
+        }
+
+        // 设置动作页按钮背景色
+        private void SetButtonBackground()
+        {
+            foreach (UIElement element in ActionPagesButtonPanel.Children)
+            {
+                Button button = element as Button; // 转换为按钮
+                button.Background = button.Name == type
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
+                    : System.Windows.Media.Brushes.Transparent; // 设置背景色
+            }
+        }
+
+        // 鼠标移入Button高亮显示黑名单项
+        private void HightLightBlacklistItem(object sender, MouseEventArgs e)
+        {
+            Button button = sender as Button; // 转换发送者为Button对象
+            if(button.Name != type)
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3"));
+            button.Background = button.Name == type
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置背景色
+        }
+
+        // 鼠标移出Button恢复原状
+        private void FadeBlacklistItem(object sender, MouseEventArgs e)
+        {
+            Button button = sender as Button; // 转换发送者为Button对象
+            button.Background = button.Name == type
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
+                : System.Windows.Media.Brushes.Transparent; // 设置背景色
         }
 
         // 加载动作页按钮
@@ -92,6 +125,8 @@ namespace Quicker.Windows
 
                 // 设置点击事件
                 button.Click += buttonClickHandlers[i];
+                button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
+                button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
 
                 // 将按钮添加到StackPanel
                 ActionPagesButtonPanel.Children.Add(button);
@@ -393,7 +428,7 @@ namespace Quicker.Windows
         // 添加动作页
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
-            int canvasIndex = MainListView.Items.Count; // 获取画布索引
+            int canvasIndex = MainListView.Items.Count - 1; // 获取画布索引
             if (canvasIndex == 9) // 如果画布索引等于9
                 toastManager.AddToast("当前动作页数量已达上限。", "Error"); // 弹出消息提醒
             else if (canvasIndex == 0)
@@ -410,7 +445,7 @@ namespace Quicker.Windows
             }
             else
             {
-                db3.UpdateActionPageTable(type, type, "", canvasIndex++, "",""); // 更新动作页数据表
+                db3.UpdateActionPageTable(type, type, "", MainListView.Items.Count + 1, "", ""); // 更新动作页数据表
                 GenerateCanvas(canvasIndex, type); // 生成画布
             }
         }

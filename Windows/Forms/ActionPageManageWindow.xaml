@@ -12,30 +12,6 @@
     Height="850"
     Width="1200"
 >
-    <Window.Resources>
-        <Style x:Key="ActionPageButton" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Height" Value="38"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#F5F5F5"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
     <Grid>
         <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28" TextChanged="SearchTextBox_TextChanged"/>
         <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">

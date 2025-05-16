@@ -16,9 +16,7 @@
     Height="500"
     Width="480"
 >
-    <Grid>
-        <Border Margin="10,0,10,0" VerticalAlignment="Bottom">
-            <StackPanel x:Name="ToastStackPanel" VerticalAlignment="Bottom"/>
-        </Border>
-    </Grid>
+    <Border Margin="10,0,10,0" VerticalAlignment="Bottom">
+        <StackPanel x:Name="ToastStackPanel" VerticalAlignment="Bottom"/>
+    </Border>
 </Window>
