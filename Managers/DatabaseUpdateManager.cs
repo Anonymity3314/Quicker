@@ -95,10 +95,10 @@ namespace Quicker.Managers
             {
                 switch (dbVersion)
                 {
-                    case "2.1.4":
+                    case "2.2.0":
                         break;
                     case "2.1.3":
-                        UpdateFrom2_1_3To2_1_4(); // 数据库版本从2.1.3升级到2.1.4
+                        UpdateFrom2_1_3To2_2_0(); // 数据库版本从2.1.3升级到2.2.0
                         break;
                     case "2.1.2":
                         UpdateFrom2_1_2To2_1_3(); // 数据库版本从2.1.2升级到2.1.3
@@ -121,10 +121,10 @@ namespace Quicker.Managers
             }
         }
 
-        // 数据库版本从2.1.3升级到2.1.4
-        private void UpdateFrom2_1_3To2_1_4()
+        // 数据库版本从2.1.3升级到2.2.0
+        private void UpdateFrom2_1_3To2_2_0()
         {
-            SetCurrentVersion("2.1.4"); // 设置数据库版本为2.1.4
+            SetCurrentVersion("2.2.0"); // 设置数据库版本为2.2.0
             if (ExistButtonDatabase()) // 如果存在按钮数据库
             {
                 Update2_1_3ButtonDatabase("Global");
@@ -132,6 +132,7 @@ namespace Quicker.Managers
                 if (db2.TableExists("Desktop")) Update2_1_3ButtonDatabase("Desktop");
                 if (db2.TableExists("Taskbar")) Update2_1_3ButtonDatabase("Taskbar");
             }
+            Update2_1_3SettingDatabase(); // 更新设置数据库
         }
 
         /// <summary>
@@ -140,8 +141,8 @@ namespace Quicker.Managers
         /// <param name="tableName"> 表名 </param>
         private void Update2_1_3ButtonDatabase(string tableName)
         {
-            using var connection = db2.OpenConnection();
-            using var transaction = connection.BeginTransaction();
+            using var connection = db2.OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
             try
             {
                 // 创建临时表
@@ -197,6 +198,29 @@ namespace Quicker.Managers
             {
                 transaction.Rollback(); // 回滚事务
             }
+        }
+
+        // 更新设置数据库
+        private void Update2_1_3SettingDatabase()
+        {
+            using var connection = db1.OpenConnection(); // 打开数据库连接
+            string addRememberLastPageQuery = @"
+            ALTER TABLE Convention 
+            ADD COLUMN RememberLastPage BOOL DEFAULT FALSE;"; // 为Convention表添加RememberLastPage列
+            using var addRememberLastPageCommand = new SQLiteCommand(addRememberLastPageQuery, connection);
+            addRememberLastPageCommand.ExecuteNonQuery(); // 执行更新命令
+
+            string addLastPageQuery = @"
+            ALTER TABLE Convention 
+            ADD COLUMN RememberLastPage INTEGER DEFAULT 11;"; // 为Convention表添加LastPage列
+            using var addLastPageCommand = new SQLiteCommand(addLastPageQuery, connection);
+            addLastPageCommand.ExecuteNonQuery(); // 执行更新命令
+
+            string addEnableMemoryOptimizationQuery = @"
+            ALTER TABLE Convention 
+            ADD COLUMN EnableMemoryOptimization BOOL DEFAULT TRUE;"; // 为Convention表添加EnableMemoryOptimization列
+            using var addEnableMemoryOptimizationCommand = new SQLiteCommand(addEnableMemoryOptimizationQuery, connection);
+            addEnableMemoryOptimizationCommand.ExecuteNonQuery(); // 执行更新命令
         }
 
         // 数据库版本从2.1.2升级到2.1.3

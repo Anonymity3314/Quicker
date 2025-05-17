@@ -17,6 +17,11 @@
         <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">
             <StackPanel x:Name="ActionPagesButtonPanel"/>
         </Border>
+        <Button x:Name="AddSceneButton" Style="{StaticResource AddSceneButton}" ToolTip="添加场景" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="50" Click="AddSceneButton_Click"/>
+        <Button x:Name="EditSceneButton" Style="{StaticResource EditSceneButton}" ToolTip="修改场景设置" HorizontalAlignment="Left" Margin="59,0,0,10" VerticalAlignment="Bottom" Width="50" Click="EditSceneButton_Click"/>
+        <Button x:Name="DeleteSceneButton" Style="{StaticResource DeleteSceneButton}" ToolTip="删除场景" HorizontalAlignment="Left" Margin="108,0,0,10" VerticalAlignment="Bottom" Width="50" Click="DeleteSceneButton_Click"/>
+        <Button x:Name="ToTopSceneButton" Style="{StaticResource WhiteButton}" ToolTip="到顶部" HorizontalAlignment="Left" Margin="200,0,0,10" VerticalAlignment="Bottom" Width="30" Click="ToTopSceneButton_Click"/>
+
         <Label Content="提示：将窗口最大化可以方便排序动作页。" Foreground="#FFABADB3" Margin="0,5,10,0" VerticalAlignment="Top" FontSize="11" HorizontalAlignment="Right" Width="229" MouseDoubleClick="ChangeActionButtonBakground">
             <Label.ToolTip>
                 <ToolTip Content="双击这里：将按钮背景色改为灰色" Foreground="Black"/>

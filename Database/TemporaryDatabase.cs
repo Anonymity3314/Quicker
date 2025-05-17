@@ -23,14 +23,6 @@ namespace Quicker.Database
             }
         }
 
-        // 删除数据库文件
-        public void DeleteDatabase()
-        {
-            string dbFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Temporary.db"); // 设置数据库文件路径
-            if (File.Exists(dbFilePath))
-                File.Delete(dbFilePath); // 删除数据库文件
-        }
-
         // 初始化 Convention 表
         private void InitializeConvention()
         {
@@ -39,15 +31,8 @@ namespace Quicker.Database
             CREATE TABLE IF NOT EXISTS Convention
             (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Version TEXT,
-                AutoStart BOOL,
-                ShowNotification BOOL,
-                ShowAddImage BOOL,
-                TotalUsageTime REAL,
-                HideTooltip BOOL,
                 LongPressThreshold INTEGER,
-                MouseMovePixels INTEGER,
-                LoopPageFlipping BOOL
+                MouseMovePixels INTEGER
             );"; // 创建 Convention 表
             using var createConventionCommand = new SQLiteCommand(createConventionTableQuery, connection); // 创建 SQLiteCommand 对象
             createConventionCommand.ExecuteNonQuery(); // 执行创建表的命令
@@ -117,19 +102,12 @@ namespace Quicker.Database
             using var connection = OpenConnection(); // 打开数据库连接
             string insertQuery = @"
             INSERT INTO Convention 
-            (Version, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
+            (LongPressThreshold, MouseMovePixels)
             VALUES 
-            (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
+            (@LongPressThreshold, @MouseMovePixels);";
             using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
-            command.Parameters.AddWithValue("@Version", convention.Version); // 添加参数
-            command.Parameters.AddWithValue("@AutoStart", convention.AutoStart); // 添加参数
-            command.Parameters.AddWithValue("@ShowNotification", convention.ShowNotification); // 添加参数
-            command.Parameters.AddWithValue("@ShowAddImage", convention.ShowAddImage); // 添加参数
-            command.Parameters.AddWithValue("@TotalUsageTime", convention.TotalUsageTime); // 添加参数
-            command.Parameters.AddWithValue("@HideTooltip", convention.HideTooltip); // 添加参数
             command.Parameters.AddWithValue("@LongPressThreshold", convention.LongPressThreshold); // 添加参数
             command.Parameters.AddWithValue("@MouseMovePixels", convention.MouseMovePixels); // 添加参数
-            command.Parameters.AddWithValue("@LoopPageFlipping", convention.LoopPageFlipping); // 添加参数
             command.ExecuteNonQuery(); // 执行插入命令
         }
 
@@ -211,16 +189,8 @@ namespace Quicker.Database
             {
                 return new Convention
                 {
-                    ID = reader.GetInt32(0),
-                    Version = reader.GetString(1),
-                    AutoStart = reader.GetBoolean(2),
-                    ShowNotification = reader.GetBoolean(3),
-                    ShowAddImage = reader.GetBoolean(4),
-                    TotalUsageTime = reader.GetDouble(5),
-                    HideTooltip = reader.GetBoolean(6),
-                    LongPressThreshold = reader.GetInt32(7),
-                    MouseMovePixels = reader.GetInt32(8),
-                    LoopPageFlipping = reader.GetBoolean(9)
+                    LongPressThreshold = reader.GetInt32(1),
+                    MouseMovePixels = reader.GetInt32(2),
                 };
             }
             return null; // 如果查询结果为空，则返回 null

@@ -10,7 +10,8 @@ namespace Quicker.UserControls
 {
     public partial class OpenMainWindowGrid : UserControl
     {
-        private SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        private List<string> ShortcutKeys = new(); // 保存快捷键
+        private SettingDatabase db1 = new(); // 设置数据库
         SettingManager settingManager; // 设置管理器
 
         public OpenMainWindowGrid(SettingWindow settingWindow)

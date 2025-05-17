@@ -10,8 +10,8 @@ namespace Quicker.UserControls
 {
     public partial class ConventionGrid : UserControl
     {
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
-        ActionManager actionManager = new ActionManager(); // 动作管理器
+        private readonly SettingDatabase db1 = new(); // 设置数据库
+        ActionManager actionManager = new(); // 动作管理器
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
         private double totalUsageTime; // 总使用时长
@@ -46,6 +46,8 @@ namespace Quicker.UserControls
                 LongPressThresholdTextBox.Text = settingManager.conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
                 MouseMovePixelsTextBox.Text = settingManager.conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
                 LoopPageFlippingCheckBox.IsChecked = settingManager.conventions.LoopPageFlipping; // 加载循环翻页设置
+                RememberLastPageCheckBox.IsChecked = settingManager.conventions.RememberLastPage; // 加载记住设置窗口中最后打开的页面
+                EnableMemoryOptimizationCheckBox.IsChecked = settingManager.conventions.EnableMemoryOptimization; // 加载启用内存优化设置
             });
         }
 

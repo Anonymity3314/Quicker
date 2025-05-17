@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using System.ComponentModel;
+using System.Windows.Shapes;
 using System.Windows.Media;
 using Quicker.UserControls;
 using System.Windows.Input;
@@ -17,21 +19,68 @@ namespace Quicker.Windows
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
         private readonly ToastManager toastManager = new(); // 通知管理器
-        public  SettingManager settingManager = new(); // 设置管理器
-        private List<string> ShortcutKeys = new(); // 保存快捷键
-        private  SettingDatabase db1 = new(); // 设置数据库
+        public readonly SettingManager settingManager = new(); // 设置管理器
+        private readonly SettingDatabase db1 = new(); // 设置数据库
 
         public SettingWindow()
         {
             InitializeComponent(); // 初始化xaml文件
-            InitializeWindow(); // 初始化窗口
         }
 
         // 初始化窗口
-        private async void InitializeWindow()
+        private void SettingWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            BasicSetting_Click(null, null); // 显示常规设置面板
-            Convention_Click(null, null); // 显示常规设置
+            var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            if (Convention.RememberLastPage)
+            {
+                SetLastPage(Convention.LastPage); // 设置上一次关闭时的状态
+            }
+            else
+            {
+                BasicSetting_Click(null, null); // 显示常规设置面板
+                Convention_Click(null, null); // 显示常规设置
+            }
+        }
+
+        /// <summary>
+        /// 设置成上一次关闭时的状态
+        /// </summary>
+        /// <param name="page"> </param>
+        private void SetLastPage(int page)
+        {
+            int num1 = page / 10; // 计算第几组按钮
+            int num2 = page % 10; // 计算第几个按钮
+            switch (num1)
+            {
+                case 1:
+                    BasicSetting_Click(null, null); // 点击基础设置按钮
+                    break;
+                case 2:
+                    Auxiliary_Functions_Click(null, null); // 点击辅助功能按钮
+                    break;
+                case 3:
+                    Tools_Click(null, null); // 点击工具按钮
+                    break;
+            }
+
+            switch (num2)
+            {
+                case 1:
+                    Convention_Click(null, null); // 点击常规设置按钮
+                    break;
+                case 2:
+                    OpenMainWindow_Click(null, null); // 点击弹出面板设置按钮
+                    break;
+                case 3:
+                    Blacklist_Click(null, null); // 点击黑名单设置按钮
+                    break;
+                case 4:
+                    Appearance_Click(null, null); // 点击外观设置按钮
+                    break;
+                case 5:
+                    AboutQuicker_Click(null, null); // 点击关于按钮
+                    break;
+            }
         }
 
         // 应用设置
@@ -56,7 +105,9 @@ namespace Quicker.Windows
                         settingManager.conventions.HideTooltip,
                         settingManager.conventions.LongPressThreshold,
                         settingManager.conventions.MouseMovePixels,
-                        settingManager.conventions.LoopPageFlipping); // 更新常规设置
+                        settingManager.conventions.LoopPageFlipping,
+                        settingManager.conventions.RememberLastPage,
+                        settingManager.conventions.EnableMemoryOptimization); // 更新常规设置
                 if (settingManager.openMainWindowConditions != null)
                     db1.ApplyOpenMainWindowSettings(
                         settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
@@ -225,15 +276,55 @@ namespace Quicker.Windows
             settingManager.ButtonStyle1_MouseLeave(sender, ToolsStackPanel); // 鼠标移出Button恢复Background
         }
 
+        // 关闭窗口时保存最后打开的页面
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            SetLastPage(); // 保存最后打开的页面
+        }
+
+        // 保存最后打开的页面
+        public void SetLastPage()
+        {
+            int lastpage = 0;
+            UIElement childElement = null;
+            foreach(UIElement child in ResultGrid.Children)
+            {
+                if (child is Rectangle || child is Button) continue; // 跳过 Rectangle 和 Button 元素
+                childElement = child; // 获取第一个子元素
+                break;
+            }
+            // 检查子元素的类型
+            if (childElement is ConventionGrid)
+            {
+                lastpage = 11; // 常规设置页面
+            }
+            else if (childElement is OpenMainWindowGrid)
+            {
+                lastpage = 12; // 弹出面板设置页面
+            }
+            else if(childElement is BlacklistGrid)
+            {
+                lastpage = 13; // 黑名单设置页面
+            }
+            else if (childElement is AppearanceGrid)
+            {
+                lastpage = 14; // 外观设置页面
+            }
+            else if (childElement is AboutQuickerGrid)
+            {
+                lastpage = 15; // 关于Quicker页面
+            }
+            db1.SetLastPage(lastpage); // 保存最后打开的页面
+        }
+
         // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
 
             settingManager.Dispose(); // 清空缓存
-            settingManager = null; // 清理引用
             toastManager.Dispose(); // 清理通知管理器
-            ShortcutKeys.Clear(); // 清空快捷键列表
 
             foreach (var child in MenuGrid.Children.OfType<StackPanel>()) // 清理用户控件
             {

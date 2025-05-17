@@ -279,7 +279,7 @@
 
     
     <!-- ActionPageManageWindow -->
-    <!-- 圆角Button -->
+    <!-- 动作 Button -->
     <Style x:Key="ActionButton" TargetType="Button">
         <Setter Property="Width" Value="65"/>
         <Setter Property="Height" Value="65"/>
@@ -310,8 +310,8 @@
         </Setter>
     </Style>
 
-    <!-- 动作页面的Button -->
-    <Style x:Key="ActionPageButton" TargetType="Button">
+    <!-- 动作场景的 Button -->
+    <Style x:Key="SceneButton" TargetType="Button">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Height" Value="38"/>
@@ -327,7 +327,88 @@
         </Setter>
     </Style>
     
+    <!-- 添加动作场景的 Button -->
+    <Style x:Key="AddSceneButton" TargetType="Button">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="White" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="5,0,0,5">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#F3F3F3"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 编辑动作场景的 Button -->
+    <Style x:Key="EditSceneButton" TargetType="Button">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="White" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#F3F3F3"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     
+    <!-- 删除动作场景的 Button -->
+    <Style x:Key="DeleteSceneButton" TargetType="Button">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="White" BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="0,5,5,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#F3F3F3"/>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
     <!-- ToastWindow -->
     <!-- 关闭 Toast 的 Button -->
     <Style x:Key="CloseToastButton" TargetType="Button">

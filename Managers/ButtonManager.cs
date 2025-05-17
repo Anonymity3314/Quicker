@@ -18,7 +18,6 @@ namespace Quicker.Managers
         private static readonly SolidColorBrush NoActionBrush =
             new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3"));
 
-
         public IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {
             if (obj == null) yield break; // 如果对象为空，停止枚举

@@ -8,7 +8,7 @@ namespace Quicker.UserControls
 {
     public partial class AppearanceGrid : UserControl
     {
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
+        private readonly SettingDatabase db1 = new(); // 设置数据库
         SettingManager settingManager; // 设置管理器
 
         public AppearanceGrid(SettingWindow settingWindow)

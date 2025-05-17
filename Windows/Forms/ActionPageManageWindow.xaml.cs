@@ -33,13 +33,13 @@ namespace Quicker.Windows
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
         private bool isDarkModle = false; // 是否为暗黑模式
-        private string type; // 动作页类型
+        private string type; // 场景类型
 
         public ActionPageManageWindow()
         {
             InitializeComponent(); // 初始化窗口
             LoadBasicButtonPrefixes(); // 加载按钮前缀
-            TypeChanged("Global"); // 默认加载全局动作页
+            TypeChanged("Common"); // 默认加载通用场景
         }
 
         /// <summary>
@@ -50,10 +50,10 @@ namespace Quicker.Windows
         {
             type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
-            SetButtonBackground(); // 设置动作页按钮背景色
+            SetButtonBackground(); // 设置场景按钮背景色
         }
 
-        // 设置动作页按钮背景色
+        // 设置场景按钮背景色
         private void SetButtonBackground()
         {
             foreach (UIElement element in ActionPagesButtonPanel.Children)
@@ -85,22 +85,22 @@ namespace Quicker.Windows
                 : System.Windows.Media.Brushes.Transparent; // 设置背景色
         }
 
-        // 加载动作页按钮
+        // 加载场景按钮
         private void LoadBasicButtonPrefixes()
         {
             var buttonInfo = new[]
             {
-                new { Name = "Global", Text = "全局" }, // 全局动作页按钮
-                new { Name = "Common", Text = "通用" }, // 通用动作页按钮
-                new { Name = "Taskbar", Text = "任务栏" }, // 任务栏动作页按钮
-                new { Name = "Desktop", Text = "桌面" } // 桌面动作页按钮
+                new { Name = "Global", Text = "全局" }, // 全局场景按钮
+                new { Name = "Common", Text = "通用" }, // 通用场景按钮
+                new { Name = "Taskbar", Text = "任务栏" }, // 任务栏场景按钮
+                new { Name = "Desktop", Text = "桌面" } // 桌面场景按钮
             }; // 定义按钮名称和文本的映射
             var buttonClickHandlers = new[]
             {
-                new RoutedEventHandler(GlobalButton_Click), // 全局动作页按钮点击事件
-                new RoutedEventHandler(CommonButton_Click), // 通用动作页按钮点击事件
-                new RoutedEventHandler(TaskBarButton_Click), // 任务栏动作页按钮点击事件
-                new RoutedEventHandler(DesktopButton_Click) // 桌面动作页按钮点击事件
+                new RoutedEventHandler(GlobalButton_Click), // 全局场景按钮点击事件
+                new RoutedEventHandler(CommonButton_Click), // 通用场景按钮点击事件
+                new RoutedEventHandler(TaskBarButton_Click), // 任务栏场景按钮点击事件
+                new RoutedEventHandler(DesktopButton_Click) // 桌面场景按钮点击事件
             }; // 为每个按钮创建事件处理方法
 
             // 动态生成按钮
@@ -108,7 +108,7 @@ namespace Quicker.Windows
             {
                 var button = new Button();
                 button.Name = buttonInfo[i].Name;
-                button.Style = FindResource("ActionPageButton") as Style; // 应用样式
+                button.Style = FindResource("SceneButton") as Style; // 应用样式
 
                 // 创建按钮内容
                 Grid buttonContent = new();
@@ -132,7 +132,7 @@ namespace Quicker.Windows
             }
         }
 
-        // 生成动作页按钮
+        // 生成场景按钮
         private void GenerateButtons(string style)
         {
 
@@ -174,8 +174,8 @@ namespace Quicker.Windows
             }
 
             if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
-            var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 获取动作页数据
-            for (int i = 0; i < actionPageData.ActionPageCount; i++)
+            var actionPageData = db3.GetSceneData(style).FirstOrDefault(); // 获取动作页数据
+            for (int i = 0; i < actionPageData.SceneCount; i++)
             {
                 MainListView.Items.Add(GenerateCanvas(i, style)); // 生成动作页
             }
@@ -416,6 +416,7 @@ namespace Quicker.Windows
         // 显示编辑窗口
         private void ShowEditWindow(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             if (sender is Button button && button.Tag != null)
             {
                 AddWindow addWindow = new AddWindow(button.Name, 0); // 创建编辑窗口
@@ -424,28 +425,28 @@ namespace Quicker.Windows
             }
         }
 
-        // 添加动作页
+        // 添加场景
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
-            int canvasIndex = MainListView.Items.Count - 1; // 获取画布索引
-            if (canvasIndex == 9) // 如果画布索引等于9
-                toastManager.AddToast("当前动作页数量已达上限。", "Error"); // 弹出消息提醒
-            else if (canvasIndex == 0)
+            int canvasCount = MainListView.Items.Count; // 获取画布索引
+            if (canvasCount == 10) // 如果画布索引等于9
+                toastManager.AddToast("当前场景数量已达上限。", "Error"); // 弹出消息提醒
+            else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
-                db3.CreatAndInitTable(type,"",""); // 创建动作页数据表
-                GenerateCanvas(canvasIndex, type); // 如果画布索引为0，则生成画布
+                db3.CreatAndInitTable(type,"",""); // 创建场景数据表
+                MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
                 if(type != "Global")
                 {
                     MainBorder.Height = 289; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-                    AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
+                    AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加场景按钮边距
                 }
             }
             else
             {
-                db3.UpdateActionPageTable(type, type, "", MainListView.Items.Count + 1, "", ""); // 更新动作页数据表
-                GenerateCanvas(canvasIndex, type); // 生成画布
+                db3.UpdateActionPageTable(type, type, "", canvasCount, ""); // 更新场景数据表
+                MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 生成画布
             }
         }
 
@@ -460,25 +461,25 @@ namespace Quicker.Windows
         // 全局按钮点击事件
         private void GlobalButton_Click(object sender, RoutedEventArgs e)
         {
-            TypeChanged("Global"); // 切换类型为全局动作页
+            TypeChanged("Global"); // 切换类型为全局场景
         }
 
         // 公共按钮点击事件
         private void CommonButton_Click(object sender, RoutedEventArgs e)
         {
-            TypeChanged("Common"); // 加载通用动作页
+            TypeChanged("Common"); // 加载通用场景
         }
 
-        // 加载任务栏动作页
+        // 加载任务栏场景
         private void TaskBarButton_Click(object sender, RoutedEventArgs e)
         {
-            TypeChanged("Taskbar"); // 设置类型为任务栏动作页
+            TypeChanged("Taskbar"); // 设置类型为任务栏场景
         }
 
-        // 加载桌面动作页
+        // 加载桌面场景
         private void DesktopButton_Click(object sender, RoutedEventArgs e)
         {
-            TypeChanged("Desktop"); // 设置类型为桌面动作页
+            TypeChanged("Desktop"); // 设置类型为桌面场景
         }
 
         // 打开创建动作菜单
@@ -536,7 +537,7 @@ namespace Quicker.Windows
         /// 更新 ListView 中的特定 Canvas
         /// </summary>
         /// <param name="canvasIndex">画布索引</param>
-        /// <param name="styleType">动作页类型</param>
+        /// <param name="styleType">场景类型</param>
         private void UpdateCanvasInListView(int canvasIndex, string styleType)
         {
             var oldCanvas = MainListView.Items[canvasIndex] as Canvas; // 获取旧的 Canvas
@@ -545,13 +546,12 @@ namespace Quicker.Windows
             MainListView.Items.Insert(canvasIndex, newCanvas); // 在主列表视图中插入新的 Canvas
         }
 
-
-        // 查找动作页按钮
+        // 查找场景按钮
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写
             if (string.IsNullOrEmpty(searchText))
-                ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
+                ActionPagesButtonPanel.Children.Clear(); // 清空场景按钮面板
         }
 
         // 双击标签切换动作按钮背景色
@@ -581,55 +581,55 @@ namespace Quicker.Windows
         /// <returns> 绑定按钮 </returns>
         private Button GetBingdingButton()
         {
-            EditActionPagePopup.IsOpen = false; // 关闭编辑动作页弹出菜单
+            EditActionPagePopup.IsOpen = false; // 关闭编辑场景弹出菜单
             return EditActionPagePopup.PlacementTarget as Button; // 获取弹出菜单所绑定按钮
         }
 
-        // 点击按钮查看动作页信息
+        // 点击按钮查看场景信息
         private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
         }
 
-        // 点击按钮复制动作页 ID
+        // 点击按钮复制场景 ID
         private void CopyActionPageIDButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
-            toastManager.AddToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 显示复制成功的通知
+            toastManager.AddToast($"场景ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 显示复制成功的通知
         }
 
-        // 点击按钮编辑动作页信息
+        // 点击按钮编辑场景信息
         private void EditActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             switch (type)
             {
                 case "Global":
-                    toastManager.AddToast("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    toastManager.AddToast("默认全局场景信息不可修改。", "Common"); // 弹出消息提醒
                     break;
                 case "Common":
-                    toastManager.AddToast("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    toastManager.AddToast("默认通用场景信息不可修改。", "Common"); // 弹出消息提醒
                     break;
                 default:
                     string canvasIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取画布索引
-                    EditActionPageInfoWindow editActionPageInfoWindow = new(type, canvasIndex); // 创建编辑动作页信息窗口
-                    editActionPageInfoWindow.Show(); // 显示编辑动作页信息窗口
+                    EditActionPageInfoWindow editActionPageInfoWindow = new(type, canvasIndex); // 创建编辑场景信息窗口
+                    editActionPageInfoWindow.Show(); // 显示编辑场景信息窗口
                     break;
             }
         }
 
-        // 点击按钮创建打开动作页动作
+        // 点击按钮创建打开场景动作
         private void CreatOpenActionPageActionButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
-            string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取动作页名称
-            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开动作页指令
+            string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取场景名称
+            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开场景指令
             Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
             toastManager.AddToast("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 显示创建成功的通知
         }
 
-        // 点击按钮删除动作页
+        // 点击按钮删除场景
         private void DeleteActionPageButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
@@ -640,15 +640,62 @@ namespace Quicker.Windows
             string targetButtonName = bingdingButton.Name.Replace("Edit", ""); // 获取目标按钮名称
             int canvadIndex = int.Parse(targetButtonName.Replace(type, "")); // 获取画布索引
             db2.DeletePageOfButtons(type, canvadIndex); // 删除按钮数据页
-            // 更新动作页数据表
-            var actionPageData = db3.GetActionPageData(type).FirstOrDefault(); // 获取动作页数据
-            db3.UpdateActionPageTable(type, type, actionPageData.ActionPageIconPath, MainListView.Items.Count, actionPageData.ActionPageTag, ""); // 更新动作页数据表
+            // 更新场景数据表
+            var sceneData = db3.GetSceneData(type).FirstOrDefault(); // 获取场景数据
+            db3.UpdateActionPageTable(type, type, sceneData.SceneIconPath, MainListView.Items.Count, sceneData.SceneTag); // 更新场景数据表
             if(MainListView.Items.Count == 0)
             {
                 db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
-                db3.DeleteActionPageTable(type, type); // 如果没有画布，则删除动作页数据表
+                db3.DeleteActionPageTable(type, type); // 如果没有画布，则删除场景数据表
             }
             LoadCanvas(type); // 刷新界面
+        }
+
+        // 点击按钮添加场景
+        private void AddSceneButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // 点击按钮编辑场景
+        private void EditSceneButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (type)
+            {
+                case "Global":
+                case "Common":
+                case "Taskbar":
+                case "Desktop":
+                    toastManager.AddToast("此项不可编辑。", "Common"); // 弹出消息提醒
+                    break;
+                default:
+                    string canvasIndex = GetBingdingButton().Name.Replace("Edit" + type, ""); // 获取画布索引
+                    EditSceneWindow editSceneWindow = new(type); // 创建编辑场景窗口
+                    editSceneWindow.Show(); // 显示编辑场景窗口
+                    break;
+            }
+        }
+
+        // 点击按钮删除场景
+        private void DeleteSceneButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (type)
+            {
+                case "Global":
+                case "Common":
+                case "Taskbar":
+                case "Desktop":
+                    toastManager.AddToast("不能删除此场景。", "Common"); // 弹出消息提醒
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // 点击按钮前往顶层场景
+        private void ToTopSceneButton_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalButton_Click(sender, e); // 切换类型为全局场景
         }
 
         // 关闭窗口时释放资源
@@ -727,7 +774,7 @@ namespace Quicker.Windows
                 }
             }
 
-            // 清理动作页按钮面板中的所有按钮
+            // 清理场景按钮面板中的所有按钮
             while (ActionPagesButtonPanel.Children.Count > 0)
             {
                 UIElement child = ActionPagesButtonPanel.Children[0];

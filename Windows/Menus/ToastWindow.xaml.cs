@@ -10,7 +10,7 @@ namespace Quicker.Windows.Menus
 {
     public partial class ToastWindow : Window
     {
-        private const string commonColor = "#FF326CF3"; // 示例通用颜色
+        private const string commonColor = "#147EC9"; // 示例通用颜色
         private const string errorColor = "#F5A300"; // 示例错误颜色
         private const string warningColor = "Red"; // 示例警告颜色
         private const string successColor = "#11AD45"; // 示例成功颜色

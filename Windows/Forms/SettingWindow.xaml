@@ -13,6 +13,8 @@
     MinWidth="863"
     Width="1211"
     Height="870"
+    
+    Loaded="SettingWindow_Loaded"
 >
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>

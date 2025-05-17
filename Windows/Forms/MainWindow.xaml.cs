@@ -91,10 +91,10 @@ namespace Quicker.Windows
         // 生成页面切换 Button
         private void GenerateButtons()
         {
-            var globalActionPageData = db3.GetActionPageData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
-            var commonActionPageData = db3.GetActionPageData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
-            GeneratePageButtons("Global", globalActionPageData.ActionPageCount, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
-            GeneratePageButtons(CommonStyle, commonActionPageData.ActionPageCount, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
+            var globalSceneData = db3.GetSceneData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
+            var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
+            GeneratePageButtons("Global", globalSceneData.SceneCount, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
+            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
         }
 
         /// <summary>
@@ -559,11 +559,11 @@ namespace Quicker.Windows
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
             int targetCanvasIndex = isNext ? currentCanvasIndex + 1 : currentCanvasIndex - 1; // 计算目标Canvas编号
-            var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 从数据库中获取动作页数据
-            if (targetCanvasIndex == actionPageData.ActionPageCount || targetCanvasIndex < 0) // 如果目标Canvas编号超出范围
+            var sceneData = db3.GetSceneData(style).FirstOrDefault(); // 从数据库中获取动作页数据
+            if (targetCanvasIndex == sceneData.SceneCount || targetCanvasIndex < 0) // 如果目标Canvas编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
-                    targetCanvasIndex = isNext ? 0 : actionPageData.ActionPageCount; // 循环到第一页或最后一页
+                    targetCanvasIndex = isNext ? 0 : sceneData.SceneCount; // 循环到第一页或最后一页
                 else return; // 如果不循环翻页，直接返回
             }
 

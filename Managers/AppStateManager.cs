@@ -29,7 +29,6 @@ namespace Quicker
             return Temporary.GetBlacklistApplications(); // 从临时数据库获取 BlacklistApplications
         }
 
-
         /// <summary>
         /// 从临时数据库获取 OpenMainWindowConditions
         /// </summary>
@@ -81,6 +80,7 @@ namespace Quicker
         public string CommonState { get; set; } = string.Empty; // 通用状态
         public float Left { get; set; } = 0; // 窗口与屏幕左边距离
         public float Top { get; set; } = 0; // 窗口与屏幕上边距离
+        public bool EnableMemoryOptimization { get; set; } = false; // 是否启用内存优化
 
         public AppStateManager()
         {
@@ -98,27 +98,30 @@ namespace Quicker
             BlacklistSettings = blacklistList[0]; // 只有一条记录
             BlacklistApplications = Db.GetAllBlacklistApplications(); // 获取所有 BlacklistApplications
 
-            // 将数据插入临时数据库
-            Temporary.InsertConvention(Conventions);
-            Temporary.InsertOpenMainWindowConditions(OpenMainWindowConditions);
-            Temporary.InsertBlacklistSettings(BlacklistSettings);
-            foreach (var app in BlacklistApplications)
+            var setting = conventions.FirstOrDefault(); // 获取设置
+            EnableMemoryOptimization = setting.EnableMemoryOptimization; // 设置是否启用内存优化
+            if (EnableMemoryOptimization) // 如果启用内存优化
             {
-                Temporary.InsertBlacklistApplication(app);
-            }
+                // 将数据插入临时数据库
+                Temporary.InsertConvention(Conventions); // 插入 Convention
+                Temporary.InsertOpenMainWindowConditions(OpenMainWindowConditions); // 插入 OpenMainWindowConditions
+                Temporary.InsertBlacklistSettings(BlacklistSettings); // 插入 BlacklistSettings
+                foreach (var app in BlacklistApplications) // 插入 BlacklistApplications
+                {
+                    Temporary.InsertBlacklistApplication(app); // 插入 BlacklistApplications
+                }
 
-            // 清空 AppState 中的缓存数据
-            Conventions = null; // 清空 Convertions
-            OpenMainWindowConditions = null; // 清空 OpenMainWindowConditions
-            BlacklistSettings = null; // 
-            BlacklistApplications = null; // 
+                // 清空 AppState 中的缓存数据
+                Conventions = null; // 清空 Convertions
+                OpenMainWindowConditions = null; // 清空 OpenMainWindowConditions
+                BlacklistSettings = null; // 清空 BlacklistSettings
+                BlacklistApplications = null; // 清空 BlacklistApplications
+            }
         }
 
         // 释放托管资源
         public void Dispose()
         {
-            Temporary.DeleteDatabase(); // 删除临时数据库
-            Temporary = null; // 清空临时数据库
             PressTimer.Stop(); // 停止鼠标按下定时器
             PressTimer = null; // 清空鼠标按下定时器
             Timer.Stop(); // 停止计时器
@@ -132,6 +135,7 @@ namespace Quicker
             DatabaseUpdateManager?.Dispose(); // 释放更新管理器资源
             DatabaseUpdateManager = null; // 清空更新管理器
             Db = null; // 清空数据库操作对象
+            Temporary = null; // 清空临时数据库
         }
     }
 }

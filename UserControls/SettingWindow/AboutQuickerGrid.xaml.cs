@@ -2,24 +2,24 @@
 using Quicker.UserControls;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Reflection;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using System.IO;
-using System.Reflection;
-using System.Windows.Shell;
 
 namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {
-        ActionManager actionManager = new ActionManager(); // 创建动作管理器
+        ActionManager actionManager = new(); // 创建动作管理器
         SettingManager settingManager; // 读取设置的管理器
 
         public AboutQuickerGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
             settingManager = settingWindow.settingManager; // 创建设置管理器
+            settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
         }
 

@@ -8,7 +8,7 @@ public class SettingDatabase
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
     private readonly static string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
     private readonly static ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-    public readonly string currentVersion = "2.1.4"; // 当前版本号
+    public readonly string currentVersion = "2.2.0"; // 当前版本号
 
     public SettingDatabase()
     {
@@ -41,7 +41,10 @@ public class SettingDatabase
             HideTooltip BOOL,
             LongPressThreshold INTEGER,
             MouseMovePixels INTEGER,
-            LoopPageFlipping BOOL
+            LoopPageFlipping BOOL,
+            RememberLastPage BOOL,
+            LastPage INTEGER,
+            EnableMemoryOptimization BOOL
         );"; // 创建 Convention 表
         using var createConventionCommand = new SQLiteCommand(createConventionTableQuery, connection); // 创建 SQLiteCommand 对象
         createConventionCommand.ExecuteNonQuery(); // 执行创建表的命令
@@ -54,9 +57,9 @@ public class SettingDatabase
         using var connection = OpenConnection(); // 打开数据库连接
         string insertConventionQuery = @"
             INSERT INTO Convention 
-            (Version, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
+            (Version, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping, RememberLastPage, LastPage, EnableMemoryOptimization)
             VALUES 
-            (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping);";
+            (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping, @RememberLastPage, @LastPage, @EnableMemoryOptimization);";
         using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
         insertConventionCommand.Parameters.AddWithValue("@Version", currentVersion); // 版本号
         insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
@@ -67,6 +70,9 @@ public class SettingDatabase
         insertConventionCommand.Parameters.AddWithValue("@LongPressThreshold", 300); // 长按阈值
         insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
         insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
+        insertConventionCommand.Parameters.AddWithValue("@RememberLastPage", false); // 是否记住设置窗口中最后打开的页面
+        insertConventionCommand.Parameters.AddWithValue("@LastPage", 11); // 设置窗口中最后打开的页面
+        insertConventionCommand.Parameters.AddWithValue("@EnableMemoryOptimization", true); // 是否启用内存优化
         insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
     }
 
@@ -175,7 +181,9 @@ public class SettingDatabase
     /// <param name="longPressThreshold"> 长按阈值 </param>
     /// <param name="mouseMovePixels"> 鼠标移动像素 </param>
     /// <param name="loopPageFlipping"> 是否循环翻页 </param>
-    public void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping)
+    /// <param name="rememberLastPage"> 是否记住设置窗口中最后打开的页面 </param>
+    /// <param name="enableMemoryOptimization"> 是否启用内存优化 </param>
+    public void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var command = new SQLiteCommand(@"
@@ -186,7 +194,9 @@ public class SettingDatabase
             HideTooltip = @HideTooltip,
             LongPressThreshold = @LongPressThreshold,
             MouseMovePixels = @MouseMovePixels,
-            LoopPageFlipping = @LoopPageFlipping
+            LoopPageFlipping = @LoopPageFlipping,
+            RememberLastPage = @RememberLastPage,
+            EnableMemoryOptimization = @EnableMemoryOptimization
         WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
         command.Parameters.AddWithValue("@AutoStart", autostart); // 是否开机自启
         command.Parameters.AddWithValue("@ShowNotification", shownotification); // 是否显示通知
@@ -195,6 +205,23 @@ public class SettingDatabase
         command.Parameters.AddWithValue("@LongPressThreshold", longPressThreshold); // 长按阈值
         command.Parameters.AddWithValue("@MouseMovePixels", mouseMovePixels); // 鼠标移动像素
         command.Parameters.AddWithValue("@LoopPageFlipping", loopPageFlipping); // 是否循环翻页
+        command.Parameters.AddWithValue("@RememberLastPage", rememberLastPage); // 是否记住设置窗口中最后打开的页面
+        command.Parameters.AddWithValue("@EnableMemoryOptimization", enableMemoryOptimization); // 是否启用内存优化
+        command.ExecuteNonQuery(); // 执行更新命令
+    }
+
+    /// <summary>
+    /// 设置窗口中最后打开的页面
+    /// </summary>
+    /// <param name="lastPage"> 设置窗口中最后打开的页面 </param>
+    public void SetLastPage(int lastPage)
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        using var command = new SQLiteCommand(@"
+        UPDATE Convention SET 
+            LastPage = @LastPage
+        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@LastPage", lastPage); // 设置最后打开的页面
         command.ExecuteNonQuery(); // 执行更新命令
     }
 
@@ -330,7 +357,10 @@ public class SettingDatabase
                 HideTooltip = reader.GetBoolean(6), // 是否隐藏提示
                 LongPressThreshold = reader.GetInt32(7), // 长按阈值
                 MouseMovePixels = reader.GetInt32(8), // 鼠标移动像素
-                LoopPageFlipping = reader.GetBoolean(9) // 是否循环翻页
+                LoopPageFlipping = reader.GetBoolean(9), // 是否循环翻页
+                RememberLastPage = reader.GetBoolean(10), // 是否记住设置窗口中最后打开的页面
+                LastPage = reader.GetInt32(11), // 设置窗口中最后打开的页面
+                EnableMemoryOptimization = reader.GetBoolean(12) // 是否启用内存优化
             }); // 将读取到的数据添加到列表中
         }
         return conventions; // 返回所有 Convention 数据
@@ -440,6 +470,9 @@ public class Convention
     public int LongPressThreshold { get; set; } // 长按阈值
     public int MouseMovePixels { get; set; } // 鼠标移动像素
     public bool LoopPageFlipping { get; set; } // 是否循环翻页
+    public bool RememberLastPage { get; set; } // 是否记住设置窗口中最后打开的页面
+    public int LastPage { get; set; } // 设置窗口中最后打开的页面
+    public bool EnableMemoryOptimization { get; set; } // 是否启用内存优化
 }
 
 // 打开主窗口的条件

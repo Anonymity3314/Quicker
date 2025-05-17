@@ -44,7 +44,10 @@ namespace Quicker.Managers
                 HideTooltip = Conventions.HideTooltip, // 隐藏工具提示
                 LongPressThreshold = Conventions.LongPressThreshold, // 长按阈值
                 MouseMovePixels = Conventions.MouseMovePixels, // 鼠标移动像素
-                LoopPageFlipping = Conventions.LoopPageFlipping // 循环翻页
+                LoopPageFlipping = Conventions.LoopPageFlipping, // 循环翻页
+                RememberLastPage = Conventions.RememberLastPage, // 是否记住设置窗口中最后打开的页面
+                LastPage = Conventions.LastPage, // 最后打开的页面
+                EnableMemoryOptimization = Conventions.EnableMemoryOptimization, // 是否启用内存优化
             }; // 加载设置数据到缓存
         }
 
@@ -233,6 +236,12 @@ namespace Quicker.Managers
                 case "LoopPageFlippingCheckBox":
                     conventions.LoopPageFlipping = isChecked == true;
                     break; // 循环翻页
+                case "RememberLastPageCheckBox":
+                    conventions.RememberLastPage = isChecked == true;
+                    break; // 记住设置窗口中最后打开的页面
+                case "EnableMemoryOptimizationCheckBox":
+                    conventions.EnableMemoryOptimization = isChecked == true;
+                    break; // 启用内存优化
                 case "OpenMainWindowByMiddleMouseClickCheckBox":
                     openMainWindowConditions.OpenMainWindowByMiddleMouseClick = isChecked == true;
                     break; // 按下中键
@@ -383,6 +392,9 @@ namespace Quicker.Managers
             public int LongPressThreshold { get; set; } // 长按阈值
             public int MouseMovePixels { get; set; } // 鼠标移动像素
             public bool LoopPageFlipping { get; set; } // 循环翻页
+            public bool RememberLastPage { get; set; } // 是否记住设置窗口中最后打开的页面
+            public int LastPage { get; set; } // 设置窗口中最后打开的页面
+            public bool EnableMemoryOptimization { get; set; } // 是否启用内存优化
         }
 
         // 弹出面板设置
