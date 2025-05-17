@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls.Primitives;
-using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
@@ -178,7 +177,7 @@ namespace Quicker.Windows
             var actionPageData = db3.GetActionPageData(style).FirstOrDefault(); // 获取动作页数据
             for (int i = 0; i < actionPageData.ActionPageCount; i++)
             {
-                GenerateCanvas(i, style); // 生成动作页
+                MainListView.Items.Add(GenerateCanvas(i, style)); // 生成动作页
             }
         }
 
@@ -187,7 +186,7 @@ namespace Quicker.Windows
         /// </summary>
         /// <param name="canvasIndex"> 动作页索引 </param>
         /// <param name="style"> 动作页类型 </param>
-        private void GenerateCanvas(int canvasIndex, string style)
+        private Canvas GenerateCanvas(int canvasIndex, string style)
         {
             Canvas dynamicCanvas = GenerateCanva(canvasIndex, style); // 生成画布
             Grid grid = GenerateTitle(canvasIndex, style); // 生成标题
@@ -225,7 +224,7 @@ namespace Quicker.Windows
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
                 }
             }
-            MainListView.Items.Add(dynamicCanvas); // 将画布添加到全局列表视图
+            return dynamicCanvas; // 返回画布
         }
 
         /// <summary>
@@ -525,14 +524,27 @@ namespace Quicker.Windows
 
                     int sourceIndex = int.Parse(sourceButtonName.Substring(sourceButtonName.Length - 1)); // 获取源 Button 索引
                     int targetIndex = int.Parse(targetCanvasName.Substring(targetCanvasName.Length - 1)); // 获取目标 Button 索引
-                    Match matchButton = Regex.Match(sourceButtonName, @"^([a-zA-Z0-9_]+)(\d{1})$"); // 正则匹配源 Button Name
-                    string style = matchButton.Groups[1].Value; // 动作页样式
 
-                    db2.SwapButtonAValues(style, sourceIndex, targetIndex); // 更新数据库 Button A 值
-                    LoadCanvas(style); // 刷新界面
+                    db2.SwapButtonAValues(type, sourceIndex, targetIndex); // 更新数据库 Button A 值
+                    UpdateCanvasInListView(sourceIndex, type); // 更新 ListView 中的特定 Canvas
+                    UpdateCanvasInListView(targetIndex, type); // 更新 ListView 中的特定 Canvas
                 }
             }
         }
+
+        /// <summary>
+        /// 更新 ListView 中的特定 Canvas
+        /// </summary>
+        /// <param name="canvasIndex">画布索引</param>
+        /// <param name="styleType">动作页类型</param>
+        private void UpdateCanvasInListView(int canvasIndex, string styleType)
+        {
+            var oldCanvas = MainListView.Items[canvasIndex] as Canvas; // 获取旧的 Canvas
+            MainListView.Items.Remove(oldCanvas); // 从主列表视图中移除旧的 Canvas
+            Canvas newCanvas = GenerateCanvas(canvasIndex, styleType); // 生成新的 Canvas
+            MainListView.Items.Insert(canvasIndex, newCanvas); // 在主列表视图中插入新的 Canvas
+        }
+
 
         // 查找动作页按钮
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -643,58 +655,102 @@ namespace Quicker.Windows
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
-            foreach (var item in MainListView.Items) // 清理主列表视图中的所有画布及其子元素
+
+            // 清理主列表视图中的所有 Canvas 及其子元素
+            while (MainListView.Items.Count > 0)
             {
-                if (item is Canvas canvas)
+                if (MainListView.Items[0] is Canvas canvas)
                 {
-                    var childrenList = canvas.Children.Cast<UIElement>().ToList(); // 将 UIElementCollection 转换为列表
-                    foreach (var child in childrenList) // 移除所有事件处理程序并清理子元素
+                    // 移除 Canvas 中的所有子元素
+                    while (canvas.Children.Count > 0)
                     {
-                        if (child is Button button)
+                        UIElement child = canvas.Children[0];
+                        if (child is Grid grid)
                         {
-                            // 移除所有事件处理程序
+                            // 移除 Grid 中的所有子元素
+                            while (grid.Children.Count > 0)
+                            {
+                                UIElement gridChild = grid.Children[0];
+                                if (gridChild is Button button)
+                                {
+                                    // 移除按钮的所有事件处理程序
+                                    button.MouseEnter -= HightLightBlacklistItem;
+                                    button.MouseLeave -= FadeBlacklistItem;
+                                    switch (button.Name)
+                                    {
+                                        case "Global":
+                                            button.Click-= GlobalButton_Click;
+                                            break;
+                                        case "Common":
+                                            button.Click -= CommonButton_Click;
+                                            break;
+                                        case "Taskbar":
+                                            button.Click -= TaskBarButton_Click;
+                                            break;
+                                        case "Desktop":
+                                            button.Click -= DesktopButton_Click;
+                                            break;
+                                    }
+                                    // 清理按钮资源
+                                    button.Content = null;
+                                    button.Tag = null;
+                                    button.Background = null;
+                                    button.Style = null;
+                                }
+                                grid.Children.Remove(gridChild);
+                            }
+                            // 清理 Grid 资源
+                            grid.Children.Clear();
+                        }
+                        else if (child is Button button)
+                        {
+                            // 移除按钮的所有事件处理程序
                             button.Drop -= Button_Drop;
                             button.Click -= ShowCreatActionMenu;
                             button.MouseEnter -= Button_MouseEnter;
                             button.MouseLeave -= Button_MouseLeave;
-                            button.MouseRightButtonDown -= OpenMenu;
                             button.MouseDoubleClick -= ShowEditWindow;
+                            button.PreviewMouseRightButtonDown -= OpenMenu;
                             button.PreviewMouseMove -= Button_PreviewMouseMove;
-                            button.PreviewDragOver -= ListView_PreviewDragOver;
                             button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp;
                             button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
-
-                            // 清理按钮内容
+                            // 清理按钮资源
                             button.Content = null;
                             button.Tag = null;
                             button.Background = null;
+                            button.Style = null;
                         }
+                        canvas.Children.Remove(child);
                     }
-                    canvas.Children.Clear(); // 清空画布中的所有子元素
+                    // 移除 Canvas 本身
+                    MainListView.Items.Remove(canvas);
                 }
             }
-            MainListView.Items.Clear(); // 清空主列表视图
 
             // 清理动作页按钮面板中的所有按钮
-            var actionPagesButtonPanelList = ActionPagesButtonPanel.Children.Cast<UIElement>().ToList();
-            foreach (var child in actionPagesButtonPanelList)
+            while (ActionPagesButtonPanel.Children.Count > 0)
             {
+                UIElement child = ActionPagesButtonPanel.Children[0];
                 if (child is Button button)
                 {
-                    // 移除所有事件处理程序
+                    // 移除按钮的所有事件处理程序
                     button.Click -= GlobalButton_Click;
                     button.Click -= CommonButton_Click;
                     button.Click -= TaskBarButton_Click;
                     button.Click -= DesktopButton_Click;
-
-                    // 清理按钮内容
+                    button.MouseEnter -= HightLightBlacklistItem;
+                    button.MouseLeave -= FadeBlacklistItem;
+                    // 清理按钮资源
                     button.Content = null;
                     button.Tag = null;
                     button.Background = null;
+                    button.Style = null;
                 }
+                ActionPagesButtonPanel.Children.Remove(child);
             }
-            ActionPagesButtonPanel.Children.Clear(); // 清空动作页按钮面板
-            toastManager.Dispose(); // 释放消息管理器资源
+
+            // 释放其他资源
+            toastManager?.Dispose(); // 释放消息管理器资源
 
             // 强制垃圾回收
             GC.Collect();

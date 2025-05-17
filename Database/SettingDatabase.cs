@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using Quicker.Database;
 using System.IO;
 
@@ -12,12 +11,6 @@ public class SettingDatabase
     public readonly string currentVersion = "2.1.4"; // 当前版本号
 
     public SettingDatabase()
-    {
-        Initialize(); // 初始化数据库
-    }
-
-    // 初始化数据库
-    public void Initialize()
     {
         string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
         string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
@@ -81,7 +74,6 @@ public class SettingDatabase
     private void InitializeOpenMainWindow()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        // 创建 OpenMainWindow 表
         string createOpenMainWindowTableQuery = @"
         CREATE TABLE IF NOT EXISTS OpenMainWindow
         (

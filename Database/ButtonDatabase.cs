@@ -10,12 +10,6 @@ namespace Quicker.Database
 
         public ButtonDatabase()
         {
-            Initialize(); // 初始化数据库
-        }
-
-        // 初始化数据库
-        private void Initialize()
-        {
             string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
             string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
             if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
@@ -58,15 +52,15 @@ namespace Quicker.Database
         /// <returns> 表名列表 </returns>
         public List<string> GetAllTableNames()
         {
-            var tableNames = new List<string>();
-            using var connection = OpenConnection();
-            using var command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table';", connection);
-            using var reader = command.ExecuteReader();
+            var tableNames = new List<string>(); // 初始化表名列表
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table';", connection); // 创建命令对象
+            using var reader = command.ExecuteReader(); // 执行查询语句
             while (reader.Read())
             {
-                tableNames.Add(reader.GetString(0));
+                tableNames.Add(reader.GetString(0)); // 添加表名到列表
             }
-            return tableNames;
+            return tableNames; // 返回表名列表
         }
 
         /// <summary>
@@ -175,10 +169,10 @@ namespace Quicker.Database
         /// <returns> ButtonData列表 </returns>
         public List<ButtonData> GetButtonDataByPrefix(string prefix)
         {
-            var buttonDataList = new List<ButtonData>();
+            var buttonDataList = new List<ButtonData>(); // 初始化ButtonData列表
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($"SELECT * FROM {prefix}", connection);
-            using var reader = command.ExecuteReader();
+            using var command = new SQLiteCommand($"SELECT * FROM {prefix}", connection); // 创建命令对象
+            using var reader = command.ExecuteReader(); // 执行查询语句
             while (reader.Read())
             {
                 buttonDataList.Add(new ButtonData
@@ -194,7 +188,7 @@ namespace Quicker.Database
                     CreateTime = reader.GetDateTime(8), // 创建时间
                     LatestEditTime = reader.GetDateTime(9), // 最近修改时间
                     ActionType = reader.GetString(10) // 动作类型
-                });
+                }); // 添加到列表
             }
             return buttonDataList; // 返回ButtonData列表
         }
@@ -269,16 +263,13 @@ namespace Quicker.Database
             string idWithoutPrefix = buttonID.Substring(prefix.Length); // 直接获取去掉前缀的部分
             string pagePart = idWithoutPrefix.Substring(0, 3); // 获取前三位数字部分
 
-            // 将三位数字部分拆分为页码、行号和列号
-            int page = int.Parse(pagePart[0].ToString());
+            int page = int.Parse(pagePart[0].ToString()); // 原页码
             string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
             if (page > pageIndex) page--; // 如果页码大于原页码，则页码减一
 
-            // 重新组合新的三位数字部分
-            string newPagePart = $"{page}{bcPart}";
-            string newButtonID = $"{prefix}{newPagePart}";
-
-            return newButtonID;
+            string newPagePart = $"{page}{bcPart}"; // 新的三位数字部分
+            string newButtonID = $"{prefix}{newPagePart}"; // 新的 ButtonID
+            return newButtonID; // 返回新的 ButtonID
         }
 
         /// <summary>
@@ -392,21 +383,21 @@ namespace Quicker.Database
         /// <returns> ButtonData列表 </returns>
         private List<ButtonData> MatchButtons(string prefix, int a)
         {
-            List<ButtonData> buttonDatas = GetButtonDataByPrefix(prefix);
+            List<ButtonData> buttonDatas = GetButtonDataByPrefix(prefix); // 获取所有以 pfefix 开头的 ButtonData
             var matchedButtons = buttonDatas
                 .Where(b =>
                 {
-                    string idWithoutPrefix = b.ButtonID.Replace(prefix, "");
-                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) == a;
+                    string idWithoutPrefix = b.ButtonID.Replace(prefix, ""); // 去掉前缀
+                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) == a; // 匹配数字 A
                 })
                 .ToList(); // 返回符合条件的 ButtonData 列表
-            return matchedButtons;
+            return matchedButtons; // 返回符合条件的 ButtonData 列表
         }
 
         /// <summary>
         /// 根据输入的字符串和数字 A1、A2，交换符合条件的 ButtonID 的 A 部分
         /// </summary>
-        /// <param name="prefix">Button的字符串索引</param>
+        /// <param name="prefix"> Button的字符串索引 </param>
         /// <param name="a1"> A1 部分 </param>
         /// <param name="a2"> A2 部分 </param>
         public void SwapButtonAValues(string prefix, int a1, int a2)

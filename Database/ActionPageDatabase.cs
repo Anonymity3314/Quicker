@@ -12,12 +12,6 @@ namespace Quicker.Database
 
         public ActionPageDatabase()
         {
-            Initialize(); // 初始化数据库
-        }
-
-        // 初始化数据库
-        public void Initialize()
-        {
             string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
             if (!Directory.Exists(dbFolder)) // 如果数据库文件夹不存在，则创建
                 Directory.CreateDirectory(dbFolder); // 创建数据库文件夹
