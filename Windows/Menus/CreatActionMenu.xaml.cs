@@ -71,7 +71,9 @@ namespace Quicker.Windows
             {
                 ButtonID = CurrentButton,
                 Title = actionInfo[1] + actionInfo[2],
-                Location = actionInfo[1] + ";" + actionInfo[2],
+                Location = "",
+                Data1 = actionInfo[1],
+                Data2 = actionInfo[2],
                 ImagePath = "",
                 Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
                 ActionType = "OpenActionPage"

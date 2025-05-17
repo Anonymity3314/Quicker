@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
@@ -86,6 +85,7 @@ namespace Quicker.Windows
 
             windowManager.SetWindowTopmost(this);// 设置窗口置顶
             SetCommonLabel(); // 设置通用标签
+            this.Activate();
         }
 
         // 生成页面切换 Button
@@ -237,7 +237,7 @@ namespace Quicker.Windows
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
             Button button = sender as Button;
-            if (button.Tag is ButtonData data && !string.IsNullOrEmpty(data.Location))
+            if (button.Tag is ButtonData data)
             {
                 button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BEE6FD"));
                 button.RenderTransform = new ScaleTransform(1.05, 1.05);
@@ -362,7 +362,8 @@ namespace Quicker.Windows
             Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
-                if(!app._appStateManager.Book) this.Visibility = Visibility.Collapsed; // 如果不订住，隐藏窗口
+                if (!app._appStateManager.Book && data.ActionType != "OpenActionPage") 
+                    this.Visibility = Visibility.Collapsed; // 隐藏窗口
                 DoAction(data); // 执行动作
             }
             else
@@ -405,29 +406,18 @@ namespace Quicker.Windows
         /// 切换动作页
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        public async void OpenActionPage(ButtonData data)
+        public void OpenActionPage(ButtonData data)
         {
-            string[] actionInfo = data.Location.Split(';'); // 解析数据
-            string style = actionInfo[0]; // 获取动作页类型
-            int index = int.Parse(actionInfo[1]);
-            buttonManager.isClosing = false;
-            if (style != "Global") OnCommonStyleChanged(style); // 如果切换到非全局动作页，更新样式
-            int currentCanvasIndex = GetVisibleCanvasIndex(style);
-
-            // 使用异步调度来减少UI线程阻塞
-            await Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                if (currentCanvasIndex > index)
-                {
-                    for (int i = currentCanvasIndex; i > index; i--)
-                        SwitchToPreviousCanvas(i, style);
-                }
-                else
-                {
-                    for (int i = currentCanvasIndex; i < index; i++)
-                        SwitchToNextCanvas(i, style);
-                }
-            });
+            string type = data.Data1; // 获取动作页类型
+            int index = int.Parse(data.Data2);
+            if (type != "Global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
+            int currentCanvasIndex = GetVisibleCanvasIndex(type); // 获取当前可见的Canvas编号
+            if (currentCanvasIndex > index)
+                for (int i = currentCanvasIndex; i > index; i--)
+                    SwitchToPreviousCanvas(i, type);
+            else
+                for (int i = currentCanvasIndex; i < index; i++)
+                    SwitchToNextCanvas(i, type);
         }
 
         // 右键按钮打开菜单
@@ -510,24 +500,17 @@ namespace Quicker.Windows
         /// <summary>
         /// 获取当前可见的Canvas编号
         /// </summary>
-        /// <param name="Style"></param>
+        /// <param name="type"></param>
         /// <returns> 当前可见的Canvas编号 </returns>
-        private int GetVisibleCanvasIndex(string Style)
+        private int GetVisibleCanvasIndex(string type)
         {
-            var canvasCollection = Style == "Global" // 根据是否是全局Canvas选择集合
+            var canvasCollection = type == "Global" // 根据是否是全局Canvas选择集合
                 ? buttonManager.FindVisualChildren<Canvas>(GlobalGrid) // 查找GlobalGrid下的Canvas集合
                 : buttonManager.FindVisualChildren<Canvas>(CommonGrid); // 查找CommonGrid下的Canvas集合
-            string canvasPrefix = $"{Style}"; // Canvas前缀
-            string pattern = $@"^{Style}(\d+)$"; // 正则表达式模式
-            Regex regex = new Regex(pattern); // 创建正则表达式对象
-
             foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
             {
                 if (canvas.Visibility == Visibility.Visible)
-                {
-                    Match match = regex.Match(canvas.Name); // 匹配Canvas名称
-                    if (match.Success) return int.Parse(match.Groups[1].Value); // 如果匹配成功，返回Canvas编号
-                }
+                    return int.Parse(canvas.Name.Replace(type, "")); // 如果匹配成功，返回Canvas编号
             }
             return 0; // 默认返回0
         }
