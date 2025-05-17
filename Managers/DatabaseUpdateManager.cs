@@ -434,7 +434,7 @@ namespace Quicker.Managers
                     // 将每个按钮数据迁移到对应的新表中
                     foreach (var buttonData in oldButtonData)
                     {
-                        string tableName = db2.GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+                        string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
                         db2.CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
 
                         string insertQuery = $@"INSERT INTO {tableName} 

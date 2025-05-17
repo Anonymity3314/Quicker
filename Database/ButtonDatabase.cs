@@ -1,9 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Security.Cryptography;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SQLite;
-using System.Text;
+﻿using System.Data.SQLite;
 using System.IO;
 
 namespace Quicker.Database
@@ -82,7 +77,7 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+            string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
             CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
             string query = $@"INSERT INTO {tableName} 
             (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType) 
@@ -112,7 +107,7 @@ namespace Quicker.Database
         public ButtonData GetButtonDataByID(string buttonID)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            string tableName = GetTableNameFromButtonID(buttonID); // 从ButtonID解析表名
+            string tableName = buttonID.Substring(0, buttonID.Length - 3); // 从ButtonID解析表名
             using var command = new SQLiteCommand($"SELECT * FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令对象
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
             using var reader = command.ExecuteReader(); // 执行查询语句
@@ -144,7 +139,7 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string tableName = GetTableNameFromButtonID(buttonData.ButtonID); // 从ButtonID解析表名
+            string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
             string query = $@"UPDATE {tableName} SET 
                 Title = @Title, 
                 Location = @Location, 
@@ -227,9 +222,12 @@ namespace Quicker.Database
 
             List<ButtonData> allButtons = GetButtonDataByPrefix(prefix); // 获取所有按钮数据
             var currentButtons = allButtons
-                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$"))
                 .Select(b => new { ButtonID = b.ButtonID, Data = b })
-                .Where(b => int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == pageIndex)
+                .Where(b =>
+                {
+                    string idWithoutPrefix = b.ButtonID.Replace(prefix, ""); // 去掉前缀
+                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) == pageIndex; // 当前页的按钮
+                })
                 .ToDictionary(b => b.ButtonID, b => b.Data); // 当前页的按钮
 
             // 删除当前页的按钮
@@ -240,9 +238,12 @@ namespace Quicker.Database
 
             // 筛选并更新后续页的按钮编号
             var subsequentButtons = allButtons
-                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$"))
                 .Select(b => new { ButtonID = b.ButtonID, Data = b })
-                .Where(b => int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) > pageIndex)
+                .Where(b =>
+                {
+                    string idWithoutPrefix = b.ButtonID.Replace(prefix, ""); // 去掉前缀
+                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) > pageIndex; // 后续页的按钮
+                })
                 .ToList(); // 后续页的按钮
 
             foreach (var item in subsequentButtons)
@@ -264,30 +265,20 @@ namespace Quicker.Database
         /// <returns>新的 ButtonID</returns>
         private string UpdateButtonPageNumber(SQLiteConnection connection, string buttonID, int pageIndex)
         {
-            Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$");
-            if (match.Success)
-            {
-                string prefix = match.Groups[1].Value; // 获取前缀部分
-                string pagePart = match.Groups[2].Value; // 获取三位数字部分
+            string prefix = buttonID.Substring(0, buttonID.Length - 3); // 获取前缀部分
+            string idWithoutPrefix = buttonID.Substring(prefix.Length); // 直接获取去掉前缀的部分
+            string pagePart = idWithoutPrefix.Substring(0, 3); // 获取前三位数字部分
 
-                // 将三位数字部分拆分为页码、行号和列号
-                int page = int.Parse(pagePart[0].ToString());
-                int row = int.Parse(pagePart[1].ToString());
-                int column = int.Parse(pagePart[2].ToString());
+            // 将三位数字部分拆分为页码、行号和列号
+            int page = int.Parse(pagePart[0].ToString());
+            string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
+            if (page > pageIndex) page--; // 如果页码大于原页码，则页码减一
 
-                // 如果页码大于原页码，则页码减一
-                if (page > pageIndex)
-                {
-                    page--;
-                }
+            // 重新组合新的三位数字部分
+            string newPagePart = $"{page}{bcPart}";
+            string newButtonID = $"{prefix}{newPagePart}";
 
-                // 重新组合新的三位数字部分
-                string newPagePart = $"{page}{row}{column}";
-                string newButtonID = $"{prefix}{newPagePart}";
-
-                return newButtonID;
-            }
-            return buttonID; // 如果格式不匹配，返回原 ButtonID
+            return newButtonID;
         }
 
         /// <summary>
@@ -298,7 +289,7 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string tableName = GetTableNameFromButtonID(buttonID); // 获取表名
+            string tableName = buttonID.Substring(0, buttonID.Length - 3); // 获取表名
             using var command = new SQLiteCommand($@"DELETE FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行命令
@@ -317,15 +308,15 @@ namespace Quicker.Database
             var data1 = GetButtonDataByID(buttonID1); // 获取 ButtonID1 的数据
             var data2 = GetButtonDataByID(buttonID2); // 获取 ButtonID2 的数据
 
-            string tempButtonID = "temp_"; // 临时ButtonID
-            string tableName1 = GetTableNameFromButtonID(buttonID1); // 从ButtonID解析表名
-            string tableName2 = GetTableNameFromButtonID(buttonID2); // 从ButtonID解析表名
+            string tempButtonID = $"temp_{Guid.NewGuid().ToString("N")}"; // 生成临时 ButtonID
+            string tableName1 = buttonID1.Substring(0, buttonID1.Length - 3); // 从ButtonID解析表名
+            string tableName2 = buttonID2.Substring(0, buttonID2.Length - 3); // 从ButtonID解析表名
             if (data2 != null) // 直接交换 ButtonID
             {
                 UpdateButtonID(connection, tableName1, buttonID1, tempButtonID); // 将 ButtonID1 的编号改为临时编号
                 UpdateButtonID(connection, tableName2, buttonID2, buttonID1); // 将 ButtonID2 的编号改为 ButtonID1
                 UpdateButtonID(connection, tableName1, tempButtonID, buttonID2); // 将临时编号改为 ButtonID2
-                transaction.Commit();
+                transaction.Commit(); // 提交事务
                 if (tableName1 != tableName2) // 表名不同，迁移到对应表
                 {
                     MoveButtonDataToNewTable(buttonID2, data1, tableName1, tableName2); // 迁移数据到新表
@@ -335,7 +326,7 @@ namespace Quicker.Database
             else // 将 ButtonID1 的编号改为 ButtonID2
             {
                 UpdateButtonID(connection, tableName1, buttonID1, buttonID2); // 更新 ButtonID1 的编号
-                transaction.Commit();
+                transaction.Commit(); // 提交事务
                 if (tableName1 != tableName2) // 表名不同，迁移到对应表
                     MoveButtonDataToNewTable(buttonID2, data1, tableName1, tableName2); // 迁移数据到新表
             }
@@ -394,64 +385,67 @@ namespace Quicker.Database
         }
 
         /// <summary>
+        /// 根据输入的字符串和数字 A，获取符合条件的 ButtonData
+        /// </summary>
+        /// <param name="prefix"> Button前缀 </param>
+        /// <param name="a"> 数字 A </param>
+        /// <returns> ButtonData列表 </returns>
+        private List<ButtonData> MatchButtons(string prefix, int a)
+        {
+            List<ButtonData> buttonDatas = GetButtonDataByPrefix(prefix);
+            var matchedButtons = buttonDatas
+                .Where(b =>
+                {
+                    string idWithoutPrefix = b.ButtonID.Replace(prefix, "");
+                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) == a;
+                })
+                .ToList(); // 返回符合条件的 ButtonData 列表
+            return matchedButtons;
+        }
+
+        /// <summary>
         /// 根据输入的字符串和数字 A1、A2，交换符合条件的 ButtonID 的 A 部分
         /// </summary>
-        /// <param name="inputString">Button的字符串索引</param>
+        /// <param name="prefix">Button的字符串索引</param>
         /// <param name="a1"> A1 部分 </param>
         /// <param name="a2"> A2 部分 </param>
-        public void SwapButtonAValues(string inputString, int a1, int a2)
+        public void SwapButtonAValues(string prefix, int a1, int a2)
         {
-            List<ButtonData> allButtons = GetButtonDataByPrefix(inputString); // 获取所有 Button 数据
-            var buttonIDMap = allButtons
-                .Select(b => new { ButtonID = b.ButtonID, Data = b })
-                .Where(b => Regex.IsMatch(b.ButtonID, @"^(\w+)(\d{3})$") &&
-                            Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[1].Value == inputString &&
-                            (int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == a1 ||
-                             int.Parse(Regex.Match(b.ButtonID, @"^(\w+)(\d{3})$").Groups[2].Value[0].ToString()) == a2))
-                .ToDictionary(b => b.ButtonID, b => b.Data); // 筛选出符合条件的 ButtonID
-
-            if (buttonIDMap.Count == 0) return; // 没有符合条件的 ButtonID，直接返回
+            var a1ButtonDatas = MatchButtons(prefix, a1); // 获取 A1 部分的 ButtonData
+            var a2ButtonDatas = MatchButtons(prefix, a2); // 获取 A2 部分的 ButtonData
+            if (a1ButtonDatas.Count == 0 && a2ButtonDatas.Count == 0) return; // 两个部分没有 ButtonData，直接返回
 
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
 
             string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
-            foreach (var pair in buttonIDMap.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
+            foreach (var buttonData in a1ButtonDatas.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
             {
-                string buttonID = pair.Key; // 原 ButtonID
-                Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
-                if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a1)
-                {
-                    string newButtonID = $"{tempPrefix}{match.Groups[2].Value}"; // 新 ButtonID
-                    UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
-                    buttonIDMap.Remove(buttonID); // 从字典中删除原数据
-                    buttonIDMap[newButtonID] = pair.Value; // 添加新数据
-                }
+                string buttonID = buttonData.ButtonID; // 原 ButtonID
+                string idWithoutPrefix = buttonID.Replace(prefix, ""); // 获取ID部分，去掉前缀
+                string newButtonID = $"{tempPrefix}{idWithoutPrefix}"; // 新 ButtonID
+                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
+
+                var index = a1ButtonDatas.IndexOf(buttonData); // 获取索引
+                if (index != -1) a1ButtonDatas[index].ButtonID = newButtonID; // 更新字典中的 ButtonID
             }
 
-            foreach (var pair in buttonIDMap.ToList())// 更新 A2 部分的 ButtonID 为目标 ID
+            foreach (var buttonData in a2ButtonDatas.ToList()) // 更新 A2 部分的 ButtonID 为目标 ID
             {
-                string buttonID = pair.Key; // 原 ButtonID
-                Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID
-                if (match.Success && int.Parse(match.Groups[2].Value[0].ToString()) == a2)
-                {
-                    string bcPart = match.Groups[2].Value.Substring(1); // 目标 ID 的 B 和 C 部分
-                    string newButtonID = $"{inputString}{a1}{bcPart}"; // 新 ButtonID
-                    UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
-                    buttonIDMap.Remove(buttonID); // 从字典中删除原数据
-                    buttonIDMap[newButtonID] = pair.Value; // 添加新数据
-                }
+                string buttonID = buttonData.ButtonID; // 原 ButtonID
+                string idWithoutPrefix = buttonID.Replace(prefix, ""); // 获取ID部分，去掉前缀
+                string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
+                string newButtonID = $"{prefix}{a1}{bcPart}"; // 新 ButtonID
+                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
             }
 
-            foreach (var pair in buttonIDMap.ToList())// 更新临时标识符的 ButtonID 为目标 ID
+            foreach (var buttonData in a1ButtonDatas.ToList()) // 更新临时标识符的 ButtonID 为目标 ID
             {
-                string buttonID = pair.Key; // 原 ButtonID
-                if (buttonID.StartsWith(tempPrefix))
-                {
-                    string bcPart = buttonID.Substring(tempPrefix.Length + 1); // 目标 ID 的 B 和 C 部分
-                    string newButtonID = $"{inputString}{a2}{bcPart}"; // 新 ButtonID
-                    UpdateButtonID(connection, inputString, buttonID, newButtonID); // 更新 ButtonID
-                }
+                string buttonID = buttonData.ButtonID; // 原 ButtonID
+                string idWithoutPrefix = buttonID.Replace(tempPrefix, ""); // 获取ID部分，去掉临时前缀
+                string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
+                string newButtonID = $"{prefix}{a2}{bcPart}"; // 新 ButtonID
+                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
             }
             transaction.Commit(); // 提交事务
         }
@@ -459,38 +453,21 @@ namespace Quicker.Database
         /// <summary>
         /// 获取总的页面数
         /// </summary>
-        /// <param name="targetStyle"> 目标样式名称 </param>
+        /// <param name="prefix"> 目标样式名称 </param>
         /// <returns> 总页面数 </returns>
-        public int GetTotalAntionPageIndex(string targetStyle)
+        public int GetTotalAntionPageIndex(string prefix)
         {
             int TotalAntionPageIndex = 1; // 重置页面索引
-            var buttonData = GetButtonDataByPrefix(targetStyle); // 从数据库中获取按钮数据
+            var buttonData = GetButtonDataByPrefix(prefix); // 从数据库中获取按钮数据
             foreach (var data in buttonData)
             {
                 string buttonID = data.ButtonID; // 获取按钮ID
-                Match match = Regex.Match(data.ButtonID, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
-                if (match.Success)
-                {
-                    string style = match.Groups[1].Value; // 获取按钮名称
-                    string numbersStr = match.Groups[2].Value; // 获取3个数字
-                    int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-                    if (style == targetStyle) // 如果是全局按钮
-                        if (numbers[0] > TotalAntionPageIndex) // 如果数字大于当前最大索引
-                            TotalAntionPageIndex = numbers[0] + 1; // 更新全局页面索引
-                }
+                string idWithoutPrefix = buttonID.Replace(prefix, ""); // 获取ID部分，去掉前缀
+                int aPart = int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()); // 获取A部分
+                if (aPart > TotalAntionPageIndex) // 如果数字大于当前最大索引
+                    TotalAntionPageIndex = aPart + 1; // 更新全局页面索引
             }
             return TotalAntionPageIndex;
-        }
-
-        /// <summary>
-        /// 使用正则表达式从 ButtonID 提取表名
-        /// </summary>
-        /// <param name="buttonID"> ButtonID </param>
-        /// <returns> 表名 </returns>
-        public string GetTableNameFromButtonID(string buttonID)
-        {
-            Match match = Regex.Match(buttonID, @"^(\w+)(\d{3})$"); // 匹配 ButtonID 格式
-            return match.Groups[1].Value; // 返回表名
         }
 
         /// <summary>

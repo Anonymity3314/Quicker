@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Quicker.UserControls.AddWindow;
+﻿using Quicker.UserControls.AddWindow;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -47,39 +46,31 @@ namespace Quicker
         // 初始化标题
         private void InitializeTitle()
         {
-            Match match = Regex.Match(CurrentButton, @"^([a-zA-Z0-9_]+)(\d{3})$"); // 匹配按钮名称和末尾的3个数字
-            if (match.Success)
+            string prefix = CurrentButton.Substring(0, CurrentButton.Length - 3); // 获取按钮名称
+            string numbersStr = CurrentButton.Replace(prefix, ""); // 获取3个数字
+            int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
+            string pageName = prefix; // 页面名称
+            if (Choice != 0) // 如果不是编辑动作
             {
-                string buttonName = match.Groups[1].Value; // 获取按钮名称
-                string numbersStr = match.Groups[2].Value; // 获取3个数字
-                int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-                if (Choice != 0) // 如果不是编辑动作
+                switch (prefix)
                 {
-                    switch(buttonName)
-                    {
-                        case "Global":
-                            Title = $"新动作--默认全局动作第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
-                            break; // 默认全局动作
-                        case "TaskBar":
-                            Title = $"新动作--默认任务栏动作第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
-                            break; // 默认任务栏动作
-                        case "Desktop":
-                            Title = $"新动作--默认桌面动作第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
-                            break; // 默认桌面动作
-                        case "Common":
-                            Title = $"新动作--默认第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
-                            break; // 默认动作
-                        default:
-                            Title = $"新动作--{buttonName} 第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作";
-                            break; // 默认动作
-                    }
-                }
-                else // 如果是编辑动作
-                {
-                    ButtonData buttonData = db2.GetButtonDataByID(CurrentButton);
-                    Title = $"新动作--第{numbers[0] +1}页{numbers[1]}行{numbers[2]}列--编辑动作";
+                    case "Global":
+                        pageName = "默认全局动作"; // 页面名称
+                        break; // 默认全局动作
+                    case "TaskBar":
+                        pageName = "默认任务栏动作"; // 页面名称
+                        break; // 默认任务栏动作
+                    case "Desktop":
+                        pageName = "默认桌面动作"; // 页面名称
+                        break; // 默认桌面动作
+                    case "Common":
+                        pageName = "默认"; // 页面名称
+                        break; // 默认动作
                 }
             }
+            else // 如果是编辑动作
+                pageName = ""; // 页面名称
+            Title = $"新动作--{pageName}第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作"; // 设置标题
         }
 
         // 初始化Button视图
