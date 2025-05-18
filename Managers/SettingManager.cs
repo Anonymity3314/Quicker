@@ -9,16 +9,6 @@ namespace Quicker.Managers
 {
     public class SettingManager
     {
-        public T FindParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            // 循环查找父元素
-            while ((child = VisualTreeHelper.GetParent(child)) != null)
-            {
-                if (child is T)
-                    return (T)child;
-            }
-            return null;
-        } // 查找父元素
         private const string DefaultButtonColor1 = "#FFE0E0E0"; // 默认按钮颜色
         private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮颜色
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
@@ -26,8 +16,8 @@ namespace Quicker.Managers
 
         public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 弹出面板设置缓存对象
         public AppearanceConditionsSettingsCache appearanceConditions; // 外观设置缓存对象
-        private readonly SettingDatabase db1 = new SettingDatabase(); // 设置数据库
         public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
+        private readonly SettingDatabase db1 = new(); // 设置数据库
         public ConventionsSettingsCache conventions; // 常规设置缓存对象
 
         // 异步加载常规设置信息

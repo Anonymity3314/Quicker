@@ -332,19 +332,23 @@ namespace Quicker.Windows
             }
             ResultGrid.Children.Clear(); // 清空 ResultGrid 的子元素
 
-            foreach (var button in MenuGrid.Children.OfType<Button>()) // 清理事件处理器
+            foreach (var button in MainStackPanel.Children.OfType<Button>()) // 清理事件处理器
             {
                 button.Click -= BasicSetting_Click;
                 button.Click -= Auxiliary_Functions_Click;
                 button.Click -= Tools_Click;
+                button.MouseLeave -= BasicSetting_MouseLeave;
+                button.MouseLeave -= Auxiliary_Functions_MouseLeave;
+                button.MouseLeave -= Tools_MouseLeave;
+            }
+
+            foreach (var button in MenuGrid.Children.OfType<Button>()) // 清理事件处理器
+            {
                 button.Click -= Convention_Click;
                 button.Click -= OpenMainWindow_Click;
                 button.Click -= Blacklist_Click;
                 button.Click -= Appearance_Click;
                 button.Click -= AboutQuicker_Click;
-                button.MouseLeave -= BasicSetting_MouseLeave;
-                button.MouseLeave -= Auxiliary_Functions_MouseLeave;
-                button.MouseLeave -= Tools_MouseLeave;
                 button.MouseLeave -= Convention_MouseLeave;
                 button.MouseLeave -= OpenMainWindow_MouseLeave;
                 button.MouseLeave -= Blacklist_MouseLeave;
