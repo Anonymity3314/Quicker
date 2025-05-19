@@ -40,7 +40,8 @@ namespace Quicker.Database
                 Description TEXT,
                 CreateTime DATETIME,
                 LatestEditTime DATETIME,
-                ActionType TEXT
+                ActionType TEXT,
+                UsedTimes INTEGER
             );";
             using var command = new SQLiteCommand(createTableQuery, connection); // 创建命令对象
             command.ExecuteNonQuery(); // 执行创建表格语句
@@ -74,9 +75,9 @@ namespace Quicker.Database
             string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
             CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
             string query = $@"INSERT INTO {tableName} 
-            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType) 
+            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
             VALUES 
-            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType)"; // 创建SQL语句
+            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType, @UsedTimes)"; // 创建SQL语句
             using var command = new SQLiteCommand(query, connection);
             command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
@@ -89,6 +90,7 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@CreateTime", DateTime.Now); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", DateTime.Now); // 最近修改时间
             command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
+            command.Parameters.AddWithValue("@UsedTimes", 0); // 使用次数
             command.ExecuteNonQuery(); // 执行插入语句
             transaction.Commit(); // 提交事务
         }
@@ -119,7 +121,8 @@ namespace Quicker.Database
                     Description = reader.GetString(7), // 对动作的描述
                     CreateTime = reader.GetDateTime(8), // 创建时间
                     LatestEditTime = reader.GetDateTime(9), // 最近修改时间
-                    ActionType = reader.IsDBNull(10) ? null : reader.GetString(10) // 动作类型
+                    ActionType = reader.IsDBNull(10) ? null : reader.GetString(10), // 动作类型
+                    UsedTimes = reader.GetInt32(11) // 使用次数
                 };
             }
             return null; // 没有找到数据
@@ -187,7 +190,8 @@ namespace Quicker.Database
                     Description = reader.GetString(7), // 对动作的描述
                     CreateTime = reader.GetDateTime(8), // 创建时间
                     LatestEditTime = reader.GetDateTime(9), // 最近修改时间
-                    ActionType = reader.GetString(10) // 动作类型
+                    ActionType = reader.GetString(10), // 动作类型
+                    UsedTimes = reader.GetInt32(11) // 使用次数
                 }); // 添加到列表
             }
             return buttonDataList; // 返回ButtonData列表
@@ -351,9 +355,9 @@ namespace Quicker.Database
 
             // 插入数据到目标表
             string query = $@"INSERT INTO {targetTable} 
-            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType) 
+            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
             VALUES 
-            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType)"; // 创建SQL语句
+            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType, @UsedTimes)"; // 创建SQL语句
             using var command = new SQLiteCommand(query, connection);
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
@@ -366,6 +370,7 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
             command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
             command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
+            command.Parameters.AddWithValue("@UsedTimes", buttonData.UsedTimes); // 使用次数
             command.ExecuteNonQuery(); // 执行插入语句
             transaction.Commit(); // 提交事务
 
@@ -373,6 +378,18 @@ namespace Quicker.Database
             using var deleteCommand = new SQLiteCommand($@"DELETE FROM {sourceTable} WHERE ButtonID = @ButtonID", connection); // 创建命令
             deleteCommand.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             deleteCommand.ExecuteNonQuery(); // 执行删除语句
+        }
+
+        /// <summary>
+        /// 增加动作使用次数
+        /// </summary>
+        /// <param name="buttonID"> 要增加的动作ID </param>
+        public void IncreaseActionUsedTimes(string buttonID)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var command = new SQLiteCommand($@"UPDATE {buttonID.Substring(0, buttonID.Length - 3)} SET UsedTimes = UsedTimes + 1 WHERE ButtonID = @ButtonID", connection);
+            command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
+            command.ExecuteNonQuery(); // 执行更新语句
         }
 
         /// <summary>
@@ -512,5 +529,6 @@ namespace Quicker.Database
         public DateTime CreateTime { get; set; } // 创建时间
         public DateTime LatestEditTime { get; set; } // 最近修改时间
         public string ActionType { get; set; } // 动作类型
+        public int UsedTimes { get; set; } // 使用次数
     }
 }

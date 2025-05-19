@@ -147,7 +147,7 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchInternetExplorer(string website)
         {
-            Process.Start("iexplore.exe", website);
+            Process.Start("iexplore.exe", website); // 启动IE浏览器
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchMicrosoftEdge(string website)
         {
-            Process.Start("microsoft-edge:" + website);
+            Process.Start("microsoft-edge:" + website); // 启动Edge浏览器
         }
 
         /// <summary>
@@ -165,13 +165,13 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchEdgeAppMode(string website)
         {
-            string edgePath = GetEdgeBrowserPath();
+            string edgePath = GetEdgeBrowserPath(); // 获取Edge浏览器路径
             Process.Start(new ProcessStartInfo
             {
                 FileName = edgePath,
                 Arguments = $"--app={website}",
                 UseShellExecute = true
-            });
+            }); // 启动Edge浏览器，并以App模式打开
         }
 
         /// <summary>
@@ -180,13 +180,13 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchEdgeInPrivateMode(string website)
         {
-            string edgePath = GetEdgeBrowserPath();
+            string edgePath = GetEdgeBrowserPath(); // 获取Edge浏览器路径
             Process.Start(new ProcessStartInfo
             {
                 FileName = edgePath,
                 Arguments = $"--inprivate {website}",
                 UseShellExecute = true
-            });
+            }); // 启动Edge浏览器，并以InPrivate模式打开
         }
 
         /// <summary>
@@ -195,13 +195,13 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchChrome(string website)
         {
-            string chromePath = GetChromeBrowserPath();
+            string chromePath = GetChromeBrowserPath(); // 获取Chrome浏览器路径
             Process.Start(new ProcessStartInfo
             {
                 FileName = chromePath,
                 Arguments = website,
                 UseShellExecute = true
-            });
+            }); // 启动Chrome浏览器
         }
 
         /// <summary>
@@ -210,13 +210,13 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchChromeAppMode(string website)
         {
-            string chromePath = GetChromeBrowserPath();
+            string chromePath = GetChromeBrowserPath(); // 获取Chrome浏览器路径
             Process.Start(new ProcessStartInfo
             {
                 FileName = chromePath,
                 Arguments = $"--app={website}",
                 UseShellExecute = true
-            });
+            }); // 启动Chrome浏览器，并以App模式打开
         }
 
         /// <summary>
@@ -225,13 +225,13 @@ namespace Quicker.Managers
         /// <param name="website"> 网站地址 </param>
         private void LaunchChromeIncognitoMode(string website)
         {
-            string chromePath = GetChromeBrowserPath();
+            string chromePath = GetChromeBrowserPath(); // 获取Chrome浏览器路径
             Process.Start(new ProcessStartInfo
             {
                 FileName = chromePath,
                 Arguments = $"-incognito {website}",
                 UseShellExecute = true
-            });
+            }); // 启动Chrome浏览器，并以无痕模式打开
         }
 
         /// <summary>
@@ -248,7 +248,7 @@ namespace Quicker.Managers
                 FileName = browserPath,
                 Arguments = website,
                 UseShellExecute = true
-            });
+            }); // 启动用户指定浏览器打开网站
         }
 
         // 获取Edge浏览器路径
@@ -260,11 +260,9 @@ namespace Quicker.Managers
 
                 if (key != null)
                 {
-                    object value = key.GetValue("Edge");
+                    object value = key.GetValue("Edge"); // 获取Edge浏览器路径
                     if (value != null)
-                    {
-                        return value.ToString();
-                    }
+                        return value.ToString(); // 返回Edge浏览器路径
                 }
             }
             catch { }
@@ -279,7 +277,7 @@ namespace Quicker.Managers
             {
                 chromePath = @"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"; // 32位路径
             }
-            return chromePath;
+            return chromePath; // 返回Chrome浏览器路径
         }
 
         /// <summary>

@@ -83,6 +83,6 @@
                 </Border>
             </Grid>
         </Popup>
-        <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="240,272,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163"/>
+        <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="240,272,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163" ToolTip="右键显示/隐藏动作使用次数" MouseRightButtonDown="AddActionPageButton_MouseRightButtonDown"/>
     </Grid>
 </Window>

@@ -25,6 +25,42 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 更新数据库
+        /// </summary>
+        /// <param name="dbVersion"> 当前数据库版本号 </param>
+        private void UpdateDatabase(string dbVersion)
+        {
+            try
+            {
+                switch (dbVersion)
+                {
+                    case "2.2.0":
+                        break;
+                    case "2.1.3":
+                        UpdateFrom2_1_3To2_2_0(); // 数据库版本从2.1.3升级到2.2.0
+                        break;
+                    case "2.1.2":
+                        UpdateFrom2_1_2To2_1_3(); // 数据库版本从2.1.2升级到2.1.3
+                        break;
+                    case "2.1.1":
+                        UpdateFrom2_1_1To2_1_2(); // 数据库版本从2.1.1升级到2.1.2
+                        break;
+                    case "2.1.0":
+                        UpdateFrom2_1_0To2_1_1(); // 数据库版本从2.1.0升级到2.1.1
+                        break;
+                    default:
+                        UpdateTo2_1_0(); // 数据库版本升级到2.1.0
+                        break;
+                }
+                CheckAndUpgradeDatabase(); // 递归检查并更新数据库
+            }
+            catch
+            {
+                toastManager.AddToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒用户
+            }
+        }
+
+        /// <summary>
         /// 获取当前数据库版本号
         /// </summary>
         /// <returns> 当前版本号 </returns>
@@ -85,42 +121,6 @@ namespace Quicker.Managers
             return File.Exists(dbFilePath); // 判断文件是否存在
         }
 
-        /// <summary>
-        /// 更新数据库
-        /// </summary>
-        /// <param name="dbVersion"> 当前数据库版本号 </param>
-        private void UpdateDatabase(string dbVersion)
-        {
-            try
-            {
-                switch (dbVersion)
-                {
-                    case "2.2.0":
-                        break;
-                    case "2.1.3":
-                        UpdateFrom2_1_3To2_2_0(); // 数据库版本从2.1.3升级到2.2.0
-                        break;
-                    case "2.1.2":
-                        UpdateFrom2_1_2To2_1_3(); // 数据库版本从2.1.2升级到2.1.3
-                        break;
-                    case "2.1.1":
-                        UpdateFrom2_1_1To2_1_2(); // 数据库版本从2.1.1升级到2.1.2
-                        break;
-                    case "2.1.0":
-                        UpdateFrom2_1_0To2_1_1(); // 数据库版本从2.1.0升级到2.1.1
-                        break;
-                    default:
-                        UpdateTo2_1_0(); // 数据库版本升级到2.1.0
-                        break;
-                }
-                CheckAndUpgradeDatabase(); // 递归检查并更新数据库
-            }
-            catch
-            {
-                toastManager.AddToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒用户
-            }
-        }
-
         // 数据库版本从2.1.3升级到2.2.0
         private void UpdateFrom2_1_3To2_2_0()
         {
@@ -159,7 +159,7 @@ namespace Quicker.Managers
                         Description TEXT,
                         CreateTime DATETIME,
                         LatestEditTime DATETIME,
-                        ActionType TEXT
+                        ActionType TEXT 
                     );";
                 using var createTempTableCommand = new SQLiteCommand(createTempTableQuery, connection);
                 createTempTableCommand.ExecuteNonQuery();
@@ -193,11 +193,27 @@ namespace Quicker.Managers
                 using var renameTempTableCommand = new SQLiteCommand(renameTempTableQuery, connection);
                 renameTempTableCommand.ExecuteNonQuery();
                 transaction.Commit();
+
+                AddNewColumn(tableName); // 为新表添加UsedTimes列
             }
             catch
             {
                 transaction.Rollback(); // 回滚事务
             }
+        }
+
+        /// <summary>
+        /// 添加新列：动作使用次数
+        /// </summary>
+        /// <param name="tableName"> 表名 </param>
+        private void AddNewColumn(string tableName)
+        {
+            using var addConnection = db2.OpenConnection(); // 打开数据库连接
+            string addUsedTimesQuery = @$"
+                ALTER TABLE {tableName}
+                ADD COLUMN UsedTimes INTEGER DEFAULT 0;"; // 为Convention表添加UsedTimes列
+            using var addUsedTimesCommand = new SQLiteCommand(addUsedTimesQuery, addConnection);
+            addUsedTimesCommand.ExecuteNonQuery(); // 执行更新命令
         }
 
         // 更新设置数据库

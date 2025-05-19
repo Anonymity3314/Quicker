@@ -710,6 +710,12 @@ namespace Quicker.Windows
             GlobalButton_Click(sender, e); // 切换类型为全局场景
         }
 
+        // 右键显示/隐藏动作使用次数
+        private void AddActionPageButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
         // 关闭窗口时释放资源
         protected override void OnClosed(EventArgs e)
         {

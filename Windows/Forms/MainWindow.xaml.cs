@@ -364,7 +364,15 @@ namespace Quicker.Windows
             {
                 if (!app._appStateManager.Book && data.ActionType != "OpenActionPage") 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
-                DoAction(data); // 执行动作
+                try
+                {
+                    DoAction(data); // 执行动作
+                    db2.IncreaseActionUsedTimes(data.ButtonID); // 增加动作使用次数
+                }
+                catch (Exception ex)
+                {
+                    toastManager.AddToast("执行动作失败：", ex.Message); // 显示错误信息
+                }
             }
             else
             {
