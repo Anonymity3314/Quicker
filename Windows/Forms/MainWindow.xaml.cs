@@ -15,21 +15,16 @@ namespace Quicker.Windows
 {
     public partial class MainWindow : Window
     {
-        private const string BookIconPath = "/Resources/Images/Icons/Book.ico"; // 订住图标路径
-        private const string DisBookIconPath = "/Resources/Images/Icons/Disbook.ico"; // 禁用订住图标路径
-        private const string LockIconPath = "/Resources/Images/Icons/Locked.ico"; // 锁定图标路径
-        private const string UnLockIconPath = "/Resources/Images/Icons/UnLocked.ico"; // 解锁图标路径
-
-        private static readonly SolidColorBrush SelectedBrush = // 选中页面按钮颜色
-            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF8D8D8D"));
-        private static readonly SolidColorBrush UnSelectedBrush = // 未选中页面按钮颜色
-            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD3D3D3"));
+        private static readonly SolidColorBrush SelectedBrush =
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8D8D8D")); // 选中页面按钮颜色
+        private static readonly SolidColorBrush UnSelectedBrush =
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD3D3D3")); // 未选中页面按钮颜色
 
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
+        private static readonly App app = (App.Current as App); // App实例
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
-        private readonly App app = (App.Current as App); // App实例
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string CommonStyle = "Common"; // 样式
@@ -65,12 +60,12 @@ namespace Quicker.Windows
             }); // 在主线程中执行
 
             // 加载BookButton图标
-            string iconPath = app._appStateManager.Book ? BookIconPath : DisBookIconPath; // 获取图标路径
+            string iconPath = app._appStateManager.Book ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
             BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
             Book.Source = bookImage; // 设置Book按钮的图标
 
             // 加载LockButton图标
-            string lockIconPath = app._appStateManager.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
+            string lockIconPath = app._appStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
@@ -91,12 +86,12 @@ namespace Quicker.Windows
         /// <summary>
         /// 生成页面切换按钮
         /// </summary>
-        /// <param name="prefix">按钮名称前缀</param>
-        /// <param name="totalPages">总页面数</param>
-        /// <param name="clickHandler">点击事件处理程序</param>
-        /// <param name="mouseEnterHandler">鼠标进入事件处理程序</param>
-        /// <param name="mouseLeaveHandler">鼠标离开事件处理程序</param>
-        /// <param name="panel">按钮所属的面板</param>
+        /// <param name="prefix"> 按钮名称前缀 </param>
+        /// <param name="totalPages"> 总页面数 </param>
+        /// <param name="clickHandler"> 点击事件处理程序 </param>
+        /// <param name="mouseEnterHandler"> 鼠标进入事件处理程序 </param>
+        /// <param name="mouseLeaveHandler"> 鼠标离开事件处理程序 </param>
+        /// <param name="panel"> 按钮所属的面板</param>
         private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, MouseEventHandler mouseEnterHandler, MouseEventHandler mouseLeaveHandler, Panel panel)
         {
             if (totalPages == 1) return; // 如果只有一个页面，不生成按钮
@@ -122,23 +117,22 @@ namespace Quicker.Windows
         // 切换到全局Canvas
         private void SwitchToGlobalCanvas(object sender, RoutedEventArgs e)
         {
-            SwitchToCanvas(sender, e, MainGrid, "Global"); // 切换到全局Canvas
+            SwitchToCanvas(sender, MainGrid, "Global"); // 切换到全局Canvas
         }
 
         // 切换到通用Canvas
         private void SwitchToCommonCanvas(object sender, RoutedEventArgs e)
         {
-            SwitchToCanvas(sender, e, CommonGrid, CommonStyle); // 切换到通用Canvas
+            SwitchToCanvas(sender, CommonGrid, CommonStyle); // 切换到通用Canvas
         }
 
         /// <summary>
         /// 切换到指定的Canvas
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <param name="targetGrid"></param>
-        /// <param name="Style"></param>
-        private void SwitchToCanvas(object sender, RoutedEventArgs e, Grid targetGrid, string Style)
+        /// <param name="sender"> 触发事件的对象 </param>
+        /// <param name="targetGrid"> 目标Grid </param>
+        /// <param name="Style"> 样式名称 </param>
+        private void SwitchToCanvas(object sender, Grid targetGrid, string Style)
         {
             if (sender is Button clickedButton)
             {
@@ -164,21 +158,22 @@ namespace Quicker.Windows
         // 设置标签内容
         private void SetCommonLabel()
         {
+            string lable = CommonStyle; // 初始化标签内容
             switch (CommonStyle)
             {
                 case "Common":
-                    CommonLabel.Content = "默认";
+                    lable = "默认";
                     break; // 如果是通用类型，设置标签内容为默认
                 case "Taskbar":
-                    CommonLabel.Content = "任务栏"; // 设置标签内容
+                    lable = "任务栏"; // 设置标签内容
                     break; // 如果是任务栏类型，设置标签内容为任务栏
                 case "Desktop":
-                    CommonLabel.Content = "桌面"; // 设置标签内容
+                    lable = "桌面"; // 设置标签内容
                     break; // 如果是桌面类型，设置标签内容为桌面
                 default:
-                    CommonLabel.Content = $"{CommonStyle}"; // 设置标签内容
-                    break; // 如果是其他类型，设置对应标签内容
+                    break; // 其他类型，不设置标签内容
             }
+            CommonLabel.Content = lable; // 设置标签内容
         }
 
         // 移动功能面板
@@ -194,9 +189,9 @@ namespace Quicker.Windows
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
             if (app._appStateManager.Book)
-                bookimage.UriSource = new Uri(BookIconPath, UriKind.Relative); // 设置为订住样式
+                bookimage.UriSource = new Uri(AppStateManager.BookIconPath, UriKind.Relative); // 设置为订住样式
             else
-                bookimage.UriSource = new Uri(DisBookIconPath, UriKind.Relative); // 设置为不订住样式
+                bookimage.UriSource = new Uri(AppStateManager.DisBookIconPath, UriKind.Relative); // 设置为不订住样式
             bookimage.EndInit(); // 结束初始化
             Book.Source = bookimage; // 更新Book按钮图标
         }
@@ -228,9 +223,9 @@ namespace Quicker.Windows
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
             Button button = sender as Button;
-            if (button.Tag is ButtonData data)
+            if (button.Tag is ButtonData)
             {
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#BEE6FD"));
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD"));
                 button.RenderTransform = new ScaleTransform(1.05, 1.05);
                 Canvas.SetZIndex(button, 1);
             }
@@ -248,7 +243,7 @@ namespace Quicker.Windows
                         HorizontalAlignment = HorizontalAlignment.Center
                     };
                 }
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA"));
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"));
             }
         }
         private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
@@ -286,12 +281,12 @@ namespace Quicker.Windows
 
                 if (targetCanvas == null)
                 {
-                    button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
+                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
                     return;
                 }
 
                 if (targetCanvas.Visibility != Visibility.Visible)
-                    button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
+                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
             }
         }
 
@@ -299,16 +294,16 @@ namespace Quicker.Windows
         private void Button_MouseLeave(object sender, MouseEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData data && data.Location != null)
+            if (button.Tag is ButtonData)
             {
                 Canvas.SetZIndex(button, 0); // 还原按钮层级
                 button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 还原背景颜色
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
             }
             else
             {
                 button.Content = null; // 清空按钮内容
-                button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 还原背景颜色
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 还原背景颜色
             }
         }
         private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
@@ -408,22 +403,22 @@ namespace Quicker.Windows
         public void OpenActionPage(ButtonData data)
         {
             string type = data.Data1; // 获取动作页类型
-            int index = int.Parse(data.Data2);
+            int index = int.Parse(data.Data2); // 获取动作页索引
             if (type != "Global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
             int currentCanvasIndex = GetVisibleCanvasIndex(type); // 获取当前可见的Canvas编号
-            if (currentCanvasIndex > index)
+            if (currentCanvasIndex > index) // 如果当前Canvas编号大于目标Canvas编号
                 for (int i = currentCanvasIndex; i > index; i--)
-                    SwitchToPreviousCanvas(i, type);
-            else
+                    SwitchToPreviousCanvas(i, type); // 向前切换Canvas
+            else // 如果当前Canvas编号小于目标Canvas编号
                 for (int i = currentCanvasIndex; i < index; i++)
-                    SwitchToNextCanvas(i, type);
+                    SwitchToNextCanvas(i, type); // 向后切换Canvas
         }
 
         // 右键按钮打开菜单
         public void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData data ? "OperationMenu" : "CreatActionMenu", this); // 打开操作菜单
+            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this); // 打开操作菜单
         }
 
         // 添加关闭标志防止报错
@@ -698,7 +693,7 @@ namespace Quicker.Windows
         private void LockCommonActionPage(object sender, RoutedEventArgs e)
         {
             app._appStateManager.Locked = !app._appStateManager.Locked; // 切换锁定状态
-            string lockIconPath = app._appStateManager.Locked ? LockIconPath : UnLockIconPath; // 获取图标路径
+            string lockIconPath = app._appStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建 BitmapImage 对象
             Lock.Source = lockImage; // 设置图标
             if (app._appStateManager.Locked) app._appStateManager.CommonState = CommonStyle; // 设置锁定状态

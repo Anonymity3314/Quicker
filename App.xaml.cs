@@ -18,14 +18,6 @@ namespace Quicker
         public AppStateManager _appStateManager = new AppStateManager(); // 应用状态管理器
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private TaskPoolGlobalHook? hook; // 钩子
-        private BitmapImage _trayIcon1;
-        private BitmapImage _trayIcon2;
-
-        public App()
-        {
-            _trayIcon1 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative)); // 运行时的图标
-            _trayIcon2 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker2.ico", UriKind.Relative)); // 暂停时的图标
-        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -50,7 +42,7 @@ namespace Quicker
         // 初始化托盘图标
         private void InitializeTaskbar()
         {
-            var icon = _trayIcon1; // 设置托盘图标
+            var icon = _appStateManager._trayIcon1; // 设置托盘图标
             Current.Resources["AppIcon"] = icon; // 设置应用图标
             taskbarIcon = new TaskbarIcon // 创建托盘图标
             {
@@ -462,7 +454,7 @@ namespace Quicker
         /// <param name="isPaused"> 是否暂停 </param>
         public void ChangeTrayIcon(bool isPaused)
         {
-            taskbarIcon.IconSource = isPaused ? _trayIcon1 : _trayIcon2; // 切换托盘图标
+            taskbarIcon.IconSource = isPaused ? _appStateManager._trayIcon1 : _appStateManager._trayIcon2; // 切换托盘图标
         }
 
         // 退出应用释放资源

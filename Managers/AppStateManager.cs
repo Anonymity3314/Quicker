@@ -1,14 +1,22 @@
-﻿using System.Windows.Threading;
+﻿using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Quicker.Database;
 using Quicker.Managers;
 using Quicker.Windows;
-using System.Windows;
 using System;
 
 namespace Quicker
 {
     public class AppStateManager
     {
+        public static readonly string BookIconPath = "/Resources/Images/Icons/Book.ico"; // 订住图标路径
+        public static readonly string DisBookIconPath = "/Resources/Images/Icons/Disbook.ico"; // 禁用订住图标路径
+        public static readonly string LockIconPath = "/Resources/Images/Icons/Locked.ico"; // 锁定图标路径
+        public static readonly string UnLockIconPath = "/Resources/Images/Icons/UnLocked.ico"; // 解锁图标路径
+
+        public BitmapImage _trayIcon1 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative)); // 运行时的图标
+        public BitmapImage _trayIcon2 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker2.ico", UriKind.Relative)); // 暂停时的图标
+        
         public SettingDatabase Db { get; set; } = new(); // 数据库操作对象
         public DatabaseUpdateManager DatabaseUpdateManager { get; set; } = new(); // 更新管理器
         public TemporaryDatabase Temporary { get; set; } = new(); // 临时数据库
