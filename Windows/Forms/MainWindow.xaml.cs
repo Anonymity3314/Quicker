@@ -28,7 +28,6 @@ namespace Quicker.Windows
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly WindowManager windowManager = new(); // 窗口管理器
-        private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
         private readonly App app = (App.Current as App); // App实例
@@ -371,7 +370,7 @@ namespace Quicker.Windows
                 }
                 catch (Exception ex)
                 {
-                    toastManager.AddToast("执行动作失败：", ex.Message); // 显示错误信息
+                    ToastManager.AddToast("执行动作失败：", ex.Message); // 显示错误信息
                 }
             }
             else
@@ -755,7 +754,6 @@ namespace Quicker.Windows
             windowManager.Dispose(); // 释放窗口管理器资源
             iconManager.Dispose(); // 释放图标管理器资源
             buttonManager.Dispose(); // 释放按钮管理器资源
-            toastManager.Dispose(); // 释放消息管理器资源
 
             GC.Collect(); // 强制回收内存
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

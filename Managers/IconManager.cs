@@ -41,8 +41,6 @@ namespace Quicker.Managers
         private const uint SHGFI_SMALLICON = 0x000000001; // 小图标
         private const uint SHGFI_ICON = 0x000000100; // 获取图标
 
-        private readonly ToastManager toastManager = new(); // 通知管理器
-
         /// <summary>
         /// 获取应用程序图标
         /// </summary>
@@ -64,7 +62,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("获取图标失败。", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("获取图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
             return null; // 如果获取失败，返回 null
@@ -86,7 +84,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("检查缓存图标失败。", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("检查缓存图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -107,7 +105,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("获取图标文件名失败。", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("获取图标文件名失败。", "Error"); // 弹出消息提醒
                 return null;
             }
         }
@@ -142,7 +140,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("保存图标失败。", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("保存图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -205,7 +203,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("获取网站图标失败。", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("获取网站图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
             finally
@@ -275,7 +273,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("处理图标失败。", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("处理图标失败。", "Error"); // 弹出消息提醒
                 throw;
             }
         }
@@ -411,7 +409,6 @@ namespace Quicker.Managers
         // 手动释放资源
         public void Dispose()
         {
-            toastManager.Dispose(); // 释放通知管理器
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

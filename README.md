@@ -35,7 +35,8 @@ Quicker/
 ├─Database/                                       # 数据库文件夹
 │   ├─ActionPageDatabase.cs                       # 动作页数据库
 │   ├─ButtonDatabase.cs                           # 按钮数据库
-│   └─SettingDatabase.cs                          # 设置数据库
+│   ├─SettingDatabase.cs                          # 设置数据库
+│   └─TemporaryDatabase.cs                        # 临时数据库
 │
 ├─Managers/                                       # 管理器文件夹
 │   ├─ActionManager.cs                            # 动作管理器
@@ -156,6 +157,10 @@ Quicker/
         │   └─CreatActionMenu.xaml.cs
         ├─CustomMenu.xaml                         # 用户菜单
         │   └─CustomMenu.xaml.cs
+        ├─EditActionPageInfoWindow.xaml           # 编译动作页信息窗口
+        │   └─EditActionPageInfoWindow.xaml.cs
+        ├─EditSceneWindow.xaml                    # 编译场景窗口
+        │   └─EditSceneWindow.xaml.cs
         ├─LoadingWindow.xaml                      # 加载弹窗
         │   └─LoadingWindow.xaml.cs
         ├─OperationMenu.xaml                      # 动作按钮操作菜单
@@ -174,7 +179,7 @@ Quicker/
 打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
 
 # 贡献指南
-如果你发现项目中有问题或有改进建议，可以通过提交 issue 的方式告知作者。
+如果你发现项目中有问题或有改进建议，可以通过提交 Issue 的方式告知作者。
 
 你可以 Fork 项目仓库，在本地进行开发后，通过 Pull Request 的方式提交你的代码贡献。
 

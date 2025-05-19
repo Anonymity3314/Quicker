@@ -30,7 +30,6 @@ namespace Quicker.Windows
         private CancellationTokenSource _cancellationTokenSource = new(); // 取消令牌源,管理异步任务
         public event ApplicationSelectedEventHandler ApplicationSelected; // 选中应用事件
         private ObservableCollection<AppInfo> _allApplications = new(); // 所有应用
-        private readonly ToastManager toastManager = new(); // 通知管理器
         private List<AppInfo> _searchResults = new(); // 搜索结果
         private ICollectionView _applicationView; // ICollectionView接口
         private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
@@ -585,7 +584,7 @@ namespace Quicker.Windows
                     if (!string.IsNullOrEmpty(directoryPath))
                     {                        
                         Clipboard.SetText(directoryPath); // 复制目录路径到剪贴板
-                        toastManager.AddToast("文件夹路径已复制到剪贴板！", "Common"); // 通知用户已复制
+                        ToastManager.AddToast("文件夹路径已复制到剪贴板！", "Common"); // 通知用户已复制
                     }
                 }
             }
@@ -767,7 +766,6 @@ namespace Quicker.Windows
             linkTargetCache.Clear(); // 清空快捷方式目标路径缓存
             fileHashCache.Clear(); // 清空文件哈希缓存
             findAppsWindow = null; // 清空静态引用
-            toastManager.Dispose(); // 释放 ToastManager 资源
 
             // 强制垃圾回收
             GC.Collect();

@@ -29,7 +29,6 @@ namespace Quicker.Managers
             }
         } // 递归查找所有指定类型的子元素
         public bool isClosing = false, isDragging, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
-        private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
@@ -312,7 +311,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("无效的URI：未能解析主机名。", "Error"); // 处理无效的URL
+                ToastManager.AddToast("无效的URI：未能解析主机名。", "Error"); // 处理无效的URL
                 return null;
             }
         }
@@ -351,7 +350,7 @@ namespace Quicker.Managers
                     }
                     catch // 如果失败，发送信息提示
                     {
-                        toastManager.AddToast($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除", "Error");
+                        ToastManager.AddToast($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除", "Error");
                     }
                 } // 如果图标路径不为none
 
@@ -402,8 +401,9 @@ namespace Quicker.Managers
             button.Content = null; // 清空按钮内容
             TextBlock textBlock = new()
             {
+                FontSize = 11, // 设置字体大小
                 TextAlignment = TextAlignment.Center, // 设置文本对齐方式
-                Text = "使用次数:" + "\n" + data.UsedTimes.ToString() // 设置文本
+                Text = "使用次数" + "\n" + data.UsedTimes.ToString() // 设置文本
             }; // 创建文本块对象
             button.Content = textBlock; // 设置按钮内容
         }
@@ -588,7 +588,6 @@ namespace Quicker.Managers
         public void Dispose()
         {
             iconManager?.Dispose(); // 清理图标管理器资源
-            toastManager?.Dispose(); // 清理通知管理器资源
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

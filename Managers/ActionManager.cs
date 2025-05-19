@@ -11,7 +11,6 @@ namespace Quicker.Managers
     internal class ActionManager
     {
         private readonly WindowManager windowManager = new(); // 窗口管理器
-        private readonly ToastManager toastManager = new(); // 通知管理器
 
         /// <summary>
         /// 打开文件
@@ -50,7 +49,7 @@ namespace Quicker.Managers
                 }
                 catch (Exception ex)
                 {
-                    toastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
+                    ToastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
                 }
             } // 如果是快捷方式或者可执行文件
             else
@@ -66,7 +65,7 @@ namespace Quicker.Managers
                 }
                 catch (Exception ex)
                 {
-                    toastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
+                    ToastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
                 }
             } // 使用系统默认方式打开文件
         }
@@ -124,7 +123,7 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                toastManager.AddToast($"打开网站失败：{ex.Message}", "Error"); // 显示错误提示
+                ToastManager.AddToast($"打开网站失败：{ex.Message}", "Error"); // 显示错误提示
             }
         }
 
@@ -310,7 +309,7 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                toastManager.AddToast($"打开UWP应用失败：{ex.Message}", "Error"); // 显示错误提示
+                ToastManager.AddToast($"打开UWP应用失败：{ex.Message}", "Error"); // 显示错误提示
             }
         }
 
@@ -318,8 +317,6 @@ namespace Quicker.Managers
         public void Dispose()
         {
             windowManager.Dispose(); // 释放窗口管理器
-            toastManager.Dispose(); // 释放通知管理器
-
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

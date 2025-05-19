@@ -4,34 +4,20 @@ using System.Windows;
 
 namespace Quicker.Managers
 {
-    public class ToastManager
+    public static class ToastManager
     {
-        /// <summary>
-        /// 显示消息
-        /// </summary>
-        /// <param name="message"> 消息内容 </param>
-        /// <param name="toastType"> 消息类型 </param>
-        /// toastType: Common, Error, Warning
-        public void AddToast(string message, string toastType)
+        public static void AddToast(string message, string toastType)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                ToastWindow toastWindow = Application.Current.Windows.OfType<ToastWindow>().FirstOrDefault(); // 获取当前应用程序中已打开的ToastWindow
-                if (toastWindow == null)
+                ToastWindow toastWindow = Application.Current.Windows.OfType<ToastWindow>().FirstOrDefault(); // 获取ToastWindow窗体
+                if (toastWindow == null) // 如果ToastWindow窗体不存在
                 {
-                    toastWindow = new ToastWindow();
-                    toastWindow.Show();
-                } // 如果ToastWindow不存在，则创建并显示
+                    toastWindow = new ToastWindow(); // 创建ToastWindow窗体
+                    toastWindow.Show(); // 显示ToastWindow窗体
+                }
                 toastWindow.AddToast(message, toastType); // 添加Toast
             });
-        }
-
-        // 释放资源
-        public void Dispose()
-        {
-            GC.Collect(); // 回收资源
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 释放资源
         }
     }
 }

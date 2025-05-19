@@ -35,7 +35,7 @@ namespace Quicker
             bool isNewInstance = SingleInstanceManager.CheckForOtherInstances(mutexName, out _); // 检查是否是新实例
             if (!isNewInstance)
             {
-                _appStateManager.ToastManager.AddToast("Quicker 已经启动", "Common"); // 弹出消息提醒
+                ToastManager.AddToast("Quicker 已经启动", "Common"); // 弹出消息提醒
                 Application.Current.Shutdown(); // 如果不是新实例，关闭当前实例
                 return; // 退出程序
             }
@@ -68,7 +68,7 @@ namespace Quicker
         {
             var Convention = _appStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
             if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
-                _appStateManager.ToastManager.AddToast("成功启动！", "Common"); // 弹出消息提醒
+                ToastManager.AddToast("成功启动！", "Common"); // 弹出消息提醒
         }
 
         // 初始化定时器
@@ -453,7 +453,7 @@ namespace Quicker
             ChangeTrayIcon(_appStateManager.Pause); // 切换托盘图标
 
             _appStateManager.Pause = !_appStateManager.Pause; // 切换暂停状态
-            _appStateManager.ToastManager.AddToast(toastMessage, _appStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
+            ToastManager.AddToast(toastMessage, _appStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
         }
 
         /// <summary>
@@ -468,6 +468,7 @@ namespace Quicker
         // 退出应用释放资源
         protected override void OnExit(ExitEventArgs e)
         {
+            taskbarIcon?.Dispose(); // 释放托盘图标
             double currentSessionTime = (DateTime.Now - _appStateManager.RecordedTime).TotalSeconds; // 计算本次会话时间
             var Convention = _appStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
             Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
@@ -475,7 +476,6 @@ namespace Quicker
 
             _appStateManager.Dispose(); // 释放数据库资源
             hook?.Dispose(); // 释放钩子
-            taskbarIcon?.Dispose(); // 释放托盘图标
 
             SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
 

@@ -19,7 +19,6 @@ namespace Quicker.Windows
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
         public readonly SettingManager settingManager = new(); // 设置管理器
-        private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly SettingDatabase db1 = new(); // 设置数据库
 
         public SettingWindow()
@@ -133,12 +132,12 @@ namespace Quicker.Windows
                 }
                 catch
                 {
-                    toastManager.AddToast("设置应用失败！", "Error"); // 添加通知
+                    ToastManager.AddToast("设置应用失败！", "Error"); // 添加通知
                 }
 
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
-                toastManager.AddToast(message, "Common"); // 添加通知
+                ToastManager.AddToast(message, "Common"); // 添加通知
             });
         }
 
@@ -324,7 +323,6 @@ namespace Quicker.Windows
             base.OnClosed(e); // 调用基类的 OnClosed 方法
 
             settingManager.Dispose(); // 清空缓存
-            toastManager.Dispose(); // 清理通知管理器
 
             foreach (var child in MenuGrid.Children.OfType<StackPanel>()) // 清理用户控件
             {

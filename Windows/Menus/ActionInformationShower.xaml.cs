@@ -16,7 +16,6 @@ namespace Quicker.Windows
     {
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private WindowManager windowManager = new(); // 窗口管理器
-        private ToastManager toastManager = new(); // 通知管理器
         public string CurrentButton { get; private set; } // 当前按钮ID
 
         public ActionInformationWindow(string currentbutton)
@@ -42,7 +41,7 @@ namespace Quicker.Windows
                 }
                 catch
                 {
-                    toastManager.AddToast($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除", "Error"); // 显示图标加载失败的通知
+                    ToastManager.AddToast($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除", "Error"); // 显示图标加载失败的通知
                 }
             }
             CreatTimeLabel.Content = buttonData.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化创建时间
@@ -58,7 +57,7 @@ namespace Quicker.Windows
                                 $"说明:{buttonData.Description}\n" +
                                 $"URI:quicker:runaction:{buttonData.ButtonID}"; // 复制的文本内容
             Clipboard.SetText(textToCopy); // 复制文本到剪贴板
-            toastManager.AddToast("已复制!", "Common"); // 显示复制成功的通知
+            ToastManager.AddToast("已复制!", "Common"); // 显示复制成功的通知
         }
 
         // 关闭动作信息窗口
@@ -73,7 +72,6 @@ namespace Quicker.Windows
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             Image.Source = null; // 释放图像资源
             windowManager.Dispose(); // 释放窗口管理器资源
-            toastManager.Dispose(); // 释放通知管理器资源
 
             // 清理事件处理器
             CopyButton.Click -= CopyButton_Click;

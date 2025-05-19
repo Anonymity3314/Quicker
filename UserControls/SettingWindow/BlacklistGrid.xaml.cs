@@ -15,7 +15,6 @@ namespace Quicker.UserControls
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
-        private readonly ToastManager toastManager = new(); // 通知管理器
         private WindowManager windowManager = new(); // 窗口管理器
         private IconManager iconManager = new(); // 图标管理器
         SettingDatabase db1 = new(); // 设置数据库
@@ -207,7 +206,7 @@ namespace Quicker.UserControls
             UnknownProcessButton.Visibility = Visibility.Collapsed; // 隐藏按钮
             var blacklistprocess = db1.GetAllBlacklistApplications(); // 获取黑名单进程
             if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
-                toastManager.AddToast("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
+                ToastManager.AddToast("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
             else
             {
                 db1.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中
@@ -509,7 +508,6 @@ namespace Quicker.UserControls
             // 清理外部资源
             windowManager?.Dispose();
             iconManager?.Dispose();
-            toastManager?.Dispose();
             db1 = null;
             settingManager = null;
             blacklistAppsCache.Clear(); // 清理缓存和变量

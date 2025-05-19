@@ -7,7 +7,6 @@ namespace Quicker.Managers
 {
     public class DatabaseUpdateManager
     {
-        private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
 
@@ -56,7 +55,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒用户
+                ToastManager.AddToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒用户
             }
         }
 
@@ -301,7 +300,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error"); // 弹出消息提醒用户
+                ToastManager.AddToast("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error"); // 弹出消息提醒用户
             }
         }
 
@@ -331,7 +330,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                toastManager.AddToast("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒用户
+                ToastManager.AddToast("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒用户
             }
         }
 
@@ -521,7 +520,6 @@ namespace Quicker.Managers
         // 释放资源
         public void Dispose()
         {
-            toastManager.Dispose(); // 释放资源
             GC.Collect(); // 回收资源
         }
     }

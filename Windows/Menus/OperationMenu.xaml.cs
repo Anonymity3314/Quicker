@@ -21,7 +21,6 @@ namespace Quicker.Windows
         public string CurrentButton { get; private set; } // 当前按钮
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly WindowManager windowManager = new(); // 窗口管理器
-        private ToastManager toastManager = new(); // 通知管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
 
@@ -92,7 +91,7 @@ namespace Quicker.Windows
             }
             else
             {
-                toastManager.AddToast($"不支持此动作类型。", "Error"); // 显示通知
+                ToastManager.AddToast($"不支持此动作类型。", "Error"); // 显示通知
                 return;
             }
 
@@ -121,7 +120,7 @@ namespace Quicker.Windows
             }
             catch (Exception ex)
             {
-                toastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
             }
             finally
             {
@@ -144,7 +143,7 @@ namespace Quicker.Windows
                         IntPtr pidlItem = ILCreateFromPathW(path);
                         if (pidlItem == IntPtr.Zero)
                         {
-                            toastManager.AddToast($"无法获取文件的 PIDL：{path}", "Error"); // 显示通知
+                            ToastManager.AddToast($"无法获取文件的 PIDL：{path}", "Error"); // 显示通知
                             continue;
                         }
                         pidlItems.Add(pidlItem);
@@ -176,7 +175,7 @@ namespace Quicker.Windows
             }
             catch (Exception ex)
             {
-                toastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
             }
         }
 
@@ -194,7 +193,7 @@ namespace Quicker.Windows
                     }
                     catch (Exception ex)
                     {
-                        toastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                        ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
                     }
                     finally
                     {
@@ -204,7 +203,7 @@ namespace Quicker.Windows
             }
             catch (Exception ex)
             {
-                toastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
             }
         }
 
@@ -220,7 +219,6 @@ namespace Quicker.Windows
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件
-            toastManager.Dispose();
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
