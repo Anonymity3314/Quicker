@@ -122,14 +122,19 @@ namespace Quicker.Managers
         /// <param name="filePath"> 文件路径 </param>
         private void ProcessSingleFileDrop(Button button, string filePath, bool isMainWindow)
         {
-            if (IsImaeg(filePath)) // 如果是图片文件
+            if (IsImaege(filePath)) // 如果是图片文件
             {
                 ProcessImageDrop(filePath, button, isMainWindow); // 处理图片拖拽
                 return; // 直接返回
             }
+            else if (Path.GetExtension(filePath).ToLower() == ".url") // 判断是否为 .url 文件
+            {
+                ProcessUrlShortcutDrop(button, filePath, isMainWindow);
+                return;
+            }
 
             ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
-            string iconPath = "none"; // 默认图标路径
+            string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {
                 iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
@@ -159,10 +164,10 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="filePath"> 文件路径 </param>
         /// <returns> 是否为图片文件 </returns>
-        private bool IsImaeg(string filePath)
+        private bool IsImaege(string filePath)
         {
-            string extension = Path.GetExtension(filePath);
-            return extension.ToLower() == ".jpg" || extension.ToLower() == ".jpeg" || extension.ToLower() == ".png" || extension.ToLower() == ".gif";
+            string extension = Path.GetExtension(filePath); // 获取文件地址
+            return extension.ToLower() == ".jpg" || extension.ToLower() == ".jpeg" || extension.ToLower() == ".png" || extension.ToLower() == ".gif"; // 判断是否为图片文件
         }
 
         /// <summary>
@@ -174,7 +179,7 @@ namespace Quicker.Managers
         private void ProcessImageDrop(string filePath, Button button, bool isMainWindow)
         {
             BitmapImage bitmap = new BitmapImage(new Uri(filePath)); // 创建 BitmapImage 对象
-            string iconPath = "none"; // 默认图标路径
+            string iconPath = ""; // 默认图标路径
             if (bitmap != null) // 如果图标存在
             {
                 iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
@@ -200,6 +205,27 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 处理 Internet 快捷方式文件拖拽
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="filePath"> 文件路径 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void ProcessUrlShortcutDrop(Button button, string filePath, bool isMainWindow)
+        {
+            string url = File.ReadAllText(filePath); // 读取 .url 文件内容以获取实际的 URL
+            string[] lines = File.ReadAllLines(filePath);
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("URL="))
+                {
+                    url = line.Substring("URL=".Length).Trim();
+                    break;
+                }
+            }
+            ProcessUrlDrop(button, url, isMainWindow, filePath); // 调用处理 URL 的方法
+        }
+
+        /// <summary>
         /// 处理多个文件拖拽
         /// </summary>
         /// <param name="button"></param>
@@ -210,7 +236,7 @@ namespace Quicker.Managers
             // 用“；”分隔文件路径
             string filePath = string.Join(";", filePaths);
             ImageSource iconSource = iconManager.GetIcon(filePaths[0]); // 获取图标
-            string iconPath = "none"; // 默认图标路径
+            string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {
                 iconPath = iconManager.CheckCachedIcon(filePaths[0]); // 检查已经保存的图标
@@ -239,12 +265,12 @@ namespace Quicker.Managers
         /// 处理 URL 拖拽
         /// </summary>
         /// <param name="button"> 目标按钮 </param>
-        /// <param name="e"> 拖拽事件参数 </param>
+        /// <param name="url"> URL 地址 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessUrlDrop(Button button, string url, bool isMainWindow)
+        private void ProcessUrlDrop(Button button, string url, bool isMainWindow, string filePath = null)
         {
             ImageSource iconSource = iconManager.GetWebsiteIcon(url); // 获取图标
-            string iconPath = "none"; // 默认图标路径
+            string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {
                 iconPath = iconManager.CheckCachedIcon(url); // 检查已经保存的图标
@@ -255,13 +281,13 @@ namespace Quicker.Managers
             ButtonData buttonData = new ButtonData
             {
                 ButtonID = button.Name,
-                Title = GetWebsiteNameFromUrl(url),
+                Title = filePath == null ? GetWebsiteNameFromUrl(url) : Path.GetFileNameWithoutExtension(filePath),
                 Location = url,
                 ImagePath = iconPath,
                 Data3 = 0.ToString(),
                 Description = $"打开网页: {url}",
                 ActionType = "OpenWebsite",
-            };
+            }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.AddAction(buttonData); // 添加按钮数据到数据库
         }
@@ -312,7 +338,7 @@ namespace Quicker.Managers
             catch
             {
                 ToastManager.AddToast("无效的URI：未能解析主机名。", "Error"); // 处理无效的URL
-                return null;
+                return ""; // 返回空字符
             }
         }
 
@@ -329,22 +355,15 @@ namespace Quicker.Managers
             {
                 if(buttonInformation.Location == null) return; // 如果文件路径不存在，直接返回
                 button.Tag = buttonInformation; // 更新按钮标签
+                button.Background = HasActionBrush; // 设置按钮背景
 
                 Grid grid = new(); // 创建Grid对象
-                button.Background = HasActionBrush; // 设置按钮背景
                 if (!string.IsNullOrEmpty(buttonInformation.ImagePath))
                 {
                     try
                     {
                         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                        Image image = new()
-                        {
-                            Width = isMainWindow ? 36 : 30, // 设置宽度
-                            Height = isMainWindow ? 36 : 30, // 设置高度
-                            VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                            HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
-                            Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
-                        }; // 创建图像对象
+                        Image image = LoadActionIcon(buttonInformation, isMainWindow); // 创建图像对象
                         grid.Children.Add(image); // 添加图像到Grid
                         Grid.SetRow(image, 0); // 设置图像所在行
                     }
@@ -352,36 +371,18 @@ namespace Quicker.Managers
                     {
                         ToastManager.AddToast($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除", "Error");
                     }
-                } // 如果图标路径不为none
+                } // 如果图标路径不为空
 
                 if (!string.IsNullOrEmpty(buttonInformation.Title))
                 {
                     grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                    TextBlock textBlock = new()
-                    {
-                        Text = buttonInformation.Title, // 设置文本
-                        TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
-                        VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                        HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
-                    }; // 创建文本块对象
-                    AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小
-
+                    TextBlock textBlock = LoadActionTitle(buttonInformation, maxWidth); // 创建文本块对象
                     grid.Children.Add(textBlock); // 添加文本块到Grid
                     Grid.SetRow(textBlock, 1); // 设置文本块所在行
                 } // 如果按钮名称不为空
                 button.Content = grid; // 设置按钮内容
 
-                if (!shouldHideTooltip)
-                {
-                    string toolTipText = null; // 提示文本
-                    if (!string.IsNullOrWhiteSpace(buttonInformation.Title) || !string.IsNullOrWhiteSpace(buttonInformation.Description))
-                    {
-                        string name = !string.IsNullOrWhiteSpace(buttonInformation.Title) ? buttonInformation.Title : null; // 获取按钮名称
-                        string usage = !string.IsNullOrWhiteSpace(buttonInformation.Description) ? buttonInformation.Description : null; // 获取按钮用途
-                        toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
-                    } // 如果按钮名称或用途不为空
-                    button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本
-                }
+                LoadActionTooltip(button, buttonInformation); // 加载动作提示
             }
             else // 如果Button的数据不存在
             {
@@ -389,6 +390,64 @@ namespace Quicker.Managers
                 button.ToolTip = null; // 清空按钮提示文本
                 button.Tag = null; // 清空按钮标签
                 button.Background = NoActionBrush; // 重置按钮背景
+            }
+        }
+
+        /// <summary>
+        /// 加载动作图标
+        /// </summary>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        /// <returns> 图像对象 </returns>
+        private Image LoadActionIcon(ButtonData buttonInformation, bool isMainWindow)
+        {
+            Image image = new()
+            {
+                Width = isMainWindow ? 36 : 30, // 设置宽度
+                Height = isMainWindow ? 36 : 30, // 设置高度
+                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
+                Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
+            }; // 创建图像对象
+            return image; // 返回图像对象
+        }
+
+        /// <summary>
+        /// 加载动作名称
+        /// </summary>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="maxWidth"> 最大宽度 </param>
+        /// <returns> 文本块对象 </returns>
+        private TextBlock LoadActionTitle(ButtonData buttonInformation, int maxWidth)
+        {
+            TextBlock textBlock = new()
+            {
+                Text = buttonInformation.Title, // 设置文本
+                TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
+                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
+            }; // 创建文本块对象
+            AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小
+            return textBlock; // 返回文本块对象
+        }
+
+        /// <summary>
+        /// 加载动作提示
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        private void LoadActionTooltip(Button button, ButtonData buttonInformation)
+        {
+            if (!shouldHideTooltip)
+            {
+                string toolTipText = null; // 提示文本
+                if (!string.IsNullOrWhiteSpace(buttonInformation.Title) || !string.IsNullOrWhiteSpace(buttonInformation.Description))
+                {
+                    string name = !string.IsNullOrWhiteSpace(buttonInformation.Title) ? buttonInformation.Title : null; // 获取按钮名称
+                    string usage = !string.IsNullOrWhiteSpace(buttonInformation.Description) ? buttonInformation.Description : null; // 获取按钮用途
+                    toolTipText = (name + "\n" + usage).Trim('\n'); // 设置按钮提示文本
+                } // 如果按钮名称或用途不为空
+                button.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本
             }
         }
 

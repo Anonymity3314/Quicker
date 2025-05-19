@@ -59,15 +59,8 @@ namespace Quicker.Windows
             Application.Current.Dispatcher.Invoke(() =>
             {
                 GenerateCanvas(0, "Global"); // 生成全局 Canvas
-                if (db2.TableExists(CommonStyle))
-                {
-                    GenerateCanvas(0, CommonStyle); // 如果有按钮，生成通用 Canvas
-                }
-                else
-                {
-                    CommonStyle = "Common"; // 设置样式为通用样式
-                    GenerateCanvas(0, CommonStyle); // 生成通用 Canvas
-                }
+                var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
+                GenerateCanvas(0, targetStyle); // 生成对应样式 Canvas
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
 
@@ -201,9 +194,9 @@ namespace Quicker.Windows
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
             if (app._appStateManager.Book)
-                bookimage.UriSource = new Uri("/Resources/Images/Icons/Book.ico", UriKind.Relative); // 设置为订住样式
+                bookimage.UriSource = new Uri(BookIconPath, UriKind.Relative); // 设置为订住样式
             else
-                bookimage.UriSource = new Uri("/Resources/Images/Icons/Disbook.ico", UriKind.Relative); // 设置为不订住样式
+                bookimage.UriSource = new Uri(DisBookIconPath, UriKind.Relative); // 设置为不订住样式
             bookimage.EndInit(); // 结束初始化
             Book.Source = bookimage; // 更新Book按钮图标
         }

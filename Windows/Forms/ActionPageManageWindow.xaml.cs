@@ -16,7 +16,7 @@ namespace Quicker.Windows
         private const string changeActionPageButtonImage = "/Resources/Images/Icons/Quicker1.ico";
         private const string editActionPageButtonImage = "/Resources/Images/Icons/Quicker1.ico";
 
-        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        private T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             while (child != null)
             {
@@ -64,12 +64,10 @@ namespace Quicker.Windows
             }
         }
 
-        // 鼠标移入Button高亮显示黑名单项
+        // 鼠标移入Button高亮按钮
         private void HightLightBlacklistItem(object sender, MouseEventArgs e)
         {
             Button button = sender as Button; // 转换发送者为Button对象
-            if(button.Name != type)
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3"));
             button.Background = button.Name == type
                 ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
                 : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置背景色
@@ -358,13 +356,13 @@ namespace Quicker.Windows
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data) // 如果按钮有数据
             {
+                if(showUsedTimes)
+                    buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
+
                 if (isDarkModle)
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
                 else
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
-
-                if(showUsedTimes)
-                    buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
             }
             else
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
@@ -609,55 +607,55 @@ namespace Quicker.Windows
         /// <returns> 绑定按钮 </returns>
         private Button GetBingdingButton()
         {
-            EditActionPagePopup.IsOpen = false; // 关闭编辑场景弹出菜单
+            EditActionPagePopup.IsOpen = false; // 关闭编辑动作页弹出菜单
             return EditActionPagePopup.PlacementTarget as Button; // 获取弹出菜单所绑定按钮
         }
 
-        // 点击按钮查看场景信息
+        // 点击按钮查看动作页信息
         private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
         }
 
-        // 点击按钮复制场景 ID
+        // 点击按钮复制动作页 ID
         private void CopyActionPageIDButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
-            ToastManager.AddToast($"场景ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 显示复制成功的通知
+            ToastManager.AddToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 显示复制成功的通知
         }
 
-        // 点击按钮编辑场景信息
+        // 点击按钮编辑动作页信息
         private void EditActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             switch (type)
             {
                 case "Global":
-                    ToastManager.AddToast("默认全局场景信息不可修改。", "Common"); // 弹出消息提醒
+                    ToastManager.AddToast("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
                     break;
                 case "Common":
-                    ToastManager.AddToast("默认通用场景信息不可修改。", "Common"); // 弹出消息提醒
+                    ToastManager.AddToast("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
                     break;
                 default:
                     string canvasIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取画布索引
-                    EditActionPageInfoWindow editActionPageInfoWindow = new(type, canvasIndex); // 创建编辑场景信息窗口
-                    editActionPageInfoWindow.Show(); // 显示编辑场景信息窗口
+                    EditActionPageInfoWindow editActionPageInfoWindow = new(type, canvasIndex); // 创建编辑动作页信息窗口
+                    editActionPageInfoWindow.Show(); // 显示编辑动作页信息窗口
                     break;
             }
         }
 
-        // 点击按钮创建打开场景动作
+        // 点击按钮创建打开动作页动作
         private void CreatOpenActionPageActionButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取场景名称
-            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开场景指令
+            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开动作页指令
             Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
             ToastManager.AddToast("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 显示创建成功的通知
         }
 
-        // 点击按钮删除场景
+        // 点击按钮删除动作页
         private void DeleteActionPageButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
@@ -682,7 +680,7 @@ namespace Quicker.Windows
         // 点击按钮添加场景
         private void AddSceneButton_Click(object sender, RoutedEventArgs e)
         {
-
+            ToastManager.AddToast("功能开发中。", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮编辑场景

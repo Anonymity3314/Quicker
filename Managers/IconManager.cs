@@ -127,7 +127,6 @@ namespace Quicker.Managers
                 string iconPath = Path.Combine(appDirectory, "LocalIcons", iconFileName); // 拼接图标文件路径
 
                 if (File.Exists(iconPath)) return iconPath; // 如果文件已存在，返回路径
-
                 Directory.CreateDirectory(Path.GetDirectoryName(iconPath)); // 创建图标目录
                 using (FileStream iconStream = new FileStream(iconPath, FileMode.Create)) // 创建文件流
                 {
@@ -183,12 +182,10 @@ namespace Quicker.Managers
             {
                 Uri uri = new Uri(websiteUrl); // 创建 Uri 对象
                 string apiFaviconUrl = $"https://icon.bqb.cool?url={uri.Host}"; // 拼接 API 地址
-
                 using (WebClient client = new WebClient()) // 创建 WebClient 对象
                 {
                     byte[] iconData = client.DownloadData(apiFaviconUrl); // 下载网站图标数据
                     BitmapImage bitmapImage = new BitmapImage(); // 创建 BitmapImage 对象
-
                     using (MemoryStream stream = new MemoryStream(iconData)) // 创建内存流
                     {
                         bitmapImage.BeginInit(); // 开始初始化 BitmapImage
@@ -197,7 +194,11 @@ namespace Quicker.Managers
                         bitmapImage.EndInit(); // 结束初始化 BitmapImage
                     }
 
-                    if (IsImageEmpty(bitmapImage)) return null; // 如果获取的网站图标为空图片，返回 null
+                    if (IsImageEmpty(bitmapImage))
+                    {
+                        ToastManager.AddToast("获取网站图标失败。", "Error"); // 弹出消息提醒
+                        return null; // 如果获取的网站图标为空图片，返回 null
+                    }
                     return bitmapImage; // 返回网站图标
                 }
             }
@@ -226,7 +227,6 @@ namespace Quicker.Managers
 
                 int stride = bitmapImage.PixelWidth * 4; // 计算每行像素的字节数
                 byte[] pixels = new byte[bitmapImage.PixelHeight * stride]; // 创建字节数组
-
                 FormatConvertedBitmap formatConvertedBitmap = new FormatConvertedBitmap(); // 创建 FormatConvertedBitmap 对象
                 formatConvertedBitmap.BeginInit(); // 开始初始化 FormatConvertedBitmap
                 formatConvertedBitmap.Source = bitmapImage; // 设置 BitmapImage 作为源

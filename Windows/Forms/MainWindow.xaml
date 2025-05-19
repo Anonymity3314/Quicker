@@ -28,37 +28,27 @@
                 </Rectangle.Effect>
             </Rectangle>
             <!-- 标题栏 -->
-            <Border BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3">
+            <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3">
                 <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
-                    <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="283,0,0,0">
-                        <Button Style="{StaticResource Task}" Click="CloseMainWindow" ToolTip="关闭面板窗口">
-                            <Image Source="/Resources/Images/Icons/CloseWindow.ico" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Button>
-                    </Border>
-                    <Border HorizontalAlignment="Right" VerticalAlignment="Center" BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="0,0,25,0">
-                        <Button Style="{StaticResource Task}" Click="BookQuicker">
-                            <Button.ToolTip>
-                                <ToolTip>
-                                    <StackPanel>
-                                        <TextBlock Text="订住：固定位置，不自动隐藏"/>
-                                        <TextBlock Text="订住需点击×关闭窗口"/>
-                                        <TextBlock Text="右键点击可打开面板浮标"/>
-                                    </StackPanel>
-                                </ToolTip>
-                            </Button.ToolTip>
-                            <Image x:Name="Book" Source="/Resources/Images/Icons/Disbook.ico" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Button>
-                    </Border>
-                    <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="58,0,0,0">
-                        <Button Style="{StaticResource Task}" Click="OpenSettingWindow" ToolTip="打开设置窗口">
-                            <Image Source="/Resources/Images/Icons/SettingImage2.ico" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Button>
-                    </Border>
-                    <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="82,0,0,0">
-                        <Button x:Name="ActionPageManager" Style="{StaticResource Task}" Click="OpenTitleMenu">
-                            <Image Source="/Resources/Images/Icons/MoreSelection.ico" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        </Button>
-                    </Border>
+                    <Button Style="{StaticResource CloseMainWindowButton}" Click="CloseMainWindow" ToolTip="关闭面板窗口" Margin="283,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource Task}" Click="BookQuicker" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="订住：固定位置，不自动隐藏"/>
+                                    <TextBlock Text="订住需点击×关闭窗口"/>
+                                    <TextBlock Text="右键点击可打开面板浮标"/>
+                                </StackPanel>
+                            </ToolTip>
+                        </Button.ToolTip>
+                        <Image x:Name="Book" Source="/Resources/Images/Icons/Disbook.ico" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Style="{StaticResource Task}" Click="OpenSettingWindow" ToolTip="打开设置窗口" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
+                        <Image Source="/Resources/Images/Icons/SettingImage2.ico" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button x:Name="ActionPageManager" Style="{StaticResource Task}" Click="OpenTitleMenu" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="82,0,0,0">
+                        <Image Source="/Resources/Images/Icons/MoreSelection.ico" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    </Button>
                     <Popup x:Name="TitlePop" PopupAnimation="Fade" Width="180" Height="70" PlacementTarget="{Binding ElementName=ActionPageManager}" AllowsTransparency="True" StaysOpen="False">
                         <Grid>
                             <Rectangle Fill="White" Margin="3,5">
@@ -85,7 +75,7 @@
                             </Border>
                         </Grid>
                     </Popup>
-                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FF8D8D8D" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#A1A1A1" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 </Grid>
             </Border>
             <!-- 全局动作 -->

@@ -23,7 +23,10 @@ namespace Quicker.Managers
             {
                 _mutex = new Mutex(true, mutexName, out isNewInstance); // 尝试创建互斥锁
             }
-            catch{ isNewInstance = false; } // 不是管理员权限，无法创建互斥锁
+            catch
+            {
+                isNewInstance = false; // 不是管理员权限，无法创建互斥锁
+            }
             return isNewInstance; // 返回是否是新实例
         }
 

@@ -135,22 +135,7 @@ namespace Quicker.Windows.Menus
         /// <returns> 关闭按钮 </returns>
         private Button InitalizeCloseButton(Border border)
         {
-            Button button = new Button()
-            {
-                Style = (Style)FindResource("CloseToastButton"), // 设置按钮样式
-            };
-
-            Path path = new Path()
-            {
-                StrokeThickness = 2, // 设置边框宽度
-                Stroke = Brushes.White, // 设置边框颜色
-                Margin = new Thickness(1), // 设置边距
-                Stretch = Stretch.Uniform, // 设置图片拉伸方式
-                VerticalAlignment = VerticalAlignment.Center, // 设置垂直居中
-                HorizontalAlignment = HorizontalAlignment.Center, // 设置水平居中
-                Data = Geometry.Parse("M 0 0 L 10 10 M 10 0 L 0 10") // 设置关闭按钮图标
-            };
-            button.Content = path;
+            Button button = new Button() { Style = (Style)FindResource("CloseToastButton") }; // 设置按钮样式
 
             // 添加鼠标进入和离开事件处理程序
             button.MouseEnter += (s, e) =>
@@ -158,23 +143,21 @@ namespace Quicker.Windows.Menus
                 e.Handled = true; // 阻止事件冒泡
                 if (border.Background is SolidColorBrush borderBrush)
                 {
-                    Color originalColor = borderBrush.Color;
-                    // 使背景颜色更深
+                    Color originalColor = borderBrush.Color; // 获取边框颜色
                     Color darkerColor = Color.FromRgb(
                         (byte)(originalColor.R * 0.9),
                         (byte)(originalColor.G * 0.9),
                         (byte)(originalColor.B * 0.9)
-                    );
+                    ); // 使背景颜色更深
                     button.Background = new SolidColorBrush(darkerColor); // 设置按钮的背景色
                 }
-            };
+            }; // 鼠标进入事件
 
             button.MouseLeave += (s, e) =>
             {
                 button.Background = new SolidColorBrush(Colors.Transparent); // 恢复按钮的背景色
-            };
-
-            return button;
+            }; // 鼠标离开事件
+            return button; // 返回关闭按钮
         }
 
         /// <summary>
