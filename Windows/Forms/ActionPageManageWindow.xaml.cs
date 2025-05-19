@@ -27,12 +27,12 @@ namespace Quicker.Windows
             return null;
         } // 查找父级控件
 
+        private bool isDarkModle = false, showUsedTimes = false; // 是否为暗黑模式，是否显示使用次数
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 初始鼠标位置
-        private bool isDarkModle = false; // 是否为暗黑模式
         private string type; // 场景类型
 
         public ActionPageManageWindow()
@@ -340,10 +340,15 @@ namespace Quicker.Windows
         {
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data) // 如果按钮数据存在
-                if(isDarkModle)
+            {
+                if (isDarkModle)
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("LightGray")); // 设置按钮背景颜色
                 else
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
+ 
+                if (showUsedTimes)
+                    buttonManager.LoadActionUsedTimes(button, data); // 刷新按钮显示
+            }
             else
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置按钮背景颜色
         }
@@ -353,10 +358,15 @@ namespace Quicker.Windows
         {
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data) // 如果按钮有数据
+            {
                 if (isDarkModle)
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
                 else
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+
+                if(showUsedTimes)
+                    buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
+            }
             else
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
         }
@@ -495,14 +505,21 @@ namespace Quicker.Windows
 
         /// <summary>
         /// 编辑动作后刷新按钮显示
-        /// 性能还能够优化
         /// </summary>
-        /// <param name="button"> 按钮 </param>
+        /// <param name="button"> 目标按钮 </param>
         public void UpdateButton(string button)
         {
             string nums = button.Replace(type, ""); // 获取按钮编号
-            int index = int.Parse(nums) / 100; // 获取按钮索引
-            UpdateCanvasInListView(index, type); // 更新 ListView 中的特定 Canvas
+            int index = int.Parse(nums) / 100; // 获取按钮所在动作页索引
+            var oldCanvas = MainListView.Items[index] as Canvas; // 获取旧的 Canvas
+            foreach(var child in oldCanvas.Children)
+            {
+                if(child is Button targetButton)
+                {
+                    ButtonData data = db2.GetButtonDataByID(targetButton.Name); // 获取按钮数据
+                    buttonManager.RefreshButtonDisplay(targetButton, data, 60, false); // 刷新按钮显示
+                }
+            }
         }
 
         // 鼠标移动时检查是否满足拖拽条件
@@ -713,7 +730,7 @@ namespace Quicker.Windows
         // 右键显示/隐藏动作使用次数
         private void AddActionPageButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            showUsedTimes = !showUsedTimes; // 切换显示/隐藏使用次数
         }
 
         // 关闭窗口时释放资源

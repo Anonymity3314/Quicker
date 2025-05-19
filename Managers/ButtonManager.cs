@@ -325,6 +325,7 @@ namespace Quicker.Managers
         /// <param name="maxWidth"> 最大宽度 </param>
         public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth, bool isMainWindow)
         {
+            button.Content = null; // 清空按钮内容
             if (buttonInformation != null) // 如果Button的数据存在
             {
                 if(buttonInformation.Location == null) return; // 如果文件路径不存在，直接返回
@@ -390,6 +391,21 @@ namespace Quicker.Managers
                 button.Tag = null; // 清空按钮标签
                 button.Background = NoActionBrush; // 重置按钮背景
             }
+        }
+
+        /// <summary>
+        /// 加载动作使用次数
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public void LoadActionUsedTimes(Button button, ButtonData data)
+        {
+            button.Content = null; // 清空按钮内容
+            TextBlock textBlock = new()
+            {
+                TextAlignment = TextAlignment.Center, // 设置文本对齐方式
+                Text = "使用次数:" + "\n" + data.UsedTimes.ToString() // 设置文本
+            }; // 创建文本块对象
+            button.Content = textBlock; // 设置按钮内容
         }
 
         // 鼠标左键按下时记录初始位置
