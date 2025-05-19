@@ -12,7 +12,6 @@ namespace Quicker
         public SettingDatabase Db { get; set; } = new(); // 数据库操作对象
         public DatabaseUpdateManager DatabaseUpdateManager { get; set; } = new(); // 更新管理器
         public TemporaryDatabase Temporary { get; set; } = new(); // 临时数据库
-        public WindowManager WindowManager { get; set; } = new(); // 窗口管理器
 
         public List<BlacklistApplication> BlacklistApplications { get; set; } = new(); // 缓存黑名单应用
         public OpenMainWindow OpenMainWindowConditions { get; set; } = new(); // 缓存 OpenMainWindowConditions
@@ -127,8 +126,6 @@ namespace Quicker
             Timer = null; // 清空计时器
             PreLoadMainWindow?.Close(); // 关闭预加载窗口
             PreLoadMainWindow = null; // 清空预加载窗口
-            WindowManager?.Dispose(); // 释放窗口管理器资源
-            WindowManager = null; // 清空窗口管理器
             DatabaseUpdateManager?.Dispose(); // 释放更新管理器资源
             DatabaseUpdateManager = null; // 清空更新管理器
             Db = null; // 清空数据库操作对象

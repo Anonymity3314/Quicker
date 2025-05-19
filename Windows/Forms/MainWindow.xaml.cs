@@ -27,7 +27,6 @@ namespace Quicker.Windows
 
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private readonly WindowManager windowManager = new(); // 窗口管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
         private readonly App app = (App.Current as App); // App实例
@@ -82,7 +81,7 @@ namespace Quicker.Windows
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
-            windowManager.SetWindowTopmost(this);// 设置窗口置顶
+            WindowManager.SetWindowTopmost(this);// 设置窗口置顶
             SetCommonLabel(); // 设置通用标签
             this.Activate();
         }
@@ -212,7 +211,7 @@ namespace Quicker.Windows
         // 打开设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
+            WindowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 关闭功能面板
@@ -495,7 +494,7 @@ namespace Quicker.Windows
         private void OpenActionPageManageWindow(object sender, RoutedEventArgs e)
         {
             TitlePop.IsOpen = false; // 关闭菜单
-            windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
+            WindowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 
         // 滚轮进行全局动作页翻页
@@ -751,7 +750,6 @@ namespace Quicker.Windows
             Book.Source = null; // 订住按钮图片
             Lock.Source = null; // 锁定按钮图片
 
-            windowManager.Dispose(); // 释放窗口管理器资源
             iconManager.Dispose(); // 释放图标管理器资源
             buttonManager.Dispose(); // 释放按钮管理器资源
 

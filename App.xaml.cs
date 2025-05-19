@@ -281,9 +281,9 @@ namespace Quicker
                 ? _appStateManager.GetBlacklistSettings()
                 : _appStateManager.BlacklistSettings; // 获取黑名单设置
             if (!blacklistSettings.IsFullScreenDisabled) return false; // 如果没有启用全屏禁用Quicker，返回false
-            if (_appStateManager.WindowManager.IsFullScreen()) // 窗口最大化
+            if (WindowManager.IsFullScreen()) // 窗口最大化
             {
-                string processName = _appStateManager.WindowManager.GetProcessName(); // 获取进程名
+                string processName = WindowManager.GetProcessName(); // 获取进程名
                 var blacklistApplications = _appStateManager.EnableMemoryOptimization
                     ? _appStateManager.GetBlacklistApplications()
                     : _appStateManager.BlacklistApplications; // 获取黑名单进程
@@ -298,10 +298,10 @@ namespace Quicker
         // 是否禁用Quicker
         private bool IsBannedFormQuicker()
         {
-            nint foregroundWindow = _appStateManager.WindowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
+            nint foregroundWindow = WindowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
             if (foregroundWindow == IntPtr.Zero) return false; // 没有前台窗口，返回false
 
-            uint processId = _appStateManager.WindowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+            uint processId = WindowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
             Process process = Process.GetProcessById((int)processId); // 获取进程
             string processName = process.ProcessName; // 获取进程名
 
@@ -417,7 +417,7 @@ namespace Quicker
         // 判断鼠标是否在桌面上
         public bool IsMouseOnDesktop()
         {
-            IntPtr foregroundWindow = _appStateManager.WindowManager.GetCurrentForegroundWindow(); // 调用封装方法
+            IntPtr foregroundWindow = WindowManager.GetCurrentForegroundWindow(); // 调用封装方法
             if (foregroundWindow == IntPtr.Zero) return true; // 没有前台窗口
             else return false; // 鼠标在桌面上
         }

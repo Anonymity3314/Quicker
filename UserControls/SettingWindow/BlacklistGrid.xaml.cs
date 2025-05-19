@@ -15,7 +15,6 @@ namespace Quicker.UserControls
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
-        private WindowManager windowManager = new(); // 窗口管理器
         private IconManager iconManager = new(); // 图标管理器
         SettingDatabase db1 = new(); // 设置数据库
         SettingManager settingManager; // 设置管理器
@@ -506,7 +505,6 @@ namespace Quicker.UserControls
             BlacklistStackScrollViewer.ScrollChanged -= BlacklistStackScrollViewer_ScrollChanged;
 
             // 清理外部资源
-            windowManager?.Dispose();
             iconManager?.Dispose();
             db1 = null;
             settingManager = null;

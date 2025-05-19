@@ -10,7 +10,6 @@ namespace Quicker.Windows
     public partial class CreatActionMenu : Window
     {
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private readonly WindowManager windowManager = new(); // 窗口管理器
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 设置管理器
         private string clipboardText; // 剪切板文本
@@ -23,7 +22,7 @@ namespace Quicker.Windows
             InitializeComponent();
             SetButtonVisbility(); // 设置按钮可见性
             CurrentButton = currentbutton; // 设置当前按钮
-            windowManager.SetWindowTopmost(this); // 设置窗口置顶
+            WindowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 设置按钮可见性

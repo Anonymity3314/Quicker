@@ -2,7 +2,8 @@
   "version": "2.1.4",
   "url": "https://github.com/user-attaclments/files/20089164/Quicker.2.1.3.zip",
   "changelog": "添加了粘贴地址时自动去除引号的功能\n- 修复了某些BUG",
-  "mandatory": {
+  "mandatory":
+  {
     "value": true,
     "mode": 1
   }

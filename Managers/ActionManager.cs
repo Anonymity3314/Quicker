@@ -10,8 +10,6 @@ namespace Quicker.Managers
 {
     internal class ActionManager
     {
-        private readonly WindowManager windowManager = new(); // 窗口管理器
-
         /// <summary>
         /// 打开文件
         /// </summary>
@@ -21,7 +19,7 @@ namespace Quicker.Managers
             if (data.Data2 == "true") // 如果尝试打开已存在的窗口
             {
                 string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
-                windowManager.TryToOpenExitingWindow(windowTitle);
+                WindowManager.TryToOpenExitingWindow(windowTitle);
             }
 
             if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) ||
@@ -316,7 +314,6 @@ namespace Quicker.Managers
         // 手动释放资源
         public void Dispose()
         {
-            windowManager.Dispose(); // 释放窗口管理器
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

@@ -10,7 +10,6 @@ namespace Quicker.Windows
 {
     public partial class CustomMenu : Window
     {
-        private readonly WindowManager windowManager = new(); // 窗口管理器
         private readonly App app = (App.Current as App); // App实例
         private readonly SettingDatabase db1 = new(); // 数据库实例
 
@@ -18,7 +17,7 @@ namespace Quicker.Windows
         {
             InitializeComponent();
             this.Visibility = Visibility.Hidden; // 隐藏窗口
-            windowManager.SetWindowTopmost(this); // 设置窗口置顶
+            WindowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 弹出面板窗口
@@ -35,13 +34,13 @@ namespace Quicker.Windows
         // 弹出设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
+            WindowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 打开动作管理窗口
         private void OpenActionPageManageWindow(object sender, RoutedEventArgs e)
         {
-            windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
+            WindowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 
         // 暂停Quicker

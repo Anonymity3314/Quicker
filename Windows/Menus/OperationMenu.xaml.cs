@@ -20,7 +20,6 @@ namespace Quicker.Windows
         private static extern int SHOpenFolderAndSelectItems(IntPtr pidlList, uint cild, IntPtr children, uint dwFlags); // 打开文件夹并选中文件
         public string CurrentButton { get; private set; } // 当前按钮
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private readonly WindowManager windowManager = new(); // 窗口管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
 
@@ -29,7 +28,7 @@ namespace Quicker.Windows
             InitializeComponent(); // 初始化窗口
             CurrentButton = currentbutton; // 设置当前按钮
             InitializeMenu(); // 初始化菜单
-            windowManager.SetWindowTopmost(this); // 设置窗口置顶
+            WindowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 初始化菜单
