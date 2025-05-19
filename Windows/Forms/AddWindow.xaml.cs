@@ -206,6 +206,9 @@ namespace Quicker
                     openWebsite.Save(); // 保存打开网址动作
                     break;
             }
+            ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
+            if (actionPageManageWindow != null)
+                actionPageManageWindow.UpdateButton(CurrentButton); // 更新菜单栏按钮
             this.Close(); // 关闭窗口
         }
 

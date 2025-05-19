@@ -493,6 +493,18 @@ namespace Quicker.Windows
                 buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
         }
 
+        /// <summary>
+        /// 编辑动作后刷新按钮显示
+        /// 性能还能够优化
+        /// </summary>
+        /// <param name="button"> 按钮 </param>
+        public void UpdateButton(string button)
+        {
+            string nums = button.Replace(type, ""); // 获取按钮编号
+            int index = int.Parse(nums) / 100; // 获取按钮索引
+            UpdateCanvasInListView(index, type); // 更新 ListView 中的特定 Canvas
+        }
+
         // 鼠标移动时检查是否满足拖拽条件
         public void Button1_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -720,24 +732,6 @@ namespace Quicker.Windows
                                 UIElement gridChild = grid.Children[0];
                                 if (gridChild is Button button)
                                 {
-                                    // 移除按钮的所有事件处理程序
-                                    button.MouseEnter -= HightLightBlacklistItem;
-                                    button.MouseLeave -= FadeBlacklistItem;
-                                    switch (button.Name)
-                                    {
-                                        case "Global":
-                                            button.Click-= GlobalButton_Click;
-                                            break;
-                                        case "Common":
-                                            button.Click -= CommonButton_Click;
-                                            break;
-                                        case "Taskbar":
-                                            button.Click -= TaskBarButton_Click;
-                                            break;
-                                        case "Desktop":
-                                            button.Click -= DesktopButton_Click;
-                                            break;
-                                    }
                                     // 清理按钮资源
                                     button.Content = null;
                                     button.Tag = null;

@@ -18,8 +18,8 @@ namespace Quicker.Windows
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮类型2颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
-        private readonly ToastManager toastManager = new(); // 通知管理器
         public readonly SettingManager settingManager = new(); // 设置管理器
+        private readonly ToastManager toastManager = new(); // 通知管理器
         private readonly SettingDatabase db1 = new(); // 设置数据库
 
         public SettingWindow()

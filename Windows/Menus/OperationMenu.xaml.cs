@@ -59,6 +59,9 @@ namespace Quicker.Windows
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             db2.DeleteAction(CurrentButton); // 删除动作
+            ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
+            if (actionPageManageWindow != null)
+                actionPageManageWindow.UpdateButton(CurrentButton); // 更新菜单栏按钮
             buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
 
