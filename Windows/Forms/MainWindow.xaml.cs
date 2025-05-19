@@ -1,4 +1,5 @@
-﻿using System.Windows.Media.Imaging;
+﻿using System.Windows.Controls.Primitives;
+using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
@@ -33,8 +34,8 @@ namespace Quicker.Windows
         {
             CommonStyle = style; // 设置样式
             InitializeComponent(); // 初始化窗口组件
-            GlobalGrid.Children.Remove(ViewGlobalCanvas); // 从主网格中移除
-            CommonGrid.Children.Remove(ViewCommonCanvas); // 从主网格中移除
+            GlobalGrid.Children.Remove(ViewGlobalUniformGrid); // 从主网格中移除
+            CommonGrid.Children.Remove(ViewCommonUniformGrid); // 从主网格中移除
         }
 
         /// <summary>
@@ -53,9 +54,9 @@ namespace Quicker.Windows
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                GenerateCanvas(0, "Global"); // 生成全局 Canvas
+                GenerateUniformGrid(0, "Global"); // 生成全局 UniformGrid
                 var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
-                GenerateCanvas(0, targetStyle); // 生成对应样式 Canvas
+                GenerateUniformGrid(0, targetStyle); // 生成对应样式 UniformGrid
                 GenerateButtons(); // 生成按钮
             }); // 在主线程中执行
 
@@ -79,8 +80,8 @@ namespace Quicker.Windows
         {
             var globalSceneData = db3.GetSceneData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
             var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
-            GeneratePageButtons("Global", globalSceneData.SceneCount, SwitchToGlobalCanvas, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
-            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, SwitchToCommonCanvas, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
+            GeneratePageButtons("Global", globalSceneData.SceneCount, SwitchToGlobalUniformGrid, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
+            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, SwitchToCommonUniformGrid, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
         }
 
         /// <summary>
@@ -114,43 +115,43 @@ namespace Quicker.Windows
             }
         }
 
-        // 切换到全局Canvas
-        private void SwitchToGlobalCanvas(object sender, RoutedEventArgs e)
+        // 切换到全局UniformGrid
+        private void SwitchToGlobalUniformGrid(object sender, RoutedEventArgs e)
         {
-            SwitchToCanvas(sender, MainGrid, "Global"); // 切换到全局Canvas
+            SwitchToUniformGrid(sender, MainGrid, "Global"); // 切换到全局UniformGrid
         }
 
-        // 切换到通用Canvas
-        private void SwitchToCommonCanvas(object sender, RoutedEventArgs e)
+        // 切换到通用UniformGrid
+        private void SwitchToCommonUniformGrid(object sender, RoutedEventArgs e)
         {
-            SwitchToCanvas(sender, CommonGrid, CommonStyle); // 切换到通用Canvas
+            SwitchToUniformGrid(sender, CommonGrid, CommonStyle); // 切换到通用UniformGrid
         }
 
         /// <summary>
-        /// 切换到指定的Canvas
+        /// 切换到指定的UniformGrid
         /// </summary>
         /// <param name="sender"> 触发事件的对象 </param>
         /// <param name="targetGrid"> 目标Grid </param>
         /// <param name="Style"> 样式名称 </param>
-        private void SwitchToCanvas(object sender, Grid targetGrid, string Style)
+        private void SwitchToUniformGrid(object sender, Grid targetGrid, string Style)
         {
             if (sender is Button clickedButton)
             {
-                int canvasIndex = int.Parse(clickedButton.Name.Replace($"{Style}", "")); // 获取Canvas索引
-                string targetCanvasName = $"{Style}{canvasIndex}"; // 生成目标Canvas名称
-                Canvas targetCanvas = buttonManager.FindVisualChildren<Canvas>(targetGrid).FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
+                int uniformGridIndex = int.Parse(clickedButton.Name.Replace($"{Style}", "")); // 获取UniformGrid索引
+                string targetUniformGridName = $"{Style}{uniformGridIndex}"; // 生成目标UniformGrid名称
+                UniformGrid targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(targetGrid).FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
 
-                // 如果目标Canvas不存在，动态生成
-                if (targetCanvas == null)
+                // 如果目标UniformGrid不存在，动态生成
+                if (targetUniformGrid == null)
                 {
-                    GenerateCanvas(canvasIndex, Style); // 动态生成Canvas
-                    targetCanvas = buttonManager.FindVisualChildren<Canvas>(targetGrid).FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
+                    GenerateUniformGrid(uniformGridIndex, Style); // 动态生成UniformGrid
+                    targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(targetGrid).FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
                 }
-                targetCanvas.Visibility = Visibility.Visible; // 设置目标Canvas可见
-                foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(targetGrid)) // 隐藏其他Canvas
+                targetUniformGrid.Visibility = Visibility.Visible; // 设置目标UniformGrid可见
+                foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(targetGrid)) // 隐藏其他UniformGrid
                 {
-                    if (canvas.Name.StartsWith($"{Style}") && canvas != targetCanvas)
-                        canvas.Visibility = Visibility.Collapsed; // 隐藏其他Canvas
+                    if (uniformGrid.Name.StartsWith($"{Style}") && uniformGrid != targetUniformGrid)
+                        uniformGrid.Visibility = Visibility.Collapsed; // 隐藏其他UniformGrid
                 }
             }
         }
@@ -227,7 +228,7 @@ namespace Quicker.Windows
             {
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD"));
                 button.RenderTransform = new ScaleTransform(1.05, 1.05);
-                Canvas.SetZIndex(button, 1);
+                UniformGrid.SetZIndex(button, 1);
             }
             else
             {
@@ -265,27 +266,27 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                int canvasIndex = int.Parse(button.Name.Replace($"{prefix}", "")); // 获取Canvas索引
-                string targetCanvasName = $"{prefix}{canvasIndex}"; // 生成目标Canvas名称
-                Canvas targetCanvas = null; // 初始化目标Canvas
+                int uniformGridIndex = int.Parse(button.Name.Replace($"{prefix}", "")); // 获取UniformGrid索引
+                string targetUniformGridName = $"{prefix}{uniformGridIndex}"; // 生成目标UniformGrid名称
+                UniformGrid targetUniformGrid = null; // 初始化目标UniformGrid
 
                 var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
-                foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
+                foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(grid)) // 查找目标UniformGrid
                 {
-                    if (canvas.Name == targetCanvasName)
+                    if (uniformGrid.Name == targetUniformGridName)
                     {
-                        targetCanvas = canvas; // 找到目标Canvas
+                        targetUniformGrid = uniformGrid; // 找到目标UniformGrid
                         break;
                     }
                 }
 
-                if (targetCanvas == null)
+                if (targetUniformGrid == null)
                 {
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
                     return;
                 }
 
-                if (targetCanvas.Visibility != Visibility.Visible)
+                if (targetUniformGrid.Visibility != Visibility.Visible)
                     button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
             }
         }
@@ -296,7 +297,7 @@ namespace Quicker.Windows
             Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData)
             {
-                Canvas.SetZIndex(button, 0); // 还原按钮层级
+                UniformGrid.SetZIndex(button, 0); // 还原按钮层级
                 button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
             }
@@ -323,21 +324,21 @@ namespace Quicker.Windows
         {
             if (sender is Button button)
             {
-                int canvasIndex = int.Parse(button.Name.Replace($"{prefix}", "")); // 获取Canvas索引
-                string targetCanvasName = $"{prefix}{canvasIndex}"; // 生成目标Canvas名称
-                Canvas targetCanvas = null; // 初始化目标Canvas
+                int uniformGridIndex = int.Parse(button.Name.Replace($"{prefix}", "")); // 获取UniformGrid索引
+                string targetUniformGridName = $"{prefix}{uniformGridIndex}"; // 生成目标UniformGrid名称
+                UniformGrid targetUniformGrid = null; // 初始化目标UniformGrid
 
                 var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
-                foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(grid)) // 查找目标Canvas
+                foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(grid)) // 查找目标UniformGrid
                 {
-                    if (canvas.Name != targetCanvasName) continue; // 如果不是目标Canvas，跳过
-                    targetCanvas = canvas; // 找到目标Canvas
+                    if (uniformGrid.Name != targetUniformGridName) continue; // 如果不是目标UniformGrid，跳过
+                    targetUniformGrid = uniformGrid; // 找到目标UniformGrid
                     break;
                 }
 
-                if (targetCanvas == null) // 如果目标Canvas不存在
+                if (targetUniformGrid == null) // 如果目标UniformGrid不存在
                     button.Background = UnSelectedBrush; // 还原按钮背景颜色
-                else if (targetCanvas.Visibility != Visibility.Visible) // 如果目标Canvas不可见
+                else if (targetUniformGrid.Visibility != Visibility.Visible) // 如果目标UniformGrid不可见
                     button.Background = UnSelectedBrush; // 还原按钮背景颜色
             }
         }
@@ -405,13 +406,13 @@ namespace Quicker.Windows
             string type = data.Data1; // 获取动作页类型
             int index = int.Parse(data.Data2); // 获取动作页索引
             if (type != "Global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
-            int currentCanvasIndex = GetVisibleCanvasIndex(type); // 获取当前可见的Canvas编号
-            if (currentCanvasIndex > index) // 如果当前Canvas编号大于目标Canvas编号
-                for (int i = currentCanvasIndex; i > index; i--)
-                    SwitchToPreviousCanvas(i, type); // 向前切换Canvas
-            else // 如果当前Canvas编号小于目标Canvas编号
-                for (int i = currentCanvasIndex; i < index; i++)
-                    SwitchToNextCanvas(i, type); // 向后切换Canvas
+            int currentUniformGridIndex = GetVisibleUniformGridIndex(type); // 获取当前可见的UniformGrid编号
+            if (currentUniformGridIndex > index) // 如果当前UniformGrid编号大于目标UniformGrid编号
+                for (int i = currentUniformGridIndex; i > index; i--)
+                    SwitchToPreviousUniformGrid(i, type); // 向前切换UniformGrid
+            else // 如果当前UniformGrid编号小于目标UniformGrid编号
+                for (int i = currentUniformGridIndex; i < index; i++)
+                    SwitchToNextUniformGrid(i, type); // 向后切换UniformGrid
         }
 
         // 右键按钮打开菜单
@@ -488,139 +489,139 @@ namespace Quicker.Windows
         // 滚轮进行全局动作页翻页
         private void GolbalGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ChangeVisibleCanvas(e, "Global"); // 滚轮进行全局动作页翻页
+            ChangeVisibleUniformGrid(e, "Global"); // 滚轮进行全局动作页翻页
         }
 
         /// <summary>
-        /// 获取当前可见的Canvas编号
+        /// 获取当前可见的UniformGrid编号
         /// </summary>
         /// <param name="type"></param>
-        /// <returns> 当前可见的Canvas编号 </returns>
-        private int GetVisibleCanvasIndex(string type)
+        /// <returns> 当前可见的UniformGrid编号 </returns>
+        private int GetVisibleUniformGridIndex(string type)
         {
-            var canvasCollection = type == "Global" // 根据是否是全局Canvas选择集合
-                ? buttonManager.FindVisualChildren<Canvas>(GlobalGrid) // 查找GlobalGrid下的Canvas集合
-                : buttonManager.FindVisualChildren<Canvas>(CommonGrid); // 查找CommonGrid下的Canvas集合
-            foreach (Canvas canvas in canvasCollection) // 遍历Canvas集合
+            var uniformGridCollection = type == "Global" // 根据是否是全局UniformGrid选择集合
+                ? buttonManager.FindVisualChildren<UniformGrid>(GlobalGrid) // 查找GlobalGrid下的UniformGrid集合
+                : buttonManager.FindVisualChildren<UniformGrid>(CommonGrid); // 查找CommonGrid下的UniformGrid集合
+            foreach (UniformGrid uniformGrid in uniformGridCollection) // 遍历UniformGrid集合
             {
-                if (canvas.Visibility == Visibility.Visible)
-                    return int.Parse(canvas.Name.Replace(type, "")); // 如果匹配成功，返回Canvas编号
+                if (uniformGrid.Visibility == Visibility.Visible)
+                    return int.Parse(uniformGrid.Name.Replace(type, "")); // 如果匹配成功，返回UniformGrid编号
             }
             return 0; // 默认返回0
         }
 
         /// <summary>
-        /// 滑动滚轮更改当前可见 Canvas
+        /// 滑动滚轮更改当前可见 UniformGrid
         /// </summary>
         /// <param name="e">鼠标滚轮事件参数</param>
-        /// <param name="style">Canvas 类型</param>
-        private void ChangeVisibleCanvas(MouseWheelEventArgs e, string style)
+        /// <param name="style">UniformGrid 类型</param>
+        private void ChangeVisibleUniformGrid(MouseWheelEventArgs e, string style)
         {
             e.Handled = true; // 标记事件已处理
             int delta = e.Delta; // 获取鼠标滚轮的增量值
-            int currentCanvasIndex = GetVisibleCanvasIndex(style); // 获取当前可见的Canvas编号
-            if (delta > 0) SwitchToPreviousCanvas(currentCanvasIndex, style); // 向上滚动，切换到上一页
-            else SwitchToNextCanvas(currentCanvasIndex, style); // 向下滚动，切换到下一页
+            int currentUniformGridIndex = GetVisibleUniformGridIndex(style); // 获取当前可见的UniformGrid编号
+            if (delta > 0) SwitchToPreviousUniformGrid(currentUniformGridIndex, style); // 向上滚动，切换到上一页
+            else SwitchToNextUniformGrid(currentUniformGridIndex, style); // 向下滚动，切换到下一页
         }
 
         /// <summary>
         /// 切换到上一页
         /// </summary>
-        /// <param name="currentCanvasIndex">当前可见的Canvas编号</param>
-        /// <param name="style">Canvas 类型</param>
-        private void SwitchToPreviousCanvas(int currentCanvasIndex, string style)
+        /// <param name="currentUniformGridIndex">当前可见的UniformGrid编号</param>
+        /// <param name="style">UniformGrid 类型</param>
+        private void SwitchToPreviousUniformGrid(int currentUniformGridIndex, string style)
         {
-            SwitchCanvas(currentCanvasIndex, style, false); // 向上滚动，切换到上一页
+            SwitchUniformGrid(currentUniformGridIndex, style, false); // 向上滚动，切换到上一页
         }
 
         /// <summary>
         /// 切换到下一页
         /// </summary>
-        /// <param name="currentCanvasIndex">当前可见的Canvas编号</param>
-        /// <param name="style">Canvas 类型</param>
-        private void SwitchToNextCanvas(int currentCanvasIndex, string style)
+        /// <param name="currentUniformGridIndex">当前可见的UniformGrid编号</param>
+        /// <param name="style">UniformGrid 类型</param>
+        private void SwitchToNextUniformGrid(int currentUniformGridIndex, string style)
         {
-            SwitchCanvas(currentCanvasIndex, style, true); // 向下滚动，切换到下一页
+            SwitchUniformGrid(currentUniformGridIndex, style, true); // 向下滚动，切换到下一页
         }
 
         /// <summary>
-        /// 切换Canvas
+        /// 切换UniformGrid
         /// </summary>
-        /// <param name="currentCanvasIndex"> 当前可见的Canvas编号 </param>
-        /// <param name="style"> Canvas 类型 </param>
+        /// <param name="currentUniformGridIndex"> 当前可见的UniformGrid编号 </param>
+        /// <param name="style"> UniformGrid 类型 </param>
         /// <param name="isNext"> 是否向下滚动 </param>
-        private void SwitchCanvas(int currentCanvasIndex, string style, bool isNext)
+        private void SwitchUniformGrid(int currentUniformGridIndex, string style, bool isNext)
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
-            int targetCanvasIndex = isNext ? currentCanvasIndex + 1 : currentCanvasIndex - 1; // 计算目标Canvas编号
+            int targetUniformGridIndex = isNext ? currentUniformGridIndex + 1 : currentUniformGridIndex - 1; // 计算目标UniformGrid编号
             var sceneData = db3.GetSceneData(style).FirstOrDefault(); // 从数据库中获取动作页数据
-            if (targetCanvasIndex == sceneData.SceneCount || targetCanvasIndex < 0) // 如果目标Canvas编号超出范围
+            if (targetUniformGridIndex == sceneData.SceneCount || targetUniformGridIndex < 0) // 如果目标UniformGrid编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
-                    targetCanvasIndex = isNext ? 0 : sceneData.SceneCount; // 循环到第一页或最后一页
+                    targetUniformGridIndex = isNext ? 0 : sceneData.SceneCount; // 循环到第一页或最后一页
                 else return; // 如果不循环翻页，直接返回
             }
 
-            string targetCanvasName = $"{style}{targetCanvasIndex}"; // 生成目标Canvas名称
-            Canvas targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? GlobalGrid : CommonGrid)
-                .FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
+            string targetUniformGridName = $"{style}{targetUniformGridIndex}"; // 生成目标UniformGrid名称
+            UniformGrid targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
+                .FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
 
-            if (targetCanvas == null) // 如果目标Canvas不存在
+            if (targetUniformGrid == null) // 如果目标UniformGrid不存在
             {
-                GenerateCanvas(targetCanvasIndex, style); // 动态生成Canvas
-                targetCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? GlobalGrid : CommonGrid)
-                    .FirstOrDefault(c => c.Name == targetCanvasName); // 查找目标Canvas
+                GenerateUniformGrid(targetUniformGridIndex, style); // 动态生成UniformGrid
+                targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
+                    .FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
             }
 
-            targetCanvas.Visibility = Visibility.Visible; // 设置目标Canvas可见
-            string currentCanvasName = $"{style}{currentCanvasIndex}"; // 生成当前Canvas名称
-            Canvas currentCanvas = buttonManager.FindVisualChildren<Canvas>(style == "Global" ? GlobalGrid : CommonGrid)
-                .FirstOrDefault(c => c.Name == currentCanvasName); // 查找当前Canvas
-            currentCanvas.Visibility = Visibility.Collapsed; // 隐藏当前Canvas
+            targetUniformGrid.Visibility = Visibility.Visible; // 设置目标UniformGrid可见
+            string currentUniformGridName = $"{style}{currentUniformGridIndex}"; // 生成当前UniformGrid名称
+            UniformGrid currentUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
+                .FirstOrDefault(c => c.Name == currentUniformGridName); // 查找当前UniformGrid
+            currentUniformGrid.Visibility = Visibility.Collapsed; // 隐藏当前UniformGrid
         }
 
         /// <summary>
-        /// 生成Canvas
+        /// 生成UniformGrid
         /// </summary>
-        /// <param name="canvasIndex"> 要生成的页面索引 </param>
-        /// <param name="style"> Canvas 类型 </param>
-        public void GenerateCanvas(int canvasIndex, string style)
+        /// <param name="uniformGridIndex"> 要生成的页面索引 </param>
+        /// <param name="style"> UniformGrid 类型 </param>
+        public void GenerateUniformGrid(int uniformGridIndex, string style)
         {
-            string canvasName = $"{style}{canvasIndex}"; // Canvas名称
-            Canvas newCanvas = new Canvas { Name = canvasName }; // 创建Canvas对象
+            int rows = style == "Global" ? 3 : 4, cols = 4; // 行数和列数
+            UniformGrid newUniformGrid = new UniformGrid
+            {
+                Rows = rows, // 设置行数
+                Columns = cols, // 设置列数
+                Name = $"{style}{uniformGridIndex}", // 设置名称
+            }; // 创建UniformGrid对象
 
             if (style == "Global")
             {
-                GlobalGrid.Children.Add(newCanvas); // 添加到主Grid
-                newCanvas.IsVisibleChanged += GlobalCanvas_IsVisibleChanged; // 添加可见性变化事件
+                GlobalGrid.Children.Add(newUniformGrid); // 添加到主Grid
+                newUniformGrid.IsVisibleChanged += GlobalUniformGrid_IsVisibleChanged; // 添加可见性变化事件
             }
             else
             {
-                CommonGrid.Children.Add(newCanvas); // 添加到公共Grid
-                newCanvas.IsVisibleChanged += CommonCanvas_IsVisibleChanged; // 添加可见性变化事件
+                CommonGrid.Children.Add(newUniformGrid); // 添加到公共Grid
+                newUniformGrid.IsVisibleChanged += CommonUniformGrid_IsVisibleChanged; // 添加可见性变化事件
             }
 
             Panel ParentPanel = style == "Global" ? GlobalButtonPanel : CommonButtonPanel; // 根据样式选择父面板
             foreach (var button in ParentPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
             {
-                button.Background = button.Name.Contains($"{canvasIndex}") // 判断是否是当前按钮
+                button.Background = button.Name.Contains($"{uniformGridIndex}") // 判断是否是当前按钮
                     ? SelectedBrush
                     : UnSelectedBrush; // 设置当前按钮颜色
             }
 
-            double buttonSpacing = 77.6; // 按钮间距
-            int rows = style == "Global" ? 3 : 4, cols = 4; // 行数和列数
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    int buttonIndex = row * 4 + col + 1; // 按钮在Canvas中的位置
-                    string buttonName = $"{style}{canvasIndex}{row + 1}{col + 1}"; // 按钮名称
-                    Margin = new Thickness(col * buttonSpacing, row * buttonSpacing, 0, 0); // 按钮布局
+                    string buttonName = $"{style}{uniformGridIndex}{row + 1}{col + 1}"; // 按钮名称
                     Style styleResource = FindResource("Button") as Style; // 按钮样式
-                    Button button = CreateButton(buttonName, styleResource, Margin, row, col); // 创建按钮
-                    newCanvas.Children.Add(button); // 添加按钮到Canvas
-
+                    Button button = CreateButton(buttonName, styleResource, row, col); // 创建按钮
+                    newUniformGrid.Children.Add(button); // 添加按钮到UniformGrid
                     var buttonData = db2.GetButtonDataByPrefix(style); // 从数据库中获取按钮数据
                     foreach (var data in buttonData)
                     {
@@ -636,17 +637,15 @@ namespace Quicker.Windows
         /// </summary>
         /// <param name="name">Button 的名称</param>
         /// <param name="style">Button 的样式</param>
-        /// <param name="margin">Button 的布局</param>
         /// <param name="row">Button 的行</param>
         /// <param name="col">Button的列</param>
         /// <returns>生成的 Button</returns>
-        private Button CreateButton(string name, Style style, Thickness margin, int row = 0, int col = 0)
+        private Button CreateButton(string name, Style style,int row = 0, int col = 0)
         {
             Button button = new Button
             {
                 Name = name, // 设置名称
                 Style = style, // 设置样式
-                Margin = margin, // 设置布局
                 AllowDrop = true, // 允许拖拽
             };
 
@@ -675,14 +674,14 @@ namespace Quicker.Windows
         }
 
         // 全局动作页可见性与切换按钮背景绑定
-        private void GlobalCanvas_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void GlobalUniformGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (sender is Canvas canvas && canvas.IsVisible)
+            if (sender is UniformGrid uniformGrid && uniformGrid.IsVisible)
             {
-                int canvasIndex = int.Parse(canvas.Name.Replace("Global", "")); // 获取Canvas索引
+                int uniformGridIndex = int.Parse(uniformGrid.Name.Replace("Global", "")); // 获取UniformGrid索引
                 foreach (var button in GlobalButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
                 {
-                    button.Background = button.Name.Contains($"{canvasIndex}") // 判断是否是当前按钮
+                    button.Background = button.Name.Contains($"{uniformGridIndex}") // 判断是否是当前按钮
                         ? SelectedBrush
                         : UnSelectedBrush; // 设置当前按钮颜色
                 } // 设置所有按钮的颜色
@@ -702,18 +701,18 @@ namespace Quicker.Windows
         // 滚轮进行通用动作页翻页
         private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ChangeVisibleCanvas(e, CommonStyle); // 调用切换 Canvas 方法
+            ChangeVisibleUniformGrid(e, CommonStyle); // 调用切换 UniformGrid 方法
         }
 
         // 通用动作页可见性与切换按钮背景绑定
-        private void CommonCanvas_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private void CommonUniformGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (sender is Canvas canvas && canvas.IsVisible)
+            if (sender is UniformGrid uniformGrid && uniformGrid.IsVisible)
             {
-                int canvasIndex = int.Parse(canvas.Name.Replace($"{CommonStyle}", "")); // 获取Canvas索引
+                int uniformGridIndex = int.Parse(uniformGrid.Name.Replace($"{CommonStyle}", "")); // 获取UniformGrid索引
                 foreach (var button in CommonButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
                 {
-                    button.Background = button.Name.Contains($"{canvasIndex}") // 判断是否是当前按钮
+                    button.Background = button.Name.Contains($"{uniformGridIndex}") // 判断是否是当前按钮
                         ? SelectedBrush
                         : UnSelectedBrush; // 设置当前按钮颜色
                 } // 设置所有按钮的颜色
@@ -733,8 +732,8 @@ namespace Quicker.Windows
             cancellationTokenSource.Cancel(); // 取消所有后台任务
             cancellationTokenSource.Dispose();
             CleanUpEventHandlers(); // 清理事件处理器
-            CleanUpCanvas(MainGrid); // 清理全局网格
-            CleanUpCanvas(CommonGrid); // 清理通用网格
+            CleanUpUniformGrid(MainGrid); // 清理全局网格
+            CleanUpUniformGrid(CommonGrid); // 清理通用网格
             Book.Source = null; // 订住按钮图片
             Lock.Source = null; // 锁定按钮图片
 
@@ -747,14 +746,14 @@ namespace Quicker.Windows
         }
 
         /// <summary>
-        /// 清理指定Grid中的所有Canvas及其子元素
+        /// 清理指定Grid中的所有UniformGrid及其子元素
         /// </summary>
         /// <param name="grid">要清理的Grid</param>
-        private void CleanUpCanvas(Grid grid)
+        private void CleanUpUniformGrid(Grid grid)
         {
-            foreach (Canvas canvas in buttonManager.FindVisualChildren<Canvas>(grid))
+            foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(grid))
             {
-                foreach (Button button in buttonManager.FindVisualChildren<Button>(canvas))
+                foreach (Button button in buttonManager.FindVisualChildren<Button>(uniformGrid))
                 {
                     // 移除所有事件处理器
                     button.Click -= DoAction;
@@ -773,11 +772,11 @@ namespace Quicker.Windows
                     button.Background = null;
                 }
 
-                // 移除Canvas事件
-                canvas.IsVisibleChanged -= GlobalCanvas_IsVisibleChanged;
-                canvas.IsVisibleChanged -= CommonCanvas_IsVisibleChanged;
+                // 移除UniformGrid事件
+                uniformGrid.IsVisibleChanged -= GlobalUniformGrid_IsVisibleChanged;
+                uniformGrid.IsVisibleChanged -= CommonUniformGrid_IsVisibleChanged;
 
-                canvas.Children.Clear(); // 清空Canvas
+                uniformGrid.Children.Clear(); // 清空UniformGrid
             }
             grid.Children.Clear(); // 清空Grid
         }
@@ -787,14 +786,14 @@ namespace Quicker.Windows
         {
             foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 清理全局按钮面板事件
             {
-                button.Click -= SwitchToGlobalCanvas;
+                button.Click -= SwitchToGlobalUniformGrid;
                 button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter;
                 button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave;
             }
 
             foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 清理公共按钮面板事件
             {
-                button.Click -= SwitchToCommonCanvas;
+                button.Click -= SwitchToCommonUniformGrid;
                 button.MouseEnter -= CommonActionPageChangeButton_MouseEnter;
                 button.MouseLeave -= CommonActionPageChangeButton_MouseLeave;
             }

@@ -80,20 +80,20 @@
             </Border>
             <!-- 全局动作 -->
             <Grid x:Name="GlobalGrid" VerticalAlignment="Top" Height="232.8" Width="310.4" Margin="0,28,0,0" MouseWheel="GolbalGrid_MouseWheel">
-                <Canvas x:Name="ViewGlobalCanvas">
-                    <Button Style="{StaticResource Button}" Margin="0,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="232.8,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="0,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="232.8,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="0,155.2,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,155.2,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,155.2,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="232.8,155.2,0,0"/>
-                </Canvas>
+                <UniformGrid x:Name="ViewGlobalUniformGrid" Rows="3" Columns="4">
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                </UniformGrid>
             </Grid>
             <!-- 功能栏 -->
             <Grid VerticalAlignment="Top" Height="25" Background="#F3F3F3" Margin="0,261,0,0" >
@@ -116,24 +116,24 @@
             </Grid>
             <!-- 通用动作 -->
             <Grid x:Name="CommonGrid" Height="310.4" Width="310.4" Margin="0,286,0,0" MouseWheel="CommonGrid_MouseWheel">
-                <Canvas x:Name="ViewCommonCanvas">
-                    <Button Style="{StaticResource Button}" Margin="0,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="232.8,0,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="0,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="232.8,77.6,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="0,155.2,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,155.2,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,155.2,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="232.8,155.2,0,0"/>
-                    <Button Style="{StaticResource SpecialButton1}" Margin="0,232.8,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="77.6,232.8,0,0"/>
-                    <Button Style="{StaticResource Button}" Margin="155.2,232.8,0,0"/>
-                    <Button Style="{StaticResource SpecialButton2}" Margin="232.8,232.8,0,0"/>
-                </Canvas>
+                <UniformGrid x:Name="ViewCommonUniformGrid" Rows="4" Columns="4">
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource SpecialButton1}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource Button}"/>
+                    <Button Style="{StaticResource SpecialButton2}"/>
+                </UniformGrid>
             </Grid>
         </Grid>
     </Border>
