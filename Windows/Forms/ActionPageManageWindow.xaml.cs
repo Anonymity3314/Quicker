@@ -275,10 +275,10 @@ namespace Quicker.Windows
             Button pageButton = new Button
             {
                 Width = 17.24, // 按钮宽度
+                Margin = new Thickness(3, 0, 0, 0), // 按钮边距
+                BorderThickness = new Thickness(0), // 按钮边框
                 Tag = $"{style}{canvasIndex}", // 按钮标签
                 Name = $"{style}{canvasIndex}", // 按钮名称
-                Margin = new Thickness(3, 0, 0, 0), // 按钮边距
-                BorderThickness = new Thickness(0, 0, 0, 0), // 按钮边框
                 VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
                 HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
             };

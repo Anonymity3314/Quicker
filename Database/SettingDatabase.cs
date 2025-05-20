@@ -275,6 +275,7 @@ public class SettingDatabase
     public void ApplyBlacklistSettings(bool isFullScreenDisabled, bool isBlacklistEnabledForExtendedHotkey)
     {
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(); // 开启事务
         using var command = new SQLiteCommand(@"
         UPDATE Blacklist SET 
             IsFullScreenDisabled = @IsFullScreenDisabled,
@@ -283,6 +284,7 @@ public class SettingDatabase
         command.Parameters.AddWithValue("@IsFullScreenDisabled", isFullScreenDisabled); // 是否开启全屏或最大化禁用功能
         command.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", isBlacklistEnabledForExtendedHotkey); // 是否将黑名单与全屏禁用设置应用于扩展热键功能
         command.ExecuteNonQuery(); // 执行更新命令
+        transaction.Commit(); // 提交事务
     }
 
     /// <summary>
@@ -295,6 +297,7 @@ public class SettingDatabase
     public void ApplyBlacklistApplication(string applicationName, string processName, bool isInBlacklist, bool isFolder)
     {
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(); // 开启事务
         string insertQuery = @"INSERT INTO BlacklistApplication 
             (ApplicationName, ProcessName, IsInBlacklist, IsFolder)
             VALUES 
@@ -305,6 +308,7 @@ public class SettingDatabase
         command.Parameters.AddWithValue("@IsInBlacklist", isInBlacklist); // 是否在黑名单中
         command.Parameters.AddWithValue("@IsFolder", isFolder); // 是否是文件夹
         command.ExecuteNonQuery(); // 执行插入命令
+        transaction.Commit(); // 提交事务
     }
 
     /// <summary>
@@ -314,10 +318,12 @@ public class SettingDatabase
     public void DeleteBlacklistApplication(string applicationName)
     {
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(); // 开启事务
         string deleteQuery = "DELETE FROM BlacklistApplication WHERE ApplicationName = @ApplicationName;"; // 删除黑名单应用
         using var command = new SQLiteCommand(deleteQuery, connection); // 创建 SQLiteCommand 对象
         command.Parameters.AddWithValue("@ApplicationName", applicationName); // 设置参数
         command.ExecuteNonQuery(); // 执行删除命令
+        transaction.Commit(); // 提交事务
     }
 
     /// <summary>
@@ -327,10 +333,12 @@ public class SettingDatabase
     public void SaveTotalUsageTime(double totalUsageTime)
     {
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(); // 开启事务
         string updateQuery = "UPDATE Convention SET TotalUsageTime = @TotalUsageTime WHERE ID = 1;"; // 更新总使用时长
         using var command = new SQLiteCommand(updateQuery, connection); // 创建 SQLiteCommand 对象
         command.Parameters.AddWithValue("@TotalUsageTime", totalUsageTime); // 设置参数
         command.ExecuteNonQuery(); // 执行更新命令
+        transaction.Commit(); // 提交事务
     }
 
     /// <summary>

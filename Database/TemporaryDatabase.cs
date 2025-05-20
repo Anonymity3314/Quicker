@@ -94,65 +94,175 @@ namespace Quicker.Database
         }
 
         /// <summary>
-        /// 插入 Convention 数据
+        /// 清空 Convention 表
         /// </summary>
-        /// <param name="convention"></param>
-        public void InsertConvention(Convention convention)
+        private void ClearConvention()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            string insertQuery = @"
-            INSERT INTO Convention 
-            (LongPressThreshold, MouseMovePixels)
-            VALUES 
-            (@LongPressThreshold, @MouseMovePixels);";
-            using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
-            command.Parameters.AddWithValue("@LongPressThreshold", convention.LongPressThreshold); // 添加参数
-            command.Parameters.AddWithValue("@MouseMovePixels", convention.MouseMovePixels); // 添加参数
-            command.ExecuteNonQuery(); // 执行插入命令
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string deleteQuery = "DELETE FROM Convention;";
+                using var command = new SQLiteCommand(deleteQuery, connection);
+                command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+        }
+
+        /// <summary>
+        /// 清空 OpenMainWindow 表
+        /// </summary>
+        private void ClearOpenMainWindowConditions()
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string deleteQuery = "DELETE FROM OpenMainWindow;";
+                using var command = new SQLiteCommand(deleteQuery, connection);
+                command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+        }
+
+        /// <summary>
+        /// 清空 Blacklist 表
+        /// </summary>
+        private void ClearBlacklistSettings()
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string deleteQuery = "DELETE FROM Blacklist;";
+                using var command = new SQLiteCommand(deleteQuery, connection);
+                command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+        }
+
+        /// <summary>
+        /// 清空 BlacklistApplication 表
+        /// </summary>
+        private void ClearBlacklistApplication()
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string deleteQuery = "DELETE FROM BlacklistApplication;";
+                using var command = new SQLiteCommand(deleteQuery, connection);
+                command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+        }
+
+        /// <summary>
+        /// 插入 Convention 数据
+        /// </summary>
+        /// <param name="convention"> Convention 对象 </param>
+        public void InsertConvention(Convention convention)
+        {
+            ClearConvention(); // 清空表
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string insertQuery = @"
+                INSERT INTO Convention 
+                (LongPressThreshold, MouseMovePixels)
+                VALUES 
+                (@LongPressThreshold, @MouseMovePixels);";
+                using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
+                command.Parameters.AddWithValue("@LongPressThreshold", convention.LongPressThreshold); // 添加参数
+                command.Parameters.AddWithValue("@MouseMovePixels", convention.MouseMovePixels); // 添加参数
+                command.ExecuteNonQuery(); // 执行插入命令
+                transaction.Commit(); // 提交事务
+            }
+            catch
+            {
+                transaction.Rollback(); // 回滚事务
+            }
         }
 
         /// <summary>
         /// 插入 OpenMainWindow 数据
         /// </summary>
-        /// <param name="conditions"></param>
+        /// <param name="conditions"> OpenMainWindow 对象 </param>
         public void InsertOpenMainWindowConditions(OpenMainWindow conditions)
         {
+            ClearOpenMainWindowConditions(); // 清空表
             using var connection = OpenConnection(); // 打开数据库连接
-            string insertQuery = @"
-            INSERT INTO OpenMainWindow 
-            (OpenMainWindowByMiddleMouseClick, OpenMainWindowByX1MouseClick, OpenMainWindowByX2MouseClick, OpenMainWindowByCtrl_MiddleMouseClick, OpenMainWindowByCtrl_RightMouseClick, OpenMainWindowByMiddleMouseClickLonger, OpenMainWindowByRightMouseClickLonger, OpenMainWindowByRightMouseClick_Move, OpenMainWindowByCtrl, WindowStartupLocation)
-            VALUES 
-            (@OpenMainWindowByMiddleMouseClick, @OpenMainWindowByX1MouseClick, @OpenMainWindowByX2MouseClick, @OpenMainWindowByCtrl_MiddleMouseClick, @OpenMainWindowByCtrl_RightMouseClick, @OpenMainWindowByMiddleMouseClickLonger, @OpenMainWindowByRightMouseClickLonger, @OpenMainWindowByRightMouseClick_Move, @OpenMainWindowByCtrl, @WindowStartupLocation);";
-            using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
-            command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", conditions.OpenMainWindowByMiddleMouseClick); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", conditions.OpenMainWindowByX1MouseClick); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", conditions.OpenMainWindowByX2MouseClick); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByCtrl_MiddleMouseClick", conditions.OpenMainWindowByCtrl_MiddleMouseClick); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByCtrl_RightMouseClick", conditions.OpenMainWindowByCtrl_RightMouseClick); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClickLonger", conditions.OpenMainWindowByMiddleMouseClickLonger); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClickLonger", conditions.OpenMainWindowByRightMouseClickLonger); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", conditions.OpenMainWindowByRightMouseClick_Move); // 添加参数
-            command.Parameters.AddWithValue("@OpenMainWindowByCtrl", conditions.OpenMainWindowByCtrl); // 添加参数
-            command.Parameters.AddWithValue("@WindowStartupLocation", conditions.WindowStartupLocation); // 添加参数
-            command.ExecuteNonQuery(); // 执行插入命令
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string insertQuery = @"
+                INSERT INTO OpenMainWindow 
+                (OpenMainWindowByMiddleMouseClick, OpenMainWindowByX1MouseClick, OpenMainWindowByX2MouseClick, OpenMainWindowByCtrl_MiddleMouseClick, OpenMainWindowByCtrl_RightMouseClick, OpenMainWindowByMiddleMouseClickLonger, OpenMainWindowByRightMouseClickLonger, OpenMainWindowByRightMouseClick_Move, OpenMainWindowByCtrl, WindowStartupLocation)
+                VALUES 
+                (@OpenMainWindowByMiddleMouseClick, @OpenMainWindowByX1MouseClick, @OpenMainWindowByX2MouseClick, @OpenMainWindowByCtrl_MiddleMouseClick, @OpenMainWindowByCtrl_RightMouseClick, @OpenMainWindowByMiddleMouseClickLonger, @OpenMainWindowByRightMouseClickLonger, @OpenMainWindowByRightMouseClick_Move, @OpenMainWindowByCtrl, @WindowStartupLocation);";
+                using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
+                command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", conditions.OpenMainWindowByMiddleMouseClick); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", conditions.OpenMainWindowByX1MouseClick); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", conditions.OpenMainWindowByX2MouseClick); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByCtrl_MiddleMouseClick", conditions.OpenMainWindowByCtrl_MiddleMouseClick); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByCtrl_RightMouseClick", conditions.OpenMainWindowByCtrl_RightMouseClick); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClickLonger", conditions.OpenMainWindowByMiddleMouseClickLonger); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClickLonger", conditions.OpenMainWindowByRightMouseClickLonger); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", conditions.OpenMainWindowByRightMouseClick_Move); // 添加参数
+                command.Parameters.AddWithValue("@OpenMainWindowByCtrl", conditions.OpenMainWindowByCtrl); // 添加参数
+                command.Parameters.AddWithValue("@WindowStartupLocation", conditions.WindowStartupLocation); // 添加参数
+                command.ExecuteNonQuery(); // 执行插入命令
+                transaction.Commit(); // 提交事务
+            }
+            catch
+            {
+                transaction.Rollback(); // 回滚事务
+            }
         }
 
         /// <summary>
         /// 插入 Blacklist 数据
         /// </summary>
-        /// <param name="blacklist"></param>
+        /// <param name="blacklist"> Blacklist 对象 </param>
         public void InsertBlacklistSettings(Blacklist blacklist)
         {
+            ClearBlacklistSettings(); // 清空表
             using var connection = OpenConnection(); // 打开数据库连接
-            string insertQuery = @"
-            INSERT INTO Blacklist 
-            (IsFullScreenDisabled, IsBlacklistEnabledForExtendedHotkey)
-            VALUES 
-            (@IsFullScreenDisabled, @IsBlacklistEnabledForExtendedHotkey);"; // 创建 Blacklist 表
-            using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
-            command.Parameters.AddWithValue("@IsFullScreenDisabled", blacklist.IsFullScreenDisabled); // 添加参数
-            command.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", blacklist.IsBlacklistEnabledForExtendedHotkey); // 添加参数
-            command.ExecuteNonQuery(); // 执行插入命令
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string insertQuery = @"
+                INSERT INTO Blacklist 
+                (IsFullScreenDisabled, IsBlacklistEnabledForExtendedHotkey)
+                VALUES 
+                (@IsFullScreenDisabled, @IsBlacklistEnabledForExtendedHotkey);";
+                using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
+                command.Parameters.AddWithValue("@IsFullScreenDisabled", blacklist.IsFullScreenDisabled); // 添加参数
+                command.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", blacklist.IsBlacklistEnabledForExtendedHotkey); // 添加参数
+                command.ExecuteNonQuery(); // 执行插入命令
+                transaction.Commit(); // 提交事务
+            }
+            catch
+            {
+                transaction.Rollback(); // 回滚事务
+            }
         }
 
         /// <summary>
@@ -161,18 +271,27 @@ namespace Quicker.Database
         /// <param name="application"> BlacklistApplication 对象 </param>
         public void InsertBlacklistApplication(BlacklistApplication application)
         {
+            ClearBlacklistApplication(); // 清空表
             using var connection = OpenConnection(); // 打开数据库连接
-            string insertQuery = @"
-            INSERT INTO BlacklistApplication 
-            (ApplicationName, ProcessName, IsInBlacklist, IsFolder)
-            VALUES 
-            (@ApplicationName, @ProcessName, @IsInBlacklist, @IsFolder);"; // 创建 BlacklistApplication 表
-            using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
-            command.Parameters.AddWithValue("@ApplicationName", application.ApplicationName); // 添加参数
-            command.Parameters.AddWithValue("@ProcessName", application.ProcessName); // 添加参数
-            command.Parameters.AddWithValue("@IsInBlacklist", application.IsInBlacklist); // 添加参数
-            command.Parameters.AddWithValue("@IsFolder", application.IsFolder); // 添加参数
-            command.ExecuteNonQuery(); // 执行插入命令
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            try
+            {
+                string insertQuery = @"INSERT INTO BlacklistApplication 
+                (ApplicationName, ProcessName, IsInBlacklist, IsFolder)
+                VALUES 
+                (@ApplicationName, @ProcessName, @IsInBlacklist, @IsFolder);";
+                using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
+                command.Parameters.AddWithValue("@ApplicationName", application.ApplicationName); // 应用名称
+                command.Parameters.AddWithValue("@ProcessName", application.ProcessName); // 进程名称
+                command.Parameters.AddWithValue("@IsInBlacklist", application.IsInBlacklist); // 是否在黑名单中
+                command.Parameters.AddWithValue("@IsFolder", application.IsFolder); // 是否是文件夹
+                command.ExecuteNonQuery(); // 执行插入命令
+                transaction.Commit(); // 提交事务
+            }
+            catch
+            {
+                transaction.Rollback(); // 回滚事务
+            }
         }
 
         /// <summary>
@@ -189,8 +308,8 @@ namespace Quicker.Database
             {
                 return new Convention
                 {
-                    LongPressThreshold = reader.GetInt32(1),
-                    MouseMovePixels = reader.GetInt32(2),
+                    LongPressThreshold = reader.GetInt32(1), // 长按阈值
+                    MouseMovePixels = reader.GetInt32(2), // 移动像素
                 };
             }
             return null; // 如果查询结果为空，则返回 null

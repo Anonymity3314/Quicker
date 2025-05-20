@@ -5,18 +5,14 @@ using System.IO;
 
 namespace Quicker.Managers
 {
-    public class DatabaseUpdateManager
+    public class DatabaseUpdateManager : IDisposable
     {
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
-
-        public DatabaseUpdateManager()
-        {
-            CheckAndUpgradeDatabase(); // 检查并更新数据库
-        }
+        private bool _disposed = false; // 标记是否已释放资源
 
         // 检查并更新数据库
-        private void CheckAndUpgradeDatabase()
+        public void CheckAndUpgradeDatabase()
         {
             string dbVersion = GetCurrentVersion(); // 获取当前数据库版本号
             if (dbVersion != db1.currentVersion)
@@ -520,7 +516,23 @@ namespace Quicker.Managers
         // 释放资源
         public void Dispose()
         {
-            GC.Collect(); // 回收资源
+            Dispose(true); // 释放托管资源
+            GC.SuppressFinalize(this); // 调用终结器（析构器）以释放非托管资源
+        }
+
+        /// <summary>
+        /// 释放资源的受保护实现
+        /// </summary>
+        /// <param name="disposing"> 是否释放托管资源 </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed) _disposed = true; // 防止多次调用
+        }
+
+        // 析构函数
+        ~DatabaseUpdateManager()
+        {
+            Dispose(false); // 释放非托管资源
         }
     }
 }

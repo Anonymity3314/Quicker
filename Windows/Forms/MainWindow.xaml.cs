@@ -22,7 +22,6 @@ namespace Quicker.Windows
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD3D3D3")); // 未选中页面按钮颜色
 
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
-        private static readonly App app = (App.Current as App); // App实例
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
@@ -61,12 +60,12 @@ namespace Quicker.Windows
             }); // 在主线程中执行
 
             // 加载BookButton图标
-            string iconPath = app._appStateManager.Book ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
+            string iconPath = AppStateManager.Book ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
             BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
             Book.Source = bookImage; // 设置Book按钮的图标
 
             // 加载LockButton图标
-            string lockIconPath = app._appStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
+            string lockIconPath = AppStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
@@ -186,10 +185,10 @@ namespace Quicker.Windows
         // 订住功能面板
         private void BookQuicker(object sender, EventArgs e)
         {
-            app._appStateManager.Book = !app._appStateManager.Book; // 更新数据库中的设置
+            AppStateManager.Book = !AppStateManager.Book; // 更新数据库中的设置
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
-            if (app._appStateManager.Book)
+            if (AppStateManager.Book)
                 bookimage.UriSource = new Uri(AppStateManager.BookIconPath, UriKind.Relative); // 设置为订住样式
             else
                 bookimage.UriSource = new Uri(AppStateManager.DisBookIconPath, UriKind.Relative); // 设置为不订住样式
@@ -213,7 +212,7 @@ namespace Quicker.Windows
         // 失去焦点时关闭功能面板
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            if (!app._appStateManager.Pause && !buttonManager.isClosing && !app._appStateManager.Book)
+            if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Book)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
@@ -349,7 +348,7 @@ namespace Quicker.Windows
             Button button = sender as Button;
             if (button.Tag is ButtonData data)
             {
-                if (!app._appStateManager.Book && data.ActionType != "OpenActionPage") 
+                if (!AppStateManager.Book && data.ActionType != "OpenActionPage") 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
                 try
                 {
@@ -691,11 +690,11 @@ namespace Quicker.Windows
         // 锁定通用动作页
         private void LockCommonActionPage(object sender, RoutedEventArgs e)
         {
-            app._appStateManager.Locked = !app._appStateManager.Locked; // 切换锁定状态
-            string lockIconPath = app._appStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
+            AppStateManager.Locked = !AppStateManager.Locked; // 切换锁定状态
+            string lockIconPath = AppStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建 BitmapImage 对象
             Lock.Source = lockImage; // 设置图标
-            if (app._appStateManager.Locked) app._appStateManager.CommonState = CommonStyle; // 设置锁定状态
+            if (AppStateManager.Locked) AppStateManager.CommonState = CommonStyle; // 设置锁定状态
         }
 
         // 滚轮进行通用动作页翻页

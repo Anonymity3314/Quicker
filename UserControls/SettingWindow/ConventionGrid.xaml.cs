@@ -56,9 +56,8 @@ namespace Quicker.UserControls
         {
             DateTime currentTime = DateTime.Now;
             var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
-            App currentApp = (App)Application.Current; // 将 Application.Current 转换为 App 类型
-            totalUsageTime = Conventions.TotalUsageTime + (currentTime - currentApp._appStateManager.RecordedTime).TotalSeconds; // 加载总使用时长
-            currentSessionTime = (currentTime - currentApp._appStateManager.StartTime).TotalSeconds; // 更新当次应用使用时长
+            totalUsageTime = Conventions.TotalUsageTime + (currentTime - AppStateManager.RecordedTime).TotalSeconds; // 加载总使用时长
+            currentSessionTime = (currentTime - AppStateManager.StartTime).TotalSeconds; // 更新当次应用使用时长
             timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) }; // 创建定时器
             timer.Tick += Timer_Tick; // 定时器每秒更新使用时长
             timer.Start(); // 启动定时器

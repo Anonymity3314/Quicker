@@ -125,10 +125,9 @@ namespace Quicker.Windows
                         settingManager.blacklistSettings.FullScreenDisable,
                         settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys); // 更新黑名单设置
 
-                App currentApp = (App)Application.Current; // 将 Application.Current 转换为 App 类型
                 try
                 {
-                    currentApp._appStateManager.LoadSettings(); // 刷新弹出面板设置
+                    AppStateManager.LoadSettings(); // 刷新弹出面板设置
                 }
                 catch
                 {
