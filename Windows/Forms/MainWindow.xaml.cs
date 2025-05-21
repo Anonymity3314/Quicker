@@ -24,7 +24,7 @@ namespace Quicker.Windows
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
         private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
-        private string CommonStyle = "Common"; // 样式
+        private string CommonStyle; // 样式
 
         public MainWindow(string style)
         {
@@ -42,7 +42,6 @@ namespace Quicker.Windows
         {
             CommonStyle = style; // 设置样式
             CommonGrid.Children.Clear(); // 清空通用网格
-            SetCommonLabel(); // 设置通用标签
         }
 
         // 加载数据库和Button
@@ -54,6 +53,7 @@ namespace Quicker.Windows
                 var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
                 GenerateUniformGrid(0, targetStyle); // 生成对应样式 UniformGrid
                 GenerateButtons(); // 生成按钮
+                SetCommonTextBlock(0); // 设置通用标签内容
             }); // 在主线程中执行
 
             // 加载BookButton图标
@@ -67,7 +67,6 @@ namespace Quicker.Windows
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
             WindowManager.SetWindowTopmost(this);// 设置窗口置顶
-            SetCommonLabel(); // 设置通用标签
             this.Activate(); // 激活窗口
         }
 
@@ -128,49 +127,37 @@ namespace Quicker.Windows
         /// </summary>
         /// <param name="sender"> 触发事件的对象 </param>
         /// <param name="targetGrid"> 目标Grid </param>
-        /// <param name="Style"> 样式名称 </param>
-        private void SwitchToUniformGrid(object sender, Grid targetGrid, string Style)
+        /// <param name="style"> 样式名称 </param>
+        private void SwitchToUniformGrid(object sender, Grid targetGrid, string style)
         {
             if (sender is Button clickedButton)
             {
-                int uniformGridIndex = int.Parse(clickedButton.Name.Replace($"{Style}", "")); // 获取UniformGrid索引
-                string targetUniformGridName = $"{Style}{uniformGridIndex}"; // 生成目标UniformGrid名称
+                int uniformGridIndex = int.Parse(clickedButton.Name.Replace($"{style}", "")); // 获取UniformGrid索引
+                string targetUniformGridName = $"{style}{uniformGridIndex}"; // 生成目标UniformGrid名称
                 UniformGrid targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(targetGrid).FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
 
                 // 如果目标UniformGrid不存在，动态生成
                 if (targetUniformGrid == null)
                 {
-                    GenerateUniformGrid(uniformGridIndex, Style); // 动态生成UniformGrid
+                    GenerateUniformGrid(uniformGridIndex, style); // 动态生成UniformGrid
                     targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(targetGrid).FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
                 }
                 targetUniformGrid.Visibility = Visibility.Visible; // 设置目标UniformGrid可见
                 foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(targetGrid)) // 隐藏其他UniformGrid
                 {
-                    if (uniformGrid.Name.StartsWith($"{Style}") && uniformGrid != targetUniformGrid)
+                    if (uniformGrid.Name.StartsWith($"{style}") && uniformGrid != targetUniformGrid)
                         uniformGrid.Visibility = Visibility.Collapsed; // 隐藏其他UniformGrid
                 }
+
+                if(style != "Global") SetCommonTextBlock(uniformGridIndex); // 设置通用标签内容
             }
         }
 
         // 设置标签内容
-        private void SetCommonLabel()
+        private void SetCommonTextBlock(int uniformGridIndex)
         {
-            string lable = CommonStyle; // 初始化标签内容
-            switch (CommonStyle)
-            {
-                case "Common":
-                    lable = "默认";
-                    break; // 如果是通用类型，设置标签内容为默认
-                case "Taskbar":
-                    lable = "任务栏"; // 设置标签内容
-                    break; // 如果是任务栏类型，设置标签内容为任务栏
-                case "Desktop":
-                    lable = "桌面"; // 设置标签内容
-                    break; // 如果是桌面类型，设置标签内容为桌面
-                default:
-                    break; // 其他类型，不设置标签内容
-            }
-            CommonLabel.Content = lable; // 设置标签内容
+            var actionPageData = db3.GetActionPageData(CommonStyle, uniformGridIndex); // 从数据库中获取动作页面数据
+            CommonTextBlock.Text = actionPageData.ActionPageName; // 设置标签内容
         }
 
         // 移动功能面板
@@ -572,6 +559,8 @@ namespace Quicker.Windows
             UniformGrid currentUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
                 .FirstOrDefault(c => c.Name == currentUniformGridName); // 查找当前UniformGrid
             currentUniformGrid.Visibility = Visibility.Collapsed; // 隐藏当前UniformGrid
+
+            if (style != "Global") SetCommonTextBlock(targetUniformGridIndex); // 设置通用动作页标签
         }
 
         /// <summary>
@@ -711,6 +700,13 @@ namespace Quicker.Windows
                         : UnSelectedBrush; // 设置当前按钮颜色
                 } // 设置所有按钮的颜色
             }
+        }
+
+        // 点击标签打开动作页管理窗口
+        private void CommonTextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ActionPageManageWindow actionPageManageWindow = new(CommonStyle); // 创建动作页管理窗口
+            actionPageManageWindow.Show(); // 显示窗口
         }
 
         // 右键锁定 Button 切换菜单

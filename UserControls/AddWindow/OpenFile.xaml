@@ -11,12 +11,12 @@
     d:DesignHeight="289"
     d:DesignWidth="493"
     
-    Loaded="OpenFile_Loaded"
     Unloaded="OpenFile_Unloaded"
+    Loaded="OpenFile_Loaded"
 >
     <Grid>
         <Label Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" Height="25" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" GotFocus="LocationTextBox_GotFocus" LostFocus="LocationTextBox_LostFocus" Text="可以用英文分号隔开不同路径来添加多个文件" FontSize="11" Foreground="#FF8C8C8C"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" GotFocus="LocationTextBox_GotFocus" LostFocus="LocationTextBox_LostFocus" Text="可以用英文分号隔开不同路径来添加多个文件" FontSize="11" Foreground="#FF8C8C8C"/>
         <Label Content="窗口风格" Margin="96,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="58"/>
         <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="161,52,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White" VerticalContentAlignment="Center">
             <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>

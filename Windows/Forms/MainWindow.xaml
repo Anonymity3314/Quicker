@@ -97,7 +97,7 @@
             </Grid>
             <!-- 功能栏 -->
             <Grid VerticalAlignment="Top" Height="25" Background="#F3F3F3" Margin="0,261,0,0" >
-                <Label x:Name="CommonLabel" Content="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF8D8D8D" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF8D8D8D" TextAlignment="Center" MouseDown="CommonTextBlock_MouseDown" Margin="10,0" Cursor="Hand"/>
                 <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                 <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>                
                 <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="253,0,0,0">

@@ -79,6 +79,12 @@ namespace Quicker.UserControls
             actionManager.LaunchDefaultBrowser("https://fontawesome.com/"); // 打开图标网站fontawesome.com
         }
 
+        // 前往icon11社区图标库
+        private void icon11_community_github_io_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            actionManager.LaunchDefaultBrowser("https://icon11-community.github.io/icons/"); // 前往icon11社区图标库
+        }
+
         // BUG反馈、需求
         private void FeedBack_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

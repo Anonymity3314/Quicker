@@ -461,6 +461,7 @@ public class SettingDatabase
     {
         var connection = new SQLiteConnection(db1); // 创建 SQLiteConnection 对象
         connection.Open(); // 打开数据库连接
+        connection.BusyTimeout = 30000; // 设置超时时间为 30 秒
         return connection; // 返回打开的连接
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Data.SQLite;
 using Quicker.Database;
-using System.Windows;
 using System.IO;
 
 namespace Quicker.Managers
@@ -122,10 +121,10 @@ namespace Quicker.Managers
             SetCurrentVersion("2.2.0"); // 设置数据库版本为2.2.0
             if (ExistButtonDatabase()) // 如果存在按钮数据库
             {
-                Update2_1_3ButtonDatabase("Global");
-                Update2_1_3ButtonDatabase("Common");
-                if (db2.TableExists("Desktop")) Update2_1_3ButtonDatabase("Desktop");
-                if (db2.TableExists("Taskbar")) Update2_1_3ButtonDatabase("Taskbar");
+                Update2_1_3ButtonDatabase("Global"); // 更新2.1.3版本按钮数据库的Global表
+                Update2_1_3ButtonDatabase("Common"); // 更新2.1.3版本按钮数据库的Common表
+                if (db2.TableExists("Desktop")) Update2_1_3ButtonDatabase("Desktop"); // 如果2.1.3版本按钮数据库存在Desktop表，更新Desktop表
+                if (db2.TableExists("Taskbar")) Update2_1_3ButtonDatabase("Taskbar"); // 如果2.1.3版本按钮数据库存在Desktop表，更新Taskbar表
             }
             Update2_1_3SettingDatabase(); // 更新设置数据库
         }
@@ -168,8 +167,8 @@ namespace Quicker.Managers
                         Title, 
                         Location, 
                         ImagePath, 
-                        CASE RunByMessager WHEN 1 THEN 'true' ELSE 'false' END AS Data1, 
-                        CASE TryToOpenExitingWindow WHEN 1 THEN 'true' ELSE 'false' END AS Data2, 
+                        CASE RunByMessager WHEN 1 THEN 'True' ELSE 'False' END AS Data1, 
+                        CASE TryToOpenExitingWindow WHEN 1 THEN 'True' ELSE 'False' END AS Data2, 
                         CAST(WindowState AS TEXT) AS Data3, 
                         Description, 
                         CreateTime, 
@@ -204,11 +203,13 @@ namespace Quicker.Managers
         private void AddNewColumn(string tableName)
         {
             using var addConnection = db2.OpenConnection(); // 打开数据库连接
+            using var transaction = addConnection.BeginTransaction(); // 开启事务
             string addUsedTimesQuery = @$"
                 ALTER TABLE {tableName}
                 ADD COLUMN UsedTimes INTEGER DEFAULT 0;"; // 为Convention表添加UsedTimes列
             using var addUsedTimesCommand = new SQLiteCommand(addUsedTimesQuery, addConnection);
             addUsedTimesCommand.ExecuteNonQuery(); // 执行更新命令
+            transaction.Commit(); // 提交事务
         }
 
         // 更新设置数据库
@@ -248,9 +249,7 @@ namespace Quicker.Managers
                 {
                     var tableName = db2.GetAllTableNames(); // 获取所有表名
                     foreach (var name in tableName) // 遍历所有表名
-                    {
                         RenameColumn(name); // 重命名表格中的列名
-                    }
                 } // 重命名表格中的列名
                 transaction.Commit(); // 提交事务
             }
@@ -341,26 +340,25 @@ namespace Quicker.Managers
             try
             {
                 // 重命名第一个列：Location → Path
-                string renameQuery1 = $"ALTER TABLE {tableName} RENAME COLUMN ButtonName TO Title;";
-                using var command1 = new SQLiteCommand(renameQuery1, connection);
-                command1.ExecuteNonQuery();
+                string renameQuery1 = $"ALTER TABLE {tableName} RENAME COLUMN ButtonName TO Title;"; // 重命名第一个列
+                using var command1 = new SQLiteCommand(renameQuery1, connection); // 创建 SQLiteCommand 对象
+                command1.ExecuteNonQuery(); // 执行更新命令
 
                 // 重命名第二个列：Type → ActionType
-                string renameQuery2 = $"ALTER TABLE {tableName} RENAME COLUMN Type TO ActionType;";
-                using var command2 = new SQLiteCommand(renameQuery2, connection);
-                command2.ExecuteNonQuery();
+                string renameQuery2 = $"ALTER TABLE {tableName} RENAME COLUMN Type TO ActionType;"; // 重命名第二个列
+                using var command2 = new SQLiteCommand(renameQuery2, connection); // 创建 SQLiteCommand 对象
+                command2.ExecuteNonQuery(); // 执行更新命令
 
                 // 重命名第三个列：Usage → Description
-                string renameQuery3 = $"ALTER TABLE {tableName} RENAME COLUMN Usage TO Description;";
-                using var command3 = new SQLiteCommand(renameQuery3, connection);
-                command3.ExecuteNonQuery();
-
+                string renameQuery3 = $"ALTER TABLE {tableName} RENAME COLUMN Usage TO Description;"; // 重命名第三个列
+                using var command3 = new SQLiteCommand(renameQuery3, connection); // 创建 SQLiteCommand 对象
+                command3.ExecuteNonQuery(); // 执行更新命令
                 transaction.Commit(); // 提交事务
             }
             catch (Exception ex)
             {
                 transaction.Rollback(); // 回滚事务
-                throw new Exception($"重命名列失败: {tableName}", ex);
+                ToastManager.AddToast($"重命名表格{tableName}中的列名失败,请删除数据库", "Error"); // 弹出消息提醒用户
             }
             finally
             {
@@ -391,28 +389,24 @@ namespace Quicker.Managers
                         LongPressThreshold INTEGER,
                         MouseMovePixels INTEGER,
                         LoopPageFlipping BOOL
-                    );";
-                using var createNewTableCommand = new SQLiteCommand(createNewTableQuery, connection);
-                createNewTableCommand.ExecuteNonQuery();
+                    );"; // 创建新表
+                using var createNewTableCommand = new SQLiteCommand(createNewTableQuery, connection); // 创建 SQLiteCommand 对象
+                createNewTableCommand.ExecuteNonQuery(); // 执行更新命令
 
-                // 将旧表的数据复制到新表
                 string insertOldDataQuery = @"INSERT INTO ConventionTemp 
                     (ID, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping)
                     SELECT ID, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping
-                    FROM Convention;";
-                using var insertOldDataCommand = new SQLiteCommand(insertOldDataQuery, connection);
-                insertOldDataCommand.ExecuteNonQuery();
+                    FROM Convention;"; // 复制旧表数据到新表
+                using var insertOldDataCommand = new SQLiteCommand(insertOldDataQuery, connection); // 创建 SQLiteCommand 对象
+                insertOldDataCommand.ExecuteNonQuery(); // 执行更新命令
 
-                // 删除旧表
-                string dropOldTableQuery = "DROP TABLE Convention;";
-                using var dropOldTableCommand = new SQLiteCommand(dropOldTableQuery, connection);
-                dropOldTableCommand.ExecuteNonQuery();
+                string dropOldTableQuery = "DROP TABLE Convention;"; // 删除旧表
+                using var dropOldTableCommand = new SQLiteCommand(dropOldTableQuery, connection); // 创建 SQLiteCommand 对象
+                dropOldTableCommand.ExecuteNonQuery(); // 执行更新命令
 
-                // 将新表重命名为旧表的名称
-                string renameNewTableQuery = "ALTER TABLE ConventionTemp RENAME TO Convention;";
-                using var renameNewTableCommand = new SQLiteCommand(renameNewTableQuery, connection);
-                renameNewTableCommand.ExecuteNonQuery();
-
+                string renameNewTableQuery = "ALTER TABLE ConventionTemp RENAME TO Convention;"; // 重命名新表为旧表的名称
+                using var renameNewTableCommand = new SQLiteCommand(renameNewTableQuery, connection); // 创建 SQLiteCommand 对象
+                renameNewTableCommand.ExecuteNonQuery(); // 执行更新命令
                 transaction.Commit(); // 提交事务
             }
             catch
@@ -491,11 +485,8 @@ namespace Quicker.Managers
 
                         insertCommand.ExecuteNonQuery(); // 执行插入语句
                     }
-
-                    // 删除临时表
-                    using var dropCommand = new SQLiteCommand("DROP TABLE Temp_ButtonData", connection);
-                    dropCommand.ExecuteNonQuery();
-
+                    using var dropCommand = new SQLiteCommand("DROP TABLE Temp_ButtonData", connection); // 创建 SQLiteCommand 对象
+                    dropCommand.ExecuteNonQuery(); // 执行删除语句
                     transaction.Commit(); // 提交事务
                 }
                 catch

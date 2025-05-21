@@ -85,6 +85,7 @@ namespace Quicker.Managers
         /// <param name="isMainWindow"> 是否为主窗口 </param>
         private void ProcessButtonDrop(Button TargetButton, bool isMainWindow)
         {
+            if (SourceButton == null) return; // 如果源按钮为空，直接返回
             db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
             var SourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
             var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
@@ -153,10 +154,11 @@ namespace Quicker.Managers
                 Data2 = true.ToString(), // 尝试打开已存在的窗口
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开文件: {fileName}", // 设置用途
+                CreateTime = DateTime.Now,
                 ActionType = "OpenFile", // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.AddAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -198,10 +200,11 @@ namespace Quicker.Managers
                 Data2 = true.ToString(), // 尝试打开已存在的窗口
                 Data3 = 0.ToString(),
                 Description = $"打开图片: {fileName}",
+                CreateTime = DateTime.Now,
                 ActionType = "OpenFile",
             };
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.AddAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -255,10 +258,11 @@ namespace Quicker.Managers
                 Data2 = true.ToString(), // 尝试打开已存在的窗口
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开以{fileName}为首的多个文件:", // 设置用途
+                CreateTime = DateTime.Now,
                 ActionType = "OpenFiles", // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.AddAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -286,10 +290,11 @@ namespace Quicker.Managers
                 ImagePath = iconPath,
                 Data3 = 0.ToString(),
                 Description = $"打开网页: {url}",
+                CreateTime = DateTime.Now,
                 ActionType = "OpenWebsite",
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.AddAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
         }
 
         /// <summary>

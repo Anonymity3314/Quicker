@@ -7,7 +7,6 @@ using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
-using Quicker;
 
 namespace Quicker.Windows
 {
@@ -34,11 +33,11 @@ namespace Quicker.Windows
         private Point initialMousePosition; // 初始鼠标位置
         private string type; // 场景类型
 
-        public ActionPageManageWindow()
+        public ActionPageManageWindow(string type = "Common")
         {
             InitializeComponent(); // 初始化窗口
             LoadBasicButtonPrefixes(); // 加载按钮前缀
-            TypeChanged("Common"); // 默认加载通用场景
+            TypeChanged(type); // 默认加载通用场景
         }
 
         /// <summary>
@@ -196,6 +195,9 @@ namespace Quicker.Windows
             grid.Children.Add(editPageButton);
             editPageButton.Content = GenerateImage(editActionPageButtonImage); // 生成编辑动作页按钮图片
 
+            TextBlock actionPageName = GenerateActionPageName(canvasIndex); // 生成动作页名称
+            grid.Children.Add(actionPageName);
+
             double buttonSpacing = 65; // 按钮间距
             int rows = style == "Global" ? 3 : 4; // 行数
             int cols = 4; // 列数
@@ -282,9 +284,9 @@ namespace Quicker.Windows
                 VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
                 HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
             };
-            pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
             pageButton.PreviewMouseMove += Button1_PreviewMouseMove; // 鼠标移动事件
             pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
+            pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
             return pageButton; // 返回按钮
         }
 
@@ -306,6 +308,7 @@ namespace Quicker.Windows
                 HorizontalAlignment = HorizontalAlignment.Right // 水平对齐方式
             };
             editPageButton.Click += OpenEditPopup; // 点击事件
+            editPageButton.MouseDoubleClick += EditActionPageInfoButton_Click; // 双击事件
             return editPageButton; // 返回按钮
         }
 
@@ -317,6 +320,24 @@ namespace Quicker.Windows
         {
             Image image = new Image { Source = new BitmapImage(new Uri(imagePath, UriKind.Relative)) };
             return image; // 返回图片
+        }
+
+        /// <summary>
+        /// 生成动作页名称
+        /// </summary>
+        /// <param name="actionPageIndex"> 动作页索引 </param>
+        /// <returns> 动作页名称 </returns>
+        private TextBlock GenerateActionPageName(int actionPageIndex)
+        {
+            var actionPageInfo = db3.GetActionPageData(type, actionPageIndex); // 获取动作页信息
+            TextBlock textBlock = new TextBlock
+            {
+                Margin = new Thickness(29, 0, 0, 0), // 文本块边距
+                Text = actionPageInfo.ActionPageName, // 动作页名称
+                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = HorizontalAlignment.Left, // 水平靠左
+            }; // 创建文本块
+            return textBlock; // 返回文本块
         }
 
         // 点击按钮编辑动作页
@@ -452,9 +473,48 @@ namespace Quicker.Windows
             }
             else
             {
-                db3.UpdateActionPageTable(type, type, "", canvasCount, ""); // 更新场景数据表
+                db3.UpdateSceneTable(type, type, "", canvasCount + 1, ""); // 更新场景数据表
+                db3.CreatActionPageTable(type); // 创建动作页数据表
+                var actionPageInfo = GetActionPageInfo(); // 获取动作页信息
+                db3.UpdateActionPageTable(type, type + canvasCount.ToString(), actionPageInfo.ActionPageProcess, actionPageInfo.ActionPageName, 0); // 更新动作页数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 生成画布
             }
+        }
+
+        /// <summary>
+        /// 设置动作页信息
+        /// </summary>
+        /// <returns> 动作页信息 </returns>
+        private ActionPageInfo GetActionPageInfo()
+        {
+            string actionPageProcess = "", actionPageName = ""; // 设置动作页信息
+            switch (type)
+            {
+                case "Global":
+                    actionPageProcess = "Default"; // 设置动作页所属应用程序名称
+                    actionPageName = "默认全局动作页"; // 设置动作页名称
+                    break;
+                case "Common":
+                    actionPageProcess = "Default"; // 设置动作页所属应用程序名称
+                    actionPageName = "默认"; // 设置动作页名称
+                    break;
+                case "Desktop":
+                    actionPageProcess = "Windows桌面"; // 设置动作页所属应用程序名称
+                    actionPageName = $"桌面 #{MainListView.Items.Count}"; // 设置动作页名称
+                    break;
+                case "Taskbar":
+                    actionPageProcess = "Windows任务栏"; // 设置动作页所属应用程序名称
+                    actionPageName = $"任务栏 #{MainListView.Items.Count}"; // 设置动作页名称
+                    break;
+                default:
+                    break;
+            }
+            ActionPageInfo actionPageInfo = new ActionPageInfo
+            {
+                ActionPageProcess = actionPageProcess,
+                ActionPageName = actionPageName,
+            }; // 创建动作页信息对象
+            return actionPageInfo; // 返回动作页信息对象
         }
 
         // 滚动条滚动事件
@@ -553,6 +613,7 @@ namespace Quicker.Windows
                     int targetIndex = int.Parse(targetCanvasName.Substring(targetCanvasName.Length - 1)); // 获取目标 Button 索引
 
                     db2.SwapButtonAValues(type, sourceIndex, targetIndex); // 更新数据库 Button A 值
+                    db3.SwapActionPage(type, sourceIndex, targetIndex); // 更新数据库动作页数据
                     UpdateCanvasInListView(sourceIndex, type); // 更新 ListView 中的特定 Canvas
                     UpdateCanvasInListView(targetIndex, type); // 更新 ListView 中的特定 Canvas
                 }
@@ -564,7 +625,7 @@ namespace Quicker.Windows
         /// </summary>
         /// <param name="canvasIndex">画布索引</param>
         /// <param name="styleType">场景类型</param>
-        private void UpdateCanvasInListView(int canvasIndex, string styleType)
+        public void UpdateCanvasInListView(int canvasIndex, string styleType)
         {
             var oldCanvas = MainListView.Items[canvasIndex] as Canvas; // 获取旧的 Canvas
             MainListView.Items.Remove(oldCanvas); // 从主列表视图中移除旧的 Canvas
@@ -577,7 +638,7 @@ namespace Quicker.Windows
         {
             string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写
             if (string.IsNullOrEmpty(searchText))
-                ActionPagesButtonPanel.Children.Clear(); // 清空场景按钮面板
+                LoadBasicButtonPrefixes(); // 如果文本为空，则加载默认按钮前缀
         }
 
         // 双击标签切换动作按钮背景色
@@ -640,7 +701,7 @@ namespace Quicker.Windows
                 default:
                     string canvasIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取画布索引
                     EditActionPageInfoWindow editActionPageInfoWindow = new(type, canvasIndex); // 创建编辑动作页信息窗口
-                    editActionPageInfoWindow.Show(); // 显示编辑动作页信息窗口
+                    editActionPageInfoWindow.ShowDialog(); // 显示编辑动作页信息窗口
                     break;
             }
         }
@@ -666,13 +727,15 @@ namespace Quicker.Windows
             string targetButtonName = bingdingButton.Name.Replace("Edit", ""); // 获取目标按钮名称
             int canvadIndex = int.Parse(targetButtonName.Replace(type, "")); // 获取画布索引
             db2.DeletePageOfButtons(type, canvadIndex); // 删除按钮数据页
+            db3.DeleteActionPage(type, canvadIndex); // 删除动作页数据表
             // 更新场景数据表
             var sceneData = db3.GetSceneData(type).FirstOrDefault(); // 获取场景数据
-            db3.UpdateActionPageTable(type, type, sceneData.SceneIconPath, MainListView.Items.Count, sceneData.SceneTag); // 更新场景数据表
+            db3.UpdateSceneTable(type, type, sceneData.SceneIconPath, MainListView.Items.Count, sceneData.SceneTag); // 更新场景数据表
             if(MainListView.Items.Count == 0)
             {
                 db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
-                db3.DeleteActionPageTable(type, type); // 如果没有画布，则删除场景数据表
+                db3.DeleteSceneTable(type); // 如果没有画布，则删除场景数据表
+                db3.DeleteActionPageTable(type); // 删除动作页数据表
             }
             LoadCanvas(type); // 刷新界面
         }
@@ -814,5 +877,11 @@ namespace Quicker.Windows
             GC.WaitForPendingFinalizers();
             GC.Collect();
         }
+    }
+
+    public class ActionPageInfo
+    {
+        public string ActionPageProcess { get; set; } // 动作页所属应用程序名称
+        public string ActionPageName { get; set; } // 动作页名称
     }
 }

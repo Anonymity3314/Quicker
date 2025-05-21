@@ -20,7 +20,6 @@ namespace Quicker
         public static List<BlacklistApplication> BlacklistApplications { get; set; } = new(); // 缓存黑名单应用
         public static OpenMainWindow OpenMainWindowConditions { get; set; } = new(); // 缓存 OpenMainWindowConditions
         public static Blacklist BlacklistSettings { get; set; } = new(); // 缓存黑名单设置
-        public static TemporaryDatabase Temporary { get; set; } = new(); // 临时数据库
         public static Convention Conventions { get; set; } = new(); // 缓存基础设置
 
         // 窗口状态
@@ -45,7 +44,7 @@ namespace Quicker
 
         // 其他状态
         public static bool EnableMemoryOptimization { get; set; } = false; // 是否启用内存优化
-        public static string CommonState { get; set; } = string.Empty; // 通用状态
+        public static string CommonState { get; set; } = "Common"; // 通用状态
         public static float Left { get; set; } = 0; // 窗口与屏幕左边距离
         public static float Top { get; set; } = 0; // 窗口与屏幕上边距离
 
@@ -63,20 +62,7 @@ namespace Quicker
             BlacklistApplications = Db.GetAllBlacklistApplications(); // 加载黑名单应用
             EnableMemoryOptimization = Conventions.EnableMemoryOptimization; // 是否启用内存优化
             if (EnableMemoryOptimization) // 启用内存优化
-                OptimizeMemoryUsage(); // 优化内存使用
-        }
-
-        // 优化内存使用
-        private static void OptimizeMemoryUsage()
-        {
-            Temporary.InsertConvention(Conventions); // 临时数据库插入基础设置
-            Temporary.InsertOpenMainWindowConditions(OpenMainWindowConditions); // 临时数据库插入 OpenMainWindowConditions
-            Temporary.InsertBlacklistSettings(BlacklistSettings); // 临时数据库插入黑名单设置
-            foreach (var app in BlacklistApplications)
-            {
-                Temporary.InsertBlacklistApplication(app); // 临时数据库插入黑名单应用
-            }
-            ClearCachedData(); // 清除缓存数据
+                ClearCachedData(); // 清除缓存数据
         }
 
         // 清除缓存数据
@@ -88,33 +74,10 @@ namespace Quicker
             BlacklistApplications = null; // 清除黑名单应用缓存
         }
 
-        // 从临时数据库获取 BlacklistApplications
-        public static List<BlacklistApplication> GetBlacklistApplications()
-        {
-            return Temporary.GetBlacklistApplications();
-        }
-
-        // 从临时数据库获取 OpenMainWindowConditions
-        public static OpenMainWindow GetOpenMainWindowConditions()
-        {
-            return Temporary.GetOpenMainWindowConditions();
-        }
-
-        // 从临时数据库获取 BlacklistSettings
-        public static Blacklist GetBlacklistSettings()
-        {
-            return Temporary.GetBlacklistSettings();
-        }
-
-        // 从临时数据库获取 Convention
-        public static Convention GetConvention()
-        {
-            return Temporary.GetConvention();
-        }
-
         // 释放托管资源
         public static void Dispose()
         {
+            ClearCachedData(); // 清除缓存数据
             PressTimer.Stop(); // 停止鼠标按下定时器
             PressTimer = null; // 清除鼠标按下定时器
             Timer.Stop(); // 停止计时器
@@ -122,7 +85,6 @@ namespace Quicker
             PreLoadMainWindow?.Close(); // 关闭预加载窗口
             PreLoadMainWindow = null; // 清除预加载窗口资源
             Db = null; // 清除数据库操作对象
-            Temporary = null; // 清除临时数据库
         }
     }
 }

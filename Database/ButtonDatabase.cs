@@ -65,37 +65,6 @@ namespace Quicker.Database
         }
 
         /// <summary>
-        /// 添加新动作到对应表中
-        /// </summary>
-        /// <param name="buttonData">要添加的动作数据</param>
-        public void AddAction(ButtonData buttonData)
-        {
-            using var connection = OpenConnection(); // 打开数据库连接
-            using var transaction = connection.BeginTransaction(); // 开始事务
-            string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
-            CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
-            string query = $@"INSERT INTO {tableName} 
-            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
-            VALUES 
-            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType, @UsedTimes)"; // 创建SQL语句
-            using var command = new SQLiteCommand(query, connection);
-            command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
-            command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
-            command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
-            command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 动作数据1
-            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 动作数据2
-            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 动作数据3
-            command.Parameters.AddWithValue("@Description", buttonData.Description); // 对动作的描述
-            command.Parameters.AddWithValue("@CreateTime", DateTime.Now); // 创建时间
-            command.Parameters.AddWithValue("@LatestEditTime", DateTime.Now); // 最近修改时间
-            command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
-            command.Parameters.AddWithValue("@UsedTimes", 0); // 使用次数
-            command.ExecuteNonQuery(); // 执行插入语句
-            transaction.Commit(); // 提交事务
-        }
-
-        /// <summary>
         /// 通过ButtonID从对应表中获取数据
         /// </summary>
         /// <param name="buttonID"> 要获取数据的ButtonID </param>
@@ -132,35 +101,29 @@ namespace Quicker.Database
         /// 更新对应表中的动作数据
         /// </summary>
         /// <param name="buttonData"> 要更新的动作数据 </param>
+        /// <summary>
         public void UpdateAction(ButtonData buttonData)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
             string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
-            string query = $@"UPDATE {tableName} SET 
-                Title = @Title, 
-                Location = @Location, 
-                ImagePath = @ImagePath, 
-                Data1 = @Data1, 
-                Data2 = @Data2, 
-                Data3 = @Data3, 
-                Description = @Description, 
-                CreateTime = @CreateTime, 
-                LatestEditTime = @LatestEditTime, 
-                ActionType = @ActionType 
-            WHERE ButtonID = @ButtonID"; // 更新指定表中的数据
+            string query = $@"INSERT OR REPLACE INTO {tableName}
+            (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
+            VALUES 
+            (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType, @UsedTimes)"; // 创建SQL语句
             using var command = new SQLiteCommand(query, connection); // 创建命令对象
             command.Parameters.AddWithValue("@ButtonID", buttonData.ButtonID); // 动作ID
             command.Parameters.AddWithValue("@Title", buttonData.Title); // 动作名称
             command.Parameters.AddWithValue("@Location", buttonData.Location); // 位置
             command.Parameters.AddWithValue("@ImagePath", buttonData.ImagePath); // 图片路径
-            command.Parameters.AddWithValue("@Data1", buttonData.Data1); // 动作数据1
-            command.Parameters.AddWithValue("@Data2", buttonData.Data2); // 动作数据2
-            command.Parameters.AddWithValue("@Data3", buttonData.Data3); // 动作数据3
+            command.Parameters.AddWithValue("@Data1", buttonData.Data1 ?? ""); // 动作数据1
+            command.Parameters.AddWithValue("@Data2", buttonData.Data2 ?? ""); // 动作数据2
+            command.Parameters.AddWithValue("@Data3", buttonData.Data3 ?? ""); // 动作数据3
             command.Parameters.AddWithValue("@Description", buttonData.Description); // 对动作的描述
             command.Parameters.AddWithValue("@CreateTime", buttonData.CreateTime); // 创建时间
-            command.Parameters.AddWithValue("@LatestEditTime", buttonData.LatestEditTime); // 最近修改时间
+            command.Parameters.AddWithValue("@LatestEditTime", DateTime.Now); // 最近修改时间
             command.Parameters.AddWithValue("@ActionType", buttonData.ActionType); // 动作类型
+            command.Parameters.AddWithValue("@UsedTimes", buttonData.UsedTimes); // 使用次数
             command.ExecuteNonQuery(); // 执行更新语句
             transaction.Commit(); // 提交事务
         }

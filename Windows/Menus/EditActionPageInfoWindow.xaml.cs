@@ -6,25 +6,31 @@ namespace Quicker.Windows.Menus
     public partial class EditActionPageInfoWindow : Window
     {
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
-        private readonly string actionPageIndex; // 动作页索引
+        private readonly ActionPageData actionPage; // 动作页信息
         private readonly string actionPageType; // 动作页类型
+        private readonly string actionPageIndex; // 动作页索引
 
         public EditActionPageInfoWindow(string actionPageType, string actionPageIndex)
         {
             InitializeComponent();
-            this.actionPageType = actionPageType; // 动作页类型
-            this.actionPageIndex = actionPageIndex; // 动作页索引
+            this.actionPageType = actionPageType; // 设置动作页类型
+            this.actionPageIndex = actionPageIndex; // 设置动作页索引
+            actionPage = db3.GetActionPageData(actionPageType, int.Parse(actionPageIndex)); // 获取动作页信息
         }
 
         // 加载动作页信息
         private void EditActionPageInfoWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            ActionPageProcess.Text = actionPage.ActionProcess; // 设置动作页所属进程名称
+            ActionPageName.Text = actionPage.ActionPageName; // 设置动作页名称
         }
 
         // 保存动作页信息
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            db3.UpdateActionPageTable(actionPageType, actionPage.DefaultActionPageName, actionPage.ActionProcess, ActionPageName.Text, actionPage.ActionPageSize); // 更新动作页信息
+            ActionPageManageWindow window = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 获取动作页管理窗口
+            window.UpdateCanvasInListView(int.Parse(actionPageIndex), actionPageType); // 更新动作信息
             this.Close(); // 关闭窗口
         }
 

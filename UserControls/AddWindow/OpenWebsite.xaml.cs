@@ -137,11 +137,11 @@ namespace Quicker.UserControls.AddWindow
                 ImagePath = AddWindow.iconPath,
                 Data3 = BrowserComboBox.SelectedIndex.ToString(),
                 Description = AddWindow.DescriptionTextBox.Text,
-                CreateTime = AddWindow.Choice != 0 ? DateTime.Now : createdTime,
+                CreateTime = createdTime,
                 LatestEditTime = DateTime.Now,
                 ActionType = "OpenWebsite"
             }; // 创建按钮数据对象
-            (AddWindow.Choice != 0 ? (Action<ButtonData>)db2.AddAction : db2.UpdateAction)(buttonData); // 添加或更新动作
+            db2.UpdateAction(buttonData); // 添加或更新动作
         }
 
         // 如果是自定义浏览器，显示相关控件进行相关设置
