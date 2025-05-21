@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
@@ -473,7 +472,7 @@ namespace Quicker.Managers
         // 鼠标左键按下时记录初始位置
         public void Button_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取目标按钮
             initialMousePosition = e.GetPosition(button); // 记录初始位置
             SourceButton = button; // 记录源按钮
             isDragging = false; // 初始化拖拽状态
@@ -498,7 +497,7 @@ namespace Quicker.Managers
                     isDragging = true; // 设置拖拽状态
                     if(isMainButton)
                     {
-                        if (button.Tag is ButtonData data)
+                        if (button.Tag is ButtonData data) // 如果是主按钮
                             DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
                     }
                     else
@@ -554,8 +553,8 @@ namespace Quicker.Managers
         /// <param name="sourceWindow"> 触发菜单的窗口 </param>
         public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow)
         {
-            Window menu = null;
-            Button button = sender as Button;
+            Window menu = null; // 菜单窗口
+            Button button = sender as Button; // 获取触发菜单的按钮
             Point mousePosition = Mouse.GetPosition(sourceWindow); // 获取鼠标位置
             if (isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
             switch (targetMenu)

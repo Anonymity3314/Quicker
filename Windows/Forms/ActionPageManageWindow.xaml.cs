@@ -49,6 +49,7 @@ namespace Quicker.Windows
             type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
             SetButtonBackground(); // 设置场景按钮背景色
+            SetSceneTitle(); // 设置场景标题
         }
 
         // 设置场景按钮背景色
@@ -133,6 +134,51 @@ namespace Quicker.Windows
         private void GenerateButtons(string style)
         {
 
+        }
+
+        private void SetSceneTitle()
+        {
+            SceneTitleStackPanel.Children.Clear(); // 清空标题StackPanel
+            var sceneInfo = db3.GetSceneData(type).FirstOrDefault(); // 获取场景信息
+            SceneImage.Source = new BitmapImage(new Uri(sceneInfo.SceneIconPath, UriKind.Relative)); // 设置场景图片
+            string sceneTitleText = GetSceneTitle(sceneInfo); // 获取场景标题
+            TextBlock sceneTitle = new()
+            {
+                Text = sceneTitleText, // 场景名称
+                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = HorizontalAlignment.Center // 水平居中
+            }; // 创建场景标题
+            SceneTitleStackPanel.Children.Add(sceneTitle); // 添加到标题StackPanel
+            TextBlock sceneDescription = new()
+            {
+                Margin = new Thickness(5, 0, 0, 0), // 边距
+                Text = sceneInfo.SceneTag, // 场景标签
+                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                HorizontalAlignment = HorizontalAlignment.Center // 水平居中
+            }; // 创建场景描述
+            SceneTitleStackPanel.Children.Add(sceneDescription); // 添加到标题StackPanel
+        }
+
+        /// <summary>
+        /// 生成场景标题
+        /// </summary>
+        /// <param name="sceneData"> 场景数据 </param>
+        /// <returns> 场景标题 </returns>
+        private string GetSceneTitle(SceneData sceneData)
+        {
+            switch(type)
+            {
+                case "Global":
+                    return "全局"; // 全局场景
+                case "Common":
+                    return "通用"; // 通用场景
+                case "Taskbar":
+                    return "任务栏"; // 任务栏场景
+                case "Desktop":
+                    return "桌面"; // 桌面场景
+                default:
+                    return sceneData.SceneName; // 其他场景
+            }
         }
 
         /// <summary>

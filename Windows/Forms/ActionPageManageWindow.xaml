@@ -22,6 +22,8 @@
         <Button x:Name="DeleteSceneButton" Style="{StaticResource DeleteSceneButton}" ToolTip="删除场景" HorizontalAlignment="Left" Margin="108,0,0,10" VerticalAlignment="Bottom" Width="50" Click="DeleteSceneButton_Click"/>
         <Button x:Name="ToTopSceneButton" Style="{StaticResource WhiteButton}" ToolTip="到顶部" HorizontalAlignment="Left" Margin="200,0,0,10" VerticalAlignment="Bottom" Width="30" Click="ToTopSceneButton_Click"/>
 
+        <Image x:Name="SceneImage" HorizontalAlignment="Left" Height="18" Margin="240,10,0,0" VerticalAlignment="Top" Width="18"/>
+        <StackPanel x:Name="SceneTitleStackPanel" Margin="268,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="18" Orientation="Horizontal"/>
         <Label Content="提示：将窗口最大化可以方便排序动作页。" Foreground="#FFABADB3" Margin="0,5,10,0" VerticalAlignment="Top" FontSize="11" HorizontalAlignment="Right" Width="229" MouseDoubleClick="ChangeActionButtonBakground">
             <Label.ToolTip>
                 <ToolTip Content="双击这里：将按钮背景色改为灰色" Foreground="Black"/>

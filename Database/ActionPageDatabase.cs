@@ -18,11 +18,10 @@ namespace Quicker.Database
             if (!File.Exists(dbFilePath)) // 如果数据库文件不存在，则创建
             {
                 SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
-                var buttonTables = db2.GetAllTableNames(); // 获取 ButtonDatabase 中的所有表名
-                foreach (var tableName in buttonTables) // 遍历 ButtonDatabase 中的每个表并初始化 ActionPageDatabase
-                {
-                    CreatAndInitTable(tableName, "", ""); // 创建数据表并初始化
-                }
+                CreatAndInitTable("Global", "/Resources/Images/Icons/Quicker1.ico", "_global"); // 创建数据表并初始化
+                CreatAndInitTable("Common", "/Resources/Images/Icons/Quicker1.ico", "common"); // 创建数据表并初始化
+                CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
+                CreatAndInitTable("Taskbar", "/Resources/Images/Icons/Quicker1.ico", "taskbar"); // 创建数据表并初始化
             }
         }
 
@@ -37,33 +36,25 @@ namespace Quicker.Database
             switch (tableName)
             {
                 case "Global":
-                    sceneIconPath = "none"; // 设置全局场景图标路径
-                    sceneTag = "_global"; // 设置全局场景标签
                     actionPageProcess = "Default"; // 设置动作页所属应用程序名称
                     actionPageName = "默认全局动作页"; // 设置动作页名称
                     break;
                 case "Common":
-                    sceneIconPath = "none"; // 设置常用场景图标路径
-                    sceneTag = "common"; // 设置常用场景标签
                     actionPageProcess = "Default"; // 设置动作页所属应用程序名称
                     actionPageName = "默认"; // 设置动作页名称
                     break;
                 case "Desktop":
-                    sceneIconPath = "none"; // 设置桌面场景图标路径
-                    sceneTag = "desktop"; // 设置桌面场景标签
                     actionPageProcess = "Windows桌面"; // 设置动作页所属应用程序名称
                     actionPageName = "桌面 #"; // 设置动作页名称
                     break;
                 case "Taskbar":
-                    sceneIconPath = "none"; // 设置任务栏场景图标路径
-                    sceneTag = "taskbar"; // 设置任务栏场景标签
                     actionPageProcess = "Windows任务栏"; // 设置动作页所属应用程序名称
                     actionPageName = "任务栏 #"; // 设置动作页名称
                     break;
                 default:
                     break;
             }
-            int actionPageCount = db2.GetTotalAntionPageIndex(tableName); // 获取动作页数量
+            int actionPageCount = db2.TableExists(tableName) ? db2.GetTotalAntionPageIndex(tableName) : 0; // 获取动作页数量
             UpdateSceneTable(tableName, tableName, sceneIconPath, actionPageCount, sceneTag); // 初始化场景数据表
             for (int i = 0; i < actionPageCount; i++) 
             {
@@ -91,7 +82,7 @@ namespace Quicker.Database
             using var transaction = connection.BeginTransaction(); // 开启事务
             string createTableQuery = $@"CREATE TABLE IF NOT EXISTS [{tableName + "Scene"}]
             (
-                SceneType TEXT PRIMARY KEY,
+                SceneName TEXT PRIMARY KEY,
                 SceneIconPath TEXT,
                 SceneCount INTEGER,
                 SceneTag TEXT
@@ -105,19 +96,19 @@ namespace Quicker.Database
         /// 更新场景数据表
         /// </summary>
         /// <param name="tableName"> 场景数据表名称 </param>
-        /// <param name="sceneType"> 场景名称 </param>
+        /// <param name="sceneName"> 场景名称 </param>
         /// <param name="sceneIconPath"> 场景图标路径 </param>
         /// <param name="sceneCount"> 场景数量 </param>
-        public void UpdateSceneTable(string tableName, string sceneType, string sceneIconPath, int sceneCount, string sceneTag)
+        public void UpdateSceneTable(string tableName, string sceneName, string sceneIconPath, int sceneCount, string sceneTag)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             string query = $@"INSERT OR REPLACE INTO {tableName + "Scene"}
-            (SceneType, SceneIconPath, SceneCount, SceneTag)
+            (SceneName, SceneIconPath, SceneCount, SceneTag)
             VALUES
-            (@SceneType, @SceneIconPath, @SceneCount, @SceneTag)"; // 更新场景数据表的SQL语句
+            (@SceneName, @SceneIconPath, @SceneCount, @SceneTag)"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@SceneType", sceneType); // 场景类型
+            command.Parameters.AddWithValue("@SceneName", sceneName); // 场景类型
             command.Parameters.AddWithValue("@SceneIconPath", sceneIconPath); // 场景图标路径
             command.Parameters.AddWithValue("@SceneCount", sceneCount); // 场景数量
             command.Parameters.AddWithValue("@SceneTag", sceneTag); // 场景标签
@@ -222,9 +213,9 @@ namespace Quicker.Database
                     updateCommand.ExecuteNonQuery(); // 执行更新表的SQL语句
                 }
             }
-            query = $@"UPDATE {tableName + "Scene"} SET SceneCount = SceneCount - 1 WHERE SceneType = @SceneType"; // 更新场景数据表的SQL语句
+            query = $@"UPDATE {tableName + "Scene"} SET SceneCount = SceneCount - 1 WHERE SceneName = @SceneName"; // 更新场景数据表的SQL语句
             using var command2 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command2.Parameters.AddWithValue("@SceneType", tableName); // 设置场景类型
+            command2.Parameters.AddWithValue("@SceneName", tableName); // 设置场景类型
             command2.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -256,7 +247,7 @@ namespace Quicker.Database
             {
                 conditions.Add(new SceneData
                 {
-                    SceneType = reader.GetString(0), // 场景类型
+                    SceneName = reader.GetString(0), // 场景类型
                     SceneIconPath = reader.GetString(1), // 场景图标路径
                     SceneCount = reader.GetInt32(2), // 场景数量
                     SceneTag = reader.GetString(3), // 场景标签
@@ -372,7 +363,7 @@ namespace Quicker.Database
     // 场景数据
     public class SceneData
     {
-        public string SceneType { get; set; } // 场景类型
+        public string SceneName { get; set; } // 场景名称
         public string SceneIconPath { get; set; } // 场景图标路径
         public int SceneCount { get; set; } // 场景数量
         public string SceneTag { get; set; } // 场景标签
