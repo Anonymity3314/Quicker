@@ -30,14 +30,13 @@ namespace Quicker.Managers
         } // 递归查找所有指定类型的子元素
         public bool isClosing = false, isDragging, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
         private readonly IconManager iconManager = new(); // 图标管理器
-        private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 鼠标初始位置
         private Button SourceButton; // 源按钮
 
         public ButtonManager()
         {
-            var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取所有约定
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取所有约定
             shouldHideTooltip = Convention.HideTooltip; // 获取隐藏提示标志
         }
 

@@ -14,17 +14,17 @@ namespace Quicker.UserControls
 {
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
+        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
         private IconManager iconManager = new(); // 图标管理器
-        SettingDatabase db1 = new(); // 设置数据库
         SettingManager settingManager; // 设置管理器
         private bool isLoading = true; // 是否全屏禁用
 
         public BlacklistGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            settingManager = settingWindow.settingManager; // 创建设置管理器
-
+            settingManager = settingWindow._settingManager; // 创建设置管理器
+            weakSettingWindow = new(settingWindow); // 保存设置窗口
             InitializeAsync(); // 异步初始化
         }
 
@@ -46,7 +46,7 @@ namespace Quicker.UserControls
 
             LoadBlacklistAppsIntoCache(); // 加载黑名单应用到缓存
 
-            var blacklistApps = db1.GetAllBlacklistApplications(); // 获取黑名单应用
+            var blacklistApps = SettingDatabase.GetAllBlacklistApplications(); // 获取黑名单应用
             Dictionary<string, BlacklistApplication> blacklistDict = new Dictionary<string, BlacklistApplication>(); // 创建字典
             Dictionary<string, BlacklistApplication> whitelistDict = new Dictionary<string, BlacklistApplication>(); // 创建字典
 
@@ -88,7 +88,7 @@ namespace Quicker.UserControls
         // 加载黑名单应用到缓存
         private void LoadBlacklistAppsIntoCache()
         {
-            var blacklistApps = db1.GetAllBlacklistApplications(); // 获取黑名单应用
+            var blacklistApps = SettingDatabase.GetAllBlacklistApplications(); // 获取黑名单应用
             blacklistAppsCache.Clear(); // 清空缓存
             foreach (var app in blacklistApps)
             {
@@ -162,7 +162,7 @@ namespace Quicker.UserControls
             {
                 string filePath = openFileDialog.FileName; // 获取选择的文件路径
                 string processName = Path.GetFileNameWithoutExtension(filePath); // 获取进程名
-                db1.ApplyBlacklistApplication(processName, processName, isBlacklist, false); // 添加到设置中
+                SettingDatabase.ApplyBlacklistApplication(processName, processName, isBlacklist, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
                 if (isBlacklist)
                     AddBlacklistItem(processName, false); // 添加到黑名单
@@ -179,7 +179,7 @@ namespace Quicker.UserControls
                 SelectLocalFile(); // 选择本地文件
             else
             {
-                db1.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), true, false); // 添加到设置中
+                SettingDatabase.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), true, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
                 AddBlacklistItem(button.Tag.ToString(), false); // 添加到黑名单
             }
@@ -194,7 +194,7 @@ namespace Quicker.UserControls
                 SelectLocalFile(false); // 选择本地文件
             else
             {
-                db1.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), false, false); // 添加到设置中
+                SettingDatabase.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), false, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
                 AddWhitelistItem(button.Tag.ToString()); // 添加到白名单
             }
@@ -206,12 +206,12 @@ namespace Quicker.UserControls
         {
             AddDirectoryButton.Margin = new Thickness(295, 230, 0, 0); // 调整按钮位置
             UnknownProcessButton.Visibility = Visibility.Collapsed; // 隐藏按钮
-            var blacklistprocess = db1.GetAllBlacklistApplications(); // 获取黑名单进程
+            var blacklistprocess = SettingDatabase.GetAllBlacklistApplications(); // 获取黑名单进程
             if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
                 ToastManager.AddToast("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
             else
             {
-                db1.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中
+                SettingDatabase.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
                 AddBlacklistItem("unknown-proc.exe", false); // 添加到黑名单
             }
@@ -234,7 +234,7 @@ namespace Quicker.UserControls
                     {
                         if (!Path.GetExtension(file).Equals(".exe", StringComparison.OrdinalIgnoreCase)) continue; // 如果不是.exe文件, 跳过
                         string fileName = Path.GetFileNameWithoutExtension(file); // 获取无后缀的文件名
-                        db1.ApplyBlacklistApplication(selectedPath, fileName, true, true); // 添加到设置中
+                        SettingDatabase.ApplyBlacklistApplication(selectedPath, fileName, true, true); // 添加到设置中
                     }
                     AppStateManager.LoadSettings(); // 加载设置
                     loadingWindow.Close(); // 关闭加载窗口
@@ -331,7 +331,7 @@ namespace Quicker.UserControls
             var grid = button.Parent as Grid; // 获取按钮的父容器（Grid）
             var border = grid.Parent as Border; // 获取Grid的父容器（Border）
             var process = button.Tag.ToString(); // 获取进程名
-            db1.DeleteBlacklistApplication(process); // 从设置中删除进程
+            SettingDatabase.DeleteBlacklistApplication(process); // 从设置中删除进程
             AppStateManager.LoadSettings(); // 加载设置
             BlacklistStackPanel.Children.Remove(border); // 将Grid从父容器StackPanel中移除
         }
@@ -467,7 +467,7 @@ namespace Quicker.UserControls
         {
             if (isLoading) return; // 防止在加载过程中执行
             string[] processNames = BlacklistProcessTextBox.Text.Split(';'); // 将文本内容按照分号分隔
-            var dbWhitelistApps = db1.GetAllBlacklistApplications()
+            var dbWhitelistApps = SettingDatabase.GetAllBlacklistApplications()
                 .Where(app => !app.IsInBlacklist)
                 .Select(app => app.ApplicationName)
                 .ToList(); // 获取数据库中的所有白名单应用
@@ -482,7 +482,7 @@ namespace Quicker.UserControls
             var appsToRemove = dbWhitelistApps.Except(currentWhitelistApps).ToList(); // 找出数据库中存在但当前白名单中不存在的应用
             foreach (var appToRemove in appsToRemove) // 遍历待删除的白名单应用
             {
-                db1.DeleteBlacklistApplication(appToRemove); // 从数据库中删除白名单应用
+                SettingDatabase.DeleteBlacklistApplication(appToRemove); // 从数据库中删除白名单应用
             }
             AppStateManager.LoadSettings(); // 加载设置
 
@@ -513,7 +513,6 @@ namespace Quicker.UserControls
 
             // 清理外部资源
             iconManager?.Dispose();
-            db1 = null;
             settingManager = null;
             blacklistAppsCache.Clear(); // 清理缓存和变量
         }

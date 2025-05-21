@@ -7,7 +7,7 @@ using System;
 
 namespace Quicker.Managers
 {
-    public class SettingManager
+    public class SettingManager : IDisposable
     {
         private const string DefaultButtonColor1 = "#FFE0E0E0"; // 默认按钮颜色
         private const string SelectedButtonColor1 = "#FFF4F4F4"; // 选中按钮颜色
@@ -17,14 +17,13 @@ namespace Quicker.Managers
         public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 弹出面板设置缓存对象
         public AppearanceConditionsSettingsCache appearanceConditions; // 外观设置缓存对象
         public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
-        private readonly SettingDatabase db1 = new(); // 设置数据库
         public ConventionsSettingsCache conventions; // 常规设置缓存对象
 
         // 异步加载常规设置信息
         public async Task LoadConventionsAsync()
         {
             if (conventions != null) return; // 如果已经初始化了数据，直接返回
-            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            var Conventions = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             conventions = new ConventionsSettingsCache // 常规设置
             {
                 Version = Conventions.Version, // 版本号
@@ -45,7 +44,7 @@ namespace Quicker.Managers
         public async Task LoadOpenMainWindowConditionsAsync()
         {
             if (openMainWindowConditions != null) return; // 如果已经初始化了数据，直接返回
-            var OpenMainWindowConditions = db1.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
+            var OpenMainWindowConditions = SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
             openMainWindowConditions = new OpenMainWindowConditionsSettingsCache // 弹出面板设置
             {
                 OpenMainWindowByMiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick,
@@ -65,7 +64,7 @@ namespace Quicker.Managers
         public async Task LoadBlacklistSettingsAsync()
         {
             if (blacklistSettings != null) return; // 如果已经初始化了数据，直接返回
-            var BlacklistSettings = db1.GetAllBlacklistSettings().FirstOrDefault(); // 获取黑名单设置信息
+            var BlacklistSettings = SettingDatabase.GetAllBlacklistSettings().FirstOrDefault(); // 获取黑名单设置信息
             blacklistSettings = new BlacklistSettingsSettingsCache // 黑名单设置
             {
                 FullScreenDisable = BlacklistSettings.IsFullScreenDisabled, // 启用黑名单
@@ -77,7 +76,7 @@ namespace Quicker.Managers
         public async Task LoadAppearanceAsync()
         {
             if (appearanceConditions != null) return; // 如果已经初始化了数据，直接返回
-            //var Appearance = db1.GetAllAppearance().FirstOrDefault(); // 获取外观设置信息
+            //var Appearance = SettingDatabase.GetAllAppearance().FirstOrDefault(); // 获取外观设置信息
             //settingsCache = new SettingsCache // 外观设置
             {
                 //AutoHideTitleBar = Appearance.AutoHideTitleBar,

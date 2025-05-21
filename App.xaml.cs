@@ -31,7 +31,7 @@ namespace Quicker
         // 确保单例运行
         private void EnsureSingleInstance()
         {
-            var version = AppStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取数据库版本
+            var version = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取数据库版本
             string mutexName = version.Version; // 互斥锁唯一标识
             bool isNewInstance = SingleInstanceManager.CheckForOtherInstances(mutexName, out _); // 检查是否是新实例
             if (!isNewInstance)
@@ -68,7 +68,7 @@ namespace Quicker
         // 弹出消息提醒
         private void ShowNotification()
         {
-            var Convention = AppStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
             if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
                 ToastManager.AddToast("成功启动！", "Common"); // 弹出消息提醒
         }
@@ -100,11 +100,11 @@ namespace Quicker
                 return; // 如果没有按下时间，停止计时器
             }
             var Conventions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllConventions().FirstOrDefault()
+                ? SettingDatabase.GetAllConventions().FirstOrDefault()
                 : AppStateManager.Conventions; // 获取设置
             double LongPressThreshold = Conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
             var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                 : AppStateManager.OpenMainWindowConditions; // 获取设置
             if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger ||
                 OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
@@ -131,9 +131,9 @@ namespace Quicker
         // 定时器每5min保存使用时长
         private void Timer_Tick(object sender, EventArgs e)
         {
-            var Convention = AppStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
             Convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
-            AppStateManager.Db.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时长到数据库
+            SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时长到数据库
             AppStateManager.RecordedTime = DateTime.Now; // 记录应用保存时间
         }
 
@@ -159,7 +159,7 @@ namespace Quicker
                 return; // 返回
             } // 如果按键已经被记录，停止记录
             var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                 : AppStateManager.OpenMainWindowConditions; // 获取设置
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
             this.Dispatcher.BeginInvoke(() =>
@@ -204,10 +204,10 @@ namespace Quicker
             AppStateManager.PressTimer?.Stop(); // 停止计时器
             if (!AppStateManager.KeyPressStartTime.HasValue) return;
             var Conventions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllConventions().FirstOrDefault()
+                ? SettingDatabase.GetAllConventions().FirstOrDefault()
                 : AppStateManager.Conventions; // 获取设置
             var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                 : AppStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
             AppStateManager.KeyPressStartTime = null;
@@ -241,7 +241,7 @@ namespace Quicker
                 return; // 返回
             } // 如果按键已经被记录，停止记录
             var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                 : AppStateManager.OpenMainWindowConditions; // 获取设置
             switch (e.Data.KeyCode)
             {
@@ -258,10 +258,10 @@ namespace Quicker
         {
             if (!AppStateManager.KeyPressStartTime.HasValue) return;
             var Conventions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllConventions().FirstOrDefault()
+                ? SettingDatabase.GetAllConventions().FirstOrDefault()
                 : AppStateManager.Conventions; // 获取设置
             var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                 : AppStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
             AppStateManager.KeyPressStartTime = null;
@@ -280,14 +280,14 @@ namespace Quicker
         private bool FullScreenDisable()
         {
             var blacklistSettings = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllBlacklistSettings().FirstOrDefault()
+                ? SettingDatabase.GetAllBlacklistSettings().FirstOrDefault()
                 : AppStateManager.BlacklistSettings; // 获取黑名单设置
             if (!blacklistSettings.IsFullScreenDisabled) return false; // 如果没有启用全屏禁用Quicker，返回false
             if (WindowManager.IsFullScreen()) // 窗口最大化
             {
                 string processName = WindowManager.GetProcessName(); // 获取进程名
                 var blacklistApplications = AppStateManager.EnableMemoryOptimization
-                    ? AppStateManager.Db.GetAllBlacklistApplications()
+                    ? SettingDatabase.GetAllBlacklistApplications()
                     : AppStateManager.BlacklistApplications; // 获取黑名单进程
                 if (blacklistApplications.Count == 0) return true; // 没有黑名单进程，返回true表示Quicker被禁用
                 if (blacklistApplications.Any(p => p.ProcessName == processName && !p.IsInBlacklist)) // 如果进程名在黑名单中
@@ -308,7 +308,7 @@ namespace Quicker
             string processName = process.ProcessName; // 获取进程名
 
             var blacklistedProcesses = AppStateManager.EnableMemoryOptimization
-                ? AppStateManager.Db.GetAllBlacklistApplications()
+                ? SettingDatabase.GetAllBlacklistApplications()
                 : AppStateManager.BlacklistApplications; // 获取黑名单进程
             if (blacklistedProcesses.Any(p => p.ProcessName == processName && p.IsInBlacklist)) // 如果进程名在黑名单中
                 return true; // 返回true表示Quicker被禁用
@@ -326,7 +326,7 @@ namespace Quicker
                     string windowType = DetermineWindowType(); // 确定窗口类型
                     mainWindow = new MainWindow(windowType); // 创建新的功能面板
                     var settings = AppStateManager.EnableMemoryOptimization
-                        ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                        ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                         : AppStateManager.OpenMainWindowConditions; // 获取设置
                     SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
                     AppStateManager.Left = (float)mainWindow.Left; // 记录功能面板位置
@@ -355,7 +355,7 @@ namespace Quicker
                 AppStateManager.PreLoadMainWindow = new MainWindow(windowType); // 创建新的功能面板
 
                 var settings = AppStateManager.EnableMemoryOptimization
-                    ? AppStateManager.Db.GetAllOpenMainWindowConditions().FirstOrDefault()
+                    ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
                     : AppStateManager.OpenMainWindowConditions; // 获取设置
                 SetMainWindowPosition(AppStateManager.PreLoadMainWindow, settings.WindowStartupLocation); // 设置窗口位置
                 AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden; // 隐藏功能面板
@@ -493,9 +493,9 @@ namespace Quicker
         {
             taskbarIcon?.Dispose(); // 释放托盘图标
             double currentSessionTime = (DateTime.Now - AppStateManager.RecordedTime).TotalSeconds; // 计算本次会话时间
-            var Convention = AppStateManager.Db.GetAllConventions().FirstOrDefault(); // 获取设置
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
             Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
-            AppStateManager.Db.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
+            SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
 
             AppStateManager.Dispose(); // 释放数据库资源
             hook?.Dispose(); // 释放钩子

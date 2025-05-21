@@ -16,7 +16,6 @@ namespace Quicker
         public static readonly string LockIconPath = "/Resources/Images/Icons/Locked.ico"; // 锁定图标路径
         public static readonly string BookIconPath = "/Resources/Images/Icons/Book.ico"; // 订住图标路径
 
-        public static SettingDatabase Db { get; set; } = new(); // 数据库操作对象
         public static List<BlacklistApplication> BlacklistApplications { get; set; } = new(); // 缓存黑名单应用
         public static OpenMainWindow OpenMainWindowConditions { get; set; } = new(); // 缓存 OpenMainWindowConditions
         public static Blacklist BlacklistSettings { get; set; } = new(); // 缓存黑名单设置
@@ -56,10 +55,10 @@ namespace Quicker
         // 从数据库加载设置并插入临时数据库
         public static void LoadSettings()
         {
-            Conventions = Db.GetAllConventions().FirstOrDefault(); // 加载基础设置
-            OpenMainWindowConditions = Db.GetAllOpenMainWindowConditions().FirstOrDefault(); // 加载 OpenMainWindowConditions
-            BlacklistSettings = Db.GetAllBlacklistSettings().FirstOrDefault(); // 加载黑名单设置
-            BlacklistApplications = Db.GetAllBlacklistApplications(); // 加载黑名单应用
+            Conventions = SettingDatabase.GetAllConventions().FirstOrDefault(); // 加载基础设置
+            OpenMainWindowConditions = SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault(); // 加载 OpenMainWindowConditions
+            BlacklistSettings = SettingDatabase.GetAllBlacklistSettings().FirstOrDefault(); // 加载黑名单设置
+            BlacklistApplications = SettingDatabase.GetAllBlacklistApplications(); // 加载黑名单应用
             EnableMemoryOptimization = Conventions.EnableMemoryOptimization; // 是否启用内存优化
             if (EnableMemoryOptimization) // 启用内存优化
                 ClearCachedData(); // 清除缓存数据
@@ -84,7 +83,6 @@ namespace Quicker
             Timer = null; // 清除计时器
             PreLoadMainWindow?.Close(); // 关闭预加载窗口
             PreLoadMainWindow = null; // 清除预加载窗口资源
-            Db = null; // 清除数据库操作对象
         }
     }
 }

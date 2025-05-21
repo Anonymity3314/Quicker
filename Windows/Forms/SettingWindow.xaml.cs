@@ -17,8 +17,7 @@ namespace Quicker.Windows
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮类型2颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
-        public readonly SettingManager settingManager = new(); // 设置管理器
-        private readonly SettingDatabase db1 = new(); // 设置数据库
+        public readonly SettingManager _settingManager = new(); // 设置管理器
 
         public SettingWindow()
         {
@@ -28,7 +27,7 @@ namespace Quicker.Windows
         // 初始化窗口
         private void SettingWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             if (Convention.RememberLastPage)
                 SetLastPage(Convention.LastPage); // 设置上一次关闭时的状态
             else
@@ -85,42 +84,42 @@ namespace Quicker.Windows
             await Task.Run(() => // 在后台线程中执行保存操作
             {
                 bool succeed = true; // 保存成功标志
-                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+                var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
                 bool originalAutoStart = Convention.AutoStart; // 保存原始的开机自启动设置
-                bool newAutoStart = settingManager.conventions.AutoStart; // 新的开机自启动设置
+                bool newAutoStart = _settingManager.conventions.AutoStart; // 新的开机自启动设置
                 if (originalAutoStart != newAutoStart)// 更新开机自启动设置
                     succeed = UpdateAutostart(newAutoStart);
 
-                if (settingManager.conventions != null)
-                    db1.ApplyConventionSettings(
+                if (_settingManager.conventions != null)
+                    SettingDatabase.ApplyConventionSettings(
                         succeed
-                            ? settingManager.conventions.AutoStart
+                            ? _settingManager.conventions.AutoStart
                             : Convention.AutoStart,
-                        settingManager.conventions.ShowNotification,
-                        settingManager.conventions.ShowAddImage,
-                        settingManager.conventions.HideTooltip,
-                        settingManager.conventions.LongPressThreshold,
-                        settingManager.conventions.MouseMovePixels,
-                        settingManager.conventions.LoopPageFlipping,
-                        settingManager.conventions.RememberLastPage,
-                        settingManager.conventions.EnableMemoryOptimization); // 更新常规设置
-                if (settingManager.openMainWindowConditions != null)
-                    db1.ApplyOpenMainWindowSettings(
-                        settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
-                    settingManager.openMainWindowConditions.OpenMainWindowByX1MouseClick,
-                    settingManager.openMainWindowConditions.OpenMainWindowByX2MouseClick,
-                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick,
-                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick,
-                    settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger,
-                    settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
-                    settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
-                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl,
-                    settingManager.openMainWindowConditions.WindowStartupLocation
+                        _settingManager.conventions.ShowNotification,
+                        _settingManager.conventions.ShowAddImage,
+                        _settingManager.conventions.HideTooltip,
+                        _settingManager.conventions.LongPressThreshold,
+                        _settingManager.conventions.MouseMovePixels,
+                        _settingManager.conventions.LoopPageFlipping,
+                        _settingManager.conventions.RememberLastPage,
+                        _settingManager.conventions.EnableMemoryOptimization); // 更新常规设置
+                if (_settingManager.openMainWindowConditions != null)
+                    SettingDatabase.ApplyOpenMainWindowSettings(
+                        _settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByX1MouseClick,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByX2MouseClick,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClickLonger,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClick_Move,
+                    _settingManager.openMainWindowConditions.OpenMainWindowByCtrl,
+                    _settingManager.openMainWindowConditions.WindowStartupLocation
                     ); // 更新弹出面板设置
-                if (settingManager.blacklistSettings != null)
-                    db1.ApplyBlacklistSettings(
-                        settingManager.blacklistSettings.FullScreenDisable,
-                        settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys); // 更新黑名单设置
+                if (_settingManager.blacklistSettings != null)
+                    SettingDatabase.ApplyBlacklistSettings(
+                        _settingManager.blacklistSettings.FullScreenDisable,
+                        _settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys); // 更新黑名单设置
 
                 try
                 {
@@ -168,12 +167,12 @@ namespace Quicker.Windows
         // 基础设置
         private void BasicSetting_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle1_Click(BasicSettingStackPanel, BasicSetting, MainStackPanel, MenuGrid); // 设置Button类型1样式
+            _settingManager.ButtonStyle1_Click(BasicSettingStackPanel, BasicSetting, MainStackPanel, MenuGrid); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
         private void BasicSetting_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle1_MouseLeave(sender, BasicSettingStackPanel); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle1_MouseLeave(sender, BasicSettingStackPanel); // 鼠标移出Button恢复Background
         }
 
 
@@ -181,94 +180,94 @@ namespace Quicker.Windows
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
             var ConventionGrid = new ConventionGrid(this) { Name = "ConventionGrid" }; // 创建常规设置Grid            
-            settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
         {
             var ConventionGrid = new ConventionGrid(this) { Name = "ConventionGrid" }; // 创建常规设置Grid  
-            settingManager.ButtonStyle2_MouseLeave(sender, ConventionGrid, ResultGrid); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle2_MouseLeave(sender, ConventionGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-弹出面板
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
             var OpenMainWindowGrid = new OpenMainWindowGrid(this) { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
-            settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void OpenMainWindow_MouseLeave(object sender, MouseEventArgs e)
         {
             var OpenMainWindowGrid = new OpenMainWindowGrid(this) { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
-            settingManager.ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid, ResultGrid); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle2_MouseLeave(sender, OpenMainWindowGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-黑名单
         private void Blacklist_Click(object sender, RoutedEventArgs e)
         {
             var BlacklistGrid = new BlacklistGrid(this) { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
-            settingManager.ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
         {
             var BlacklistGrid = new BlacklistGrid(this) { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
-            settingManager.ButtonStyle2_MouseLeave(sender, BlacklistGrid, ResultGrid); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle2_MouseLeave(sender, BlacklistGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-外观
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
             var AppearanceGrid = new AppearanceGrid(this) { Name = "AppearanceGrid" }; // 创建外观设置Grid
-            settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Visible; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void Appearance_MouseLeave(object sender, MouseEventArgs e)
         {
             var AppearanceGrid = new AppearanceGrid(this) { Name = "AppearanceGrid" }; // 创建外观设置Grid
-            settingManager.ButtonStyle2_MouseLeave(sender, AppearanceGrid, ResultGrid); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle2_MouseLeave(sender, AppearanceGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         // 基础设置-关于Quicker
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
             var AboutQuickerGrid = new AboutQuickerGrid(this) { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
-            settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Collapsed; // 设置ApplySettingsButton可见性
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
         {
             var AboutQuickerGrid = new AboutQuickerGrid(this) { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
-            settingManager.ButtonStyle2_MouseLeave(sender, AboutQuickerGrid, ResultGrid); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle2_MouseLeave(sender, AboutQuickerGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
 
         // 辅助功能
         private void Auxiliary_Functions_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle1_Click(Auxiliary_FunctionsStackPanel, Auxiliary_Functions, MainStackPanel, MenuGrid); // 设置Button类型1样式
+            _settingManager.ButtonStyle1_Click(Auxiliary_FunctionsStackPanel, Auxiliary_Functions, MainStackPanel, MenuGrid); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
         private void Auxiliary_Functions_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle1_MouseLeave(sender, Auxiliary_FunctionsStackPanel); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle1_MouseLeave(sender, Auxiliary_FunctionsStackPanel); // 鼠标移出Button恢复Background
         }
 
 
         // 工具
         private void Tools_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.ButtonStyle1_Click(ToolsStackPanel, Tools, MainStackPanel, MenuGrid); // 设置Button类型1样式
+            _settingManager.ButtonStyle1_Click(ToolsStackPanel, Tools, MainStackPanel, MenuGrid); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
         private void Tools_MouseLeave(object sender, MouseEventArgs e)
         {
-            settingManager.ButtonStyle1_MouseLeave(sender, ToolsStackPanel); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle1_MouseLeave(sender, ToolsStackPanel); // 鼠标移出Button恢复Background
         }
 
         // 关闭窗口时保存最后打开的页面
@@ -310,7 +309,7 @@ namespace Quicker.Windows
             {
                 lastpage = 15; // 关于Quicker页面
             }
-            db1.SetLastPage(lastpage); // 保存最后打开的页面
+            SettingDatabase.SetLastPage(lastpage); // 保存最后打开的页面
         }
 
         // 关闭窗口前，释放资源
@@ -318,7 +317,7 @@ namespace Quicker.Windows
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
 
-            settingManager.Dispose(); // 清空缓存
+            _settingManager.Dispose(); // 清空缓存
 
             foreach (var child in MenuGrid.Children.OfType<StackPanel>()) // 清理用户控件
             {

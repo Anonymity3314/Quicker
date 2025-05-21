@@ -33,7 +33,7 @@
                 <ListView x:Name="MainListView" Background="LightGray" AllowDrop="True" PreviewDragOver="ListView_PreviewDragOver" Drop="ListView_Drop">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel x:Name="MainStackPanel" Orientation="Horizontal"/>
+                            <WrapPanel x:Name="MainStackPanel" Orientation="Horizontal" MouseWheel="MainStackPanel_MouseWheel"/>
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                 </ListView>

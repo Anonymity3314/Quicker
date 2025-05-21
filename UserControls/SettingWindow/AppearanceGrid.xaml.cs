@@ -8,13 +8,14 @@ namespace Quicker.UserControls
 {
     public partial class AppearanceGrid : UserControl
     {
-        private readonly SettingDatabase db1 = new(); // 设置数据库
+        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
         SettingManager settingManager; // 设置管理器
 
         public AppearanceGrid(SettingWindow settingWindow)
         {
-            settingManager = settingWindow.settingManager; // 初始化设置管理器
             InitializeComponent(); // 初始化xaml界面
+            settingManager = settingWindow._settingManager; // 初始化设置管理器
+            weakSettingWindow = new(settingWindow); // 保存设置窗口
             InitializeAsync(); // 异步初始化
         }
 

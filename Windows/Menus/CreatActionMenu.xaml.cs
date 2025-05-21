@@ -7,7 +7,6 @@ namespace Quicker.Windows
     public partial class CreatActionMenu : Window
     {
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 设置管理器
         private string clipboardText; // 剪切板文本
         private bool hasChanged = false; // 是否已检查

@@ -10,15 +10,15 @@ namespace Quicker.UserControls
 {
     public partial class OpenMainWindowGrid : UserControl
     {
+        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private List<string> ShortcutKeys = new(); // 保存快捷键
-        private SettingDatabase db1 = new(); // 设置数据库
         SettingManager settingManager; // 设置管理器
 
         public OpenMainWindowGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            settingManager = settingWindow.settingManager; // 创建设置管理器
-
+            settingManager = settingWindow._settingManager; // 创建设置管理器
+            weakSettingWindow = new(settingWindow); // 保存设置窗口
             InitializeAsync(); // 异步初始化
         }
 
@@ -318,7 +318,6 @@ namespace Quicker.UserControls
             TestButton = null; // 清理测试按钮
 
             settingManager = null; // 释放设置管理器资源
-            db1 = null; // 释放设置数据库资源
         }
     }
 }

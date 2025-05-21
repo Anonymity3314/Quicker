@@ -102,29 +102,30 @@ namespace Quicker.Windows
             // 动态生成按钮
             for (int i = 0; i < buttonInfo.Length; i++)
             {
-                var button = new Button();
-                button.Name = buttonInfo[i].Name;
-                button.Style = FindResource("SceneButton") as Style; // 应用样式
+                var button = new Button()
+                {
+                    AllowDrop = true, // 允许拖拽
+                    Name = buttonInfo[i].Name, // 按钮名称
+                    Style = FindResource("SceneButton") as Style, // 应用样式
+                };
 
                 // 创建按钮内容
                 Grid buttonContent = new();
                 TextBlock textBlock = new()
                 {
-                    FontSize = 14,
-                    Text = buttonInfo[i].Text,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
+                    FontSize = 14, // 字体大小
+                    Text = buttonInfo[i].Text, // 文本内容
+                    VerticalAlignment = VerticalAlignment.Center, // 垂直居中
+                    HorizontalAlignment = HorizontalAlignment.Center // 水平居中
                 }; // 创建 TextBlock
-                buttonContent.Children.Add(textBlock);
-                button.Content = buttonContent;
+                buttonContent.Children.Add(textBlock); // 添加到网格
+                button.Content = buttonContent; // 设置按钮内容
 
                 // 设置点击事件
-                button.Click += buttonClickHandlers[i];
+                button.Click += buttonClickHandlers[i]; // 设置按钮点击事件
                 button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
                 button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
-
-                // 将按钮添加到StackPanel
-                ActionPagesButtonPanel.Children.Add(button);
+                ActionPagesButtonPanel.Children.Add(button); // 将按钮添加到StackPanel
             }
         }
 
@@ -728,9 +729,6 @@ namespace Quicker.Windows
             int canvadIndex = int.Parse(targetButtonName.Replace(type, "")); // 获取画布索引
             db2.DeletePageOfButtons(type, canvadIndex); // 删除按钮数据页
             db3.DeleteActionPage(type, canvadIndex); // 删除动作页数据表
-            // 更新场景数据表
-            var sceneData = db3.GetSceneData(type).FirstOrDefault(); // 获取场景数据
-            db3.UpdateSceneTable(type, type, sceneData.SceneIconPath, MainListView.Items.Count, sceneData.SceneTag); // 更新场景数据表
             if(MainListView.Items.Count == 0)
             {
                 db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
@@ -791,6 +789,14 @@ namespace Quicker.Windows
         private void AddActionPageButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             showUsedTimes = !showUsedTimes; // 切换显示/隐藏使用次数
+        }
+
+        // 滚动滚轮移动视图
+        private void MainStackPanel_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            e.Handled = true; // 标记事件为已处理，防止默认行为
+            int delta = e.Delta < 0 ? 30 : -30; // 获取滚轮滚动方向
+            ScrollBar.Value += delta; // 调整滚动条值
         }
 
         // 关闭窗口时释放资源

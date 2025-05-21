@@ -196,33 +196,35 @@ namespace Quicker.Database
             command1.Parameters.AddWithValue("@DefaultActionPageName", tableName + actionPageIndex.ToString()); // 添加参数
             command1.ExecuteNonQuery(); // 执行删除表的SQL语句
 
-            // 获取所有后续动作页并更新它们的编号
-            string updateQuery = $@"UPDATE {tableName + "ActionPage"}
-                SET DefaultActionPageName = @NewDefaultActionPageName
-                WHERE DefaultActionPageName LIKE @OldDefaultActionPageNamePattern"; // 更新动作页编号的SQL语句
-            using var updateCommand = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
             string selectQuery = $@"SELECT DefaultActionPageName FROM {tableName + "ActionPage"} 
-                WHERE CAST(SUBSTR(DefaultActionPageName, LENGTH(@TableName) + 1) AS INTEGER) > @ActionPageIndex"; // 获取后续动作页的SQL语句
+                    ORDER BY CAST(SUBSTR(DefaultActionPageName, LENGTH(@TableName) + 1) AS INTEGER)"; // 获取所有剩余动作页的 SQL语句
             using var selectCommand = new SQLiteCommand(selectQuery, connection, transaction); // 创建SQLiteCommand对象
-            selectCommand.Parameters.AddWithValue("@ActionPageIndex", actionPageIndex); // 设置动作页索引
-            selectCommand.Parameters.AddWithValue("@TableName", tableName); // 设置表名
+            selectCommand.Parameters.AddWithValue("@TableName", tableName); // 设置参数
             using var reader = selectCommand.ExecuteReader(); // 执行查询SQL语句
+            List<string> defaultNames = new List<string>(); // 所有剩余动作页的 DefaultActionPageName
             while (reader.Read())
             {
-                string oldDefaultActionPageName = reader.GetString(0); // 旧的动作页名称
-                int oldIndex = int.Parse(oldDefaultActionPageName.Substring(tableName.Length)); // 旧的动作页索引
-                int newIndex = oldIndex - 1; // 新的动作页索引
-                string newDefaultActionPageName = $"{tableName}{newIndex}"; // 新的动作页名称
-
-                updateCommand.Parameters.Clear(); // 清空参数
-                updateCommand.Parameters.AddWithValue("@NewDefaultActionPageName", newDefaultActionPageName); // 设置新的动作页名称
-                updateCommand.Parameters.AddWithValue("@OldDefaultActionPageNamePattern", $"{tableName}%"); // 设置旧的动作页名称模式
-                updateCommand.ExecuteNonQuery(); // 执行更新表的SQL语句
+                defaultNames.Add(reader.GetString(0)); // 获取所有剩余动作页的 DefaultActionPageName
             }
 
+            for (int i = 0; i < defaultNames.Count; i++) // 重新编号并更新每个动作页的 DefaultActionPageName
+            {
+                string oldDefaultActionPageName = defaultNames[i]; // 获取旧名称
+                string newDefaultActionPageName = $"{tableName}{i}"; // 设置新名称
+                if (oldDefaultActionPageName != newDefaultActionPageName)
+                {
+                    string updateQuery = $@"UPDATE {tableName + "ActionPage"}
+                            SET DefaultActionPageName = @NewDefaultActionPageName
+                            WHERE DefaultActionPageName = @OldDefaultActionPageName"; // 更新动作页数据表的SQL语句
+                    using var updateCommand = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
+                    updateCommand.Parameters.AddWithValue("@NewDefaultActionPageName", newDefaultActionPageName); // 设置新名称
+                    updateCommand.Parameters.AddWithValue("@OldDefaultActionPageName", oldDefaultActionPageName); // 设置旧名称
+                    updateCommand.ExecuteNonQuery(); // 执行更新表的SQL语句
+                }
+            }
             query = $@"UPDATE {tableName + "Scene"} SET SceneCount = SceneCount - 1 WHERE SceneType = @SceneType"; // 更新场景数据表的SQL语句
             using var command2 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command2.Parameters.AddWithValue("@SceneType", tableName); // 添加参数
+            command2.Parameters.AddWithValue("@SceneType", tableName); // 设置场景类型
             command2.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }

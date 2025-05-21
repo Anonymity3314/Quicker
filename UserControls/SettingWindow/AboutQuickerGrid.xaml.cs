@@ -12,13 +12,15 @@ namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {
+        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
         ActionManager actionManager = new(); // 创建动作管理器
         SettingManager settingManager; // 读取设置的管理器
 
         public AboutQuickerGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            settingManager = settingWindow.settingManager; // 创建设置管理器
+            settingManager = settingWindow._settingManager; // 创建设置管理器
+            weakSettingWindow = new(settingWindow); // 保存设置窗口
             settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
         }

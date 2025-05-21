@@ -22,7 +22,6 @@ namespace Quicker.Windows
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
-        private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string CommonStyle; // 样式
 
@@ -158,6 +157,7 @@ namespace Quicker.Windows
         {
             var actionPageData = db3.GetActionPageData(CommonStyle, uniformGridIndex); // 从数据库中获取动作页面数据
             CommonTextBlock.Text = actionPageData.ActionPageName; // 设置标签内容
+            CommonTextBlock.ToolTip = actionPageData.ActionPageName; // 设置标签提示
         }
 
         // 移动功能面板
@@ -214,7 +214,7 @@ namespace Quicker.Windows
             }
             else
             {
-                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
+                var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
                 if (Convention?.ShowAddImage == true) // 如果显示添加按钮
                 {
                     button.Content = new System.Windows.Controls.Image
@@ -344,7 +344,7 @@ namespace Quicker.Windows
             }
             else
             {
-                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
+                var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
                 if (Convention.ShowAddImage) // 如果显示添加按钮
                     buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 点击打开菜单
             }
@@ -533,7 +533,7 @@ namespace Quicker.Windows
         /// <param name="isNext"> 是否向下滚动 </param>
         private void SwitchUniformGrid(int currentUniformGridIndex, string style, bool isNext)
         {
-            var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置数据
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置数据
             int targetUniformGridIndex = isNext ? currentUniformGridIndex + 1 : currentUniformGridIndex - 1; // 计算目标UniformGrid编号
             var sceneData = db3.GetSceneData(style).FirstOrDefault(); // 从数据库中获取动作页数据
             if (targetUniformGridIndex == sceneData.SceneCount || targetUniformGridIndex < 0) // 如果目标UniformGrid编号超出范围

@@ -6,7 +6,6 @@ namespace Quicker.Managers
 {
     public class DatabaseUpdateManager : IDisposable
     {
-        private readonly SettingDatabase db1 = new(); // 设置数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private bool _disposed = false; // 标记是否已释放资源
 
@@ -14,7 +13,7 @@ namespace Quicker.Managers
         public void CheckAndUpgradeDatabase()
         {
             string dbVersion = GetCurrentVersion(); // 获取当前数据库版本号
-            if (dbVersion != db1.currentVersion)
+            if (dbVersion != SettingDatabase.currentVersion)
                 UpdateDatabase(dbVersion); // 数据库版本不同，更新数据库
         }
 
@@ -60,7 +59,7 @@ namespace Quicker.Managers
         /// <returns> 当前版本号 </returns>
         private string GetCurrentVersion()
         {
-            using var connection = db1.OpenConnection(); // 打开数据库连接
+            using var connection = SettingDatabase.OpenConnection(); // 打开数据库连接
             string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
             using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
             using var reader = command.ExecuteReader(); // 执行查询命令
@@ -76,7 +75,7 @@ namespace Quicker.Managers
         /// <param name="version"> 版本号 </param>
         private void SetCurrentVersion(string version)
         {
-            var connection = db1.OpenConnection(); // 打开数据库连接
+            var connection = SettingDatabase.OpenConnection(); // 打开数据库连接
             string updateVersionQuery = @$"UPDATE Convention SET Version = '{version}';"; // 设置默认值
             using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
             updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
@@ -215,7 +214,7 @@ namespace Quicker.Managers
         // 更新设置数据库
         private void Update2_1_3SettingDatabase()
         {
-            using var connection = db1.OpenConnection(); // 打开数据库连接
+            using var connection = SettingDatabase.OpenConnection(); // 打开数据库连接
             string addRememberLastPageQuery = @"
             ALTER TABLE Convention 
             ADD COLUMN RememberLastPage BOOL DEFAULT FALSE;"; // 为Convention表添加RememberLastPage列
@@ -371,7 +370,7 @@ namespace Quicker.Managers
         /// </summary>
         private void Update2_1_0SettingDatabase()
         {
-            using var connection = db1.OpenConnection(); // 打开数据库连接
+            using var connection = SettingDatabase.OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
             try
             {

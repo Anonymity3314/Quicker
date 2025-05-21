@@ -3,14 +3,14 @@ using Quicker.Database;
 using System.IO;
 
 // SQLite数据库操作类
-public class SettingDatabase
+public static class SettingDatabase
 {
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
     private readonly static string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
     private readonly static ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-    public readonly string currentVersion = "2.2.0"; // 当前版本号
+    public static readonly string currentVersion = "2.2.0"; // 当前版本号
 
-    public SettingDatabase()
+    static SettingDatabase()
     {
         string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
         string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
@@ -26,7 +26,7 @@ public class SettingDatabase
     }
 
     // 初始化 Convention 表
-    private void InitializeConvention()
+    private static void InitializeConvention()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string createConventionTableQuery = @"
@@ -52,7 +52,7 @@ public class SettingDatabase
     }
 
     // 插入默认数据
-    private void InsertDefaultConventionData()
+    private static void InsertDefaultConventionData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string insertConventionQuery = @"
@@ -77,7 +77,7 @@ public class SettingDatabase
     }
 
     // 初始化OpenMainWindow 表
-    private void InitializeOpenMainWindow()
+    private static void InitializeOpenMainWindow()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string createOpenMainWindowTableQuery = @"
@@ -101,7 +101,7 @@ public class SettingDatabase
     }
 
     // 插入默认数据
-    private void InsertDefaultOpenMainWindowData()
+    private static void InsertDefaultOpenMainWindowData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string insertOpenMainWindowQuery = @"
@@ -124,7 +124,7 @@ public class SettingDatabase
     }
 
     // 初始化 Blacklist 表
-    public void InitializeBlacklist()
+    public static void InitializeBlacklist()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string createBlacklistTableQuery = @"
@@ -140,7 +140,7 @@ public class SettingDatabase
     }
 
     // 插入默认数据
-    private void InsertDefaultBlacklistData()
+    private static void InsertDefaultBlacklistData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string insertBlacklistQuery = @"
@@ -155,7 +155,7 @@ public class SettingDatabase
     }
 
     // 初始化 BlacklistApplication 表
-    public void InitializeBlacklistApplication()
+    public static void InitializeBlacklistApplication()
     {
         using var connection = OpenConnection(); // 打开数据库连接
         string createBlacklistApplicationTableQuery = @"
@@ -183,7 +183,7 @@ public class SettingDatabase
     /// <param name="loopPageFlipping"> 是否循环翻页 </param>
     /// <param name="rememberLastPage"> 是否记住设置窗口中最后打开的页面 </param>
     /// <param name="enableMemoryOptimization"> 是否启用内存优化 </param>
-    public void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization)
+    public static void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var command = new SQLiteCommand(@"
@@ -214,7 +214,7 @@ public class SettingDatabase
     /// 设置窗口中最后打开的页面
     /// </summary>
     /// <param name="lastPage"> 设置窗口中最后打开的页面 </param>
-    public void SetLastPage(int lastPage)
+    public static void SetLastPage(int lastPage)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var command = new SQLiteCommand(@"
@@ -238,7 +238,7 @@ public class SettingDatabase
     /// <param name="OpenMainWindowByRightMouseClick_Move"> 按右键移动 </param>
     /// <param name="OpenMainWindowByCtrl"> 单击Ctrl键 </param>
     /// <param name="windowStartupLocation"> 功能面板打开位置 </param>
-    public void ApplyOpenMainWindowSettings(bool OpenMainWindowByMiddleMouseClick, bool OpenMainWindowByX1MouseClick, bool OpenMainWindowByX2MouseClick, bool OpenMainWindowByCtrl_MiddleMouseClick, bool OpenMainWindowByCtrl_RightMouseClick, bool OpenMainWindowByMiddleMouseClickLonger, bool OpenMainWindowByRightMouseClickLonger, bool OpenMainWindowByRightMouseClick_Move, bool OpenMainWindowByCtrl, int windowStartupLocation)
+    public static void ApplyOpenMainWindowSettings(bool OpenMainWindowByMiddleMouseClick, bool OpenMainWindowByX1MouseClick, bool OpenMainWindowByX2MouseClick, bool OpenMainWindowByCtrl_MiddleMouseClick, bool OpenMainWindowByCtrl_RightMouseClick, bool OpenMainWindowByMiddleMouseClickLonger, bool OpenMainWindowByRightMouseClickLonger, bool OpenMainWindowByRightMouseClick_Move, bool OpenMainWindowByCtrl, int windowStartupLocation)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var command = new SQLiteCommand(@"
@@ -272,7 +272,7 @@ public class SettingDatabase
     /// </summary>
     /// <param name="isFullScreenDisabled"> 是否开启全屏或最大化禁用功能 </param>
     /// <param name="isBlacklistEnabledForExtendedHotkey"> 是否将黑名单与全屏禁用设置应用于扩展热键功能 </param>
-    public void ApplyBlacklistSettings(bool isFullScreenDisabled, bool isBlacklistEnabledForExtendedHotkey)
+    public static void ApplyBlacklistSettings(bool isFullScreenDisabled, bool isBlacklistEnabledForExtendedHotkey)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
@@ -294,7 +294,7 @@ public class SettingDatabase
     /// <param name="processName"> 进程名称 </param>
     /// <param name="isInBlacklist"> 是否在黑名单中 </param>
     /// <param name="isFolder"> 是否是文件夹 </param>
-    public void ApplyBlacklistApplication(string applicationName, string processName, bool isInBlacklist, bool isFolder)
+    public static void ApplyBlacklistApplication(string applicationName, string processName, bool isInBlacklist, bool isFolder)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
@@ -315,7 +315,7 @@ public class SettingDatabase
     /// 通过应用名称删除黑名单应用
     /// </summary>
     /// <param name="applicationName"> 应用名称 </param>
-    public void DeleteBlacklistApplication(string applicationName)
+    public static void DeleteBlacklistApplication(string applicationName)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
@@ -330,7 +330,7 @@ public class SettingDatabase
     /// 保存总使用时长
     /// </summary>
     /// <param name="totalUsageTime"> 总使用时长 </param>
-    public void SaveTotalUsageTime(double totalUsageTime)
+    public static void SaveTotalUsageTime(double totalUsageTime)
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
@@ -345,7 +345,7 @@ public class SettingDatabase
     /// 获取常规设置信息
     /// </summary>
     /// <returns> Convention 类 </returns>
-    public List<Convention> GetAllConventions()
+    public static List<Convention> GetAllConventions()
     {
         var conventions = new List<Convention>(); // 创建一个空的 Convention 列表
         using var connection = OpenConnection(); // 打开数据库连接
@@ -378,7 +378,7 @@ public class SettingDatabase
     /// 获取OpenMainWindow设置信息
     /// </summary>
     /// <returns> OpenMainWindow 类 </returns>
-    public List<OpenMainWindow> GetAllOpenMainWindowConditions()
+    public static List<OpenMainWindow> GetAllOpenMainWindowConditions()
     {
         var conditions = new List<OpenMainWindow>(); // 创建一个空的 OpenMainWindow 列表
         using var connection = OpenConnection(); // 打开数据库连接
@@ -409,7 +409,7 @@ public class SettingDatabase
     /// 获取黑名单设置
     /// </summary>
     /// <returns> Blacklist 类 </returns>
-    public List<Blacklist> GetAllBlacklistSettings()
+    public static List<Blacklist> GetAllBlacklistSettings()
     {
         var blacklists = new List<Blacklist>(); // 创建一个空的 Blacklist 列表
         using var connection = OpenConnection(); // 打开数据库连接
@@ -432,7 +432,7 @@ public class SettingDatabase
     /// 获取黑名单应用
     /// </summary>
     /// <returns> BlacklistApplication 类 </returns>
-    public List<BlacklistApplication> GetAllBlacklistApplications()
+    public static List<BlacklistApplication> GetAllBlacklistApplications()
     {
         var applications = new List<BlacklistApplication>(); // 创建一个空的 BlacklistApplication 列表
         using var connection = OpenConnection(); // 打开数据库连接
@@ -457,7 +457,7 @@ public class SettingDatabase
     /// 打开数据库连接
     /// </summary>
     /// <returns> SQLiteConnection 对象 </returns>
-    public SQLiteConnection OpenConnection()
+    public static SQLiteConnection OpenConnection()
     {
         var connection = new SQLiteConnection(db1); // 创建 SQLiteConnection 对象
         connection.Open(); // 打开数据库连接

@@ -10,18 +10,19 @@ namespace Quicker.UserControls
 {
     public partial class ConventionGrid : UserControl
     {
-        private readonly SettingDatabase db1 = new(); // 设置数据库
+        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
         ActionManager actionManager = new(); // 动作管理器
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
         private double totalUsageTime; // 总使用时长
         private DispatcherTimer timer; // 定时器
 
+
         public ConventionGrid(SettingWindow settingWindow)
         {
             InitializeComponent();
-            settingManager = settingWindow.settingManager; // 创建设置管理器
-
+            weakSettingWindow = new(settingWindow); // 保存设置窗口
+            settingManager = settingWindow._settingManager; // 获取设置管理器
             InitializeAsync(); // 异步初始化
         }
 
@@ -54,8 +55,8 @@ namespace Quicker.UserControls
         // 异步加载使用时长
         private async Task LoadUsageTimeAsync()
         {
-            DateTime currentTime = DateTime.Now;
-            var Conventions = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            DateTime currentTime = DateTime.Now; // 获取当前时间
+            var Conventions = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             totalUsageTime = Conventions.TotalUsageTime + (currentTime - AppStateManager.RecordedTime).TotalSeconds; // 加载总使用时长
             currentSessionTime = (currentTime - AppStateManager.StartTime).TotalSeconds; // 更新当次应用使用时长
             timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) }; // 创建定时器
