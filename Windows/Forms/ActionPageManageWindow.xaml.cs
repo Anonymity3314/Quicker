@@ -36,7 +36,7 @@ namespace Quicker.Windows
         public ActionPageManageWindow(string type = "Common")
         {
             InitializeComponent(); // 初始化窗口
-            LoadBasicButtonPrefixes(); // 加载按钮前缀
+            GenerateSceneButtons(); // 加载按钮前缀
             TypeChanged(type); // 默认加载通用场景
         }
 
@@ -82,31 +82,16 @@ namespace Quicker.Windows
                 : System.Windows.Media.Brushes.Transparent; // 设置背景色
         }
 
-        // 加载场景按钮
-        private void LoadBasicButtonPrefixes()
+        // 生成场景按钮
+        private void GenerateSceneButtons()
         {
-            var buttonInfo = new[]
-            {
-                new { Name = "Global", Text = "全局" }, // 全局场景按钮
-                new { Name = "Common", Text = "通用" }, // 通用场景按钮
-                new { Name = "Taskbar", Text = "任务栏" }, // 任务栏场景按钮
-                new { Name = "Desktop", Text = "桌面" } // 桌面场景按钮
-            }; // 定义按钮名称和文本的映射
-            var buttonClickHandlers = new[]
-            {
-                new RoutedEventHandler(GlobalButton_Click), // 全局场景按钮点击事件
-                new RoutedEventHandler(CommonButton_Click), // 通用场景按钮点击事件
-                new RoutedEventHandler(TaskBarButton_Click), // 任务栏场景按钮点击事件
-                new RoutedEventHandler(DesktopButton_Click) // 桌面场景按钮点击事件
-            }; // 为每个按钮创建事件处理方法
-
-            // 动态生成按钮
-            for (int i = 0; i < buttonInfo.Length; i++)
+            var sceneData = db3.GetAllSceneData(); // 获取所有场景数据
+            foreach (var data in sceneData)
             {
                 var button = new Button()
                 {
                     AllowDrop = true, // 允许拖拽
-                    Name = buttonInfo[i].Name, // 按钮名称
+                    Name = data.SceneName, // 按钮名称
                     Style = FindResource("SceneButton") as Style, // 应用样式
                 };
 
@@ -115,7 +100,7 @@ namespace Quicker.Windows
                 TextBlock textBlock = new()
                 {
                     FontSize = 14, // 字体大小
-                    Text = buttonInfo[i].Text, // 文本内容
+                    Text = GetSceneTitle(data), // 文本内容
                     VerticalAlignment = VerticalAlignment.Center, // 垂直居中
                     HorizontalAlignment = HorizontalAlignment.Center // 水平居中
                 }; // 创建 TextBlock
@@ -123,19 +108,14 @@ namespace Quicker.Windows
                 button.Content = buttonContent; // 设置按钮内容
 
                 // 设置点击事件
-                button.Click += buttonClickHandlers[i]; // 设置按钮点击事件
+                button.Click += new RoutedEventHandler(ChanceSceneButton_Click); // 设置按钮点击事件
                 button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
                 button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
                 ActionPagesButtonPanel.Children.Add(button); // 将按钮添加到StackPanel
             }
         }
 
-        // 生成场景按钮
-        private void GenerateButtons(string style)
-        {
-
-        }
-
+        // 设置场景标题
         private void SetSceneTitle()
         {
             SceneTitleStackPanel.Children.Clear(); // 清空标题StackPanel
@@ -166,7 +146,7 @@ namespace Quicker.Windows
         /// <returns> 场景标题 </returns>
         private string GetSceneTitle(SceneData sceneData)
         {
-            switch(type)
+            switch(sceneData.SceneName)
             {
                 case "Global":
                     return "全局"; // 全局场景
@@ -572,28 +552,12 @@ namespace Quicker.Windows
             ScrollBar.Value = ScrollViewer.HorizontalOffset; // 设置滚动条值
         }
 
-        // 全局按钮点击事件
-        private void GlobalButton_Click(object sender, RoutedEventArgs e)
+        // 点击按钮切换场景类型
+        private void ChanceSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            TypeChanged("Global"); // 切换类型为全局场景
-        }
-
-        // 公共按钮点击事件
-        private void CommonButton_Click(object sender, RoutedEventArgs e)
-        {
-            TypeChanged("Common"); // 加载通用场景
-        }
-
-        // 加载任务栏场景
-        private void TaskBarButton_Click(object sender, RoutedEventArgs e)
-        {
-            TypeChanged("Taskbar"); // 设置类型为任务栏场景
-        }
-
-        // 加载桌面场景
-        private void DesktopButton_Click(object sender, RoutedEventArgs e)
-        {
-            TypeChanged("Desktop"); // 设置类型为桌面场景
+            Button button = sender as Button; // 获取按钮
+            var sceneInfo = db3.GetSceneData(button.Name).FirstOrDefault(); // 获取场景信息
+            TypeChanged(sceneInfo.SceneName); // 切换类型为全局场景
         }
 
         // 打开创建动作菜单
@@ -685,7 +649,7 @@ namespace Quicker.Windows
         {
             string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写
             if (string.IsNullOrEmpty(searchText))
-                LoadBasicButtonPrefixes(); // 如果文本为空，则加载默认按钮前缀
+                GenerateSceneButtons(); // 如果文本为空，则加载默认按钮前缀
         }
 
         // 双击标签切换动作按钮背景色
@@ -828,7 +792,7 @@ namespace Quicker.Windows
         // 点击按钮前往顶层场景
         private void ToTopSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            GlobalButton_Click(sender, e); // 切换类型为全局场景
+            TypeChanged("Global"); // 切换类型为全局场景
         }
 
         // 右键显示/隐藏动作使用次数
@@ -910,10 +874,7 @@ namespace Quicker.Windows
                 if (child is Button button)
                 {
                     // 移除按钮的所有事件处理程序
-                    button.Click -= GlobalButton_Click;
-                    button.Click -= CommonButton_Click;
-                    button.Click -= TaskBarButton_Click;
-                    button.Click -= DesktopButton_Click;
+                    button.Click -= ChanceSceneButton_Click;
                     button.MouseEnter -= HightLightBlacklistItem;
                     button.MouseLeave -= FadeBlacklistItem;
                     // 清理按钮资源

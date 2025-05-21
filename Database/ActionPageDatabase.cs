@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System.Data;
+using System.Data.SQLite;
 using System.IO;
 
 namespace Quicker.Database
@@ -18,11 +19,39 @@ namespace Quicker.Database
             if (!File.Exists(dbFilePath)) // 如果数据库文件不存在，则创建
             {
                 SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
-                CreatAndInitTable("Global", "/Resources/Images/Icons/Quicker1.ico", "_global"); // 创建数据表并初始化
-                CreatAndInitTable("Common", "/Resources/Images/Icons/Quicker1.ico", "common"); // 创建数据表并初始化
-                CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
-                CreatAndInitTable("Taskbar", "/Resources/Images/Icons/Quicker1.ico", "taskbar"); // 创建数据表并初始化
+                InitializeDatabase(); // 初始化数据库
             }
+        }
+
+        // 初始化数据库
+        private void InitializeDatabase()
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            string createMasterTableQuery = @"
+                CREATE TABLE IF NOT EXISTS Application_Master (
+                    TableName TEXT PRIMARY KEY
+                );
+            "; // 创建Application_Master表的SQL语句
+            using var command = new SQLiteCommand(createMasterTableQuery, connection); // 创建SQLiteCommand对象
+            command.ExecuteNonQuery(); // 执行创建表的SQL语句
+
+            // 创建并初始化场景数据表
+            CreatAndInitTable("Global", "/Resources/Images/Icons/Quicker1.ico", "_global"); // 创建数据表并初始化
+            CreatAndInitTable("Common", "/Resources/Images/Icons/Quicker1.ico", "common"); // 创建数据表并初始化
+            CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
+            CreatAndInitTable("Taskbar", "/Resources/Images/Icons/Quicker1.ico", "taskbar"); // 创建数据表并初始化
+
+            // 将场景数据表名插入到Application_Master表中
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string[] sceneTableNames = { "GlobalScene", "CommonScene", "DesktopScene", "TaskbarScene" }; // 场景数据表名称数组
+            foreach (var tableName in sceneTableNames)
+            {
+                string insertQuery = "INSERT OR IGNORE INTO Application_Master (TableName) VALUES (@TableName);"; // 插入场景数据表名的SQL语句
+                using var insertCommand = new SQLiteCommand(insertQuery, connection, transaction); // 创建SQLiteCommand对象
+                insertCommand.Parameters.AddWithValue("@TableName", tableName); // 场景数据表名
+                insertCommand.ExecuteNonQuery(); // 执行插入表的SQL语句
+            }
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>
@@ -31,6 +60,14 @@ namespace Quicker.Database
         /// <param name="tableName"> 场景数据表名称 </param>
         public void CreatAndInitTable(string tableName, string sceneIconPath, string sceneTag)
         {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string insertQuery = "INSERT OR IGNORE INTO Application_Master (TableName) VALUES (@TableName);"; // 插入场景数据表名的SQL语句
+            using var insertCommand = new SQLiteCommand(insertQuery, connection, transaction); // 创建SQLiteCommand对象
+            insertCommand.Parameters.AddWithValue("@TableName", tableName + "Scene"); // 场景数据表名
+            insertCommand.ExecuteNonQuery(); // 执行插入表的SQL语句
+            transaction.Commit(); // 提交事务
+        
             CreateSceneTable(tableName); // 创建场景数据表
             string actionPageProcess = "", actionPageName = "";
             switch (tableName)
@@ -169,8 +206,14 @@ namespace Quicker.Database
         public void DeleteSceneTable(string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string query = $@"DELETE FROM Application_Master WHERE TableName = @TableName"; // 删除场景数据表的SQL语句
+            using var command1 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
+            command1.Parameters.AddWithValue("@TableName", tableName + "Scene"); // 设置参数
+            command1.ExecuteNonQuery(); // 执行删除表的SQL语句
             using var command = new SQLiteCommand($"DROP TABLE IF EXISTS {tableName + "Scene"}", connection); // 创建命令对象
             command.ExecuteNonQuery(); // 执行删除表格语句
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>
@@ -254,6 +297,44 @@ namespace Quicker.Database
                 }); // 添加场景数据
             }
             return conditions; // 返回场景数据表
+        }
+
+        /// <summary>
+        /// 获取所有场景数据
+        /// </summary>
+        /// <returns> 所有场景数据 </returns>
+        /// <summary>
+        /// 获取所有场景数据
+        /// </summary>
+        /// <returns> 所有场景数据 </returns>
+        public List<SceneData> GetAllSceneData()
+        {
+            var conditions = new List<SceneData>(); // 场景数据表
+            using var connection = OpenConnection(); // 打开数据库连接
+            string selectQuery = "SELECT TableName FROM Application_Master WHERE TableName LIKE '%Scene'"; // 获取所有场景数据表的SQL语句
+            using var command = new SQLiteCommand(selectQuery, connection); // 创建SQLiteCommand对象
+            using var reader = command.ExecuteReader(); // 执行查询SQL语句
+            var sceneTableNames = new List<string>(); // 场景数据表名称
+            while (reader.Read()) // 获取所有场景数据表名称
+                sceneTableNames.Add(reader.GetString(0)); // 添加场景数据表名称
+
+            foreach (var tableName in sceneTableNames)
+            {
+                string selectTableQuery = $"SELECT * FROM [{tableName}]"; // 获取场景数据表的SQL语句
+                using var tableCommand = new SQLiteCommand(selectTableQuery, connection); // 创建SQLiteCommand对象
+                using var tableReader = tableCommand.ExecuteReader(); // 执行查询SQL语句
+                while (tableReader.Read()) // 获取场景数据
+                {
+                    conditions.Add(new SceneData
+                    {
+                        SceneName = tableReader.GetString(0), // 场景类型
+                        SceneIconPath = tableReader.GetString(1), // 场景图标路径
+                        SceneCount = tableReader.GetInt32(2), // 场景数量
+                        SceneTag = tableReader.GetString(3), // 场景标签
+                    }); // 添加场景数据
+                }
+            }
+            return conditions; // 返回所有场景数据
         }
 
         /// <summary>
@@ -355,6 +436,7 @@ namespace Quicker.Database
         public SQLiteConnection OpenConnection()
         {
             var connection = new SQLiteConnection(db3); // 创建数据库连接
+            connection.BusyTimeout = 30000; // 设置超时时间 30秒
             connection.Open(); // 打开数据库连接
             return connection; // 返回数据库连接
         }
