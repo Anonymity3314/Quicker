@@ -1,8 +1,6 @@
 ﻿using System.Windows.Media.Animation;
-using System.Collections.Generic;
 using System.Windows.Threading;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows;
 
@@ -23,19 +21,6 @@ namespace Quicker.Windows.Menus
             InitializeComponent();
             double screenHeight = SystemParameters.WorkArea.Height; // 获取屏幕高度
             this.Height = screenHeight; // 设置窗口高度为屏幕高度
-            Closed += ToastWindow_Closed; // 添加窗口关闭事件
-        }
-
-        private void ToastWindow_Closed(object sender, EventArgs e)
-        {
-            // 在窗口关闭时清理资源
-            foreach (DispatcherTimer timer in timerDictionary.Values)
-            {
-                timer.Stop(); // 停止计时器
-                timer.Tick -= Timer_Tick; // 移除计时器事件
-            }
-            timerDictionary.Clear(); // 清空字典
-            GC.Collect(); // 强制进行垃圾回收
         }
 
         /// <summary>
@@ -47,24 +32,19 @@ namespace Quicker.Windows.Menus
         {
             var msg = new Message { Content = message, Type = toastType }; // 创建消息对象
             messageQueue.Enqueue(msg); // 将消息添加到队列中
-
             CheckAndDisplayToast(); // 检查并显示消息
         }
 
         // 检查并显示消息
         private void CheckAndDisplayToast()
         {
-            if (ToastStackPanel.Children.Count < 5 && messageQueue.Count > 0)
+            if (ToastStackPanel.Children.Count < 5 && messageQueue.Count > 0) // 判断消息数量是否达到上限
             {
                 var msg = messageQueue.Dequeue(); // 从队列中取出消息
                 ShowToast(msg); // 显示消息
             }
         }
 
-        /// <summary>
-        /// 显示消息
-        /// </summary>
-        /// <param name="msg"> 消息内容 </param>
         /// <summary>
         /// 显示消息
         /// </summary>
@@ -174,7 +154,7 @@ namespace Quicker.Windows.Menus
                 Margin = new Thickness(20, 20, 20, 20), // 设置边距
                 VerticalAlignment = VerticalAlignment.Center, // 设置垂直对齐方式
                 Foreground = new SolidColorBrush(Colors.White) // 设置字体颜色
-            };
+            }; // 创建消息文本框
             return textBlock; // 返回消息
         }
 
@@ -192,24 +172,22 @@ namespace Quicker.Windows.Menus
         // 计时器事件
         private void Timer_Tick(object sender, EventArgs e)
         {
-            DispatcherTimer timer = (DispatcherTimer)sender;
+            DispatcherTimer timer = (DispatcherTimer)sender; // 获取计时器
             Border border = (Border)timer.Tag; // 获取消息边框
             if (border != null)
             {
                 // 创建淡出动画
-                DoubleAnimation fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(0.2)));
-                Storyboard.SetTarget(fadeOut, border);
-                Storyboard.SetTargetProperty(fadeOut, new PropertyPath(UIElement.OpacityProperty));
-                Storyboard fadeOutStoryboard = new Storyboard();
-                fadeOutStoryboard.Children.Add(fadeOut);
-
-                // 淡出动画完成时删除消息
+                DoubleAnimation fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(0.2))); // 设置淡出动画
+                Storyboard.SetTarget(fadeOut, border); // 设置动画目标为边框
+                Storyboard.SetTargetProperty(fadeOut, new PropertyPath(UIElement.OpacityProperty)); // 设置动画目标属性
+                Storyboard fadeOutStoryboard = new Storyboard(); // 创建动画播放器
+                fadeOutStoryboard.Children.Add(fadeOut); // 添加动画到播放器中
                 fadeOut.Completed += (s, arg) =>
                 {
                     DeleteToast(border); // 删除消息
-                };
+                }; // 淡出动画完成时删除消息
 
-                fadeOutStoryboard.Begin();
+                fadeOutStoryboard.Begin(); // 开始播放淡出动画
 
                 timer.Stop(); // 停止计时器
                 timer.Tick -= Timer_Tick; // 移除计时器事件
@@ -223,31 +201,29 @@ namespace Quicker.Windows.Menus
         /// <param name="border"> 消息边框 </param>
         private void DeleteToast(Border border)
         {
-            if (ToastStackPanel.Children.Contains(border)) // 判断消息边框是否存在于消息面板中
+            if (timerDictionary.ContainsKey(border)) // 判断计时器是否存在
             {
-                if (timerDictionary.ContainsKey(border))
-                {
-                    DispatcherTimer timer = timerDictionary[border];
-                    timer.Stop(); // 停止计时器
-                    timer.Tick -= Timer_Tick; // 移除计时器事件
-                    timerDictionary.Remove(border); // 从字典中移除计时器
-                    timer = null; // 释放计时器
-                }
-
-                ToastStackPanel.Children.Remove(border); // 从消息面板中删除消息边框
-                CheckAndDisplayToast(); // 检查并显示新的消息
+                DispatcherTimer timer = timerDictionary[border]; // 获取计时器
+                timer.Stop(); // 停止计时器
+                timer.Tick -= Timer_Tick; // 移除计时器事件
+                timerDictionary.Remove(border); // 从字典中移除计时器
+                timer = null; // 释放计时器
             }
+
+            ToastStackPanel.Children.Remove(border); // 从消息面板中删除消息边框
+            CheckAndDisplayToast(); // 检查并显示新的消息
         }
 
         // 关闭窗口释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e);
+            base.OnClosed(e); // 关闭窗口
+            messageQueue.Clear(); // 清空消息队列
             foreach (DispatcherTimer timer in timerDictionary.Values)
             {
                 timer.Stop(); // 停止所有计时器
                 timer.Tick -= Timer_Tick; // 移除计时器事件
-            }
+            } // 释放所有计时器资源
             timerDictionary.Clear(); // 清空字典
             GC.Collect(); // 垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

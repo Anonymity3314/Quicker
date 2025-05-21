@@ -1,11 +1,8 @@
 ﻿using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Windows.Interop;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
 using System.IO;
-using Quicker;
 
 namespace Quicker.Windows
 {
@@ -66,11 +63,11 @@ namespace Quicker.Windows
         // 查看动作信息
         private void CheckImformation_Click(object sender, RoutedEventArgs e)
         {
-            ActionInformationWindow actionInformationWindow = new(CurrentButton);
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+            ActionInformationWindow actionInformationWindow = new(CurrentButton); // 创建动作信息窗口
+            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
             actionInformationWindow.Owner = mainWindow; // 设置父窗口
-            actionInformationWindow.ShowDialog();
-            this.Close();
+            actionInformationWindow.ShowDialog(); // 显示动作信息窗口
+            this.Close(); // 关闭操作菜单窗口
         }
 
         // 在资源管理器中打开文件或文件夹
@@ -81,41 +78,35 @@ namespace Quicker.Windows
             List<string> paths = new List<string>(); // 文件或文件夹路径列表
 
             if (buttonData.ActionType == "OpenFile")
-            {
-                paths.Add(buttonData.Location);
-            }
+                paths.Add(buttonData.Location); // 添加文件路径
             else if (buttonData.ActionType == "OpenFiles")
-            {
-                paths.AddRange(buttonData.Location.Split(';').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)));
-            }
+                paths.AddRange(buttonData.Location.Split(';').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p))); // 添加多个文件路径
             else
             {
                 ToastManager.AddToast($"不支持此动作类型。", "Error"); // 显示通知
-                return;
+                return; // 退出
             }
 
             try // 检查是否所有文件都在同一个目录下
             {
-                string commonDirectory = null;
-                bool sameDirectory = true;
-                foreach (string path in paths)
+                string commonDirectory = null; // 公共目录
+                bool sameDirectory = true; // 是否所有文件在同一个目录下
+                foreach (string path in paths) // 遍历所有文件路径
                 {
-                    string directory = Path.GetDirectoryName(path);
-                    if (commonDirectory == null)
-                        commonDirectory = directory;
-                    else if (commonDirectory != directory)
+                    string directory = Path.GetDirectoryName(path); // 获取文件所在目录
+                    if (commonDirectory == null) // 第一次循环
+                        commonDirectory = directory; // 设置公共目录
+                    else if (commonDirectory != directory) // 后续循环
                     {
-                        sameDirectory = false;
-                        break;
+                        sameDirectory = false; // 设置为不同目录
+                        break; // 退出循环
                     }
                 }
 
                 if (sameDirectory && paths.Count > 0)
-                    // 如果所有文件在同一个目录下，打开一个资源管理器窗口并选中所有文件
-                    OpenMultipleFilesInSameDirectory(paths);
+                    OpenMultipleFilesInSameDirectory(paths); // 如果所有文件在同一个目录下，打开一个资源管理器窗口并选中所有文件
                 else
-                    // 如果文件不在同一个目录下，分别打开多个资源管理器窗口并选中相应文件
-                    OpenMultipleFilesInDifferentDirectories(paths);
+                    OpenMultipleFilesInDifferentDirectories(paths); // 如果文件不在同一个目录下，分别打开多个资源管理器窗口并选中相应文件
             }
             catch (Exception ex)
             {
@@ -132,44 +123,43 @@ namespace Quicker.Windows
         {
             try
             {
-                string commonDirectory = Path.GetDirectoryName(paths[0]);
-                IntPtr pidlFolder = ILCreateFromPathW(commonDirectory);
+                string commonDirectory = Path.GetDirectoryName(paths[0]); // 获取公共目录
+                IntPtr pidlFolder = ILCreateFromPathW(commonDirectory); // 获取公共目录的 PIDL
                 try
                 {
-                    List<IntPtr> pidlItems = new List<IntPtr>();
-                    foreach (string path in paths)
+                    List<IntPtr> pidlItems = new List<IntPtr>(); // 文件 PIDL 列表
+                    foreach (string path in paths) // 遍历所有文件路径
                     {
-                        IntPtr pidlItem = ILCreateFromPathW(path);
-                        if (pidlItem == IntPtr.Zero)
+                        IntPtr pidlItem = ILCreateFromPathW(path); // 获取文件 PIDL
+                        if (pidlItem == IntPtr.Zero) // 无法获取 PIDL
                         {
                             ToastManager.AddToast($"无法获取文件的 PIDL：{path}", "Error"); // 显示通知
-                            continue;
+                            continue; // 跳过当前文件
                         }
-                        pidlItems.Add(pidlItem);
+                        pidlItems.Add(pidlItem); // 添加 PIDL 到列表
                     }
 
-                    IntPtr pidlArray = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * pidlItems.Count);
+                    IntPtr pidlArray = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * pidlItems.Count); // 申请内存空间
                     try
                     {
-                        for (int i = 0; i < pidlItems.Count; i++)
+                        for (int i = 0; i < pidlItems.Count; i++) // 遍历 PIDL 列表
                         {
-                            Marshal.WriteIntPtr(pidlArray, i * Marshal.SizeOf(typeof(IntPtr)), pidlItems[i]);
+                            Marshal.WriteIntPtr(pidlArray, i * Marshal.SizeOf(typeof(IntPtr)), pidlItems[i]); // 写入 PIDL 到内存
                         }
-
-                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlFolder, (uint)pidlItems.Count, pidlArray, 0));
+                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlFolder, (uint)pidlItems.Count, pidlArray, 0)); // 打开文件夹并选中文件
                     }
                     finally
                     {
-                        Marshal.FreeHGlobal(pidlArray);
-                        foreach (IntPtr pidlItem in pidlItems)
+                        Marshal.FreeHGlobal(pidlArray); // 释放内存空间
+                        foreach (IntPtr pidlItem in pidlItems) // 释放 PIDL 资源
                         {
-                            ILFree(pidlItem);
+                            ILFree(pidlItem); // 释放 PIDL 资源
                         }
                     }
                 }
                 finally
                 {
-                    ILFree(pidlFolder);
+                    ILFree(pidlFolder); // 释放 PIDL 资源
                 }
             }
             catch (Exception ex)
@@ -183,12 +173,12 @@ namespace Quicker.Windows
         {
             try
             {
-                foreach (string path in paths)
+                foreach (string path in paths) // 遍历所有文件路径
                 {
-                    IntPtr pidlList = ILCreateFromPathW(path);
+                    IntPtr pidlList = ILCreateFromPathW(path); // 获取文件 PIDL
                     try
                     {
-                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0));
+                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0)); // 打开文件所在目录并选中文件
                     }
                     catch (Exception ex)
                     {
@@ -196,7 +186,7 @@ namespace Quicker.Windows
                     }
                     finally
                     {
-                        ILFree(pidlList);
+                        ILFree(pidlList); // 释放 PIDL 资源
                     }
                 }
             }
@@ -209,8 +199,8 @@ namespace Quicker.Windows
         // 失去焦点时关闭操作菜单
         private void OperationMenu_Deactivated(object sender, EventArgs e)
         {
-            ClosingOrHiding?.Invoke();
-            this.Visibility = Visibility.Hidden;
+            ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
         }
 
         // 关闭窗口前释放资源

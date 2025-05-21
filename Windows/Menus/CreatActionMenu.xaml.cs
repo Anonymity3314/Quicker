@@ -1,9 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using Quicker.Database;
+﻿using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
-using Quicker;
 
 namespace Quicker.Windows
 {
@@ -76,7 +73,7 @@ namespace Quicker.Windows
                 ImagePath = "",
                 Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
                 ActionType = "OpenActionPage"
-            };
+            }; // 创建按钮数据
             db2.AddAction(buttonData); // 保存按钮数据
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }

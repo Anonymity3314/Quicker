@@ -44,7 +44,7 @@ namespace Quicker.Windows
             for (int i = 0; i < itemsPanel.Children.Count; i++)
             {
                 var child = itemsPanel.Children[i]; // 获取子元素
-                if (child is FrameworkElement element)
+                if (child is FrameworkElement element) // 如果子元素是 FrameworkElement
                     contentHeight = Math.Max(contentHeight, element.DesiredSize.Height); // 计算 WrapPanel 的内容高度
             }
             contentHeight *= Math.Ceiling((double)itemsPanel.Children.Count / itemsPerRow); // 计算 WrapPanel 的内容高度
@@ -134,7 +134,7 @@ namespace Quicker.Windows
             {
                 if (count >= maxImagesToLoad) break; // 达到最大数量时停止加载
                 FileInfo fileInfo = new FileInfo(file); // 获取文件信息
-                if (supportedExtensions.Contains(fileInfo.Extension.ToLower()))
+                if (supportedExtensions.Contains(fileInfo.Extension.ToLower())) // 检查文件扩展名
                 {
                     var imageItem = new ImageItem // 创建图片项
                     {
@@ -153,9 +153,7 @@ namespace Quicker.Windows
         {
             try
             {
-                if (!File.Exists(filePath))
-                    return null; // 如果文件不存在，返回空
-
+                if (!File.Exists(filePath)) return null; // 如果文件不存在，返回空
                 BitmapImage bi = new BitmapImage(); // 创建 BitmapImage 对象
                 using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
@@ -166,7 +164,7 @@ namespace Quicker.Windows
                 }
                 return bi; // 返回图片
             }
-            catch{ return null; }
+            catch{ return null; } // 加载失败返回空
         }
 
         // 关闭窗口
@@ -266,38 +264,23 @@ namespace Quicker.Windows
         private int CalculateRowCount()
         {
             if (ImageListView == null || ImageListView.Items == null || ImageListView.Items.Count == 0)
-            {
-                return 0;
-            }
+                return 0; // 如果图片列表为空，返回 0
 
-            // 获取 ItemsPanel
-            Panel itemsPanel = FindVisualChild<Panel>(ImageListView);
+            Panel itemsPanel = FindVisualChild<Panel>(ImageListView); // 查找 ItemsPanel
             if (itemsPanel == null)
-            {
-                return 0;
-            }
+                return 0; // 如果 ItemsPanel 为 null，返回 0
 
-            // 获取 ItemsPanel 的实际宽度
-            double itemsPanelWidth = itemsPanel.ActualWidth;
-
+            double itemsPanelWidth = itemsPanel.ActualWidth; // 获取 ItemsPanel 的宽度
             if (itemsPanelWidth <= 0)
-            {
-                return 0;
-            }
+                return 0; // 如果 ItemsPanel 的宽度为 0，返回 0
 
-            // 每项的宽度（可以根据实际布局调整）
             double itemWidth = 40; // 假设每项宽度为 40 像素
-
-            // 每行显示的项数
-            int itemsPerRow = (int)(itemsPanelWidth / itemWidth);
-
-            // 总项数
-            int totalItems = ImageListView.Items.Count;
+            int itemsPerRow = (int)(itemsPanelWidth / itemWidth); // 计算每行显示的项数
+            int totalItems = ImageListView.Items.Count; // 获取总项数
 
             // 计算行数，向上取整
             int rowCount = (int)Math.Ceiling((double)totalItems / itemsPerRow);
-
-            return rowCount;
+            return rowCount; // 返回行数
         }
 
         // 管理本地图标
@@ -350,13 +333,9 @@ namespace Quicker.Windows
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
 
-            // 清理图片资源
-            foreach (var imageItem in ImageItems)
+            foreach (var imageItem in ImageItems) // 遍历图片项集合
             {
-                if (imageItem.ImageSource != null)
-                {
-                    imageItem.ImageSource = null; // 释放图片资源
-                }
+                imageItem.ImageSource = null; // 释放图片资源
             }
             ImageItems.Clear(); // 清空图片项集合
 

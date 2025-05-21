@@ -4,13 +4,10 @@ using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Input;
-using IWshRuntimeLibrary;
-using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
 using System.IO;
-using Quicker;
 
 namespace Quicker.Windows
 {
@@ -71,7 +68,7 @@ namespace Quicker.Windows
 
             WindowManager.SetWindowTopmost(this);// 设置窗口置顶
             SetCommonLabel(); // 设置通用标签
-            this.Activate();
+            this.Activate(); // 激活窗口
         }
 
         // 生成页面切换 Button
@@ -102,13 +99,13 @@ namespace Quicker.Windows
                     Name = $"{prefix}{i}", // 设置按钮名称
                     Margin = new Thickness(2.5, 0, 2.5, 0), // 设置按钮边距
                     Style = FindResource("ActionPageChangeButton") as Style // 设置按钮样式
-                };
+                }; // 创建按钮对象
                 if (i == 0) button.Background = SelectedBrush; // 设置当前按钮颜色
 
                 // 添加事件处理程序
-                button.Click += clickHandler;
-                button.MouseEnter += mouseEnterHandler;
-                button.MouseLeave += mouseLeaveHandler;
+                button.Click += clickHandler; // 绑定点击事件
+                button.MouseEnter += mouseEnterHandler; // 绑定鼠标进入事件
+                button.MouseLeave += mouseLeaveHandler; // 绑定鼠标离开事件
 
                 panel.Children.Add(button); // 添加到面板
             }
@@ -188,10 +185,9 @@ namespace Quicker.Windows
             AppStateManager.Book = !AppStateManager.Book; // 更新数据库中的设置
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
-            if (AppStateManager.Book)
-                bookimage.UriSource = new Uri(AppStateManager.BookIconPath, UriKind.Relative); // 设置为订住样式
-            else
-                bookimage.UriSource = new Uri(AppStateManager.DisBookIconPath, UriKind.Relative); // 设置为不订住样式
+            bookimage.UriSource = AppStateManager.Book
+                ? new Uri(AppStateManager.BookIconPath, UriKind.Relative) // 设置为订住样式
+                : new Uri(AppStateManager.DisBookIconPath, UriKind.Relative); // 设置为不订住样式
             bookimage.EndInit(); // 结束初始化
             Book.Source = bookimage; // 更新Book按钮图标
         }
@@ -222,17 +218,17 @@ namespace Quicker.Windows
         // 鼠标移入Button改变外观
         private void Button_MouseEnter(object sender, MouseEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData)
             {
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD"));
-                button.RenderTransform = new ScaleTransform(1.05, 1.05);
-                UniformGrid.SetZIndex(button, 1);
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 改变按钮背景颜色
+                button.RenderTransform = new ScaleTransform(1.05, 1.05); // 放大按钮
+                UniformGrid.SetZIndex(button, 1); // 调整按钮层级
             }
             else
             {
-                var Convention = db1.GetAllConventions().FirstOrDefault();
-                if (Convention?.ShowAddImage == true)
+                var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取配置信息
+                if (Convention?.ShowAddImage == true) // 如果显示添加按钮
                 {
                     button.Content = new System.Windows.Controls.Image
                     {
@@ -241,27 +237,26 @@ namespace Quicker.Windows
                         Height = 36,
                         VerticalAlignment = VerticalAlignment.Center,
                         HorizontalAlignment = HorizontalAlignment.Center
-                    };
+                    }; // 设置按钮内容
                 }
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"));
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变按钮背景颜色
             }
         }
         private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseEnter(sender, e, "Global", "#FFB9B9B9"); // 改变按钮颜色
+            PageChangeButton_MouseEnter(sender, "Global", "#FFB9B9B9"); // 改变按钮颜色
         }
         private void CommonActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseEnter(sender, e, CommonStyle, "#FFB9B9B9"); // 改变按钮颜色
+            PageChangeButton_MouseEnter(sender, CommonStyle, "#FFB9B9B9"); // 改变按钮颜色
         }
         /// <summary>
         /// 鼠标移入Button改变外观
         /// </summary>
-        /// <param name="sender">按钮</param>
-        /// <param name="e">事件参数</param>
-        /// <param name="prefix">按钮名称前缀</param>
-        /// <param name="color">按钮颜色</param>
-        private void PageChangeButton_MouseEnter(object sender, MouseEventArgs e, string prefix, string color)
+        /// <param name="sender"> 按钮 </param>
+        /// <param name="prefix"> 按钮名称前缀 </param>
+        /// <param name="color"> 按钮颜色 </param>
+        private void PageChangeButton_MouseEnter(object sender, string prefix, string color)
         {
             if (sender is Button button)
             {
@@ -345,7 +340,7 @@ namespace Quicker.Windows
         // 左键点击按钮时执行动作
         private void DoAction(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
+            Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData data)
             {
                 if (!AppStateManager.Book && data.ActionType != "OpenActionPage") 

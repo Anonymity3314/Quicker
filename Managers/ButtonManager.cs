@@ -350,7 +350,6 @@ namespace Quicker.Managers
         /// <param name="maxWidth"> 最大宽度 </param>
         public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth, bool isMainWindow)
         {
-            button.Content = null; // 清空按钮内容
             if (buttonInformation != null) // 如果Button的数据存在
             {
                 if(buttonInformation.Location == null) return; // 如果文件路径不存在，直接返回

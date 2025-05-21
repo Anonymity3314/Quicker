@@ -14,7 +14,7 @@ namespace Quicker.Windows.Menus
         // 失去焦点关闭窗口
         private void SelectActionPageMenu_Deactivated(object sender, EventArgs e)
         {
-            ClosingOrHiding?.Invoke();
+            ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件处理器
             this.Visibility = Visibility.Hidden; // 失去焦点关闭窗口
         }
 

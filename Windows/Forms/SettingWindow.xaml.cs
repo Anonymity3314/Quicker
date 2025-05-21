@@ -1,7 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Shapes;
-using System.Windows.Media;
 using Quicker.UserControls;
 using System.Windows.Input;
 using Quicker.Database;
@@ -31,9 +30,7 @@ namespace Quicker.Windows
         {
             var Convention = db1.GetAllConventions().FirstOrDefault(); // 获取设置信息
             if (Convention.RememberLastPage)
-            {
                 SetLastPage(Convention.LastPage); // 设置上一次关闭时的状态
-            }
             else
             {
                 BasicSetting_Click(null, null); // 显示常规设置面板

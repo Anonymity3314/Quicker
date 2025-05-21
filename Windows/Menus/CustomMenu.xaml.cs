@@ -1,17 +1,14 @@
 ﻿using System.Windows.Media.Imaging;
 using System.Windows.Interop;
-using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
 using System.IO;
-using Quicker;
 
 namespace Quicker.Windows
 {
     public partial class CustomMenu : Window
     {
         private readonly App app = (App.Current as App); // App实例
-        private readonly SettingDatabase db1 = new(); // 数据库实例
 
         public CustomMenu()
         {
@@ -27,8 +24,8 @@ namespace Quicker.Windows
             {
                 app.PreLoadMainWindow(); // 调用App类中的PreLoadMainWindow方法
                 app.CloseOrShowMainWindow(); // 调用App类中的CloseOrShowMainWindow方法
-            });
-            this.Visibility = Visibility.Hidden;
+            }); // 调用Dispatcher.Invoke方法确保在主线程中执行
+            this.Visibility = Visibility.Hidden; // 隐藏当前窗口
         }
 
         // 弹出设置窗口
@@ -53,38 +50,30 @@ namespace Quicker.Windows
             this.Visibility = Visibility.Hidden; // 隐藏当前窗口
         }
 
-        // 未实现的功能
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         // 重启应用
         public void Restart(object sender, RoutedEventArgs e)
         {
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location; // 获取当前应用程序的完整路径
             string directory = Path.GetDirectoryName(exePath); // 获取可执行文件的目录
             string exeName = Path.GetFileNameWithoutExtension(exePath) + ".exe"; // 获取可执行文件的名称
-
-            // 启动新进程运行当前应用程序
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo // 启动新进程
             {
-                FileName = Path.Combine(directory, exeName),
-                UseShellExecute = true
+                FileName = Path.Combine(directory, exeName), // 指定可执行文件的路径
+                UseShellExecute = true // 使用ShellExecute来启动程序
             });
-            Application.Current.Shutdown();
+            Application.Current.Shutdown(); // 关闭当前应用程序
         }
 
         // 退出应用
         private void Exit(object sender, RoutedEventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown(); // 关闭当前应用程序
         }
 
         // 失去焦点时关闭窗口
         private void CustomMenu_Deactivated(object sender, EventArgs e)
         {
-            this.Visibility = Visibility.Hidden;
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
         }
 
         // 关闭窗口前释放资源
