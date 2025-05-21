@@ -349,6 +349,7 @@ public static class SettingDatabase
     {
         var conventions = new List<Convention>(); // 创建一个空的 Convention 列表
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
         string selectQuery = "SELECT * FROM Convention;"; // 查询所有 Convention 数据
         using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
@@ -371,6 +372,7 @@ public static class SettingDatabase
                 EnableMemoryOptimization = reader.GetBoolean(12) // 是否启用内存优化
             }); // 将读取到的数据添加到列表中
         }
+        transaction.Commit(); // 提交事务
         return conventions; // 返回所有 Convention 数据
     }
 
@@ -382,6 +384,7 @@ public static class SettingDatabase
     {
         var conditions = new List<OpenMainWindow>(); // 创建一个空的 OpenMainWindow 列表
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
         string selectQuery = "SELECT * FROM OpenMainWindow;"; // 查询所有 OpenMainWindow 数据
         using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
@@ -402,6 +405,7 @@ public static class SettingDatabase
                 WindowStartupLocation = reader.GetInt32(10) // 功能面板打开位置
             }); // 将读取到的数据添加到列表中
         }
+        transaction.Commit(); // 提交事务
         return conditions; // 返回所有 OpenMainWindow 数据
     }
 
@@ -413,6 +417,7 @@ public static class SettingDatabase
     {
         var blacklists = new List<Blacklist>(); // 创建一个空的 Blacklist 列表
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
         string selectQuery = "SELECT * FROM Blacklist;"; // 查询所有 Blacklist 数据
         using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
@@ -425,6 +430,7 @@ public static class SettingDatabase
                 IsBlacklistEnabledForExtendedHotkey = reader.GetBoolean(2) // 是否将黑名单与全屏禁用设置应用于扩展热键功能
             }); // 将读取到的数据添加到列表中
         }
+        transaction.Commit(); // 提交事务
         return blacklists; // 返回所有 Blacklist 数据
     }
 
@@ -436,6 +442,7 @@ public static class SettingDatabase
     {
         var applications = new List<BlacklistApplication>(); // 创建一个空的 BlacklistApplication 列表
         using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
         string selectQuery = "SELECT * FROM BlacklistApplication;"; // 查询所有 BlacklistApplication 数据
         using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
@@ -450,6 +457,7 @@ public static class SettingDatabase
                 IsFolder = reader.GetBoolean(4) // 是否是文件夹
             }); // 将读取到的数据添加到列表中
         }
+        transaction.Commit(); // 提交事务
         return applications; // 返回所有 BlacklistApplication 数据
     }
 
@@ -460,8 +468,8 @@ public static class SettingDatabase
     public static SQLiteConnection OpenConnection()
     {
         var connection = new SQLiteConnection(db1); // 创建 SQLiteConnection 对象
-        connection.Open(); // 打开数据库连接
         connection.BusyTimeout = 30000; // 设置超时时间为 30 秒
+        connection.Open(); // 打开数据库连接
         return connection; // 返回打开的连接
     }
 }
