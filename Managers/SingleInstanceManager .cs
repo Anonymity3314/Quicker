@@ -33,8 +33,11 @@ namespace Quicker.Managers
         // 释放互斥锁
         public static void ReleaseMutex()
         {
-            _mutex?.ReleaseMutex(); // 释放互斥锁
-            _mutex?.Dispose(); // 释放互斥锁资源
+            if (_mutex != null)
+            {
+                _mutex.Dispose(); // 释放互斥锁资源
+                _mutex = null; // 清除互斥锁引用
+            }
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using System.Windows.Media.Imaging;
-using System.Windows.Interop;
-using Quicker.Managers;
-using System.Windows;
+﻿using Quicker.Managers;
+using System.Diagnostics;
 using System.IO;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media.Imaging;
 
 namespace Quicker.Windows
 {
@@ -56,12 +57,13 @@ namespace Quicker.Windows
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location; // 获取当前应用程序的完整路径
             string directory = Path.GetDirectoryName(exePath); // 获取可执行文件的目录
             string exeName = Path.GetFileNameWithoutExtension(exePath) + ".exe"; // 获取可执行文件的名称
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo // 启动新进程
+            SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
+            Application.Current.Shutdown(); // 关闭当前应用程序
+            Process.Start(new ProcessStartInfo // 启动新进程
             {
                 FileName = Path.Combine(directory, exeName), // 指定可执行文件的路径
                 UseShellExecute = true // 使用ShellExecute来启动程序
             });
-            Application.Current.Shutdown(); // 关闭当前应用程序
         }
 
         // 退出应用
