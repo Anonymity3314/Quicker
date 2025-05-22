@@ -8,12 +8,14 @@ namespace Quicker.Windows
     public partial class ActionInformationWindow : Window
     {
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
-        public string CurrentButton { get; private set; } // 当前按钮ID
+        public int CurrentButton { get; private set; } // 当前按钮ID
+        public string TableName { get; private set; } // 表名
 
-        public ActionInformationWindow(string currentbutton)
+        public ActionInformationWindow(int currentbutton, string tableName)
         {
             InitializeComponent();
             CurrentButton = currentbutton;
+            TableName = tableName;
             InitializeWindow(); // 初始化窗口
             WindowManager.SetWindowTopmost(this);
         }
@@ -21,7 +23,7 @@ namespace Quicker.Windows
         // 初始化信息窗口
         private void InitializeWindow()
         {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
             IDLabel.Content = buttonData.ButtonID; // 初始化动作ID
             TitleLabel.Content = buttonData.Title; // 初始化动作名称
             UsageLabel.Content = buttonData.Description; // 初始化动作用途
@@ -43,7 +45,7 @@ namespace Quicker.Windows
         // 复制动作信息
         private void CopyButton_Click(object sender, RoutedEventArgs e)
         {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
             string textToCopy = $"ID:{buttonData.ButtonID}\n" +
                                 $"标题:{buttonData.Title}\n" +
                                 $"说明:{buttonData.Description}\n" +

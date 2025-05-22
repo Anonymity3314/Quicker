@@ -39,7 +39,7 @@ namespace Quicker.UserControls.AddWindow
         // 编辑动作 加载动作信息
         private void LoadButtonInformation()
         {
-            ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton, AddWindow.TableName); // 获取按钮数据
             if (buttonData.ActionType != "OpenWebsite") return; // 如果不是打开网站动作，则不执行操作
 
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
@@ -124,7 +124,7 @@ namespace Quicker.UserControls.AddWindow
                 ? iconManager.SaveIconToFile(AddWindow.ButtonImage.Source)
                 : ""; // 如果图标可见，则保存图标，否则设置为默认值
 
-            var oldData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取旧数据
+            var oldData = db2.GetButtonDataByID(AddWindow.CurrentButton, AddWindow.TableName); // 获取旧数据
             DateTime createdTime = DateTime.Now;
             if (oldData != null) createdTime = oldData.CreateTime; // 获取创建时间
             var buttonData = new ButtonData
@@ -141,7 +141,7 @@ namespace Quicker.UserControls.AddWindow
                 LatestEditTime = DateTime.Now,
                 ActionType = "OpenWebsite"
             }; // 创建按钮数据对象
-            db2.UpdateAction(buttonData); // 添加或更新动作
+            db2.UpdateAction(buttonData, AddWindow.TableName); // 添加或更新动作
         }
 
         // 如果是自定义浏览器，显示相关控件进行相关设置

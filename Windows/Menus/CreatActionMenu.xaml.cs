@@ -10,14 +10,16 @@ namespace Quicker.Windows
         private readonly ButtonDatabase db2 = new(); // 设置管理器
         private string clipboardText; // 剪切板文本
         private bool hasChanged = false; // 是否已检查
-        public string CurrentButton { get; private set; } // 当前按钮
+        public int CurrentButton { get; private set; } // 当前按钮
+        public string TableName { get; private set; } // 表名
         public event Action? ClosingOrHiding; // 事件
 
-        public CreatActionMenu(string currentbutton)
+        public CreatActionMenu(int currentbutton, string tableName)
         {
             InitializeComponent();
             SetButtonVisbility(); // 设置按钮可见性
             CurrentButton = currentbutton; // 设置当前按钮
+            TableName = tableName; // 设置表名
             WindowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
@@ -73,7 +75,7 @@ namespace Quicker.Windows
                 Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
                 ActionType = "OpenActionPage"
             }; // 创建按钮数据
-            db2.UpdateAction(buttonData); // 保存按钮数据
+            db2.UpdateAction(buttonData, TableName); // 保存按钮数据
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
 
@@ -81,7 +83,7 @@ namespace Quicker.Windows
         private void StartApp(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(CurrentButton, 1); // 传递当前按钮和类型
+            AddWindow addWindow = new(CurrentButton, TableName, 1); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -90,7 +92,7 @@ namespace Quicker.Windows
         private void OpenDocument(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(CurrentButton, 2); // 传递当前按钮和类型
+            AddWindow addWindow = new(CurrentButton, TableName, 2); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -99,7 +101,7 @@ namespace Quicker.Windows
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(CurrentButton, 3); // 传递当前按钮和类型
+            AddWindow addWindow = new(CurrentButton, TableName, 3); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -108,7 +110,7 @@ namespace Quicker.Windows
         private void OpenWebsite(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(CurrentButton, 4); // 传递当前按钮和类型
+            AddWindow addWindow = new(CurrentButton, TableName, 4); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }

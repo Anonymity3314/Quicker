@@ -30,7 +30,7 @@ namespace Quicker.Database
             var connection = OpenConnection(); // 打开数据库连接
             string createTableQuery = @"CREATE TABLE IF NOT EXISTS [" + tableName + @"]
             (
-                ButtonID TEXT PRIMARY KEY,
+                ButtonID INTEGER PRIMARY KEY,
                 Title TEXT,
                 Location TEXT,
                 ImagePath TEXT,
@@ -69,10 +69,9 @@ namespace Quicker.Database
         /// </summary>
         /// <param name="buttonID"> 要获取数据的ButtonID </param>
         /// <returns> ButtonData对象，如果找不到则返回null </returns>
-        public ButtonData GetButtonDataByID(string buttonID)
+        public ButtonData GetButtonDataByID(int buttonID, string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            string tableName = buttonID.Substring(0, buttonID.Length - 3); // 从ButtonID解析表名
             using var command = new SQLiteCommand($"SELECT * FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令对象
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
             using var reader = command.ExecuteReader(); // 执行查询语句
@@ -80,7 +79,7 @@ namespace Quicker.Database
             {
                 return new ButtonData
                 {
-                    ButtonID = reader.GetString(0), // 动作ID
+                    ButtonID = reader.GetInt32(0), // 动作ID
                     Title = reader.GetString(1), // 动作名称
                     Location = reader.GetString(2), // 位置
                     ImagePath = reader.GetString(3), // 图片路径
@@ -102,11 +101,10 @@ namespace Quicker.Database
         /// </summary>
         /// <param name="buttonData"> 要更新的动作数据 </param>
         /// <summary>
-        public void UpdateAction(ButtonData buttonData)
+        public void UpdateAction(ButtonData buttonData, string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
             string query = $@"INSERT OR REPLACE INTO {tableName}
             (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
             VALUES 
@@ -131,19 +129,19 @@ namespace Quicker.Database
         /// <summary>
         /// 通过Button前缀读取对应表格中所有ButtonData
         /// </summary>
-        /// <param name="prefix"> Button前缀 </param>
+        /// <param name="tableName"> Button前缀 </param>
         /// <returns> ButtonData列表 </returns>
-        public List<ButtonData> GetButtonDataByPrefix(string prefix)
+        public List<ButtonData> GetButtonDataByTableName(string tableName)
         {
             var buttonDataList = new List<ButtonData>(); // 初始化ButtonData列表
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($"SELECT * FROM {prefix}", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"SELECT * FROM {tableName}", connection); // 创建命令对象
             using var reader = command.ExecuteReader(); // 执行查询语句
             while (reader.Read())
             {
                 buttonDataList.Add(new ButtonData
                 {
-                    ButtonID = reader.GetString(0), // 动作ID
+                    ButtonID = reader.GetInt32(0), // 动作ID
                     Title = reader.GetString(1), // 动作名称
                     Location = reader.GetString(2), // 位置
                     ImagePath = reader.GetString(3), // 图片路径
@@ -174,44 +172,36 @@ namespace Quicker.Database
         /// <summary>
         /// 删除一整页的按钮
         /// </summary>
-        /// <param name="prefix"> Button前缀 </param>
+        /// <param name="tableName"> 要删除的表名 </param>
         /// <param name="pageIndex"> 页码 </param>
-        public void DeletePageOfButtons(string prefix, int pageIndex)
+        public void DeletePageOfButtons(string tableName, int pageIndex)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
 
-            List<ButtonData> allButtons = GetButtonDataByPrefix(prefix); // 获取所有按钮数据
+            List<ButtonData> allButtons = GetButtonDataByTableName(tableName); // 获取所有按钮数据
             var currentButtons = allButtons
                 .Select(b => new { ButtonID = b.ButtonID, Data = b })
-                .Where(b =>
-                {
-                    string idWithoutPrefix = b.ButtonID.Replace(prefix, ""); // 去掉前缀
-                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) == pageIndex; // 当前页的按钮
-                })
+                .Where(b => b.ButtonID / 100 == pageIndex)
                 .ToDictionary(b => b.ButtonID, b => b.Data); // 当前页的按钮
 
             // 删除当前页的按钮
             foreach (var buttonData in currentButtons.Values)
             {
-                DeleteAction(buttonData.ButtonID); // 删除动作
+                DeleteAction(buttonData.ButtonID, tableName); // 删除动作
             }
 
             // 筛选并更新后续页的按钮编号
             var subsequentButtons = allButtons
                 .Select(b => new { ButtonID = b.ButtonID, Data = b })
-                .Where(b =>
-                {
-                    string idWithoutPrefix = b.ButtonID.Replace(prefix, ""); // 去掉前缀
-                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) > pageIndex; // 后续页的按钮
-                })
+                .Where(b => b.ButtonID / 100 > pageIndex)
                 .ToList(); // 后续页的按钮
 
             foreach (var item in subsequentButtons)
             {
-                string buttonID = item.ButtonID; // 原 ButtonID
-                string newButtonID = UpdateButtonPageNumber(connection, buttonID, pageIndex); // 更新按钮的页码编号
-                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
+                int buttonID = item.ButtonID; // 原 ButtonID
+                int newButtonID = UpdateButtonPageNumber(connection, buttonID, pageIndex); // 更新按钮的页码编号
+                UpdateButtonID(connection, tableName, buttonID, newButtonID); // 更新 ButtonID
             }
 
             transaction.Commit(); // 提交事务
@@ -224,18 +214,12 @@ namespace Quicker.Database
         /// <param name="buttonID">原 ButtonID </param>
         /// <param name="pageIndex">原页码</param>
         /// <returns>新的 ButtonID</returns>
-        private string UpdateButtonPageNumber(SQLiteConnection connection, string buttonID, int pageIndex)
+        private int UpdateButtonPageNumber(SQLiteConnection connection, int buttonID, int pageIndex)
         {
-            string prefix = buttonID.Substring(0, buttonID.Length - 3); // 获取前缀部分
-            string idWithoutPrefix = buttonID.Substring(prefix.Length); // 直接获取去掉前缀的部分
-            string pagePart = idWithoutPrefix.Substring(0, 3); // 获取前三位数字部分
-
-            int page = int.Parse(pagePart[0].ToString()); // 原页码
-            string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
+            int page = buttonID / 100; // 原页码
+            int bcPart = buttonID % 100; // 目标 ID 的 B 和 C 部分
             if (page > pageIndex) page--; // 如果页码大于原页码，则页码减一
-
-            string newPagePart = $"{page}{bcPart}"; // 新的三位数字部分
-            string newButtonID = $"{prefix}{newPagePart}"; // 新的 ButtonID
+            int newButtonID = page * 100 + bcPart; // 新的 ButtonID
             return newButtonID; // 返回新的 ButtonID
         }
 
@@ -243,11 +227,10 @@ namespace Quicker.Database
         /// 删除动作
         /// </summary>
         /// <param name="buttonID">要删除的动作ID</param>
-        public void DeleteAction(string buttonID)
+        public void DeleteAction(int buttonID, string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string tableName = buttonID.Substring(0, buttonID.Length - 3); // 获取表名
             using var command = new SQLiteCommand($@"DELETE FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行命令
@@ -259,35 +242,47 @@ namespace Quicker.Database
         /// </summary>
         /// <param name="buttonID1"> ButtonID1 </param>
         /// <param name="buttonID2"> ButtonID2 </param>
-        public void ExchangeButtonID(string buttonID1, string buttonID2)
+        public void ExchangeButtonID(int buttonID1, int buttonID2, string tableName1, string tableName2)
         {
             using var connection = OpenConnection(); // 打开连接
-            using var transaction = connection.BeginTransaction(); // 开始事务
-            var data1 = GetButtonDataByID(buttonID1); // 获取 ButtonID1 的数据
-            var data2 = GetButtonDataByID(buttonID2); // 获取 ButtonID2 的数据
+            var data1 = GetButtonDataByID(buttonID1, tableName1); // 获取 ButtonID1 的数据
+            var data2 = GetButtonDataByID(buttonID2, tableName2); // 获取 ButtonID2 的数据
+            ButtonData newButtonData1 = new ButtonData
+            {
+                ButtonID = buttonID2,
+                Title = data1.Title,
+                Location = data1.Location,
+                ImagePath = data1.ImagePath,
+                Data1 = data1.Data1,
+                Data2 = data1.Data2,
+                Data3 = data1.Data3,
+                Description = data1.Description,
+                CreateTime = data1.CreateTime,
+                LatestEditTime = data1.LatestEditTime,
+                ActionType = data1.ActionType,
+                UsedTimes = data1.UsedTimes
+            }; // 构造新的 ButtonData
+            ButtonData newButtonData2 = new(); // 构造新的 ButtonData
+            DeleteAction(buttonID1, tableName1); // 删除 ButtonID1
+            if (data2 != null)
+            {
+                newButtonData2.ButtonID = buttonID1; // 新的 ButtonID
+                newButtonData2.Title = data2.Title;
+                newButtonData2.Location = data2.Location;
+                newButtonData2.ImagePath = data2.ImagePath;
+                newButtonData2.Data1 = data2.Data1;
+                newButtonData2.Data2 = data2.Data2;
+                newButtonData2.Data3 = data2.Data3;
+                newButtonData2.Description = data2.Description;
+                newButtonData2.CreateTime = data2.CreateTime;
+                newButtonData2.LatestEditTime = data2.LatestEditTime;
+                newButtonData2.ActionType = data2.ActionType;
+                newButtonData2.UsedTimes = data2.UsedTimes;
 
-            string tempButtonID = $"temp_{Guid.NewGuid().ToString("N")}"; // 生成临时 ButtonID
-            string tableName1 = buttonID1.Substring(0, buttonID1.Length - 3); // 从ButtonID解析表名
-            string tableName2 = buttonID2.Substring(0, buttonID2.Length - 3); // 从ButtonID解析表名
-            if (data2 != null) // 直接交换 ButtonID
-            {
-                UpdateButtonID(connection, tableName1, buttonID1, tempButtonID); // 将 ButtonID1 的编号改为临时编号
-                UpdateButtonID(connection, tableName2, buttonID2, buttonID1); // 将 ButtonID2 的编号改为 ButtonID1
-                UpdateButtonID(connection, tableName1, tempButtonID, buttonID2); // 将临时编号改为 ButtonID2
-                transaction.Commit(); // 提交事务
-                if (tableName1 != tableName2) // 表名不同，迁移到对应表
-                {
-                    MoveButtonDataToNewTable(buttonID2, data1, tableName1, tableName2); // 迁移数据到新表
-                    MoveButtonDataToNewTable(buttonID1, data2, tableName2, tableName1); // 迁移数据到旧表
-                }
+                DeleteAction(buttonID2, tableName2); // 删除 ButtonID2
+                UpdateAction(newButtonData2, tableName1); // 更新 ButtonID2 到 ButtonID1
             }
-            else // 将 ButtonID1 的编号改为 ButtonID2
-            {
-                UpdateButtonID(connection, tableName1, buttonID1, buttonID2); // 更新 ButtonID1 的编号
-                transaction.Commit(); // 提交事务
-                if (tableName1 != tableName2) // 表名不同，迁移到对应表
-                    MoveButtonDataToNewTable(buttonID2, data1, tableName1, tableName2); // 迁移数据到新表
-            }
+            UpdateAction(newButtonData1, tableName2); // 更新 ButtonID1 到 ButtonID2
         }
 
         /// <summary>
@@ -297,7 +292,7 @@ namespace Quicker.Database
         /// <param name="tableName"> 数据库表名 </param>
         /// <param name="oldButtonID"> 要更改的 ButtonID </param>
         /// <param name="newButtonID"> 目标 ButtonID </param>
-        private void UpdateButtonID(SQLiteConnection connection, string tableName, string oldButtonID, string newButtonID)
+        private void UpdateButtonID(SQLiteConnection connection, string tableName, int oldButtonID, int newButtonID)
         {
             using var command = new SQLiteCommand($@"UPDATE {tableName} SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
             command.Parameters.AddWithValue("@NewButtonID", newButtonID); // 绑定参数
@@ -311,12 +306,9 @@ namespace Quicker.Database
         /// <param name="buttonID">按钮ID</param>
         /// <param name="sourceTable">源表名</param>
         /// <param name="targetTable">目标表名</param>
-        private void MoveButtonDataToNewTable(string buttonID, ButtonData buttonData, string sourceTable, string targetTable)
+        private void MoveButtonDataToNewTable(SQLiteConnection connection, int buttonID, ButtonData buttonData, string sourceTable, string targetTable)
         {
-            using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-
-            // 插入数据到目标表
             string query = $@"INSERT INTO {targetTable} 
             (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
             VALUES 
@@ -337,20 +329,17 @@ namespace Quicker.Database
             command.ExecuteNonQuery(); // 执行插入语句
             transaction.Commit(); // 提交事务
 
-            // 从源表删除数据
-            using var deleteCommand = new SQLiteCommand($@"DELETE FROM {sourceTable} WHERE ButtonID = @ButtonID", connection); // 创建命令
-            deleteCommand.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
-            deleteCommand.ExecuteNonQuery(); // 执行删除语句
+            DeleteAction(buttonID, sourceTable); // 删除源表数据
         }
 
         /// <summary>
         /// 增加动作使用次数
         /// </summary>
         /// <param name="buttonID"> 要增加的动作ID </param>
-        public void IncreaseActionUsedTimes(string buttonID)
+        public void IncreaseActionUsedTimes(int buttonID, string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($@"UPDATE {buttonID.Substring(0, buttonID.Length - 3)} SET UsedTimes = UsedTimes + 1 WHERE ButtonID = @ButtonID", connection);
+            using var command = new SQLiteCommand($@"UPDATE {tableName} SET UsedTimes = UsedTimes + 1 WHERE ButtonID = @ButtonID", connection);
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行更新语句
         }
@@ -358,18 +347,14 @@ namespace Quicker.Database
         /// <summary>
         /// 根据输入的字符串和数字 A，获取符合条件的 ButtonData
         /// </summary>
-        /// <param name="prefix"> Button前缀 </param>
+        /// <param name="tableName"> Button前缀 </param>
         /// <param name="a"> 数字 A </param>
         /// <returns> ButtonData列表 </returns>
-        private List<ButtonData> MatchButtons(string prefix, int a)
+        private List<ButtonData> GetPagesOfButtons(string tableName, int a)
         {
-            List<ButtonData> buttonDatas = GetButtonDataByPrefix(prefix); // 获取所有以 pfefix 开头的 ButtonData
+            List<ButtonData> buttonDatas = GetButtonDataByTableName(tableName); // 获取所有以 pfefix 开头的 ButtonData
             var matchedButtons = buttonDatas
-                .Where(b =>
-                {
-                    string idWithoutPrefix = b.ButtonID.Replace(prefix, ""); // 去掉前缀
-                    return int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()) == a; // 匹配数字 A
-                })
+                .Where(b => b.ButtonID / 100 == a)
                 .ToList(); // 返回符合条件的 ButtonData 列表
             return matchedButtons; // 返回符合条件的 ButtonData 列表
         }
@@ -382,20 +367,16 @@ namespace Quicker.Database
         /// <param name="a2"> A2 部分 </param>
         public void SwapButtonAValues(string prefix, int a1, int a2)
         {
-            var a1ButtonDatas = MatchButtons(prefix, a1); // 获取 A1 部分的 ButtonData
-            var a2ButtonDatas = MatchButtons(prefix, a2); // 获取 A2 部分的 ButtonData
+            var a1ButtonDatas = GetPagesOfButtons(prefix, a1); // 获取 A1 部分的 ButtonData
+            var a2ButtonDatas = GetPagesOfButtons(prefix, a2); // 获取 A2 部分的 ButtonData
             if (a1ButtonDatas.Count == 0 && a2ButtonDatas.Count == 0) return; // 两个部分没有 ButtonData，直接返回
 
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-
-            string tempPrefix = $"temp_{Guid.NewGuid():N}_"; // 生成临时标识符前缀
             foreach (var buttonData in a1ButtonDatas.ToList()) // 更新 A1 部分的 ButtonID 为临时标识符
             {
-                string buttonID = buttonData.ButtonID; // 原 ButtonID
-                string idWithoutPrefix = buttonID.Replace(prefix, ""); // 获取ID部分，去掉前缀
-                string newButtonID = $"{tempPrefix}{idWithoutPrefix}"; // 新 ButtonID
-                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
+                int newButtonID = -buttonData.ButtonID; // 新 ButtonID
+                UpdateButtonID(connection, prefix, buttonData.ButtonID, newButtonID); // 更新 ButtonID
 
                 var index = a1ButtonDatas.IndexOf(buttonData); // 获取索引
                 if (index != -1) a1ButtonDatas[index].ButtonID = newButtonID; // 更新字典中的 ButtonID
@@ -403,20 +384,16 @@ namespace Quicker.Database
 
             foreach (var buttonData in a2ButtonDatas.ToList()) // 更新 A2 部分的 ButtonID 为目标 ID
             {
-                string buttonID = buttonData.ButtonID; // 原 ButtonID
-                string idWithoutPrefix = buttonID.Replace(prefix, ""); // 获取ID部分，去掉前缀
-                string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
-                string newButtonID = $"{prefix}{a1}{bcPart}"; // 新 ButtonID
-                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
+                int bcPart = buttonData.ButtonID % 100; // 目标 ID 的 B 和 C 部分
+                int newButtonID = a1 * 100 + bcPart; // 新 ButtonID
+                UpdateButtonID(connection, prefix, buttonData.ButtonID, newButtonID); // 更新 ButtonID
             }
 
             foreach (var buttonData in a1ButtonDatas.ToList()) // 更新临时标识符的 ButtonID 为目标 ID
             {
-                string buttonID = buttonData.ButtonID; // 原 ButtonID
-                string idWithoutPrefix = buttonID.Replace(tempPrefix, ""); // 获取ID部分，去掉临时前缀
-                string bcPart = idWithoutPrefix.Substring(1); // 目标 ID 的 B 和 C 部分
-                string newButtonID = $"{prefix}{a2}{bcPart}"; // 新 ButtonID
-                UpdateButtonID(connection, prefix, buttonID, newButtonID); // 更新 ButtonID
+                int bcPart = -buttonData.ButtonID % 100; // 目标 ID 的 B 和 C 部分
+                int newButtonID = a2 * 100 + bcPart; // 新 ButtonID
+                UpdateButtonID(connection, prefix, buttonData.ButtonID, newButtonID); // 更新 ButtonID
             }
             transaction.Commit(); // 提交事务
         }
@@ -424,17 +401,15 @@ namespace Quicker.Database
         /// <summary>
         /// 获取总的页面数
         /// </summary>
-        /// <param name="prefix"> 目标样式名称 </param>
+        /// <param name="tableName"> 目标样式名称 </param>
         /// <returns> 总页面数 </returns>
-        public int GetTotalAntionPageIndex(string prefix)
+        public int GetTotalAntionPageIndex(string tableName)
         {
             int TotalAntionPageIndex = 1; // 重置页面索引
-            var buttonData = GetButtonDataByPrefix(prefix); // 从数据库中获取按钮数据
+            var buttonData = GetButtonDataByTableName(tableName); // 从数据库中获取按钮数据
             foreach (var data in buttonData)
             {
-                string buttonID = data.ButtonID; // 获取按钮ID
-                string idWithoutPrefix = buttonID.Replace(prefix, ""); // 获取ID部分，去掉前缀
-                int aPart = int.Parse(idWithoutPrefix[idWithoutPrefix.Length - 3].ToString()); // 获取A部分
+                int aPart = data.ButtonID / 100; // 获取A部分
                 if (aPart > TotalAntionPageIndex) // 如果数字大于当前最大索引
                     TotalAntionPageIndex = aPart + 1; // 更新全局页面索引
             }
@@ -481,7 +456,7 @@ namespace Quicker.Database
     // ButtonData 类
     public class ButtonData
     {
-        public string ButtonID { get; set; } // 动作ID，通常为Button的名称
+        public int ButtonID { get; set; } // 动作ID，通常为Button的名称
         public string Title { get; set; } // 动作名称
         public string Location { get; set; } // 位置
         public string ImagePath { get; set; } // 图片路径

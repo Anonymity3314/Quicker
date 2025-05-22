@@ -138,8 +138,26 @@ namespace Quicker.Managers
             using var transaction = connection.BeginTransaction(); // 开始事务
             try
             {
-                // 创建临时表
-                string createTempTableQuery = $@"
+                ChangeDataStyle(connection, tableName); // 转换数据类型
+                AddNewColumn(tableName); // 为新表添加UsedTimes列
+                ChangeButtonIDType(connection); // 转换 ButtonID 类型
+                transaction.Commit(); // 提交事务
+            }
+            catch
+            {
+                transaction.Rollback(); // 回滚事务
+            }
+        }
+
+        /// <summary>
+        /// 转换数据类型
+        /// </summary>
+        /// <param name="connection"> 数据库连接 </param>
+        /// <param name="tableName"> 表名 </param>
+        private void ChangeDataStyle(SQLiteConnection connection, string tableName)
+        {
+            // 创建临时表
+            string createTempTableQuery = $@"
                     CREATE TABLE Temp_{tableName}
                     (
                         ButtonID TEXT PRIMARY KEY,
@@ -154,11 +172,11 @@ namespace Quicker.Managers
                         LatestEditTime DATETIME,
                         ActionType TEXT 
                     );";
-                using var createTempTableCommand = new SQLiteCommand(createTempTableQuery, connection);
-                createTempTableCommand.ExecuteNonQuery();
+            using var createTempTableCommand = new SQLiteCommand(createTempTableQuery, connection);
+            createTempTableCommand.ExecuteNonQuery();
 
-                // 将数据从旧表迁移到临时表，转换数据类型
-                string migrateDataQuery = $@"
+            // 将数据从旧表迁移到临时表，转换数据类型
+            string migrateDataQuery = $@"
                     INSERT INTO Temp_{tableName} 
                     (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType)
                     SELECT 
@@ -174,25 +192,17 @@ namespace Quicker.Managers
                         LatestEditTime, 
                         ActionType 
                     FROM {tableName};";
-                using var migrateDataCommand = new SQLiteCommand(migrateDataQuery, connection);
-                migrateDataCommand.ExecuteNonQuery();
+            using var migrateDataCommand = new SQLiteCommand(migrateDataQuery, connection);
+            migrateDataCommand.ExecuteNonQuery();
 
-                // 删除旧表
-                using var dropCommand = new SQLiteCommand($"DROP TABLE {tableName}", connection);
-                dropCommand.ExecuteNonQuery();
+            // 删除旧表
+            using var dropCommand = new SQLiteCommand($"DROP TABLE {tableName}", connection);
+            dropCommand.ExecuteNonQuery();
 
-                // 将临时表重命名为旧表名
-                string renameTempTableQuery = $"ALTER TABLE Temp_{tableName} RENAME TO {tableName};";
-                using var renameTempTableCommand = new SQLiteCommand(renameTempTableQuery, connection);
-                renameTempTableCommand.ExecuteNonQuery();
-                transaction.Commit();
-
-                AddNewColumn(tableName); // 为新表添加UsedTimes列
-            }
-            catch
-            {
-                transaction.Rollback(); // 回滚事务
-            }
+            // 将临时表重命名为旧表名
+            string renameTempTableQuery = $"ALTER TABLE Temp_{tableName} RENAME TO {tableName};";
+            using var renameTempTableCommand = new SQLiteCommand(renameTempTableQuery, connection);
+            renameTempTableCommand.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -209,6 +219,88 @@ namespace Quicker.Managers
             using var addUsedTimesCommand = new SQLiteCommand(addUsedTimesQuery, addConnection);
             addUsedTimesCommand.ExecuteNonQuery(); // 执行更新命令
             transaction.Commit(); // 提交事务
+        }
+
+        /// 转换 ButtonID 类型
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        /// <param name="tableName">表名（已弃用，保留参数兼容）</param>
+        private void ChangeButtonIDType(SQLiteConnection connection)
+        {
+            var oldTableNames = db2.GetAllTableNames()
+                .Where(n => !n.StartsWith("sqlite_")) // 过滤系统表
+                .ToList();
+
+            foreach (var oldTableName in oldTableNames)
+            {
+                // 创建临时表
+                var tempTableName = $"Temp_{oldTableName}";
+                db2.CreateButtonTable(tempTableName);
+
+                // 迁移数据
+                var oldButtonDataList = GetOldDataFromTable(oldTableName);
+                foreach (var oldButtonData in oldButtonDataList)
+                {
+                    // 安全处理可能为空的 ButtonID
+                    var buttonId = oldButtonData.ButtonID ?? "";
+                    if (buttonId.StartsWith(oldTableName) &&
+                        int.TryParse(buttonId.Substring(oldTableName.Length), out int newButtonID))
+                    {
+                        var newButtonData = new ButtonData
+                        {
+                            ButtonID = newButtonID,
+                            Title = oldButtonData.Title,
+                            Location = oldButtonData.Location,
+                            ImagePath = oldButtonData.ImagePath,
+                            Data1 = oldButtonData.Data1,
+                            Data2 = oldButtonData.Data2,
+                            Data3 = oldButtonData.Data3,
+                            Description = oldButtonData.Description,
+                            CreateTime = oldButtonData.CreateTime,
+                            LatestEditTime = oldButtonData.LatestEditTime,
+                            ActionType = oldButtonData.ActionType,
+                            UsedTimes = oldButtonData.UsedTimes // 设置动作使用次数为0
+                        };
+                        db2.UpdateAction(newButtonData, tempTableName);
+                    }
+                }
+
+                db2.DeleteButtonTable(oldTableName);
+                string renameQuery = $"ALTER TABLE {tempTableName} RENAME TO {oldTableName};";
+                new SQLiteCommand(renameQuery, connection).ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// 从旧表中获取数据
+        /// </summary>
+        /// <param name="tableName">旧表名</param>
+        /// <returns>旧的 ButtonData 列表</returns>
+        private List<ButtonDataBefore2_2_0> GetOldDataFromTable(string tableName)
+        {
+            var oldButtonDataList = new List<ButtonDataBefore2_2_0>(); // 旧的 ButtonData 列表
+            using var connection = db2.OpenConnection(); // 打开数据库连接
+            using var command = new SQLiteCommand($@"SELECT * FROM {tableName}", connection); // 创建 SQLiteCommand 对象
+            using var reader = command.ExecuteReader(); // 执行查询命令
+            while (reader.Read())
+            {
+                oldButtonDataList.Add(new ButtonDataBefore2_2_0
+                {
+                    ButtonID = reader.GetString(0), // 动作ID
+                    Title = reader.GetString(1), // 动作名称
+                    Location = reader.GetString(2), // 位置
+                    ImagePath = reader.GetString(3), // 图片路径
+                    Data1 = reader.IsDBNull(4) ? null : reader.GetString(4), // 动作数据1
+                    Data2 = reader.IsDBNull(5) ? null : reader.GetString(5), // 动作数据2
+                    Data3 = reader.IsDBNull(6) ? null : reader.GetString(6), // 动作数据3
+                    Description = reader.GetString(7), // 对动作的描述
+                    CreateTime = reader.GetDateTime(8), // 创建时间
+                    LatestEditTime = reader.GetDateTime(9), // 最近修改时间
+                    ActionType = reader.GetString(10), // 动作类型
+                    UsedTimes = reader.GetInt32(11) // 使用次数
+                }); // 添加 ButtonData 到列表
+            }
+            return oldButtonDataList; // 返回旧的 ButtonData 列表
         }
 
         // 更新设置数据库
@@ -438,12 +530,12 @@ namespace Quicker.Managers
                     renameCommand.ExecuteNonQuery();
 
                     // 获取旧表ButtonData中的所有按钮数据
-                    var oldButtonData = new List<ButtonData>();
+                    var oldButtonData = new List<ButtonDataBefore2_2_0>();
                     using var oldCommand = new SQLiteCommand("SELECT * FROM Temp_ButtonData", connection);
                     using var oldReader = oldCommand.ExecuteReader();
                     while (oldReader.Read())
                     {
-                        oldButtonData.Add(new ButtonData
+                        oldButtonData.Add(new ButtonDataBefore2_2_0
                         {
                             ButtonID = oldReader.GetString(0),
                             Title = oldReader.GetString(1),
@@ -523,6 +615,23 @@ namespace Quicker.Managers
         ~DatabaseUpdateManager()
         {
             Dispose(false); // 释放非托管资源
+        }
+
+        // 2.2.0 版本之前的按钮数据
+        public class ButtonDataBefore2_2_0
+        {
+            public string ButtonID { get; set; }
+            public string Title { get; set; }
+            public string Location { get; set; }
+            public string ImagePath { get; set; }
+            public string Data1 { get; set; }
+            public string Data2 { get; set; }
+            public string Data3 { get; set; }
+            public string Description { get; set; }
+            public DateTime CreateTime { get; set; }
+            public DateTime LatestEditTime { get; set; }
+            public string ActionType { get; set; }
+            public int UsedTimes { get; set; }
         }
     }
 }

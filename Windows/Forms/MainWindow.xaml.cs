@@ -328,6 +328,7 @@ namespace Quicker.Windows
         private void DoAction(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
+            string buttonType = button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
             if (button.Tag is ButtonData data)
             {
                 if (!AppStateManager.Book && data.ActionType != "OpenActionPage") 
@@ -335,7 +336,7 @@ namespace Quicker.Windows
                 try
                 {
                     DoAction(data); // 执行动作
-                    db2.IncreaseActionUsedTimes(data.ButtonID); // 增加动作使用次数
+                    db2.IncreaseActionUsedTimes(data.ButtonID, buttonType); // 增加动作使用次数
                 }
                 catch (Exception ex)
                 {
@@ -346,7 +347,7 @@ namespace Quicker.Windows
             {
                 var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
                 if (Convention.ShowAddImage) // 如果显示添加按钮
-                    buttonManager.OpenMenu(sender, true, "CreatActionMenu", this); // 点击打开菜单
+                    buttonManager.OpenMenu(sender, true, "CreatActionMenu", this, buttonType); // 点击打开菜单
             }
         }
 
@@ -400,7 +401,8 @@ namespace Quicker.Windows
         public void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this); // 打开操作菜单
+            string buttonType = button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
+            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this, buttonType); // 打开操作菜单
         }
 
         // 添加关闭标志防止报错
@@ -423,7 +425,10 @@ namespace Quicker.Windows
         public void Button_Drop(object sender, DragEventArgs e)
         {
             if (sender is Button TargetButton)
-                buttonManager.Button_Drop(sender, e, true); // 处理拖拽事件
+            {
+                string buttonType = TargetButton.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
+                buttonManager.Button_Drop(sender, e, true, buttonType); // 处理拖拽事件
+            }
         }
 
         // 鼠标左键按下时记录初始位置
@@ -437,7 +442,10 @@ namespace Quicker.Windows
         public void Button_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
-                buttonManager.Button_PreviewMouseMove(sender, e, true); // 检查拖拽条件
+            {
+                string buttonType = button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
+                buttonManager.Button_PreviewMouseMove(sender, e, true, buttonType); // 检查拖拽条件
+            }
         }
 
         // 鼠标左键释放时重置状态
@@ -601,14 +609,15 @@ namespace Quicker.Windows
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    string buttonName = $"{style}{uniformGridIndex}{row + 1}{col + 1}"; // 按钮名称
+                    int buttonIndex = uniformGridIndex * 100 + (row + 1) * 10 + (col + 1); // 按钮索引
+                    string buttonName = $"{style}{buttonIndex}"; // 按钮名称
                     Style styleResource = FindResource("Button") as Style; // 按钮样式
                     Button button = CreateButton(buttonName, styleResource, row, col); // 创建按钮
                     newUniformGrid.Children.Add(button); // 添加按钮到UniformGrid
-                    var buttonData = db2.GetButtonDataByPrefix(style); // 从数据库中获取按钮数据
+                    var buttonData = db2.GetButtonDataByTableName(style); // 从数据库中获取按钮数据
                     foreach (var data in buttonData)
                     {
-                        if (data.ButtonID == button.Name)
+                        if (data.ButtonID == buttonIndex)
                             buttonManager.RefreshButtonDisplay(button, data, 60, true); // 更新按钮内容
                     }
                 }

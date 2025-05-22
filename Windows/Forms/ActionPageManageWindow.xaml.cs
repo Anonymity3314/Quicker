@@ -46,10 +46,13 @@ namespace Quicker.Windows
         /// <param name="targetType"> 目标类型 </param>
         private void TypeChanged(string targetType)
         {
+            LoadingWindow loadingWindow = new(); // 创建加载窗口
+            loadingWindow.Show(); // 显示加载窗口
             type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
             SetButtonBackground(); // 设置场景按钮背景色
             SetSceneTitle(); // 设置场景标题
+            loadingWindow?.Close(); // 关闭加载窗口
         }
 
         // 设置场景按钮背景色
@@ -275,7 +278,7 @@ namespace Quicker.Windows
 
                     dynamicCanvas.Children.Add(button); // 将按钮添加到画布
 
-                    var data = db2.GetButtonDataByID(buttonName); // 获取按钮数据
+                    var data = db2.GetButtonDataByID(int.Parse(buttonName.Replace(style, "")), type); // 获取按钮数据
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
                 }
             }
@@ -466,7 +469,7 @@ namespace Quicker.Windows
         private void Button_Drop(object sender, DragEventArgs e)
         {
             if (sender is Button TargetButton)
-                buttonManager.Button_Drop(sender, e, false); // 处理拖放事件
+                buttonManager.Button_Drop(sender, e, false, type); // 处理拖放事件
         }
 
         // 鼠标左键按下事件
@@ -493,7 +496,7 @@ namespace Quicker.Windows
         private void ShowCreatActionMenu(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag == null)
-                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
+                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this, type); // 打开创建动作菜单
         }
 
         // 显示编辑窗口
@@ -502,7 +505,7 @@ namespace Quicker.Windows
             e.Handled = true;
             if (sender is Button button && button.Tag != null)
             {
-                AddWindow addWindow = new AddWindow(button.Name, 0); // 创建编辑窗口
+                AddWindow addWindow = new AddWindow(int.Parse(button.Name.Replace(type, "")), type, 0); // 创建编辑窗口
                 addWindow.Show(); // 显示编辑窗口
                 addWindow.Activate(); // 激活编辑窗口
             }
@@ -594,25 +597,24 @@ namespace Quicker.Windows
             e.Handled = true; // 阻止默认右键菜单
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data && button != null)
-                buttonManager.OpenMenu(sender, false, "OperationMenu", this); // 打开操作菜单
+                buttonManager.OpenMenu(sender, false, "OperationMenu", this, type); // 打开操作菜单
             else
-                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this); // 打开创建动作菜单
+                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this, type); // 打开创建动作菜单
         }
 
         /// <summary>
         /// 编辑动作后刷新按钮显示
         /// </summary>
         /// <param name="button"> 目标按钮 </param>
-        public void UpdateButton(string button)
+        public void UpdateButton(int button)
         {
-            string nums = button.Replace(type, ""); // 获取按钮编号
-            int index = int.Parse(nums) / 100; // 获取按钮所在动作页索引
+            int index = button / 100; // 获取按钮所在动作页索引
             var oldCanvas = MainListView.Items[index] as Canvas; // 获取旧的 Canvas
             foreach(var child in oldCanvas.Children)
             {
                 if(child is Button targetButton)
                 {
-                    ButtonData data = db2.GetButtonDataByID(targetButton.Name); // 获取按钮数据
+                    ButtonData data = db2.GetButtonDataByID(int.Parse(targetButton.Name.Replace(type, "")), type); // 获取按钮数据
                     buttonManager.RefreshButtonDisplay(targetButton, data, 60, false); // 刷新按钮显示
                 }
             }

@@ -53,7 +53,7 @@ namespace Quicker.UserControls.AddWindow
         // 编辑动作 加载动作信息
         private void LoadButtonInformation()
         {
-            ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(AddWindow.CurrentButton, AddWindow.TableName); // 获取按钮数据
             switch(buttonData.ActionType)
             {
                 case "OpenFile":
@@ -235,7 +235,7 @@ namespace Quicker.UserControls.AddWindow
                     actionType = "OpenUwpApp"; // 如果地址栏不是有效路径，则设置为打开 UWP 应用
             }
 
-            var oldData = db2.GetButtonDataByID(AddWindow.CurrentButton); // 获取旧数据
+            var oldData = db2.GetButtonDataByID(AddWindow.CurrentButton, AddWindow.TableName); // 获取旧数据
             DateTime createdTime = DateTime.Now;
             if (oldData != null)  createdTime= oldData.CreateTime; // 获取创建时间
             var buttonData = new ButtonData
@@ -252,7 +252,7 @@ namespace Quicker.UserControls.AddWindow
                 LatestEditTime = DateTime.Now,
                 ActionType = actionType
             }; // 创建按钮数据对象
-            db2.UpdateAction(buttonData); // 添加或更新动作
+            db2.UpdateAction(buttonData, AddWindow.TableName); // 添加或更新动作
         }
 
         // 获得焦点时隐藏提示

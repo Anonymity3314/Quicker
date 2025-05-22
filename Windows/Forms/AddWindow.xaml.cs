@@ -23,12 +23,14 @@ namespace Quicker
         public Image ButtonImage; // 按钮图片
         public string iconPath; // 图标路径
 
-        public string CurrentButton { get; private set; } // 当前按钮
+        public int CurrentButton { get; private set; } // 当前按钮
+        public string TableName { get; private set; } // 表名
         public int Choice { get; private set; } // 选择添加动作类型
 
-        public AddWindow(string currentbutton, int choice)
+        public AddWindow(int currentbutton, string tableName, int choice)
         {
             CurrentButton = currentbutton; // 当前按钮
+            TableName = tableName; // 表名
             Choice = choice; // 选择添加动作类型
             InitializeComponent(); // 初始化窗口组件
             ExecuteChoiceAction(); // 执行对应命令
@@ -46,13 +48,10 @@ namespace Quicker
         // 初始化标题
         private void InitializeTitle()
         {
-            string prefix = CurrentButton.Substring(0, CurrentButton.Length - 3); // 获取按钮名称
-            string numbersStr = CurrentButton.Replace(prefix, ""); // 获取3个数字
-            int[] numbers = numbersStr.Select(c => int.Parse(c.ToString())).ToArray(); // 转换为整数数组
-            string pageName = prefix; // 页面名称
+            string pageName = TableName; // 页面名称
             if (Choice != 0) // 如果不是编辑动作
             {
-                switch (prefix)
+                switch (TableName)
                 {
                     case "Global":
                         pageName = "默认全局动作"; // 页面名称
@@ -70,7 +69,10 @@ namespace Quicker
             }
             else // 如果是编辑动作
                 pageName = ""; // 页面名称
-            Title = $"新动作--{pageName}第{numbers[0] + 1}页{numbers[1]}行{numbers[2]}列--编辑动作"; // 设置标题
+            int page = (CurrentButton / 100) + 1; // 计算页码
+            int row = (CurrentButton / 10) % 10; // 计算行号
+            int column = CurrentButton % 10; // 计算列号
+            Title = $"新动作--{pageName}第{page}页{row}行{column}列--编辑动作"; // 设置标题
         }
 
         // 初始化Button视图
@@ -135,7 +137,7 @@ namespace Quicker
         // 编辑动作，加载动作信息
         private void LoadActionInfo()
         {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
             switch (buttonData.ActionType)
             {
                 case "OpenFile":

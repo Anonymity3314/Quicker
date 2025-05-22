@@ -31,6 +31,7 @@ namespace Quicker.Managers
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private Point initialMousePosition; // 鼠标初始位置
+        private string SourceTableName; // 数据库表名
         private Button SourceButton; // 源按钮
 
         public ButtonManager()
@@ -55,23 +56,23 @@ namespace Quicker.Managers
         /// <param name="sender">目标按钮</param>
         /// <param name="e">拖拽事件参数</param>
         /// <param name="isMainWindow">是否为主窗口</param>
-        public void Button_Drop(object sender, DragEventArgs e, bool isMainWindow)
+        public void Button_Drop(object sender, DragEventArgs e, bool isMainWindow, string tableName)
         {
             Button TargetButton = sender as Button; // 获取目标按钮
             if (TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
             if (e.Data.GetDataPresent(typeof(ButtonData))) // 如果拖拽的是按钮
             {
-                ProcessButtonDrop(TargetButton, isMainWindow); // 处理按钮拖拽
+                ProcessButtonDrop(TargetButton, isMainWindow, SourceTableName, tableName); // 处理按钮拖拽
             }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
             {
-                ProcessFileDrop(e, TargetButton, isMainWindow); // 处理文件拖拽
+                ProcessFileDrop(e, TargetButton, isMainWindow, tableName); // 处理文件拖拽
             }
             else if (e.Data.GetDataPresent(DataFormats.Text)) // 如果拖拽的是文本（可能是 URL）
             {
                 string text = (string)e.Data.GetData(DataFormats.Text).ToString(); // 获取文本
                 if (Uri.TryCreate(text, UriKind.Absolute, out Uri url))
-                    ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow); // 处理 URL 拖拽
+                    ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow, tableName); // 处理 URL 拖拽
             }
         }
 
@@ -81,10 +82,10 @@ namespace Quicker.Managers
         /// <param name="TargetButton"> 目标按钮 </param>
         /// <param name="buttonData"> 按钮数据 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessButtonDrop(Button TargetButton, bool isMainWindow)
+        private void ProcessButtonDrop(Button TargetButton, bool isMainWindow, string tableName1, string tableName2)
         {
             if (SourceButton == null) return; // 如果源按钮为空，直接返回
-            db2.ExchangeButtonID(SourceButton.Name, TargetButton.Name); // 交换按钮编号
+            db2.ExchangeButtonID(int.Parse(SourceButton.Name.Replace(tableName1, "")), int.Parse(TargetButton.Name.Replace(tableName2, "")), tableName1, tableName2); // 交换按钮编号
             var SourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
             var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
 
@@ -99,18 +100,18 @@ namespace Quicker.Managers
         /// <param name="e"> 拖拽事件参数 </param>
         /// <param name="TargetButton"> 目标按钮 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessFileDrop(DragEventArgs e, Button TargetButton, bool isMainWindow)
+        private void ProcessFileDrop(DragEventArgs e, Button TargetButton, bool isMainWindow, string tableName)
         {
             string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
             if (filePaths.Length <= 0) return; // 如果没有文件，直接返回
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
 
             if (files.Length == 1) // 如果只有一个文件
-                ProcessSingleFileDrop(TargetButton, files[0], isMainWindow); // 处理文件拖拽
+                ProcessSingleFileDrop(TargetButton, files[0], isMainWindow, tableName); // 处理文件拖拽
             else // 如果有多个文件
-                ProcessMultipleFileDrop(TargetButton, files, isMainWindow); // 处理多个文件拖拽
+                ProcessMultipleFileDrop(TargetButton, files, isMainWindow, tableName); // 处理多个文件拖拽
 
-            var TargetData = db2.GetButtonDataByID(TargetButton.Name); // 获取目标按钮数据
+            var TargetData = db2.GetButtonDataByID(int.Parse(TargetButton.Name), tableName); // 获取目标按钮数据
             RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
         }
 
@@ -119,11 +120,11 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="button"> 目标按钮 </param>
         /// <param name="filePath"> 文件路径 </param>
-        private void ProcessSingleFileDrop(Button button, string filePath, bool isMainWindow)
+        private void ProcessSingleFileDrop(Button button, string filePath, bool isMainWindow, string tableName)
         {
             if (IsImaege(filePath)) // 如果是图片文件
             {
-                ProcessImageDrop(filePath, button, isMainWindow); // 处理图片拖拽
+                ProcessImageDrop(filePath, button, isMainWindow, tableName); // 处理图片拖拽
                 return; // 直接返回
             }
             else if (Path.GetExtension(filePath).ToLower() == ".url") // 判断是否为 .url 文件
@@ -144,7 +145,7 @@ namespace Quicker.Managers
             string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
             ButtonData buttonData = new ButtonData
             {
-                ButtonID = button.Name, // 获取按钮ID
+                ButtonID = int.Parse(button.Name.Replace(tableName,"")), // 获取按钮ID
                 Title = fileName, // 设置按钮名称
                 Location = filePath, // 设置文件路径
                 ImagePath = iconPath, // 设置图标路径
@@ -156,7 +157,7 @@ namespace Quicker.Managers
                 ActionType = "OpenFile", // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -176,7 +177,7 @@ namespace Quicker.Managers
         /// <param name="e"> 拖拽事件参数 </param>
         /// <param name="button"> 目标按钮 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessImageDrop(string filePath, Button button, bool isMainWindow)
+        private void ProcessImageDrop(string filePath, Button button, bool isMainWindow, string tableName)
         {
             BitmapImage bitmap = new BitmapImage(new Uri(filePath)); // 创建 BitmapImage 对象
             string iconPath = ""; // 默认图标路径
@@ -190,7 +191,7 @@ namespace Quicker.Managers
             string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
             ButtonData buttonData = new ButtonData
             {
-                ButtonID = button.Name,
+                ButtonID = int.Parse(button.Name.Replace(tableName,"")),
                 Title = fileName,
                 Location = filePath,
                 ImagePath = iconPath,
@@ -202,7 +203,7 @@ namespace Quicker.Managers
                 ActionType = "OpenFile",
             };
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -229,10 +230,11 @@ namespace Quicker.Managers
         /// <summary>
         /// 处理多个文件拖拽
         /// </summary>
-        /// <param name="button"></param>
-        /// <param name="filePaths"></param>
-        /// <param name="isMainWindow"></param>
-        private void ProcessMultipleFileDrop(Button button, string[] filePaths, bool isMainWindow)
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="filePaths"> 文件路径 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        /// <param name="tableName"> 数据库表名 </param>
+        private void ProcessMultipleFileDrop(Button button, string[] filePaths, bool isMainWindow, string tableName)
         {
             // 用“；”分隔文件路径
             string filePath = string.Join(";", filePaths);
@@ -248,7 +250,7 @@ namespace Quicker.Managers
             string fileName = Path.GetFileNameWithoutExtension(filePaths[0]); // 获取文件名
             ButtonData buttonData = new ButtonData
             {
-                ButtonID = button.Name, // 获取按钮ID
+                ButtonID = int.Parse(button.Name.Replace(tableName,"")), // 获取按钮ID
                 Title = $"{fileName}等{filePaths.Length}个文件(夹)", // 设置按钮名称
                 Location = filePath, // 设置文件路径
                 ImagePath = iconPath, // 设置图标路径
@@ -260,7 +262,7 @@ namespace Quicker.Managers
                 ActionType = "OpenFiles", // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -269,7 +271,7 @@ namespace Quicker.Managers
         /// <param name="button"> 目标按钮 </param>
         /// <param name="url"> URL 地址 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessUrlDrop(Button button, string url, bool isMainWindow, string filePath = null)
+        private void ProcessUrlDrop(Button button, string url, bool isMainWindow, string tableName, string filePath = null)
         {
             ImageSource iconSource = iconManager.GetWebsiteIcon(url); // 获取图标
             string iconPath = ""; // 默认图标路径
@@ -282,7 +284,7 @@ namespace Quicker.Managers
 
             ButtonData buttonData = new ButtonData
             {
-                ButtonID = button.Name,
+                ButtonID = int.Parse(button.Name.Replace(tableName,"")),
                 Title = filePath == null ? GetWebsiteNameFromUrl(url) : Path.GetFileNameWithoutExtension(filePath),
                 Location = url,
                 ImagePath = iconPath,
@@ -292,7 +294,7 @@ namespace Quicker.Managers
                 ActionType = "OpenWebsite",
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
-            db2.UpdateAction(buttonData); // 添加按钮数据到数据库
+            db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
 
         /// <summary>
@@ -484,8 +486,9 @@ namespace Quicker.Managers
         /// <param name="sender"> 目标按钮 </param>
         /// <param name="e"> 鼠标事件参数 </param>
         /// <param name="isMainButton"> 是否为主按钮 </param>
-        public void Button_PreviewMouseMove(object sender, MouseEventArgs e, bool isMainButton)
+        public void Button_PreviewMouseMove(object sender, MouseEventArgs e, bool isMainButton, string sourceTableName = null)
         {
+            SourceTableName = sourceTableName; // 记录源表名
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
                 Point currentPosition = e.GetPosition(button); // 获取当前位置
@@ -551,7 +554,7 @@ namespace Quicker.Managers
         /// <param name="isMainWindow"> 是否为主窗口 </param>
         /// <param name="targetMenu"> 要打开的菜单名称 </param>
         /// <param name="sourceWindow"> 触发菜单的窗口 </param>
-        public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow)
+        public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow, string tableName)
         {
             Window menu = null; // 菜单窗口
             Button button = sender as Button; // 获取触发菜单的按钮
@@ -562,7 +565,7 @@ namespace Quicker.Managers
                 case "OperationMenu":
                     OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
                     operationMenu?.Close(); // 关闭操作菜单
-                    operationMenu = new(button.Name)
+                    operationMenu = new(int.Parse(button.Name.Replace(tableName,"")), tableName)
                     {
                         Left = mousePosition.X,
                         Top = mousePosition.Y
@@ -579,7 +582,7 @@ namespace Quicker.Managers
                 case "CreatActionMenu":
                     CreatActionMenu creatActionMenu = Application.Current.Windows.OfType<CreatActionMenu>().FirstOrDefault(); // 查找现有的创建动作菜单
                     creatActionMenu?.Close(); // 关闭创建动作菜单
-                    creatActionMenu = new(button.Name)
+                    creatActionMenu = new(int.Parse(button.Name.Replace(tableName,"")), tableName)
                     {
                         Left = mousePosition.X,
                         Top = mousePosition.Y
