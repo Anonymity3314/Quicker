@@ -47,7 +47,8 @@ namespace Quicker.Managers
                 }
                 catch (Exception ex)
                 {
-                    ToastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
+                    using var toast = new ToastManager(); // 消息提醒管理器
+                    toast.ShowToast($"打开失败：{ex}", "Error"); // 弹出消息提醒
                 }
             } // 如果是快捷方式或者可执行文件
             else
@@ -63,7 +64,8 @@ namespace Quicker.Managers
                 }
                 catch (Exception ex)
                 {
-                    ToastManager.AddToast($"打开失败：{ex}", "Error"); // 显示错误提示
+                    using var toast = new ToastManager(); // 消息提醒管理器
+                    toast.ShowToast($"打开失败：{ex}", "Error"); // 弹出消息提醒
                 }
             } // 使用系统默认方式打开文件
         }
@@ -121,7 +123,8 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                ToastManager.AddToast($"打开网站失败：{ex.Message}", "Error"); // 显示错误提示
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"打开网站失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
         }
 
@@ -307,7 +310,8 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                ToastManager.AddToast($"打开UWP应用失败：{ex.Message}", "Error"); // 显示错误提示
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"打开UWP应用失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
         }
 

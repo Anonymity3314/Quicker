@@ -4,20 +4,43 @@ using System.Windows;
 
 namespace Quicker.Managers
 {
-    public static class ToastManager
+    public class ToastManager : IDisposable
     {
-        public static void AddToast(string message, string toastType)
+        private ToastWindow? toastWindow;
+        private bool isDisposed = false;
+
+        // 添加Toast消息
+        public void ShowToast(string message, string toastType)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                ToastWindow toastWindow = Application.Current.Windows.OfType<ToastWindow>().FirstOrDefault(); // 获取ToastWindow窗体
-                if (toastWindow == null) // 如果ToastWindow窗体不存在
+                toastWindow = Application.Current.Windows.OfType<ToastWindow>().FirstOrDefault();
+                if (toastWindow == null)
                 {
-                    toastWindow = new ToastWindow(); // 创建ToastWindow窗体
-                    toastWindow.Show(); // 显示ToastWindow窗体
+                    toastWindow = new ToastWindow();
+                    toastWindow.Show();
                 }
-                toastWindow.AddToast(message, toastType); // 添加Toast
+                toastWindow.AddToast(message, toastType);
             });
+        }
+
+        // 实现IDisposable接口
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this); // 告知垃圾回收器不需要调用终结器
+        }
+
+        // 释放资源
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed) isDisposed = true;
+        }
+
+        // 析构函数
+        ~ToastManager()
+        {
+            Dispose(false);
         }
     }
 }

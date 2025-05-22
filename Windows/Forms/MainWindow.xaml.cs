@@ -331,7 +331,8 @@ namespace Quicker.Windows
                 }
                 catch (Exception ex)
                 {
-                    ToastManager.AddToast("执行动作失败：", ex.Message); // 显示错误信息
+                    using var toast = new ToastManager(); // 消息提醒管理器
+                    toast.ShowToast("动作执行失败：", ex.Message); // 弹出消息提醒
                 }
             }
             else

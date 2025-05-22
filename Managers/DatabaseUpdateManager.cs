@@ -49,7 +49,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒用户
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 弹出消息提醒
             }
         }
 
@@ -386,7 +387,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error"); // 弹出消息提醒用户
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error"); // 弹出消息提醒
             }
         }
 
@@ -416,7 +418,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒用户
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒
             }
         }
 
@@ -448,8 +451,9 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"重命名表格{tableName}中的列名失败,请删除数据库", "Error"); // 弹出消息提醒
                 transaction.Rollback(); // 回滚事务
-                ToastManager.AddToast($"重命名表格{tableName}中的列名失败,请删除数据库", "Error"); // 弹出消息提醒用户
             }
             finally
             {

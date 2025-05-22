@@ -490,7 +490,10 @@ namespace Quicker.Windows
         {
             int canvasCount = MainListView.Items.Count; // 获取画布索引
             if (canvasCount == 10) // 如果画布索引等于9
-                ToastManager.AddToast("当前场景数量已达上限。", "Error"); // 弹出消息提醒
+            {
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("当前场景数量已达上限。", "Error"); // 弹出消息提醒
+            }
             else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
@@ -698,7 +701,8 @@ namespace Quicker.Windows
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
-            ToastManager.AddToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 显示复制成功的通知
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.ShowToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮编辑动作页信息
@@ -708,10 +712,16 @@ namespace Quicker.Windows
             switch (type)
             {
                 case "Global":
-                    ToastManager.AddToast("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    {
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    }
                     break;
                 case "Common":
-                    ToastManager.AddToast("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    {
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
+                    }
                     break;
                 default:
                     string canvasIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取画布索引
@@ -728,7 +738,8 @@ namespace Quicker.Windows
             string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取场景名称
             string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开动作页指令
             Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
-            ToastManager.AddToast("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 显示创建成功的通知
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.ShowToast("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮删除动作页
@@ -755,7 +766,8 @@ namespace Quicker.Windows
         // 点击按钮添加场景
         private void AddSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            ToastManager.AddToast("功能开发中。", "Common"); // 弹出消息提醒
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.ShowToast("功能开发中。", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮编辑场景
@@ -767,7 +779,10 @@ namespace Quicker.Windows
                 case "Common":
                 case "Taskbar":
                 case "Desktop":
-                    ToastManager.AddToast("此项不可编辑。", "Common"); // 弹出消息提醒
+                    {
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("此项不可编辑。", "Common"); // 弹出消息提醒
+                    }
                     break;
                 default:
                     string canvasIndex = GetBingdingButton().Name.Replace("Edit" + type, ""); // 获取画布索引
@@ -786,7 +801,10 @@ namespace Quicker.Windows
                 case "Common":
                 case "Taskbar":
                 case "Desktop":
-                    ToastManager.AddToast("不能删除此场景。", "Common"); // 弹出消息提醒
+                    {
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("此项不可删除。", "Common"); // 弹出消息提醒
+                    }
                     break;
                 default:
                     break;

@@ -127,12 +127,14 @@ namespace Quicker.Windows
                 }
                 catch
                 {
-                    ToastManager.AddToast("设置应用失败！", "Error"); // 添加通知
+                    using var toast1 = new ToastManager(); // 消息提醒管理器
+                    toast1.ShowToast("设置应用失败！", "Error"); // 弹出消息提醒
                 }
 
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
-                ToastManager.AddToast(message, "Common"); // 添加通知
+                using var toast2 = new ToastManager(); // 消息提醒管理器
+                toast2.ShowToast(message, "Common"); // 弹出消息提醒
             });
         }
 

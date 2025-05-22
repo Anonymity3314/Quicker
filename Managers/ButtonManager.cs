@@ -345,7 +345,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("无效的URI：未能解析主机名。", "Error"); // 处理无效的URL
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("无效的URI：未能解析主机名。", "Error"); // 弹出消息提醒
                 return ""; // 返回空字符
             }
         }
@@ -376,7 +377,8 @@ namespace Quicker.Managers
                     }
                     catch // 如果失败，发送信息提示
                     {
-                        ToastManager.AddToast($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除", "Error");
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast($"图标加载失败：按钮{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
                     }
                 } // 如果图标路径不为空
 

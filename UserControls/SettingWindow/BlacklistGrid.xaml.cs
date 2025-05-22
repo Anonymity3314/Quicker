@@ -208,7 +208,10 @@ namespace Quicker.UserControls
             UnknownProcessButton.Visibility = Visibility.Collapsed; // 隐藏按钮
             var blacklistprocess = SettingDatabase.GetAllBlacklistApplications(); // 获取黑名单进程
             if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
-                ToastManager.AddToast("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
+            {
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
+            }
             else
             {
                 SettingDatabase.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中

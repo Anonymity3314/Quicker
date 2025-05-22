@@ -153,7 +153,10 @@ namespace Quicker.UserControls.AddWindow
                         AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
                     }
                     else
-                        ToastManager.AddToast("图标提取失败!","Error"); // 显示通知
+                    {
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("图标提取失败!","Error"); // 弹出消息提醒
+                    }
                 }
             }
         }
@@ -182,7 +185,10 @@ namespace Quicker.UserControls.AddWindow
                         AddWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
                     }
                     else
-                        ToastManager.AddToast("图标提取失败!","Error"); // 显示通知
+                    {
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("图标提取失败!","Error"); // 弹出消息提醒
+                    }
                 }
             }
         }

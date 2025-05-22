@@ -85,7 +85,8 @@ namespace Quicker.Windows
                 paths.AddRange(buttonData.Location.Split(';').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p))); // 添加多个文件路径
             else
             {
-                ToastManager.AddToast($"不支持此动作类型。", "Error"); // 显示通知
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"不支持此动作类型。", "Error"); // 弹出消息提醒
                 return; // 退出
             }
 
@@ -112,7 +113,8 @@ namespace Quicker.Windows
             }
             catch (Exception ex)
             {
-                ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"打开路径失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
             finally
             {
@@ -135,7 +137,8 @@ namespace Quicker.Windows
                         IntPtr pidlItem = ILCreateFromPathW(path); // 获取文件 PIDL
                         if (pidlItem == IntPtr.Zero) // 无法获取 PIDL
                         {
-                            ToastManager.AddToast($"无法获取文件的 PIDL：{path}", "Error"); // 显示通知
+                            using var toast = new ToastManager(); // 消息提醒管理器
+                            toast.ShowToast($"无法获取文件的 PIDL：{path}", "Error"); // 弹出消息提醒
                             continue; // 跳过当前文件
                         }
                         pidlItems.Add(pidlItem); // 添加 PIDL 到列表
@@ -166,7 +169,8 @@ namespace Quicker.Windows
             }
             catch (Exception ex)
             {
-                ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"打开路径失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
         }
 
@@ -184,7 +188,8 @@ namespace Quicker.Windows
                     }
                     catch (Exception ex)
                     {
-                        ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast($"打开路径失败：{ex.Message}", "Error"); // 弹出消息提醒
                     }
                     finally
                     {
@@ -194,7 +199,8 @@ namespace Quicker.Windows
             }
             catch (Exception ex)
             {
-                ToastManager.AddToast($"打开路径失败：{ex.Message}", "Error"); // 显示通知
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast($"打开路径失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
         }
 

@@ -62,7 +62,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("获取图标失败。", "Error"); // 弹出消息提醒
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("获取图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
             return null; // 如果获取失败，返回 null
@@ -84,7 +85,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("检查缓存图标失败。", "Error"); // 弹出消息提醒
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("检查缓存图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -105,7 +107,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("获取图标文件名失败。", "Error"); // 弹出消息提醒
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("获取图标文件名失败。", "Error"); // 弹出消息提醒
                 return null;
             }
         }
@@ -139,7 +142,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("保存图标失败。", "Error"); // 弹出消息提醒
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("保存图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -196,7 +200,8 @@ namespace Quicker.Managers
 
                     if (IsImageEmpty(bitmapImage))
                     {
-                        ToastManager.AddToast("获取网站图标失败。", "Error"); // 弹出消息提醒
+                        using var toast = new ToastManager(); // 消息提醒管理器
+                        toast.ShowToast("获取网站图标失败。", "Error"); // 弹出消息提醒
                         return null; // 如果获取的网站图标为空图片，返回 null
                     }
                     return bitmapImage; // 返回网站图标
@@ -204,7 +209,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("获取网站图标失败。", "Error"); // 弹出消息提醒
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("获取网站图标失败。", "Error"); // 弹出消息提醒
                 return null; // 如果出现异常，返回 null
             }
             finally
@@ -273,7 +279,8 @@ namespace Quicker.Managers
             }
             catch
             {
-                ToastManager.AddToast("处理图标失败。", "Error"); // 弹出消息提醒
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("处理图标失败。", "Error"); // 弹出消息提醒
                 throw;
             }
         }
