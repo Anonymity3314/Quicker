@@ -15,7 +15,8 @@ namespace Quicker.Windows
         {
             InitializeComponent();
             this.Visibility = Visibility.Hidden; // 隐藏窗口
-            WindowManager.SetWindowTopmost(this); // 设置窗口置顶
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 弹出面板窗口
@@ -32,13 +33,15 @@ namespace Quicker.Windows
         // 弹出设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            WindowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 打开动作管理窗口
         private void OpenActionPageManageWindow(object sender, RoutedEventArgs e)
         {
-            WindowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 
         // 暂停Quicker

@@ -19,7 +19,8 @@ namespace Quicker.Managers
             if (data.Data2 == "true") // 如果尝试打开已存在的窗口
             {
                 string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
-                WindowManager.TryToOpenExitingWindow(windowTitle);
+                using var windowManager = new WindowManager(); // 创建窗口管理器
+                windowManager.TryToOpenExitingWindow(windowTitle);
             }
 
             if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) ||

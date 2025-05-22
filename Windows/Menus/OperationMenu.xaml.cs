@@ -27,7 +27,8 @@ namespace Quicker.Windows
             CurrentButton = currentbutton; // 设置当前按钮
             TableName = tableName; // 设置表名
             InitializeMenu(); // 初始化菜单
-            WindowManager.SetWindowTopmost(this); // 设置窗口置顶
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 初始化菜单

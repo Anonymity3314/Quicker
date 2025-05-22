@@ -65,7 +65,8 @@ namespace Quicker.Windows
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
-            WindowManager.SetWindowTopmost(this);// 设置窗口置顶
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowTopmost(this);// 设置窗口置顶
             this.Activate(); // 激活窗口
         }
 
@@ -182,7 +183,8 @@ namespace Quicker.Windows
         // 打开设置窗口
         private void OpenSettingWindow(object sender, RoutedEventArgs e)
         {
-            WindowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
         }
 
         // 关闭功能面板
@@ -464,7 +466,8 @@ namespace Quicker.Windows
         private void OpenActionPageManageWindow(object sender, RoutedEventArgs e)
         {
             TitlePop.IsOpen = false; // 关闭菜单
-            WindowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 
         // 滚轮进行全局动作页翻页
