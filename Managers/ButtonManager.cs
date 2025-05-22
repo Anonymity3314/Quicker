@@ -12,9 +12,9 @@ namespace Quicker.Managers
 {
     public class ButtonManager
     {
-        private static readonly SolidColorBrush HasActionBrush =
+        private readonly SolidColorBrush HasActionBrush =
             new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White"));
-        private static readonly SolidColorBrush NoActionBrush =
+        private readonly SolidColorBrush NoActionBrush =
             new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3"));
 
         public IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
@@ -79,18 +79,21 @@ namespace Quicker.Managers
         /// <summary>
         /// 处理按钮拖拽到其他按钮上
         /// </summary>
-        /// <param name="TargetButton"> 目标按钮 </param>
-        /// <param name="buttonData"> 按钮数据 </param>
+        /// <param name="targetButton"> 目标按钮 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessButtonDrop(Button TargetButton, bool isMainWindow, string tableName1, string tableName2)
+        /// <param name="tableName1"> 原表名 </param>
+        /// <param name="tableName2"> 目标表名 </param>
+        private void ProcessButtonDrop(Button targetButton, bool isMainWindow, string tableName1, string tableName2)
         {
             if (SourceButton == null) return; // 如果源按钮为空，直接返回
-            db2.ExchangeButtonID(int.Parse(SourceButton.Name.Replace(tableName1, "")), int.Parse(TargetButton.Name.Replace(tableName2, "")), tableName1, tableName2); // 交换按钮编号
-            var SourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
-            var TargetData = TargetButton.Tag as ButtonData; // 获取目标按钮数据
+            int buttonID1 = int.Parse(SourceButton.Name.Replace(tableName1, "")); // 获取源按钮ID
+            int buttonID2 = int.Parse(targetButton.Name.Replace(tableName2, "")); // 获取目标按钮ID
+            db2.ExchangeButtonID(buttonID1, buttonID2, tableName1, tableName2); // 交换按钮编号
+            var sourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
+            var targetData = targetButton.Tag as ButtonData; // 获取目标按钮数据
 
-            RefreshButtonDisplay(SourceButton, TargetData, 60, isMainWindow); // 更新 sourceButton 的内容
-            RefreshButtonDisplay(TargetButton, SourceData, 60, isMainWindow); // 更新 targetButton 的内容
+            RefreshButtonDisplay(SourceButton, targetData, 60, isMainWindow); // 更新 sourceButton 的内容
+            RefreshButtonDisplay(targetButton, sourceData, 60, isMainWindow); // 更新 targetButton 的内容
             SourceButton = null; // 清空源按钮
         }
 
@@ -409,8 +412,6 @@ namespace Quicker.Managers
             {
                 Width = isMainWindow ? 36 : 30, // 设置宽度
                 Height = isMainWindow ? 36 : 30, // 设置高度
-                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
                 Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
             }; // 创建图像对象
             return image; // 返回图像对象
@@ -427,8 +428,6 @@ namespace Quicker.Managers
             TextBlock textBlock = new()
             {
                 Text = buttonInformation.Title, // 设置文本
-                TextWrapping = TextWrapping.NoWrap, // 设置文本换行方式
-                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
                 HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
             }; // 创建文本块对象
             AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小

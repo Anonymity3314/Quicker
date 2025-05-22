@@ -1,21 +1,21 @@
 ﻿<Window
-    mc:Ignorable="d"
-    xmlns:local="clr-namespace:Quicker.Windows"
-    x:Class="Quicker.Windows.SelectImageWindow"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Quicker.Windows.SelectImageWindow"
+    xmlns:local="clr-namespace:Quicker.Windows"
+    mc:Ignorable="d"
     
-    Width="500"
-    Height="450"
-    ShowInTaskbar="False"
-    Title="选择已保存的图标"
     WindowStartupLocation="CenterOwner"
+    Title="选择已保存的图标"
+    ShowInTaskbar="False"
+    Height="450"
+    Width="500"
     
-    Loaded="SelectImageWindow_Loaded"
-    KeyDown="SelectImageWindow_KeyDown"
     SizeChanged="SelectImageWindow_SizeChanged"
+    KeyDown="SelectImageWindow_KeyDown"
+    Loaded="SelectImageWindow_Loaded"
 >
     <Grid>
         <Button Content="加载更多..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="24,0,0,39" VerticalAlignment="Bottom" Width="81" Click="ContinueLoadImages"/>

@@ -11,22 +11,26 @@
         <!--合并资源词典-->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- 图片样式 -->
-                <ResourceDictionary Source="Resources/Styles/ImageStyle.xaml"/>
-                <!-- 标签样式 -->
-                <ResourceDictionary Source="Resources/Styles/SliderStyle.xaml"/>
-                <!-- 输入框样式 -->
-                <ResourceDictionary Source="Resources/Styles/TextBoxStyle.xaml"/>
-                <!-- 按钮样式 -->
-                <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
-                <!-- 提示框样式 -->
-                <ResourceDictionary Source="Resources/Styles/TooltipStyle.xaml"/>
-                <!-- 下拉框样式 -->
-                <ResourceDictionary Source="Resources/Styles/ComboBoxStyle.xaml"/>
-                <!-- 复选框样式 -->
-                <ResourceDictionary Source="Resources/Styles/CheckBoxStyle.xaml"/>
+                <!-- 文本块样式 -->
+                <ResourceDictionary Source="Resources/Styles/TextBlockStyles.xaml"/>
                 <!-- 滚动条样式 -->
                 <ResourceDictionary Source="Resources/Styles/ScrollBarStyle.xaml"/>
+                <!-- 复选框样式 -->
+                <ResourceDictionary Source="Resources/Styles/CheckBoxStyle.xaml"/>
+                <!-- 下拉框样式 -->
+                <ResourceDictionary Source="Resources/Styles/ComboBoxStyle.xaml"/>
+                <!-- 提示框样式 -->
+                <ResourceDictionary Source="Resources/Styles/TooltipStyle.xaml"/>
+                <!-- 按钮样式 -->
+                <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
+                <!-- 输入框样式 -->
+                <ResourceDictionary Source="Resources/Styles/TextBoxStyle.xaml"/>
+                <!-- 标签样式 -->
+                <ResourceDictionary Source="Resources/Styles/SliderStyle.xaml"/>
+                <!-- 图片样式 -->
+                <ResourceDictionary Source="Resources/Styles/ImageStyles.xaml"/>
+                <!-- 网格样式 -->
+                <ResourceDictionary Source="Resources/Styles/GridStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

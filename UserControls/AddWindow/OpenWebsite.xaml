@@ -11,8 +11,8 @@
     d:DesignHeight="289"
     d:DesignWidth="493"
     
-    Loaded="OpenWebsite_Loaded"
     Unloaded="OpenWebsite_Unloaded"
+    Loaded="OpenWebsite_Loaded"
 >
     <Grid>
         <Label Content="网址" Margin="122,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="34"/>
@@ -28,7 +28,7 @@
                 <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
                     <Button Style="{StaticResource MenuButton}" Click="CopyLocation">
                         <Grid Width="174" Height="20">
-                            <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource ImageStyle}"/>
+                            <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
                             <TextBlock Text="插入剪切贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                         </Grid>
                     </Button>

@@ -216,16 +216,7 @@ namespace Quicker.Windows
             {
                 var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
                 if (Convention?.ShowAddImage == true) // 如果显示添加按钮
-                {
-                    button.Content = new System.Windows.Controls.Image
-                    {
-                        Source = new BitmapImage(new Uri("/Resources/Images/Icons/Add.ico", UriKind.Relative)),
-                        Width = 36,
-                        Height = 36,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        HorizontalAlignment = HorizontalAlignment.Center
-                    }; // 设置按钮内容
-                }
+                    button.Content = new Image { Style = FindResource("AddActionImage") as Style }; // 设置按钮内容
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变按钮背景颜色
             }
         }

@@ -30,7 +30,6 @@ namespace Quicker.Windows
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
-        private Point initialMousePosition; // 初始鼠标位置
         private string type; // 场景类型
 
         public ActionPageManageWindow(string type = "Common")
@@ -99,39 +98,23 @@ namespace Quicker.Windows
                 };
 
                 // 创建按钮内容
-                Grid buttonContent = new()
-                {
-                    Width = 221, // 宽度
-                    Height = 36, // 高度
-                    VerticalAlignment = VerticalAlignment.Top, // 垂直居中
-                    HorizontalAlignment = HorizontalAlignment.Left, // 水平居左
-                }; // 创建网格
+                Grid buttonContent = new() { Style = FindResource("SceneButtonContentGrid") as Style }; // 创建网格
                 Image image = new()
                 {
-                    Width = 24, // 图片宽度
-                    Height = 24, // 图片高度
-                    Margin = new Thickness(5, 0, 0, 0), // 边距
-                    VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                    HorizontalAlignment = HorizontalAlignment.Left, // 水平居左
+                    Style = FindResource("SceneButtonImage") as Style, // 应用样式
                     Source = new BitmapImage(new Uri(data.SceneIconPath, UriKind.Relative)), // 设置按钮图片
                 }; // 创建图片
                 buttonContent.Children.Add(image); // 添加到网格
-                TextBlock sceenName = new()
+                TextBlock sceneName = new()
                 {
-                    Margin = new Thickness(35, 3, 0, 0), // 边距
                     Text = GetSceneTitle(data), // 文本内容
-                    VerticalAlignment = VerticalAlignment.Top, // 垂直居上
-                    HorizontalAlignment = HorizontalAlignment.Left // 水平居左
+                    Style = FindResource("SceneNameTextBlock") as Style, // 应用样式
                 }; // 创建 TextBlock
-                buttonContent.Children.Add(sceenName); // 添加到网格
+                buttonContent.Children.Add(sceneName); // 添加到网格
                 TextBlock sceneTag = new()
                 {
-                    Margin = new Thickness(35, 0, 0, 3), // 边距
-                    FontSize = 10, // 字体大小
+                    Style = FindResource("SceneTagTextBlock") as Style, // 应用样式
                     Text = data.SceneTag, // 文本内容
-                    VerticalAlignment = VerticalAlignment.Bottom, // 垂直居下
-                    HorizontalAlignment = HorizontalAlignment.Left, // 水平居左
-                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB4B4B4")) // 设置字体颜色
                 }; // 创建 TextBlock
                 buttonContent.Children.Add(sceneTag); // 添加到网格
                 button.Content = buttonContent; // 设置按钮内容
@@ -153,20 +136,14 @@ namespace Quicker.Windows
             string sceneTitleText = GetSceneTitle(sceneInfo); // 获取场景标题
             TextBlock sceneTitle = new()
             {
-                FontSize = 11, // 字体大小
                 Text = sceneTitleText, // 场景名称
-                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = HorizontalAlignment.Center // 水平居中
+                Style = FindResource("SceneTitleTextBlock") as Style, // 应用样式
             }; // 创建场景标题
             SceneTitleStackPanel.Children.Add(sceneTitle); // 添加到标题StackPanel
             TextBlock sceneDescription = new()
             {
-                FontSize = 11, // 字体大小
                 Text = sceneInfo.SceneTag, // 场景标签
-                Margin = new Thickness(10, 0, 0, 0), // 边距
-                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
-                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB4B4B4")) // 设置字体颜色
+                Style = FindResource("SceneDescriptionTextBlock") as Style, // 应用样式
             }; // 创建场景描述
             SceneTitleStackPanel.Children.Add(sceneDescription); // 添加到标题StackPanel
         }
@@ -391,11 +368,8 @@ namespace Quicker.Windows
             var actionPageInfo = db3.GetActionPageData(type, actionPageIndex); // 获取动作页信息
             TextBlock textBlock = new TextBlock
             {
-                FontSize = 11, // 字体大小
-                Margin = new Thickness(27, 0, 0, 0), // 文本块边距
-                Text = actionPageInfo.ActionPageName, // 动作页名称
-                VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = HorizontalAlignment.Left, // 水平靠左
+                Style = FindResource("ActionPageNameTextBlock") as Style,
+                Text = actionPageInfo.ActionPageName // 动作页名称
             }; // 创建文本块
             return textBlock; // 返回文本块
         }

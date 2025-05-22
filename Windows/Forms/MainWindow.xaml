@@ -60,14 +60,14 @@
                                 <StackPanel Background="{x:Null}">
                                     <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">
                                         <Grid Width="176">
-                                            <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource ImageStyle}"/>
+                                            <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="场景与动作" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>
                                     <Rectangle Height="1" Width="176" Fill="#FFF0F0F0" Margin="0,3"/>
                                     <Button Style="{StaticResource MenuButton}" ToolTip="关闭Quicker软件" Click="QuitQuicker">
                                         <Grid Width="176">
-                                            <Image Source="/Resources/Images/Icons/CloseQuicker.ico" Style="{StaticResource ImageStyle}"/>
+                                            <Image Source="/Resources/Images/Icons/CloseQuicker.ico" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="退出" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>

@@ -514,10 +514,10 @@
 
     <!-- “菜单按钮”的按钮样式 -->
     <Style x:Key="MenuButton" TargetType="Button">
-        <Setter Property="Height" Value="25"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="White"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Height" Value="25"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
