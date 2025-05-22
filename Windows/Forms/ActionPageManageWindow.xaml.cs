@@ -96,15 +96,41 @@ namespace Quicker.Windows
                 };
 
                 // 创建按钮内容
-                Grid buttonContent = new();
-                TextBlock textBlock = new()
+                Grid buttonContent = new()
                 {
-                    FontSize = 14, // 字体大小
-                    Text = GetSceneTitle(data), // 文本内容
+                    Width = 221, // 宽度
+                    Height = 36, // 高度
+                    VerticalAlignment = VerticalAlignment.Top, // 垂直居中
+                    HorizontalAlignment = HorizontalAlignment.Left, // 水平居左
+                }; // 创建网格
+                Image image = new()
+                {
+                    Width = 24, // 图片宽度
+                    Height = 24, // 图片高度
+                    Margin = new Thickness(5, 0, 0, 0), // 边距
                     VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                    HorizontalAlignment = HorizontalAlignment.Center // 水平居中
+                    HorizontalAlignment = HorizontalAlignment.Left, // 水平居左
+                    Source = new BitmapImage(new Uri(data.SceneIconPath, UriKind.Relative)), // 设置按钮图片
+                }; // 创建图片
+                buttonContent.Children.Add(image); // 添加到网格
+                TextBlock sceenName = new()
+                {
+                    Margin = new Thickness(35, 3, 0, 0), // 边距
+                    Text = GetSceneTitle(data), // 文本内容
+                    VerticalAlignment = VerticalAlignment.Top, // 垂直居上
+                    HorizontalAlignment = HorizontalAlignment.Left // 水平居左
                 }; // 创建 TextBlock
-                buttonContent.Children.Add(textBlock); // 添加到网格
+                buttonContent.Children.Add(sceenName); // 添加到网格
+                TextBlock sceneTag = new()
+                {
+                    Margin = new Thickness(35, 0, 0, 3), // 边距
+                    FontSize = 10, // 字体大小
+                    Text = data.SceneTag, // 文本内容
+                    VerticalAlignment = VerticalAlignment.Bottom, // 垂直居下
+                    HorizontalAlignment = HorizontalAlignment.Left, // 水平居左
+                    Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB4B4B4")) // 设置字体颜色
+                }; // 创建 TextBlock
+                buttonContent.Children.Add(sceneTag); // 添加到网格
                 button.Content = buttonContent; // 设置按钮内容
 
                 // 设置点击事件
@@ -124,6 +150,7 @@ namespace Quicker.Windows
             string sceneTitleText = GetSceneTitle(sceneInfo); // 获取场景标题
             TextBlock sceneTitle = new()
             {
+                FontSize = 11, // 字体大小
                 Text = sceneTitleText, // 场景名称
                 VerticalAlignment = VerticalAlignment.Center, // 垂直居中
                 HorizontalAlignment = HorizontalAlignment.Center // 水平居中
@@ -131,10 +158,12 @@ namespace Quicker.Windows
             SceneTitleStackPanel.Children.Add(sceneTitle); // 添加到标题StackPanel
             TextBlock sceneDescription = new()
             {
-                Margin = new Thickness(5, 0, 0, 0), // 边距
+                FontSize = 11, // 字体大小
                 Text = sceneInfo.SceneTag, // 场景标签
+                Margin = new Thickness(10, 0, 0, 0), // 边距
                 VerticalAlignment = VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = HorizontalAlignment.Center // 水平居中
+                HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
+                Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB4B4B4")) // 设置字体颜色
             }; // 创建场景描述
             SceneTitleStackPanel.Children.Add(sceneDescription); // 添加到标题StackPanel
         }
@@ -173,25 +202,25 @@ namespace Quicker.Windows
                 case "Global":
                     MainBorder.Height = 224; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
-                    AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+                    AddActionPageButton.Margin = new Thickness(239, 264, 0, 0); // 设置添加动作页按钮边距
                     break; // 全局动作页
                 case "Common":
                     MainBorder.Height = 289; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-                    AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
+                    AddActionPageButton.Margin = new Thickness(239, 329, 0, 0); // 设置添加动作页按钮边距
                     break; // 普通动作页
                 default:
                     if (db2.TableExists(style)) // 如果存在通用样式按钮数据表
                     {
                         MainBorder.Height = 289; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-                        AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加动作页按钮边距
+                        AddActionPageButton.Margin = new Thickness(239, 329, 0, 0); // 设置添加动作页按钮边距
                     }
                     else
                     {
                         MainBorder.Height = 224; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
-                        AddActionPageButton.Margin = new Thickness(239, 272, 0, 0); // 设置添加动作页按钮边距
+                        AddActionPageButton.Margin = new Thickness(239, 264, 0, 0); // 设置添加动作页按钮边距
                     }
                     break;
             }
@@ -359,7 +388,8 @@ namespace Quicker.Windows
             var actionPageInfo = db3.GetActionPageData(type, actionPageIndex); // 获取动作页信息
             TextBlock textBlock = new TextBlock
             {
-                Margin = new Thickness(29, 0, 0, 0), // 文本块边距
+                FontSize = 11, // 字体大小
+                Margin = new Thickness(27, 0, 0, 0), // 文本块边距
                 Text = actionPageInfo.ActionPageName, // 动作页名称
                 VerticalAlignment = VerticalAlignment.Center, // 垂直居中
                 HorizontalAlignment = HorizontalAlignment.Left, // 水平靠左
@@ -386,11 +416,10 @@ namespace Quicker.Windows
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data) // 如果按钮数据存在
             {
-                if (isDarkModle)
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("LightGray")); // 设置按钮背景颜色
-                else
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
- 
+                button.Background = isDarkModle
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("LightGray"))
+                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
+
                 if (showUsedTimes)
                     buttonManager.LoadActionUsedTimes(button, data); // 刷新按钮显示
             }
@@ -407,10 +436,9 @@ namespace Quicker.Windows
                 if(showUsedTimes)
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
 
-                if (isDarkModle)
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
-                else
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                button.Background = isDarkModle
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
+                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
             }
             else
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色

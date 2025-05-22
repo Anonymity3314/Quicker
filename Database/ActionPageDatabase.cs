@@ -38,8 +38,8 @@ namespace Quicker.Database
             // 创建并初始化场景数据表
             CreatAndInitTable("Global", "/Resources/Images/Icons/Quicker1.ico", "_global"); // 创建数据表并初始化
             CreatAndInitTable("Common", "/Resources/Images/Icons/Quicker1.ico", "common"); // 创建数据表并初始化
-            CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
             CreatAndInitTable("Taskbar", "/Resources/Images/Icons/Quicker1.ico", "taskbar"); // 创建数据表并初始化
+            CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
 
             // 将场景数据表名插入到Application_Master表中
             using var transaction = connection.BeginTransaction(); // 开启事务
