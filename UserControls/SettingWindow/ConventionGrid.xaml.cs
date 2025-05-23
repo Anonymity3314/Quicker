@@ -5,6 +5,7 @@ using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using Quicker;
+using Quicker.Windows.Forms;
 
 namespace Quicker.UserControls
 {
@@ -97,8 +98,12 @@ namespace Quicker.UserControls
         // 打开网站检查更新
         private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker/releases"); // 打开更新页面
+            using var updateManager = new AppUpdateManager(); // 创建更新管理器
+            if (updateManager.LatestUpdateInfo.NewVersion != SettingDatabase.currentVersion) // 检查是否有新版本
+            {
+                UpdateWindow updateWindow = new(); // 创建更新窗口
+                updateWindow.Show(); // 显示更新窗口
+            }
         }
 
         // 勾选框点击事件
