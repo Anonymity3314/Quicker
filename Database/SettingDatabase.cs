@@ -5,6 +5,43 @@ using System.IO;
 // SQLite数据库操作类
 public static class SettingDatabase
 {
+    // 配置项默认说明：
+    /* [Convention]
+     * Version: 软件的当前版本号，默认为程序版本。
+     * AutoStart: 是否开机自启，默认为false（关闭）。
+     * ShowNotification: 是否显示系统通知，默认为true（开启）。
+     * ShowAddImage: 是否显示添加图片选项，默认为true（开启）。
+     * HideTooltip: 是否隐藏工具提示，默认为false（不隐藏）。
+     * LongPressThreshold: 长按判定阈值（毫秒），默认为300ms。
+     * MouseMovePixels: 鼠标移动触发距离（像素），默认为50px。
+     * LoopPageFlipping: 是否循环翻页，默认为true（开启）。
+     * RememberLastPage: 是否记住设置窗口中最后打开的页面，默认为false（不记住）。
+     * LastPage: 最后打开的页面ID，默认为11。
+     * EnableMemoryOptimization: 是否启用内存优化，默认为true（开启）。
+     */
+    /* [OpenMainWindow]
+     * OpenMainWindowByMiddleMouseClick: 按中键点击打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByX1MouseClick: 按X1键点击打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByX2MouseClick: 按X2键点击打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByCtrl_MiddleMouseClick: 按Ctrl+中键点击打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByCtrl_RightMouseClick: 按Ctrl+右键点击打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByMiddleMouseClickLonger: 中键长按打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByRightMouseClickLonger: 右键长按打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByRightMouseClick_Move: 右键移动打开设置窗口，默认为false（关闭）。
+     * OpenMainWindowByCtrl: 按Ctrl打开设置窗口，默认为true（开启）。
+     * WindowStartupLocation: 设置窗口启动位置，默认为2（可能代表屏幕中央或其他位置）。
+     */
+    /* [Blacklist]
+     * IsFullScreenDisabled: 是否禁用全屏功能，默认为false（不禁用）。
+     * IsBlacklistEnabledForExtendedHotkey: 扩展快捷键是否启用黑名单，默认为false（不启用）。
+     */
+    /* [BlacklistApplication]
+     * ApplicationName: 黑名单列表显示的文字，可以是文件夹路径，也可以是应用程序名称。
+     * ProcessName: 确切的应用程序进程名称，应用程序的可执行文件名称。
+     * IsInBlacklist: 此项用于标识该应用程序是否在黑名单中。
+     * IsFolder: 此项用于标识ApplicationName是否为文件夹路径。
+     */
+
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
     private readonly static string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
     private readonly static ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
@@ -29,145 +66,97 @@ public static class SettingDatabase
     private static void InitializeConvention()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string createConventionTableQuery = @"
-        CREATE TABLE IF NOT EXISTS Convention
-        (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Version TEXT,
-            AutoStart BOOL,
-            ShowNotification BOOL,
-            ShowAddImage BOOL,
-            TotalUsageTime REAL,
-            HideTooltip BOOL,
-            LongPressThreshold INTEGER,
-            MouseMovePixels INTEGER,
-            LoopPageFlipping BOOL,
-            RememberLastPage BOOL,
-            LastPage INTEGER,
-            EnableMemoryOptimization BOOL
-        );"; // 创建 Convention 表
-        using var createConventionCommand = new SQLiteCommand(createConventionTableQuery, connection); // 创建 SQLiteCommand 对象
+        using var createConventionCommand = new SQLiteCommand(SQLStatements.CreateConventionTable, connection); // 创建 SQLiteCommand 对象
         createConventionCommand.ExecuteNonQuery(); // 执行创建表的命令
         InsertDefaultConventionData(); // 插入默认数据
     }
-
     // 插入默认数据
     private static void InsertDefaultConventionData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string insertConventionQuery = @"
-            INSERT INTO Convention 
-            (Version, AutoStart, ShowNotification, ShowAddImage, TotalUsageTime, HideTooltip, LongPressThreshold, MouseMovePixels, LoopPageFlipping, RememberLastPage, LastPage, EnableMemoryOptimization)
-            VALUES 
-            (@Version, @AutoStart, @ShowNotification, @ShowAddImage, @TotalUsageTime, @HideTooltip, @LongPressThreshold, @MouseMovePixels, @LoopPageFlipping, @RememberLastPage, @LastPage, @EnableMemoryOptimization);";
-        using var insertConventionCommand = new SQLiteCommand(insertConventionQuery, connection); // 创建 SQLiteCommand 对象
-        insertConventionCommand.Parameters.AddWithValue("@Version", currentVersion); // 版本号
-        insertConventionCommand.Parameters.AddWithValue("@AutoStart", false); // 是否开机自启
-        insertConventionCommand.Parameters.AddWithValue("@ShowNotification", true); // 是否显示通知
-        insertConventionCommand.Parameters.AddWithValue("@ShowAddImage", true); // 是否显示添加图片
-        insertConventionCommand.Parameters.AddWithValue("@TotalUsageTime", 0.0); // 总使用时长
-        insertConventionCommand.Parameters.AddWithValue("@HideTooltip", false); // 是否隐藏提示
-        insertConventionCommand.Parameters.AddWithValue("@LongPressThreshold", 300); // 长按阈值
-        insertConventionCommand.Parameters.AddWithValue("@MouseMovePixels", 50); // 鼠标移动像素
-        insertConventionCommand.Parameters.AddWithValue("@LoopPageFlipping", true); // 是否循环翻页
-        insertConventionCommand.Parameters.AddWithValue("@RememberLastPage", false); // 是否记住设置窗口中最后打开的页面
-        insertConventionCommand.Parameters.AddWithValue("@LastPage", 11); // 设置窗口中最后打开的页面
-        insertConventionCommand.Parameters.AddWithValue("@EnableMemoryOptimization", true); // 是否启用内存优化
-        insertConventionCommand.ExecuteNonQuery(); // 执行插入命令
+        var defaults = (currentVersion, false, true, true, 0.0, false, 300, 50, true, false, 11, true); // 使用参数元组封装默认值
+        var parameters = new Dictionary<string, object>
+        {
+            ["@Version"] = defaults.Item1,
+            ["@AutoStart"] = defaults.Item2,
+            ["@ShowNotification"] = defaults.Item3,
+            ["@ShowAddImage"] = defaults.Item4,
+            ["@TotalUsageTime"] = defaults.Item5,
+            ["@HideTooltip"] = defaults.Item6,
+            ["@LongPressThreshold"] = defaults.Item7,
+            ["@MouseMovePixels"] = defaults.Item8,
+            ["@LoopPageFlipping"] = defaults.Item9,
+            ["@RememberLastPage"] = defaults.Item10,
+            ["@LastPage"] = defaults.Item11,
+            ["@EnableMemoryOptimization"] = defaults.Item12
+        }; // 使用字典批量绑定参数
+        using var command = new SQLiteCommand(SQLStatements.InsertConvention, connection); // 创建 SQLiteCommand 对象
+        foreach (var param in parameters)
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+        command.ExecuteNonQuery(); // 执行插入命令
     }
 
     // 初始化OpenMainWindow 表
     private static void InitializeOpenMainWindow()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string createOpenMainWindowTableQuery = @"
-        CREATE TABLE IF NOT EXISTS OpenMainWindow
-        (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            OpenMainWindowByMiddleMouseClick BOOL,
-            OpenMainWindowByX1MouseClick BOOL,
-            OpenMainWindowByX2MouseClick BOOL,
-            OpenMainWindowByCtrl_MiddleMouseClick BOOL,
-            OpenMainWindowByCtrl_RightMouseClick BOOL,
-            OpenMainWindowByMiddleMouseClickLonger BOOL,
-            OpenMainWindowByRightMouseClickLonger BOOL,
-            OpenMainWindowByRightMouseClick_Move BOOL,
-            OpenMainWindowByCtrl BOOL,
-            WindowStartupLocation INT
-        );"; // 创建 OpenMainWindow 表
-        using var createOpenMainWindowCommand = new SQLiteCommand(createOpenMainWindowTableQuery, connection); // 创建 SQLiteCommand 对象
+        using var createOpenMainWindowCommand = new SQLiteCommand(SQLStatements.CreateOpenMainWindowTable, connection); // 创建 SQLiteCommand 对象
         createOpenMainWindowCommand.ExecuteNonQuery(); // 执行创建表的命令
         InsertDefaultOpenMainWindowData(); // 插入默认数据
     }
-
     // 插入默认数据
     private static void InsertDefaultOpenMainWindowData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string insertOpenMainWindowQuery = @"
-            INSERT INTO OpenMainWindow 
-            (OpenMainWindowByMiddleMouseClick, OpenMainWindowByX1MouseClick, OpenMainWindowByX2MouseClick, OpenMainWindowByCtrl_MiddleMouseClick, OpenMainWindowByCtrl_RightMouseClick, OpenMainWindowByMiddleMouseClickLonger, OpenMainWindowByRightMouseClickLonger, OpenMainWindowByRightMouseClick_Move, OpenMainWindowByCtrl, WindowStartupLocation)
-            VALUES 
-            (@OpenMainWindowByMiddleMouseClick, @OpenMainWindowByX1MouseClick, @OpenMainWindowByX2MouseClick, @OpenMainWindowByCtrl_MiddleMouseClick, @OpenMainWindowByCtrl_RightMouseClick, @OpenMainWindowByMiddleMouseClickLonger, @OpenMainWindowByRightMouseClickLonger, @OpenMainWindowByRightMouseClick_Move, @OpenMainWindowByCtrl, @WindowStartupLocation);";
-        using var insertOpenMainWindowCommand = new SQLiteCommand(insertOpenMainWindowQuery, connection); // 创建 SQLiteCommand 对象
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", false); // 按下中键
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", false); // 按下X1键
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", false); // 按下X2键
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl_MiddleMouseClick", false); // Ctrl+中键单击
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl_RightMouseClick", false); // Ctrl+右键单击
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClickLonger", false); // 长按中键
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByRightMouseClickLonger", false); // 长按右键
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", false); // 按右键移动
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@OpenMainWindowByCtrl", true); // 单击Ctrl键
-        insertOpenMainWindowCommand.Parameters.AddWithValue("@WindowStartupLocation", 2); // 功能面板打开位置
-        insertOpenMainWindowCommand.ExecuteNonQuery(); // 执行插入命令
+        var defaults = (false, true, 2); // 使用参数元组封装默认值
+        var parameters = new Dictionary<string, object>
+        {
+            ["@OpenMainWindowByMiddleMouseClick"] = defaults.Item1,
+            ["@OpenMainWindowByX1MouseClick"] = defaults.Item1,
+            ["@OpenMainWindowByX2MouseClick"] = defaults.Item1,
+            ["@OpenMainWindowByCtrl_MiddleMouseClick"] = defaults.Item1,
+            ["@OpenMainWindowByCtrl_RightMouseClick"] = defaults.Item1,
+            ["@OpenMainWindowByMiddleMouseClickLonger"] = defaults.Item1,
+            ["@OpenMainWindowByRightMouseClickLonger"] = defaults.Item1,
+            ["@OpenMainWindowByRightMouseClick_Move"] = defaults.Item1,
+            ["@OpenMainWindowByCtrl"] = defaults.Item2,
+            ["@WindowStartupLocation"] = defaults.Item3
+        }; // 使用字典批量绑定参数
+        using var command = new SQLiteCommand(SQLStatements.InsertOpenMainWindow, connection); // 创建 SQLiteCommand 对象
+        foreach (var param in parameters)
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+        command.ExecuteNonQuery(); // 执行插入命令
     }
 
     // 初始化 Blacklist 表
     public static void InitializeBlacklist()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string createBlacklistTableQuery = @"
-        CREATE TABLE IF NOT EXISTS Blacklist
-        (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            IsFullScreenDisabled BOOL,
-            IsBlacklistEnabledForExtendedHotkey BOOL
-        );"; // 创建 Blacklist 表
-        using var createBlacklistCommand = new SQLiteCommand(createBlacklistTableQuery, connection); // 创建 SQLiteCommand 对象
+        using var createBlacklistCommand = new SQLiteCommand(SQLStatements.CreateBlacklistTable, connection); // 创建 SQLiteCommand 对象
         createBlacklistCommand.ExecuteNonQuery(); // 执行创建表的命令
         InsertDefaultBlacklistData(); // 插入默认数据
     }
-
     // 插入默认数据
     private static void InsertDefaultBlacklistData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string insertBlacklistQuery = @"
-            INSERT INTO Blacklist 
-            (IsFullScreenDisabled, IsBlacklistEnabledForExtendedHotkey) 
-            VALUES 
-            (@IsFullScreenDisabled, @IsBlacklistEnabledForExtendedHotkey);";
-        using var insertBlacklistCommand = new SQLiteCommand(insertBlacklistQuery, connection); // 创建 SQLiteCommand 对象
-        insertBlacklistCommand.Parameters.AddWithValue("@IsFullScreenDisabled", false); // 是否开启全屏或最大化禁用功能
-        insertBlacklistCommand.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", false); // 是否将黑名单与全屏禁用设置应用于扩展热键功能
-        insertBlacklistCommand.ExecuteNonQuery(); // 执行插入命令
+        var defaults = (false, false); // 使用参数元组封装默认值
+        var parameters = new Dictionary<string, object>
+        {
+            ["@IsFullScreenDisabled"] = defaults.Item1,
+            ["@IsBlacklistEnabledForExtendedHotkey"] = defaults.Item2
+        }; // 使用字典批量绑定参数
+        using var command = new SQLiteCommand(SQLStatements.InsertBlacklist, connection); // 创建 SQLiteCommand 对象
+        foreach (var param in parameters)
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+        command.ExecuteNonQuery(); // 执行插入命令
     }
 
     // 初始化 BlacklistApplication 表
     public static void InitializeBlacklistApplication()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        string createBlacklistApplicationTableQuery = @"
-        CREATE TABLE IF NOT EXISTS BlacklistApplication
-        (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            ApplicationName TEXT,
-            ProcessName TEXT,
-            IsInBlacklist BOOL,
-            IsFolder BOOL
-        );"; // 创建 BlacklistApplication 表
-        using var createBlacklistApplicationCommand = new SQLiteCommand(createBlacklistApplicationTableQuery, connection); // 创建 SQLiteCommand 对象
+        using var createBlacklistApplicationCommand = new SQLiteCommand(SQLStatements.CreateBlacklistApplicationTable, connection); // 创建 SQLiteCommand 对象
         createBlacklistApplicationCommand.ExecuteNonQuery(); // 执行创建表的命令
     }
 
@@ -186,42 +175,35 @@ public static class SettingDatabase
     public static void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization)
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        using var command = new SQLiteCommand(@"
-        UPDATE Convention SET 
-            AutoStart = @AutoStart, 
-            ShowNotification = @ShowNotification, 
-            ShowAddImage = @ShowAddImage, 
-            HideTooltip = @HideTooltip,
-            LongPressThreshold = @LongPressThreshold,
-            MouseMovePixels = @MouseMovePixels,
-            LoopPageFlipping = @LoopPageFlipping,
-            RememberLastPage = @RememberLastPage,
-            EnableMemoryOptimization = @EnableMemoryOptimization
-        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@AutoStart", autostart); // 是否开机自启
-        command.Parameters.AddWithValue("@ShowNotification", shownotification); // 是否显示通知
-        command.Parameters.AddWithValue("@ShowAddImage", showaddimage); // 是否显示添加图片
-        command.Parameters.AddWithValue("@HideTooltip", hideTooltip); // 是否隐藏提示
-        command.Parameters.AddWithValue("@LongPressThreshold", longPressThreshold); // 长按阈值
-        command.Parameters.AddWithValue("@MouseMovePixels", mouseMovePixels); // 鼠标移动像素
-        command.Parameters.AddWithValue("@LoopPageFlipping", loopPageFlipping); // 是否循环翻页
-        command.Parameters.AddWithValue("@RememberLastPage", rememberLastPage); // 是否记住设置窗口中最后打开的页面
-        command.Parameters.AddWithValue("@EnableMemoryOptimization", enableMemoryOptimization); // 是否启用内存优化
-        command.ExecuteNonQuery(); // 执行更新命令
+        var parameters = new Dictionary<string, object>
+        {
+            ["@AutoStart"] = autostart, // 是否开机自启
+            ["@ShowNotification"] = shownotification, // 是否显示通知
+            ["@ShowAddImage"] = showaddimage, // 是否显示添加图片
+            ["@HideTooltip"] = hideTooltip, // 是否隐藏提示
+            ["@LongPressThreshold"] = longPressThreshold, // 长按阈值
+            ["@MouseMovePixels"] = mouseMovePixels, // 鼠标移动像素
+            ["@LoopPageFlipping"] = loopPageFlipping, // 是否循环翻页
+            ["@RememberLastPage"] = rememberLastPage, // 是否记住设置窗口中最后打开的页面
+            ["@EnableMemoryOptimization"] = enableMemoryOptimization // 是否启用内存优化
+        };
+        foreach (var param in parameters) // 遍历参数字典
+        {
+            using var command = new SQLiteCommand(SQLStatements.UpdateConvention, connection); // 创建 SQLiteCommand 对象
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+            command.ExecuteNonQuery(); // 执行更新命令
+        }
     }
 
     /// <summary>
     /// 设置窗口中最后打开的页面
     /// </summary>
     /// <param name="lastPage"> 设置窗口中最后打开的页面 </param>
-    public static void SetLastPage(int lastPage)
+    public static void RecordLastPage(int lastPage)
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        using var command = new SQLiteCommand(@"
-        UPDATE Convention SET 
-            LastPage = @LastPage
-        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@LastPage", lastPage); // 设置最后打开的页面
+        using var command = new SQLiteCommand(SQLStatements.UpdateLastPage, connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@LastPage", lastPage); // 绑定参数
         command.ExecuteNonQuery(); // 执行更新命令
     }
 
@@ -241,30 +223,25 @@ public static class SettingDatabase
     public static void ApplyOpenMainWindowSettings(bool OpenMainWindowByMiddleMouseClick, bool OpenMainWindowByX1MouseClick, bool OpenMainWindowByX2MouseClick, bool OpenMainWindowByCtrl_MiddleMouseClick, bool OpenMainWindowByCtrl_RightMouseClick, bool OpenMainWindowByMiddleMouseClickLonger, bool OpenMainWindowByRightMouseClickLonger, bool OpenMainWindowByRightMouseClick_Move, bool OpenMainWindowByCtrl, int windowStartupLocation)
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        using var command = new SQLiteCommand(@"
-        UPDATE OpenMainWindow SET 
-            OpenMainWindowByMiddleMouseClick = @OpenMainWindowByMiddleMouseClick,
-            OpenMainWindowByX1MouseClick = @OpenMainWindowByX1MouseClick,
-            OpenMainWindowByX2MouseClick = @OpenMainWindowByX2MouseClick,
-            OpenMainWindowByCtrl_MiddleMouseClick = @OpenMainWindowByCtrl_MiddleMouseClick,
-            OpenMainWindowByCtrl_RightMouseClick = @OpenMainWindowByCtrl_RightMouseClick,
-            OpenMainWindowByMiddleMouseClickLonger = @OpenMainWindowByMiddleMouseClickLonger,
-            OpenMainWindowByRightMouseClickLonger = @OpenMainWindowByRightMouseClickLonger,
-            OpenMainWindowByRightMouseClick_Move = @OpenMainWindowByRightMouseClick_Move,
-            OpenMainWindowByCtrl = @OpenMainWindowByCtrl,
-            WindowStartupLocation = @WindowStartupLocation 
-        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClick", OpenMainWindowByMiddleMouseClick); // 按下中键
-        command.Parameters.AddWithValue("@OpenMainWindowByX1MouseClick", OpenMainWindowByX1MouseClick); // 按下X1键
-        command.Parameters.AddWithValue("@OpenMainWindowByX2MouseClick", OpenMainWindowByX2MouseClick); // 按下X2键
-        command.Parameters.AddWithValue("@OpenMainWindowByCtrl_MiddleMouseClick", OpenMainWindowByCtrl_MiddleMouseClick); // Ctrl+中键单击
-        command.Parameters.AddWithValue("@OpenMainWindowByCtrl_RightMouseClick", OpenMainWindowByCtrl_RightMouseClick); // Ctrl+右键单击
-        command.Parameters.AddWithValue("@OpenMainWindowByMiddleMouseClickLonger", OpenMainWindowByMiddleMouseClickLonger); // 长按中键
-        command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClickLonger", OpenMainWindowByRightMouseClickLonger); // 长按右键
-        command.Parameters.AddWithValue("@OpenMainWindowByRightMouseClick_Move", OpenMainWindowByRightMouseClick_Move); // 按右键移动
-        command.Parameters.AddWithValue("@OpenMainWindowByCtrl", OpenMainWindowByCtrl); // 单击Ctrl键
-        command.Parameters.AddWithValue("@WindowStartupLocation", windowStartupLocation); // 功能面板打开位置
-        command.ExecuteNonQuery(); // 执行更新命令
+        var parameters = new Dictionary<string, object>
+        {
+            ["@OpenMainWindowByMiddleMouseClick"] = OpenMainWindowByMiddleMouseClick, // 按下中键
+            ["@OpenMainWindowByX1MouseClick"] = OpenMainWindowByX1MouseClick, // 按下X1键
+            ["@OpenMainWindowByX2MouseClick"] = OpenMainWindowByX2MouseClick, // 按下X2键
+            ["@OpenMainWindowByCtrl_MiddleMouseClick"] = OpenMainWindowByCtrl_MiddleMouseClick, // Ctrl+中键单击
+            ["@OpenMainWindowByCtrl_RightMouseClick"] = OpenMainWindowByCtrl_RightMouseClick, // Ctrl+右键单击
+            ["@OpenMainWindowByMiddleMouseClickLonger"] = OpenMainWindowByMiddleMouseClickLonger, // 长按中键
+            ["@OpenMainWindowByRightMouseClickLonger"] = OpenMainWindowByRightMouseClickLonger, // 长按右键
+            ["@OpenMainWindowByRightMouseClick_Move"] = OpenMainWindowByRightMouseClick_Move, // 按右键移动
+            ["@OpenMainWindowByCtrl"] = OpenMainWindowByCtrl, // 单击Ctrl键
+            ["@WindowStartupLocation"] = windowStartupLocation // 功能面板打开位置
+        };
+        foreach (var param in parameters) // 遍历参数字典
+        {
+            using var command = new SQLiteCommand(SQLStatements.UpdateOpenMainWindow, connection); // 创建 SQLiteCommand 对象
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+            command.ExecuteNonQuery(); // 执行更新命令
+        }
     }
 
     /// <summary>
@@ -276,14 +253,17 @@ public static class SettingDatabase
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
-        using var command = new SQLiteCommand(@"
-        UPDATE Blacklist SET 
-            IsFullScreenDisabled = @IsFullScreenDisabled,
-            IsBlacklistEnabledForExtendedHotkey = @IsBlacklistEnabledForExtendedHotkey
-        WHERE ID = 1;", connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@IsFullScreenDisabled", isFullScreenDisabled); // 是否开启全屏或最大化禁用功能
-        command.Parameters.AddWithValue("@IsBlacklistEnabledForExtendedHotkey", isBlacklistEnabledForExtendedHotkey); // 是否将黑名单与全屏禁用设置应用于扩展热键功能
-        command.ExecuteNonQuery(); // 执行更新命令
+        var parameters = new Dictionary<string, object>
+        {
+            ["@IsFullScreenDisabled"] = isFullScreenDisabled, // 是否开启全屏或最大化禁用功能
+            ["@IsBlacklistEnabledForExtendedHotkey"] = isBlacklistEnabledForExtendedHotkey // 是否将黑名单与全屏禁用设置应用于扩展热键功能
+        };
+        foreach (var param in parameters) // 遍历参数字典
+        {
+            using var command = new SQLiteCommand(SQLStatements.UpdateBlacklist, connection); // 创建 SQLiteCommand 对象
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+            command.ExecuteNonQuery(); // 执行更新命令
+        }
         transaction.Commit(); // 提交事务
     }
 
@@ -298,16 +278,19 @@ public static class SettingDatabase
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
-        string insertQuery = @"INSERT INTO BlacklistApplication 
-            (ApplicationName, ProcessName, IsInBlacklist, IsFolder)
-            VALUES 
-            (@ApplicationName, @ProcessName, @IsInBlacklist, @IsFolder);";
-        using var command = new SQLiteCommand(insertQuery, connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@ApplicationName", applicationName); // 应用名称
-        command.Parameters.AddWithValue("@ProcessName", processName); // 进程名称
-        command.Parameters.AddWithValue("@IsInBlacklist", isInBlacklist); // 是否在黑名单中
-        command.Parameters.AddWithValue("@IsFolder", isFolder); // 是否是文件夹
-        command.ExecuteNonQuery(); // 执行插入命令
+        var parameters = new Dictionary<string, object>
+        {
+            ["@ApplicationName"] = applicationName, // 应用名称
+            ["@ProcessName"] = processName, // 进程名称
+            ["@IsInBlacklist"] = isInBlacklist, // 是否在黑名单中
+            ["@IsFolder"] = isFolder // 是否是文件夹
+        };
+        foreach (var param in parameters) // 遍历参数字典
+        {
+            using var command = new SQLiteCommand(SQLStatements.InsertBlacklistApplication, connection); // 创建 SQLiteCommand 对象
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+            command.ExecuteNonQuery(); // 执行插入命令
+        }
         transaction.Commit(); // 提交事务
     }
 
@@ -319,9 +302,8 @@ public static class SettingDatabase
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
-        string deleteQuery = "DELETE FROM BlacklistApplication WHERE ApplicationName = @ApplicationName;"; // 删除黑名单应用
-        using var command = new SQLiteCommand(deleteQuery, connection); // 创建 SQLiteCommand 对象
-        command.Parameters.AddWithValue("@ApplicationName", applicationName); // 设置参数
+        using var command = new SQLiteCommand(SQLStatements.DeleteBlacklistApplication, connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@ApplicationName", applicationName); // 应用名称
         command.ExecuteNonQuery(); // 执行删除命令
         transaction.Commit(); // 提交事务
     }
@@ -334,8 +316,7 @@ public static class SettingDatabase
     {
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(); // 开启事务
-        string updateQuery = "UPDATE Convention SET TotalUsageTime = @TotalUsageTime WHERE ID = 1;"; // 更新总使用时长
-        using var command = new SQLiteCommand(updateQuery, connection); // 创建 SQLiteCommand 对象
+        using var command = new SQLiteCommand(SQLStatements.UpdateTotalUsageTime, connection); // 创建 SQLiteCommand 对象
         command.Parameters.AddWithValue("@TotalUsageTime", totalUsageTime); // 设置参数
         command.ExecuteNonQuery(); // 执行更新命令
         transaction.Commit(); // 提交事务
@@ -350,8 +331,7 @@ public static class SettingDatabase
         var conventions = new List<Convention>(); // 创建一个空的 Convention 列表
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
-        string selectQuery = "SELECT * FROM Convention;"; // 查询所有 Convention 数据
-        using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+        using var command = new SQLiteCommand(SQLStatements.GetAllConventions, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
         while (reader.Read())
         {
@@ -385,8 +365,7 @@ public static class SettingDatabase
         var conditions = new List<OpenMainWindow>(); // 创建一个空的 OpenMainWindow 列表
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
-        string selectQuery = "SELECT * FROM OpenMainWindow;"; // 查询所有 OpenMainWindow 数据
-        using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+        using var command = new SQLiteCommand(SQLStatements.GetAllOpenMainWindowConditions, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
         while (reader.Read())
         {
@@ -418,8 +397,7 @@ public static class SettingDatabase
         var blacklists = new List<Blacklist>(); // 创建一个空的 Blacklist 列表
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
-        string selectQuery = "SELECT * FROM Blacklist;"; // 查询所有 Blacklist 数据
-        using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+        using var command = new SQLiteCommand(SQLStatements.GetAllBlacklistSettings, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
         while (reader.Read())
         {
@@ -443,8 +421,7 @@ public static class SettingDatabase
         var applications = new List<BlacklistApplication>(); // 创建一个空的 BlacklistApplication 列表
         using var connection = OpenConnection(); // 打开数据库连接
         using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
-        string selectQuery = "SELECT * FROM BlacklistApplication;"; // 查询所有 BlacklistApplication 数据
-        using var command = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+        using var command = new SQLiteCommand(SQLStatements.GetAllBlacklistApplications, connection); // 创建 SQLiteCommand 对象
         using var reader = command.ExecuteReader(); // 执行查询并获取结果
         while (reader.Read())
         {
@@ -471,6 +448,183 @@ public static class SettingDatabase
         connection.BusyTimeout = 30000; // 设置超时时间为 30 秒
         connection.Open(); // 打开数据库连接
         return connection; // 返回打开的连接
+    }
+
+    // 数据库文件路径语句
+    private static class SQLStatements
+    {
+        // 常规设置表
+        public const string CreateConventionTable = @"
+        CREATE TABLE IF NOT EXISTS Convention
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            Version TEXT,
+            AutoStart BOOLEAN,
+            ShowNotification BOOLEAN,
+            ShowAddImage BOOLEAN,
+            TotalUsageTime REAL,
+            HideTooltip BOOLEAN,
+            LongPressThreshold INTEGER,
+            MouseMovePixels INTEGER,
+            LoopPageFlipping BOOLEAN,
+            RememberLastPage BOOLEAN,
+            LastPage INTEGER,
+            EnableMemoryOptimization BOOLEAN
+        );";
+        public const string InsertConvention = @"
+        INSERT INTO Convention
+        (
+            Version,            AutoStart, 
+            ShowNotification,   ShowAddImage,
+            TotalUsageTime,     HideTooltip,
+            LongPressThreshold, MouseMovePixels,
+            LoopPageFlipping,   RememberLastPage,
+            LastPage,           EnableMemoryOptimization
+        )
+        VALUES
+        (
+            @Version,           @AutoStart,
+            @ShowNotification,  @ShowAddImage,
+            @TotalUsageTime,    @HideTooltip,
+            @LongPressThreshold,@MouseMovePixels,
+            @LoopPageFlipping,  @RememberLastPage,
+            @LastPage,          @EnableMemoryOptimization
+        );";
+        public const string UpdateConvention = @"
+        UPDATE Convention SET
+            Version = @Version,
+            AutoStart = @AutoStart,
+            ShowNotification = @ShowNotification,
+            ShowAddImage = @ShowAddImage,
+            TotalUsageTime = @TotalUsageTime,
+            HideTooltip = @HideTooltip,
+            LongPressThreshold = @LongPressThreshold,
+            MouseMovePixels = @MouseMovePixels,
+            LoopPageFlipping = @LoopPageFlipping,
+            RememberLastPage = @RememberLastPage,
+            LastPage = @LastPage,
+            EnableMemoryOptimization = @EnableMemoryOptimization
+        WHERE ID = 1;";
+        public const string GetAllConventions = "SELECT * FROM Convention;";
+        // 打开主窗口设置表
+        public const string CreateOpenMainWindowTable = @"
+        CREATE TABLE IF NOT EXISTS OpenMainWindow
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            OpenMainWindowByMiddleMouseClick BOOLEAN,
+            OpenMainWindowByX1MouseClick BOOLEAN,
+            OpenMainWindowByX2MouseClick BOOLEAN,
+            OpenMainWindowByCtrl_MiddleMouseClick BOOLEAN,
+            OpenMainWindowByCtrl_RightMouseClick BOOLEAN,
+            OpenMainWindowByMiddleMouseClickLonger BOOLEAN,
+            OpenMainWindowByRightMouseClickLonger BOOLEAN,
+            OpenMainWindowByRightMouseClick_Move BOOLEAN,
+            OpenMainWindowByCtrl BOOLEAN,
+            WindowStartupLocation INTEGER
+        );";
+        public const string InsertOpenMainWindow = @"
+        INSERT INTO OpenMainWindow
+        (
+            OpenMainWindowByMiddleMouseClick,
+            OpenMainWindowByX1MouseClick,
+            OpenMainWindowByX2MouseClick,
+            OpenMainWindowByCtrl_MiddleMouseClick,
+            OpenMainWindowByCtrl_RightMouseClick,
+            OpenMainWindowByMiddleMouseClickLonger,
+            OpenMainWindowByRightMouseClickLonger,
+            OpenMainWindowByRightMouseClick_Move,
+            OpenMainWindowByCtrl,
+            WindowStartupLocation
+        )
+        VALUES
+        (
+            @OpenMainWindowByMiddleMouseClick,
+            @OpenMainWindowByX1MouseClick,
+            @OpenMainWindowByX2MouseClick,
+            @OpenMainWindowByCtrl_MiddleMouseClick,
+            @OpenMainWindowByCtrl_RightMouseClick,
+            @OpenMainWindowByMiddleMouseClickLonger,
+            @OpenMainWindowByRightMouseClickLonger,
+            @OpenMainWindowByRightMouseClick_Move,
+            @OpenMainWindowByCtrl,
+            @WindowStartupLocation
+        );";
+        public const string UpdateOpenMainWindow = @"
+        UPDATE OpenMainWindow SET
+            OpenMainWindowByMiddleMouseClick = @OpenMainWindowByMiddleMouseClick,
+            OpenMainWindowByX1MouseClick = @OpenMainWindowByX1MouseClick,
+            OpenMainWindowByX2MouseClick = @OpenMainWindowByX2MouseClick,
+            OpenMainWindowByCtrl_MiddleMouseClick = @OpenMainWindowByCtrl_MiddleMouseClick,
+            OpenMainWindowByCtrl_RightMouseClick = @OpenMainWindowByCtrl_RightMouseClick,
+            OpenMainWindowByMiddleMouseClickLonger = @OpenMainWindowByMiddleMouseClickLonger,
+            OpenMainWindowByRightMouseClickLonger = @OpenMainWindowByRightMouseClickLonger,
+            OpenMainWindowByRightMouseClick_Move = @OpenMainWindowByRightMouseClick_Move,
+            OpenMainWindowByCtrl = @OpenMainWindowByCtrl,
+            WindowStartupLocation = @WindowStartupLocation
+        WHERE ID = 1;";
+        public const string GetAllOpenMainWindowConditions = "SELECT * FROM OpenMainWindow;";
+        // 黑名单设置表
+        public const string CreateBlacklistTable = @"
+        CREATE TABLE IF NOT EXISTS Blacklist
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            IsFullScreenDisabled BOOLEAN,
+            IsBlacklistEnabledForExtendedHotkey BOOLEAN
+        );";
+        public const string InsertBlacklist = @"
+        INSERT INTO Blacklist
+        (
+            IsFullScreenDisabled,
+            IsBlacklistEnabledForExtendedHotkey
+        )
+        VALUES
+        (
+            @IsFullScreenDisabled,
+            @IsBlacklistEnabledForExtendedHotkey
+        );";
+        public const string UpdateBlacklist = @"
+        UPDATE Blacklist SET
+            IsFullScreenDisabled = @IsFullScreenDisabled,
+            IsBlacklistEnabledForExtendedHotkey = @IsBlacklistEnabledForExtendedHotkey
+        WHERE ID = 1;";
+        public const string GetAllBlacklistSettings = "SELECT * FROM Blacklist;";
+        // 黑名单应用表
+        public const string CreateBlacklistApplicationTable = @"
+        CREATE TABLE IF NOT EXISTS BlacklistApplication
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ApplicationName TEXT,
+            ProcessName TEXT,
+            IsInBlacklist BOOLEAN,
+            IsFolder BOOLEAN
+        );";
+        public const string InsertBlacklistApplication = @"
+        INSERT INTO BlacklistApplication
+        (
+            ApplicationName,
+            ProcessName,
+            IsInBlacklist,
+            IsFolder
+        )
+        VALUES
+        (
+            @ApplicationName,
+            @ProcessName,
+            @IsInBlacklist,
+            @IsFolder
+        );";
+        public const string DeleteBlacklistApplication = @"
+        DELETE FROM BlacklistApplication WHERE ApplicationName = @ApplicationName;";
+        public const string GetAllBlacklistApplications = "SELECT * FROM BlacklistApplication;";
+        // 其他语句
+        public const string UpdateTotalUsageTime = @"
+        UPDATE Convention SET 
+            TotalUsageTime = @TotalUsageTime 
+        WHERE ID = 1;"; // 更新使用总时长
+        public const string UpdateLastPage = @"
+        UPDATE Convention SET 
+            LastPage = @LastPage
+        WHERE ID = 1;";
     }
 }
 

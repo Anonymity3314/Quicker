@@ -90,9 +90,7 @@ namespace Quicker.Managers
         public void SetGridVisible(Grid childrengrid, Grid fathergrid)
         {
             foreach (var grid in fathergrid.Children.OfType<Grid>())
-            {
                 grid.Visibility = grid == childrengrid ? Visibility.Visible : Visibility.Collapsed; // 设置Grid可见性
-            }
         }
 
         /// <summary>
@@ -105,16 +103,12 @@ namespace Quicker.Managers
         {
             if (targetStackPanel.Visibility == Visibility.Visible) return; // 如果目标面板已经打开，则不执行任何操作
             foreach (var stackpanel in fathergrid.Children.OfType<StackPanel>())
-            {
                 stackpanel.Visibility = stackpanel == targetStackPanel ? Visibility.Visible : Visibility.Collapsed; // 设置StackPanel可见性
-            } // 设置StackPanel可见性
 
             foreach (var button in fatherStackPanel.Children.OfType<Button>())
-            {
                 button.Background = button == targetButton
                     ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(SelectedButtonColor1))
                     : new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultButtonColor1)); // 设置Button类型1颜色
-            } // 设置Button类型1颜色
         }
 
         /// <summary>
@@ -177,10 +171,8 @@ namespace Quicker.Managers
         /// <param name="buttonPanelGrid"> Button面板Grid </param>
         public void ButtonStyle3_Click(Button clickedButton, Grid buttonPanelGrid)
         {
-            foreach (var button in buttonPanelGrid.Children.OfType<Button>())
-            {
-                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 2) : new Thickness(0); // 设置Button边框
-            }
+            foreach (var button in buttonPanelGrid.Children.OfType<Button>()) // 遍历Button容器中所有Button，设置边框
+                button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 2) : new Thickness(0);
         }
 
         // 下拉框选择改变事件
@@ -358,11 +350,10 @@ namespace Quicker.Managers
         // 手动释放资源
         public void Dispose()
         {
-            // 清理缓存
-            conventions = null;
-            openMainWindowConditions = null;
-            blacklistSettings = null;
-            appearanceConditions = null;
+            conventions = null; // 常规设置
+            openMainWindowConditions = null; // 弹出面板设置
+            blacklistSettings = null; // 黑名单设置
+            appearanceConditions = null; // 外观设置
 
             // 强制垃圾回收
             GC.Collect();

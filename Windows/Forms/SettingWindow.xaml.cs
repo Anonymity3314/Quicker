@@ -43,8 +43,16 @@ namespace Quicker.Windows
         /// <param name="page"> </param>
         private void SetLastPage(int page)
         {
-            int num1 = page / 10; // 计算第几组按钮
-            int num2 = page % 10; // 计算第几个按钮
+            LoadPage1(page / 10); // 计算第几组按钮
+            LoadPage2(page % 10); // 计算第几个按钮
+        }
+
+        /// <summary>
+        /// 加载第一组按钮
+        /// </summary>
+        /// <param name="num1"> 第几组按钮 </param>
+        private void LoadPage1(int num1)
+        {
             switch (num1)
             {
                 case 1:
@@ -57,7 +65,14 @@ namespace Quicker.Windows
                     Tools_Click(null, null); // 点击工具按钮
                     break;
             }
+        }
 
+        /// <summary>
+        /// 加载第二组按钮
+        /// </summary>
+        /// <param name="num2"> 第几组按钮 </param>
+        private void LoadPage2(int num2)
+        {
             switch (num2)
             {
                 case 1:
@@ -311,7 +326,7 @@ namespace Quicker.Windows
             {
                 lastpage = 15; // 关于Quicker页面
             }
-            SettingDatabase.SetLastPage(lastpage); // 保存最后打开的页面
+            SettingDatabase.RecordLastPage(lastpage); // 保存最后打开的页面
         }
 
         // 关闭窗口前，释放资源
@@ -326,31 +341,6 @@ namespace Quicker.Windows
                 child.Children.Clear(); // 清空 StackPanel 的子元素
             }
             ResultGrid.Children.Clear(); // 清空 ResultGrid 的子元素
-
-            foreach (var button in MainStackPanel.Children.OfType<Button>()) // 清理事件处理器
-            {
-                button.Click -= BasicSetting_Click;
-                button.Click -= Auxiliary_Functions_Click;
-                button.Click -= Tools_Click;
-                button.MouseLeave -= BasicSetting_MouseLeave;
-                button.MouseLeave -= Auxiliary_Functions_MouseLeave;
-                button.MouseLeave -= Tools_MouseLeave;
-            }
-
-            foreach (var button in MenuGrid.Children.OfType<Button>()) // 清理事件处理器
-            {
-                button.Click -= Convention_Click;
-                button.Click -= OpenMainWindow_Click;
-                button.Click -= Blacklist_Click;
-                button.Click -= Appearance_Click;
-                button.Click -= AboutQuicker_Click;
-                button.MouseLeave -= Convention_MouseLeave;
-                button.MouseLeave -= OpenMainWindow_MouseLeave;
-                button.MouseLeave -= Blacklist_MouseLeave;
-                button.MouseLeave -= Appearance_MouseLeave;
-                button.MouseLeave -= AboutQuicker_MouseLeave;
-            }
-            this.Icon = null; // 清理窗口图标
 
             // 强制垃圾回收
             GC.Collect();
