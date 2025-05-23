@@ -214,6 +214,21 @@ namespace Quicker.Managers
             return process.ProcessName; // 返回进程名称
         }
 
+        // 设置主窗口焦点
+        public void SetMainWindowFocused()
+        {
+            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口对象
+            if (mainWindow != null) // 主窗口对象不为空
+                mainWindow.Activate(); // 激活主窗口
+        }
+
+        // 延时关闭窗口
+        public async Task CloseMenuAsync(Window window)
+        {
+            await Task.Delay(1000); // 延迟100毫秒
+            window.Close(); // 关闭窗口
+        }
+
         // 释放资源
         public void Dispose()
         {

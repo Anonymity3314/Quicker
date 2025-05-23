@@ -19,6 +19,8 @@
                 <ResourceDictionary Source="Resources/Styles/CheckBoxStyle.xaml"/>
                 <!-- 下拉框样式 -->
                 <ResourceDictionary Source="Resources/Styles/ComboBoxStyle.xaml"/>
+                <!-- 画布样式 -->
+                <ResourceDictionary Source="Resources/Styles/CanvasStyles.xaml"/>
                 <!-- 提示框样式 -->
                 <ResourceDictionary Source="Resources/Styles/TooltipStyle.xaml"/>
                 <!-- 按钮样式 -->

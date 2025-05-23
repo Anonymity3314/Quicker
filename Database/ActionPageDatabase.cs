@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
+using System.Data;
 using System.IO;
 
 namespace Quicker.Database
@@ -27,30 +27,23 @@ namespace Quicker.Database
         private void InitializeDatabase()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            string createMasterTableQuery = @"
-                CREATE TABLE IF NOT EXISTS Application_Master (
-                    TableName TEXT PRIMARY KEY
-                );
-            "; // 创建Application_Master表的SQL语句
-            using var command = new SQLiteCommand(createMasterTableQuery, connection); // 创建SQLiteCommand对象
-            command.ExecuteNonQuery(); // 执行创建表的SQL语句
-
-            // 创建并初始化场景数据表
+            CreatMasterTable(connection); // 创建Application_Master表
             CreatAndInitTable("Global", "/Resources/Images/Icons/Quicker1.ico", "_global"); // 创建数据表并初始化
             CreatAndInitTable("Common", "/Resources/Images/Icons/Quicker1.ico", "common"); // 创建数据表并初始化
             CreatAndInitTable("Taskbar", "/Resources/Images/Icons/Quicker1.ico", "taskbar"); // 创建数据表并初始化
             CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
+        }
 
-            // 将场景数据表名插入到Application_Master表中
+        // 创建Application_Master表
+        private void CreatMasterTable(SQLiteConnection connection)
+        {
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string[] sceneTableNames = { "GlobalScene", "CommonScene", "DesktopScene", "TaskbarScene" }; // 场景数据表名称数组
-            foreach (var tableName in sceneTableNames)
-            {
-                string insertQuery = "INSERT OR IGNORE INTO Application_Master (TableName) VALUES (@TableName);"; // 插入场景数据表名的SQL语句
-                using var insertCommand = new SQLiteCommand(insertQuery, connection, transaction); // 创建SQLiteCommand对象
-                insertCommand.Parameters.AddWithValue("@TableName", tableName); // 场景数据表名
-                insertCommand.ExecuteNonQuery(); // 执行插入表的SQL语句
-            }
+            string createMasterTableQuery = @"
+                CREATE TABLE IF NOT EXISTS Application_Master (
+                    TableName TEXT PRIMARY KEY
+            );"; // 创建Application_Master表的SQL语句
+            using var command = new SQLiteCommand(createMasterTableQuery, connection, transaction); // 创建SQLiteCommand对象
+            command.ExecuteNonQuery(); // 执行创建表的SQL语句
             transaction.Commit(); // 提交事务
         }
 
@@ -92,19 +85,20 @@ namespace Quicker.Database
                     break;
             }
             int actionPageCount = db2.TableExists(tableName) ? db2.GetTotalAntionPageIndex(tableName) : 0; // 获取动作页数量
-            UpdateSceneTable(tableName, tableName, sceneIconPath, actionPageCount, sceneTag); // 初始化场景数据表
+            SceneData sceneData = new SceneData()
+            {
+                SceneName = tableName,
+                SceneIconPath = sceneIconPath,
+                SceneCount = actionPageCount,
+                SceneTag = sceneTag,
+                AutoReturnToFirstPage = false,
+            }; // 创建场景数据对象
+            UpdateSceneTable(tableName, sceneData); // 初始化场景数据表
             for (int i = 0; i < actionPageCount; i++) 
             {
                 CreatActionPageTable(tableName);
-                switch(tableName)
-                {
-                    case "Global":
-                    case "Common":
-                        break;
-                    default:
-                        actionPageName = actionPageName + i.ToString(); // 设置动作页名称
-                        break;
-                }
+                if (tableName != "Global" && tableName != "Common")
+                    actionPageName = actionPageName + i.ToString(); // 设置动作页名称
                 UpdateActionPageTable(tableName, tableName+i.ToString(), actionPageProcess, actionPageName, 0); // 初始化动作页数据表
             }
         }
@@ -122,7 +116,8 @@ namespace Quicker.Database
                 SceneName TEXT PRIMARY KEY,
                 SceneIconPath TEXT,
                 SceneCount INTEGER,
-                SceneTag TEXT
+                SceneTag TEXT,
+                AutoReturnToFirstPage BOOL
             );"; // 创建场景数据表的SQL语句
             using var command = new SQLiteCommand(createTableQuery, connection); // 创建SQLiteCommand对象
             command.ExecuteNonQuery(); // 执行创建表的SQL语句
@@ -133,22 +128,73 @@ namespace Quicker.Database
         /// 更新场景数据表
         /// </summary>
         /// <param name="tableName"> 场景数据表名称 </param>
-        /// <param name="sceneName"> 场景名称 </param>
-        /// <param name="sceneIconPath"> 场景图标路径 </param>
-        /// <param name="sceneCount"> 场景数量 </param>
-        public void UpdateSceneTable(string tableName, string sceneName, string sceneIconPath, int sceneCount, string sceneTag)
+        /// <param name="sceneData"> 场景数据对象 </param>
+        public void UpdateSceneTable(string tableName, SceneData sceneData)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             string query = $@"INSERT OR REPLACE INTO {tableName + "Scene"}
-            (SceneName, SceneIconPath, SceneCount, SceneTag)
+            (SceneName, SceneIconPath, SceneCount, SceneTag, AutoReturnToFirstPage)
             VALUES
-            (@SceneName, @SceneIconPath, @SceneCount, @SceneTag)"; // 更新场景数据表的SQL语句
+            (@SceneName, @SceneIconPath, @SceneCount, @SceneTag, @AutoReturnToFirstPage)"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@SceneName", sceneName); // 场景类型
-            command.Parameters.AddWithValue("@SceneIconPath", sceneIconPath); // 场景图标路径
-            command.Parameters.AddWithValue("@SceneCount", sceneCount); // 场景数量
-            command.Parameters.AddWithValue("@SceneTag", sceneTag); // 场景标签
+            command.Parameters.AddWithValue("@SceneName", sceneData.SceneName); // 场景类型
+            command.Parameters.AddWithValue("@SceneIconPath", sceneData.SceneIconPath); // 场景图标路径
+            command.Parameters.AddWithValue("@SceneCount", sceneData.SceneCount); // 场景数量
+            command.Parameters.AddWithValue("@SceneTag", sceneData.SceneTag); // 场景标签
+            command.Parameters.AddWithValue("@AutoReturnToFirstPage", sceneData.AutoReturnToFirstPage); // 是否自动返回到第一个页面
+            command.ExecuteNonQuery(); // 执行更新表的SQL语句
+            transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 设置是否自动返回第一页
+        /// </summary>
+        /// <param name="tableName"> 场景表名称 </param>
+        /// <param name="autoReturnToFirstPage"> 是否自动返回到第一个页面 </param>
+        public void SetAutoReturnToFirstPage(string tableName, bool autoReturnToFirstPage)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string query = $@"UPDATE {tableName + "Scene"} SET AutoReturnToFirstPage = @AutoReturnToFirstPage"; // 更新场景数据表的SQL语句
+            using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
+            command.Parameters.AddWithValue("@AutoReturnToFirstPage", autoReturnToFirstPage); // 设置参数
+            command.ExecuteNonQuery(); // 执行更新表的SQL语句
+            transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 获取是否自动返回第一页
+        /// </summary>
+        /// <param name="tableName"> 场景表名称 </param>
+        /// <returns> 是否自动返回到第一个页面 </returns>
+        public bool GetAutoReturnToFirstPage(string tableName)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string query = $@"SELECT AutoReturnToFirstPage FROM {tableName + "Scene"}"; // 获取场景数据表的SQL语句
+            using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
+            using var reader = command.ExecuteReader(); // 执行查询SQL语句
+            bool autoReturnToFirstPage = false; // 自动返回到第一个页面
+            while (reader.Read())
+            {
+                autoReturnToFirstPage = reader.GetBoolean(0); // 获取自动返回到第一个页面
+            }
+            return autoReturnToFirstPage; // 返回自动返回到第一个页面
+        }
+
+        /// <summary>
+        /// 更新场景数量
+        /// </summary>
+        /// <param name="tableName"> 场景数据表名称 </param>
+        /// <param name="sceneCount"> 场景数量 </param>
+        public void UpdateSceneCount(string tableName, int sceneCount)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string query = $@"UPDATE {tableName + "Scene"} SET SceneCount = @SceneCount"; // 更新场景数据表的SQL语句
+            using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
+            command.Parameters.AddWithValue("@SceneCount", sceneCount); // 设置参数
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -294,15 +340,12 @@ namespace Quicker.Database
                     SceneIconPath = reader.GetString(1), // 场景图标路径
                     SceneCount = reader.GetInt32(2), // 场景数量
                     SceneTag = reader.GetString(3), // 场景标签
+                    AutoReturnToFirstPage = reader.GetBoolean(4), // 是否自动返回第一个页面
                 }); // 添加场景数据
             }
             return conditions; // 返回场景数据表
         }
 
-        /// <summary>
-        /// 获取所有场景数据
-        /// </summary>
-        /// <returns> 所有场景数据 </returns>
         /// <summary>
         /// 获取所有场景数据
         /// </summary>
@@ -374,59 +417,59 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            try
-            {
-                // 获取两个动作页的当前 DefaultActionPageName
-                string actionPage1Name = $"{tableName}{index1}";
-                string actionPage2Name = $"{tableName}{index2}";
-                string tempName = $"{tableName}_temp_swap"; // 生成临时名称
+            string actionPage1Name = $"{tableName}{index1}"; // 获取第一个动作页的名称
+            string actionPage2Name = $"{tableName}{index2}"; // 获取第二个动作页的名称
+            string tempName = $"{tableName}_temp_swap"; // 生成临时名称
 
-                // 更新第一个动作页为临时名称
-                string updateQuery = $@"UPDATE {tableName + "ActionPage"}
+            // 更新第一个动作页为临时名称
+            string updateQuery = $@"UPDATE {tableName + "ActionPage"}
                                 SET DefaultActionPageName = @TempName
                                 WHERE DefaultActionPageName = @ActionPage1Name"; // 更新第一个动作页的SQL语句
-                using var updateCommand1 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
-                updateCommand1.Parameters.AddWithValue("@TempName", tempName); // 设置临时名称
-                updateCommand1.Parameters.AddWithValue("@ActionPage1Name", actionPage1Name); // 设置第一个动作页名称
-                updateCommand1.ExecuteNonQuery(); // 执行更新表的SQL语句
+            using var updateCommand1 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
+            updateCommand1.Parameters.AddWithValue("@TempName", tempName); // 设置临时名称
+            updateCommand1.Parameters.AddWithValue("@ActionPage1Name", actionPage1Name); // 设置第一个动作页名称
+            updateCommand1.ExecuteNonQuery(); // 执行更新表的SQL语句
 
-                // 更新第二个动作页为第一个动作页的原始名称
-                updateQuery = $@"UPDATE {tableName + "ActionPage"}
+            // 更新第二个动作页为第一个动作页的原始名称
+            updateQuery = $@"UPDATE {tableName + "ActionPage"}
                         SET DefaultActionPageName = @ActionPage1Name
                         WHERE DefaultActionPageName = @ActionPage2Name"; // 更新第二个动作页的SQL语句
-                using var updateCommand2 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
-                updateCommand2.Parameters.AddWithValue("@ActionPage1Name", actionPage1Name); // 设置第一个动作页名称
-                updateCommand2.Parameters.AddWithValue("@ActionPage2Name", actionPage2Name); // 设置第二个动作页名称
-                updateCommand2.ExecuteNonQuery(); // 执行更新表的SQL语句
+            using var updateCommand2 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
+            updateCommand2.Parameters.AddWithValue("@ActionPage1Name", actionPage1Name); // 设置第一个动作页名称
+            updateCommand2.Parameters.AddWithValue("@ActionPage2Name", actionPage2Name); // 设置第二个动作页名称
+            updateCommand2.ExecuteNonQuery(); // 执行更新表的SQL语句
 
-                // 更新第一个动作页为第二个动作页的原始名称
-                updateQuery = $@"UPDATE {tableName + "ActionPage"}
+            // 更新第一个动作页为第二个动作页的原始名称
+            updateQuery = $@"UPDATE {tableName + "ActionPage"}
                         SET DefaultActionPageName = @ActionPage2Name
                         WHERE DefaultActionPageName = @TempName"; // 更新第一个动作页的SQL语句
-                using var updateCommand3 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
-                updateCommand3.Parameters.AddWithValue("@ActionPage2Name", actionPage2Name); // 设置第二个动作页名称
-                updateCommand3.Parameters.AddWithValue("@TempName", tempName); // 设置临时名称
-                updateCommand3.ExecuteNonQuery(); // 执行更新表的SQL语句
-                transaction.Commit(); // 提交事务
-            }
-            catch
-            {
-                transaction.Rollback(); // 回滚事务
-            }
+            using var updateCommand3 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
+            updateCommand3.Parameters.AddWithValue("@ActionPage2Name", actionPage2Name); // 设置第二个动作页名称
+            updateCommand3.Parameters.AddWithValue("@TempName", tempName); // 设置临时名称
+            updateCommand3.ExecuteNonQuery(); // 执行更新表的SQL语句
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>
-        /// 判断场景数据表是否存在
+        /// 生成场景标题
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
-        /// <returns> 场景数据表是否存在 </returns>
-        public bool TableExists(string tableName)
+        /// <param name="sceneData"> 场景数据 </param>
+        /// <returns> 场景标题 </returns>
+        public string GetSceneTitle(SceneData sceneData)
         {
-            using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name = @TableName;", connection); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@TableName", tableName); // 添加参数
-            using var reader = command.ExecuteReader(); // 执行查询SQL语句
-            return reader.Read(); // 返回场景数据表是否存在
+            switch (sceneData.SceneName)
+            {
+                case "Global":
+                    return "全局"; // 全局场景
+                case "Common":
+                    return "通用"; // 通用场景
+                case "Taskbar":
+                    return "任务栏"; // 任务栏场景
+                case "Desktop":
+                    return "桌面"; // 桌面场景
+                default:
+                    return sceneData.SceneName; // 其他场景
+            }
         }
 
         /// <summary>
@@ -449,6 +492,7 @@ namespace Quicker.Database
         public string SceneIconPath { get; set; } // 场景图标路径
         public int SceneCount { get; set; } // 场景数量
         public string SceneTag { get; set; } // 场景标签
+        public bool AutoReturnToFirstPage { get; set; } // 是否自动返回第一个页面
     }
 
     // 动作页信息

@@ -32,7 +32,7 @@
 
         <Border x:Name="MainBorder" Margin="239,31,11,0" BorderBrush="#FF606060" BorderThickness="0.75" VerticalAlignment="Top" Height="224">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
-                <ListView x:Name="MainListView" Background="LightGray" AllowDrop="True" PreviewDragOver="ListView_PreviewDragOver" Drop="ListView_Drop">
+                <ListView x:Name="MainListView" Background="#EEEEEE" AllowDrop="True" PreviewDragOver="ListView_PreviewDragOver" Drop="ListView_Drop">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel x:Name="MainStackPanel" Orientation="Horizontal" MouseWheel="MainStackPanel_MouseWheel"/>
@@ -86,5 +86,6 @@
             </Grid>
         </Popup>
         <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="240,264,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163" ToolTip="右键显示/隐藏动作使用次数" MouseRightButtonDown="AddActionPageButton_MouseRightButtonDown"/>
+        <CheckBox x:Name="AutoReturnToFirstPageCheckBox" Content="自动返回第一页" Margin="535,268,0,0" VerticalAlignment="Top" ToolTip="在后面的页执行完动作后是否自动返回到第一页" HorizontalAlignment="Left" Checked="AutoReturnToFirstPageCheckBox_Checked"/>
     </Grid>
 </Window>

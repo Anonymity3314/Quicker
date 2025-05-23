@@ -130,7 +130,6 @@ namespace Quicker.UserControls.AddWindow
             {
                 Filter = "任意文件(*.*)|*.*|可执行程序(*.exe)|*.exe" // 设置文件类型过滤器
             };
-
             if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了“确定”
             {
                 LocationTextBox.Text = openFileDialog.FileName; // 获取文件路径

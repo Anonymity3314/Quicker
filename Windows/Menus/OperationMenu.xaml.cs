@@ -27,8 +27,6 @@ namespace Quicker.Windows
             CurrentButton = currentbutton; // 设置当前按钮
             TableName = tableName; // 设置表名
             InitializeMenu(); // 初始化菜单
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
         // 初始化菜单
@@ -68,7 +66,6 @@ namespace Quicker.Windows
         {
             ActionInformationWindow actionInformationWindow = new(CurrentButton, TableName); // 创建动作信息窗口
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
-            actionInformationWindow.Owner = mainWindow; // 设置父窗口
             actionInformationWindow.ShowDialog(); // 显示动作信息窗口
             this.Close(); // 关闭操作菜单窗口
         }
@@ -209,7 +206,11 @@ namespace Quicker.Windows
         private void OperationMenu_Deactivated(object sender, EventArgs e)
         {
             ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件
+            using var windowMananger = new WindowManager(); // 创建窗口管理器
+            windowMananger.SetMainWindowFocused(); // 关闭窗口
             this.Visibility = Visibility.Hidden; // 隐藏窗口
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.CloseMenuAsync(this); // 延时关闭窗口
         }
 
         // 关闭窗口前释放资源
@@ -217,6 +218,7 @@ namespace Quicker.Windows
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件
+            buttonManager.Dispose();
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收

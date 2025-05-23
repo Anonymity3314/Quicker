@@ -13,6 +13,7 @@ namespace Quicker.Windows
         public int CurrentButton { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
         public event Action? ClosingOrHiding; // 事件
+        private bool haveAction = false; // 是否有动作
 
         public CreatActionMenu(int currentbutton, string tableName)
         {
@@ -34,7 +35,7 @@ namespace Quicker.Windows
                 {
                     MainGrid.Height -= 29; // 减少高度
                     Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
-                    PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏复制按钮
+                    PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
                     StartAppButton.Margin = new Thickness(0, 5, 0, 0); // 调整按钮位置
                     hasChanged = !hasChanged;
                 }
@@ -47,7 +48,7 @@ namespace Quicker.Windows
                 {
                     MainGrid.Height += 29; // 增加高度
                     Line1.Visibility = Visibility.Visible; // 显示分割线
-                    PasteActionButton.Visibility = Visibility.Visible; // 显示复制按钮
+                    PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
                     StartAppButton.Margin = new Thickness(0, 3, 0, 0); // 调整按钮位置
                     hasChanged = !hasChanged;
                 }
@@ -60,7 +61,7 @@ namespace Quicker.Windows
             SetButtonVisbility(); // 设置按钮可见性
         }
 
-        // 复制动作
+        // 粘贴动作
         private void PasteActionButton_Click(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
@@ -83,6 +84,7 @@ namespace Quicker.Windows
         // 启动软件
         private void StartApp(object sender, RoutedEventArgs e)
         {
+            haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, TableName, 1); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
@@ -92,6 +94,7 @@ namespace Quicker.Windows
         // 打开文件
         private void OpenDocument(object sender, RoutedEventArgs e)
         {
+            haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, TableName, 2); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
@@ -101,6 +104,7 @@ namespace Quicker.Windows
         // 打开文件夹
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
+            haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, TableName, 3); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
@@ -110,6 +114,7 @@ namespace Quicker.Windows
         // 打开网址
         private void OpenWebsite(object sender, RoutedEventArgs e)
         {
+            haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             AddWindow addWindow = new(CurrentButton, TableName, 4); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
@@ -120,7 +125,14 @@ namespace Quicker.Windows
         private void CreatActionMenu_Deactivated(object sender, EventArgs e)
         {
             ClosingOrHiding?.Invoke(); // 调用事件
+            if(!haveAction)
+            {
+                using var windowMananger = new WindowManager(); // 创建窗口管理器
+                windowMananger.SetMainWindowFocused(); // 关闭窗口
+            }
             this.Visibility = Visibility.Hidden; // 隐藏窗口
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.CloseMenuAsync(this); // 延时关闭窗口
         }
 
         // 关闭窗口前释放资源
@@ -130,6 +142,7 @@ namespace Quicker.Windows
             ClosingOrHiding = null; // 清理事件
             clipboardText = null; // 清理剪切板文本
             hasChanged = false; // 清理检查状态
+            buttonManager.Dispose();
 
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

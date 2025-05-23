@@ -11,7 +11,6 @@ namespace Quicker.UserControls
     public partial class ConventionGrid : UserControl
     {
         private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
-        ActionManager actionManager = new(); // 动作管理器
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
         private double totalUsageTime; // 总使用时长
@@ -98,6 +97,7 @@ namespace Quicker.UserControls
         // 打开网站检查更新
         private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker/releases"); // 打开更新页面
         }
 
@@ -116,7 +116,6 @@ namespace Quicker.UserControls
         // 窗体关闭释放资源
         private void ConventionGrid_Unloaded(object sender, RoutedEventArgs e)
         {
-            actionManager.Dispose();
             timer.Stop(); // 停止定时器
             totalUsageTime = 0; // 清空总使用时长
             currentSessionTime = 0; // 清空当次应用使用时长

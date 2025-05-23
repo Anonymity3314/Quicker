@@ -19,7 +19,7 @@ namespace Quicker.Windows
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD3D3D3")); // 未选中页面按钮颜色
 
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
-        private readonly ButtonManager buttonManager = new(); // 按钮管理器
+        public readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
@@ -37,10 +37,14 @@ namespace Quicker.Windows
         /// 通用类型改变事件
         /// </summary>
         /// <param name="style"> 样式名称 </param>
-        private void OnCommonStyleChanged(string style)
+        public void OnCommonStyleChanged(string style)
         {
             CommonStyle = style; // 设置样式
             CommonGrid.Children.Clear(); // 清空通用网格
+            SetCommonTextBlock(0); // 设置通用标签内容
+            GenerateUniformGrid(0, CommonStyle); // 生成对应样式 UniformGrid
+            GenerateButtons(); // 生成按钮
+            LockCommonActionPage(null, null); // 锁住通用动作页面
         }
 
         // 加载数据库和Button
@@ -73,6 +77,8 @@ namespace Quicker.Windows
         // 生成页面切换 Button
         private void GenerateButtons()
         {
+            GlobalButtonPanel.Children.Clear(); // 清空全局动作页切换按钮
+            CommonButtonPanel.Children.Clear(); // 清空通用动作页切换按钮
             var globalSceneData = db3.GetSceneData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
             var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
             GeneratePageButtons("Global", globalSceneData.SceneCount, SwitchToGlobalUniformGrid, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
@@ -95,9 +101,8 @@ namespace Quicker.Windows
             {
                 Button button = new Button
                 {
-                    Name = $"{prefix}{i}", // 设置按钮名称
-                    Margin = new Thickness(2.5, 0, 2.5, 0), // 设置按钮边距
-                    Style = FindResource("ActionPageChangeButton") as Style // 设置按钮样式
+                    Style = FindResource("ActionPageChangeButton") as Style, // 设置按钮样式
+                    Name = $"{prefix}{i}" // 设置按钮名称
                 }; // 创建按钮对象
                 if (i == 0) button.Background = SelectedBrush; // 设置当前按钮颜色
 
@@ -197,11 +202,16 @@ namespace Quicker.Windows
         // 失去焦点时关闭功能面板
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Book)
+            ActionInformationWindow actionInformationWindow = App.Current.Windows.OfType<ActionInformationWindow>().FirstOrDefault(); // 查找ActionInformationWindow
+            if (actionInformationWindow != null) // 如果存在ActionInformationWindow
+                this.Activate(); // 激活窗口
+            else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Book)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
             }
+            else
+                this.Activate(); // 激活窗口
         }
 
         // 鼠标移入Button改变外观
@@ -321,20 +331,23 @@ namespace Quicker.Windows
         private void DoAction(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            string buttonType = button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
+            string buttonType = GetButtonType(sender); // 获取按钮类型
             if (button.Tag is ButtonData data)
             {
                 if (!AppStateManager.Book && data.ActionType != "OpenActionPage") 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
-                try
+
+                DoAction(data); // 执行动作
+                db2.IncreaseActionUsedTimes(data.ButtonID, buttonType); // 增加动作使用次数
+
+                bool autoReturn = db3.GetAutoReturnToFirstPage(buttonType); // 获取是否自动返回第一页
+                if(autoReturn) // 如果自动返回第一页，清空按钮所在容器
                 {
-                    DoAction(data); // 执行动作
-                    db2.IncreaseActionUsedTimes(data.ButtonID, buttonType); // 增加动作使用次数
-                }
-                catch (Exception ex)
-                {
-                    using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.ShowToast("动作执行失败：", ex.Message); // 弹出消息提醒
+                    if (buttonType == "Global")
+                        GlobalGrid.Children.Clear();
+                    else
+                        CommonGrid.Children.Clear();
+                    GenerateUniformGrid(0, buttonType); // 重新生成第一页内容
                 }
             }
             else
@@ -351,7 +364,7 @@ namespace Quicker.Windows
         /// <param name="data"> 按钮数据 </param>
         private void DoAction(ButtonData data)
         {
-            var actionManager = new ActionManager(); // 创建 ActionManager 的实例
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             switch (data.ActionType)
             {
                 case "OpenFile":
@@ -370,7 +383,6 @@ namespace Quicker.Windows
                     OpenActionPage(data); // 打开动作页
                     break; // 打开动作页
             }
-            actionManager.Dispose(); // 释放动作管理器资源
         }
 
         /// <summary>
@@ -395,8 +407,7 @@ namespace Quicker.Windows
         public void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            string buttonType = button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
-            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this, buttonType); // 打开操作菜单
+            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this, GetButtonType(sender)); // 打开操作菜单
         }
 
         // 添加关闭标志防止报错
@@ -420,8 +431,7 @@ namespace Quicker.Windows
         {
             if (sender is Button TargetButton)
             {
-                string buttonType = TargetButton.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
-                buttonManager.Button_Drop(sender, e, true, buttonType); // 处理拖拽事件
+                buttonManager.Button_Drop(sender, e, true, GetButtonType(sender)); // 处理拖拽事件
             }
         }
 
@@ -437,8 +447,7 @@ namespace Quicker.Windows
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
             {
-                string buttonType = button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
-                buttonManager.Button_PreviewMouseMove(sender, e, true, buttonType); // 检查拖拽条件
+                buttonManager.Button_PreviewMouseMove(sender, e, true, GetButtonType(sender)); // 检查拖拽条件
             }
         }
 
@@ -716,7 +725,18 @@ namespace Quicker.Windows
         // 右键锁定 Button 切换菜单
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
-            //buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this); // 打开菜单
+            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this, GetButtonType(sender)); // 打开菜单
+        }
+
+        /// <summary>
+        /// 获取按钮类型
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <returns></returns>
+        private string GetButtonType(object sender)
+        {
+            Button button = sender as Button; // 获取按钮
+            return button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
         }
 
         // 窗口关闭时强制垃圾回收
@@ -791,16 +811,6 @@ namespace Quicker.Windows
                 button.MouseEnter -= CommonActionPageChangeButton_MouseEnter;
                 button.MouseLeave -= CommonActionPageChangeButton_MouseLeave;
             }
-
-            // 移除窗口事件
-            this.Loaded -= MainWindow_Loaded;
-            this.Closing -= MainWindow_Closing;
-            this.Deactivated -= MainWindow_Deactivated;
-            this.MouseLeftButtonDown -= MoveMainWindow;
-
-            // 移除网格事件
-            GlobalGrid.MouseWheel -= CommonGrid_MouseWheel;
-            CommonGrid.MouseWheel -= CommonGrid_MouseWheel;
         }
     }
 }

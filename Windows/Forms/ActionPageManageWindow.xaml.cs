@@ -12,9 +12,6 @@ namespace Quicker.Windows
 {
     public partial class ActionPageManageWindow : Window
     {
-        private const string changeActionPageButtonImage = "/Resources/Images/Icons/Quicker1.ico";
-        private const string editActionPageButtonImage = "/Resources/Images/Icons/Quicker1.ico";
-
         private T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             while (child != null)
@@ -45,13 +42,22 @@ namespace Quicker.Windows
         /// <param name="targetType"> 目标类型 </param>
         private void TypeChanged(string targetType)
         {
+            if (type == targetType) return; // 如果目标类型与当前类型相同，直接返回
             LoadingWindow loadingWindow = new(); // 创建加载窗口
             loadingWindow.Show(); // 显示加载窗口
             type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
+            LoadSettings(); // 加载设置
             SetButtonBackground(); // 设置场景按钮背景色
             SetSceneTitle(); // 设置场景标题
             loadingWindow?.Close(); // 关闭加载窗口
+        }
+
+        // 加载设置
+        private void LoadSettings()
+        {
+            var autoReturn = db3.GetAutoReturnToFirstPage(type); // 获取设置
+            AutoReturnToFirstPageCheckBox.IsChecked = autoReturn; // 加载设置
         }
 
         // 设置场景按钮背景色
@@ -61,7 +67,7 @@ namespace Quicker.Windows
             {
                 Button button = element as Button; // 转换为按钮
                 button.Background = button.Name == type
-                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9E9E9"))
                     : System.Windows.Media.Brushes.Transparent; // 设置背景色
             }
         }
@@ -71,8 +77,8 @@ namespace Quicker.Windows
         {
             Button button = sender as Button; // 转换发送者为Button对象
             button.Background = button.Name == type
-                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
-                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置背景色
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DFDFDF"))
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F5F5F5")); // 设置背景色
         }
 
         // 鼠标移出Button恢复原状
@@ -80,7 +86,7 @@ namespace Quicker.Windows
         {
             Button button = sender as Button; // 转换发送者为Button对象
             button.Background = button.Name == type
-                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"))
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9E9E9"))
                 : System.Windows.Media.Brushes.Transparent; // 设置背景色
         }
 
@@ -107,7 +113,7 @@ namespace Quicker.Windows
                 buttonContent.Children.Add(image); // 添加到网格
                 TextBlock sceneName = new()
                 {
-                    Text = GetSceneTitle(data), // 文本内容
+                    Text = db3.GetSceneTitle(data), // 文本内容
                     Style = FindResource("SceneNameTextBlock") as Style, // 应用样式
                 }; // 创建 TextBlock
                 buttonContent.Children.Add(sceneName); // 添加到网格
@@ -133,7 +139,7 @@ namespace Quicker.Windows
             SceneTitleStackPanel.Children.Clear(); // 清空标题StackPanel
             var sceneInfo = db3.GetSceneData(type).FirstOrDefault(); // 获取场景信息
             SceneImage.Source = new BitmapImage(new Uri(sceneInfo.SceneIconPath, UriKind.Relative)); // 设置场景图片
-            string sceneTitleText = GetSceneTitle(sceneInfo); // 获取场景标题
+            string sceneTitleText = db3.GetSceneTitle(sceneInfo); // 获取场景标题
             TextBlock sceneTitle = new()
             {
                 Text = sceneTitleText, // 场景名称
@@ -149,28 +155,6 @@ namespace Quicker.Windows
         }
 
         /// <summary>
-        /// 生成场景标题
-        /// </summary>
-        /// <param name="sceneData"> 场景数据 </param>
-        /// <returns> 场景标题 </returns>
-        private string GetSceneTitle(SceneData sceneData)
-        {
-            switch(sceneData.SceneName)
-            {
-                case "Global":
-                    return "全局"; // 全局场景
-                case "Common":
-                    return "通用"; // 通用场景
-                case "Taskbar":
-                    return "任务栏"; // 任务栏场景
-                case "Desktop":
-                    return "桌面"; // 桌面场景
-                default:
-                    return sceneData.SceneName; // 其他场景
-            }
-        }
-
-        /// <summary>
         /// 加载动作页
         /// </summary>
         /// <param name="style">动作页样式</param>
@@ -183,11 +167,13 @@ namespace Quicker.Windows
                     MainBorder.Height = 224; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
                     AddActionPageButton.Margin = new Thickness(239, 264, 0, 0); // 设置添加动作页按钮边距
+                    AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 268, 0, 0); // 设置自动返回到第一页复选框边距
                     break; // 全局动作页
                 case "Common":
                     MainBorder.Height = 289; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
                     AddActionPageButton.Margin = new Thickness(239, 329, 0, 0); // 设置添加动作页按钮边距
+                    AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 333, 0, 0); // 设置自动返回到第一页复选框边距
                     break; // 普通动作页
                 default:
                     if (db2.TableExists(style)) // 如果存在通用样式按钮数据表
@@ -195,12 +181,14 @@ namespace Quicker.Windows
                         MainBorder.Height = 289; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
                         AddActionPageButton.Margin = new Thickness(239, 329, 0, 0); // 设置添加动作页按钮边距
+                        AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 333, 0, 0); // 设置自动返回到第一页复选框边距
                     }
                     else
                     {
                         MainBorder.Height = 224; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 250, 10, 0); // 设置滚动条边距
                         AddActionPageButton.Margin = new Thickness(239, 264, 0, 0); // 设置添加动作页按钮边距
+                        AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 268, 0, 0); // 设置自动返回到第一页复选框边距
                     }
                     break;
             }
@@ -225,35 +213,34 @@ namespace Quicker.Windows
             dynamicCanvas.Children.Add(grid); // 将网格添加到画布
             Button pageButton = GenerateChangePageButton(canvasIndex, style); // 生成标题按钮
             grid.Children.Add(pageButton);
-            pageButton.Content = GenerateImage(changeActionPageButtonImage); // 生成标题按钮图片
 
             Button editPageButton = GenerateEditActionPageButton(canvasIndex, style); // 生成编辑动作页按钮
             grid.Children.Add(editPageButton);
-            editPageButton.Content = GenerateImage(editActionPageButtonImage); // 生成编辑动作页按钮图片
 
             TextBlock actionPageName = GenerateActionPageName(canvasIndex); // 生成动作页名称
             grid.Children.Add(actionPageName);
-
-            double buttonSpacing = 65; // 按钮间距
+    
             int rows = style == "Global" ? 3 : 4; // 行数
             int cols = 4; // 列数
+            UniformGrid uniformGrid = new()
+            {
+                Margin = new Thickness(0, 20, 0, 0),
+                Columns = cols,
+                Rows = rows,
+            };
+            dynamicCanvas.Children.Add(uniformGrid);
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    int buttonIndex = row * 4 + col + 1; // 按钮索引
                     string buttonName = $"{style}{canvasIndex}{row + 1}{col + 1}"; // 按钮名称
-
                     Button button = new Button // 创建按钮
                     {
-                        Name = buttonName, // 按钮名称
                         Style = FindResource("ActionButton") as Style, // 按钮样式
-                        Margin = new Thickness(col * buttonSpacing, row * buttonSpacing + grid.Height, 0, 0) // 按钮边距
+                        Name = buttonName // 按钮名称
                     }; // 创建按钮
-
                     BindButtonEvents(button); // 绑定按钮事件
-
-                    dynamicCanvas.Children.Add(button); // 将按钮添加到画布
+                    uniformGrid.Children.Add(button); // 将按钮添加到画布
 
                     var data = db2.GetButtonDataByID(int.Parse(buttonName.Replace(style, "")), type); // 获取按钮数据
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
@@ -273,12 +260,9 @@ namespace Quicker.Windows
             string canvasName = $"{style}{canvasIndex}"; // 画布名称
             Canvas dynamicCanvas = new Canvas // 创建画布
             {
-                Width = 260, // 画布宽度
-                AllowDrop = true,
-                Name = canvasName, // 画布名称
+                Style = FindResource("ActionPageCanvas") as Style,
                 Height = style == "Global" ? 215 : 280, // 画布高度
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
+                Name = canvasName, // 画布名称
             }; // 创建画布
             return dynamicCanvas; // 返回画布
         }
@@ -291,14 +275,7 @@ namespace Quicker.Windows
         /// <returns> 标题 </returns>
         private Grid GenerateTitle(int canvasIndex, string style)
         {
-            Grid grid = new Grid
-            {
-                Height = 20, // 网格高度
-                Width = 260, // 网格宽度
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Left, // 水平对齐方式
-                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")) // 背景颜色
-            }; // 创建网格
+            Grid grid = new Grid { Style = FindResource("ActionPageTitleGrid") as Style }; // 创建网格
             return grid; // 返回网格
         }
 
@@ -312,13 +289,8 @@ namespace Quicker.Windows
         {
             Button pageButton = new Button
             {
-                Width = 17.24, // 按钮宽度
-                Margin = new Thickness(3, 0, 0, 0), // 按钮边距
-                BorderThickness = new Thickness(0), // 按钮边框
-                Tag = $"{style}{canvasIndex}", // 按钮标签
+                Style = FindResource("ActionChangePageButton") as Style,
                 Name = $"{style}{canvasIndex}", // 按钮名称
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Left // 水平对齐方式
             };
             pageButton.PreviewMouseMove += Button1_PreviewMouseMove; // 鼠标移动事件
             pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
@@ -336,26 +308,12 @@ namespace Quicker.Windows
         {
             Button editPageButton = new Button
             {
-                Width = 17.24, // 按钮宽度
+                Style = FindResource("ActionPageEditButton") as Style,
                 Name = $"Edit{style}{canvasIndex}", // 按钮名称
-                Margin = new Thickness(0, 0, 3, 0), // 按钮边距
-                BorderThickness = new Thickness(0, 0, 0, 0), // 按钮边框
-                VerticalAlignment = VerticalAlignment.Center, // 垂直对齐方式
-                HorizontalAlignment = HorizontalAlignment.Right // 水平对齐方式
             };
             editPageButton.Click += OpenEditPopup; // 点击事件
             editPageButton.MouseDoubleClick += EditActionPageInfoButton_Click; // 双击事件
             return editPageButton; // 返回按钮
-        }
-
-        /// <summary>
-        /// 生成图片
-        /// </summary>
-        /// <returns> 图片 </returns>
-        private Image GenerateImage(string imagePath)
-        {
-            Image image = new Image { Source = new BitmapImage(new Uri(imagePath, UriKind.Relative)) };
-            return image; // 返回图片
         }
 
         /// <summary>
@@ -497,19 +455,20 @@ namespace Quicker.Windows
             else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
-                db3.CreatAndInitTable(type,"",""); // 创建场景数据表
+                if (!new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果不是默认场景
+                    db3.CreatAndInitTable(type,"",""); // 创建场景数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
                 if(type != "Global")
                 {
                     MainBorder.Height = 289; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
                     AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加场景按钮边距
+                    AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 341, 0, 0); // 设置自动返回到第一页复选框边距
                 }
             }
             else
             {
-                db3.UpdateSceneTable(type, type, "", canvasCount + 1, ""); // 更新场景数据表
-                db3.CreatActionPageTable(type); // 创建动作页数据表
+                db3.UpdateSceneCount(type, canvasCount + 1); // 更新场景数据表
                 var actionPageInfo = GetActionPageInfo(); // 获取动作页信息
                 db3.UpdateActionPageTable(type, type + canvasCount.ToString(), actionPageInfo.ActionPageProcess, actionPageInfo.ActionPageName, 0); // 更新动作页数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 生成画布
@@ -745,6 +704,7 @@ namespace Quicker.Windows
         // 点击按钮删除动作页
         private void DeleteActionPageButton_Click(object sender, RoutedEventArgs e)
         {
+            EditActionPagePopup.IsOpen = false; // 关闭编辑动作页弹出菜单
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             // 移除画布
             Grid targetGrid = bingdingButton.Parent as Grid; // 获取目标画布
@@ -757,8 +717,9 @@ namespace Quicker.Windows
             if(MainListView.Items.Count == 0)
             {
                 db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
-                db3.DeleteSceneTable(type); // 如果没有画布，则删除场景数据表
                 db3.DeleteActionPageTable(type); // 删除动作页数据表
+                if (!new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果不是默认场景
+                    db3.DeleteSceneTable(type); // 删除场景数据表
             }
             LoadCanvas(type); // 刷新界面
         }
@@ -773,41 +734,30 @@ namespace Quicker.Windows
         // 点击按钮编辑场景
         private void EditSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (type)
+            if (new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果是默认场景
             {
-                case "Global":
-                case "Common":
-                case "Taskbar":
-                case "Desktop":
-                    {
-                        using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast("此项不可编辑。", "Common"); // 弹出消息提醒
-                    }
-                    break;
-                default:
-                    string canvasIndex = GetBingdingButton().Name.Replace("Edit" + type, ""); // 获取画布索引
-                    EditSceneWindow editSceneWindow = new(type); // 创建编辑场景窗口
-                    editSceneWindow.Show(); // 显示编辑场景窗口
-                    break;
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("此项不可编辑。", "Common"); // 弹出消息提醒
+            }
+            else
+            {
+                string canvasIndex = GetBingdingButton().Name.Replace("Edit" + type, ""); // 获取画布索引
+                EditSceneWindow editSceneWindow = new(type); // 创建编辑场景窗口
+                editSceneWindow.Show(); // 显示编辑场景窗口
             }
         }
 
         // 点击按钮删除场景
         private void DeleteSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (type)
+            if (new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果是默认场景
             {
-                case "Global":
-                case "Common":
-                case "Taskbar":
-                case "Desktop":
-                    {
-                        using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast("此项不可删除。", "Common"); // 弹出消息提醒
-                    }
-                    break;
-                default:
-                    break;
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.ShowToast("此项不可删除。", "Common"); // 弹出消息提醒
+            }
+            else
+            {
+
             }
         }
 
@@ -829,6 +779,12 @@ namespace Quicker.Windows
             e.Handled = true; // 标记事件为已处理，防止默认行为
             int delta = e.Delta < 0 ? 30 : -30; // 获取滚轮滚动方向
             ScrollBar.Value += delta; // 调整滚动条值
+        }
+
+        // 点击勾选框更改设置
+        private void AutoReturnToFirstPageCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            db3.SetAutoReturnToFirstPage(type, AutoReturnToFirstPageCheckBox.IsChecked == true); // 更改设置
         }
 
         // 关闭窗口时释放资源

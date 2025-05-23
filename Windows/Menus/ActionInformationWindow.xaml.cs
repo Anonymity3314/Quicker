@@ -14,11 +14,9 @@ namespace Quicker.Windows
         public ActionInformationWindow(int currentbutton, string tableName)
         {
             InitializeComponent();
-            CurrentButton = currentbutton;
-            TableName = tableName;
+            CurrentButton = currentbutton; // 设置当前按钮ID
+            TableName = tableName; // 设置表名
             InitializeWindow(); // 初始化窗口
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowTopmost(this);
         }
 
         // 初始化信息窗口
@@ -51,7 +49,7 @@ namespace Quicker.Windows
             string textToCopy = $"ID:{buttonData.ButtonID}\n" +
                                 $"标题:{buttonData.Title}\n" +
                                 $"说明:{buttonData.Description}\n" +
-                                $"URI:quicker:runaction:{buttonData.ButtonID}"; // 复制的文本内容
+                                $"URI:quicker:runaction:{buttonData.Data1}{buttonData.Data2}{buttonData.Data3}"; // 复制的文本内容
             Clipboard.SetText(textToCopy); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
             toast.ShowToast("已复制!", "Common"); // 显示复制成功的通知
@@ -60,6 +58,8 @@ namespace Quicker.Windows
         // 关闭动作信息窗口
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            using var windowMananger = new WindowManager(); // 创建窗口管理器
+            windowMananger.SetMainWindowFocused(); // 关闭窗口
             this.Close(); // 关闭窗口
         }
 

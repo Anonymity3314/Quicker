@@ -1,15 +1,15 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using System.Runtime.InteropServices;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using System.Diagnostics;
 using Quicker.Database;
 using Quicker.Managers;
 using Quicker.Windows;
-using SharpHook;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using SharpHook;
 
 namespace Quicker
 {

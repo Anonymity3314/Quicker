@@ -559,7 +559,7 @@ namespace Quicker.Managers
                     foreach (var buttonData in oldButtonData)
                     {
                         string tableName = buttonData.ButtonID.Substring(0, buttonData.ButtonID.Length - 3); // 从ButtonID解析表名
-                        db2.CheckAndCreateTable(tableName, connection); // 检查表是否存在，不存在则创建
+                        db2.CreateButtonTable(tableName); // 检查表是否存在，不存在则创建
 
                         string insertQuery = $@"INSERT INTO {tableName} 
                         (ButtonID, ButtonName, Location, ImagePath, Data1, Data2, Data3, Usage, CreateTime, LatestEditTime, Type) 

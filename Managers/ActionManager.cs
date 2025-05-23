@@ -8,8 +8,10 @@ using System.IO;
 
 namespace Quicker.Managers
 {
-    internal class ActionManager
+    public class ActionManager : IDisposable
     {
+        private bool isDisposed = false; // 是否释放
+
         /// <summary>
         /// 打开文件
         /// </summary>
@@ -35,8 +37,8 @@ namespace Quicker.Managers
                     ProcessStartInfo processStartInfo = new ProcessStartInfo
                     {
                         FileName = targetPath, // 设置启动文件路径
-                        UseShellExecute = data.Data1 == "true", // 是否使用系统默认方式运行
-                        Verb = data.Data1 == "true" ? "runas" : null, // 管理员权限运行
+                        UseShellExecute = data.Data1 == "True", // 是否使用系统默认方式运行
+                        Verb = data.Data1 == "True" ? "runas" : null, // 管理员权限运行
                         WindowStyle = int.Parse(data.Data3) switch
                         {
                             0 => ProcessWindowStyle.Normal,
@@ -316,12 +318,23 @@ namespace Quicker.Managers
             }
         }
 
-        // 手动释放资源
+        // 实现IDisposable接口
         public void Dispose()
         {
-            GC.Collect(); // 强制垃圾回收
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 再次强制垃圾回收
+            Dispose(true);
+            GC.SuppressFinalize(this); // 告知垃圾回收器不需要调用终结器
+        }
+
+        // 释放资源
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed) isDisposed = true;
+        }
+
+        // 析构函数
+        ~ActionManager()
+        {
+            Dispose(false);
         }
     }
 }

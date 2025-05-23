@@ -20,7 +20,7 @@
     
     Deactivated="CustomMenu_Deactivated"
 >
-    <Grid Height="159" Width="200">
+    <Grid Width="200" Height="159">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>

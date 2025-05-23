@@ -37,7 +37,7 @@
                                 <StackPanel>
                                     <TextBlock Text="订住：固定位置，不自动隐藏"/>
                                     <TextBlock Text="订住需点击×关闭窗口"/>
-                                    <TextBlock Text="右键点击可打开面板浮标"/>
+                                    <!--<TextBlock Text="右键点击可打开面板浮标"/>-->
                                 </StackPanel>
                             </ToolTip>
                         </Button.ToolTip>

@@ -13,7 +13,6 @@ namespace Quicker.UserControls
     public partial class AboutQuickerGrid : UserControl
     {
         private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
-        ActionManager actionManager = new(); // 创建动作管理器
         SettingManager settingManager; // 读取设置的管理器
 
         public AboutQuickerGrid(SettingWindow settingWindow)
@@ -66,30 +65,35 @@ namespace Quicker.UserControls
         // 前往图标网站www.iconfont.cn
         private void www_iconfont_cn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             actionManager.LaunchDefaultBrowser("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
         }
 
         // 前往图标网站icons8.com
         private void icons8_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             actionManager.LaunchDefaultBrowser("https://icons8.com/"); // 打开图标网站icons8.com
         }
 
         // 前往图标网站fontawesome.com
         private void fontawesome_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             actionManager.LaunchDefaultBrowser("https://fontawesome.com/"); // 打开图标网站fontawesome.com
         }
 
         // 前往icon11社区图标库
         private void icon11_community_github_io_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             actionManager.LaunchDefaultBrowser("https://icon11-community.github.io/icons/"); // 前往icon11社区图标库
         }
 
         // BUG反馈、需求
         private void FeedBack_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
             actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker/issues"); // 前往Github反馈
         }
 
@@ -117,8 +121,6 @@ namespace Quicker.UserControls
             VersionLabel.MouseLeave -= Event_MouseLeave;
 
             // 清理外部资源
-            actionManager?.Dispose();
-            actionManager = null;
             settingManager = null;
 
             VersionLabel.Content = string.Empty; // 清理文本内容

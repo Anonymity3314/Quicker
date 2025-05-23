@@ -417,17 +417,6 @@ namespace Quicker.Database
         }
 
         /// <summary>
-        /// 检查表是否存在，不存在则创建
-        /// </summary>
-        /// <param name="tableName"> 要检查的表名 </param>
-        /// <param name="connection"> 数据库连接 </param>
-        public void CheckAndCreateTable(string tableName, SQLiteConnection connection)
-        {
-            if (TableExists(tableName)) return; // 表存在，直接返回
-            CreateButtonTable(tableName); // 创建表
-        }
-
-        /// <summary>
         /// 检查表是否存在
         /// </summary>
         /// <param name="tableName">要检查的表名</param>

@@ -135,9 +135,10 @@
 
     <!-- 切换动作页面的 Button -->
     <Style x:Key="ActionPageChangeButton" TargetType="Button">
-        <Setter Property="Width" Value="6"/>
-        <Setter Property="Height" Value="6"/>
         <Setter Property="Background" Value="#FFD3D3D3"/>
+        <Setter Property="Margin" Value="2.5,0"/>
+        <Setter Property="Height" Value="6"/>
+        <Setter Property="Width" Value="6"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -433,6 +434,40 @@
         </Setter>
     </Style>
 
+    <!-- 动作页标题的更改动作页的 Button -->
+    <Style x:Key="ActionChangePageButton" TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Height" Value="17.24"/>
+        <Setter Property="Width" Value="17.24"/>
+        <Setter Property="Margin" Value="3,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- 动作页标题的编辑动作页的 Button -->
+    <Style x:Key="ActionPageEditButton" TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Height" Value="17.24"/>
+        <Setter Property="Width" Value="17.24"/>
+        <Setter Property="Margin" Value="3,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <!-- ToastWindow -->
     <!-- 关闭 Toast 的 Button -->

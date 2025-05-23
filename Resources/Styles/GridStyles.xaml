@@ -9,4 +9,13 @@
         <Setter Property="Height" Value="36"/>
         <Setter Property="Width" Value="221"/>
     </Style>
+
+    <!-- 动作页标题网格 -->
+    <Style x:Key="ActionPageTitleGrid" TargetType="Grid">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="#F3F3F3"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Width" Value="260"/>
+    </Style>
 </ResourceDictionary>

@@ -10,6 +10,7 @@
     WindowStartupLocation="CenterScreen"
     ResizeMode="NoResize"
     Title="动作信息"
+    Topmost="True"
     Height="330"
     Width="408"
 >

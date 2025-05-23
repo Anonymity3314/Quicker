@@ -7,20 +7,26 @@
     xmlns:local="clr-namespace:Quicker.Windows.Menus"
     mc:Ignorable="d"
         
-    WindowStartupLocation="Manual"
     AllowsTransparency="True"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
     Background="{x:Null}"
     WindowStyle="None"
     Topmost="True"
-    Height="159"
-    Width="200"
-    
+    Height="330"
+    Width="650"
+
     Deactivated="SelectActionPageMenu_Deactivated"
+    Loaded="SelectActionPageMenu_Loaded"
 >
-    <Grid>
-        <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="White">
+    <Grid x:Name="MainGrid" Width="200" Height="10">
+        <!-- 窗口阴影 -->
+        <Rectangle Fill="White" Margin="5,7">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Border BorderThickness="0" CornerRadius="5" Padding="1,6" Background="White">
             <StackPanel x:Name="ChangeSceneButtonStackPanel" Margin="-1,-1,-1,-1"/>
         </Border>
     </Grid>

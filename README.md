@@ -151,8 +151,8 @@ Quicker/
     │        └─SettingWindow.xaml.cs
     │
     └─Menus/                                      # 菜单文件夹
-        ├─ActionInformationShower.xaml            # 动作信息菜单
-        │   └─ActionInformationShower.xaml.cs
+        ├─ActionInformationWindow.xaml            # 动作信息菜单
+        │   └─ActionInformationWindow.xaml.cs
         ├─CreatActionMenu.xaml                    # 创建动作菜单
         │   └─CreatActionMenu.xaml.cs
         ├─CustomMenu.xaml                         # 用户菜单
