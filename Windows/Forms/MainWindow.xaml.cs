@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.Windows.Menus;
+using Quicker.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Managers;
@@ -29,8 +29,6 @@ namespace Quicker.Windows
         {
             CommonStyle = style; // 设置样式
             InitializeComponent(); // 初始化窗口组件
-            GlobalGrid.Children.Remove(ViewGlobalUniformGrid); // 从主网格中移除
-            CommonGrid.Children.Remove(ViewCommonUniformGrid); // 从主网格中移除
         }
 
         /// <summary>
@@ -50,6 +48,18 @@ namespace Quicker.Windows
         // 加载数据库和Button
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            InitializeActionPages(); // 初始化动作页
+            InitializeButtons(); // 初始化按钮
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowTopmost(this);// 设置窗口置顶
+            this.Activate(); // 激活窗口
+        }
+
+        /// 初始化动作页面
+        private void InitializeActionPages()
+        {
+            GlobalGrid.Children.Remove(ViewGlobalUniformGrid); // 从主网格中移除
+            CommonGrid.Children.Remove(ViewCommonUniformGrid); // 从主网格中移除
             Application.Current.Dispatcher.Invoke(() =>
             {
                 GenerateUniformGrid(0, "Global"); // 生成全局 UniformGrid
@@ -58,7 +68,11 @@ namespace Quicker.Windows
                 GenerateButtons(); // 生成按钮
                 SetCommonTextBlock(0); // 设置通用标签内容
             }); // 在主线程中执行
+        }
 
+        // 初始化按钮
+        private void InitializeButtons()
+        {
             // 加载BookButton图标
             string iconPath = AppStateManager.Book ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
             BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
@@ -69,9 +83,9 @@ namespace Quicker.Windows
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
 
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowTopmost(this);// 设置窗口置顶
-            this.Activate(); // 激活窗口
+            HasNewVersionTip.Visibility = AppStateManager.HasNewVersion
+                ? Visibility.Visible
+                : Visibility.Collapsed; // 设置是否有新版本提示
         }
 
         // 生成页面切换 Button
@@ -737,6 +751,13 @@ namespace Quicker.Windows
         {
             Button button = sender as Button; // 获取按钮
             return button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
+        }
+
+        // 点击按钮更新Quicker
+        private void UpdateQuicker(object sender, RoutedEventArgs e)
+        {
+            UpdateWindow updateWindow = new(); // 创建更新窗口
+            updateWindow.Show(); // 显示窗口
         }
 
         // 窗口关闭时强制垃圾回收

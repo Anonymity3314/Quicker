@@ -44,6 +44,7 @@ namespace Quicker
         // 其他状态
         public static bool EnableMemoryOptimization { get; set; } = false; // 是否启用内存优化
         public static string CommonState { get; set; } = "Common"; // 通用状态
+        public static bool HasNewVersion { get; set; } = false; // 是否有新版本
         public static float Left { get; set; } = 0; // 窗口与屏幕左边距离
         public static float Top { get; set; } = 0; // 窗口与屏幕上边距离
 

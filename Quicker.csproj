@@ -19,6 +19,9 @@
     <AssemblyVersion>2.2.0</AssemblyVersion>
     <Authors>Anonymity</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <SignAssembly>False</SignAssembly>
+    <RepositoryUrl>https://github.com/Anonymity3314/Quicker</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

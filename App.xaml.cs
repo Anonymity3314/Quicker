@@ -22,6 +22,7 @@ namespace Quicker
         {
             base.OnStartup(e); // 调用基类方法
             EnsureSingleInstance(); // 确保单例运行
+            CheckAppUpdate(); // 检查应用更新
             CheckAndUpdateDatabase(); // 检查并升级数据库
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
@@ -49,6 +50,12 @@ namespace Quicker
         {
             using var databaseUpdater = new DatabaseUpdateManager(); // 数据库更新管理器
             databaseUpdater.CheckAndUpgradeDatabase(); // 检查并升级数据库
+        }
+
+        // 检查应用更新
+        private void CheckAppUpdate()
+        {
+            var instance = AppUpdateManager.Instance;
         }
 
         // 初始化托盘图标
@@ -140,6 +147,7 @@ namespace Quicker
             Convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
             SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时长到数据库
             AppStateManager.RecordedTime = DateTime.Now; // 记录应用保存时间
+            CheckAppUpdate(); // 检查应用更新
         }
 
         // 初始化钩子

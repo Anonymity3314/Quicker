@@ -1,22 +1,17 @@
-﻿using System.Windows.Controls;
-using System.ComponentModel;
-using Quicker.Windows.Menus;
-using System.Windows.Input;
+﻿using Quicker.Windows.Forms;
 using AutoUpdaterDotNET;
+using Quicker.Managers;
 using Newtonsoft.Json;
-using Quicker.Windows;
-using System.Windows;
 using System.Net;
+using Quicker;
 
 public class AppUpdateManager
 {
-    // 静态实例，确保全局唯一
-    public static AppUpdateManager Instance { get; } = new AppUpdateManager();
+    public static AppUpdateManager Instance { get; } = new();
+    public static UpdateInfo LatestUpdateInfo { get; private set; }
 
-    // 私有构造函数，防止外部实例化
     private AppUpdateManager()
     {
-        // 初始化 AutoUpdater.NET
         AutoUpdater.ParseUpdateInfoEvent += ParseUpdateInfoEvent;
         AutoUpdater.CheckForUpdateEvent += CheckForUpdateEvent;
         AutoUpdater.Start("https://raw.githubusercontent.com/Anonymity3314/Quicker/main/VersionInfo.json");
@@ -28,67 +23,38 @@ public class AppUpdateManager
         try
         {
             dynamic json = JsonConvert.DeserializeObject(args.RemoteData);
-            args.UpdateInfo = new UpdateInfoEventArgs
+            LatestUpdateInfo = new UpdateInfo
             {
-                CurrentVersion = json.version,
-                DownloadURL = json.url,
-                Mandatory = new Mandatory
-                {
-                    Value = json.mandatory.value,
-                    UpdateMode = json.mandatory.mode
-                }
+                NewVersion = json.version, // 当前版本
+                DownloadUrl = json.url, // 下载地址
+                Changelog = json.changelog, // 更新日志
+                ReleaseDate = json.releaseDate // 发布日期
             };
         }
-        catch (Exception ex)
+        catch
         {
-            MessageBox.Show($"解析更新信息失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            using var toast = new ToastManager(); // 弹窗管理器
+            toast.ShowToast("解析更新信息失败!", "Error"); // 弹窗提示
         }
     }
 
     // 检查更新的事件处理
     private void CheckForUpdateEvent(UpdateInfoEventArgs args)
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        if (args.IsUpdateAvailable)
         {
-            if (args.IsUpdateAvailable)
-            {
-                UpdateWindow updateWindow = new UpdateWindow(); // 创建更新窗口
-                updateWindow.Show(); // 显示更新窗口
-            }
-        });
+            AppStateManager.HasNewVersion = true; // 设置有新版本
+            using var toast = new ToastManager(); // 弹窗管理器
+            toast.ShowToast($"发现新版本：{args.CurrentVersion}", "Common"); // 弹窗提示
+        }
     }
 
-    // 更新下载进度改变的事件处理
-    private void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+    // 更新信息类
+    public class UpdateInfo
     {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            MessageBox.Show($"下载进度：{e.ProgressPercentage}%", "下载进度", MessageBoxButton.OK, MessageBoxImage.Information);
-        });
-    }
-
-    // 下载完成的事件处理
-    private void DownloadCompleted(object sender, AsyncCompletedEventArgs e)
-    {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            if (e.Error != null)
-            {
-                MessageBox.Show($"更新失败：{e.Error.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else
-            {
-                MessageBox.Show("更新下载完成，将在重启后应用更新。", "更新完成", MessageBoxButton.OK, MessageBoxImage.Information);
-                CustomMenu customMenu = Application.Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-                customMenu.Restart(null, null); // 重启应用程序
-            }
-        });
-    }
-
-    // 设置提醒时间
-    public void SetRemindLater(TimeSpan remindLaterTime)
-    {
-        AutoUpdater.RemindLaterTimeSpan = RemindLaterFormat.Minutes;
-        AutoUpdater.RemindLaterAt = (int)remindLaterTime.TotalMinutes;
+        public string NewVersion { get; set; } // 版本号
+        public string DownloadUrl { get; set; } // 下载地址
+        public string Changelog { get; set; } // 更新日志
+        public string ReleaseDate { get; set; } // 发布日期
     }
 }
