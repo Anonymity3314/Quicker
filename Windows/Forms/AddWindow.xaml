@@ -21,13 +21,13 @@
         <ComboBox x:Name="ChoiceComboBox" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top" Width="270" SelectedIndex="0" BorderBrush="#FFFBFBFB" Height="26" Background="White" SelectionChanged="ChoiceComboBox_SelectionChanged" VerticalContentAlignment="Center">
             <ComboBoxItem>
                 <Grid>
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                     <TextBlock Text="运行程序或打开文件" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>
             <ComboBoxItem>
                 <Grid>
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                     <TextBlock Text="打开网址" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>
@@ -38,14 +38,14 @@
         <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,0,0,79" Stroke="LightGray" VerticalAlignment="Bottom" Width="648"/>
         <Rectangle HorizontalAlignment="Left" Margin="493,10,0,85" Stroke="LightGray" Width="1"/>
         <Button Style="{StaticResource ImageButton}" ToolTip="去除图标" HorizontalAlignment="Left" Margin="601,103,0,0" VerticalAlignment="Top" Click="DeleteImage">
-            <Image Source="/Resources/Images/Icons/DeleteImage.ico"/>
+            <Image Source="/Resources/Images/DeleteImage.png"/>
         </Button>
         <TextBox x:Name="TitleTextBox" Style="{StaticResource RoundedTextBox}" Width="138" Margin="520,155,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" TextChanged="UpdateTitle"/>
         <TextBox x:Name="DescriptionTextBox" Style="{StaticResource RoundedTextBox}" Width="138" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="520,215,0,0" TextChanged="UsageTextBox_TextChanged"/>
         <Label Content="标题" HorizontalAlignment="Left" Margin="515,125,0,0" VerticalAlignment="Top"/>
         <Label Content="功能/用途说明" HorizontalAlignment="Left" Margin="515,185,0,0" VerticalAlignment="Top"/>
         <Button Style="{StaticResource ImageButton}" ToolTip="选择网络或文件图标" HorizontalAlignment="Left" Margin="548,103,0,0" VerticalAlignment="Top" Click="AddImage">
-            <Image Source="/Resources/Images/Icons/SelectLocalImage.ico" Width="16" Height="16"/>
+            <Image Source="/Resources/Images/SelectLocalImage.png" Width="16" Height="16"/>
         </Button>
         <Button x:Name="ButtonView" Width="78" Height="78" BorderBrush="#FF707070" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="1.5,1.5,1.5,1.5" Margin="547,20,0,0" Background="White" Click="SelectImage"/>
         <Grid x:Name="ActionInfoGrid" Margin="0,66,207,80"/>

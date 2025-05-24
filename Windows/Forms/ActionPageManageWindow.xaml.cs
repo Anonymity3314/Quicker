@@ -37,7 +37,7 @@ namespace Quicker.Windows
         }
 
         /// <summary>
-        /// 类型改变事件
+        /// 场景类型改变事件
         /// </summary>
         /// <param name="targetType"> 目标类型 </param>
         private void TypeChanged(string targetType)
@@ -142,14 +142,14 @@ namespace Quicker.Windows
             string sceneTitleText = db3.GetSceneTitle(sceneInfo); // 获取场景标题
             TextBlock sceneTitle = new()
             {
-                Text = sceneTitleText, // 场景名称
                 Style = FindResource("SceneTitleTextBlock") as Style, // 应用样式
+                Text = sceneTitleText // 场景名称
             }; // 创建场景标题
             SceneTitleStackPanel.Children.Add(sceneTitle); // 添加到标题StackPanel
             TextBlock sceneDescription = new()
             {
-                Text = sceneInfo.SceneTag, // 场景标签
                 Style = FindResource("SceneDescriptionTextBlock") as Style, // 应用样式
+                Text = sceneInfo.SceneTag // 场景标签
             }; // 创建场景描述
             SceneTitleStackPanel.Children.Add(sceneDescription); // 添加到标题StackPanel
         }
@@ -284,7 +284,7 @@ namespace Quicker.Windows
         /// </summary>
         /// <param name="canvasIndex"></param>
         /// <param name="style"></param>
-        /// <returns></returns>
+        /// <returns> 编辑标题按钮 </returns>
         private Button GenerateChangePageButton(int canvasIndex, string style)
         {
             Button pageButton = new Button
@@ -382,7 +382,7 @@ namespace Quicker.Windows
         /// <summary>
         /// 绑定按钮事件
         /// </summary>
-        /// <param name="button">按钮</param>
+        /// <param name="button"> 按钮 </param>
         private void BindButtonEvents(Button button)
         {
             button.AllowDrop = true; // 允许拖放
@@ -600,8 +600,8 @@ namespace Quicker.Windows
         /// <summary>
         /// 更新 ListView 中的特定 Canvas
         /// </summary>
-        /// <param name="canvasIndex">画布索引</param>
-        /// <param name="styleType">场景类型</param>
+        /// <param name="canvasIndex"> 画布索引 </param>
+        /// <param name="styleType"> 场景类型 </param>
         public void UpdateCanvasInListView(int canvasIndex, string styleType)
         {
             var oldCanvas = MainListView.Items[canvasIndex] as Canvas; // 获取旧的 Canvas
@@ -782,7 +782,7 @@ namespace Quicker.Windows
         }
 
         // 点击勾选框更改设置
-        private void AutoReturnToFirstPageCheckBox_Checked(object sender, RoutedEventArgs e)
+        private void AutoReturnToFirstPageCheckBox_Click(object sender, RoutedEventArgs e)
         {
             db3.SetAutoReturnToFirstPage(type, AutoReturnToFirstPageCheckBox.IsChecked == true); // 更改设置
         }
@@ -791,7 +791,9 @@ namespace Quicker.Windows
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
-
+            type = null; // 清理类型
+            isDarkModle = false; // 清理模式
+            showUsedTimes = false; // 清理显示/隐藏使用次数
             // 清理主列表视图中的所有 Canvas 及其子元素
             while (MainListView.Items.Count > 0)
             {
@@ -870,6 +872,7 @@ namespace Quicker.Windows
         }
     }
 
+    // 动作页信息类
     public class ActionPageInfo
     {
         public string ActionPageProcess { get; set; } // 动作页所属应用程序名称

@@ -445,7 +445,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="1"/>
+                    <Image Source="/Resources/Images/Quicker1.png" Margin="1"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -463,7 +463,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="1"/>
+                    <Image Source="/Resources/Images/Quicker1.png" Margin="1"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

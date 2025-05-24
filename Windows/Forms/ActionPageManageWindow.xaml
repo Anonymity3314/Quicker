@@ -53,31 +53,31 @@
                     <StackPanel Background="{x:Null}">
                         <Button x:Name="CheckActionPageInfoButton" Style="{StaticResource MenuButton}" ToolTip="查看动作页信息" Margin="0,3,0,0" Click="CheckActionPageInfoButton_Click">
                             <Grid Width="176">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="信息" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button x:Name="CopyActionPageIDButton" Style="{StaticResource MenuButton}" ToolTip="复制动作页ID" Click="CopyActionPageIDButton_Click">
                             <Grid Width="176">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="复制ID" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button x:Name="EditActionPageInfoButton" Style="{StaticResource MenuButton}" ToolTip="编辑动作页信息" Click="EditActionPageInfoButton_Click">
                             <Grid Width="176">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="编辑" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button x:Name="CreatOpenActionPageActionButton" Style="{StaticResource MenuButton}" ToolTip="创建一个切换到此动作页的动作并复制到剪贴板" Click="CreatOpenActionPageActionButton_Click">
                             <Grid Width="176">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="生成加载动作页的动作" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button x:Name="DeleteActionPageButton" Style="{StaticResource MenuButton}" ToolTip="删除动作页" Click="DeleteActionPageButton_Click">
                             <Grid Width="176">
-                                <Image Source="/Resources/Images/Icons/DeleteImage.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/DeleteImage.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="删除动作页" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
@@ -86,6 +86,6 @@
             </Grid>
         </Popup>
         <Button x:Name="AddActionPageButton" Content="添加动作页" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="240,264,0,0" VerticalAlignment="Top" Click="AddActionPage" Width="163" ToolTip="右键显示/隐藏动作使用次数" MouseRightButtonDown="AddActionPageButton_MouseRightButtonDown"/>
-        <CheckBox x:Name="AutoReturnToFirstPageCheckBox" Content="自动返回第一页" Margin="535,268,0,0" VerticalAlignment="Top" ToolTip="在后面的页执行完动作后是否自动返回到第一页" HorizontalAlignment="Left" Checked="AutoReturnToFirstPageCheckBox_Checked"/>
+        <CheckBox x:Name="AutoReturnToFirstPageCheckBox" Content="自动返回第一页" Margin="535,268,0,0" VerticalAlignment="Top" ToolTip="在后面的页执行完动作后是否自动返回到第一页" HorizontalAlignment="Left" Click="AutoReturnToFirstPageCheckBox_Click"/>
     </Grid>
 </Window>

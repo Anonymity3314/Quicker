@@ -39,21 +39,29 @@
     <Compile Remove="LocalIcons\**" />
     <Compile Remove="OldVersion\**" />
     <Compile Remove="Properties\**" />
+    <Compile Remove="Resources\Images\Icons\**" />
+    <Compile Remove="Resources\Images\SourseImages\**" />
     <Compile Remove="新建文件夹\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="LocalIcons\**" />
     <EmbeddedResource Remove="OldVersion\**" />
     <EmbeddedResource Remove="Properties\**" />
+    <EmbeddedResource Remove="Resources\Images\Icons\**" />
+    <EmbeddedResource Remove="Resources\Images\SourseImages\**" />
     <EmbeddedResource Remove="新建文件夹\**" />
     <None Remove="bin\**" />
     <None Remove="LocalIcons\**" />
     <None Remove="OldVersion\**" />
     <None Remove="Properties\**" />
+    <None Remove="Resources\Images\Icons\**" />
+    <None Remove="Resources\Images\SourseImages\**" />
     <None Remove="新建文件夹\**" />
     <Page Remove="bin\**" />
     <Page Remove="LocalIcons\**" />
     <Page Remove="OldVersion\**" />
     <Page Remove="Properties\**" />
+    <Page Remove="Resources\Images\Icons\**" />
+    <Page Remove="Resources\Images\SourseImages\**" />
     <Page Remove="新建文件夹\**" />
   </ItemGroup>
 
@@ -62,38 +70,59 @@
     <None Remove=".gitignore" />
     <None Remove=".gitignore~RF3e5ebf6d.TMP" />
     <None Remove="App.xaml.cs~RF119692ff.TMP" />
-    <None Remove="Quicker.ico" />
-    <None Remove="Resources\Images\AboutQuicker.ico" />
-    <None Remove="Resources\Images\ActionInformation.ico" />
-    <None Remove="Resources\Images\Add.ico" />
-    <None Remove="Resources\Images\BasicSettingButton.ico" />
-    <None Remove="Resources\Images\Book.ico" />
-    <None Remove="Resources\Images\CloseQuicker.ico" />
-    <None Remove="Resources\Images\CloseWindow.ico" />
-    <None Remove="Resources\Images\DeleteImage.ico" />
-    <None Remove="Resources\Images\Disbook.ico" />
-    <None Remove="Resources\Images\EditButton.ico" />
-    <None Remove="Resources\Images\Icons\ActionPagesManager.ico" />
-    <None Remove="Resources\Images\Icons\DesktopSceneImage.ico" />
-    <None Remove="Resources\Images\Icons\Locked.ico" />
-    <None Remove="Resources\Images\Icons\MoreSelection.ico" />
-    <None Remove="Resources\Images\Icons\OpenMainWindow1.ico" />
-    <None Remove="Resources\Images\Icons\OpenMainWindow2.ico" />
-    <None Remove="Resources\Images\Icons\UnLocked.ico" />
-    <None Remove="Resources\Images\OpenFile.ico" />
-    <None Remove="Resources\Images\OpenMainWindow.ico" />
-    <None Remove="Resources\Images\Pause.ico" />
-    <None Remove="Resources\Images\Quicker1.ico" />
-    <None Remove="Resources\Images\Quicker2.ico" />
-    <None Remove="Resources\Images\RestartQuicker.ico" />
-    <None Remove="Resources\Images\SelectLocalImage.ico" />
-    <None Remove="Resources\Images\SettingImage1.ico" />
-    <None Remove="Resources\Images\SettingImage2.ico" />
-    <None Remove="Resources\Images\SettingWindow.ico" />
-    <None Remove="Resources\Images\SourseImages\ClearButton.png" />
-    <None Remove="Resources\Images\SourseImages\CloseDownloadWindow.png" />
-    <None Remove="Resources\Images\SourseImages\MoreSelection.png" />
-    <None Remove="Resources\Images\SourseImages\Quicker1.png" />
+    <None Remove="Quicker.png" />
+    <None Remove="Resources\Images\1372BCD4FF819A292E9B6CD87E818C9D965C848D.png" />
+    <None Remove="Resources\Images\2686D17D552D34E87B3B6186D788F27CB08E3F6A.png" />
+    <None Remove="Resources\Images\6BEAA5E098C1BF0BD7305BD14DE6C8658DC00FF5.png" />
+    <None Remove="Resources\Images\6DCBD7BAAA9CAF359D6413931A422ECB3B1AD83C.png" />
+    <None Remove="Resources\Images\AboutQuicker.png" />
+    <None Remove="Resources\Images\AboutQuicker.png" />
+    <None Remove="Resources\Images\ActionInformation.png" />
+    <None Remove="Resources\Images\ActionInformation.png" />
+    <None Remove="Resources\Images\ActionPagesManager.jpg" />
+    <None Remove="Resources\Images\Add.png" />
+    <None Remove="Resources\Images\Add.png" />
+    <None Remove="Resources\Images\BasicSettingButton.png" />
+    <None Remove="Resources\Images\BasicSettingButton.png" />
+    <None Remove="Resources\Images\Book.png" />
+    <None Remove="Resources\Images\Book.png" />
+    <None Remove="Resources\Images\ClearButton.png" />
+    <None Remove="Resources\Images\CloseDownloadWindow.png" />
+    <None Remove="Resources\Images\CloseQuicker.png" />
+    <None Remove="Resources\Images\CloseQuicker.png" />
+    <None Remove="Resources\Images\CloseWindow.png" />
+    <None Remove="Resources\Images\CloseWindow.png" />
+    <None Remove="Resources\Images\DeleteImage.png" />
+    <None Remove="Resources\Images\DeleteImage.png" />
+    <None Remove="Resources\Images\DesktopSceneImage.png" />
+    <None Remove="Resources\Images\Disbook.png" />
+    <None Remove="Resources\Images\Disbook.png" />
+    <None Remove="Resources\Images\EditButton.png" />
+    <None Remove="Resources\Images\EditButton.png" />
+    <None Remove="Resources\Images\Locked.png" />
+    <None Remove="Resources\Images\MoreSelection.png" />
+    <None Remove="Resources\Images\OpenFile.png" />
+    <None Remove="Resources\Images\OpenFile.png" />
+    <None Remove="Resources\Images\OpenMainWindow.png" />
+    <None Remove="Resources\Images\OpenMainWindow1.png" />
+    <None Remove="Resources\Images\OpenMainWindow2.png" />
+    <None Remove="Resources\Images\Pause.png" />
+    <None Remove="Resources\Images\Pause.png" />
+    <None Remove="Resources\Images\Quicker1.png" />
+    <None Remove="Resources\Images\Quicker1.png" />
+    <None Remove="Resources\Images\Quicker2.png" />
+    <None Remove="Resources\Images\Quicker2.png" />
+    <None Remove="Resources\Images\RestartQuicker.png" />
+    <None Remove="Resources\Images\RestartQuicker.png" />
+    <None Remove="Resources\Images\SelectLocalImage.png" />
+    <None Remove="Resources\Images\SelectLocalImage.png" />
+    <None Remove="Resources\Images\SettingImage1.png" />
+    <None Remove="Resources\Images\SettingImage1.png" />
+    <None Remove="Resources\Images\SettingImage2.png" />
+    <None Remove="Resources\Images\SettingImage2.png" />
+    <None Remove="Resources\Images\SettingWindow.png" />
+    <None Remove="Resources\Images\SettingWindow.png" />
+    <None Remove="Resources\Images\UnLocked.png" />
     <None Remove="UpdateHistory.txt" />
     <None Remove="Windows\MainWindow.xaml.cs~RF56f46fe.TMP" />
     <None Remove="Windows\MainWindow.xaml.cs~RFc4626a.TMP" />
@@ -123,97 +152,101 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Images\Icons\AboutQuicker.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\ActionInformation.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\ActionPagesManager.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Add.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\BasicSettingButton.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Book.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\CloseQuicker.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\CloseWindow.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\DeleteImage.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\DesktopSceneImage.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Disbook.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\EditButton.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Locked.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\MoreSelection.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\OpenFile.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\OpenMainWindow1.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\OpenMainWindow2.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Pause.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Quicker1.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\Quicker2.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\RestartQuicker.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\SelectLocalImage.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\SettingImage1.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\SettingImage2.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\SettingWindow.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Icons\UnLocked.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\SourseImages\ClearButton.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\SourseImages\CloseDownloadWindow.png">
+    <Resource Include="Resources\Images\1372BCD4FF819A292E9B6CD87E818C9D965C848D.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\SourseImages\MoreSelection.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Resource Include="Resources\Images\2686D17D552D34E87B3B6186D788F27CB08E3F6A.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\SourseImages\Quicker1.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Resource Include="Resources\Images\6BEAA5E098C1BF0BD7305BD14DE6C8658DC00FF5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\6DCBD7BAAA9CAF359D6413931A422ECB3B1AD83C.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\AboutQuicker.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\ActionInformation.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\ActionPagesManager.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Add.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\BasicSettingButton.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Book.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\ClearButton.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\CloseDownloadWindow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\CloseQuicker.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\CloseWindow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\DeleteImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\DesktopSceneImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Disbook.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\EditButton.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Locked.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\MoreSelection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\OpenFile.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\OpenMainWindow1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\OpenMainWindow2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Pause.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Quicker1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Quicker2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\RestartQuicker.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SelectLocalImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SettingImage1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SettingImage2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SettingWindow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\UnLocked.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 

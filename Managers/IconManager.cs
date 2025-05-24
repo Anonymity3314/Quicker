@@ -78,9 +78,8 @@ namespace Quicker.Managers
         {
             try
             {
-                string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用程序目录
                 string iconFileName = GetIconFileName(filePath); // 获取图标文件名
-                string iconPath = Path.Combine(appDirectory, "LocalIcons", iconFileName); // 拼接图标文件路径
+                string iconPath = Path.Combine(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons", iconFileName); // 拼接图标文件路径
                 return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
             }
             catch
@@ -125,9 +124,8 @@ namespace Quicker.Managers
                 byte[] imageHash = GetImageHash(imageSource); // 计算图像的哈希值
                 if (imageHash == null) return null; // 如果计算哈希值失败，返回 null
 
-                string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用程序目录
                 string iconFileName = BitConverter.ToString(imageHash).Replace("-", "").ToLower() + ".png"; // 拼接图标文件名
-                string iconPath = Path.Combine(appDirectory, "LocalIcons", iconFileName); // 拼接图标文件路径
+                string iconPath = Path.Combine(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons", iconFileName); // 拼接图标文件路径
 
                 if (File.Exists(iconPath)) return iconPath; // 如果文件已存在，返回路径
                 Directory.CreateDirectory(Path.GetDirectoryName(iconPath)); // 创建图标目录

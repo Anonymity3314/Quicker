@@ -7,12 +7,12 @@ namespace Quicker.Database
     internal class ActionPageDatabase
     {
         // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
-        private readonly string db3 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "ActionPage.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private const string db3 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\ActionPage.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+        private readonly ButtonDatabase db2 = new(); // 按钮数据库
 
         public ActionPageDatabase()
         {
-            string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
+            string dbFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 获取数据库文件夹路径
             if (!Directory.Exists(dbFolder)) // 如果数据库文件夹不存在，则创建
                 Directory.CreateDirectory(dbFolder); // 创建数据库文件夹
             string dbFilePath = Path.Combine(dbFolder, "ActionPage.db"); // 获取数据库文件路径
@@ -28,10 +28,10 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             CreatMasterTable(connection); // 创建Application_Master表
-            CreatAndInitTable("Global", "/Resources/Images/Icons/Quicker1.ico", "_global"); // 创建数据表并初始化
-            CreatAndInitTable("Common", "/Resources/Images/Icons/Quicker1.ico", "common"); // 创建数据表并初始化
-            CreatAndInitTable("Taskbar", "/Resources/Images/Icons/Quicker1.ico", "taskbar"); // 创建数据表并初始化
-            CreatAndInitTable("Desktop", "/Resources/Images/Icons/DesktopSceneImage.ico", "desktop"); // 创建数据表并初始化
+            CreatAndInitTable("Global", "/Resources/Images/Quicker1.png", "_global"); // 创建数据表并初始化
+            CreatAndInitTable("Common", "/Resources/Images/Quicker1.png", "common"); // 创建数据表并初始化
+            CreatAndInitTable("Taskbar", "/Resources/Images/Quicker1.png", "taskbar"); // 创建数据表并初始化
+            CreatAndInitTable("Desktop", "/Resources/Images/DesktopSceneImage.png", "desktop"); // 创建数据表并初始化
         }
 
         // 创建Application_Master表

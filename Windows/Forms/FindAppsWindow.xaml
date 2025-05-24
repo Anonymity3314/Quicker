@@ -30,7 +30,7 @@
         <Button Style="{StaticResource WhiteButton}" Margin="382.5,17,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="86" Height="27" IsEnabled="False">
             <Grid Width="76">
                 <TextBlock Text="选择窗口" Margin="23,0,0,0"/>
-                <Image Source="/Resources/Images/Icons/Quicker1.ico" Margin="5,0,56,0" Width="15" Height="15"/>
+                <Image Source="/Resources/Images/Quicker1.png" Margin="5,0,56,0" Width="15" Height="15"/>
             </Grid>
         </Button>
         <Grid  Margin="13,49,11,42" MouseEnter="ShowScrollBar" MouseLeave="HideScrollBar">

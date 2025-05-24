@@ -43,13 +43,13 @@ public static class SettingDatabase
      */
 
     // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
-    private readonly static string db1 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Setting.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-    private readonly static ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-    public static readonly string currentVersion = "2.2.0"; // 当前版本号
+    private const string db1 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+    private readonly static ButtonDatabase db2 = new(); // 按钮数据库
+    public const string currentVersion = "2.2.0"; // 当前版本号
 
     static SettingDatabase()
     {
-        string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
+        string dbFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 获取数据库文件夹路径
         string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
         if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
         if (!File.Exists(dbFilePath))

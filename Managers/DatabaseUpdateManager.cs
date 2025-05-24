@@ -1,5 +1,6 @@
 ﻿using System.Data.SQLite;
 using Quicker.Database;
+using Quicker.Windows;
 using System.IO;
 
 namespace Quicker.Managers
@@ -14,7 +15,12 @@ namespace Quicker.Managers
         {
             string dbVersion = GetCurrentVersion(); // 获取当前数据库版本号
             if (dbVersion != SettingDatabase.currentVersion)
+            {
+                LoadingWindow loadingWindow = new(); // 显示加载窗口
+                loadingWindow.Show(); // 显示加载窗口
                 UpdateDatabase(dbVersion); // 数据库版本不同，更新数据库
+                loadingWindow?.Close(); // 关闭加载窗口
+            }
         }
 
         /// <summary>
@@ -126,7 +132,58 @@ namespace Quicker.Managers
                 if (db2.TableExists("Desktop")) Update2_1_3ButtonDatabase("Desktop"); // 如果2.1.3版本按钮数据库存在Desktop表，更新Desktop表
                 if (db2.TableExists("Taskbar")) Update2_1_3ButtonDatabase("Taskbar"); // 如果2.1.3版本按钮数据库存在Desktop表，更新Taskbar表
             }
+            UpdateAllImagePathsToNewFolder(); // 更新所有按钮的 ImagePath 字段
             Update2_1_3SettingDatabase(); // 更新设置数据库
+        }
+
+        // 更新按钮数据库中所有按钮的 ImagePath 字段
+        /// <summary>
+        /// 更新按钮数据库中所有按钮的 ImagePath 字段为新的路径
+        /// </summary>
+        public void UpdateAllImagePathsToNewFolder()
+        {
+            string newBasePath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\";
+
+            using var connection = db2.OpenConnection();
+            using var transaction = connection.BeginTransaction();
+
+            List<string> tableNames = db2.GetAllTableNames(); // 获取所有表名
+            // 遍历每个表并更新 ImagePath
+            foreach (string tableName in tableNames)
+            {
+                string selectQuery = $@"SELECT ButtonID, ImagePath FROM [{tableName}];";
+                using var selectCommand = new SQLiteCommand(selectQuery, connection);
+                using var selectReader = selectCommand.ExecuteReader();
+
+                List<(int ButtonID, string ImagePath)> entriesToUpdate = new List<(int, string)>();
+
+                while (selectReader.Read())
+                {
+                    int buttonID = selectReader.GetInt32(0);
+                    string imagePath = selectReader.GetString(1);
+
+                    // 提取文件名
+                    string fileName = Path.GetFileName(imagePath);
+                    if (!string.IsNullOrEmpty(fileName))
+                    {
+                        // 拼接新的路径
+                        string newImagePath = Path.Combine(newBasePath, fileName);
+                        entriesToUpdate.Add((buttonID, newImagePath));
+                    }
+                }
+
+                // 更新 ImagePath
+                foreach (var (buttonID, newImagePath) in entriesToUpdate)
+                {
+                    string updateQuery = $@"UPDATE [{tableName}] SET ImagePath = @NewImagePath WHERE ButtonID = @ButtonID;";
+                    using var updateCommand = new SQLiteCommand(updateQuery, connection);
+                    updateCommand.Parameters.AddWithValue("@NewImagePath", newImagePath);
+                    updateCommand.Parameters.AddWithValue("@ButtonID", buttonID);
+                    updateCommand.ExecuteNonQuery();
+                }
+            }
+
+            transaction.Commit();
         }
 
         /// <summary>

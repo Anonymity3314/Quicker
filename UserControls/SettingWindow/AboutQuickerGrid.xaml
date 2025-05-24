@@ -26,7 +26,7 @@
                 <ColumnDefinition Width="300*"/>
             </Grid.ColumnDefinitions>
             <Label Content="Quicker" HorizontalAlignment="Left" Margin="57,16,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold"/>
-            <Image HorizontalAlignment="Left" Height="48" Margin="4,12,0,0" VerticalAlignment="Top" Width="48" Source="/Resources/Images/Icons/Quicker1.ico"/>
+            <Image HorizontalAlignment="Left" Height="48" Margin="4,12,0,0" VerticalAlignment="Top" Width="48" Source="/Resources/Images/Quicker1.png"/>
             <Label x:Name="VersionLabel" Content="版本：" HorizontalAlignment="Left" Margin="4,65,0,0" VerticalAlignment="Top" FontSize="16"/>
             <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
             <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>

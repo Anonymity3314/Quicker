@@ -39,25 +39,25 @@
                     <StackPanel Background="{x:Null}" Margin="0,3">
                         <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="已安装的软件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="文件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="文件夹..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>

@@ -308,7 +308,7 @@ namespace Quicker.UserControls
 
             Image image = new()
             {
-                Source = new BitmapImage(new Uri("/Resources/Images/Icons/DeleteImage.ico", UriKind.Relative)),
+                Source = new BitmapImage(new Uri("/Resources/Images/DeleteImage.png", UriKind.Relative)),
                 Width = 20,
                 Height = 20,
                 VerticalAlignment = VerticalAlignment.Center,

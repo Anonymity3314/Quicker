@@ -17,6 +17,8 @@
                 <ResourceDictionary Source="Resources/Styles/ScrollBarStyle.xaml"/>
                 <!-- 复选框样式 -->
                 <ResourceDictionary Source="Resources/Styles/CheckBoxStyle.xaml"/>
+                <!-- 输入框样式 -->
+                <ResourceDictionary Source="Resources/Styles/TextBoxStyles.xaml"/>
                 <!-- 下拉框样式 -->
                 <ResourceDictionary Source="Resources/Styles/ComboBoxStyle.xaml"/>
                 <!-- 画布样式 -->
@@ -25,8 +27,6 @@
                 <ResourceDictionary Source="Resources/Styles/TooltipStyle.xaml"/>
                 <!-- 按钮样式 -->
                 <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
-                <!-- 输入框样式 -->
-                <ResourceDictionary Source="Resources/Styles/TextBoxStyle.xaml"/>
                 <!-- 标签样式 -->
                 <ResourceDictionary Source="Resources/Styles/SliderStyle.xaml"/>
                 <!-- 图片样式 -->

@@ -29,7 +29,7 @@ Quicker/
 │   AssemblyInfo.cs                               # 项目的属性和版本信息
 │   installer.idproj                              # 安装程序项目文件
 │   Quicker.csproj                                # 项目的核心配置文件
-│   Quicker.ico                                   # 应用图标
+│   Quicker.png                                   # 应用图标
 │   Quicker.sln                                   # 项目解决方案文件
 │
 ├─Database/                                       # 数据库文件夹
@@ -41,6 +41,7 @@ Quicker/
 ├─Managers/                                       # 管理器文件夹
 │   ├─ActionManager.cs                            # 动作管理器
 │   ├─AppStateManager.cs                          # 应用状态管理器
+│   ├─AppUpdateManager.cs                         # 应用更新管理器
 │   ├─ButtonManager.cs                            # 按钮管理器
 │   ├─DatabaseUpdateManager.cs                    # 数据库更新管理器
 │   ├─IconManager.cs                              # 图标管理器
@@ -52,31 +53,31 @@ Quicker/
 ├─Resources/                                      # 资源文件夹
 │   ├─Images/                                     # 图像资源文件夹
 │   │   ├─Icons/                                  # 图标资源文件夹
-│   │   │   ├─AboutQuicker.ico                    # 关于Quicker的图标
-│   │   │   ├─ActionInformation.ico               # 动作信息的图标
-│   │   │   ├─ActionPagesManager.ico              # 动作场景的图标
-│   │   │   ├─Add.ico                             # 主面板添加动作的图标
-│   │   │   ├─BasicSettingButton.ico              # 基础设置按钮的图标
-│   │   │   ├─Book.ico                            # 订住主面板的图标
-│   │   │   ├─CloseQuicker.ico                    # 退出Quicker的图标
-│   │   │   ├─CloseWindow.ico                     # 关闭主面板的图标
-│   │   │   ├─DeleteImage.ico                     # 删除动作按钮图像的图标
-│   │   │   ├─Disbook.ico                         # 不订住Quicker的图标
-│   │   │   ├─EditButton.ico                      # 编辑动作的图标
-│   │   │   ├─Locked.ico                          # 锁住通用动作页的图标
-│   │   │   ├─MoreSelection.ico                   # 主面板更多选择的图标
-│   │   │   ├─OpenFile.ico                        # 打开文件所在文件夹的图标
-│   │   │   ├─OpenMainWindow1.ico                 # 菜单中打开主面板的图标
-│   │   │   ├─OpenMainWindow2.ico                 # 设置窗口中弹出面板按钮的图标
-│   │   │   ├─Pause.ico                           # 暂停Quicker的图标
-│   │   │   ├─Quicker1.ico                        # Quicker运行中的图标
-│   │   │   ├─Quicker2.ico                        # Quicker暂停时的图标
-│   │   │   ├─RestartQuicker.ico                  # 重启Quicker的图标
-│   │   │   ├─SelectLocalImage.ico                # 从本地文件选择动作按钮图像的图标
-│   │   │   ├─SettingImage1.ico                   # 菜单中打开设置窗口的按钮图标
-│   │   │   ├─SettingImage2.ico                   # 主面板打开设置面板的图标
-│   │   │   ├─SettingWindow.ico                   # 设置面板的图标
-│   │   │   └─UnLocked.ico                        # 不锁住通用动作页的图标
+│   │   │   ├─AboutQuicker.png                    # 关于Quicker的图标
+│   │   │   ├─ActionInformation.png               # 动作信息的图标
+│   │   │   ├─ActionPagesManager.png              # 动作场景的图标
+│   │   │   ├─Add.png                             # 主面板添加动作的图标
+│   │   │   ├─BasicSettingButton.png              # 基础设置按钮的图标
+│   │   │   ├─Book.png                            # 订住主面板的图标
+│   │   │   ├─CloseQuicker.png                    # 退出Quicker的图标
+│   │   │   ├─CloseWindow.png                     # 关闭主面板的图标
+│   │   │   ├─DeleteImage.png                     # 删除动作按钮图像的图标
+│   │   │   ├─Disbook.png                         # 不订住Quicker的图标
+│   │   │   ├─EditButton.png                      # 编辑动作的图标
+│   │   │   ├─Locked.png                          # 锁住通用动作页的图标
+│   │   │   ├─MoreSelection.png                   # 主面板更多选择的图标
+│   │   │   ├─OpenFile.png                        # 打开文件所在文件夹的图标
+│   │   │   ├─OpenMainWindow1.png                 # 菜单中打开主面板的图标
+│   │   │   ├─OpenMainWindow2.png                 # 设置窗口中弹出面板按钮的图标
+│   │   │   ├─Pause.png                           # 暂停Quicker的图标
+│   │   │   ├─Quicker1.png                        # Quicker运行中的图标
+│   │   │   ├─Quicker2.png                        # Quicker暂停时的图标
+│   │   │   ├─RestartQuicker.png                  # 重启Quicker的图标
+│   │   │   ├─SelectLocalImage.png                # 从本地文件选择动作按钮图像的图标
+│   │   │   ├─SettingImage1.png                   # 菜单中打开设置窗口的按钮图标
+│   │   │   ├─SettingImage2.png                   # 主面板打开设置面板的图标
+│   │   │   ├─SettingWindow.png                   # 设置面板的图标
+│   │   │   └─UnLocked.png                        # 不锁住通用动作页的图标
 │   │   │
 │   │   └─SourseImages/                           # 图标的原图文件夹
 │   │       ├─AboutQuicker.png                    # 关于Quicker的图标原图
@@ -107,12 +108,15 @@ Quicker/
 │   │
 │   └─Styles/                                     # 样式资源文件夹
 │       ├─ButtonStyles.xaml                       # 按钮样式
+│       ├─CanvasStyles.xaml                       # 画布样式
 │       ├─CheckBoxStyle.xaml                      # 勾选框样式
 │       ├─ComboBoxStyle.xaml                      # 下拉框样式
-│       ├─ImageStyle.xaml                         # 图片样式
+│       ├─GridStyles.xaml                         # 表格样式
+│       ├─ImageStyles.xaml                        # 图片样式
 │       ├─ScrollBarStyle.xaml                     # 滚动条样式
 │       ├─SliderStyle.xaml                        # 滑动条样式
-│       ├─TextBoxStyle.xaml                       # 文本框样式
+│       ├─TextBlockStyles.xaml                    # 文本块样式
+│       ├─TextBoxStyles.xaml                      # 文本框样式
 │       └─TooltipStyle.xaml                       # 提示框样式
 │
 ├─UserControls/                                   # 自定义控件文件夹
@@ -147,8 +151,10 @@ Quicker/
     │   │   └─MainWindow.xaml.cs
     │   ├─SelectImageWindow.xaml                  # 选择图片窗口
     │   │   └─SelectImageWindow.xaml.cs
-    │   └─SettingWindow.xaml                      # 设置窗口
-    │        └─SettingWindow.xaml.cs
+    │   ├─SettingWindow.xaml                      # 设置窗口
+    │   │    └─SettingWindow.xaml.cs
+    │   └─UpdateWindow.xaml                       # 更新窗口
+    │        └─UpdateWindow.xaml.cs
     │
     └─Menus/                                      # 菜单文件夹
         ├─ActionInformationWindow.xaml            # 动作信息菜单
@@ -157,6 +163,8 @@ Quicker/
         │   └─CreatActionMenu.xaml.cs
         ├─CustomMenu.xaml                         # 用户菜单
         │   └─CustomMenu.xaml.cs
+        ├─DownloadWindow.xaml                     # 下载窗口
+        │   └─DownloadWindow.xaml.cs
         ├─EditActionPageInfoWindow.xaml           # 编译动作页信息窗口
         │   └─EditActionPageInfoWindow.xaml.cs
         ├─EditSceneWindow.xaml                    # 编译场景窗口

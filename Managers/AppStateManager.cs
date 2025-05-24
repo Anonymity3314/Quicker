@@ -8,13 +8,13 @@ namespace Quicker
 {
     public static class AppStateManager
     {
-        public static BitmapImage _trayIcon1 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker1.ico", UriKind.Relative)); // 运行时的图标
-        public static BitmapImage _trayIcon2 = new BitmapImage(new Uri("/Resources/Images/Icons/Quicker2.ico", UriKind.Relative)); // 暂停时的图标
+        public static BitmapImage _trayIcon1 = new BitmapImage(new Uri("/Resources/Images/Quicker1.png", UriKind.Relative)); // 运行时的图标
+        public static BitmapImage _trayIcon2 = new BitmapImage(new Uri("/Resources/Images/Quicker2.png", UriKind.Relative)); // 暂停时的图标
 
-        public static readonly string DisBookIconPath = "/Resources/Images/Icons/Disbook.ico"; // 禁用订住图标路径
-        public static readonly string UnLockIconPath = "/Resources/Images/Icons/UnLocked.ico"; // 解锁图标路径
-        public static readonly string LockIconPath = "/Resources/Images/Icons/Locked.ico"; // 锁定图标路径
-        public static readonly string BookIconPath = "/Resources/Images/Icons/Book.ico"; // 订住图标路径
+        public static readonly string DisBookIconPath = "/Resources/Images/Disbook.png"; // 禁用订住图标路径
+        public static readonly string UnLockIconPath = "/Resources/Images/UnLocked.png"; // 解锁图标路径
+        public static readonly string LockIconPath = "/Resources/Images/Locked.png"; // 锁定图标路径
+        public static readonly string BookIconPath = "/Resources/Images/Book.png"; // 订住图标路径
 
         public static List<BlacklistApplication> BlacklistApplications { get; set; } = new(); // 缓存黑名单应用
         public static OpenMainWindow OpenMainWindowConditions { get; set; } = new(); // 缓存 OpenMainWindowConditions

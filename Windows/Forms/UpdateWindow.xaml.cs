@@ -67,8 +67,11 @@ namespace Quicker.Windows.Forms
             else
             {
                 TitleTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF7D4D")); // 显示标题颜色
+                LatestVersionTextBlock1.Text = SettingDatabase.currentVersion; // 显示当前版本号
+                LatestVersionTextBlock1.FontWeight = FontWeights.Normal; // 显示最新版本号
                 DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
                 TitleTextBlock.Text = "暂无新版本。"; // 显示标题
+                LineRectangle.Width = 350; // 调整分界线宽度
                 this.LocateCenter(); // 窗口居中
                 this.Height = 266; // 隐藏更新信息
                 this.Width = 400; // 调整窗口大小

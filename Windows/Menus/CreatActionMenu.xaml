@@ -30,32 +30,32 @@
             <StackPanel>
                 <Button x:Name="PasteActionButton" Click="PasteActionButton_Click" Style="{StaticResource MenuButton}" Margin="0,5,0,3">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock x:Name="PasteActionTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Rectangle x:Name="Line1" Height="1" Fill="#FFF0F0F0"/>
                 <Button x:Name="StartAppButton" Click="StartApp" Style="{StaticResource MenuButton}" Margin="0,0,0,0">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="启动软件"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenDocument" Style="{StaticResource MenuButton}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开文件"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenFolder" Style="{StaticResource MenuButton}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开文件夹"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenWebsite" Style="{StaticResource MenuButton}">
                     <Grid>
-                        <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource MenuButtonImage}" Margin="7,0,7,0"/>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,7,0"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开网址"/>
                     </Grid>
                 </Button>

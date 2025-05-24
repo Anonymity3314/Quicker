@@ -31,7 +31,7 @@
 
     <!-- 添加动作图像样式 -->
     <Style x:Key="AddActionImage" TargetType="Image">
-        <Setter Property="Source" Value="/Resources/Images/Icons/Add.ico"/>
+        <Setter Property="Source" Value="/Resources/Images/Add.png"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Height" Value="36"/>

@@ -117,8 +117,7 @@ namespace Quicker.Windows
         // 从文件夹加载图片
         private void LoadImagesFromFolder()
         {
-            string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用的运行目录
-            string targetFolderPath = Path.Combine(appDirectory, "LocalIcons"); // 拼接目标文件夹路径
+            string targetFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
             if (!Directory.Exists(targetFolderPath))
             {
                 Directory.CreateDirectory(targetFolderPath); // 创建文件夹
@@ -286,8 +285,7 @@ namespace Quicker.Windows
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
-            string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用的运行目录
-            string folderPath = Path.Combine(appDirectory, "LocalIcons"); // 拼接目标文件夹路径
+            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
             if (!Directory.Exists(folderPath))  Directory.CreateDirectory(folderPath); // 创建文件夹
             Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true }); // 打开文件夹
         }
@@ -295,8 +293,7 @@ namespace Quicker.Windows
         // 继续加载图片
         private void ContinueLoadImages(object sender, RoutedEventArgs e)
         {
-            string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 获取应用的运行目录
-            string targetFolderPath = Path.Combine(appDirectory, "LocalIcons"); // 拼接目标文件夹路径
+            string targetFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
             if (!Directory.Exists(targetFolderPath))
             {
                 Directory.CreateDirectory(targetFolderPath); // 创建文件夹

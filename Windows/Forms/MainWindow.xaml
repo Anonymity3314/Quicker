@@ -32,11 +32,11 @@
                 <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
                     <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#A1A1A1" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                     <Button Style="{StaticResource Task}" Click="OpenSettingWindow" ToolTip="打开设置窗口" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
-                        <Image Source="/Resources/Images/Icons/SettingImage2.ico" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image Source="/Resources/Images/SettingImage2.png" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Button x:Name="ActionPageManager" Style="{StaticResource Task}" Click="OpenTitleMenu" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="82,0,0,0">
                         <Grid>
-                            <Image Source="/Resources/Images/Icons/MoreSelection.ico" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Image Source="/Resources/Images/MoreSelection.png" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                             <Border x:Name="HasNewVersionTip" CornerRadius="4,4,4,4" Background="#11AD45" Margin="12,12,0,0"/>
                         </Grid>
                     </Button>
@@ -51,20 +51,20 @@
                                 <StackPanel Background="{x:Null}">
                                     <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">
                                         <Grid Width="176">
-                                            <Image Source="/Resources/Images/Icons/ActionPagesManager.ico" Style="{StaticResource SelectButtonImage}"/>
+                                            <Image Source="/Resources/Images/ActionPagesManager.jpg" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="场景与动作" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>
                                     <Button x:Name="UpdateButton" Style="{StaticResource MenuButton}" Click="UpdateQuicker">
                                         <Grid Width="176">
-                                            <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
+                                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="升级Quicker" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>
                                     <Rectangle Height="1" Width="176" Fill="#FFF0F0F0" Margin="0,3"/>
                                     <Button Style="{StaticResource MenuButton}" ToolTip="关闭Quicker软件" Click="QuitQuicker">
                                         <Grid Width="176">
-                                            <Image Source="/Resources/Images/Icons/CloseQuicker.ico" Style="{StaticResource SelectButtonImage}"/>
+                                            <Image Source="/Resources/Images/CloseQuicker.png" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="退出" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>
@@ -82,7 +82,7 @@
                                 </StackPanel>
                             </ToolTip>
                         </Button.ToolTip>
-                        <Image x:Name="Book" Source="/Resources/Images/Icons/Disbook.ico" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image x:Name="Book" Source="/Resources/Images/Disbook.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                     <Button Style="{StaticResource CloseMainWindowButton}" Click="CloseMainWindow" ToolTip="关闭面板窗口" Margin="283,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </Grid>
@@ -119,7 +119,7 @@
                                 </StackPanel>
                             </ToolTip>
                         </Button.ToolTip>
-                        <Image x:Name="Lock" Source="/Resources/Images/Icons/UnLocked.ico" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
                 </Border>
             </Grid>

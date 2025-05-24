@@ -6,11 +6,11 @@ namespace Quicker.Database
     public class ButtonDatabase
     {
         // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
-        private readonly string db2 = "Data Source=" + Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", "Button.db") + ";Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+        private const string db2 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Button.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
 
         public ButtonDatabase()
         {
-            string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取数据库文件夹路径
+            string dbFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 获取数据库文件夹路径
             string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
             if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
             if (!File.Exists(dbFilePath))
