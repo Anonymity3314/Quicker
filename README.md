@@ -14,7 +14,6 @@
 
 | 程序包                                 | 说明                              |
 | :-----------------------------------: | :------------------------------: |
-| Autoupdater.NET.Official              | 提供自动更新功能                    |
 | DK.WshRuntime                         | 提供 Windows 脚本主机运行时功能      |
 | Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
 | SharpHook                             | 提供键盘和鼠标钩子功能               |
@@ -52,59 +51,34 @@ Quicker/
 │
 ├─Resources/                                      # 资源文件夹
 │   ├─Images/                                     # 图像资源文件夹
-│   │   ├─Icons/                                  # 图标资源文件夹
-│   │   │   ├─AboutQuicker.png                    # 关于Quicker的图标
-│   │   │   ├─ActionInformation.png               # 动作信息的图标
-│   │   │   ├─ActionPagesManager.png              # 动作场景的图标
-│   │   │   ├─Add.png                             # 主面板添加动作的图标
-│   │   │   ├─BasicSettingButton.png              # 基础设置按钮的图标
-│   │   │   ├─Book.png                            # 订住主面板的图标
-│   │   │   ├─CloseQuicker.png                    # 退出Quicker的图标
-│   │   │   ├─CloseWindow.png                     # 关闭主面板的图标
-│   │   │   ├─DeleteImage.png                     # 删除动作按钮图像的图标
-│   │   │   ├─Disbook.png                         # 不订住Quicker的图标
-│   │   │   ├─EditButton.png                      # 编辑动作的图标
-│   │   │   ├─Locked.png                          # 锁住通用动作页的图标
-│   │   │   ├─MoreSelection.png                   # 主面板更多选择的图标
-│   │   │   ├─OpenFile.png                        # 打开文件所在文件夹的图标
-│   │   │   ├─OpenMainWindow1.png                 # 菜单中打开主面板的图标
-│   │   │   ├─OpenMainWindow2.png                 # 设置窗口中弹出面板按钮的图标
-│   │   │   ├─Pause.png                           # 暂停Quicker的图标
-│   │   │   ├─Quicker1.png                        # Quicker运行中的图标
-│   │   │   ├─Quicker2.png                        # Quicker暂停时的图标
-│   │   │   ├─RestartQuicker.png                  # 重启Quicker的图标
-│   │   │   ├─SelectLocalImage.png                # 从本地文件选择动作按钮图像的图标
-│   │   │   ├─SettingImage1.png                   # 菜单中打开设置窗口的按钮图标
-│   │   │   ├─SettingImage2.png                   # 主面板打开设置面板的图标
-│   │   │   ├─SettingWindow.png                   # 设置面板的图标
-│   │   │   └─UnLocked.png                        # 不锁住通用动作页的图标
-│   │   │
-│   │   └─SourseImages/                           # 图标的原图文件夹
-│   │       ├─AboutQuicker.png                    # 关于Quicker的图标原图
-│   │       ├─ActionInformation.png               # 动作信息的图标原图
-│   │       ├─ActionPagesManager.jpg              # 动作场景的图标原图
-│   │       ├─Add.png                             # 主面板添加动作的图标原图
-│   │       ├─BasicSettingButton.png              # 基础设置按钮的图标原图
-│   │       ├─Book.png                            # 订住主面板的图标原图
-│   │       ├─CloseQuicker.png                    # 退出Quicker的图标原图
-│   │       ├─CloseWindow.png                     # 关闭主面板的图标原图
-│   │       ├─DeleteImage.png                     # 删除动作按钮图像的图标原图
-│   │       ├─Disbook.png                         # 不订住Quicker的图标原图
-│   │       ├─EditButton.png                      # 编辑动作的图标原图
-│   │       ├─Locked.png                          # 锁住通用动作页的图标原图
-│   │       ├─MoreSelection.png                   # 主面板更多选择的图标原图
-│   │       ├─OpenFile.png                        # 打开文件所在文件夹的图标原图
-│   │       ├─OpenMainWindow1.png                 # 菜单中打开主面板的图标原图
-│   │       ├─OpenMainWindow2.png                 # 设置窗口中弹出面板按钮的图标原图
-│   │       ├─Pause.png                           # 暂停Quicker的图标原图
-│   │       ├─Quicker1.png                        # Quicker运行中的图标原图
-│   │       ├─Quicker2.png                        # Quicker暂停时的图标原图
-│   │       ├─RestartQuicker.png                  # 重启Quicker的图标原图
-│   │       ├─SelectLocalImage.png                # 从本地文件选择动作按钮图像的图标原图
-│   │       ├─SettingImage1.png                   # 菜单中打开设置窗口的按钮图标原图
-│   │       ├─SettingImage2.png                   # 主面板打开设置面板的图标原图
-│   │       ├─SettingWindow.png                   # 设置面板的图标原图
-│   │       └─UnLocked.png                        # 不锁住通用动作页的图标原图
+│   │   ├─AboutQuicker.png                        # 关于Quicker的图片
+│   │   ├─ActionInformation.png                   # 动作信息的图片
+│   │   ├─ActionPagesManager.jpg                  # 动作场景的图片
+│   │   ├─Add.png                                 # 主面板添加动作的图片
+│   │   ├─BasicSettingButton.png                  # 基础设置按钮的图片
+│   │   ├─Book.png                                # 订住主面板的图片
+│   │   ├─ClearButton.png                         # 下载窗口中清理按钮发图片
+│   │   ├─CloseDownloadWindow.png                 # 关闭下载窗口的按钮图片
+│   │   ├─CloseQuicker.png                        # 退出Quicker的图片
+│   │   ├─CloseWindow.png                         # 关闭主面板的图片
+│   │   ├─DeleteImage.png                         # 删除动作按钮图像的图片
+│   │   ├─DesktopSceneImage.png                   # 桌面场景的图片
+│   │   ├─Disbook.png                             # 不订住Quicker的图片
+│   │   ├─EditButton.png                          # 编辑动作的图片
+│   │   ├─Locked.png                              # 锁住通用动作页的图片
+│   │   ├─MoreSelection.png                       # 主面板更多选择的图片
+│   │   ├─OpenFile.png                            # 打开文件所在文件夹的图片
+│   │   ├─OpenMainWindow1.png                     # 菜单中打开主面板的图片
+│   │   ├─OpenMainWindow2.png                     # 设置窗口中弹出面板按钮的图片
+│   │   ├─Pause.png                               # 暂停Quicker的图片
+│   │   ├─Quicker1.png                            # Quicker运行中的图片
+│   │   ├─Quicker2.png                            # Quicker暂停时的图片
+│   │   ├─RestartQuicker.png                      # 重启Quicker的图片
+│   │   ├─SelectLocalImage.png                    # 从本地文件选择动作按钮图像的图片
+│   │   ├─SettingImage1.png                       # 菜单中打开设置窗口的按钮图片
+│   │   ├─SettingImage2.png                       # 主面板打开设置面板的图片
+│   │   ├─SettingWindow.png                       # 设置面板的图片
+│   │   └─UnLocked.png                            # 不锁住通用动作页的图片
 │   │
 │   └─Styles/                                     # 样式资源文件夹
 │       ├─ButtonStyles.xaml                       # 按钮样式
