@@ -161,12 +161,8 @@ namespace Quicker.Windows.Menus
         // 初始化动画
         private void InitializeAnimation(Border border)
         {
-            DoubleAnimation fadeIn = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(0.2))); // 设置淡入动画
-            Storyboard.SetTarget(fadeIn, border); // 设置动画目标为边框
-            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(UIElement.OpacityProperty)); // 设置动画目标属性
-            Storyboard fadeInStoryboard = new Storyboard(); // 创建动画播放器
-            fadeInStoryboard.Children.Add(fadeIn); // 添加动画到播放器中
-            fadeInStoryboard.Begin(); // 开始播放动画
+            Storyboard fadeInStoryboard = (Storyboard)FindResource("FadeInAnimation"); // 获取淡入动画
+            fadeInStoryboard.Begin(border); // 开始播放淡入动画
         }
 
         // 计时器事件
@@ -176,18 +172,13 @@ namespace Quicker.Windows.Menus
             Border border = (Border)timer.Tag; // 获取消息边框
             if (border != null)
             {
-                // 创建淡出动画
-                DoubleAnimation fadeOut = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(0.2))); // 设置淡出动画
-                Storyboard.SetTarget(fadeOut, border); // 设置动画目标为边框
-                Storyboard.SetTargetProperty(fadeOut, new PropertyPath(UIElement.OpacityProperty)); // 设置动画目标属性
-                Storyboard fadeOutStoryboard = new Storyboard(); // 创建动画播放器
-                fadeOutStoryboard.Children.Add(fadeOut); // 添加动画到播放器中
-                fadeOut.Completed += (s, arg) =>
+                // 获取淡出动画并开始播放
+                Storyboard fadeOutStoryboard = (Storyboard)FindResource("FadeOutAnimation"); // 获取淡出动画
+                fadeOutStoryboard.Completed += (s, arg) =>
                 {
                     DeleteToast(border); // 删除消息
                 }; // 淡出动画完成时删除消息
-
-                fadeOutStoryboard.Begin(); // 开始播放淡出动画
+                fadeOutStoryboard.Begin(border); // 开始播放淡出动画
 
                 timer.Stop(); // 停止计时器
                 timer.Tick -= Timer_Tick; // 移除计时器事件

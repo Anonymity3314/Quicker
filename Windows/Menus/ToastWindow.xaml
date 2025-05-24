@@ -16,6 +16,16 @@
     Height="500"
     Width="480"
 >
+    <Window.Resources>
+        <!-- Toast 消息的淡入动画 -->
+        <Storyboard x:Key="FadeInAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3" />
+        </Storyboard>
+        <!-- Toast 消息的淡出动画 -->
+        <Storyboard x:Key="FadeOutAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:0.3" />
+        </Storyboard>
+    </Window.Resources>
     <Border Margin="10,0,10,0" VerticalAlignment="Bottom">
         <StackPanel x:Name="ToastStackPanel" VerticalAlignment="Bottom"/>
     </Border>

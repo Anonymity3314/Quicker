@@ -50,6 +50,7 @@ namespace Quicker.Windows
         {
             InitializeActionPages(); // 初始化动作页
             InitializeButtons(); // 初始化按钮
+            CheckUpdate(); // 检查更新
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.SetWindowTopmost(this);// 设置窗口置顶
             this.Activate(); // 激活窗口
@@ -82,10 +83,17 @@ namespace Quicker.Windows
             string lockIconPath = AppStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
             BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
             Lock.Source = lockImage; // 设置Lock按钮的图标
+        }
 
-            HasNewVersionTip.Visibility = AppStateManager.HasNewVersion
-                ? Visibility.Visible
-                : Visibility.Collapsed; // 设置是否有新版本提示
+        // 检查更新
+        private void CheckUpdate()
+        {
+            if (!AppStateManager.HasNewVersion) // 如果没有新版本
+            {
+                HasNewVersionTip.Visibility = Visibility.Collapsed; // 隐藏提示
+                TitlePop.Height -= 25; // 减少高度
+                UpdateButton.Visibility = Visibility.Collapsed; // 隐藏更新按钮
+            }
         }
 
         // 生成页面切换 Button
@@ -172,7 +180,10 @@ namespace Quicker.Windows
             }
         }
 
-        // 设置标签内容
+        /// <summary>
+        /// 设置通用标签内容
+        /// </summary>
+        /// <param name="uniformGridIndex"> UniformGrid索引 </param>
         private void SetCommonTextBlock(int uniformGridIndex)
         {
             var actionPageData = db3.GetActionPageData(CommonStyle, uniformGridIndex); // 从数据库中获取动作页面数据
@@ -444,9 +455,7 @@ namespace Quicker.Windows
         public void Button_Drop(object sender, DragEventArgs e)
         {
             if (sender is Button TargetButton)
-            {
                 buttonManager.Button_Drop(sender, e, true, GetButtonType(sender)); // 处理拖拽事件
-            }
         }
 
         // 鼠标左键按下时记录初始位置
@@ -460,9 +469,7 @@ namespace Quicker.Windows
         public void Button_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
-            {
                 buttonManager.Button_PreviewMouseMove(sender, e, true, GetButtonType(sender)); // 检查拖拽条件
-            }
         }
 
         // 鼠标左键释放时重置状态
@@ -745,8 +752,8 @@ namespace Quicker.Windows
         /// <summary>
         /// 获取按钮类型
         /// </summary>
-        /// <param name="sender"></param>
-        /// <returns></returns>
+        /// <param name="sender"> 按钮对象 </param>
+        /// <returns> 按钮类型 </returns>
         private string GetButtonType(object sender)
         {
             Button button = sender as Button; // 获取按钮

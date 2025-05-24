@@ -55,7 +55,7 @@
                                             <TextBlock Text="场景与动作" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>
-                                    <Button Style="{StaticResource MenuButton}" Click="UpdateQuicker">
+                                    <Button x:Name="UpdateButton" Style="{StaticResource MenuButton}" Click="UpdateQuicker">
                                         <Grid Width="176">
                                             <Image Source="/Resources/Images/Icons/Quicker1.ico" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="升级Quicker" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>

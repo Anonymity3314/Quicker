@@ -90,6 +90,8 @@
     <None Remove="Resources\Images\SettingImage1.ico" />
     <None Remove="Resources\Images\SettingImage2.ico" />
     <None Remove="Resources\Images\SettingWindow.ico" />
+    <None Remove="Resources\Images\SourseImages\ClearButton.png" />
+    <None Remove="Resources\Images\SourseImages\CloseDownloadWindow.png" />
     <None Remove="Resources\Images\SourseImages\MoreSelection.png" />
     <None Remove="Resources\Images\SourseImages\Quicker1.png" />
     <None Remove="UpdateHistory.txt" />
@@ -198,6 +200,12 @@
     </Resource>
     <Resource Include="Resources\Images\Icons\UnLocked.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SourseImages\ClearButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SourseImages\CloseDownloadWindow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\SourseImages\MoreSelection.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

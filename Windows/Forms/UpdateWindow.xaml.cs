@@ -1,13 +1,10 @@
-﻿using Microsoft.Win32;
-using Quicker.Managers;
+﻿using static AppUpdateManager;
 using Quicker.Windows.Menus;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Windows;
+using System.Windows.Media;
 using System.Windows.Forms;
-using static AppUpdateManager;
+using Quicker.Managers;
+using System.Windows;
+using System.IO;
 
 namespace Quicker.Windows.Forms
 {
@@ -18,6 +15,7 @@ namespace Quicker.Windows.Forms
         public UpdateWindow()
         {
             InitializeComponent();
+            CheckNewVersion(); // 检查新版本
             this.Activate(); // 激活窗口
         }
 
@@ -36,7 +34,8 @@ namespace Quicker.Windows.Forms
                 var toast = new ToastManager(); // 创建Toast提示
                 var fileName = Path.GetFileName(new Uri(downloadUrl).AbsolutePath); // 获取文件名
                 string destinationPath = Path.Combine(folderDialog.SelectedPath, fileName); // 保存路径
-                DownloadWindow.GetInstance(downloadUrl, destinationPath); // 创建下载窗口
+                var downloadWindow = DownloadWindow.GetInstance(downloadUrl, destinationPath); // 创建下载窗口
+                downloadWindow.Show(); // 确保调用 Show 方法显示窗口
             }
         }
 
@@ -50,15 +49,41 @@ namespace Quicker.Windows.Forms
         // 获取更新信息
         private void UpdateWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //if (AppStateManager.HasNewVersion)
-            //{
+            VersionTextBlock.Text = $"当前版本：{SettingDatabase.currentVersion}"; // 显示当前版本号
+        }
+
+        // 检查新版本
+        private void CheckNewVersion()
+        {
+            if (AppStateManager.HasNewVersion)
+            {
                 using var updateManager = new AppUpdateManager(); // 创建更新管理器
                 using var toast = new ToastManager(); // 创建Toast提示
                 if (updateManager.LatestUpdateInfo != null)
                     LoadUpdateInfo(updateManager.LatestUpdateInfo); // 加载更新信息
                 else
                     toast.ShowToast("获取更新失败！", "Common"); // 显示Toast提示
-            //}
+            }
+            else
+            {
+                TitleTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF7D4D")); // 显示标题颜色
+                DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
+                TitleTextBlock.Text = "暂无新版本。"; // 显示标题
+                this.LocateCenter(); // 窗口居中
+                this.Height = 266; // 隐藏更新信息
+                this.Width = 400; // 调整窗口大小
+            }
+        }
+
+        // 窗口居中
+        private void LocateCenter()
+        {
+            double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight; // 获取屏幕高度
+            double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth; // 获取屏幕宽度
+            double windowHeight = this.Height; // 获取窗口高度
+            double windowWidth = this.Width; // 获取窗口宽度
+            this.Left = (screenWidth / 2) - (windowWidth / 2); // 窗口居中
+            this.Top = (screenHeight / 2) - (windowHeight / 2); // 窗口居中
         }
 
         /// <summary>
@@ -68,13 +93,11 @@ namespace Quicker.Windows.Forms
         private void LoadUpdateInfo(UpdateInfo updateInfo)
         {
             downloadUrl = updateInfo.DownloadUrl; // 获取下载地址
-            string currentVersion = SettingDatabase.currentVersion; // 当前版本号
             string newVersion = updateInfo.NewVersion; // 最新版本号
             int count = updateInfo.Changelog.Count(c => c == '~'); // 获取更新内容的行数
             LatestVersionTextBlock1.Text = newVersion; // 显示最新版本号
             LatestVersionTextBlock2.Text = newVersion; // 显示最新版本号
-            VersionTextBlock.Text = $"当前版本：{currentVersion}"; // 显示当前版本号
-            VersionChangeTextBlock.Text = $"{currentVersion} -- {newVersion}"; // 显示版本号变更
+            VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
             UpdateDateTextBlock.Text = updateInfo.ReleaseDate; // 显示更新日期
             UpdateInfoTextBlock.Text = updateInfo.Changelog; // 显示更新内容
             UpdateInfoGrid.Height += count * 20; // 设置更新内容的高度
