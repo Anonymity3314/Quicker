@@ -480,9 +480,17 @@ namespace Quicker
         // 暂停Quicker
         public async void PauseQuicker(object sender, RoutedEventArgs e)
         {
-            hook?.Dispose(); // 销毁当前钩子
-            hook = null; // 清空钩子
-            if (AppStateManager.Pause) InitializeHookAsync(); // 重新初始化钩子
+            using var toast = new ToastManager(); // 消息提醒管理器
+            try
+            {
+                hook?.Dispose(); // 销毁当前钩子
+                hook = null; // 清空钩子
+                if (AppStateManager.Pause) InitializeHookAsync(); // 重新初始化钩子
+            }
+            catch
+            {
+                toast.ShowToast("请勿频繁操作！", "Warning"); // 弹出消息提醒
+            }
 
             var toastMessage = AppStateManager.Pause ? "Quicker已恢复" : "Quicker已暂停"; // 消息提醒
             var text = AppStateManager.Pause ? "暂停" : "恢复"; // 消息提醒
@@ -491,7 +499,6 @@ namespace Quicker
             ChangeTrayIcon(AppStateManager.Pause); // 切换托盘图标
 
             AppStateManager.Pause = !AppStateManager.Pause; // 切换暂停状态
-            using var toast = new ToastManager(); // 消息提醒管理器
             toast.ShowToast(toastMessage, AppStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
         }
 

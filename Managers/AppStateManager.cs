@@ -8,8 +8,8 @@ namespace Quicker
 {
     public static class AppStateManager
     {
-        public static BitmapImage _trayIcon1 = new BitmapImage(new Uri("/Resources/Images/Quicker1.png", UriKind.Relative)); // 运行时的图标
-        public static BitmapImage _trayIcon2 = new BitmapImage(new Uri("/Resources/Images/Quicker2.png", UriKind.Relative)); // 暂停时的图标
+        public static BitmapImage _trayIcon1 = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker1.png")); // 运行时的图标
+        public static BitmapImage _trayIcon2 = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker2.png")); // 暂停时的图标
 
         public static readonly string DisBookIconPath = "/Resources/Images/Disbook.png"; // 禁用订住图标路径
         public static readonly string UnLockIconPath = "/Resources/Images/UnLocked.png"; // 解锁图标路径

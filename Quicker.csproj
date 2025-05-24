@@ -146,9 +146,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="UpdateHistory.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <Resource Include="UpdateHistory.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

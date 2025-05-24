@@ -1,12 +1,13 @@
-﻿using System.Windows.Controls;
+﻿using Quicker.Managers;
 using Quicker.UserControls;
-using System.Windows.Input;
-using System.Diagnostics;
-using System.Reflection;
-using Quicker.Managers;
 using Quicker.Windows;
-using System.Windows;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Resources;
 
 namespace Quicker.UserControls
 {
@@ -46,19 +47,16 @@ namespace Quicker.UserControls
         // 打开更新历史文件
         private void OpenUpdateHistory(object sender, MouseButtonEventArgs e)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly(); // 获取当前程序集
-            string resourceName = "Quicker.UpdateHistory.txt"; // 获取更新历史文件名
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName)) // 打开资源流
+            string resourceName = "UpdateHistory.txt"; // 确保资源名称正确
+            Uri resourceUri = new Uri(resourceName, UriKind.Relative); // 构造资源URI
+            StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流信息
+            using (StreamReader reader = new StreamReader(streamInfo.Stream)) // 读取资源流
             {
-                if (stream == null) return; // 资源不存在则返回
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    string content = reader.ReadToEnd(); // 读取资源内容
-                    string tempPath = Path.GetTempPath(); // 获取系统临时文件夹路径
-                    string tempFilePath = Path.Combine(tempPath, "更新历史.txt"); // 更改临时文件名
-                    File.WriteAllText(tempFilePath, content); // 将内容写入临时文件
-                    System.Diagnostics.Process.Start("notepad.exe", tempFilePath); // 使用系统默认文本编辑器打开临时文件
-                }
+                string content = reader.ReadToEnd(); // 读取资源内容
+                string tempPath = Path.GetTempPath(); // 获取临时文件夹路径
+                string tempFilePath = Path.Combine(tempPath, "更新历史.txt"); // 构造临时文件路径
+                File.WriteAllText(tempFilePath, content); // 写入临时文件
+                System.Diagnostics.Process.Start("notepad.exe", tempFilePath); // 使用系统默认文本编辑器打开临时文件
             }
         }
 
