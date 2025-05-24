@@ -98,12 +98,8 @@ namespace Quicker.UserControls
         // 打开网站检查更新
         private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            using var updateManager = new AppUpdateManager(); // 创建更新管理器
-            if (updateManager.LatestUpdateInfo.NewVersion != SettingDatabase.currentVersion) // 检查是否有新版本
-            {
-                UpdateWindow updateWindow = new(); // 创建更新窗口
-                updateWindow.Show(); // 显示更新窗口
-            }
+            UpdateWindow updateWindow = new(); // 创建更新窗口
+            updateWindow.Show(); // 显示更新窗口
         }
 
         // 勾选框点击事件

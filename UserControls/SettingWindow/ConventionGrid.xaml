@@ -25,8 +25,8 @@
                 <TextBlock x:Name="TotalUsageTimeTextBlock" HorizontalAlignment="Left" Margin="22,148,0,0" TextWrapping="Wrap" Text="加载中……" VerticalAlignment="Top" FontSize="14"/>
                 <TextBlock HorizontalAlignment="Left" Margin="10,187,0,0" TextWrapping="Wrap" Text="本次使用时长" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <TextBlock x:Name="CurrentUsingTimeTextBlock" HorizontalAlignment="Right" Margin="0,225,220,0" TextWrapping="Wrap" Text="加载中……" VerticalAlignment="Top" FontSize="14"/>
-                <Label x:Name="VersionLabel" Content="当前版本：2.1.1" Margin="0,26,196,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Left"/>
-                <Button x:Name="CheckUpdateButton" Content="检查是否有更新" Style="{StaticResource WhiteButton}" Click="CheckUpdateButton_Click" HorizontalAlignment="Left" Margin="12,59,0,0" VerticalAlignment="Top" Width="76"/>
+                <Label x:Name="VersionLabel" Content="当前版本：" Margin="0,26,196,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Left"/>
+                <Button x:Name="CheckUpdateButton" Content="检查是否有更新" Style="{StaticResource WhiteButton}" Click="CheckUpdateButton_Click" HorizontalAlignment="Left" Margin="12,59,0,0" VerticalAlignment="Top" Width="94"/>
             </Grid>
             <ScrollViewer Margin="0,23,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="645" Height="779">
                 <Grid>
