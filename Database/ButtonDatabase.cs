@@ -5,7 +5,7 @@ namespace Quicker.Database
 {
     public class ButtonDatabase
     {
-        // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
+        // 数据库连接字符串
         private const string db2 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Button.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
 
         public ButtonDatabase()
@@ -350,7 +350,7 @@ namespace Quicker.Database
         /// <param name="tableName"> Button前缀 </param>
         /// <param name="a"> 数字 A </param>
         /// <returns> ButtonData列表 </returns>
-        private List<ButtonData> GetPagesOfButtons(string tableName, int a)
+        public List<ButtonData> GetPagesOfButtons(string tableName, int a)
         {
             List<ButtonData> buttonDatas = GetButtonDataByTableName(tableName); // 获取所有以 pfefix 开头的 ButtonData
             var matchedButtons = buttonDatas

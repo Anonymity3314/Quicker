@@ -295,6 +295,7 @@ namespace Quicker.UserControls.AddWindow
             RunByMessager.IsChecked = false; // 取消勾选
             TryToOpenExitingWindow.IsChecked = false; // 取消勾选
             AddWindow = null; // 清空引用
+            db2 = null; // 释放资源
         }
     }
 }

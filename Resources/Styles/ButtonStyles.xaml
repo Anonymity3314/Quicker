@@ -340,6 +340,7 @@
     <Style x:Key="SceneButton" TargetType="Button">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="AllowDrop" Value="True"/>
         <Setter Property="Height" Value="36"/>
         <Setter Property="Margin" Value="1"/>
         <Setter Property="Template">

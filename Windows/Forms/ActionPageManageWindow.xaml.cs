@@ -126,6 +126,7 @@ namespace Quicker.Windows
                 button.Content = buttonContent; // 设置按钮内容
 
                 // 设置点击事件
+                button.Drop += ChangeActionPageScene; // 设置拖拽事件
                 button.Click += new RoutedEventHandler(ChanceSceneButton_Click); // 设置按钮点击事件
                 button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
                 button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
@@ -292,7 +293,7 @@ namespace Quicker.Windows
                 Style = FindResource("ActionChangePageButton") as Style,
                 Name = $"{style}{canvasIndex}", // 按钮名称
             };
-            pageButton.PreviewMouseMove += Button1_PreviewMouseMove; // 鼠标移动事件
+            pageButton.PreviewMouseMove += ChangePageButton_PreviewMouseMove; // 鼠标移动事件
             pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
             pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
             return pageButton; // 返回按钮
@@ -415,7 +416,7 @@ namespace Quicker.Windows
         private void Button_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed) // 如果鼠标左键按下
-                buttonManager.Button_PreviewMouseMove(sender, e, true); // 处理鼠标移动事件
+                buttonManager.Button_PreviewMouseMove(sender, e, true, type); // 处理鼠标移动事件
         }
 
         // 鼠标左键抬起事件
@@ -443,20 +444,19 @@ namespace Quicker.Windows
             }
         }
 
-        // 添加场景
+        // 添加动作页
         private void AddActionPage(object sender, RoutedEventArgs e)
         {
             int canvasCount = MainListView.Items.Count; // 获取画布索引
             if (canvasCount == 10) // 如果画布索引等于9
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("当前场景数量已达上限。", "Error"); // 弹出消息提醒
+                toast.ShowToast("当前场景动作页数量已达上限。", "Error"); // 弹出消息提醒
             }
             else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
-                if (!new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果不是默认场景
-                    db3.CreatAndInitTable(type,"",""); // 创建场景数据表
+                db3.CreatAndInitTable(type, "", ""); // 创建场景数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
                 if(type != "Global")
                 {
@@ -470,7 +470,7 @@ namespace Quicker.Windows
             {
                 db3.UpdateSceneCount(type, canvasCount + 1); // 更新场景数据表
                 var actionPageInfo = GetActionPageInfo(); // 获取动作页信息
-                db3.UpdateActionPageTable(type, type + canvasCount.ToString(), actionPageInfo.ActionPageProcess, actionPageInfo.ActionPageName, 0); // 更新动作页数据表
+                db3.UpdateActionPageTable(type, type + canvasCount.ToString(), actionPageInfo.ActionPageName, 0); // 更新动作页数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 生成画布
             }
         }
@@ -557,7 +557,7 @@ namespace Quicker.Windows
         }
 
         // 鼠标移动时检查是否满足拖拽条件
-        public void Button1_PreviewMouseMove(object sender, MouseEventArgs e)
+        public void ChangePageButton_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (sender is Button button && e.LeftButton == MouseButtonState.Pressed)
                 buttonManager.Button_PreviewMouseMove(sender, e, false); // 处理鼠标移动事件
@@ -785,6 +785,89 @@ namespace Quicker.Windows
         private void AutoReturnToFirstPageCheckBox_Click(object sender, RoutedEventArgs e)
         {
             db3.SetAutoReturnToFirstPage(type, AutoReturnToFirstPageCheckBox.IsChecked == true); // 更改设置
+        }
+
+        // 将动作页拖拽按钮拖放到其他场景按钮上给动作页切换场景
+        private void ChangeActionPageScene(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent("ButtonData"))
+            {
+                Button targetButton = sender as Button; // 获取目标按钮
+                var targetSceneData = db3.GetSceneData(targetButton.Name).FirstOrDefault(); // 获取目标场景数据
+                if (targetSceneData.SceneCount == 10) 
+                {
+                    using var toast = new ToastManager(); // 消息提醒管理器
+                    toast.ShowToast($"{targetSceneData.SceneName}场景动作页数量已达上限。", "Error"); // 弹出消息提醒
+                }
+                else
+                {
+                    string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
+                    if (!string.IsNullOrEmpty(sourceButtonName))
+                    {
+                        int sourceIndex = int.Parse(sourceButtonName.Replace(type, "")); // 获取源动作页索引
+                        if (targetSceneData.SceneCount == 0)
+                        {
+                            db2.CreateButtonTable(targetSceneData.SceneName); // 创建按钮数据表
+                            db3.CreatActionPageTable(targetSceneData.SceneName); // 创建动作页数据表
+                        }
+                        var sourceActionPageData = db3.GetActionPageData(type, sourceIndex); // 获取源动作页数据
+                        db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName), sourceActionPageData.ActionPageSize); // 更新动作页数据表
+                        db3.UpdateSceneCount(targetSceneData.SceneName, targetSceneData.SceneCount + 1); // 更新场景数据表
+                        db3.DeleteActionPage(type, sourceIndex); // 删除源动作页
+                        db2.DeletePageOfButtons(type, sourceIndex); // 删除源动作页按钮数据
+                        MainListView.Items.RemoveAt(sourceIndex); // 从主列表视图中移除画布
+                        var buttons = db2.GetPagesOfButtons(type, sourceIndex); // 获取源动作页按钮数据
+                        foreach (var button in buttons)
+                        {
+                            ButtonData newButtonData = new()
+                            {
+                                ButtonID = targetSceneData.SceneCount * 100 + button.ButtonID % 100,
+                                Title = button.Title,
+                                Location = button.Location,
+                                ImagePath = button.ImagePath,
+                                Data1 = button.Data1,
+                                Data2 = button.Data2,
+                                Data3 = button.Data3,
+                                Description = button.Description,
+                                CreateTime = button.CreateTime,
+                                LatestEditTime = DateTime.Now,
+                                ActionType = button.ActionType,
+                                UsedTimes = button.UsedTimes
+                            }; // 创建新按钮数据
+                            db2.UpdateAction(newButtonData, targetSceneData.SceneName); // 更新按钮数据
+                        }
+
+                        if (MainListView.Items.Count == 0)
+                        {
+                            db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
+                            db3.DeleteActionPageTable(type); // 删除动作页数据表
+                            if (!new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果不是默认场景
+                                db3.DeleteSceneTable(type); // 删除场景数据表
+                        }
+                        TypeChanged(targetSceneData.SceneName); // 刷新界面
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取动作页名称
+        /// </summary>
+        /// <param name="sceneType"> 场景类型 </param>
+        /// <param name="actionPageName"> 动作页名称 </param>
+        /// <returns> 动作页名称 </returns>
+        private string GetActionPageName(string sceneType, string actionPageName)
+        {
+            switch (sceneType)
+            {
+                case "Global":
+                    return "默认全局动作页";
+                case "Common":
+                    return "默认";
+                case "Desktop":
+                default:
+                    return actionPageName;
+            }
         }
 
         // 关闭窗口时释放资源

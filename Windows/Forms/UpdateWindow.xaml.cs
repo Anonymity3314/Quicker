@@ -28,7 +28,7 @@ namespace Quicker.Windows.Forms
         // 点击按钮下载
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            using var folderDialog = new FolderBrowserDialog(); // 创建文件夹对话框
+            using var folderDialog = new FolderBrowserDialog() { Description = "选择下载路径" }; // 创建文件夹对话框
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var toast = new ToastManager(); // 创建Toast提示

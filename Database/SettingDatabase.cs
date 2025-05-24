@@ -42,7 +42,7 @@ public static class SettingDatabase
      * IsFolder: 此项用于标识ApplicationName是否为文件夹路径。
      */
 
-    // 获取应用程序根目录，并设置数据库文件路径为根目录下的"Database"文件夹
+    // 数据库连接
     private const string db1 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
     private readonly static ButtonDatabase db2 = new(); // 按钮数据库
     public const string currentVersion = "2.2.0"; // 当前版本号

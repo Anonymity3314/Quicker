@@ -21,14 +21,15 @@ namespace Quicker.Windows.Menus
         // 加载动作页信息
         private void EditActionPageInfoWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ActionPageProcess.Text = actionPage.ActionProcess; // 设置动作页所属进程名称
+            var sceneData = db3.GetSceneData(actionPageType).FirstOrDefault(); // 获取场景信息
+            ActionPageProcess.Text = sceneData.SceneProcess; // 设置动作页所属进程名称
             ActionPageName.Text = actionPage.ActionPageName; // 设置动作页名称
         }
 
         // 保存动作页信息
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            db3.UpdateActionPageTable(actionPageType, actionPage.DefaultActionPageName, actionPage.ActionProcess, ActionPageName.Text, actionPage.ActionPageSize); // 更新动作页信息
+            db3.UpdateActionPageTable(actionPageType, actionPage.DefaultActionPageName, ActionPageName.Text, actionPage.ActionPageSize); // 更新动作页信息
             ActionPageManageWindow window = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 获取动作页管理窗口
             window.UpdateCanvasInListView(int.Parse(actionPageIndex), actionPageType); // 更新动作信息
             this.Close(); // 关闭窗口
