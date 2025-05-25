@@ -122,7 +122,6 @@ namespace Quicker.Windows
             {
                 Directory.CreateDirectory(targetFolderPath); // 创建文件夹
                 DirectoryInfo dirInfo = new DirectoryInfo(Path.GetDirectoryName(targetFolderPath)); // 获取文件夹信息
-                dirInfo.Attributes |= FileAttributes.Hidden; // 设置文件夹为隐藏
                 return; // 返回
             } // 如果文件夹不存在，则创建文件夹
             string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif" }; // 支持的图片格式

@@ -1,13 +1,12 @@
-﻿using Quicker.Managers;
-using Quicker.UserControls;
-using Quicker.Windows;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Windows;
+﻿using System.Windows.Resources;
 using System.Windows.Controls;
+using Quicker.UserControls;
 using System.Windows.Input;
-using System.Windows.Resources;
+using System.Diagnostics;
+using Quicker.Managers;
+using Quicker.Windows;
+using System.Windows;
+using System.IO;
 
 namespace Quicker.UserControls
 {
@@ -23,18 +22,6 @@ namespace Quicker.UserControls
             weakSettingWindow = new(settingWindow); // 保存设置窗口
             settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
-        }
-
-        // 当鼠标移入事件文本框时，改变鼠标样式为手型
-        private void Event_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Cursor = Cursors.Hand; // 改变鼠标样式为手型
-        }
-
-        // 当鼠标移出事件文本框时，恢复默认鼠标样式
-        private void Event_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Cursor = Cursors.Arrow; // 恢复默认鼠标样式
         }
 
         // 基础设置-关于Quicker-关于Quicker
@@ -102,6 +89,84 @@ namespace Quicker.UserControls
             settingManager.ButtonStyle3_Click(Privacy_StatementButton, MainGrid); // 保存Button类型3边框设置
         }
 
+        // 前往程序数据根目录
+        private void RootFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\"; // 文件夹路径
+            OpenFolder(folderPath); // 打开文件夹
+        }
+
+        // 前往程序数据库目录
+        private void DatabaseFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database\"; // 文件夹路径
+            OpenFolder(folderPath); // 打开文件夹
+        }
+
+        // 前往程序图标目录
+        private void LocalIconsFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
+            OpenFolder(folderPath); // 打开文件夹
+        }
+
+        // 备份数据
+        private void BackupDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            using var folderDialog = new System.Windows.Forms.FolderBrowserDialog() { Description = "选择备份路径" }; // 创建文件夹对话框
+            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string folderPath = folderDialog.SelectedPath; // 获取选择的路径
+                string sourceFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker"; // 源文件夹路径
+                string backupFolderPath = Path.Combine(folderPath, "QuickerData"); // 构造备份文件夹路径
+                if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath); // 创建备份文件夹
+                CopyFolder(sourceFolderPath, backupFolderPath); // 复制文件夹内容到目标路径
+                using var toast = new ToastManager(); // 创建 ToastManager 的实例
+                toast.ShowToast("操作完成！", "Success"); // 显示提示
+                OpenFolder(folderPath); // 打开文件夹
+            }
+        }
+
+        // 打开程序文件夹
+        private void OpenFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath); // 创建文件夹
+            Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true }); // 打开文件夹
+        }
+
+        /// <summary>
+        /// 复制文件夹内容到目标路径
+        /// </summary>
+        /// <param name="sourceFolder"> 源文件夹路径 </param>
+        /// <param name="targetFolder"> 目标文件夹路径 </param>
+        private void CopyFolder(string sourceFolder, string targetFolder)
+        {
+            try
+            {
+                Directory.CreateDirectory(targetFolder); // 创建目标文件夹
+                string[] files = Directory.GetFiles(sourceFolder); // 获取源文件夹中的所有文件
+                foreach (string file in files) // 遍历并复制每个文件
+                {
+                    string name = Path.GetFileName(file); // 获取文件名
+                    string dest = Path.Combine(targetFolder, name); // 构造目标文件路径
+                    File.Copy(file, dest, true); // 复制文件并覆盖已存在的文件
+                }
+
+                string[] folders = Directory.GetDirectories(sourceFolder); // 获取源文件夹中的所有子文件夹
+                foreach (string folder in folders) // 遍历并递归复制每个子文件夹
+                {
+                    string name = Path.GetFileName(folder); // 获取子文件夹名
+                    string dest = Path.Combine(targetFolder, name); // 构造目标文件夹路径
+                    CopyFolder(folder, dest); // 递归复制子文件夹
+                }
+            }
+            catch
+            {
+                using var toast = new ToastManager(); // 创建 ToastManager 的实例
+                toast.ShowToast("备份失败！", "Error"); // 显示提示
+            }
+        }
+
         // 控件关闭释放资源
         private void AboutQuickerGrid_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -115,11 +180,6 @@ namespace Quicker.UserControls
             icons8_com.MouseLeftButtonDown -= icons8_com_MouseLeftButtonDown;
             fontawesome_com.MouseLeftButtonDown -= fontawesome_com_MouseLeftButtonDown;
             FeedBack.MouseLeftButtonDown -= FeedBack_MouseLeftButtonDown;
-            VersionLabel.MouseEnter -= Event_MouseEnter;
-            VersionLabel.MouseLeave -= Event_MouseLeave;
-
-            // 清理外部资源
-            settingManager = null;
 
             VersionLabel.Content = string.Empty; // 清理文本内容
             MainGrid.Background = null;

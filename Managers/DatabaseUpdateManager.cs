@@ -7,6 +7,7 @@ namespace Quicker.Managers
 {
     public class DatabaseUpdateManager : IDisposable
     {
+        private const string DatabaseFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 数据库文件夹路径
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private bool _disposed = false; // 标记是否已释放资源
 
@@ -78,7 +79,6 @@ namespace Quicker.Managers
         /// <summary>
         /// 设置数据库版本号
         /// </summary>
-        /// <param name="connection"> 数据库连接 </param>
         /// <param name="version"> 版本号 </param>
         private void SetCurrentVersion(string version)
         {
@@ -94,8 +94,7 @@ namespace Quicker.Managers
         /// <returns> 是否存在设置数据库 </returns>
         private bool ExistSettingDatabase()
         {
-            string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
-            string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
+            string dbFilePath = Path.Combine(DatabaseFolder, "Setting.db"); // 设置数据库文件路径
             return File.Exists(dbFilePath); // 判断文件是否存在
         }
 
@@ -105,8 +104,7 @@ namespace Quicker.Managers
         /// <returns> 是否存在按钮数据库 </returns>
         private bool ExistButtonDatabase()
         {
-            string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
-            string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
+            string dbFilePath = Path.Combine(DatabaseFolder, "Button.db"); // 设置数据库文件路径
             return File.Exists(dbFilePath); // 判断文件是否存在
         }
 
@@ -116,8 +114,7 @@ namespace Quicker.Managers
         /// <returns> 是否存在动作页面数据库 </returns>
         private bool ExistActionPageDatabase()
         {
-            string dbFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database"); // 获取应用程序根目录下的"Database"文件夹
-            string dbFilePath = Path.Combine(dbFolder, "ActionPage.db"); // 设置数据库文件路径
+            string dbFilePath = Path.Combine(DatabaseFolder, "ActionPage.db"); // 设置数据库文件路径
             return File.Exists(dbFilePath); // 判断文件是否存在
         }
 

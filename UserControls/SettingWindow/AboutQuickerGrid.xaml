@@ -31,19 +31,30 @@
             <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
             <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
             <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
-            <TextBlock x:Name="UpdateHistory" Text="更新历史" HorizontalAlignment="Left" Margin="96,70,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" MouseLeftButtonDown="OpenUpdateHistory">
+            <TextBlock x:Name="UpdateHistory" Text="更新历史" HorizontalAlignment="Left" Margin="96,70,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" Cursor="Hand" MouseLeftButtonDown="OpenUpdateHistory">
                 <TextBlock.ToolTip>
                     <ToolTip Content="点击查看" FontSize="12" Foreground="Black"/>
                 </TextBlock.ToolTip>
             </TextBlock>
             <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
             <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <TextBlock x:Name="icons8_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
+            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
+            <TextBlock x:Name="icons8_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
             <Label HorizontalAlignment="Left" Margin="0,186,0,0" VerticalAlignment="Top" Content="支持" Foreground="Black" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="FeedBack" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
-            <TextBlock x:Name="icon11_community_github_io" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" MouseEnter="Event_MouseEnter" MouseLeave="Event_MouseLeave" Grid.Column="1"/>
+            <TextBlock x:Name="FeedBack" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
+            <TextBlock x:Name="icon11_community_github_io" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
+
+            <Label Content="数据文件夹" HorizontalAlignment="Left" Margin="0,493,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+            <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,523,0,0" VerticalAlignment="Top" FontSize="14"/>
+            <TextBlock x:Name="RootFolderPath" HorizontalAlignment="Left" Margin="23,553,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="RootFolderPath_MouseDown"/>
+            <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,573,0,0" VerticalAlignment="Top" FontSize="14"/>
+            <TextBlock x:Name="DatabaseFolderPath" HorizontalAlignment="Left" Margin="23,601,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="DatabaseFolderPath_MouseDown"/>
+            <Label Content="图标文件夹：" HorizontalAlignment="Left" Margin="18,621,0,0" VerticalAlignment="Top" FontSize="14"/>
+            <TextBlock x:Name="LocalIconsFolderPath" HorizontalAlignment="Left" Margin="23,649,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="LocalIconsFolderPath_MouseDown"/>
+            <Label Content="备份数据" HorizontalAlignment="Left" Margin="0,684,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+            <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" Margin="14,719,0,0" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>
+            <Label Content="仅作为备份用途，不支持导入。" HorizontalAlignment="Left" Margin="14,743,0,0" VerticalAlignment="Top" FontSize="10" Foreground="#FFB4B4B4"/>
         </Grid>
 
         <!-- 基础设置-关于Quicker-隐私声明 -->
