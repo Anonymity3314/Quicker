@@ -18,17 +18,17 @@
     Loaded="SelectImageWindow_Loaded"
 >
     <Grid>
-        <Button Content="加载更多..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="24,0,0,39" VerticalAlignment="Bottom" Width="81" Click="ContinueLoadImages"/>
+        <Button Content="加载更多..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="24,0,0,39" VerticalAlignment="Bottom" Width="81" Click="LoadImages"/>
         <Button x:Name="ConfirmButton" Content="选择(S)" Style="{StaticResource BlueButton}" HorizontalAlignment="Right" Margin="0,0,95,39" VerticalAlignment="Bottom" Width="73" IsEnabled="False" Click="AddIcon"/>
         <Button Content="选择其它图标..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,31,27,0" VerticalAlignment="Top" Width="108" Click="SelectLocalIcons"/>
         <Button Content="取消" Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,0,27,39" VerticalAlignment="Bottom" Width="63" Click="CancelSelect"/>
         <Button Content="搜索" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="157,31,0,0" VerticalAlignment="Top" Width="76"/>
         <TextBox Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="13,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" Height="24" FontSize="13"/>
         <Grid Margin="13,84,6,105" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave">
-            <ListView x:Name="ImageListView" d:ItemsSource="{d:SampleData ItemCount=10}" Margin="0,0,4,0" SelectionMode="Single" BorderBrush="Gray" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" SelectionChanged="SelectImage" ScrollViewer.ScrollChanged="ListViewScrollViewer_ScrollChanged" MouseDoubleClick="ConfirmImage">
+            <ListView x:Name="ImageListView" Margin="0,0,4,0" SelectionMode="Single" BorderBrush="Gray" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" SelectionChanged="SelectImage" ScrollViewer.ScrollChanged="ListViewScrollViewer_ScrollChanged" MouseDoubleClick="ConfirmImage">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel x:Name="ImagePanel" Orientation="Horizontal" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListView}}" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ListView}}"/>
+                        <WrapPanel x:Name="ImagePanel" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ListView}}" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=ListView}}"/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
                 <ListView.ItemTemplate>

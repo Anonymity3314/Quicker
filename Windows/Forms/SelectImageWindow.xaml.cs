@@ -9,9 +9,9 @@ using System.IO;
 
 namespace Quicker.Windows
 {
-    public partial class SelectImageWindow : System.Windows.Window
+    public partial class SelectImageWindow : Window
     {
-        public ObservableCollection<ImageItem> ImageItems { get; set; } = new ObservableCollection<ImageItem>(); // 图片项集合
+        public ObservableCollection<ImageItem> ImageItems { get; set; } = new(); // 图片项集合
         public string SelectedImagePath { get; private set; } = string.Empty; // 选中的图片路径
         public event EventHandler<string> ImageConfirmed; // 图片确认事件
         private ScrollViewer listViewScrollViewer; // 图片列表的 ScrollViewer
@@ -24,8 +24,8 @@ namespace Quicker.Windows
         // 窗口加载事件
         private void SelectImageWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ImageListView.ItemsSource = ImageItems; // 设置图片列表的数据源
             LoadImagesFromFolder(); // 从文件夹加载图片
+            ImageListView.ItemsSource = ImageItems; // 设置图片列表的数据源
             listViewScrollViewer = FindScrollViewer(ImageListView); // 查找 ScrollViewer
             var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
             listViewScrollViewer.Content = itemsPanel; // 设置 ScrollViewer 的内容为 WrapPanel
@@ -37,7 +37,7 @@ namespace Quicker.Windows
         {
             if (listViewScrollViewer == null || VerticalScrollBar == null) return; // 如果 ScrollViewer 或 VerticalScrollBar 为 null，返回
             var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
-            if (itemsPanel == null) return;// 计算每行显示的项数
+            if (itemsPanel == null) return; // 如果 WrapPanel 为 null，返回
 
             double contentHeight = 0; // WrapPanel 的内容高度
             int itemsPerRow = CalculateItemsPerRow(itemsPanel); // 计算每行显示的项数
@@ -64,10 +64,7 @@ namespace Quicker.Windows
             double panelWidth = itemsPanel.ActualWidth; // 获取 WrapPanel 的宽度
             if (panelWidth == 0)
                 return 1; // 如果 WrapPanel 的宽度为 0，返回 1
-            double itemWidth = ((FrameworkElement)itemsPanel.Children[0]).ActualWidth; // 假设所有项的宽度相同
-            if (itemWidth == 0)
-                return 1; // 如果项的宽度为 0，返回 1
-            return (int)(panelWidth / itemWidth); // 计算每行显示的项数
+            return (int)(panelWidth / 40); // 计算每行显示的项数
         }
 
         // 窗口大小变化时，更新滚动条的属性
@@ -87,13 +84,7 @@ namespace Quicker.Windows
         // 外部滚动条的值变化事件
         private void ExternalScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (sender == VerticalScrollBar)
-            {
-                listViewScrollViewer.ScrollToVerticalOffset(e.NewValue); // 更新 ScrollViewer 的位置
-                var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
-                itemsPanel.InvalidateArrange(); // 重新布局
-                itemsPanel.InvalidateMeasure(); // 重新测量
-            }
+            listViewScrollViewer.ScrollToVerticalOffset(e.NewValue); // 更新 ScrollViewer 的位置
         }
 
         // 查找 ScrollViewer
@@ -127,23 +118,20 @@ namespace Quicker.Windows
             string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif" }; // 支持的图片格式
             string[] imageFiles = Directory.GetFiles(targetFolderPath); // 获取文件夹中的所有文件
             int maxImagesToLoad = 45; // 一次加载的最大图片数量
-            int count = 0;
-            foreach (string file in imageFiles) // 遍历文件夹中的所有文件
+            for (int i = 0; i < imageFiles.Length && i < maxImagesToLoad; i++) // 使用 for 循环遍历文件夹中的文件
             {
-                if (count >= maxImagesToLoad) break; // 达到最大数量时停止加载
-                FileInfo fileInfo = new FileInfo(file); // 获取文件信息
+                FileInfo fileInfo = new FileInfo(imageFiles[i]); // 获取文件信息
                 if (supportedExtensions.Contains(fileInfo.Extension.ToLower())) // 检查文件扩展名
                 {
                     var imageItem = new ImageItem // 创建图片项
                     {
-                        FilePath = file, // 文件路径
+                        FilePath = imageFiles[i], // 文件路径
                         FileName = fileInfo.Name, // 文件名
-                        ImageSource = LoadImage(file) // 加载图片
+                        ImageSource = LoadImage(imageFiles[i]) // 加载图片
                     };
                     ImageItems.Add(imageItem); // 添加到图片项集合
-                    count++; // 增加计数器
                 }
-            } // 遍历完成后，更新 ScrollBar 的属性
+            } // 循环完成后，更新 ScrollBar 的属性
         }
 
         // 加载图片
@@ -290,7 +278,7 @@ namespace Quicker.Windows
         }
 
         // 继续加载图片
-        private void ContinueLoadImages(object sender, RoutedEventArgs e)
+        private void LoadImages(object sender, RoutedEventArgs e)
         {
             string targetFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
             if (!Directory.Exists(targetFolderPath))
@@ -305,7 +293,6 @@ namespace Quicker.Windows
             int continueLoadCount = 27; // 每次继续加载的图片数量
             int startIndex = ImageItems.Count; // 当前已加载的图片数量
             int endIndex = Math.Min(startIndex + continueLoadCount, imageFiles.Length); // 计算结束索引
-
             for (int i = startIndex; i < endIndex; i++)
             {
                 string file = imageFiles[i]; // 获取文件路径
