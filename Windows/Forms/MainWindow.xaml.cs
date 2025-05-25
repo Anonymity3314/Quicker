@@ -659,16 +659,9 @@ namespace Quicker.Windows
         /// <returns>生成的 Button</returns>
         private Button CreateButton(string name, Style style,int row = 0, int col = 0)
         {
-            Button button = new Button
-            {
-                Name = name, // 设置名称
-                Style = style, // 设置样式
-                AllowDrop = true, // 允许拖拽
-            };
-
+            Button button = new Button { Name = name, Style = style }; // 创建 Button 对象
             if (row == 3 && col == 0) button.Style = FindResource("SpecialButton1") as Style; // 设置特殊样式
             else if (row == 3 && col == 3) button.Style = FindResource("SpecialButton2") as Style; // 设置特殊样式
-
             BindButtonEvents(button); // 绑定按钮事件
             return button; // 返回创建的按钮
         }
@@ -765,6 +758,26 @@ namespace Quicker.Windows
         {
             UpdateWindow updateWindow = new(); // 创建更新窗口
             updateWindow.Show(); // 显示窗口
+        }
+
+        /// <summary>
+        /// 更新按钮内容
+        /// </summary>
+        /// <param name="buttonID"> 按钮ID </param>
+        /// <param name="tableName"> 数据库表名 </param>
+        public void UpdateButtonContent(int buttonID, string tableName)
+        {
+            Grid fatherGrid = tableName == "Global" ? GlobalGrid : CommonGrid; // 根据表名选择父网格
+            int pageIndex = buttonID / 100; // 计算按钮索引
+            string buttonName = $"{tableName}{buttonID}"; // 生成按钮名称
+            var button = fatherGrid.Children.OfType<UniformGrid>()
+                .Where(ug => ug.Name == $"{tableName}{pageIndex}")
+                .SelectMany(ug => ug.Children.OfType<Button>())
+                .FirstOrDefault(b => b.Name == buttonName); // 查找按钮
+
+            if (button == null) return; // 如果按钮不存在，直接返回
+            var buttonData = db2.GetButtonDataByID(buttonID, tableName); // 从数据库中获取按钮数据
+            buttonManager.RefreshButtonDisplay(button, buttonData, 60, true); // 更新按钮内容
         }
 
         // 窗口关闭时强制垃圾回收

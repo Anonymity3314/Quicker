@@ -28,26 +28,26 @@
         <Border CornerRadius="5" Background="White">
             <StackPanel x:Name="MainStackPanel">
                 <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource MenuButton}" Margin="0,5,0,3" Click="EditeInformation_Click">
-                    <Grid>
+                    <Grid Width="194">
                         <Image Source="/Resources/Images/EditButton.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="编辑"/>
                     </Grid>
                 </Button>
                 <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
                 <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="DeleteAction_Click">
-                    <Grid>
+                    <Grid Width="199">
                         <Image Source="/Resources/Images/DeleteImage.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="删除"/>
                     </Grid>
                 </Button>
                 <Button x:Name="CheckImformation" ToolTip="查看动作信息" Style="{StaticResource MenuButton}" Click="CheckImformation_Click">
-                    <Grid>
+                    <Grid Width="198">
                         <Image Source="/Resources/Images/ActionInformation.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="查看信息"/>
                     </Grid>
                 </Button>
                 <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource MenuButton}" Margin="0,0,0,5" Click="OpenLocation_Click">
-                    <Grid>
+                    <Grid Width="194">
                         <Image Source="/Resources/Images/OpenFile.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开所在位置"/>
                     </Grid>

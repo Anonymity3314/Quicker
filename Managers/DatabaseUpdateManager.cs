@@ -134,53 +134,41 @@ namespace Quicker.Managers
         }
 
         // 更新按钮数据库中所有按钮的 ImagePath 字段
-        /// <summary>
-        /// 更新按钮数据库中所有按钮的 ImagePath 字段为新的路径
-        /// </summary>
         public void UpdateAllImagePathsToNewFolder()
         {
-            string newBasePath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\";
-
-            using var connection = db2.OpenConnection();
-            using var transaction = connection.BeginTransaction();
-
+            string newBasePath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 新的图片路径基准路径
+            using var connection = db2.OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开始事务
             List<string> tableNames = db2.GetAllTableNames(); // 获取所有表名
-            // 遍历每个表并更新 ImagePath
-            foreach (string tableName in tableNames)
+            foreach (string tableName in tableNames) // 遍历每个表并更新 ImagePath
             {
-                string selectQuery = $@"SELECT ButtonID, ImagePath FROM [{tableName}];";
-                using var selectCommand = new SQLiteCommand(selectQuery, connection);
-                using var selectReader = selectCommand.ExecuteReader();
-
-                List<(int ButtonID, string ImagePath)> entriesToUpdate = new List<(int, string)>();
-
+                string selectQuery = $@"SELECT ButtonID, ImagePath FROM [{tableName}];"; // 查询语句
+                using var selectCommand = new SQLiteCommand(selectQuery, connection); // 创建 SQLiteCommand 对象
+                using var selectReader = selectCommand.ExecuteReader(); // 执行查询命令
+                List<(int ButtonID, string ImagePath)> entriesToUpdate = new List<(int, string)>(); // 待更新的按钮数据
                 while (selectReader.Read())
                 {
-                    int buttonID = selectReader.GetInt32(0);
-                    string imagePath = selectReader.GetString(1);
-
-                    // 提取文件名
-                    string fileName = Path.GetFileName(imagePath);
-                    if (!string.IsNullOrEmpty(fileName))
+                    int buttonID = selectReader.GetInt32(0); // 按钮ID
+                    string imagePath = selectReader.GetString(1); // 图片路径
+                    string fileName = Path.GetFileName(imagePath); // 提取文件名
+                    if (!string.IsNullOrEmpty(fileName)) // 如果文件名不为空
                     {
                         // 拼接新的路径
-                        string newImagePath = Path.Combine(newBasePath, fileName);
-                        entriesToUpdate.Add((buttonID, newImagePath));
+                        string newImagePath = Path.Combine(newBasePath, fileName); // 拼接新的路径
+                        entriesToUpdate.Add((buttonID, newImagePath)); // 加入待更新列表
                     }
                 }
 
-                // 更新 ImagePath
-                foreach (var (buttonID, newImagePath) in entriesToUpdate)
+                foreach (var (buttonID, newImagePath) in entriesToUpdate) // 更新 ImagePath
                 {
-                    string updateQuery = $@"UPDATE [{tableName}] SET ImagePath = @NewImagePath WHERE ButtonID = @ButtonID;";
-                    using var updateCommand = new SQLiteCommand(updateQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@NewImagePath", newImagePath);
-                    updateCommand.Parameters.AddWithValue("@ButtonID", buttonID);
-                    updateCommand.ExecuteNonQuery();
+                    string updateQuery = $@"UPDATE [{tableName}] SET ImagePath = @NewImagePath WHERE ButtonID = @ButtonID;"; // 更新语句
+                    using var updateCommand = new SQLiteCommand(updateQuery, connection); // 创建 SQLiteCommand 对象
+                    updateCommand.Parameters.AddWithValue("@NewImagePath", newImagePath); // 添加参数
+                    updateCommand.Parameters.AddWithValue("@ButtonID", buttonID); // 添加参数
+                    updateCommand.ExecuteNonQuery(); // 执行更新命令
                 }
             }
-
-            transaction.Commit();
+            transaction.Commit(); // 提交事务
         }
 
         /// <summary>

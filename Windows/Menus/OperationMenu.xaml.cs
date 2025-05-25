@@ -53,12 +53,15 @@ namespace Quicker.Windows
         // 删除动作
         private async void DeleteAction_Click(object sender, RoutedEventArgs e)
         {
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
             db2.DeleteAction(CurrentButton, TableName); // 删除动作
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
                 actionPageManageWindow.UpdateButton(CurrentButton); // 更新菜单栏按钮
-            buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
+            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
+            if (mainWindow != null)
+                mainWindow.UpdateButtonContent(CurrentButton, TableName); // 更新主窗口按钮
+            this.Close(); // 关闭窗口
         }
 
         // 查看动作信息

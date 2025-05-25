@@ -55,7 +55,7 @@
                 </Button>
                 <Button Click="OpenWebsite" Style="{StaticResource MenuButton}">
                     <Grid>
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,7,0"/>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开网址"/>
                     </Grid>
                 </Button>
