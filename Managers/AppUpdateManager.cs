@@ -1,6 +1,6 @@
 ﻿using Quicker.Windows.Forms;
 using Quicker.Managers;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Net;
 using System.IO;
 using Quicker;
@@ -39,7 +39,7 @@ public class AppUpdateManager : IDisposable
         {
             using WebClient client = new WebClient(); // 创建 WebClient 实例
             string jsonResponse = client.DownloadString(url); // 同步下载 JSON 数据
-            UpdateInfo updateInfo = JsonConvert.DeserializeObject<UpdateInfo>(jsonResponse); // 将 JSON 数据解析为对象
+            UpdateInfo updateInfo = JsonSerializer.Deserialize<UpdateInfo>(jsonResponse); // 反序列化 JSON 数据
             return updateInfo; // 返回解析后的对象
         }
         catch

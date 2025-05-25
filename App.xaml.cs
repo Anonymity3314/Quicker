@@ -180,7 +180,7 @@ namespace Quicker
             }); // 在 UI 线程中获取键盘状态
             switch (e.Data.Button)
             {
-                case SharpHook.Native.MouseButton.Button2:
+                case SharpHook.Data.MouseButton.Button2:
                     if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
                     {
                         AppStateManager.StartPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
@@ -191,7 +191,7 @@ namespace Quicker
                     else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
                         PreLoadMainWindow(true); // 长按右键
                     break; // 右键
-                case SharpHook.Native.MouseButton.Button3:
+                case SharpHook.Data.MouseButton.Button3:
                     if (isCtrlPressed && OpenMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick)
                         CloseOrShowMainWindow(); // Ctrl + 中键
                     else if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
@@ -199,11 +199,11 @@ namespace Quicker
                     else if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger)
                         PreLoadMainWindow(true); // 长按中键
                     break; // 中键
-                case SharpHook.Native.MouseButton.Button4:
+                case SharpHook.Data.MouseButton.Button4:
                     if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick)
                         PreLoadMainWindow();
                     break; // X1键
-                case SharpHook.Native.MouseButton.Button5:
+                case SharpHook.Data.MouseButton.Button5:
                     if (OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
                         PreLoadMainWindow();
                     break; // X2键
@@ -225,13 +225,13 @@ namespace Quicker
             AppStateManager.KeyPressStartTime = null;
             switch (e.Data.Button)
             {
-                case SharpHook.Native.MouseButton.Button3:
+                case SharpHook.Data.MouseButton.Button3:
                     if (pressDuration.TotalSeconds <= Conventions.LongPressThreshold &&
                         OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
                         CloseOrShowMainWindow();
                     break; // 短按中键
-                case SharpHook.Native.MouseButton.Button4: // 短按X1键
-                case SharpHook.Native.MouseButton.Button5:
+                case SharpHook.Data.MouseButton.Button4: // 短按X1键
+                case SharpHook.Data.MouseButton.Button5:
                     if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick ||
                         OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
                     {
@@ -257,8 +257,8 @@ namespace Quicker
                 : AppStateManager.OpenMainWindowConditions; // 获取设置
             switch (e.Data.KeyCode)
             {
-                case SharpHook.Native.KeyCode.VcLeftControl: // 左 Ctrl 键
-                case SharpHook.Native.KeyCode.VcRightControl:
+                case SharpHook.Data.KeyCode.VcLeftControl: // 左 Ctrl 键
+                case SharpHook.Data.KeyCode.VcRightControl:
                     if (OpenMainWindowConditions.OpenMainWindowByCtrl)
                         PreLoadMainWindow();
                     break; // 右 Ctrl 键
@@ -279,8 +279,8 @@ namespace Quicker
             AppStateManager.KeyPressStartTime = null;
             switch (e.Data.KeyCode)
             {
-                case SharpHook.Native.KeyCode.VcLeftControl: // 左 Ctrl 键
-                case SharpHook.Native.KeyCode.VcRightControl:
+                case SharpHook.Data.KeyCode.VcLeftControl: // 左 Ctrl 键
+                case SharpHook.Data.KeyCode.VcRightControl:
                     if (OpenMainWindowConditions.OpenMainWindowByCtrl &&
                         pressDuration.TotalSeconds <= Conventions.LongPressThreshold)
                         CloseOrShowMainWindow();

@@ -103,8 +103,28 @@ namespace Quicker.Windows.Forms
             VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
             UpdateDateTextBlock.Text = updateInfo.ReleaseDate; // 显示更新日期
             UpdateInfoTextBlock.Text = updateInfo.Changelog; // 显示更新内容
-            UpdateInfoGrid.Height += count * 20; // 设置更新内容的高度
-            UpdateInfoBorder.Height += count * 20; // 设置更新内容的高度
+            UpdateInfoGrid.Height += count * 18; // 设置更新内容的高度
+            UpdateInfoBorder.Height += count * 18; // 设置更新内容的高度
+        }
+
+        // 窗口关闭清理资源
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e); // 调用基类方法
+
+            downloadUrl = null;
+
+            VersionTextBlock.Text = null;
+            LatestVersionTextBlock1.Text = null;
+            LatestVersionTextBlock2.Text = null;
+            VersionChangeTextBlock.Text = null;
+            UpdateDateTextBlock.Text = null;
+            UpdateInfoTextBlock.Text = null;
+
+            this.Content = null;
+            this.DataContext = null; // 清理数据绑定
+
+            GC.Collect(); // 回收资源
         }
     }
 }
