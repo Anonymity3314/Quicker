@@ -19,7 +19,7 @@
     IsVisibleChanged="CreatActionMenu_IsVisibleChanged"
     Deactivated="CreatActionMenu_Deactivated"
 >
-    <Grid x:Name="MainGrid" Width="178" Height="139">
+    <Grid x:Name="MainGrid" Width="178" Height="142">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>
@@ -35,7 +35,7 @@
                     </Grid>
                 </Button>
                 <Rectangle x:Name="Line1" Height="1" Fill="#FFF0F0F0"/>
-                <Button x:Name="StartAppButton" Click="StartApp" Style="{StaticResource MenuButton}" Margin="0,0,0,0">
+                <Button x:Name="StartAppButton" Click="StartApp" Style="{StaticResource MenuButton}" Margin="0,3,0,0">
                     <Grid>
                         <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="启动软件"/>

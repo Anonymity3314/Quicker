@@ -33,7 +33,7 @@ namespace Quicker.Windows
             {
                 if(!hasChanged)
                 {
-                    MainGrid.Height -= 29; // 减少高度
+                    MainGrid.Height -= 32; // 减少高度
                     Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
                     PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
                     StartAppButton.Margin = new Thickness(0, 5, 0, 0); // 调整按钮位置
@@ -46,7 +46,7 @@ namespace Quicker.Windows
                 PasteActionTextBlock.Text = $"粘贴动作：{actionInfo[1]}{actionInfo[2]}"; // 设置文本
                 if(hasChanged)
                 {
-                    MainGrid.Height += 29; // 增加高度
+                    MainGrid.Height += 32; // 增加高度
                     Line1.Visibility = Visibility.Visible; // 显示分割线
                     PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
                     StartAppButton.Margin = new Thickness(0, 3, 0, 0); // 调整按钮位置
