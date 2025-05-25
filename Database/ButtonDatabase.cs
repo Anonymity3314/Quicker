@@ -188,7 +188,7 @@ namespace Quicker.Database
             // 删除当前页的按钮
             foreach (var buttonData in currentButtons.Values)
             {
-                DeleteAction(buttonData.ButtonID, tableName); // 删除动作
+                DeleteAction(buttonData.ButtonID, tableName, connection); // 删除动作
             }
 
             // 筛选并更新后续页的按钮编号
@@ -227,9 +227,9 @@ namespace Quicker.Database
         /// 删除动作
         /// </summary>
         /// <param name="buttonID">要删除的动作ID</param>
-        public void DeleteAction(int buttonID, string tableName)
-        {
-            using var connection = OpenConnection(); // 打开数据库连接
+        public void DeleteAction(int buttonID, string tableName, SQLiteConnection connection = null)
+        { 
+            if (connection == null) connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
             using var command = new SQLiteCommand($@"DELETE FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数

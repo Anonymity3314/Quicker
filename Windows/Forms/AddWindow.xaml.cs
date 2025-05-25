@@ -14,9 +14,9 @@ namespace Quicker
 {
     public partial class AddWindow : Window
     {
-        private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器
-        private readonly IconManager iconManager = new IconManager(); // 图标管理器
-        private readonly ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
+        private readonly ButtonManager buttonManager = new(); // 按钮管理器
+        private readonly IconManager iconManager = new(); // 图标管理器
+        private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
         public TextBlock ButtonTitle; // 按钮标题

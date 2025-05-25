@@ -546,9 +546,10 @@ namespace Quicker.Windows
         {
             int index = button / 100; // 获取按钮所在动作页索引
             var oldCanvas = MainListView.Items[index] as Canvas; // 获取旧的 Canvas
-            foreach(var child in oldCanvas.Children)
+            UniformGrid targetGrid = oldCanvas.Children.Cast<UIElement>().Where(c => c is UniformGrid).First() as UniformGrid; // 获取目标网格
+            foreach(var childs in targetGrid.Children)
             {
-                if(child is Button targetButton)
+                if(childs is Button targetButton && targetButton.Name.Contains(button.ToString()))
                 {
                     ButtonData data = db2.GetButtonDataByID(int.Parse(targetButton.Name.Replace(type, "")), type); // 获取按钮数据
                     buttonManager.RefreshButtonDisplay(targetButton, data, 60, false); // 刷新按钮显示
@@ -810,12 +811,6 @@ namespace Quicker.Windows
                             db2.CreateButtonTable(targetSceneData.SceneName); // 创建按钮数据表
                             db3.CreatActionPageTable(targetSceneData.SceneName); // 创建动作页数据表
                         }
-                        var sourceActionPageData = db3.GetActionPageData(type, sourceIndex); // 获取源动作页数据
-                        db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName), sourceActionPageData.ActionPageSize); // 更新动作页数据表
-                        db3.UpdateSceneCount(targetSceneData.SceneName, targetSceneData.SceneCount + 1); // 更新场景数据表
-                        db3.DeleteActionPage(type, sourceIndex); // 删除源动作页
-                        db2.DeletePageOfButtons(type, sourceIndex); // 删除源动作页按钮数据
-                        MainListView.Items.RemoveAt(sourceIndex); // 从主列表视图中移除画布
                         var buttons = db2.GetPagesOfButtons(type, sourceIndex); // 获取源动作页按钮数据
                         foreach (var button in buttons)
                         {
@@ -836,6 +831,12 @@ namespace Quicker.Windows
                             }; // 创建新按钮数据
                             db2.UpdateAction(newButtonData, targetSceneData.SceneName); // 更新按钮数据
                         }
+                        var sourceActionPageData = db3.GetActionPageData(type, sourceIndex); // 获取源动作页数据
+                        db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName), sourceActionPageData.ActionPageSize); // 更新动作页数据表
+                        db3.UpdateSceneCount(targetSceneData.SceneName, targetSceneData.SceneCount + 1); // 更新场景数据表
+                        db3.DeleteActionPage(type, sourceIndex); // 删除源动作页
+                        db2.DeletePageOfButtons(type, sourceIndex); // 删除源动作页按钮数据
+                        MainListView.Items.RemoveAt(sourceIndex); // 从主列表视图中移除画布
 
                         if (MainListView.Items.Count == 0)
                         {
