@@ -297,7 +297,7 @@ namespace Quicker.Windows
             {
                 Style = FindResource("ActionChangePageButton") as Style,
                 Name = $"{style}{canvasIndex}", // 按钮名称
-            };
+            }; // 创建按钮
             pageButton.PreviewMouseMove += ChangePageButton_PreviewMouseMove; // 鼠标移动事件
             pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
             pageButton.PreviewMouseLeftButtonDown += buttonManager.Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
@@ -316,7 +316,7 @@ namespace Quicker.Windows
             {
                 Style = FindResource("ActionPageEditButton") as Style,
                 Name = $"Edit{style}{canvasIndex}", // 按钮名称
-            };
+            }; // 创建按钮
             editPageButton.Click += OpenEditPopup; // 点击事件
             editPageButton.MouseDoubleClick += EditActionPageInfoButton_Click; // 双击事件
             return editPageButton; // 返回按钮
@@ -361,7 +361,7 @@ namespace Quicker.Windows
                     ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("LightGray"))
                     : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
 
-                if (showUsedTimes)
+                if (showUsedTimes) // 如果显示使用次数
                     buttonManager.LoadActionUsedTimes(button, data); // 刷新按钮显示
             }
             else
@@ -374,7 +374,7 @@ namespace Quicker.Windows
             Button button = sender as Button; // 获取按钮
             if (button.Tag is ButtonData data) // 如果按钮有数据
             {
-                if(showUsedTimes)
+                if(showUsedTimes) // 如果显示使用次数
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
 
                 button.Background = isDarkModle
@@ -440,7 +440,7 @@ namespace Quicker.Windows
         // 显示编辑窗口
         private void ShowEditWindow(object sender, MouseButtonEventArgs e)
         {
-            e.Handled = true;
+            e.Handled = true; // 阻止默认双击事件
             if (sender is Button button && button.Tag != null)
             {
                 AddWindow addWindow = new AddWindow(int.Parse(button.Name.Replace(type, "")), type, 0); // 创建编辑窗口
@@ -870,7 +870,6 @@ namespace Quicker.Windows
                     return "默认全局动作页";
                 case "Common":
                     return "默认";
-                case "Desktop":
                 default:
                     return actionPageName;
             }

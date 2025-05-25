@@ -58,11 +58,14 @@ namespace Quicker.Windows.Forms
             if (AppStateManager.HasNewVersion)
             {
                 using var updateManager = new AppUpdateManager(); // 创建更新管理器
-                using var toast = new ToastManager(); // 创建Toast提示
+                updateManager.ReadJsonFromUrl(); // 读取更新信息
                 if (updateManager.LatestUpdateInfo != null)
                     LoadUpdateInfo(updateManager.LatestUpdateInfo); // 加载更新信息
                 else
+                {
+                    using var toast = new ToastManager(); // 创建Toast提示
                     toast.ShowToast("获取更新失败！", "Common"); // 显示Toast提示
+                }
             }
             else
             {

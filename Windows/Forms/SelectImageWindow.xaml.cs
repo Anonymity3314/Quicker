@@ -27,9 +27,9 @@ namespace Quicker.Windows
             ImageListView.ItemsSource = ImageItems; // 设置图片列表的数据源
             LoadImagesFromFolder(); // 从文件夹加载图片
             listViewScrollViewer = FindScrollViewer(ImageListView); // 查找 ScrollViewer
-            var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel            
+            var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
             listViewScrollViewer.Content = itemsPanel; // 设置 ScrollViewer 的内容为 WrapPanel
-            UpdateScrollBarProperties(); // 初始化滚动条               
+            UpdateScrollBarProperties(); // 初始化滚动条
         }
 
         // 更新滚动条的属性

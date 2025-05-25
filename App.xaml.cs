@@ -56,6 +56,7 @@ namespace Quicker
         private void CheckAppUpdate()
         {
             using var updateManager = new AppUpdateManager(); // 创建更新管理器
+            updateManager.CheckForUpdate(); // 检查并安装更新
         }
 
         // 初始化托盘图标
