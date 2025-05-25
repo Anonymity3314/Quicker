@@ -24,12 +24,11 @@ namespace Quicker.Windows
         // 窗口加载事件
         private void SelectImageWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadImagesFromFolder(); // 从文件夹加载图片
             ImageListView.ItemsSource = ImageItems; // 设置图片列表的数据源
             listViewScrollViewer = FindScrollViewer(ImageListView); // 查找 ScrollViewer
             var itemsPanel = FindVisualChild<WrapPanel>(ImageListView); // 查找 WrapPanel
             listViewScrollViewer.Content = itemsPanel; // 设置 ScrollViewer 的内容为 WrapPanel
-            UpdateScrollBarProperties(); // 初始化滚动条
+            LoadImagesFromFolder(); // 从文件夹加载图片
         }
 
         // 更新滚动条的属性
@@ -48,12 +47,7 @@ namespace Quicker.Windows
                     contentHeight = Math.Max(contentHeight, element.DesiredSize.Height); // 计算 WrapPanel 的内容高度
             }
             contentHeight *= Math.Ceiling((double)itemsPanel.Children.Count / itemsPerRow); // 计算 WrapPanel 的内容高度
-
             itemsPanel.Height = contentHeight; // 确保 WrapPanel 的高度正确
-
-            VerticalScrollBar.Maximum = contentHeight; // 设置滚动条的最大值
-            VerticalScrollBar.ViewportSize = listViewScrollViewer.ViewportHeight; // 设置滚动条的视窗大小
-            VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset; // 设置滚动条的当前值
         }
 
         // 计算每行显示的项数
@@ -76,9 +70,12 @@ namespace Quicker.Windows
         // 更新滚动条的值
         private void ListViewScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (listViewScrollViewer == null || VerticalScrollBar == null)
-                return; // 如果 ScrollViewer 或 VerticalScrollBar 为 null，返回
-            VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset; // 更新滚动条的值
+            if (listViewScrollViewer != null)
+            {
+                VerticalScrollBar.Maximum = e.ExtentHeight - e.ViewportHeight; // 更新滚动条的最大值
+                VerticalScrollBar.ViewportSize = e.ViewportHeight; // 更新滚动条的视窗大小
+                VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset; // 更新滚动条的值
+            }
         }
 
         // 外部滚动条的值变化事件
@@ -131,7 +128,8 @@ namespace Quicker.Windows
                     };
                     ImageItems.Add(imageItem); // 添加到图片项集合
                 }
-            } // 循环完成后，更新 ScrollBar 的属性
+            }
+            UpdateScrollBarProperties(); // 更新滚动条的属性
         }
 
         // 加载图片

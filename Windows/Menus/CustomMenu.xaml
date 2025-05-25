@@ -30,25 +30,25 @@
         <Border BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="White">
             <StackPanel Margin="-1,-1,-1,-1">
                 <Button Click="ShowMainWindow" ToolTip="弹出面板窗口" Style="{StaticResource MenuButton}" Margin="0,5,0,0">
-                    <Grid>
+                    <Grid Width="194">
                         <Image x:Name="showMainWindow" Source="/Resources/Images/OpenMainWindow1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Text="显示面板窗口" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenSettingWindow" ToolTip="打开设置窗口" Style="{StaticResource MenuButton}">
-                    <Grid>
+                    <Grid Width="194">
                         <Image x:Name="openSettingWindow" Source="/Resources/Images/SettingImage1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Text="设置" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenActionPageManageWindow" ToolTip="打开场景与动作管理窗口" Style="{StaticResource MenuButton}">
-                    <Grid>
+                    <Grid Width="194">
                         <Image x:Name="openActionPageManageWindow" Source="/Resources/Images/ActionPagesManager.jpg" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Text="场景与动作" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="PauseQuicker" ToolTip="暂停和恢复Quicker触发" Style="{StaticResource MenuButton}">
-                    <Grid>
+                    <Grid Width="194">
                         <Image x:Name="pauseQuicker" Source="/Resources/Images/Pause.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,7,0"/>
                         <TextBlock Text="暂停" x:Name="PauseQuickerTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
@@ -90,13 +90,13 @@
                     </Grid>
                 </Button>-->
                 <Button Click="Restart" ToolTip="退出并重新启动" Style="{StaticResource MenuButton}">
-                    <Grid>
+                    <Grid Width="194">
                         <Image x:Name="restart" Source="/Resources/Images/RestartQuicker.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Text="重启Quicker" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="Exit" ToolTip="关闭Quicker软件" Style="{StaticResource MenuButton}">
-                    <Grid>
+                    <Grid Width="194">
                         <Image x:Name="exit" Source="/Resources/Images/CloseQuicker.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,7,0"/>
                         <TextBlock Text="退出" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
