@@ -78,6 +78,9 @@ namespace Quicker.Windows
                 ActionType = "OpenActionPage"
             }; // 创建按钮数据
             db2.UpdateAction(buttonData, TableName); // 保存按钮数据
+            ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
+            if (actionPageManageWindow != null)
+                actionPageManageWindow.UpdateButton(CurrentButton); // 更新菜单栏按钮
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
 

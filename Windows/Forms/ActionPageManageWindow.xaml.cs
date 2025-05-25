@@ -162,7 +162,19 @@ namespace Quicker.Windows
         private void LoadCanvas(string style)
         {
             MainListView.Items.Clear(); // 清空总列表视图
-            switch (style)
+            UpdateUI(); // 更新UI布局
+            if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
+            var actionPageData = db3.GetSceneData(style).FirstOrDefault(); // 获取动作页数据
+            for (int i = 0; i < actionPageData.SceneCount; i++)
+            {
+                MainListView.Items.Add(GenerateCanvas(i, style)); // 生成动作页
+            }
+        }
+
+        // 更新UI布局
+        public void UpdateUI()
+        {
+            switch (type)
             {
                 case "Global":
                     MainBorder.Height = 224; // 设置主边框高度
@@ -177,7 +189,7 @@ namespace Quicker.Windows
                     AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 333, 0, 0); // 设置自动返回到第一页复选框边距
                     break; // 普通动作页
                 default:
-                    if (db2.TableExists(style)) // 如果存在通用样式按钮数据表
+                    if (db2.TableExists(type)) // 如果存在通用样式按钮数据表
                     {
                         MainBorder.Height = 289; // 设置主边框高度
                         ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
@@ -192,13 +204,6 @@ namespace Quicker.Windows
                         AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 268, 0, 0); // 设置自动返回到第一页复选框边距
                     }
                     break;
-            }
-
-            if (!db2.TableExists(style)) return; // 如果不存在按钮数据表，则返回
-            var actionPageData = db3.GetSceneData(style).FirstOrDefault(); // 获取动作页数据
-            for (int i = 0; i < actionPageData.SceneCount; i++)
-            {
-                MainListView.Items.Add(GenerateCanvas(i, style)); // 生成动作页
             }
         }
 
