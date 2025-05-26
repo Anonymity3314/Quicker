@@ -349,7 +349,10 @@ namespace Quicker
                     mainWindow.Show(); // 显示功能面板
                 }
                 else
-                    mainWindow?.Activate(); // 激活现有的功能面板
+                {
+                    mainWindow.Visibility = Visibility.Visible; // 显示功能面板
+                    AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
+                }
             });
         }
 

@@ -70,12 +70,10 @@ namespace Quicker.Windows
         // 更新滚动条的值
         private void ListViewScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
+            VerticalScrollBar.Maximum = e.ExtentHeight - e.ViewportHeight; // 更新滚动条的最大值
+            VerticalScrollBar.ViewportSize = e.ViewportHeight; // 更新滚动条的视窗大小
             if (listViewScrollViewer != null)
-            {
-                VerticalScrollBar.Maximum = e.ExtentHeight - e.ViewportHeight; // 更新滚动条的最大值
-                VerticalScrollBar.ViewportSize = e.ViewportHeight; // 更新滚动条的视窗大小
                 VerticalScrollBar.Value = listViewScrollViewer.VerticalOffset; // 更新滚动条的值
-            }
         }
 
         // 外部滚动条的值变化事件
