@@ -22,6 +22,7 @@
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <SignAssembly>False</SignAssembly>
     <RepositoryUrl>https://github.com/Anonymity3314/Quicker</RepositoryUrl>
+    <NuGetAuditMode>all</NuGetAuditMode>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
