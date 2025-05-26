@@ -36,37 +36,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="bin\**" />
-    <Compile Remove="LocalIcons\**" />
-    <Compile Remove="OldVersion\**" />
-    <Compile Remove="Properties\**" />
-    <Compile Remove="Resources\Images\Icons\**" />
-    <Compile Remove="Resources\Images\SourseImages\**" />
-    <Compile Remove="新建文件夹\**" />
-    <EmbeddedResource Remove="bin\**" />
-    <EmbeddedResource Remove="LocalIcons\**" />
-    <EmbeddedResource Remove="OldVersion\**" />
-    <EmbeddedResource Remove="Properties\**" />
-    <EmbeddedResource Remove="Resources\Images\Icons\**" />
-    <EmbeddedResource Remove="Resources\Images\SourseImages\**" />
-    <EmbeddedResource Remove="新建文件夹\**" />
-    <None Remove="bin\**" />
-    <None Remove="LocalIcons\**" />
-    <None Remove="OldVersion\**" />
-    <None Remove="Properties\**" />
-    <None Remove="Resources\Images\Icons\**" />
-    <None Remove="Resources\Images\SourseImages\**" />
-    <None Remove="新建文件夹\**" />
-    <Page Remove="bin\**" />
-    <Page Remove="LocalIcons\**" />
-    <Page Remove="OldVersion\**" />
-    <Page Remove="Properties\**" />
-    <Page Remove="Resources\Images\Icons\**" />
-    <Page Remove="Resources\Images\SourseImages\**" />
-    <Page Remove="新建文件夹\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove=".gitattributes" />
     <None Remove=".gitignore" />
     <None Remove=".gitignore~RF3e5ebf6d.TMP" />

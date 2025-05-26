@@ -1,5 +1,7 @@
 ﻿using System.Data.SQLite;
+using System.Text.Json;
 using System.IO;
+using System.Xml;
 
 namespace Quicker.Database
 {
@@ -417,10 +419,38 @@ namespace Quicker.Database
         }
 
         /// <summary>
+        /// 将JSON文件中的数据导入数据库
+        /// </summary>
+        /// <param name="tableName"> 要导入数据的表名 </param>
+        /// <param name="jsonFilePath"> JSON文件的路径 </param>
+        public void ImportJsonDataToList(string tableName, string jsonFilePath)
+        {
+            string json = File.ReadAllText(jsonFilePath);
+            ButtonData data = JsonSerializer.Deserialize<ButtonData>(json);
+            using var connection = OpenConnection(); // 打开数据库连接
+            UpdateAction(data, tableName); // 更新动作数据到数据库
+        }
+
+        /// <summary>
+        /// 将动作数据导出为 JSON 文件
+        /// </summary>
+        /// <param name="tableName"> 动作所在表名 </param>
+        /// <param name="buttonID"> 动作ID </param>
+        /// <param name="outputPath"> 输出文件夹路径 </param>
+        public void ExportActionDataToJson(string tableName, int buttonID, string outputPath)
+        {
+            var data = GetButtonDataByID(buttonID, tableName); // 获取动作数据
+            string fileName = $"{data.Title}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.json"; // 构造文件名
+            outputPath = Path.Combine(outputPath, fileName); // 构造输出路径
+            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }); // 序列化数据为 JSON 格式
+            File.WriteAllText(outputPath, json); // 写入 JSON 文件
+        }
+
+        /// <summary>
         /// 检查表是否存在
         /// </summary>
-        /// <param name="tableName">要检查的表名</param>
-        /// <returns>表是否存在</returns>
+        /// <param name="tableName"> 要检查的表名 </param>
+        /// <returns> 表是否存在 </returns>
         public bool TableExists(string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
