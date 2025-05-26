@@ -1,15 +1,14 @@
-﻿using Quicker.Database;
-using Quicker.Managers;
-using System.Drawing;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Runtime.InteropServices;
 using System.Windows.Controls;
-using System.Windows.Media;
+using Quicker.Database;
+using Quicker.Managers;
+using Quicker.Windows;
+using System.Windows;
+using System.IO;
 
-namespace Quicker.Windows
+namespace Quicker.UserControls.OperationMenu
 {
-    public partial class OperationMenu : Window
+    public partial class EditMenu : UserControl
     {
         // 打开文件夹并选中文件
         [DllImport("shell32.dll", ExactSpelling = true)]
@@ -24,33 +23,18 @@ namespace Quicker.Windows
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
 
-        public OperationMenu(int currentbutton, string tableName)
+        public EditMenu()
         {
-            InitializeComponent(); // 初始化窗口
-            CurrentButton = currentbutton; // 设置当前按钮
-            TableName = tableName; // 设置表名
-            InitializeMenu(); // 初始化菜单
-        }
-
-        // 初始化菜单
-        private void InitializeMenu()
-        {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
-            if(buttonData.ActionType == "OpenWebsite")
-            {
-                MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
-                MainStackPanel.Height -= 25; // 设置窗口高度
-                MainGrid.Height -= 25; // 设置网格高度
-            }
+            InitializeComponent();
         }
 
         // 编辑动作信息
         private void EditeInformation_Click(object sender, RoutedEventArgs e)
         {
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new AddWindow(CurrentButton, TableName, 0); // 创建添加动作窗口
-            addWindow.Show(); // 显示添加动作窗口
-            buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
+            //buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            //AddWindow addWindow = new AddWindow(CurrentButton, TableName, 0); // 创建添加动作窗口
+            //addWindow.Show(); // 显示添加动作窗口
+            //buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
 
         // 删除动作
@@ -64,7 +48,7 @@ namespace Quicker.Windows
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
             if (mainWindow != null)
                 mainWindow.UpdateButtonContent(CurrentButton, TableName); // 更新主窗口按钮
-            this.Close(); // 关闭窗口
+            //this.Close(); // 关闭窗口
         }
 
         // 查看动作信息
@@ -73,13 +57,13 @@ namespace Quicker.Windows
             ActionInformationWindow actionInformationWindow = new(CurrentButton, TableName); // 创建动作信息窗口
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
             actionInformationWindow.ShowDialog(); // 显示动作信息窗口
-            this.Close(); // 关闭操作菜单窗口
+            //this.Close(); // 关闭操作菜单窗口
         }
 
         // 在资源管理器中打开文件或文件夹
         private void OpenLocation_Click(object sender, RoutedEventArgs e)
         {
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            //buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
             List<string> paths = new List<string>(); // 文件或文件夹路径列表
 
@@ -122,7 +106,7 @@ namespace Quicker.Windows
             }
             finally
             {
-                buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
+                //buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
             }
         }
 
@@ -208,38 +192,5 @@ namespace Quicker.Windows
             }
         }
 
-        // 失去焦点时关闭操作菜单
-        private void OperationMenu_Deactivated(object sender, EventArgs e)
-        {
-            ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件
-            using var windowMananger = new WindowManager(); // 创建窗口管理器
-            windowMananger.SetMainWindowFocused(); // 关闭窗口
-            this.Visibility = Visibility.Hidden; // 隐藏窗口
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.CloseMenuAsync(this); // 延时关闭窗口
-        }
-
-        // 关闭窗口前释放资源
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e); // 调用基类的 OnClosed 方法
-            ClosingOrHiding = null; // 清理事件
-            buttonManager.Dispose();
-            GC.Collect(); // 强制垃圾回收
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 再次强制垃圾回收
-        }
-
-        private void CheckImformation_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //Button button = sender as Button;
-            //button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA"));
-            //Level1Popup.IsOpen = true;
-        }
-
-        private void CheckImformation_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //Level1Popup.IsOpen = false;
-        }
     }
 }
