@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using Quicker.Windows.Menus;
+using System.Data.SQLite;
 using Quicker.Database;
 using Quicker.Windows;
 using System.IO;

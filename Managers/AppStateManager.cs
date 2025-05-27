@@ -1,5 +1,6 @@
 ﻿using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Quicker.Windows.Forms;
 using Quicker.Database;
 using Quicker.Managers;
 using Quicker.Windows;

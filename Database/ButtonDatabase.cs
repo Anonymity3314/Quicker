@@ -423,12 +423,27 @@ namespace Quicker.Database
         /// </summary>
         /// <param name="tableName"> 要导入数据的表名 </param>
         /// <param name="jsonFilePath"> JSON文件的路径 </param>
-        public void ImportJsonDataToList(string tableName, string jsonFilePath)
+        public void ImportJsonDataToList(string tableName, string jsonFilePath, int buttonID)
         {
-            string json = File.ReadAllText(jsonFilePath);
-            ButtonData data = JsonSerializer.Deserialize<ButtonData>(json);
+            string json = File.ReadAllText(jsonFilePath); // 读取 JSON 文件
+            ButtonData data = JsonSerializer.Deserialize<ButtonData>(json); // 反序列化 JSON 数据
             using var connection = OpenConnection(); // 打开数据库连接
-            UpdateAction(data, tableName); // 更新动作数据到数据库
+            ButtonData newData = new ButtonData
+            {
+                ButtonID = buttonID,
+                Title = data.Title,
+                Location = data.Location,
+                ImagePath = data.ImagePath,
+                Data1 = data.Data1,
+                Data2 = data.Data2,
+                Data3 = data.Data3,
+                Description = data.Description,
+                CreateTime = data.CreateTime,
+                LatestEditTime = DateTime.Now,
+                ActionType = data.ActionType,
+                UsedTimes = 0
+            }; // 构造新的 ButtonData
+            UpdateAction(newData, tableName); // 更新动作数据到数据库
         }
 
         /// <summary>

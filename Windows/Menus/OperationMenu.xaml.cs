@@ -2,10 +2,10 @@
 using System.Windows.Controls;
 using Quicker.Windows.Forms;
 using System.Windows.Media;
+using System.Windows.Input;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
-using System.Drawing;
 using System.IO;
 
 namespace Quicker.Windows.Menus
@@ -25,10 +25,13 @@ namespace Quicker.Windows.Menus
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
+        private bool close = true; // 是否关闭窗口
 
         public OperationMenu(int buttonID, string tableName)
         {
             InitializeComponent(); // 初始化窗口
+            FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+            SecondChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             ButtonID = buttonID; // 设置当前按钮
             TableName = tableName; // 设置表名
             InitializeMenu(); // 初始化菜单
@@ -43,6 +46,7 @@ namespace Quicker.Windows.Menus
                 MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
                 MainStackPanel.Height -= 25; // 设置窗口高度
                 MainGrid.Height -= 25; // 设置网格高度
+                ChiildGrid.Margin = new Thickness(494, 240, 0, 0); // 设置子菜单边距
             }
         }
 
@@ -213,12 +217,95 @@ namespace Quicker.Windows.Menus
         // 失去焦点时关闭操作菜单
         private void OperationMenu_Deactivated(object sender, EventArgs e)
         {
-            ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件
-            using var windowMananger = new WindowManager(); // 创建窗口管理器
-            windowMananger.SetMainWindowFocused(); // 关闭窗口
-            this.Visibility = Visibility.Hidden; // 隐藏窗口
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.CloseMenuAsync(this); // 延时关闭窗口
+            if (close) 
+            {
+                ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件
+                using var windowMananger = new WindowManager(); // 创建窗口管理器
+                windowMananger.SetMainWindowFocused(); // 关闭窗口
+                this.Visibility = Visibility.Hidden; // 隐藏窗口
+                using var windowManager = new WindowManager(); // 创建窗口管理器
+                windowManager.CloseMenuAsync(this); // 延时关闭窗口
+            }
+        }
+
+        // 鼠标移入显示子菜单
+        private void OtherFunction_MouseEnter(object sender, MouseEventArgs e)
+        {
+            OtherFunction.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变背景颜色
+            FirstChildGrid.Visibility = Visibility.Visible; // 显示子菜单
+        }
+
+        // 鼠标移出关闭子菜单
+        private void OtherFunction_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (FirstChildGrid.IsMouseOver) return;
+            OtherFunction.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White"));
+            FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+        }
+
+        // 鼠标移入显示子菜单
+        private void CopyActionInfo_MouseEnter(object sender, MouseEventArgs e)
+        {
+            CopyActionInfo.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变背景颜色
+            SecondChildGrid.Visibility = Visibility.Visible; // 显示子菜单
+        }
+
+        // 鼠标移出关闭子菜单
+        private void CopyActionInfo_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!SecondChildGrid.IsMouseOver)
+            {
+                CopyActionInfo.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
+                SecondChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+            }
+        }
+
+        // 复制动作名称
+        private void CopyActionName_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonData data = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
+            Clipboard.SetText(data.Title); // 复制文本到剪贴板
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.ShowToast("已复制。", "Success"); // 弹出消息提醒
+            this.Close(); // 关闭窗口
+        }
+
+        // 复制动作ID
+        private void CopyActionID_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonData data = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
+            Clipboard.SetText($"{data.ButtonID}"); // 复制文本到剪贴板
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.ShowToast("动作ID已复制。", "Success"); // 弹出消息提醒
+            this.Close(); // 关闭窗口
+        }
+
+        // 鼠标移出关闭子菜单
+        private void SecondChildGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            CopyActionInfo.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
+            SecondChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+        }
+
+        // 导出动作数据到指定文件夹
+        private void ExportAction_Click(object sender, RoutedEventArgs e)
+        {
+            close = false; // 设置关闭标识符
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog() { ShowNewFolderButton = true }; // 创建文件夹选择对话框
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) // 选择文件夹
+                db2.ExportActionDataToJson(TableName, ButtonID, dialog.SelectedPath); // 导出动作数据到指定文件夹
+            close = true; // 设置关闭标识符
+        }
+
+        // 鼠标移出关闭子菜单
+        private void FirstChildGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!MainGrid.IsMouseOver && !SecondChildGrid.IsMouseOver && !OtherFunction.IsMouseOver)
+            {
+                OtherFunction.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
+                FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+            }
         }
 
         // 关闭窗口前释放资源
@@ -226,22 +313,11 @@ namespace Quicker.Windows.Menus
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件
-            buttonManager.Dispose();
+            buttonManager.Dispose(); // 释放按钮管理器资源
+            close = false; // 设置关闭标识符
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
-        }
-
-        private void CheckImformation_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //Button button = sender as Button;
-            //button.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFEAEAEA"));
-            //Level1Popup.IsOpen = true;
-        }
-
-        private void CheckImformation_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //Level1Popup.IsOpen = false;
         }
     }
 }

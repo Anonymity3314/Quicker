@@ -10,54 +10,108 @@
     AllowsTransparency="True"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
-    WindowStyle="None"
     Background="{x:Null}"
+    WindowStyle="None"
     Topmost="True"
     Height="451"
     Width="784"
     
     Deactivated="OperationMenu_Deactivated"
 >
-    <Grid x:Name="MainGrid" Height="117" Width="204">
-        <!-- 窗口阴影 -->
-        <Rectangle Fill="White" Margin="5,7">
-            <Rectangle.Effect>
-                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-            </Rectangle.Effect>
-        </Rectangle>
-        <Border CornerRadius="5" Background="White">
-            <StackPanel x:Name="MainStackPanel">
-                <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource MenuButton}" Margin="0,5,0,3" Click="EditeInformation_Click">
-                    <Grid Width="194">
-                        <Image Source="/Resources/Images/EditButton.png" Style="{StaticResource MenuButtonImage}"/>
-                        <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="编辑"/>
-                    </Grid>
-                </Button>
-                <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
-                <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="DeleteAction_Click">
-                    <Grid Width="199">
-                        <Image Source="/Resources/Images/DeleteImage.png" Style="{StaticResource MenuButtonImage}"/>
-                        <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="删除"/>
-                    </Grid>
-                </Button>
-                <Button x:Name="CheckImformation" ToolTip="查看动作信息" Style="{StaticResource MenuButton}" Click="CheckImformation_Click" MouseEnter="CheckImformation_MouseEnter" MouseLeave="CheckImformation_MouseLeave">
-                    <Grid Width="198">
-                        <Image Source="/Resources/Images/ActionInformation.png" Style="{StaticResource MenuButtonImage}"/>
-                        <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="查看信息"/>
-                    </Grid>
-                </Button>
-                <!--<Popup x:Name="Level1Popup" Placement="Right" PlacementTarget="{Binding ElementName=CheckImformation}" StaysOpen="False">
-                    <Grid Background="Black" Height="100" Width="100">
-                        <Button Height="30" Width="30"/>
-                    </Grid>
-                </Popup>-->
-                <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource MenuButton}" Margin="0,0,0,5" Click="OpenLocation_Click">
-                    <Grid Width="194">
-                        <Image Source="/Resources/Images/OpenFile.png" Style="{StaticResource MenuButtonImage}"/>
-                        <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开所在位置"/>
-                    </Grid>
-                </Button>
-            </StackPanel>
-        </Border>
+    <Grid>
+        <Grid x:Name="MainGrid" Height="117" Width="204">
+            <!-- 窗口阴影 -->
+            <Rectangle Fill="White" Margin="5,7">
+                <Rectangle.Effect>
+                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                </Rectangle.Effect>
+            </Rectangle>
+            <Border CornerRadius="5" Background="White">
+                <StackPanel x:Name="MainStackPanel">
+                    <Button x:Name="EditeInformation" ToolTip="编辑动作定义" Style="{StaticResource MenuButton}" Margin="0,5,0,3" Click="EditeInformation_Click">
+                        <Grid Width="194">
+                            <Image Source="/Resources/Images/EditButton.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="编辑"/>
+                        </Grid>
+                    </Button>
+                    <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
+                    <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="DeleteAction_Click">
+                        <Grid Width="199">
+                            <Image Source="/Resources/Images/DeleteImage.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="删除"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="OtherFunction" ToolTip="其它功能" Style="{StaticResource MenuButton}" MouseEnter="OtherFunction_MouseEnter" MouseLeave="OtherFunction_MouseLeave">
+                        <Grid Width="198">
+                            <Image Source="/Resources/Images/ActionInformation.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="信息"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource MenuButton}" Margin="0,0,0,5" Click="OpenLocation_Click">
+                        <Grid Width="194">
+                            <Image Source="/Resources/Images/OpenFile.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开所在位置"/>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+        <Grid x:Name="ChiildGrid" Margin="494,226,30,112" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid x:Name="FirstChildGrid" Margin="0,0,0,0" MouseLeave="FirstChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <!-- 窗口阴影 -->
+                <Rectangle Fill="White" Margin="5,7">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Border CornerRadius="3" Background="White">
+                    <StackPanel>
+                        <Button x:Name="ExportAction" Style="{StaticResource MenuButton}" ToolTip="导出动作定义到文件" Margin="0,3" Click="ExportAction_Click">
+                            <Grid Width="130">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="导出动作"/>
+                            </Grid>
+                        </Button>
+                        <Rectangle Height="1" Fill="#FFF0F0F0" Width="130"/>
+                        <Button x:Name="CheckImformation" Style="{StaticResource MenuButton}" ToolTip="查看动作信息" Margin="0,3,0,0" Click="CheckImformation_Click">
+                            <Grid Width="130">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="查看信息"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="CopyActionInfo" Style="{StaticResource MenuButton}" Margin="0,0,0,3" MouseEnter="CopyActionInfo_MouseEnter" MouseLeave="CopyActionInfo_MouseLeave">
+                            <Grid Width="130">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,0,0"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="复制"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid x:Name="SecondChildGrid" Margin="130,57,0,0" MouseLeave="SecondChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <!-- 窗口阴影 -->
+                <Rectangle Fill="White" Margin="5,7">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Border CornerRadius="3" Background="White">
+                    <StackPanel>
+                        <Button x:Name="CopyActionID" Style="{StaticResource MenuButton}" ToolTip="复制动作的ID文字" Margin="0,3,0,0" Click="CopyActionID_Click">
+                            <Grid Width="130">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="动作ID"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="CopyActionName" Style="{StaticResource MenuButton}" ToolTip="复制动作的名称文字" Margin="0,0,0,3" Click="CopyActionName_Click">
+                            <Grid Width="130">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="动作名称"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

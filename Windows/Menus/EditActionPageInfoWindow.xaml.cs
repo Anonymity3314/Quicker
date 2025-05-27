@@ -1,4 +1,5 @@
-﻿using Quicker.Database;
+﻿using Quicker.Windows.Forms;
+using Quicker.Database;
 using System.Windows;
 
 namespace Quicker.Windows.Menus

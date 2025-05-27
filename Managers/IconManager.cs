@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using Quicker.Windows.Menus;
 using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Windows;

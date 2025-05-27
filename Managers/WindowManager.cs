@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using Quicker.Windows.Forms;
 using System.Diagnostics;
 using Quicker.Windows;
 using System.Windows;

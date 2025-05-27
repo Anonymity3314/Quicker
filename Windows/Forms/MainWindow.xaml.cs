@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Managers;

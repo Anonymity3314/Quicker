@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using Quicker.Windows.Forms;
+using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Database;
