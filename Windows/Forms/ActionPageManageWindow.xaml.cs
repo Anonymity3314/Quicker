@@ -94,44 +94,86 @@ namespace Quicker.Windows.Forms
         private void GenerateSceneButtons()
         {
             var sceneData = db3.GetAllSceneData(); // 获取所有场景数据
-            foreach (var data in sceneData)
+            var defaultScenes = new List<string> { "Global", "Common", "Taskbar", "Desktop" }; // 默认场景顺序
+            var otherScenes = new List<SceneData>(); // 其他场景
+            foreach (var data in sceneData) // 遍历场景数据
             {
-                var button = new Button()
+                if (defaultScenes.Contains(data.SceneName)) // 如果是默认场景，按照指定顺序插入到列表中
                 {
-                    AllowDrop = true, // 允许拖拽
-                    Name = data.SceneName, // 按钮名称
-                    Style = FindResource("SceneButton") as Style, // 应用样式
-                };
-
-                // 创建按钮内容
-                Grid buttonContent = new() { Style = FindResource("SceneButtonContentGrid") as Style }; // 创建网格
-                Image image = new()
-                {
-                    Style = FindResource("SceneButtonImage") as Style, // 应用样式
-                    Source = new BitmapImage(new Uri(data.SceneIconPath, UriKind.Relative)), // 设置按钮图片
-                }; // 创建图片
-                buttonContent.Children.Add(image); // 添加到网格
-                TextBlock sceneName = new()
-                {
-                    Text = db3.GetSceneTitle(data), // 文本内容
-                    Style = FindResource("SceneNameTextBlock") as Style, // 应用样式
-                }; // 创建 TextBlock
-                buttonContent.Children.Add(sceneName); // 添加到网格
-                TextBlock sceneTag = new()
-                {
-                    Style = FindResource("SceneTagTextBlock") as Style, // 应用样式
-                    Text = data.SceneTag, // 文本内容
-                }; // 创建 TextBlock
-                buttonContent.Children.Add(sceneTag); // 添加到网格
-                button.Content = buttonContent; // 设置按钮内容
-
-                // 设置点击事件
-                button.Drop += ChangeActionPageScene; // 设置拖拽事件
-                button.Click += new RoutedEventHandler(ChanceSceneButton_Click); // 设置按钮点击事件
-                button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
-                button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
-                ActionPagesButtonPanel.Children.Add(button); // 将按钮添加到StackPanel
+                    int index = defaultScenes.IndexOf(data.SceneName); // 获取索引
+                    if (index < 0) index = defaultScenes.Count; // 如果索引不存在，则设置为默认列表末尾
+                    while (otherScenes.Count <= index) // 填充空项
+                    {
+                        otherScenes.Add(null); // 添加空项
+                    }
+                    otherScenes[index] = data; // 插入数据
+                }
+                else
+                    otherScenes.Add(data); // 否则添加到其他场景列表中
             }
+            otherScenes = otherScenes.Where(s => s != null).ToList(); // 过滤空项
+            foreach (var data in otherScenes) // 添加默认场景和其他场景
+            {
+                CreateSceneButton(data); // 创建场景按钮
+            }
+        }
+
+        /// <summary>
+        /// 创建场景按钮
+        /// </summary>
+        /// <param name="sceneData"> 场景数据 </param>
+        private void CreateSceneButton(SceneData sceneData)
+        {
+            var button = new Button()
+            {
+                Style = FindResource("SceneButton") as Style, // 应用样式
+                Name = sceneData.SceneName // 按钮名称
+            };
+            Grid buttonContent = CreateButtonContent(sceneData); // 使用模块化方法创建按钮内容
+            button.Content = buttonContent; // 设置按钮内容
+            SetupButtonEvents(button); // 使用模块化方法设置按钮事件
+            ActionPagesButtonPanel.Children.Add(button); // 将按钮添加到StackPanel
+        }
+
+        /// <summary>
+        /// 创建场景按钮内容
+        /// </summary>
+        /// <param name="sceneData"> 场景数据 </param>
+        /// <returns> 按钮内容 </returns>
+        private Grid CreateButtonContent(SceneData sceneData)
+        {
+            Grid buttonContent = new() { Style = FindResource("SceneButtonContentGrid") as Style }; // 创建网格
+            Image image = new()
+            {
+                Source = new BitmapImage(new Uri(sceneData.SceneIconPath, UriKind.Relative)), // 设置按钮图片
+                Style = FindResource("SceneButtonImage") as Style // 应用样式
+            }; // 创建图片
+            buttonContent.Children.Add(image); // 添加到网格
+            TextBlock sceneName = new()
+            {
+                Style = FindResource("SceneNameTextBlock") as Style, // 应用样式
+                Text = db3.GetSceneTitle(sceneData) // 文本内容
+            }; // 创建 TextBlock
+            buttonContent.Children.Add(sceneName); // 添加到网格
+            TextBlock sceneTag = new()
+            {
+                Style = FindResource("SceneTagTextBlock") as Style, // 应用样式
+                Text = sceneData.SceneTag, // 文本内容
+            }; // 创建 TextBlock
+            buttonContent.Children.Add(sceneTag); // 添加到网格
+            return buttonContent; // 返回按钮内容
+        }
+
+        /// <summary>
+        /// 设置场景按钮事件
+        /// </summary>
+        /// <param name="button"> 按钮 </param>
+        private void SetupButtonEvents(Button button)
+        {
+            button.Drop += ChangeActionPageScene; // 设置拖拽事件
+            button.Click += new RoutedEventHandler(ChanceSceneButton_Click); // 设置按钮点击事件
+            button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
+            button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
         }
 
         // 设置场景标题
