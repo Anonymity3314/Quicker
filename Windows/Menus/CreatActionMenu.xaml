@@ -19,7 +19,7 @@
     IsVisibleChanged="CreatActionMenu_IsVisibleChanged"
     Deactivated="CreatActionMenu_Deactivated"
 >
-    <Grid x:Name="MainGrid" Width="178" Height="142">
+    <Grid x:Name="MainGrid" Width="178" Height="171">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>
@@ -28,7 +28,7 @@
         </Rectangle>
         <Border CornerRadius="3" Background="White">
             <StackPanel>
-                <Button x:Name="PasteActionButton" Click="PasteActionButton_Click" Style="{StaticResource MenuButton}" Margin="0,5,0,3">
+                <Button x:Name="PasteActionButton" Click="PasteActionButton_Click" Style="{StaticResource MenuButton}" Margin="0,3,0,3">
                     <Grid>
                         <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock x:Name="PasteActionTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
@@ -53,10 +53,17 @@
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开文件夹"/>
                     </Grid>
                 </Button>
-                <Button Click="OpenWebsite" Style="{StaticResource MenuButton}">
+                <Button Click="OpenWebsite" Style="{StaticResource MenuButton}" Margin="0,0,0,3">
                     <Grid>
                         <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开网址"/>
+                    </Grid>
+                </Button>
+                <Rectangle Height="1" Fill="#FFF0F0F0"/>
+                <Button Click="ImportActionData" Style="{StaticResource MenuButton}" Margin="0,3">
+                    <Grid>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="导入动作"/>
                     </Grid>
                 </Button>
             </StackPanel>
