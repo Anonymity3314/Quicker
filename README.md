@@ -65,6 +65,7 @@ Quicker/
 │   │   ├─Disbook.png                             # 不订住Quicker的图片
 │   │   ├─EditButton.png                          # 编辑动作的图片
 │   │   ├─Locked.png                              # 锁住通用动作页的图片
+│   │   ├─MessageImage.jpg                        # 消息弹窗的图片
 │   │   ├─MoreSelection.png                       # 主面板更多选择的图片
 │   │   ├─OpenFile.png                            # 打开文件所在文件夹的图片
 │   │   ├─OpenMainWindow1.png                     # 菜单中打开主面板的图片
@@ -144,6 +145,8 @@ Quicker/
         │   └─EditSceneWindow.xaml.cs
         ├─LoadingWindow.xaml                      # 加载弹窗
         │   └─LoadingWindow.xaml.cs
+        ├─MessageWindow.xaml                      # 消息弹窗
+        │   └─MessageWindow.xaml.cs
         ├─OperationMenu.xaml                      # 动作按钮操作菜单
         │   └─OperationMenu.xaml.cs
         ├─SelectActionPageMenu.xaml               # 选择动作页菜单

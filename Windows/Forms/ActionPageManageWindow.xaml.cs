@@ -678,10 +678,9 @@ namespace Quicker.Windows.Forms
                 {
                     if (child is Button button && button.Tag is ButtonData data)
                     {
-                        if (isDarkModle)
-                            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray")); // 设置按钮背景颜色
-                        else
-                            button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                        button.Background = isDarkModle
+                            ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
+                            : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
                     }
                 }
             }
@@ -701,6 +700,8 @@ namespace Quicker.Windows.Forms
         private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
+            MessageWindow messageWindow = new("动作页信息", "ID：\n最后修改：\n大小："); // 创建消息窗口
+            messageWindow.ShowDialog(); // 显示消息窗口
         }
 
         // 点击按钮复制动作页 ID

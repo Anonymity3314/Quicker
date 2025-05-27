@@ -70,6 +70,7 @@
     <None Remove="Resources\Images\EditButton.png" />
     <None Remove="Resources\Images\EditButton.png" />
     <None Remove="Resources\Images\Locked.png" />
+    <None Remove="Resources\Images\MessageImage.jpg" />
     <None Remove="Resources\Images\MoreSelection.png" />
     <None Remove="Resources\Images\OpenFile.png" />
     <None Remove="Resources\Images\OpenFile.png" />
@@ -116,6 +117,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Images\MessageImage.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="UpdateHistory.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

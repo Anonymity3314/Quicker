@@ -1,15 +1,10 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
-using System.Runtime.InteropServices;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Threading.Tasks;
 using Quicker.Windows.Forms;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Diagnostics;
-using Quicker.Database;
 using Quicker.Managers;
-using Quicker.Windows;
 using System.Windows;
 using SharpHook;
 
@@ -40,8 +35,9 @@ namespace Quicker
             bool isNewInstance = SingleInstanceManager.CheckForOtherInstances(mutexName, out _); // 检查是否是新实例
             if (!isNewInstance)
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("Quicker 已经启动", "Common"); // 弹出消息提醒
+                MessageWindow messageWindow = new("Quicker", "Quicker已经在运行，不能启动多个实例！"); // 创建消息窗口
+                messageWindow.ShowInTaskbar = true; // 显示在任务栏
+                messageWindow.ShowDialog(); // 显示消息窗口
                 Application.Current.Shutdown(); // 如果不是新实例，关闭当前实例
                 return; // 退出程序
             }
