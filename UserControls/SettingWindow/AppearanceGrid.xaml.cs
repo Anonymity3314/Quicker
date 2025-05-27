@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
+using Quicker.Windows.Forms;
 using Quicker.UserControls;
 using Quicker.Managers;
-using Quicker.Windows;
 using System.Windows;
 
 namespace Quicker.UserControls

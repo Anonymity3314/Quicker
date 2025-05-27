@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.IO;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Forms
 {
     public partial class SelectImageWindow : Window
     {

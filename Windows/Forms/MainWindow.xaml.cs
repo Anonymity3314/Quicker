@@ -1,7 +1,6 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Managers;
@@ -9,7 +8,7 @@ using Quicker.Database;
 using System.Windows;
 using System.IO;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Forms
 {
     public partial class MainWindow : Window
     {

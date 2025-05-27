@@ -1,10 +1,10 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Quicker.Windows.Forms;
 using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Managers;
-using Quicker.Windows;
 using System.Windows;
 using System.IO;
 
@@ -15,10 +15,10 @@ namespace Quicker.UserControls.AddWindow
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器接口
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的静态引用
-        private Quicker.AddWindow AddWindow; // AddWindow 的静态引用
+        private Quicker.Windows.Forms.AddWindow AddWindow; // AddWindow 的静态引用
         private ButtonDatabase db2 = new(); // 初始换按钮数据库
 
-        public OpenFile(Quicker.AddWindow addWindow)
+        public OpenFile(Quicker.Windows.Forms.AddWindow addWindow)
         {
             AddWindow = addWindow; // 保存 AddWindow 的静态引用
             InitializeComponent();

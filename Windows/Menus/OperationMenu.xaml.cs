@@ -1,13 +1,14 @@
-﻿using Quicker.Database;
+﻿using System.Runtime.InteropServices;
+using System.Windows.Controls;
+using Quicker.Windows.Forms;
+using System.Windows.Media;
+using Quicker.Database;
 using Quicker.Managers;
+using System.Windows;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Menus
 {
     public partial class OperationMenu : Window
     {
@@ -18,16 +19,17 @@ namespace Quicker.Windows
         private static extern IntPtr ILCreateFromPathW(string pszPath); //创建指定文件路径
         [DllImport("shell32.dll")]
         private static extern int SHOpenFolderAndSelectItems(IntPtr pidlList, uint cild, IntPtr children, uint dwFlags); // 打开文件夹并选中文件
-        public int CurrentButton { get; private set; } // 当前按钮
+
+        public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
 
-        public OperationMenu(int currentbutton, string tableName)
+        public OperationMenu(int buttonID, string tableName)
         {
             InitializeComponent(); // 初始化窗口
-            CurrentButton = currentbutton; // 设置当前按钮
+            ButtonID = buttonID; // 设置当前按钮
             TableName = tableName; // 设置表名
             InitializeMenu(); // 初始化菜单
         }
@@ -35,7 +37,7 @@ namespace Quicker.Windows
         // 初始化菜单
         private void InitializeMenu()
         {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             if(buttonData.ActionType == "OpenWebsite")
             {
                 MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
@@ -48,7 +50,7 @@ namespace Quicker.Windows
         private void EditeInformation_Click(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new AddWindow(CurrentButton, TableName, 0); // 创建添加动作窗口
+            AddWindow addWindow = new AddWindow(ButtonID, TableName, 0); // 创建添加动作窗口
             addWindow.Show(); // 显示添加动作窗口
             buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
@@ -57,20 +59,20 @@ namespace Quicker.Windows
         private async void DeleteAction_Click(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Hidden; // 隐藏窗口
-            db2.DeleteAction(CurrentButton, TableName); // 删除动作
+            db2.DeleteAction(ButtonID, TableName); // 删除动作
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
-                actionPageManageWindow.UpdateButton(CurrentButton); // 更新菜单栏按钮
+                actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
             if (mainWindow != null)
-                mainWindow.UpdateButtonContent(CurrentButton, TableName); // 更新主窗口按钮
+                mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
             this.Close(); // 关闭窗口
         }
 
         // 查看动作信息
         private void CheckImformation_Click(object sender, RoutedEventArgs e)
         {
-            ActionInformationWindow actionInformationWindow = new(CurrentButton, TableName); // 创建动作信息窗口
+            ActionInformationWindow actionInformationWindow = new(ButtonID, TableName); // 创建动作信息窗口
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
             actionInformationWindow.ShowDialog(); // 显示动作信息窗口
             this.Close(); // 关闭操作菜单窗口
@@ -80,7 +82,7 @@ namespace Quicker.Windows
         private void OpenLocation_Click(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             List<string> paths = new List<string>(); // 文件或文件夹路径列表
 
             if (buttonData.ActionType == "OpenFile")

@@ -1,11 +1,11 @@
-﻿using Quicker.Managers;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
+﻿using System.Windows.Media.Imaging;
 using System.Windows.Interop;
-using System.Windows.Media.Imaging;
+using System.Diagnostics;
+using Quicker.Managers;
+using System.Windows;
+using System.IO;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Menus
 {
     public partial class CustomMenu : Window
     {

@@ -1,5 +1,6 @@
 ﻿using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Quicker.Windows.Forms;
 using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Database;
@@ -15,9 +16,9 @@ namespace Quicker.UserControls.AddWindow
         private readonly ButtonManager buttonManager = new ButtonManager(); // 按钮管理器接口
         private readonly IconManager iconManager = new IconManager(); // 图标管理器接口
         private ButtonDatabase db2 = new ButtonDatabase(); // 按钮数据库
-        private Quicker.AddWindow AddWindow; // AddWindow 的静态引用
+        private Quicker.Windows.Forms.AddWindow AddWindow; // AddWindow 的静态引用
 
-        public OpenWebsite(Quicker.AddWindow addWindow)
+        public OpenWebsite(Quicker.Windows.Forms.AddWindow addWindow)
         {
             AddWindow = addWindow; // 保存 AddWindow 的引用
             InitializeComponent();

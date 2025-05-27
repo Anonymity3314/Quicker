@@ -8,7 +8,7 @@ using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Forms
 {
     public partial class ActionPageManageWindow : Window
     {

@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.ComponentModel;
+using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Data;
 using Quicker.Database;
@@ -18,7 +19,7 @@ using System.Windows;
 using System.Text;
 using System.IO;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Forms
 {
     public partial class FindAppsWindow : Window
     {

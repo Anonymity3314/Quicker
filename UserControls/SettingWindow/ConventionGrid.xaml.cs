@@ -1,11 +1,11 @@
 ﻿using System.Windows.Threading;
 using System.Windows.Controls;
+using Quicker.Windows.Forms;
 using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using Quicker;
-using Quicker.Windows.Forms;
 
 namespace Quicker.UserControls
 {

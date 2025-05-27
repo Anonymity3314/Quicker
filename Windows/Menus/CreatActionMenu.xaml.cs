@@ -2,7 +2,7 @@
 using Quicker.Managers;
 using System.Windows;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Menus
 {
     public partial class CreatActionMenu : Window
     {

@@ -3,8 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:Quicker.Windows"
-    x:Class="Quicker.Windows.OperationMenu"
+    xmlns:local="clr-namespace:Quicker.Windows.Menus"
+    x:Class="Quicker.Windows.Menus.OperationMenu"
     mc:Ignorable="d"
 
     AllowsTransparency="True"

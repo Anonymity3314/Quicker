@@ -8,7 +8,7 @@ using Quicker.Managers;
 using Microsoft.Win32;
 using System.Windows;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Forms
 {
     public partial class SettingWindow : Window
     {

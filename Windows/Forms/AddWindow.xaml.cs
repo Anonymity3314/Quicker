@@ -10,7 +10,7 @@ using System.Windows;
 using System.Media;
 using System.IO;
 
-namespace Quicker
+namespace Quicker.Windows.Forms
 {
     public partial class AddWindow : Window
     {

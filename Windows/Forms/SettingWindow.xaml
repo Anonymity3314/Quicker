@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Quicker.UserControls"
-    x:Class="Quicker.Windows.SettingWindow"
+    x:Class="Quicker.Windows.Forms.SettingWindow"
     mc:Ignorable="d"
 
     Icon="/Resources/Images/SettingWindow.png"

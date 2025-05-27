@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Controls;
+using Quicker.Windows.Menus;
+using Quicker.Windows.Forms;
 using Quicker.Database;
 using Quicker.Managers;
 using Quicker.Windows;
@@ -32,7 +34,7 @@ namespace Quicker.UserControls.OperationMenu
         private void EditeInformation_Click(object sender, RoutedEventArgs e)
         {
             //buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            //AddWindow addWindow = new AddWindow(CurrentButton, TableName, 0); // 创建添加动作窗口
+            Quicker.Windows.Forms.AddWindow addWindow = new(CurrentButton, TableName, 0); // 创建添加动作窗口
             //addWindow.Show(); // 显示添加动作窗口
             //buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }

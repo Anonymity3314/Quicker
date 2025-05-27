@@ -3,7 +3,7 @@ using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
 
-namespace Quicker.Windows
+namespace Quicker.Windows.Menus
 {
     public partial class ActionInformationWindow : Window
     {

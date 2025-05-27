@@ -1,12 +1,13 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.UserControls;
+using Quicker.Windows.Menus;
+using Quicker.Windows.Forms;
 using System.Windows.Forms;
+using Quicker.UserControls;
 using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Managers;
-using Quicker.Windows;
 using System.Windows;
 using System.IO;
 
