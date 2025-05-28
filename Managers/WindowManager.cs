@@ -13,7 +13,19 @@ namespace Quicker.Managers
         // 设置窗口位置和大小
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetCursorPos(out POINT lpPoint); // 获取鼠标位置
+
+        // 设置窗口位置和大小
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags); // 设置窗口位置和大小
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct POINT
+        {
+            public int X; // 鼠标X坐标
+            public int Y; // 鼠标Y坐标
+        }
 
         // 查找窗口句柄
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
@@ -27,6 +39,7 @@ namespace Quicker.Managers
         private const int HWND_TOPMOST = -1; // 置顶
         private const int SWP_NOSIZE = 0x0001; // 不调整大小
         private const int SWP_NOMOVE = 0x0002; // 不调整位置
+        private const int SWP_NOZORDER = 0x0004; // 不调整Z轴顺序
 
         // 获取当前活动窗口句柄
         [DllImport("user32.dll")]
@@ -228,6 +241,44 @@ namespace Quicker.Managers
         {
             await Task.Delay(1000); // 延迟100毫秒
             window.Close(); // 关闭窗口
+        }
+
+        /// <summary>
+        /// 获取鼠标位置并设置窗口位置
+        /// </summary>
+        /// <param name="window"> 要定位的窗口 </param>
+        /// <param name="left"> 窗口左边界 </param>
+        /// <param name="top"> 窗口上边界 </param>
+        private void SetWindowPosition(Window window, int left, int top)
+        {
+            nint hWnd = new WindowInteropHelper(window).Handle; // 获取窗口句柄
+            SetWindowPos(hWnd, IntPtr.Zero, left, top, 0, 0, SWP_NOSIZE | SWP_NOZORDER); // 设置窗口位置
+        }
+
+        /// <summary>
+        /// 将窗口定位到鼠标位置附近
+        /// </summary>
+        /// <param name="window"> 要定位的窗口 </param>
+        public void SetWindowPositionNearMouse(Window window)
+        {
+            GetCursorPos(out POINT cursorPos); // 获取鼠标位置
+            SetWindowPosition(window, cursorPos.X, cursorPos.Y); // 设置窗口位置
+        }
+
+        /// <summary>
+        /// 将窗口左下角定位到鼠标位置附近
+        /// </summary>
+        /// <param name="window"> 要定位的窗口 </param>
+        public void SetWindowBottomLeftNearMouse(Window window)
+        {
+            GetCursorPos(out POINT cursorPos); // 获取鼠标位置
+            var workArea = SystemParameters.WorkArea; // 获取屏幕工作区
+
+            // 计算窗口左下角的位置
+            int left = cursorPos.X; // 窗口左边界
+            int top = cursorPos.Y - 270; // 窗口上边界（鼠标Y坐标减去窗口高度）
+
+            SetWindowPosition(window, left, top); // 设置窗口位置
         }
 
         // 释放资源

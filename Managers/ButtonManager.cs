@@ -567,11 +567,7 @@ namespace Quicker.Managers
                 case "OperationMenu":
                     OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
                     operationMenu?.Close(); // 关闭操作菜单
-                    operationMenu = new(int.Parse(button.Name.Replace(tableName,"")), tableName)
-                    {
-                        Left = mousePosition.X,
-                        Top = mousePosition.Y
-                    }; // 设置菜单位置
+                    operationMenu = new(int.Parse(button.Name.Replace(tableName, "")), tableName); // 设置菜单位置
                     if (isMainWindow)
                     {
                         operationMenu.ClosingOrHiding += () =>
@@ -584,11 +580,7 @@ namespace Quicker.Managers
                 case "CreatActionMenu":
                     CreatActionMenu creatActionMenu = Application.Current.Windows.OfType<CreatActionMenu>().FirstOrDefault(); // 查找现有的创建动作菜单
                     creatActionMenu?.Close(); // 关闭创建动作菜单
-                    creatActionMenu = new(int.Parse(button.Name.Replace(tableName,"")), tableName)
-                    {
-                        Left = mousePosition.X,
-                        Top = mousePosition.Y
-                    }; // 设置菜单位置
+                    creatActionMenu = new(int.Parse(button.Name.Replace(tableName, "")), tableName); // 设置菜单位置
                     if (isMainWindow)
                     {
                         creatActionMenu.ClosingOrHiding += () =>

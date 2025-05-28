@@ -27,6 +27,13 @@ namespace Quicker.Windows.Menus
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
         }
 
+        // 窗口加载时设置窗口位置
+        private void CreatActionMenu_Loaded(object sender, RoutedEventArgs e)
+        {
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+        }
+
         // 设置按钮可见性
         private void SetButtonVisbility()
         {

@@ -18,8 +18,9 @@
     
     IsVisibleChanged="CreatActionMenu_IsVisibleChanged"
     Deactivated="CreatActionMenu_Deactivated"
+    Loaded="CreatActionMenu_Loaded"
 >
-    <Grid x:Name="MainGrid" Width="178" Height="171">
+    <Grid x:Name="MainGrid" Width="178" Height="171" Margin="9,8,571,261">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>

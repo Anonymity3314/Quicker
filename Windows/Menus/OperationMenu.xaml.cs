@@ -37,6 +37,13 @@ namespace Quicker.Windows.Menus
             InitializeMenu(); // 初始化菜单
         }
 
+        // 窗口加载时设置窗口位置
+        private void OperationMenu_Loaded(object sender, RoutedEventArgs e)
+        {
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+        }
+
         // 初始化菜单
         private void InitializeMenu()
         {
@@ -46,7 +53,7 @@ namespace Quicker.Windows.Menus
                 MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
                 MainStackPanel.Height -= 25; // 设置窗口高度
                 MainGrid.Height -= 25; // 设置网格高度
-                ChiildGrid.Margin = new Thickness(494, 240, 0, 0); // 设置子菜单边距
+                ChiildGrid.Margin = new Thickness(219, 86, 0, 0); // 设置子菜单边距
             }
         }
 

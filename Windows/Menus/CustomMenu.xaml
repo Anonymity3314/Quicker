@@ -16,9 +16,10 @@
     WindowStyle="None"
     Topmost="True"
     Height="190"
-    Width="220"
+    Width="240"
     
     Deactivated="CustomMenu_Deactivated"
+    Loaded="CustomMenu_Loaded"
 >
     <Grid Width="200" Height="159">
         <!-- 窗口阴影 -->

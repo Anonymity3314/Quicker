@@ -17,9 +17,10 @@
     Width="784"
     
     Deactivated="OperationMenu_Deactivated"
+    Loaded="OperationMenu_Loaded"
 >
     <Grid>
-        <Grid x:Name="MainGrid" Height="117" Width="204">
+        <Grid x:Name="MainGrid" Height="117" Width="204" Margin="15,13,565,321">
             <!-- 窗口阴影 -->
             <Rectangle Fill="White" Margin="5,7">
                 <Rectangle.Effect>
@@ -56,7 +57,7 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <Grid x:Name="ChiildGrid" Margin="494,226,30,112" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid x:Name="ChiildGrid" Margin="219,72,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <Grid x:Name="FirstChildGrid" Margin="0,0,0,0" MouseLeave="FirstChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <!-- 窗口阴影 -->
                 <Rectangle Fill="White" Margin="5,7">
