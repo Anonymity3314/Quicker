@@ -15,7 +15,7 @@
     WindowStyle="None"
     Topmost="True"
     Height="190"
-    Width="240"
+    Width="235"
     
     Deactivated="CustomMenu_Deactivated"
     Loaded="CustomMenu_Loaded"

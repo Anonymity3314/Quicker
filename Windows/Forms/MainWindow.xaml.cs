@@ -13,9 +13,9 @@ namespace Quicker.Windows.Forms
 {
     public partial class MainWindow : Window
     {
-        private static readonly SolidColorBrush SelectedBrush =
+        private readonly SolidColorBrush SelectedBrush =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8D8D8D")); // 选中页面按钮颜色
-        private static readonly SolidColorBrush UnSelectedBrush =
+        private readonly SolidColorBrush UnSelectedBrush =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD3D3D3")); // 未选中页面按钮颜色
 
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
@@ -788,6 +788,7 @@ namespace Quicker.Windows.Forms
             Book.Source = null; // 订住按钮图片
             Lock.Source = null; // 锁定按钮图片
 
+            CommonStyle = null; // 清理通用样式
             iconManager.Dispose(); // 释放图标管理器资源
             buttonManager.Dispose(); // 释放按钮管理器资源
 

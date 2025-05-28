@@ -961,85 +961,112 @@ namespace Quicker.Windows.Forms
         // 关闭窗口时释放资源
         protected override void OnClosed(EventArgs e)
         {
+            type = null; // 清理场景类型
+            isDarkModle = false; // 清理是否为暗黑模式
+            showUsedTimes = false; // 清理是否显示使用次数
+            CleanupMainListView(); // 清理主列表视图
+            CleanupActionPagesButtonPanel(); // 清理场景按钮面板
+            buttonManager?.Dispose(); // 清理按钮管理器
+
             base.OnClosed(e); // 调用基类的 OnClosed 方法
-            type = null; // 清理类型
-            isDarkModle = false; // 清理模式
-            showUsedTimes = false; // 清理显示/隐藏使用次数
-            // 清理主列表视图中的所有 Canvas 及其子元素
+            GC.Collect(); // 强制垃圾回收
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 再次强制垃圾回收
+        }
+
+        // 清理主列表视图
+        private void CleanupMainListView()
+        {
             while (MainListView.Items.Count > 0)
             {
                 if (MainListView.Items[0] is Canvas canvas)
                 {
-                    // 移除 Canvas 中的所有子元素
-                    while (canvas.Children.Count > 0)
-                    {
-                        UIElement child = canvas.Children[0];
-                        if (child is Grid grid)
-                        {
-                            // 移除 Grid 中的所有子元素
-                            while (grid.Children.Count > 0)
-                            {
-                                UIElement gridChild = grid.Children[0];
-                                if (gridChild is Button button)
-                                {
-                                    // 清理按钮资源
-                                    button.Content = null;
-                                    button.Tag = null;
-                                    button.Background = null;
-                                    button.Style = null;
-                                }
-                                grid.Children.Remove(gridChild);
-                            }
-                            // 清理 Grid 资源
-                            grid.Children.Clear();
-                        }
-                        else if (child is Button button)
-                        {
-                            // 移除按钮的所有事件处理程序
-                            button.Drop -= Button_Drop;
-                            button.Click -= ShowCreatActionMenu;
-                            button.MouseEnter -= Button_MouseEnter;
-                            button.MouseLeave -= Button_MouseLeave;
-                            button.MouseDoubleClick -= ShowEditWindow;
-                            button.PreviewMouseRightButtonDown -= OpenMenu;
-                            button.PreviewMouseMove -= Button_PreviewMouseMove;
-                            button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp;
-                            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
-                            // 清理按钮资源
-                            button.Content = null;
-                            button.Tag = null;
-                            button.Background = null;
-                            button.Style = null;
-                        }
-                        canvas.Children.Remove(child);
-                    }
-                    // 移除 Canvas 本身
-                    MainListView.Items.Remove(canvas);
+                    CleanupCanvas(canvas); // 清理画布
+                    MainListView.Items.Remove(canvas); // 移除画布
                 }
             }
+        }
 
-            // 清理场景按钮面板中的所有按钮
+        // 清理画布
+        private void CleanupCanvas(Canvas canvas)
+        {
+            while (canvas.Children.Count > 0)
+            {
+                UIElement child = canvas.Children[0];
+                if (child is Grid grid)
+                {
+                    CleanupGrid(grid); // 清理网格
+                }
+                else if (child is Button button)
+                {
+                    CleanupButton(button); // 清理按钮
+                }
+                canvas.Children.Remove(child); // 移除画布子元素
+            }
+        }
+
+        /// <summary>
+        /// 清理网格
+        /// </summary>
+        /// <param name="grid"> 网格 </param>
+        private void CleanupGrid(Grid grid)
+        {
+            while (grid.Children.Count > 0)
+            {
+                UIElement gridChild = grid.Children[0];
+                if (gridChild is Button button)
+                {
+                    CleanupButton(button); // 清理按钮
+                }
+                grid.Children.Remove(gridChild); // 移除网格子元素
+            }
+        }
+
+        /// <summary>
+        /// 清理按钮
+        /// </summary>
+        /// <param name="button"> 按钮 </param>
+        private void CleanupButton(Button button)
+        {
+            // 解绑所有事件
+            button.Drop -= Button_Drop; // 解绑按钮拖拽事件
+            button.Click -= ShowCreatActionMenu; // 解绑按钮点击事件
+            button.MouseEnter -= Button_MouseEnter; // 解绑按钮鼠标进入事件
+            button.MouseLeave -= Button_MouseLeave; // 解绑按钮鼠标离开事件
+            button.MouseDoubleClick -= ShowEditWindow; // 解绑按钮鼠标双击事件
+            button.PreviewMouseRightButtonDown -= OpenMenu; // 解绑按钮鼠标右键点击事件
+            button.PreviewMouseMove -= Button_PreviewMouseMove; // 解绑按钮鼠标移动事件
+            button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 解绑按钮鼠标左键释放事件
+            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 解绑按钮鼠标左键按下事件
+
+            // 清理按钮资源
+            button.Content = null; // 清理按钮内容
+            button.Tag = null; // 清理按钮标签
+            button.Background = null; // 清理按钮背景
+            button.Style = null; // 清理按钮样式
+        }
+
+        // 清理场景按钮面板
+        private void CleanupActionPagesButtonPanel()
+        {
             while (ActionPagesButtonPanel.Children.Count > 0)
             {
                 UIElement child = ActionPagesButtonPanel.Children[0];
                 if (child is Button button)
                 {
-                    // 移除按钮的所有事件处理程序
-                    button.Click -= ChanceSceneButton_Click;
-                    button.MouseEnter -= HightLightBlacklistItem;
-                    button.MouseLeave -= FadeBlacklistItem;
+                    // 解绑事件
+                    button.Click -= ChanceSceneButton_Click; // 解绑按钮点击事件
+                    button.MouseEnter -= HightLightBlacklistItem; // 解绑按钮鼠标进入事件
+                    button.MouseLeave -= FadeBlacklistItem; // 解绑按钮鼠标离开事件
+
                     // 清理按钮资源
-                    button.Content = null;
-                    button.Tag = null;
-                    button.Background = null;
-                    button.Style = null;
+                    button.Content = null; // 清理按钮内容
+                    button.Tag = null; // 清理按钮标签
+                    button.Background = null; // 清理按钮背景
+                    button.Style = null; // 清理按钮样式
                 }
-                ActionPagesButtonPanel.Children.Remove(child);
+                ActionPagesButtonPanel.Children.Remove(child); // 移除场景按钮面板子元素
             }
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
         }
     }
 

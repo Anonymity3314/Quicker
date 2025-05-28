@@ -176,10 +176,12 @@ namespace Quicker.Windows.Menus
             ClosingOrHiding = null; // 清理事件
             clipboardText = null; // 清理剪切板文本
             hasChanged = false; // 清理检查状态
-            buttonManager.Dispose();
+            clipboardText = null; // 清理剪切板文本
+            buttonManager.Dispose(); // 释放按钮管理器
             ButtonID = 0; // 清理当前按钮
             TableName = null; // 清理表名
             haveAction = false; // 清理是否有动作
+            close = false; // 清理关闭状态
 
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

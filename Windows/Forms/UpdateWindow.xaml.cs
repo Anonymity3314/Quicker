@@ -115,14 +115,14 @@ namespace Quicker.Windows.Forms
         {
             base.OnClosed(e); // 调用基类方法
 
-            downloadUrl = null;
+            downloadUrl = null; // 清理下载地址
 
-            VersionTextBlock.Text = null;
-            LatestVersionTextBlock1.Text = null;
-            LatestVersionTextBlock2.Text = null;
-            VersionChangeTextBlock.Text = null;
-            UpdateDateTextBlock.Text = null;
-            UpdateInfoTextBlock.Text = null;
+            VersionTextBlock.Text = null; // 清理版本号
+            LatestVersionTextBlock1.Text = null; // 清理最新版本号
+            LatestVersionTextBlock2.Text = null; // 清理最新版本号
+            VersionChangeTextBlock.Text = null; // 清理版本号变更
+            UpdateDateTextBlock.Text = null; // 清理更新日期
+            UpdateInfoTextBlock.Text = null; // 清理更新内容
 
             this.Content = null;
             this.DataContext = null; // 清理数据绑定

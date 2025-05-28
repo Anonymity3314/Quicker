@@ -756,23 +756,60 @@ namespace Quicker.Windows.Forms
         // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 调用基类的 OnClosed 方法
-            ApplicationSelected = null; // 清空事件
-            _allApplications.Clear(); // 清空应用列表
-            foreach (var icon in iconCache.Values) // 清理图片资源
-            {
-                if (icon is IDisposable disposableIcon)
-                    disposableIcon.Dispose(); // 释放图标资源
-            }
-            iconCache.Clear(); // 清空图标缓存
-            linkTargetCache.Clear(); // 清空快捷方式目标路径缓存
-            fileHashCache.Clear(); // 清空文件哈希缓存
-            findAppsWindow = null; // 清空静态引用
+            ApplicationSelected = null; // 清理事件
+            _applicationView = null; // 清理视图
 
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            // 清理应用列表
+            _allApplications?.Clear(); // 清空应用列表
+            _allApplications = null; // 清理应用列表
+
+            // 清理搜索结果
+            _searchResults?.Clear(); // 清空搜索结果
+            _searchResults = null; // 清理搜索结果
+
+            // 清理图标缓存
+            CleanupIconCache();
+
+            // 清理其他缓存
+            linkTargetCache?.Clear(); // 清空快捷方式目标路径缓存
+            fileHashCache?.Clear(); // 清空文件哈希缓存
+
+            // 取消所有异步操作
+            _cancellationTokenSource?.Cancel(); // 取消所有异步操作
+            _cancellationTokenSource?.Dispose(); // 释放取消令牌源
+            _cancellationTokenSource = null; // 清理取消令牌源
+
+            // 清理静态引用
+            findAppsWindow = null; // 清理静态引用
+
+            // 调用基类的 OnClosed 方法
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
+            GC.Collect(); // 强制垃圾回收
+            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
+            GC.Collect(); // 强制垃圾回收
+        }
+
+        // 清理图标缓存
+        private void CleanupIconCache()
+        {
+            if (iconCache != null)
+            {
+                foreach (var icon in iconCache.Values)
+                {
+                    if (icon is IDisposable disposableIcon)
+                    {
+                        try
+                        {
+                            disposableIcon.Dispose(); // 释放图标
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error disposing icon: {ex.Message}"); // 输出错误信息
+                        }
+                    }
+                }
+                iconCache.Clear(); // 清空图标缓存
+            }
         }
     }
 
