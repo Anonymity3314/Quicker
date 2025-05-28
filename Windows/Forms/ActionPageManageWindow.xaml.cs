@@ -673,10 +673,10 @@ namespace Quicker.Windows.Forms
             foreach (var item in MainListView.Items)
             {
                 Canvas canvas = item as Canvas; // 获取画布
-                var childrenList = canvas.Children.Cast<UIElement>().ToList(); // 将 UIElementCollection 转换为列表
-                foreach (var child in childrenList)
+                UniformGrid targetGrid = canvas.Children.Cast<UIElement>().Where(c => c is UniformGrid).First() as UniformGrid; // 获取目标网格
+                foreach (var childs in targetGrid.Children)
                 {
-                    if (child is Button button && button.Tag is ButtonData data)
+                    if (childs is Button button && button.Tag is ButtonData data)
                     {
                         button.Background = isDarkModle
                             ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))

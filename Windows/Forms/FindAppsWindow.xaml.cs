@@ -620,39 +620,33 @@ namespace Quicker.Windows.Forms
         {
             try
             {
-                PackageManager packageManager = new PackageManager();
-                var packages = packageManager.FindPackagesForUser("");
+                PackageManager packageManager = new(); // 创建包管理器实例
+                var packages = packageManager.FindPackagesForUser(""); // 获取所有包信息
                 foreach (var package in packages)
                 {
                     try
                     {
-                        if (package.IsFramework || package.IsResourcePackage || package.IsBundle)
-                        {
-                            continue; // 跳过框架包、资源包和系统组件
-                        }
-                        if (string.IsNullOrWhiteSpace(package.DisplayName) ||
-                            package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue; // 跳过没有显示名称或显示名称是包ID的应用
-                        }
-                        if (package.IsDevelopmentMode)
-                        {
-                            continue; // 跳过开发模式安装的应用
-                        }
-                        if (package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
+                        if (package.IsFramework || package.IsResourcePackage || package.IsBundle ||
+                            string.IsNullOrWhiteSpace(package.DisplayName) ||
+                            package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase) ||
+                            package.IsDevelopmentMode ||
+                            package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
                             package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase))
                         {
-                            continue; // 跳过Microsoft系统应用
+                            continue; // 跳过框架包、资源包、系统组件、没有显示名称或显示名称是包ID、开发模式安装的应用、Microsoft系统应用
                         }
 
-                        // 获取显示名称
-                        var displayName = package.DisplayName;
-                        var packageFamilyName = package.Id.FamilyName;
+                        var displayName = package.DisplayName; // 获取显示名称
+                        var packageFamilyName = package.Id.FamilyName; // 获取包ID
+                        
+                        // 构建shell:AppsFolder协议使用的应用标识符
+                        var appFolderID = packageFamilyName + "_" + packageFamilyName.Split('_')[0];
+                        
                         ImageSource icon = ExtractUWPAppIcon(packageFamilyName); // 获取应用图标
                         _allApplications.Add(new AppInfo
                         {
                             Name = displayName,
-                            Location = package.Id.Name, // 使用包名
+                            Location = appFolderID, // 使用shell:AppsFolder兼容的ID
                             Icon = icon,
                             Tag = "[Windows 商店应用]" // 保存包ID
                         }); // 添加到应用列表

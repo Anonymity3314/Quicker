@@ -1,4 +1,5 @@
-﻿using IWshRuntimeLibrary;
+﻿using System.Runtime.InteropServices;
+using IWshRuntimeLibrary;
 using System.Diagnostics;
 using Quicker.Windows;
 using Quicker.Database;
@@ -11,6 +12,9 @@ namespace Quicker.Managers
     public class ActionManager : IDisposable
     {
         private bool isDisposed = false; // 是否释放
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr ShellExecute(IntPtr hwnd, string lpOperation, string lpFile, string lpParameters, string lpDirectory, int nShowCmd);
 
         /// <summary>
         /// 打开文件
@@ -304,12 +308,9 @@ namespace Quicker.Managers
         {
             try
             {
-                string appProtocol = $"microsoft-{data.Location}://"; // UWP应用的协议
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = appProtocol,
-                    UseShellExecute = true
-                }); // 启动UWP应用
+                // 使用shell:AppsFolder协议启动UWP应用
+                string appPath = $"shell:AppsFolder\\{data.Location}";
+                ShellExecute(IntPtr.Zero, "open", appPath, null, null, 1);
             }
             catch (Exception ex)
             {
