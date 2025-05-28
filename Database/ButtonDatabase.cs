@@ -111,6 +111,9 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@UsedTimes", buttonData.UsedTimes); // 使用次数
             command.ExecuteNonQuery(); // 执行更新语句
             transaction.Commit(); // 提交事务
+
+            ActionPageDatabase db3 = new(); // 实例化 ActionPageDatabase
+            db3.UpdateActionPageLastEditTime(tableName, buttonData.ButtonID / 100); // 更新动作页面的最后编辑时间
         }
 
         /// <summary>
@@ -204,6 +207,9 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行命令
             transaction.Commit(); // 提交事务
+
+            ActionPageDatabase db3 = new(); // 实例化 ActionPageDatabase
+            db3.UpdateActionPageLastEditTime(tableName, buttonID / 100); // 更新动作页面的最后编辑时间
         }
 
         /// <summary>
@@ -365,6 +371,10 @@ namespace Quicker.Database
                 UpdateButtonID(connection, prefix, buttonData.ButtonID, newButtonID); // 更新 ButtonID
             }
             transaction.Commit(); // 提交事务
+
+            ActionPageDatabase db3 = new(); // 实例化 ActionPageDatabase
+            db3.UpdateActionPageLastEditTime(prefix, a1); // 更新动作页面的最后编辑时间
+            db3.UpdateActionPageLastEditTime(prefix, a2); // 更新动作页面的最后编辑时间
         }
 
         /// <summary>
@@ -430,6 +440,31 @@ namespace Quicker.Database
             // 在文件资源管理器中选中文件
             string command = "/select, \"" + fullOutputPath + "\""; // 构造命令
             System.Diagnostics.Process.Start("explorer.exe", command); // 打开文件资源管理器并选中文件
+        }
+
+        /// <summary>
+        /// 获取动作大小
+        /// </summary>
+        /// <param name="tableName"> 动作所在表名 </param>
+        /// <param name="buttonID"> 动作ID </param>
+        /// <returns> 动作大小 </returns>
+        public int GetActionSize(string tableName, int buttonID)
+        {
+            var data = GetButtonDataByID(buttonID, tableName); // 获取动作数据
+            int size = 0; // 动作大小
+            size += data.Title?.Length * 2 ?? 0; // 标题字符串长度 * 2 (UTF-16)
+            size += data.Location?.Length * 2 ?? 0; // 位置字符串长度 * 2
+            size += data.ImagePath?.Length * 2 ?? 0; // 图片路径字符串长度 * 2
+            size += data.Data1?.Length * 2 ?? 0; // 数据1字符串长度 * 2
+            size += data.Data2?.Length * 2 ?? 0; // 数据2字符串长度 * 2
+            size += data.Data3?.Length * 2 ?? 0; // 数据3字符串长度 * 2
+            size += data.Description?.Length * 2 ?? 0; // 描述字符串长度 * 2
+            size += data.ActionType?.Length * 2 ?? 0; // 动作类型字符串长度 * 2
+            size += 4; // ButtonID (int)
+            size += 8; // CreateTime (DateTime)
+            size += 8; // LatestEditTime (DateTime)
+            size += 4; // UsedTimes (int)
+            return size; // 返回动作大小
         }
 
         /// <summary>

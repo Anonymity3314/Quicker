@@ -22,14 +22,16 @@
         <Label Content="创建时间" HorizontalAlignment="Left" Margin="64,147,0,0" VerticalAlignment="Top"/>
         <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,224,0,0" Fill="#E8E8E8" VerticalAlignment="Top" Width="392"/>
         <Image x:Name="Image" HorizontalAlignment="Left" Height="48" Margin="127,97,0,0" VerticalAlignment="Top" Width="48"/>
-        <Label x:Name="IDLabel" Content="Label" HorizontalAlignment="Left" Margin="122,21,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="TitleLabel" Content="Label" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="IDTextBlock" HorizontalAlignment="Left" Margin="122,26,0,0" VerticalAlignment="Top" MouseDown="IDTextBlock_MouseDown" Cursor="Hand"/>
+        <Label x:Name="TitleLabel" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
         <Label HorizontalAlignment="Left" Margin="122,71,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="UsageLabel" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="122,71,0,0"/>
-        <Label x:Name="CreatTimeLabel" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="122,147,0,0"/>
+        <Label x:Name="UsageLabel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="122,71,0,0"/>
+        <Label x:Name="CreatTimeLabel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="122,147,0,0"/>
         <Label Content="最后编辑" HorizontalAlignment="Left" Margin="64,172,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="LatestEditTimeLabel" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="122,172,0,0"/>
+        <Label x:Name="LatestEditTimeLabel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="122,172,0,0"/>
         <Button x:Name="CloseButton" Style="{StaticResource BlueButton}" Content="关闭" HorizontalAlignment="Left" Margin="327,234,0,0" VerticalAlignment="Top" Width="47" Foreground="White" Height="30" Click="CloseButton_Click"/>
         <Button x:Name="CopyButton" Style="{StaticResource WhiteButton}" Content="复制基本信息" HorizontalAlignment="Left" Margin="223,234,0,0" VerticalAlignment="Top" Width="94" Height="30" Click="CopyButton_Click"/>
+        <Label Content="大小" HorizontalAlignment="Left" Margin="83,197,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="ActionSizeLabel" HorizontalAlignment="Left" Margin="122,197,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

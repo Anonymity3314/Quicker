@@ -1,12 +1,10 @@
 ﻿using System.Data.SQLite;
 using System.Data;
 using System.IO;
-using System.Collections.Generic;
-using System;
 
 namespace Quicker.Database
 {
-    internal class ActionPageDatabase
+    public class ActionPageDatabase
     {
         // 数据库连接字符串
         private const string db3 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\ActionPage.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
@@ -498,6 +496,53 @@ namespace Quicker.Database
                 default:
                     return sceneData.SceneName; // 其他场景
             }
+        }
+
+        /// <summary>
+        /// 更新动作页最后编辑时间
+        /// </summary>
+        /// <param name="tableName"> 动作页数据表名称 </param>
+        /// <param name="actionPageIndex"> 动作页索引 </param>
+        public void UpdateActionPageLastEditTime(string tableName, int actionPageIndex)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            string query = $@"UPDATE {tableName + "ActionPage"}
+            SET LastEditTime = @LastEditTime
+            WHERE DefaultActionPageName = @DefaultActionPageName"; // 更新动作页最后编辑时间的SQL语句
+            using var command = new SQLiteCommand(query, connection); // 创建SQLiteCommand对象
+            command.Parameters.AddWithValue("@LastEditTime", DateTime.Now); // 设置最后编辑时间
+            command.Parameters.AddWithValue("@DefaultActionPageName", tableName + actionPageIndex.ToString()); // 设置动作页名称
+            command.ExecuteNonQuery(); // 执行更新表的SQL语句
+        }
+
+        /// <summary>
+        /// 统计动作页大小
+        /// </summary>
+        /// <param name="tableName"> 动作页数据表名称 </param>
+        /// <param name="actionPageIndex"> 动作页索引 </param>
+        /// <returns> 动作页大小 </returns>
+        public int GetActionPageSize(string tableName, int actionPageIndex)
+        {
+            using var connection = OpenConnection(); // 打开数据库连接
+            var buttonDatas = db2.GetPagesOfButtons(tableName, actionPageIndex); // 获取动作页按钮数据
+            int size = 0; // 动作页大小
+            foreach (var buttonData in buttonDatas)
+            {
+                // 计算每个按钮占用的内存大小
+                size += buttonData.Title?.Length * 2 ?? 0; // 标题字符串长度 * 2 (UTF-16)
+                size += buttonData.Location?.Length * 2 ?? 0; // 位置字符串长度 * 2
+                size += buttonData.ImagePath?.Length * 2 ?? 0; // 图片路径字符串长度 * 2
+                size += buttonData.Data1?.Length * 2 ?? 0; // 数据1字符串长度 * 2
+                size += buttonData.Data2?.Length * 2 ?? 0; // 数据2字符串长度 * 2
+                size += buttonData.Data3?.Length * 2 ?? 0; // 数据3字符串长度 * 2
+                size += buttonData.Description?.Length * 2 ?? 0; // 描述字符串长度 * 2
+                size += buttonData.ActionType?.Length * 2 ?? 0; // 动作类型字符串长度 * 2
+                size += 4; // ButtonID (int)
+                size += 8; // CreateTime (DateTime)
+                size += 8; // LatestEditTime (DateTime)
+                size += 4; // UsedTimes (int)
+            }
+            return size; // 返回动作页大小（字节）
         }
 
         /// <summary>

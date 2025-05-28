@@ -1,7 +1,8 @@
-﻿using System.Windows.Media.Imaging;
+﻿using Quicker.Database;
 using Quicker.Managers;
-using Quicker.Database;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace Quicker.Windows.Menus
 {
@@ -23,7 +24,7 @@ namespace Quicker.Windows.Menus
         private void InitializeWindow()
         {
             ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
-            IDLabel.Content = buttonData.ButtonID; // 初始化动作ID
+            IDTextBlock.Text = buttonData.ButtonID.ToString(); // 初始化动作ID
             TitleLabel.Content = buttonData.Title; // 初始化动作名称
             UsageLabel.Content = buttonData.Description; // 初始化动作用途
             if(!string.IsNullOrEmpty(buttonData.ImagePath))
@@ -40,6 +41,47 @@ namespace Quicker.Windows.Menus
             }
             CreatTimeLabel.Content = buttonData.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化创建时间
             LatestEditTimeLabel.Content = buttonData.LatestEditTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化最后编辑时间
+            ActionSizeLabel.Content = $"{GetActionSize()} {GetActionSizeUnit()}"; // 初始化动作大小
+        }
+
+        /// <summary>
+        /// 获取动作页大小
+        /// </summary>
+        /// <returns> 动作页大小 </returns>
+        private int GetActionSize()
+        {
+            int actionPageSize = db2.GetActionSize(TableName, ButtonID); // 获取动作大小
+            if (actionPageSize < 1024)
+                return actionPageSize; // 字节
+            else if (actionPageSize < 1024 * 1024)
+                return actionPageSize / 1024; // 千字节
+            else if (actionPageSize < 1024 * 1024 * 1024)
+                return actionPageSize / (1024 * 1024); // 兆字节
+            return actionPageSize / (1024 * 1024 * 1024); // 吉字节
+        }
+
+        /// <summary>
+        /// 获取动作页大小单位
+        /// </summary>
+        /// <returns> 动作页大小单位 </returns>
+        private string GetActionSizeUnit()
+        {
+            int actionPageSize = db2.GetActionSize(TableName, ButtonID); // 获取动作大小
+            if (actionPageSize < 1024)
+                return "B"; // 字节
+            else if (actionPageSize < 1024 * 1024)
+                return "KB"; // 千字节
+            else if (actionPageSize < 1024 * 1024 * 1024)
+                return "MB"; // 兆字节
+            return "GB"; // 吉字节
+        }
+
+        // 获取动作ID
+        private void IDTextBlock_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Clipboard.SetText(IDTextBlock.Text); // 复制文本到剪贴板
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.ShowToast("动作ID已经写入剪贴板。", "Success"); // 显示复制成功的通知
         }
 
         // 复制动作信息

@@ -700,8 +700,48 @@ namespace Quicker.Windows.Forms
         private void CheckActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
-            MessageWindow messageWindow = new("动作页信息", "ID：\n最后修改：\n大小："); // 创建消息窗口
+            int actionPageIndex = int.Parse(bingdingButton.Name.Replace($"Edit{type}", "")); // 获取动作页 ID
+            ActionPageData actionPageData = db3.GetActionPageData(type, actionPageIndex); // 获取动作页信息
+            int actionPageSize = db3.GetActionPageSize(type, actionPageIndex); // 获取动作页大小
+            actionPageSize = GetActionPageSize(actionPageSize); // 获取动作页大小
+            string actionPageSizeUnit = GetActionPageSizeUnit(actionPageSize); // 获取动作页大小单位
+            string actionPageInfo = $"ID：{actionPageData.DefaultActionPageName}\n" +
+                                    $"最后修改：{actionPageData.LastEditTime}\n" +
+                                    $"大小：{actionPageSize} {actionPageSizeUnit}"; // 创建消息窗口
+            MessageWindow messageWindow = new("动作页信息", actionPageInfo); // 创建消息窗口
             messageWindow.ShowDialog(); // 显示消息窗口
+        }
+
+        /// <summary>
+        /// 获取动作页大小
+        /// </summary>
+        /// <param name="actionPageSize"> 动作页大小 </param>
+        /// <returns> 动作页大小 </returns>
+        private int GetActionPageSize(int actionPageSize)
+        {
+            if(actionPageSize < 1024)
+                return actionPageSize; // 字节
+            else if(actionPageSize < 1024 * 1024)
+                return actionPageSize / 1024; // 千字节
+            else if(actionPageSize < 1024 * 1024 * 1024)
+                return actionPageSize / (1024 * 1024); // 兆字节
+            return actionPageSize / (1024 * 1024 * 1024); // 吉字节
+        }
+
+        /// <summary>
+        /// 获取动作页大小单位
+        /// </summary>
+        /// <param name="actionPageSize"> 动作页大小 </param>
+        /// <returns> 动作页大小单位 </returns>
+        private string GetActionPageSizeUnit(int actionPageSize)
+        {
+            if(actionPageSize < 1024)
+                return "B"; // 字节
+            else if(actionPageSize < 1024 * 1024)
+                return "KB"; // 千字节
+            else if(actionPageSize < 1024 * 1024 * 1024)
+                return "MB"; // 兆字节
+            return "GB"; // 吉字节
         }
 
         // 点击按钮复制动作页 ID
