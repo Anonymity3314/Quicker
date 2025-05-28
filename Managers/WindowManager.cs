@@ -272,11 +272,10 @@ namespace Quicker.Managers
         public void SetWindowBottomLeftNearMouse(Window window)
         {
             GetCursorPos(out POINT cursorPos); // 获取鼠标位置
-            var workArea = SystemParameters.WorkArea; // 获取屏幕工作区
 
             // 计算窗口左下角的位置
-            int left = cursorPos.X; // 窗口左边界
-            int top = cursorPos.Y - 270; // 窗口上边界（鼠标Y坐标减去窗口高度）
+            int left = cursorPos.X - 20; // 窗口左边界
+            int top = cursorPos.Y - 290; // 窗口上边界（鼠标Y坐标减去窗口高度）
 
             SetWindowPosition(window, left, top); // 设置窗口位置
         }

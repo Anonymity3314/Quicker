@@ -14,6 +14,7 @@ namespace Quicker.Windows.Menus
         public CustomMenu()
         {
             InitializeComponent();
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
         }
 
         // 窗口加载完成后设置窗口位置
@@ -21,7 +22,6 @@ namespace Quicker.Windows.Menus
         {
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.SetWindowBottomLeftNearMouse(this); // 设置窗口左下角在鼠标位置附近
-            this.Activate(); // 激活窗口
         }
 
         // 弹出面板窗口
@@ -84,8 +84,6 @@ namespace Quicker.Windows.Menus
         private void CustomMenu_Deactivated(object sender, EventArgs e)
         {
             this.Visibility = Visibility.Hidden; // 隐藏窗口
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.CloseMenuAsync(this); // 延时关闭窗口
         }
 
         // 关闭窗口前释放资源

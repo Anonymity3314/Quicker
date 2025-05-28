@@ -8,7 +8,6 @@
     x:Class="Quicker.Windows.Menus.CustomMenu"
     mc:Ignorable="d"
     
-    WindowStartupLocation="Manual"
     AllowsTransparency="True"
     ShowInTaskbar="False"
     ResizeMode="NoResize"
