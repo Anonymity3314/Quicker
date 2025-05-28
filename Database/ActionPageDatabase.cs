@@ -1,6 +1,8 @@
 ﻿using System.Data.SQLite;
 using System.Data;
 using System.IO;
+using System.Collections.Generic;
+using System;
 
 namespace Quicker.Database
 {
@@ -27,15 +29,15 @@ namespace Quicker.Database
         private void InitializeDatabase()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            CreatMasterTable(connection); // 创建Application_Master表
-            CreatAndInitTable("Global", "", ""); // 创建数据表并初始化
-            CreatAndInitTable("Common", "", ""); // 创建数据表并初始化
-            CreatAndInitTable("Taskbar", "", ""); // 创建数据表并初始化
-            CreatAndInitTable("Desktop", "", ""); // 创建数据表并初始化
+            CreateMasterTable(connection); // 创建Application_Master表
+            CreateAndInitTable("Global", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("Common", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("Taskbar", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("Desktop", "", ""); // 创建数据表并初始化
         }
 
         // 创建Application_Master表
-        private void CreatMasterTable(SQLiteConnection connection)
+        private void CreateMasterTable(SQLiteConnection connection)
         {
             using var transaction = connection.BeginTransaction(); // 开启事务
             string createMasterTableQuery = @"
@@ -48,45 +50,47 @@ namespace Quicker.Database
         }
 
         /// <summary>
+        /// 场景配置数据
+        /// </summary>
+        private static class SceneConfig
+        {
+            public static readonly Dictionary<string, (string Process, string ActionPageName, string IconPath, string Tag)> Configs = new()
+            {
+                ["Global"] = ("Default", "默认全局动作页", "/Resources/Images/Quicker1.png", "_global"),
+                ["Common"] = ("Default", "默认", "/Resources/Images/Quicker1.png", "common"),
+                ["Desktop"] = ("Windows桌面", "桌面 #", "/Resources/Images/DesktopSceneImage.png", "desktop"),
+                ["Taskbar"] = ("Windows任务栏", "任务栏 #", "/Resources/Images/Quicker1.png", "taskbar")
+            };
+        }
+
+        /// <summary>
         /// 创建场景数据表并初始化
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
-        public void CreatAndInitTable(string tableName, string sceneIconPath, string sceneTag)
+        /// <param name="tableName">场景数据表名称</param>
+        /// <param name="sceneIconPath">场景图标路径</param>
+        /// <param name="sceneTag">场景标签</param>
+        public void CreateAndInitTable(string tableName, string sceneIconPath = "", string sceneTag = "")
         {
-            AddToApplication_MasterTable(tableName); // 添加到Application_Master表
-            CreateSceneTable(tableName); // 创建场景数据表
-            string sceneProcess = "", actionPageName = "";
-            switch (tableName)
-            {
-                case "Global":
-                    sceneProcess = "Default"; // 设置动作页所属应用程序名称
-                    actionPageName = "默认全局动作页"; // 设置动作页名称
-                    sceneIconPath = "/Resources/Images/Quicker1.png"; // 设置场景图标路径
-                    sceneTag = "_global"; // 设置场景标签
-                    break;
-                case "Common":
-                    sceneProcess = "Default"; // 设置动作页所属应用程序名称
-                    actionPageName = "默认"; // 设置动作页名称
-                    sceneIconPath = "/Resources/Images/Quicker1.png"; // 设置场景图标路径
-                    sceneTag = "common"; // 设置场景标签
-                    break;
-                case "Desktop":
-                    sceneProcess = "Windows桌面"; // 设置动作页所属应用程序名称
-                    actionPageName = "桌面 #"; // 设置动作页名称
-                    sceneIconPath = "/Resources/Images/DesktopSceneImage.png"; // 设置场景图标路径
-                    sceneTag = "desktop"; // 设置场景标签
-                    break;
-                case "Taskbar":
-                    sceneProcess = "Windows任务栏"; // 设置动作页所属应用程序名称
-                    actionPageName = "任务栏 #"; // 设置动作页名称
-                    sceneIconPath = "/Resources/Images/Quicker1.png"; // 设置场景图标路径
-                    sceneTag = "taskbar"; // 设置场景标签
-                    break;
-                default:
-                    break;
-            }
-            int actionPageCount = db2.TableExists(tableName) ? db2.GetTotalAntionPageIndex(tableName) : 0; // 获取动作页数量
-            SceneData sceneData = new SceneData()
+            // 添加到Application_Master表
+            AddToApplication_MasterTable(tableName);
+
+            // 创建场景数据表
+            CreateSceneTable(tableName);
+
+            // 获取场景配置
+            var (sceneProcess, actionPageName, defaultIconPath, defaultTag) =
+                SceneConfig.Configs.GetValueOrDefault(tableName,
+                    (string.Empty, string.Empty, sceneIconPath, sceneTag));
+
+            // 如果未提供自定义值，使用默认值
+            sceneIconPath = string.IsNullOrEmpty(sceneIconPath) ? defaultIconPath : sceneIconPath;
+            sceneTag = string.IsNullOrEmpty(sceneTag) ? defaultTag : sceneTag;
+
+            // 获取动作页数量
+            int actionPageCount = db2.TableExists(tableName) ? db2.GetTotalAntionPageIndex(tableName) : 0;
+
+            // 创建并初始化场景数据
+            var sceneData = new SceneData
             {
                 SceneName = tableName,
                 SceneIconPath = sceneIconPath,
@@ -94,14 +98,23 @@ namespace Quicker.Database
                 SceneTag = sceneTag,
                 AutoReturnToFirstPage = false,
                 SceneProcess = sceneProcess
-            }; // 创建场景数据对象
-            UpdateSceneTable(tableName, sceneData); // 初始化场景数据表
-            for (int i = 0; i < actionPageCount; i++) 
+            };
+
+            // 更新场景数据表
+            UpdateSceneTable(tableName, sceneData);
+
+            // 创建并初始化动作页
+            for (int i = 0; i < actionPageCount; i++)
             {
-                CreatActionPageTable(tableName);
-                if (tableName != "Global" && tableName != "Common")
-                    actionPageName = actionPageName + i.ToString(); // 设置动作页名称
-                UpdateActionPageTable(tableName, tableName+i.ToString(), actionPageName, 0); // 初始化动作页数据表
+                CreateActionPageTable(tableName);
+
+                string currentActionPageName = tableName switch
+                {
+                    "Global" or "Common" => actionPageName,
+                    _ => $"{actionPageName}{i}"
+                };
+
+                UpdateActionPageTable(tableName, $"{tableName}{i}", currentActionPageName);
             }
         }
 
@@ -222,7 +235,7 @@ namespace Quicker.Database
         /// 创建动作页数据表
         /// </summary>
         /// <param name="tableName"> 动作页名称 </param>
-        public void CreatActionPageTable(string tableName)
+        public void CreateActionPageTable(string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
@@ -230,8 +243,7 @@ namespace Quicker.Database
             (
                 DefaultActionPageName TEXT PRIMARY KEY,
                 ActionPageName TEXT,
-                LastEditTime DATETIME,
-                ActionPageSize INTEGER
+                LastEditTime DATETIME
             );"; // 创建场景数据表的SQL语句
             using var command = new SQLiteCommand(createTableQuery, connection); // 创建SQLiteCommand对象
             command.ExecuteNonQuery(); // 执行创建表的SQL语句
@@ -242,22 +254,20 @@ namespace Quicker.Database
         /// 更新动作页数据
         /// </summary>
         /// <param name="tableName"> 动作页名称 </param>
-        /// <param name="actionProcess"> 动作页所属应用程序名称 </param>
+        /// <param name="defaultActionPageName"> 动作页默认名称 </param>
         /// <param name="actionPageName"> 动作页名称 </param>
-        /// <param name="actionPageSize"> 动作页大小 </param>
-        public void UpdateActionPageTable(string tableName, string defaultActionPageName, string actionPageName, int actionPageSize)
+        public void UpdateActionPageTable(string tableName, string defaultActionPageName, string actionPageName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             string query = $@"INSERT OR REPLACE INTO {tableName + "ActionPage"}
-            (DefaultActionPageName, ActionPageName, LastEditTime, ActionPageSize)
+            (DefaultActionPageName, ActionPageName, LastEditTime)
             VALUES
-            (@DefaultActionPageName, @ActionPageName, @LastEditTime, @ActionPageSize)"; // 更新场景数据表的SQL语句
+            (@DefaultActionPageName, @ActionPageName, @LastEditTime)"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@DefaultActionPageName", defaultActionPageName); // 动作页内置默认名称
             command.Parameters.AddWithValue("@ActionPageName", actionPageName); // 场景图标路径
             command.Parameters.AddWithValue("@LastEditTime", DateTime.Now); // 场景数量
-            command.Parameters.AddWithValue("@ActionPageSize", actionPageSize); // 场景标签
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -417,10 +427,9 @@ namespace Quicker.Database
             {
                 return new ActionPageData
                 {
-                    DefaultActionPageName = reader.GetString(0), // 内部默认的动作页名称，例如“Global0”
+                    DefaultActionPageName = reader.GetString(0), // 内部默认的动作页名称，例如"Global0"
                     ActionPageName = reader.GetString(1), // 动作页名称
                     LastEditTime = reader.GetDateTime(2), // 最后编辑时间
-                    ActionPageSize = reader.GetInt32(3), // 动作页大小
                 }; // 返回动作页数据
             }
             return null; // 返回空
@@ -518,9 +527,8 @@ namespace Quicker.Database
     // 动作页信息
     public class ActionPageData
     {
-        public string DefaultActionPageName { get; set; } // 内部默认的动作页名称，例如“Global0”
+        public string DefaultActionPageName { get; set; } // 内部默认的动作页名称，例如"Global0"
         public string ActionPageName { get; set; } // 动作页名称
         public DateTime LastEditTime { get; set; } // 最后编辑时间
-        public int ActionPageSize { get; set; } // 动作页大小
     }
 }

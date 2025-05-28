@@ -503,7 +503,7 @@ namespace Quicker.Windows.Forms
             else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
-                db3.CreatAndInitTable(type, "", ""); // 创建场景数据表
+                db3.CreateAndInitTable(type, "", ""); // 创建场景数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
                 if(type != "Global")
                 {
@@ -517,7 +517,7 @@ namespace Quicker.Windows.Forms
             {
                 db3.UpdateSceneCount(type, canvasCount + 1); // 更新场景数据表
                 var actionPageInfo = GetActionPageInfo(); // 获取动作页信息
-                db3.UpdateActionPageTable(type, type + canvasCount.ToString(), actionPageInfo.ActionPageName, 0); // 更新动作页数据表
+                db3.UpdateActionPageTable(type, type + canvasCount.ToString(), actionPageInfo.ActionPageName); // 更新动作页数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 生成画布
             }
         }
@@ -857,7 +857,7 @@ namespace Quicker.Windows.Forms
                         if (targetSceneData.SceneCount == 0)
                         {
                             db2.CreateButtonTable(targetSceneData.SceneName); // 创建按钮数据表
-                            db3.CreatActionPageTable(targetSceneData.SceneName); // 创建动作页数据表
+                            db3.CreateActionPageTable(targetSceneData.SceneName); // 创建动作页数据表
                         }
                         var buttons = db2.GetPagesOfButtons(type, sourceIndex); // 获取源动作页按钮数据
                         foreach (var button in buttons)
@@ -880,7 +880,7 @@ namespace Quicker.Windows.Forms
                             db2.UpdateAction(newButtonData, targetSceneData.SceneName); // 更新按钮数据
                         }
                         var sourceActionPageData = db3.GetActionPageData(type, sourceIndex); // 获取源动作页数据
-                        db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName), sourceActionPageData.ActionPageSize); // 更新动作页数据表
+                        db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName)); // 更新动作页数据表
                         db3.UpdateSceneCount(targetSceneData.SceneName, targetSceneData.SceneCount + 1); // 更新场景数据表
                         db3.DeleteActionPage(type, sourceIndex); // 删除源动作页
                         db2.DeletePageOfButtons(type, sourceIndex); // 删除源动作页按钮数据

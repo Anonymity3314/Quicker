@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using System.Windows;
+using System;
 
 namespace Quicker.Windows.Menus
 {
@@ -29,6 +30,14 @@ namespace Quicker.Windows.Menus
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
             DragMove(); // 允许拖动窗口
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            TitileTextBlock.Text = null; // 清空标题
+            MessageTextBlock.Text = null; // 清空消息
+            base.OnClosed(e);
+            GC.Collect(); // 释放内存
         }
     }
 }

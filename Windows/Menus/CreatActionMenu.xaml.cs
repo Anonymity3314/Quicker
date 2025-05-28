@@ -152,6 +152,9 @@ namespace Quicker.Windows.Menus
             openFileDialog.Filter = "动作数据文件|*.json"; // 设置文件类型
             if (openFileDialog.ShowDialog() == true) // 显示文件对话框并选择文件
                 db2.ImportJsonDataToList(TableName, openFileDialog.FileName, ButtonID); // 导入动作数据
+            ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
+            if (actionPageManageWindow != null)
+                actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
             if (mainWindow != null)
                 mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮

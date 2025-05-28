@@ -30,7 +30,7 @@ namespace Quicker.Windows.Menus
         // 保存动作页信息
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            db3.UpdateActionPageTable(actionPageType, actionPage.DefaultActionPageName, ActionPageName.Text, actionPage.ActionPageSize); // 更新动作页信息
+            db3.UpdateActionPageTable(actionPageType, actionPage.DefaultActionPageName, ActionPageName.Text); // 更新动作页信息
             ActionPageManageWindow window = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 获取动作页管理窗口
             window.UpdateCanvasInListView(int.Parse(actionPageIndex), actionPageType); // 更新动作信息
             this.Close(); // 关闭窗口

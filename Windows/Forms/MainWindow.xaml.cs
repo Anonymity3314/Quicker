@@ -639,12 +639,8 @@ namespace Quicker.Windows.Forms
                     Style styleResource = FindResource("Button") as Style; // 按钮样式
                     Button button = CreateButton(buttonName, styleResource, row, col); // 创建按钮
                     newUniformGrid.Children.Add(button); // 添加按钮到UniformGrid
-                    var buttonData = db2.GetButtonDataByTableName(style); // 从数据库中获取按钮数据
-                    foreach (var data in buttonData)
-                    {
-                        if (data.ButtonID == buttonIndex)
-                            buttonManager.RefreshButtonDisplay(button, data, 60, true); // 更新按钮内容
-                    }
+                    var buttonData = db2.GetButtonDataByID(buttonIndex, style); // 从数据库中获取按钮数据
+                    buttonManager.RefreshButtonDisplay(button, buttonData, 60, true); // 更新按钮内容
                 }
             }
         }

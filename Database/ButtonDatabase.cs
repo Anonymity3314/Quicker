@@ -1,7 +1,6 @@
 ﻿using System.Data.SQLite;
 using System.Text.Json;
 using System.IO;
-using System.Xml;
 
 namespace Quicker.Database
 {
@@ -75,27 +74,13 @@ namespace Quicker.Database
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var command = new SQLiteCommand($"SELECT * FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令对象
-            command.Parameters.AddWithValue("@ButtonID", buttonID); // 动作ID
+            command.Parameters.AddWithValue("@ButtonID", buttonID); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询语句
             if (reader.Read())
             {
-                return new ButtonData
-                {
-                    ButtonID = reader.GetInt32(0), // 动作ID
-                    Title = reader.GetString(1), // 动作名称
-                    Location = reader.GetString(2), // 位置
-                    ImagePath = reader.GetString(3), // 图片路径
-                    Data1 = reader.IsDBNull(4) ? null : reader.GetString(4), // 动作数据1
-                    Data2 = reader.IsDBNull(5) ? null : reader.GetString(5), // 动作数据2
-                    Data3 = reader.IsDBNull(6) ? null : reader.GetString(6), // 动作数据3
-                    Description = reader.GetString(7), // 对动作的描述
-                    CreateTime = reader.GetDateTime(8), // 创建时间
-                    LatestEditTime = reader.GetDateTime(9), // 最近修改时间
-                    ActionType = reader.IsDBNull(10) ? null : reader.GetString(10), // 动作类型
-                    UsedTimes = reader.GetInt32(11) // 使用次数
-                };
+                return ButtonDataHelper.FromReader(reader); // 返回ButtonData对象
             }
-            return null; // 没有找到数据
+            return null; // 如果找不到则返回null
         }
 
         /// <summary>
@@ -141,21 +126,7 @@ namespace Quicker.Database
             using var reader = command.ExecuteReader(); // 执行查询语句
             while (reader.Read())
             {
-                buttonDataList.Add(new ButtonData
-                {
-                    ButtonID = reader.GetInt32(0), // 动作ID
-                    Title = reader.GetString(1), // 动作名称
-                    Location = reader.GetString(2), // 位置
-                    ImagePath = reader.GetString(3), // 图片路径
-                    Data1 = reader.IsDBNull(4) ? null : reader.GetString(4), // 动作数据1
-                    Data2 = reader.IsDBNull(5) ? null : reader.GetString(5), // 动作数据2
-                    Data3 = reader.IsDBNull(6) ? null : reader.GetString(6), // 动作数据3
-                    Description = reader.GetString(7), // 对动作的描述
-                    CreateTime = reader.GetDateTime(8), // 创建时间
-                    LatestEditTime = reader.GetDateTime(9), // 最近修改时间
-                    ActionType = reader.GetString(10), // 动作类型
-                    UsedTimes = reader.GetInt32(11) // 使用次数
-                }); // 添加到列表
+                buttonDataList.Add(ButtonDataHelper.FromReader(reader)); // 添加ButtonData到列表
             }
             return buttonDataList; // 返回ButtonData列表
         }
@@ -179,33 +150,29 @@ namespace Quicker.Database
         public void DeletePageOfButtons(string tableName, int pageIndex)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            using var transaction = connection.BeginTransaction(); // 开始事务
-
+            using var transaction = connection.BeginTransaction(); // 开始事务           
             List<ButtonData> allButtons = GetButtonDataByTableName(tableName); // 获取所有按钮数据
-            var currentButtons = allButtons
-                .Select(b => new { ButtonID = b.ButtonID, Data = b })
+            var currentButtonIDs = allButtons
                 .Where(b => b.ButtonID / 100 == pageIndex)
-                .ToDictionary(b => b.ButtonID, b => b.Data); // 当前页的按钮
-
-            // 删除当前页的按钮
-            foreach (var buttonData in currentButtons.Values)
+                .Select(b => b.ButtonID)
+                .ToList(); // 当前页所有ButtonID
+            if (currentButtonIDs.Count > 0) // 批量删除当前页的按钮
             {
-                DeleteAction(buttonData.ButtonID, tableName, connection); // 删除动作
+                string ids = string.Join(",", currentButtonIDs); // 当前页所有ButtonID
+                using var delCmd = new SQLiteCommand($"DELETE FROM {tableName} WHERE ButtonID IN ({ids})", connection, transaction); // 创建删除命令
+                delCmd.ExecuteNonQuery(); // 执行删除语句
             }
 
-            // 筛选并更新后续页的按钮编号
             var subsequentButtons = allButtons
-                .Select(b => new { ButtonID = b.ButtonID, Data = b })
                 .Where(b => b.ButtonID / 100 > pageIndex)
-                .ToList(); // 后续页的按钮
-
-            foreach (var item in subsequentButtons)
+                .ToList(); // 后续页所有ButtonData
+            foreach (var button in subsequentButtons)
             {
-                int buttonID = item.ButtonID; // 原 ButtonID
-                int newButtonID = UpdateButtonPageNumber(connection, buttonID, pageIndex); // 更新按钮的页码编号
-                UpdateButtonID(connection, tableName, buttonID, newButtonID); // 更新 ButtonID
+                int page = button.ButtonID / 100; // 原页码
+                int bcPart = button.ButtonID % 100; // 目标 ID 的 B 和 C 部分
+                int newButtonID = (page - 1) * 100 + bcPart; // 新的 ButtonID
+                UpdateButtonID(connection, tableName, button.ButtonID, newButtonID); // 更新 ButtonID
             }
-
             transaction.Commit(); // 提交事务
         }
 
@@ -506,5 +473,28 @@ namespace Quicker.Database
         public DateTime LatestEditTime { get; set; } // 最近修改时间
         public string ActionType { get; set; } // 动作类型
         public int UsedTimes { get; set; } // 使用次数
+    }
+
+    // ButtonData 帮助类
+    public static class ButtonDataHelper
+    {
+        public static ButtonData FromReader(SQLiteDataReader reader)
+        {
+            return new ButtonData
+            {
+                ButtonID = reader.GetInt32(0), // 动作ID
+                Title = reader.GetString(1), // 动作名称
+                Location = reader.GetString(2), // 位置
+                ImagePath = reader.GetString(3), // 图片路径
+                Data1 = reader.IsDBNull(4) ? null : reader.GetString(4), // 动作数据1
+                Data2 = reader.IsDBNull(5) ? null : reader.GetString(5), // 动作数据2
+                Data3 = reader.IsDBNull(6) ? null : reader.GetString(6), // 动作数据3
+                Description = reader.GetString(7), // 对动作的描述
+                CreateTime = reader.GetDateTime(8), // 创建时间
+                LatestEditTime = reader.GetDateTime(9), // 最近修改时间
+                ActionType = reader.IsDBNull(10) ? null : reader.GetString(10), // 动作类型
+                UsedTimes = reader.GetInt32(11) // 使用次数
+            }; // 返回 ButtonData 对象
+        }
     }
 }

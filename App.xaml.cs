@@ -1,5 +1,4 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
-using System.Windows.Threading;
 using Quicker.Windows.Forms;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
@@ -66,7 +65,7 @@ namespace Quicker
             {
                 IconSource = icon, // 设置图标
                 ToolTipText = "Quicker" // 设置提示文本
-            };
+            }; // 创建托盘图标
 
             taskbarIcon.TrayLeftMouseDown += ShowMainWindow; // 左键单击弹出功能面板
             taskbarIcon.TrayRightMouseDown += ShowCustomMenu; // 右键单击弹出菜单栏
@@ -91,13 +90,11 @@ namespace Quicker
             AppStateManager.RecordedTime = AppStateManager.StartTime; // 记录应用记录时间
 
             // 初始化定时器
-            AppStateManager.Timer = new DispatcherTimer();
             AppStateManager.Timer.Interval = TimeSpan.FromMinutes(5); // 每 5 分钟更新一次
             AppStateManager.Timer.Tick += Timer_Tick; // 每 5 分钟触发一次
             AppStateManager.Timer.Start(); // 启动定时器
 
             // 初始化按键计时器
-            AppStateManager.PressTimer = new DispatcherTimer();
             AppStateManager.PressTimer.Interval = TimeSpan.FromMilliseconds(10); // 每 10 毫秒检查一次
             AppStateManager.PressTimer.Tick += PressTimer_Tick; // 计时器回调
         }
@@ -110,251 +107,429 @@ namespace Quicker
                 AppStateManager.PressTimer.Stop(); // 停止计时器
                 return; // 如果没有按下时间，停止计时器
             }
-            var Conventions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllConventions().FirstOrDefault()
-                : AppStateManager.Conventions; // 获取设置
-            double LongPressThreshold = Conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
-            var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                : AppStateManager.OpenMainWindowConditions; // 获取设置
-            if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger ||
-                OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
+            var conventions = AppStateManager.Conventions; // 获取设置
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
+            ProcessLongPressAndMouseMove(conventions, openMainWindowConditions); // 处理长按和鼠标移动
+        }
+
+        /// <summary>
+        /// 处理长按和鼠标移动
+        /// </summary>
+        /// <param name="conventions"> 设置 </param>
+        /// <param name="conditions"> 设置 </param>
+        private void ProcessLongPressAndMouseMove(Convention conventions, OpenMainWindow conditions)
+        {
+            if (conditions.OpenMainWindowByMiddleMouseClickLonger ||
+                conditions.OpenMainWindowByRightMouseClickLonger)
             {
-                TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下时间
-                if (pressDuration.TotalSeconds >= LongPressThreshold)
-                {
-                    CloseOrShowMainWindow(); // 如果按键时间超过阈值，触发功能
-                    AppStateManager.KeyPressStartTime = null; // 重置按键时间
-                    AppStateManager.PressTimer.Stop(); // 停止计时器
-                }
-            } // 长按中键或右键
-            else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
+                ProcessLongPress(conventions); // 处理长按事件
+            }
+            else if (conditions.OpenMainWindowByRightMouseClick_Move)
             {
-                System.Windows.Point currentPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
-                double offsetX = currentPosition.X - AppStateManager.StartPosition.X; // 计算水平偏移量
-                double offsetY = currentPosition.Y - AppStateManager.StartPosition.Y; // 计算垂直偏移量
-                double distance = Math.Sqrt(offsetX * offsetX + offsetY * offsetY); // 计算移动距离
-                if (distance > Conventions.MouseMovePixels) // 如果移动距离大于设置像素值
-                    CloseOrShowMainWindow(); // 关闭或显示主窗口
-            } // 右键移动
+                ProcessMouseMove(conventions); // 处理鼠标移动事件
+            }
+        }
+
+        /// <summary>
+        /// 处理长按事件
+        /// </summary>
+        /// <param name="conventions"> 设置 </param>
+        private void ProcessLongPress(Convention conventions)
+        {
+            TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下时间
+            double longPressThreshold = conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
+            if (pressDuration.TotalSeconds >= longPressThreshold)
+            {
+                CloseOrShowMainWindow(); // 如果按键时间超过阈值，触发功能
+                AppStateManager.KeyPressStartTime = null; // 重置按键时间
+                AppStateManager.PressTimer.Stop(); // 停止计时器
+            }
+        }
+
+        /// <summary>
+        /// 处理鼠标移动事件
+        /// </summary>
+        /// <param name="conventions"> 设置 </param>
+        private void ProcessMouseMove(Convention conventions)
+        {
+            var currentPosition = new System.Windows.Point(
+                System.Windows.Forms.Cursor.Position.X,
+                System.Windows.Forms.Cursor.Position.Y
+            ); // 获取当前鼠标位置
+
+            double offsetX = currentPosition.X - AppStateManager.StartPosition.X; // 计算水平偏移量
+            double offsetY = currentPosition.Y - AppStateManager.StartPosition.Y; // 计算垂直偏移量
+            double distance = Math.Sqrt(offsetX * offsetX + offsetY * offsetY); // 计算移动距离
+            if (distance > conventions.MouseMovePixels) // 如果移动距离大于设置像素值
+            {
+                CloseOrShowMainWindow(); // 关闭或显示主窗口
+            }
         }
 
         // 定时器每5min保存使用时长
         private void Timer_Tick(object sender, EventArgs e)
         {
-            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
-            Convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
-            SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时长到数据库
+            var convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
+            convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
+            SettingDatabase.SaveTotalUsageTime(convention.TotalUsageTime); // 保存总使用时长到数据库
             AppStateManager.RecordedTime = DateTime.Now; // 记录应用保存时间
         }
 
         // 初始化钩子
         private async Task InitializeHookAsync()
         {
-            hook = new TaskPoolGlobalHook(); // 创建钩子
+            hook = new(); // 创建钩子
             hook.KeyPressed += Hook_KeyPressed; // 按键按下事件
             hook.KeyReleased += Hook_KeyReleased; // 按键松开事件
             hook.MousePressed += Hook_MousePressed; // 鼠标按下事件
             hook.MouseReleased += Hook_MouseReleased; // 鼠标松开事件
-            await hook.RunAsync().ConfigureAwait(false); // 确保钩子启动
+            await hook.RunAsync().ConfigureAwait(false); // 启动钩子
         }
 
-        // 按下鼠标快捷键时如果按键尚未被记录，记录按键按下的时间
+        // 鼠标按下事件
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
-            if (IsBannedFormQuicker()) return; // 如果禁用Quicker，返回
-            if (FullScreenDisable()) return; // 如果全屏禁用Quicker，返回
-            if (AppStateManager.KeyPressStartTime.HasValue)
-            {
-                AppStateManager.KeyPressStartTime = null; // 重置按键时间
-                return; // 返回
-            } // 如果按键已经被记录，停止记录
-            var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                : AppStateManager.OpenMainWindowConditions; // 获取设置
-            bool isCtrlPressed = false; // 是否按下 Ctrl 键
-            this.Dispatcher.BeginInvoke(() =>
-            {
-                isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-            }); // 在 UI 线程中获取键盘状态
-            switch (e.Data.Button)
-            {
-                case SharpHook.Data.MouseButton.Button2:
-                    if (OpenMainWindowConditions.OpenMainWindowByRightMouseClick_Move)
-                    {
-                        AppStateManager.StartPosition = new System.Windows.Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y); // 获取当前鼠标位置
-                        PreLoadMainWindow(true);
-                    } // 右键移动
-                    else if (isCtrlPressed && OpenMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick)
-                        CloseOrShowMainWindow(); // Ctrl + 右键
-                    else if (OpenMainWindowConditions.OpenMainWindowByRightMouseClickLonger)
-                        PreLoadMainWindow(true); // 长按右键
-                    break; // 右键
-                case SharpHook.Data.MouseButton.Button3:
-                    if (isCtrlPressed && OpenMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick)
-                        CloseOrShowMainWindow(); // Ctrl + 中键
-                    else if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
-                        PreLoadMainWindow(); // 单击中键
-                    else if (OpenMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger)
-                        PreLoadMainWindow(true); // 长按中键
-                    break; // 中键
-                case SharpHook.Data.MouseButton.Button4:
-                    if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick)
-                        PreLoadMainWindow();
-                    break; // X1键
-                case SharpHook.Data.MouseButton.Button5:
-                    if (OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
-                        PreLoadMainWindow();
-                    break; // X2键
-            }
+            if (!CanProcessHook()) return; // 如果不能处理钩子，返回
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
+            bool isCtrlPressed = GetCtrlKeyState(); // 获取 Ctrl 键状态
+            
+            ProcessMouseButtonPress(e.Data.Button, openMainWindowConditions, isCtrlPressed); // 处理鼠标按下事件
         }
 
-        // 松开鼠标满足条件弹出面板
+        // 鼠标松开事件
         private void Hook_MouseReleased(object? sender, MouseHookEventArgs e)
         {
             AppStateManager.PressTimer?.Stop(); // 停止计时器
-            if (!AppStateManager.KeyPressStartTime.HasValue) return;
-            var Conventions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllConventions().FirstOrDefault()
-                : AppStateManager.Conventions; // 获取设置
-            var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                : AppStateManager.OpenMainWindowConditions; // 获取设置
-            TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
-            AppStateManager.KeyPressStartTime = null;
-            switch (e.Data.Button)
-            {
-                case SharpHook.Data.MouseButton.Button3:
-                    if (pressDuration.TotalSeconds <= Conventions.LongPressThreshold &&
-                        OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick)
-                        CloseOrShowMainWindow();
-                    break; // 短按中键
-                case SharpHook.Data.MouseButton.Button4: // 短按X1键
-                case SharpHook.Data.MouseButton.Button5:
-                    if (OpenMainWindowConditions.OpenMainWindowByX1MouseClick ||
-                        OpenMainWindowConditions.OpenMainWindowByX2MouseClick)
-                    {
-                        if (pressDuration.TotalSeconds <= Conventions.LongPressThreshold)
-                            CloseOrShowMainWindow();
-                    }
-                    break; // 短按X2键
-            }
+            if (!AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键时间未记录，返回
+
+            var conventions = AppStateManager.Conventions; // 获取设置
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
+            TimeSpan pressDuration = GetPressDuration(); // 获取按键按下时间
+            
+            ProcessMouseButtonRelease(e.Data.Button, openMainWindowConditions, conventions, pressDuration); // 处理鼠标松开事件
         }
 
-        // 按下键盘快捷键时如果按键尚未被记录，记录按键按下的时间
+        // 按键按下事件
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
-            if (IsBannedFormQuicker()) return; // 如果禁用Quicker，返回
-            if (FullScreenDisable()) return; // 如果全屏禁用Quicker，返回
-            if (AppStateManager.KeyPressStartTime.HasValue)
-            {
-                AppStateManager.KeyPressStartTime = null; // 重置按键时间
-                return; // 返回
-            } // 如果按键已经被记录，停止记录
-            var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                : AppStateManager.OpenMainWindowConditions; // 获取设置
-            switch (e.Data.KeyCode)
-            {
-                case SharpHook.Data.KeyCode.VcLeftControl: // 左 Ctrl 键
-                case SharpHook.Data.KeyCode.VcRightControl:
-                    if (OpenMainWindowConditions.OpenMainWindowByCtrl)
-                        PreLoadMainWindow();
-                    break; // 右 Ctrl 键
-            }
+            if (!CanProcessHook()) return; // 如果不能处理钩子，返回
+            if (IsKeyPressAlreadyRecorded()) return; // 如果按键已经记录，返回
+
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
+            ProcessControlKeyPress(e.Data.KeyCode, openMainWindowConditions); // 处理按键按下事件
         }
 
-        // 松开按键满足条件弹出面板
+        // 按键松开事件
         private void Hook_KeyReleased(object sender, KeyboardHookEventArgs e)
         {
-            if (!AppStateManager.KeyPressStartTime.HasValue) return;
-            var Conventions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllConventions().FirstOrDefault()
-                : AppStateManager.Conventions; // 获取设置
-            var OpenMainWindowConditions = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                : AppStateManager.OpenMainWindowConditions; // 获取设置
-            TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下和释放的时间差
-            AppStateManager.KeyPressStartTime = null;
-            switch (e.Data.KeyCode)
+            if (!AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键时间未记录，返回
+
+            var conventions = AppStateManager.Conventions; // 获取设置
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
+            TimeSpan pressDuration = GetPressDuration(); // 获取按键按下时间
+            
+            ProcessControlKeyRelease(e.Data.KeyCode, openMainWindowConditions, conventions, pressDuration); // 处理按键松开事件
+        }
+
+        /// <summary>
+        /// 判断是否可以处理钩子
+        /// </summary>
+        /// <returns> 是否可以处理钩子 </returns>
+        private bool CanProcessHook()
+        {
+            return !IsBannedFormQuicker() && !FullScreenDisable(); // 如果禁用Quicker或全屏禁用Quicker，返回
+        }
+
+        /// <summary>
+        /// 判断是否已经记录按键按下时间
+        /// </summary>
+        /// <returns> 是否已经记录按键按下时间 </returns>
+        private bool IsKeyPressAlreadyRecorded()
+        {
+            if (!AppStateManager.KeyPressStartTime.HasValue) return false; // 如果按键时间未记录，返回
+            AppStateManager.KeyPressStartTime = null; // 重置按键时间
+            return true; // 返回是否已经记录按键按下时间
+        }
+
+        /// <summary>
+        /// 获取 Ctrl 键状态
+        /// </summary>
+        /// <returns> Ctrl 键状态 </returns>
+        private bool GetCtrlKeyState()
+        {
+            bool isCtrlPressed = false; // 是否按下 Ctrl 键
+            this.Dispatcher.Invoke(() =>
             {
-                case SharpHook.Data.KeyCode.VcLeftControl: // 左 Ctrl 键
-                case SharpHook.Data.KeyCode.VcRightControl:
-                    if (OpenMainWindowConditions.OpenMainWindowByCtrl &&
-                        pressDuration.TotalSeconds <= Conventions.LongPressThreshold)
-                        CloseOrShowMainWindow();
-                    break; // 右 Ctrl 键
+                isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+            }); // 获取 Ctrl 键状态
+            return isCtrlPressed; // 返回 Ctrl 键状态
+        }
+
+        /// <summary>
+        /// 获取按键按下时间
+        /// </summary>
+        /// <returns> 按键按下时间 </returns>
+        private TimeSpan GetPressDuration()
+        {
+            var duration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 获取按键按下时间
+            AppStateManager.KeyPressStartTime = null; // 重置按键时间
+            return duration; // 返回按键按下时间
+        }
+
+        /// <summary>
+        /// 处理鼠标按下事件
+        /// </summary>
+        /// <param name="button"> 鼠标按钮 </param>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="isCtrlPressed"> Ctrl 键状态 </param>
+        private void ProcessMouseButtonPress(SharpHook.Data.MouseButton button, OpenMainWindow conditions, bool isCtrlPressed)
+        {
+            switch (button)
+            {
+                case SharpHook.Data.MouseButton.Button2:
+                    ProcessRightMouseButtonPress(conditions, isCtrlPressed);
+                    break; // 右键按下
+                case SharpHook.Data.MouseButton.Button3:
+                    ProcessMiddleMouseButtonPress(conditions, isCtrlPressed);
+                    break; // 中键按下
+                case SharpHook.Data.MouseButton.Button4:
+                    ProcessX1MouseButtonPress(conditions);
+                    break; // X1鼠标按下
+                case SharpHook.Data.MouseButton.Button5:
+                    ProcessX2MouseButtonPress(conditions);
+                    break; // X2鼠标按下
             }
         }
 
-        // 是否全屏禁用Quicker
+        /// <summary>
+        /// 处理右键按下事件
+        /// </summary>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="isCtrlPressed"> Ctrl 键状态 </param>
+        private void ProcessRightMouseButtonPress(OpenMainWindow conditions, bool isCtrlPressed)
+        {
+            if (conditions.OpenMainWindowByRightMouseClick_Move)
+            {
+                RecordMousePosition(); // 记录鼠标位置
+                PreLoadMainWindow(true); // 预加载主窗口
+            }
+            else if (isCtrlPressed && conditions.OpenMainWindowByCtrl_RightMouseClick)
+            {
+                CloseOrShowMainWindow(); // 关闭或显示主窗口
+            }
+            else if (conditions.OpenMainWindowByRightMouseClickLonger)
+            {
+                PreLoadMainWindow(true); // 预加载主窗口
+            }
+        }
+
+        /// <summary>
+        /// 处理中键按下事件
+        /// </summary>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="isCtrlPressed"> Ctrl 键状态 </param>
+        private void ProcessMiddleMouseButtonPress(OpenMainWindow conditions, bool isCtrlPressed)
+        {
+            if (isCtrlPressed && conditions.OpenMainWindowByCtrl_MiddleMouseClick)
+            {
+                CloseOrShowMainWindow(); // 关闭或显示主窗口
+            }
+            else if (conditions.OpenMainWindowByMiddleMouseClick)
+            {
+                PreLoadMainWindow(); // 预加载主窗口
+            }
+            else if (conditions.OpenMainWindowByMiddleMouseClickLonger)
+            {
+                PreLoadMainWindow(true); // 预加载主窗口
+            }
+        }
+
+        /// <summary>
+        /// 处理 X1 鼠标按下事件
+        /// </summary>
+        /// <param name="conditions"> 设置 </param>
+        private void ProcessX1MouseButtonPress(OpenMainWindow conditions)
+        {
+            if (conditions.OpenMainWindowByX1MouseClick)
+            {
+                PreLoadMainWindow(); // 预加载主窗口
+            }
+        }
+
+        /// <summary>
+        /// 处理 X2 鼠标按下事件
+        /// </summary>
+        /// <param name="conditions"> 设置 </param>
+        private void ProcessX2MouseButtonPress(OpenMainWindow conditions)
+        {
+            if (conditions.OpenMainWindowByX2MouseClick)
+            {
+                PreLoadMainWindow(); // 预加载主窗口
+            }
+        }
+
+        /// <summary>
+        /// 处理鼠标松开事件
+        /// </summary>
+        /// <param name="button"> 鼠标按钮 </param>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="conventions"> 设置 </param>
+        /// <param name="pressDuration"> 按键按下时间 </param>
+        private void ProcessMouseButtonRelease(SharpHook.Data.MouseButton button, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        {
+            switch (button)
+            {
+                case SharpHook.Data.MouseButton.Button3:
+                    ProcessMiddleMouseButtonRelease(conditions, conventions, pressDuration);
+                    break; // 中键松开
+                case SharpHook.Data.MouseButton.Button4:
+                case SharpHook.Data.MouseButton.Button5:
+                    ProcessXMouseButtonRelease(conditions, conventions, pressDuration);
+                    break; // X鼠标松开
+            }
+        }
+
+        /// <summary>
+        /// 处理中键松开事件
+        /// </summary>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="conventions"> 设置 </param>
+        /// <param name="pressDuration"> 按键按下时间 </param>
+        private void ProcessMiddleMouseButtonRelease(OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        {
+            if (pressDuration.TotalSeconds <= conventions.LongPressThreshold &&
+                conditions.OpenMainWindowByMiddleMouseClick)
+            {
+                CloseOrShowMainWindow(); // 关闭或显示主窗口
+            }
+        }
+
+        /// <summary>
+        /// 处理 X 鼠标按下事件
+        /// </summary>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="conventions"> 设置 </param>
+        /// <param name="pressDuration"> 按键按下时间 </param>
+        private void ProcessXMouseButtonRelease(OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        {
+            if ((conditions.OpenMainWindowByX1MouseClick ||
+                 conditions.OpenMainWindowByX2MouseClick) &&
+                pressDuration.TotalSeconds <= conventions.LongPressThreshold)
+            {
+                CloseOrShowMainWindow(); // 关闭或显示主窗口
+            }
+        }
+
+        /// <summary>
+        /// 处理 Ctrl 按键按下事件
+        /// </summary>
+        /// <param name="keyCode"> 按键代码 </param>
+        /// <param name="conditions"> 设置 </param>
+        private void ProcessControlKeyPress(SharpHook.Data.KeyCode keyCode, OpenMainWindow conditions)
+        {
+            if ((keyCode == SharpHook.Data.KeyCode.VcLeftControl ||
+                 keyCode == SharpHook.Data.KeyCode.VcRightControl) &&
+                (conditions.OpenMainWindowByCtrl_MiddleMouseClick ||
+                 conditions.OpenMainWindowByCtrl_RightMouseClick ||
+                 conditions.OpenMainWindowByCtrl))
+            {
+                PreLoadMainWindow(); // 预加载主窗口
+            }
+
+        }
+
+        /// <summary>
+        /// 处理 Ctrl 按键松开事件
+        /// </summary>
+        /// <param name="keyCode"> 按键代码 </param>
+        /// <param name="conditions"> 设置 </param>
+        /// <param name="conventions"> 设置 </param>
+        /// <param name="pressDuration"> 按键按下时间 </param>
+        private void ProcessControlKeyRelease(SharpHook.Data.KeyCode keyCode, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        {
+            if ((keyCode == SharpHook.Data.KeyCode.VcLeftControl ||
+                 keyCode == SharpHook.Data.KeyCode.VcRightControl) &&
+                conditions.OpenMainWindowByCtrl &&
+                pressDuration.TotalSeconds <= conventions.LongPressThreshold)
+            {
+                CloseOrShowMainWindow(); // 关闭或显示主窗口
+            }
+        }
+
+        // 记录鼠标位置
+        private void RecordMousePosition()
+        {
+            AppStateManager.StartPosition = new System.Windows.Point(
+                System.Windows.Forms.Cursor.Position.X, // 鼠标位置
+                System.Windows.Forms.Cursor.Position.Y // 鼠标位置
+            ); // 记录鼠标位置
+        }
+
+        /// <summary>
+        /// 判断是否全屏禁用Quicker
+        /// </summary>
+        /// <returns> 是否全屏禁用Quicker </returns>
         private bool FullScreenDisable()
         {
-            var blacklistSettings = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllBlacklistSettings().FirstOrDefault()
-                : AppStateManager.BlacklistSettings; // 获取黑名单设置
-            if (!blacklistSettings.IsFullScreenDisabled) return false; // 如果没有启用全屏禁用Quicker，返回false
+            var blacklistSettings = AppStateManager.BlacklistSettings; // 获取设置
+            if (!blacklistSettings.IsFullScreenDisabled) return false; // 如果全屏禁用Quicker，返回
+
             using var windowManager = new WindowManager(); // 创建窗口管理器
-            if (windowManager.IsFullScreen()) // 窗口最大化
-            {
-                string processName = windowManager.GetProcessName(); // 获取进程名
-                var blacklistApplications = AppStateManager.EnableMemoryOptimization
-                    ? SettingDatabase.GetAllBlacklistApplications()
-                    : AppStateManager.BlacklistApplications; // 获取黑名单进程
-                if (blacklistApplications.Count == 0) return true; // 没有黑名单进程，返回true表示Quicker被禁用
-                if (blacklistApplications.Any(p => p.ProcessName == processName && !p.IsInBlacklist)) // 如果进程名在黑名单中
-                    return false; // 返回false表示正常工作
-                return true; // 返回true表示Quicker被禁用
-            }
-            return false; // 返回false表示正常工作
+            if (!windowManager.IsFullScreen()) return false; // 如果窗口不是全屏，返回
+
+            string processName = windowManager.GetProcessName(); // 获取进程名称
+            var blacklistApplications = AppStateManager.BlacklistApplications; // 获取设置
+            
+            if (blacklistApplications.Count == 0) return true;
+            
+            return !blacklistApplications.Any(p => p.ProcessName == processName && !p.IsInBlacklist);
         }
 
-        // 是否禁用Quicker
+        /// <summary>
+        /// 判断是否禁用Quicker
+        /// </summary>
+        /// <returns> 是否禁用Quicker </returns>
         private bool IsBannedFormQuicker()
         {
             using var windowManager = new WindowManager(); // 创建窗口管理器
-            nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
-            if (foregroundWindow == IntPtr.Zero) return false; // 没有前台窗口，返回false
+            nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
+            if (foregroundWindow == IntPtr.Zero) return false; // 如果当前前台窗口为空，返回
 
-            uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
-            Process process = Process.GetProcessById((int)processId); // 获取进程
-            string processName = process.ProcessName; // 获取进程名
+            uint processId = windowManager.GetWindowProcessId(foregroundWindow);
+            string processName = Process.GetProcessById((int)processId).ProcessName;
 
-            var blacklistedProcesses = AppStateManager.EnableMemoryOptimization
-                ? SettingDatabase.GetAllBlacklistApplications()
-                : AppStateManager.BlacklistApplications; // 获取黑名单进程
-            if (blacklistedProcesses.Any(p => p.ProcessName == processName && p.IsInBlacklist)) // 如果进程名在黑名单中
-                return true; // 返回true表示Quicker被禁用
-            return false; // 返回false表示正常工作
+            return AppStateManager.BlacklistApplications
+                .Any(p => p.ProcessName == processName && p.IsInBlacklist); // 如果进程名称在黑名单中，返回
         }
 
-        // 弹出功能面板
+        // 弹出主窗口
         private void ShowMainWindow(object sender, RoutedEventArgs e)
         {
             this.Dispatcher.Invoke(() =>
             {
-                MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+                var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口
                 if (mainWindow == null)
                 {
                     string windowType = DetermineWindowType(); // 确定窗口类型
-                    mainWindow = new MainWindow(windowType); // 创建新的功能面板
-                    var settings = AppStateManager.EnableMemoryOptimization
-                        ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                        : AppStateManager.OpenMainWindowConditions; // 获取设置
+                    mainWindow = new MainWindow(windowType); // 创建主窗口
+                    var settings = AppStateManager.OpenMainWindowConditions; // 获取设置
                     SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                    AppStateManager.Left = (float)mainWindow.Left; // 记录功能面板位置
-                    AppStateManager.Top = (float)mainWindow.Top; // 记录功能面板位置
-                    mainWindow.Show(); // 显示功能面板
+                    AppStateManager.Left = (float)mainWindow.Left; // 记录主窗口位置
+                    AppStateManager.Top = (float)mainWindow.Top; // 记录主窗口位置
+                    mainWindow.Show(); // 显示主窗口
                 }
                 else
                 {
-                    mainWindow.Visibility = Visibility.Visible; // 显示功能面板
+                    mainWindow.Visibility = Visibility.Visible; // 显示主窗口
                     AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
                 }
             });
         }
 
-        // 预加载主窗口
+        /// <summary>
+        /// 预加载主窗口
+        /// </summary>
+        /// <param name="startTimer"> 是否启动计时器 </param>
         public void PreLoadMainWindow(bool startTimer = false)
         {
             this.Dispatcher.Invoke(() =>
@@ -362,36 +537,38 @@ namespace Quicker
                 AppStateManager.KeyPressStartTime = DateTime.Now; // 记录按键按下时间
                 if (startTimer) AppStateManager.PressTimer.Start(); // 启动按键计时器
 
-                ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作窗口打开，则不打开功能面板
-                SettingWindow settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
-                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，则不打开功能面板
+                var actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 获取动作页面管理窗口
+                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作页面管理窗口打开，返回
+
+                var settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 获取设置窗口
+                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，返回
 
                 string windowType = DetermineWindowType(); // 确定窗口类型
-                AppStateManager.PreLoadMainWindow = new MainWindow(windowType); // 创建新的功能面板
+                AppStateManager.PreLoadMainWindow = new MainWindow(windowType); // 创建主窗口
 
-                var settings = AppStateManager.EnableMemoryOptimization
-                    ? SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault()
-                    : AppStateManager.OpenMainWindowConditions; // 获取设置
+                var settings = AppStateManager.OpenMainWindowConditions; // 获取设置
                 SetMainWindowPosition(AppStateManager.PreLoadMainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden; // 隐藏功能面板
-                AppStateManager.Left = (float)AppStateManager.PreLoadMainWindow.Left; // 记录功能面板位置
-                AppStateManager.Top = (float)AppStateManager.PreLoadMainWindow.Top; // 记录功能面板位置
+                AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden; // 隐藏主窗口
+                AppStateManager.Left = (float)AppStateManager.PreLoadMainWindow.Left; // 记录主窗口位置
+                AppStateManager.Top = (float)AppStateManager.PreLoadMainWindow.Top; // 记录主窗口位置
             });
         }
 
-        // 关闭或重新显示主窗口
+        // 关闭或显示主窗口
         public void CloseOrShowMainWindow()
         {
             this.Dispatcher.Invoke(() =>
             {
-                if (AppStateManager.PreLoadMainWindow == null) return; // 如果没有预加载窗口，返回
-                AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示功能面板
+                if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
+                AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示主窗口
                 AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
             });
         }
 
-        // 确定窗口类型
+        /// <summary>
+        /// 确定窗口类型
+        /// </summary>
+        /// <returns> 窗口类型 </returns>
         private string DetermineWindowType()
         {
             if (AppStateManager.Locked)
@@ -404,30 +581,34 @@ namespace Quicker
                 return "Common"; // 鼠标在其他窗口上
         }
 
-        // 设置窗口位置
+        /// <summary>
+        /// 设置主窗口位置
+        /// </summary>
+        /// <param name="mainWindow"> 主窗口 </param>
+        /// <param name="conditions"> 窗口位置 </param>
         private void SetMainWindowPosition(MainWindow mainWindow, int conditions)
         {
             switch (conditions)
             {
                 case 0:
-                    mainWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+                    mainWindow.WindowStartupLocation = WindowStartupLocation.Manual; // 系统默认
                     break; // 系统默认
                 case 1:
-                    mainWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+                    mainWindow.WindowStartupLocation = WindowStartupLocation.Manual; // 鼠标位置
                     mainWindow.Left = System.Windows.Forms.Cursor.Position.X; // 鼠标位置
                     mainWindow.Top = System.Windows.Forms.Cursor.Position.Y; // 鼠标位置
                     break; // 窗口打开位置跟随鼠标
                 case 2:
-                    mainWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    mainWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen; // 屏幕中心
                     break; // 屏幕中心
                 case 3:
-                    mainWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                    mainWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner; // 当前窗口中心
                     break; // 当前窗口中心
                 case 4:
                     if (AppStateManager.Left != null && AppStateManager.Top != null) // 上次弹出位置
                     {
-                        mainWindow.Left = AppStateManager.Left;
-                        mainWindow.Top = AppStateManager.Top;
+                        mainWindow.Left = AppStateManager.Left; // 记录主窗口位置
+                        mainWindow.Top = AppStateManager.Top; // 记录主窗口位置
                     }
                     else
                         mainWindow.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -516,18 +697,36 @@ namespace Quicker
         // 退出应用释放资源
         protected override void OnExit(ExitEventArgs e)
         {
-            taskbarIcon?.Dispose(); // 释放托盘图标
             double currentSessionTime = (DateTime.Now - AppStateManager.RecordedTime).TotalSeconds; // 计算本次会话时间
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
             Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
             SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
-
-            AppStateManager.Dispose(); // 释放数据库资源
-            hook?.Dispose(); // 释放钩子
-
+            DisposeTaskbarIcon(); // 释放托盘图标绑定的事件
+            DisposeHook(); // 释放钩子绑定的事件
+            AppStateManager.Dispose(); // 释放所有资源
             SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
-
             base.OnExit(e); // 调用基类的 OnExit 方法
+        }
+
+        // 释放托盘图标绑定的事件
+        private void DisposeTaskbarIcon()
+        {
+            taskbarIcon.TrayLeftMouseDown -= ShowMainWindow; // 移除左键单击弹出功能面板事件
+            taskbarIcon.TrayRightMouseDown -= ShowCustomMenu; // 移除右键单击弹出菜单栏事件
+            taskbarIcon.TrayMouseDoubleClick -= PauseQuicker; // 移除双击暂停Quicker事件
+            taskbarIcon?.Dispose(); // 释放托盘图标
+            taskbarIcon = null; // 清空托盘图标
+        }
+
+        // 释放钩子绑定的事件
+        private void DisposeHook()
+        {
+            hook.KeyPressed -= Hook_KeyPressed; // 移除按键按下事件处理器
+            hook.KeyReleased -= Hook_KeyReleased; // 移除按键松开事件处理器
+            hook.MousePressed -= Hook_MousePressed; // 移除鼠标按下事件处理器
+            hook.MouseReleased -= Hook_MouseReleased; // 移除鼠标松开事件处理器
+            hook?.Dispose(); // 释放钩子
+            hook = null; // 清空钩子
         }
     }
 }
