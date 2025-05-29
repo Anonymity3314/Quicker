@@ -23,6 +23,11 @@ namespace Quicker.Interface
             try
             {
                 string[] moduleFiles = Directory.GetFiles(modulesDirectory, "*.dll"); // 获取模块文件列表
+                if (moduleFiles.Length == 0)
+                {
+                    toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", "Error"); // 显示消息提醒
+                    return; // 退出
+                }
                 foreach (string moduleFile in moduleFiles)
                 {
                     try
