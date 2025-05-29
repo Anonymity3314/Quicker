@@ -379,7 +379,7 @@ namespace Quicker.Managers
                     catch // 如果失败，发送信息提示
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
+                        toast.Show($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
                     }
                 } // 如果图标路径不为空
 

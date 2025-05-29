@@ -7,6 +7,7 @@ using Quicker.Database;
 using Quicker.Managers;
 using Microsoft.Win32;
 using System.Windows;
+using Quicker.Interface;
 
 namespace Quicker.Windows.Forms
 {
@@ -22,6 +23,9 @@ namespace Quicker.Windows.Forms
         public SettingWindow()
         {
             InitializeComponent(); // 初始化xaml文件
+            string modulesDirectory = "E:\\Program\\QuickerExtension\\bin\\Debug\\net8.0-windows10.0.17763.0";
+            ModuleLoader manager = new(); // 模块加载器
+            manager.LoadModules(modulesDirectory); // 加载模块
         }
 
         // 初始化窗口
@@ -143,13 +147,13 @@ namespace Quicker.Windows.Forms
                 catch
                 {
                     using var toast1 = new ToastManager(); // 消息提醒管理器
-                    toast1.ShowToast("设置应用失败！", "Error"); // 弹出消息提醒
+                    toast1.Show("设置应用失败！", "Error"); // 弹出消息提醒
                 }
 
                 // 显示设置成功通知
                 string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
                 using var toast2 = new ToastManager(); // 消息提醒管理器
-                toast2.ShowToast(message, "Common"); // 弹出消息提醒
+                toast2.Show(message, "Common"); // 弹出消息提醒
             });
         }
 

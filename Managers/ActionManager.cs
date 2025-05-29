@@ -11,6 +11,7 @@ namespace Quicker.Managers
 {
     public class ActionManager : IDisposable
     {
+        private const string tempDir = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\TempData"; // 临时目录
         private bool isDisposed = false; // 是否释放
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
@@ -22,6 +23,9 @@ namespace Quicker.Managers
         /// <param name="data"> 按钮数据 </param>
         public void OpenFile(ButtonData data)
         {
+            if (!Directory.Exists(tempDir)) // 如果临时目录不存在，则创建
+                Directory.CreateDirectory(tempDir);
+
             if (data.Data2 == "true") // 如果尝试打开已存在的窗口
             {
                 string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
@@ -38,11 +42,16 @@ namespace Quicker.Managers
 
                 try
                 {
+                    string fileDirectory = Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
+                        ? Path.GetDirectoryName(GetShortcutTargetPath(data.Location))
+                        : Path.GetDirectoryName(data.Location); // 获取文件所在的目录
+
                     ProcessStartInfo processStartInfo = new ProcessStartInfo
                     {
                         FileName = targetPath, // 设置启动文件路径
                         UseShellExecute = data.Data1 == "True", // 是否使用系统默认方式运行
                         Verb = data.Data1 == "True" ? "runas" : null, // 管理员权限运行
+                        WorkingDirectory = fileDirectory ?? tempDir, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
                         WindowStyle = int.Parse(data.Data3) switch
                         {
                             0 => ProcessWindowStyle.Normal,
@@ -55,16 +64,18 @@ namespace Quicker.Managers
                 catch (Exception ex)
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.ShowToast($"打开失败：{ex}", "Error"); // 弹出消息提醒
+                    toast.Show($"打开失败：{ex}", "Error"); // 弹出消息提醒
                 }
             } // 如果是快捷方式或者可执行文件
             else
             {
                 try
                 {
+                    string fileDirectory = Path.GetDirectoryName(data.Location); // 获取文件所在的目录
                     ProcessStartInfo startInfo = new ProcessStartInfo
                     {
                         FileName = data.Location,
+                        WorkingDirectory = fileDirectory ?? tempDir, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
                         UseShellExecute = true
                     }; // 创建进程启动信息
                     Process.Start(startInfo); // 启动进程
@@ -72,7 +83,7 @@ namespace Quicker.Managers
                 catch (Exception ex)
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.ShowToast($"打开失败：{ex}", "Error"); // 弹出消息提醒
+                    toast.Show($"打开失败：{ex}", "Error"); // 弹出消息提醒
                 }
             } // 使用系统默认方式打开文件
         }
@@ -131,7 +142,7 @@ namespace Quicker.Managers
             catch (Exception ex)
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast($"打开网站失败：{ex.Message}", "Error"); // 弹出消息提醒
+                toast.Show($"打开网站失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
         }
 
@@ -315,7 +326,7 @@ namespace Quicker.Managers
             catch (Exception ex)
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast($"打开UWP应用失败：{ex.Message}", "Error"); // 弹出消息提醒
+                toast.Show($"打开UWP应用失败：{ex.Message}", "Error"); // 弹出消息提醒
             }
         }
 

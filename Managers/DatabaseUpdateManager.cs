@@ -502,7 +502,7 @@ namespace Quicker.Managers
             {
                 transaction.Rollback(); // 回滚事务
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast($"重命名表格{tableName}中的列名失败,请删除数据库", "Error"); // 弹出消息提醒
+                toast.Show($"重命名表格{tableName}中的列名失败,请删除数据库", "Error"); // 弹出消息提醒
             }
         }
 

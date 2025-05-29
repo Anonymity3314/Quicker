@@ -19,7 +19,7 @@ public class AppUpdateManager : IDisposable
         {
             AppStateManager.HasNewVersion = true; // 设置有新版本
             using var toast = new ToastManager(); // 弹窗管理器
-            toast.ShowToast($"发现新版本：{LatestUpdateInfo.NewVersion}", "Common"); // 弹窗提示
+            toast.Show($"发现新版本：{LatestUpdateInfo.NewVersion}", "Common"); // 弹窗提示
         }
     }
 

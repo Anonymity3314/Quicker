@@ -184,7 +184,7 @@ namespace Quicker.Windows.Menus
         {
             var toast = new ToastManager(); // 创建Toast提示
             var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
-            toast.ShowToast($"{fileName} 下载完成", "Success"); // 显示Toast提示
+            toast.Show($"{fileName} 下载完成", "Success"); // 显示Toast提示
             EnableDownloadButton(true); // 启用下载按钮
             var downloadedFileInfo = new FileInfo(_downloadPath); // 获取下载文件信息
             System.Diagnostics.Process.Start("explorer.exe", $"/select, \"{downloadedFileInfo.FullName}\""); // 打开下载目录并选中文件
@@ -207,13 +207,13 @@ namespace Quicker.Windows.Menus
                 if (webEx.Status == WebExceptionStatus.ProtocolError) // 协议错误
                 {
                     var response = webEx.Response as HttpWebResponse; // 获取HttpWebResponse
-                    toast.ShowToast($"服务器返回错误：{(int)response.StatusCode} {response.StatusDescription}", "Error"); // 服务器返回错误
+                    toast.Show($"服务器返回错误：{(int)response.StatusCode} {response.StatusDescription}", "Error"); // 服务器返回错误
                 }
                 else
-                    toast.ShowToast($"网络错误：{webEx.Message}", "Error"); // 网络错误
+                    toast.Show($"网络错误：{webEx.Message}", "Error"); // 网络错误
             }
             else
-                toast.ShowToast($"系统错误：{ex.Message}", "Error"); // 其他错误
+                toast.Show($"系统错误：{ex.Message}", "Error"); // 其他错误
             EnableDownloadButton(true); // 启用下载按钮
         }
 
@@ -266,7 +266,7 @@ namespace Quicker.Windows.Menus
                 catch (Exception ex)
                 {
                     var toast = new ToastManager(); // 创建Toast提示
-                    toast.ShowToast($"删除文件失败：{ex.Message}", "Error"); // 显示Toast提示
+                    toast.Show($"删除文件失败：{ex.Message}", "Error"); // 显示Toast提示
                 }
                 this.Close(); // 关闭窗口
             }

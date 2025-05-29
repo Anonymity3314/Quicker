@@ -750,7 +750,7 @@ namespace Quicker.Windows.Forms
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 弹出消息提醒
+            toast.Show($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮编辑动作页信息
@@ -886,7 +886,7 @@ namespace Quicker.Windows.Forms
                 if (targetSceneData.SceneCount == 10) 
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.ShowToast($"{targetSceneData.SceneName}场景动作页数量已达上限。", "Error"); // 弹出消息提醒
+                    toast.Show($"{targetSceneData.SceneName}场景动作页数量已达上限。", "Error"); // 弹出消息提醒
                 }
                 else
                 {

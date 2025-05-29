@@ -36,7 +36,7 @@ namespace Quicker.Windows.Menus
                 catch
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.ShowToast($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
+                    toast.Show($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
                 }
             }
             CreatTimeLabel.Content = buttonData.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化创建时间

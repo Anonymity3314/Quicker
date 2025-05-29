@@ -16,7 +16,7 @@ namespace Quicker.Interface
             if (!Directory.Exists(modulesDirectory))
             {
                 Directory.CreateDirectory(modulesDirectory); // 创建模块目录
-                toast.ShowToast($"模块目录 {modulesDirectory} 不存在，已创建。", "Error"); // 显示消息提醒
+                toast.Show($"模块目录 {modulesDirectory} 不存在，已创建。", "Error"); // 显示消息提醒
                 return; // 退出
             }
 
@@ -41,13 +41,13 @@ namespace Quicker.Interface
                     }
                     catch (Exception ex)
                     {
-                        toast.ShowToast($"加载模块 {moduleFile} 时出错：{ex.Message}", "Error"); // 显示消息提醒
+                        toast.Show($"加载模块 {moduleFile} 时出错：{ex.Message}", "Error"); // 显示消息提醒
                     }
                 }
             }
             catch (Exception ex)
             {
-                toast.ShowToast($"加载模块时出错：{ex.Message}", "Error"); // 显示消息提醒
+                toast.Show($"加载模块时出错：{ex.Message}", "Error"); // 显示消息提醒
             }
         }
     }
