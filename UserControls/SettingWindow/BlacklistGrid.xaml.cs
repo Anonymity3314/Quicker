@@ -211,7 +211,7 @@ namespace Quicker.UserControls
             if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
+                toast.Show("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
             }
             else
             {

@@ -347,7 +347,7 @@ namespace Quicker.Managers
             catch
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("无效的URI：未能解析主机名。", "Error"); // 弹出消息提醒
+                toast.Show("无效的URI：未能解析主机名。", "Error"); // 弹出消息提醒
                 return ""; // 返回空字符
             }
         }

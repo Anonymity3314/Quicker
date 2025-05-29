@@ -498,7 +498,7 @@ namespace Quicker.Windows.Forms
             if (canvasCount == 10) // 如果画布索引等于9
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("当前场景动作页数量已达上限。", "Error"); // 弹出消息提醒
+                toast.Show("当前场景动作页数量已达上限。", "Error"); // 弹出消息提醒
             }
             else if (canvasCount == 0)
             {
@@ -762,13 +762,13 @@ namespace Quicker.Windows.Forms
                 case "Global":
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
+                        toast.Show("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
                     }
                     break;
                 case "Common":
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
+                        toast.Show("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
                     }
                     break;
                 default:
@@ -787,7 +787,7 @@ namespace Quicker.Windows.Forms
             string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开动作页指令
             Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 弹出消息提醒
+            toast.Show("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮删除动作页
@@ -817,7 +817,7 @@ namespace Quicker.Windows.Forms
         private void AddSceneButton_Click(object sender, RoutedEventArgs e)
         {
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast("功能开发中。", "Common"); // 弹出消息提醒
+            toast.Show("功能开发中。", "Common"); // 弹出消息提醒
         }
 
         // 点击按钮编辑场景
@@ -826,7 +826,7 @@ namespace Quicker.Windows.Forms
             if (new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果是默认场景
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("此项不可编辑。", "Common"); // 弹出消息提醒
+                toast.Show("此项不可编辑。", "Common"); // 弹出消息提醒
             }
             else
             {
@@ -842,7 +842,7 @@ namespace Quicker.Windows.Forms
             if (new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果是默认场景
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("此项不可删除。", "Common"); // 弹出消息提醒
+                toast.Show("此项不可删除。", "Common"); // 弹出消息提醒
             }
             else
             {

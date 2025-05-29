@@ -39,7 +39,7 @@ public class AppUpdateManager : IDisposable
         catch
         {
             using var toast = new ToastManager(); // 弹窗管理器
-            toast.ShowToast("获取更新信息失败！", "Error"); // 弹窗提示
+            toast.Show("获取更新信息失败！", "Error"); // 弹窗提示
         }
     }
 

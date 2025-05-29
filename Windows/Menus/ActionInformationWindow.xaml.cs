@@ -81,7 +81,7 @@ namespace Quicker.Windows.Menus
         {
             Clipboard.SetText(IDTextBlock.Text); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast("动作ID已经写入剪贴板。", "Success"); // 显示复制成功的通知
+            toast.Show("动作ID已经写入剪贴板。", "Success"); // 显示复制成功的通知
         }
 
         // 复制动作信息
@@ -94,7 +94,7 @@ namespace Quicker.Windows.Menus
                                 $"URI:quicker:runaction:{buttonData.Data1}{buttonData.Data2}{buttonData.Data3}"; // 复制的文本内容
             Clipboard.SetText(textToCopy); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast("已复制!", "Common"); // 显示复制成功的通知
+            toast.Show("已复制!", "Common"); // 显示复制成功的通知
         }
 
         // 关闭动作信息窗口

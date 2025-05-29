@@ -64,7 +64,7 @@ namespace Quicker.Windows.Forms
                 else
                 {
                     using var toast = new ToastManager(); // 创建Toast提示
-                    toast.ShowToast("获取更新失败！", "Common"); // 显示Toast提示
+                    toast.Show("获取更新失败！", "Common"); // 显示Toast提示
                 }
             }
             else

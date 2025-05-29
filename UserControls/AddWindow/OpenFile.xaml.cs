@@ -154,7 +154,7 @@ namespace Quicker.UserControls.AddWindow
                     else
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast("图标提取失败!","Error"); // 弹出消息提醒
+                        toast.Show("图标提取失败!","Error"); // 弹出消息提醒
                     }
                 }
             }
@@ -186,7 +186,7 @@ namespace Quicker.UserControls.AddWindow
                     else
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.ShowToast("图标提取失败!","Error"); // 弹出消息提醒
+                        toast.Show("图标提取失败!","Error"); // 弹出消息提醒
                     }
                 }
             }

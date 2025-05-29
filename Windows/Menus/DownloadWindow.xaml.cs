@@ -46,7 +46,7 @@ namespace Quicker.Windows.Menus
             else
             {
                 var toast = new ToastManager(); // 创建Toast提示
-                toast.ShowToast("下载中，请勿重复操作", "Common"); // 显示Toast提示
+                toast.Show("下载中，请勿重复操作", "Common"); // 显示Toast提示
                 _instance.EnableDownloadButton(false); // 通过实例禁用下载按钮
             }
             return _instance; // 返回实例
@@ -195,7 +195,7 @@ namespace Quicker.Windows.Menus
         private void HandleCancellation()
         {
             var toast = new ToastManager(); // 创建Toast提示
-            toast.ShowToast("下载已取消", "Common"); // 显示Toast提示
+            toast.Show("下载已取消", "Common"); // 显示Toast提示
         }
 
         // 处理下载错误

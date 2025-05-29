@@ -273,7 +273,7 @@ namespace Quicker.Windows.Menus
             ButtonData data = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             Clipboard.SetText(data.Title); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast("已复制。", "Success"); // 弹出消息提醒
+            toast.Show("已复制。", "Success"); // 弹出消息提醒
             this.Close(); // 关闭窗口
         }
 
@@ -283,7 +283,7 @@ namespace Quicker.Windows.Menus
             ButtonData data = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             Clipboard.SetText($"{data.ButtonID}"); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.ShowToast("动作ID已复制。", "Success"); // 弹出消息提醒
+            toast.Show("动作ID已复制。", "Success"); // 弹出消息提醒
             this.Close(); // 关闭窗口
         }
 

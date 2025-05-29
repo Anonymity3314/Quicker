@@ -65,7 +65,7 @@ namespace Quicker.Managers
             catch
             {
                 using var toast = new ToastManager(); // 创建 Toast 管理器
-                toast.ShowToast("数据库更新失败，请删除数据库文件后重试。", "Error"); // 显示 Toast 通知
+                toast.Show("数据库更新失败，请删除数据库文件后重试。", "Error"); // 显示 Toast 通知
             }
         }
 
@@ -469,7 +469,7 @@ namespace Quicker.Managers
             catch
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error");
+                toast.Show("数据库迁移失败，请关闭应用后手动将数据库文件从应用目录迁移到目录下的Database文件夹。", "Error");
             }
         }
 
@@ -698,7 +698,7 @@ namespace Quicker.Managers
             catch
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.ShowToast("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒
+                toast.Show("数据库更新失败，该版本的数据库无法更新，请删除数据库后重试。", "Error"); // 弹出消息提醒
             }
         }
 

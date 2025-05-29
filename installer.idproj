@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<installer>
-	<component cid="com.installer.design.configure">
-		<item name="digital_signature" sign_type="2" signtool_type="0" signtool_file="" sign_cert_type="0" sign_cert_file="" sign_cert_pws="123456" sign_cmdline="sign /a /t http://timestamp.sectigo.com" />
-	</component>
-	<component cid="com.installer.design.userdata" />
-</installer>

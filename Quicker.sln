@@ -5,6 +5,10 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quicker", "Quicker.csproj", "{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "..\Setup\Setup.vdproj", "{4D1AC582-8087-5490-FCC2-03CEC5D22547}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickerExtension", "..\QuickerExtension\QuickerExtension.csproj", "{92525A9D-FB18-0079-A6B8-F82CABA29AA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,8 +19,17 @@ Global
 		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Debug|Any CPU.ActiveCfg = Debug
+		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Release|Any CPU.ActiveCfg = Release
+		{92525A9D-FB18-0079-A6B8-F82CABA29AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92525A9D-FB18-0079-A6B8-F82CABA29AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92525A9D-FB18-0079-A6B8-F82CABA29AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92525A9D-FB18-0079-A6B8-F82CABA29AA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94A8D941-A952-4FB4-BD15-A34D71D2CCCA}
 	EndGlobalSection
 EndGlobal

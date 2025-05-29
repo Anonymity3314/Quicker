@@ -122,7 +122,7 @@ namespace Quicker.UserControls
                 if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath); // 创建备份文件夹
                 CopyFolder(sourceFolderPath, backupFolderPath); // 复制文件夹内容到目标路径
                 using var toast = new ToastManager(); // 创建 ToastManager 的实例
-                toast.ShowToast("操作完成！", "Success"); // 显示提示
+                toast.Show("操作完成！", "Success"); // 显示提示
                 OpenFolder(folderPath); // 打开文件夹
             }
         }
@@ -163,7 +163,7 @@ namespace Quicker.UserControls
             catch
             {
                 using var toast = new ToastManager(); // 创建 ToastManager 的实例
-                toast.ShowToast("备份失败！", "Error"); // 显示提示
+                toast.Show("备份失败！", "Error"); // 显示提示
             }
         }
 

@@ -79,8 +79,6 @@
     <None Remove="Resources\Images\OpenMainWindow2.png" />
     <None Remove="Resources\Images\Pause.png" />
     <None Remove="Resources\Images\Pause.png" />
-    <None Remove="Resources\Images\Quicker1.png" />
-    <None Remove="Resources\Images\Quicker1.png" />
     <None Remove="Resources\Images\Quicker2.png" />
     <None Remove="Resources\Images\Quicker2.png" />
     <None Remove="Resources\Images\RestartQuicker.png" />
@@ -233,6 +231,10 @@
 
   <ItemGroup>
     <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="Resources\Images\Quicker1.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

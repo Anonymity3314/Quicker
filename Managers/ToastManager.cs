@@ -10,7 +10,7 @@ namespace Quicker.Managers
         private bool isDisposed = false;
 
         // 添加Toast消息
-        public void ShowToast(string message, string toastType)
+        public void Show(string message, string toastType)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
