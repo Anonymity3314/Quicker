@@ -15,19 +15,22 @@ public class AppUpdateManager : IDisposable
     public void CheckForUpdate()
     {
         ReadJsonFromUrl(); // 读取 JSON 数据
-        if (SettingDatabase.currentVersion != LatestUpdateInfo.NewVersion) // 如果当前版本不等于最新版本
+        using var toast = new ToastManager(); // 弹窗管理器
+        if (LatestUpdateInfo != null)  // 如果有最新版本信息
         {
-            AppStateManager.HasNewVersion = true; // 设置有新版本
-            using var toast = new ToastManager(); // 弹窗管理器
-            toast.Show($"发现新版本：{LatestUpdateInfo.NewVersion}", "Common"); // 弹窗提示
+            if (SettingDatabase.currentVersion != LatestUpdateInfo.NewVersion) // 如果当前版本不等于最新版本
+            {
+                AppStateManager.HasNewVersion = true; // 设置有新版本
+                toast.Show($"发现新版本：{LatestUpdateInfo.NewVersion}", "Common"); // 弹窗提示
+            }
+        }
+        else
+        {
+            toast.Show("获取更新信息失败！", "Error"); // 弹窗提示
         }
     }
 
-    /// <summary>
-    /// 同步读取 JSON 数据
-    /// </summary>
-    /// <param name="url"> JSON 数据的 URL 地址 </param>
-    /// <returns> 解析后的 UpdateInfo 对象 </returns>
+    // 同步读取 JSON 数据
     public void ReadJsonFromUrl()
     {
         try
@@ -36,11 +39,7 @@ public class AppUpdateManager : IDisposable
             string jsonResponse = client.DownloadString(UpdateInfoUrl); // 同步下载 JSON 数据
             LatestUpdateInfo = JsonSerializer.Deserialize<UpdateInfo>(jsonResponse); // 反序列化 JSON 数据
         }
-        catch
-        {
-            using var toast = new ToastManager(); // 弹窗管理器
-            toast.Show("获取更新信息失败！", "Error"); // 弹窗提示
-        }
+        catch { }
     }
 
     // 释放资源
@@ -50,7 +49,10 @@ public class AppUpdateManager : IDisposable
         GC.SuppressFinalize(this); // 告知垃圾回收器不需要调用终结器
     }
 
-    // 释放资源
+    /// <summary>
+    /// 释放资源
+    /// </summary>
+    /// <param name="disposing"> 是否释放托管资源 </param>
     protected virtual void Dispose(bool disposing)
     {
         if (!isDisposed)
