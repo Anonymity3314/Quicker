@@ -1,9 +1,11 @@
 ﻿# 项目简介
+
 这是由作者重构的 WPF 应用Quicker，主要功能包括动作管理、应用状态管理、按钮管理等。
 
 该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
 
 # 声明
+
 本项目为开源项目，作者非计算机专业，项目仍有很多地方需要优化。
 
 项目仍在持续更新中，如有侵权，请联系作者删除。
@@ -11,6 +13,7 @@
 如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
 
 # NuGet 程序包
+
 | 程序包                                 | 说明                              |
 | :-----------------------------------: | :------------------------------: |
 | Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
@@ -19,6 +22,7 @@
 | System.Data.SQLite                    | 提供 SQLite 数据库支持              |
 
 # 文件结构
+
 ```
 Quicker/
 │   App.xaml                                      # 应用入口点
@@ -164,6 +168,7 @@ Quicker/
 ```
 
 # 快速开始指南
+
 克隆项目仓库：https://github.com/Anonymity3314/Quicker.git
 
 安装必要的依赖项，包括上述列出的 NuGet 程序包。
@@ -171,14 +176,17 @@ Quicker/
 打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
 
 # 贡献指南
+
 如果你发现项目中有问题或有改进建议，可以通过提交 Issue 的方式告知作者。
 
 你可以 Fork 项目仓库，在本地进行开发后，通过 Pull Request 的方式提交你的代码贡献。
 
 # 关于扩展
-可以通过创建`WPF类库项目`并添加引用来创建扩展模块，增强应用功能
+
+可以通过创建 `WPF 类库项目` 并添加引用来创建扩展模块，增强应用功能
 
 详情请见 [QuickerExtensions](https://github.com/Anonymity3314/QuickerExtensions "查看Quicker扩展项目")。
 
 # 致谢
+
 感谢为该项目提供参考的 [Quicker 软件](https://getquicker.net/ "访问 Quicker 官方网站")。

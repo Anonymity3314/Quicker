@@ -1,21 +1,16 @@
 ﻿using System.Reflection;
 using Quicker.Managers;
 using System.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Quicker.Extend
 {
     public class ModuleLoader
     {
-        private readonly Dictionary<string, IExtensionModule> _loadedModules = new Dictionary<string, IExtensionModule>();
-        private readonly Dictionary<string, Assembly> _loadedAssemblies = new Dictionary<string, Assembly>();
-        private readonly ToastManager _toast = new ToastManager();
+        private readonly Dictionary<string, IExtensionModule> _loadedModules = new(); // 已加载的模块
+        private readonly Dictionary<string, Assembly> _loadedAssemblies = new(); // 已加载的程序集
+        private readonly ToastManager _toast = new(); // 通知管理器
 
-        /// <summary>
-        /// 获取已加载的模块列表
-        /// </summary>
+        // 获取已加载的模块列表
         public IReadOnlyDictionary<string, IExtensionModule> LoadedModules => _loadedModules;
 
         /// <summary>
@@ -27,7 +22,7 @@ namespace Quicker.Extend
             if (!Directory.Exists(modulesDirectory))
             {
                 Directory.CreateDirectory(modulesDirectory);
-                _toast.Show($"模块目录 {modulesDirectory} 不存在，已创建。", "Info");
+                _toast.Show($"模块目录 {modulesDirectory} 不存在，已创建。", "Common");
                 return;
             }
 
@@ -56,7 +51,7 @@ namespace Quicker.Extend
             string[] moduleFiles = Directory.GetFiles(modulesDirectory, "*.dll");
             if (moduleFiles.Length == 0)
             {
-                _toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", "Info");
+                _toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", "Error");
                 return;
             }
 
@@ -91,7 +86,7 @@ namespace Quicker.Extend
                         {
                             IExtensionModule module = (IExtensionModule)Activator.CreateInstance(type);
                             _loadedModules[module.Name] = module;
-                            _toast.Show($"发现模块：{module.Name} v{module.Version} by {module.Author}", "Info");
+                            _toast.Show($"发现模块：{module.Name} v{module.Version} by {module.Author}", "Common");
                         }
                     }
                 }
@@ -102,16 +97,11 @@ namespace Quicker.Extend
             }
         }
 
-        /// <summary>
-        /// 按依赖关系排序并初始化模块
-        /// </summary>
+        // 按依赖关系排序并初始化模块
         private void InitializeModulesInOrder()
         {
-            // 使用拓扑排序处理依赖关系
-            List<string> sortedModules = SortModulesByDependency();
-            
-            // 按顺序初始化模块
-            foreach (string moduleName in sortedModules)
+            List<string> sortedModules = SortModulesByDependency(); // 按依赖关系排序
+            foreach (string moduleName in sortedModules) // 按顺序初始化模块
             {
                 if (_loadedModules.TryGetValue(moduleName, out IExtensionModule module))
                 {
@@ -138,6 +128,7 @@ namespace Quicker.Extend
         /// <summary>
         /// 使用拓扑排序处理模块依赖关系
         /// </summary>
+        /// <returns> 已排序的模块名称列表 </returns>
         private List<string> SortModulesByDependency()
         {
             Dictionary<string, bool> visited = new Dictionary<string, bool>();
@@ -169,7 +160,7 @@ namespace Quicker.Extend
 
             if (!_loadedModules.ContainsKey(moduleName))
             {
-                _toast.Show($"找不到依赖的模块：{moduleName}", "Warning");
+                _toast.Show($"找不到依赖的模块：{moduleName}", "Error");
                 return;
             }
 
@@ -190,9 +181,7 @@ namespace Quicker.Extend
             sortedModules.Add(moduleName);
         }
 
-        /// <summary>
-        /// 卸载所有模块
-        /// </summary>
+        // 卸载所有模块
         public void UnloadAllModules()
         {
             // 按加载的相反顺序卸载
@@ -201,7 +190,7 @@ namespace Quicker.Extend
                 try
                 {
                     module.Stop();
-                    _toast.Show($"模块 {module.Name} 已停止", "Info");
+                    _toast.Show($"模块 {module.Name} 已停止", "Common");
                 }
                 catch (Exception ex)
                 {
