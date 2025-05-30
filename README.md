@@ -11,7 +11,6 @@
 如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
 
 # NuGet 程序包
-
 | 程序包                                 | 说明                              |
 | :-----------------------------------: | :------------------------------: |
 | Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
@@ -35,6 +34,15 @@ Quicker/
 │   ├─ButtonDatabase.cs                           # 按钮数据库
 │   ├─SettingDatabase.cs                          # 设置数据库
 │   └─TemporaryDatabase.cs                        # 临时数据库
+|
+├─Extend/                                         # 扩展文件夹
+│   ├─IExtensionModule.cs                         # 实现扩展的接口
+│   └─ModuleLoader.cs                             # 扩展模块加载器
+|
+├─InformationData/                                # 信息数据文件夹
+│   ├─Extensions.json                             # 扩展信息
+│   ├─UpdateHistory.txt                           # 更新历史
+│   └─VersionInfo.json                            # 版本信息
 │
 ├─Managers/                                       # 管理器文件夹
 │   ├─ActionManager.cs                            # 动作管理器
@@ -166,6 +174,11 @@ Quicker/
 如果你发现项目中有问题或有改进建议，可以通过提交 Issue 的方式告知作者。
 
 你可以 Fork 项目仓库，在本地进行开发后，通过 Pull Request 的方式提交你的代码贡献。
+
+# 关于扩展
+可以通过创建`WPF类库项目`并添加引用来创建扩展模块，增强应用功能
+
+详情请见 [QuickerExtensions](https://github.com/Anonymity3314/QuickerExtensions "查看Quicker扩展项目")。
 
 # 致谢
 感谢为该项目提供参考的 [Quicker 软件](https://getquicker.net/ "访问 Quicker 官方网站")。
