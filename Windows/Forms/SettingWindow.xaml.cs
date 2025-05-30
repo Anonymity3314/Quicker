@@ -23,9 +23,6 @@ namespace Quicker.Windows.Forms
         public SettingWindow()
         {
             InitializeComponent(); // 初始化xaml文件
-            string modulesDirectory = "E:\\Program\\QuickerExtension\\Backup\\bin\\Debug\\net8.0-windows10.0.17763.0";
-            ModuleLoader manager = new(); // 模块加载器
-            manager.LoadModules(modulesDirectory); // 加载模块
         }
 
         // 初始化窗口

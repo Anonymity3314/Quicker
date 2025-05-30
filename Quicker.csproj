@@ -118,7 +118,7 @@
     <Resource Include="Resources\Images\MessageImage.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="UpdateHistory.txt">
+    <Resource Include="InformationData\UpdateHistory.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

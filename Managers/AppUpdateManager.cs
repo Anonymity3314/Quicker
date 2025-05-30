@@ -7,7 +7,7 @@ using Quicker;
 
 public class AppUpdateManager : IDisposable
 {
-    private const string UpdateInfoUrl = "https://raw.githubusercontent.com/Anonymity3314/Quicker/main/VersionInfo.json"; // 更新信息的 URL 地址
+    private const string UpdateInfoUrl = "https://raw.githubusercontent.com/Anonymity3314/Quicker/main/InfomationData/VersionInfo.json"; // 更新信息的 URL 地址
     public UpdateInfo LatestUpdateInfo { get; private set; } // 最新版本信息
     private bool isDisposed = false; // 是否已释放资源
 

@@ -34,7 +34,7 @@ namespace Quicker.UserControls
         // 打开更新历史文件
         private void OpenUpdateHistory(object sender, MouseButtonEventArgs e)
         {
-            string resourceName = "UpdateHistory.txt"; // 确保资源名称正确
+            string resourceName = "InformationData/UpdateHistory.txt"; // 确保资源名称正确
             Uri resourceUri = new Uri(resourceName, UriKind.Relative); // 构造资源URI
             StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流信息
             using (StreamReader reader = new StreamReader(streamInfo.Stream)) // 读取资源流
