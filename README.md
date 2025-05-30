@@ -183,7 +183,7 @@ Quicker/
 
 # 关于扩展
 
-可以通过创建 `WPF 类库项目` 并添加引用来创建扩展模块，增强应用功能
+可以通过创建 WPF 类库项目 并添加引用来创建扩展模块，增强应用功能
 
 详情请见 [QuickerExtensions](https://github.com/Anonymity3314/QuickerExtensions "查看Quicker扩展项目")。
 

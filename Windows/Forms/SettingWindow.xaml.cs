@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Windows.Shapes;
 using Quicker.UserControls;
 using System.Windows.Input;
-using Quicker.Interface;
 using Quicker.Database;
 using Quicker.Managers;
 using Microsoft.Win32;
