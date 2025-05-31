@@ -54,11 +54,21 @@
                 <Grid>
                     <!--<CheckBox Content="自动激活鼠标位置窗口" HorizontalAlignment="Left" Margin="10,52,0,10" Height="17"/>-->
                     <ComboBox x:Name="WindowStartupLocationComboBox" HorizontalAlignment="Left" Margin="70,14,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectionChanged="ComboBox_SelectionChanged">
-                        <ComboBoxItem Content="系统默认"/>
-                        <ComboBoxItem Content="跟随鼠标"/>
-                        <ComboBoxItem Content="屏幕中心"/>
-                        <ComboBoxItem Content="当前窗口中心"/>
-                        <ComboBoxItem Content="上次弹出位置"/>
+                        <ComboBoxItem>
+                            <TextBlock Text="系统默认" Margin="5,0"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <TextBlock Text="跟随鼠标" Margin="5,0"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <TextBlock Text="屏幕中心" Margin="5,0"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <TextBlock Text="当前窗口中心" Margin="5,0"/>
+                        </ComboBoxItem>
+                        <ComboBoxItem>
+                            <TextBlock Text="上次弹出位置" Margin="5,0"/>
+                        </ComboBoxItem>
                     </ComboBox>
                     <Label Content="弹出位置：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 </Grid>

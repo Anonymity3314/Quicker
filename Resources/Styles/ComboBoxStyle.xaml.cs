@@ -37,7 +37,10 @@ namespace Quicker.Resources.Styles
             }
         }
         
-        // 强制刷新ComboBox显示内容
+        /// <summary>
+        /// 强制刷新ComboBox显示内容
+        /// </summary>
+        /// <param name="comboBox">要刷新的ComboBox</param>
         private void ForceRefreshComboBoxDisplay(ComboBox comboBox)
         {
             if (comboBox == null) return;
@@ -61,18 +64,18 @@ namespace Quicker.Resources.Styles
                 {
                     // 获取当前选中项
                     object selectedItem = comboBox.SelectedItem;
-                    if (selectedItem == null) return;
+                    if (selectedItem == null) return; // 如果选中项为null，放弃更新
                     
                     // 强制更新布局
                     comboBox.InvalidateVisual();
-                    comboBox.UpdateLayout();
+                    comboBox.UpdateLayout(); // 强制更新布局
                     
                     // 获取ToggleButton
                     if (comboBox.Template.FindName("ToggleButton", comboBox) is ToggleButton toggleButton)
                     {
                         // 强制更新ToggleButton
                         toggleButton.InvalidateVisual();
-                        toggleButton.UpdateLayout();
+                        toggleButton.UpdateLayout(); // 强制更新ToggleButton
                     }
                 }
                 catch
@@ -93,6 +96,13 @@ namespace Quicker.Resources.Styles
         // 缓存已克隆的元素，避免重复克隆
         private static readonly ConcurrentDictionary<int, WeakReference> _cloneCache = new ConcurrentDictionary<int, WeakReference>();
 
+        /// <summary>
+        /// 将值转换为克隆后的元素
+        /// </summary>
+        /// <param name="value">要转换的值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
@@ -148,11 +158,15 @@ namespace Quicker.Resources.Styles
                 return CreateTextBlock($"[显示错误: {ex.Message}]"); // 返回显示错误信息的TextBlock
             }
         }
-        
-        // 计算缓存键
+
+        /// <summary>
+        /// 计算缓存键
+        /// </summary>
+        /// <param name="value">要计算的值</param>
+        /// <returns>缓存键</returns>
         private int CalculateCacheKey(object value)
         {
-            if (value == null) return 0;
+            if (value == null) return 0; // 如果值为null，返回0
             
             // 组合类型和HashCode
             int typeHash = value.GetType().GetHashCode();
@@ -161,13 +175,17 @@ namespace Quicker.Resources.Styles
             // 如果是ComboBoxItem，考虑其内容
             if (value is ComboBoxItem comboBoxItem && comboBoxItem.Content != null)
             {
-                valueHash = comboBoxItem.Content.GetHashCode();
+                valueHash = comboBoxItem.Content.GetHashCode(); // 获取内容哈希值
             }
             
-            return typeHash ^ valueHash;
+            return typeHash ^ valueHash; // 返回类型和值的哈希值
         }
         
-        // 创建标准化的TextBlock
+        /// <summary>
+        /// 创建标准化的TextBlock
+        /// </summary>
+        /// <param name="text">要显示的文本</param>
+        /// <returns>TextBlock</returns>
         private TextBlock CreateTextBlock(string text)
         {
             return new TextBlock
@@ -229,7 +247,7 @@ namespace Quicker.Resources.Styles
                         FontWeight = textBlock.FontWeight,
                         Foreground = textBlock.Foreground,
                         VerticalAlignment = VerticalAlignment.Center
-                    };
+                    }; // 返回新的TextBlock
                 }
                 
                 // 使用XamlWriter和XamlReader完整克隆元素

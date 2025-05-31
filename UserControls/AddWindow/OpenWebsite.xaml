@@ -38,15 +38,30 @@
         <Button x:Name="GetWebsiteIconButton" Content="获取网站图标" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="161,45,0,0" VerticalAlignment="Top" Width="85" Height="25" Click="GetWebsiteIconButton_Click"/>
         <Label Margin="116,75,0,0" Content="浏览器" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <ComboBox x:Name="BrowserComboBox" Margin="161,75,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="138" Height="25" SelectedIndex="0" VerticalContentAlignment="Center" SelectionChanged="BrowserComboBox_SelectionChanged">
-            <ComboBoxItem Content="（系统默认浏览器）"/>
-            <ComboBoxItem Content="IE浏览器"/>
-            <ComboBoxItem Content="Edge"/>
-            <ComboBoxItem Content="Edge App模式"/>
-            <ComboBoxItem Content="Edge InPrivate窗口"/>
-            <ComboBoxItem Content="Chorme"/>
-            <ComboBoxItem Content="Chrome App模式"/>
-            <ComboBoxItem Content="Chrome 无痕窗口"/>
-            <ComboBoxItem Content="自定义浏览器程序"/>
+            <ComboBoxItem>
+                <TextBlock Text="(系统默认浏览器)" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="IE浏览器" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="Edge" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="Edge App模式" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="Edge InPrivate窗口" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="Chorme" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="Chrome App模式" Margin="5,0"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <TextBlock Text="Chrome 无痕窗口" Margin="5,0"/>
+            </ComboBoxItem>
         </ComboBox>
         <Grid x:Name="UserControlGrid" Margin="0,105,0,0" Visibility="Collapsed">
             <Label Content="自定义浏览器" HorizontalAlignment="Left" Margin="74,4,0,0" VerticalAlignment="Top"/>
