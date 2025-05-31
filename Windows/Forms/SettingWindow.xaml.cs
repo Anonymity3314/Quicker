@@ -1,12 +1,13 @@
-﻿using System.Windows.Controls;
-using System.ComponentModel;
-using System.Windows.Shapes;
-using Quicker.UserControls;
-using System.Windows.Input;
+﻿using Microsoft.Win32;
 using Quicker.Database;
 using Quicker.Managers;
-using Microsoft.Win32;
+using Quicker.UserControls;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Quicker.Windows.Forms
 {
@@ -40,11 +41,11 @@ namespace Quicker.Windows.Forms
         /// <summary>
         /// 设置成上一次关闭时的状态
         /// </summary>
-        /// <param name="page"> </param>
+        /// <param name="page"> 界面数据 </param>
         private void SetLastPage(int page)
         {
-            LoadPage1(page / 10); // 计算第几组按钮
-            LoadPage2(page % 10); // 计算第几个按钮
+            LoadPage1(page / 100); // 计算第几组按钮
+            LoadPage2(page % 100 / 10); // 计算第几个按钮
         }
 
         /// <summary>
@@ -255,6 +256,11 @@ namespace Quicker.Windows.Forms
             var AboutQuickerGrid = new AboutQuickerGrid(this) { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
             _settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
             ApplySettingsButton.Visibility = Visibility.Collapsed; // 设置ApplySettingsButton可见性
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
+            if (Convention.RememberLastPage && Convention.LastPage % 10 == 2) 
+            {
+                AboutQuickerGrid.Privacy_StatementButton_Click(null, null); // 显示隐私声明
+            }
         }
         // 鼠标移出Button恢复Background
         private void AboutQuicker_MouseLeave(object sender, MouseEventArgs e)
@@ -308,25 +314,57 @@ namespace Quicker.Windows.Forms
             // 检查子元素的类型
             if (childElement is ConventionGrid)
             {
-                lastpage = 11; // 常规设置页面
+                lastpage = 111; // 常规设置页面
             }
             else if (childElement is OpenMainWindowGrid)
             {
-                lastpage = 12; // 弹出面板设置页面
+                lastpage = 121; // 弹出面板设置页面
             }
             else if(childElement is BlacklistGrid)
             {
-                lastpage = 13; // 黑名单设置页面
+                lastpage = 131; // 黑名单设置页面
             }
             else if (childElement is AppearanceGrid)
             {
-                lastpage = 14; // 外观设置页面
+                lastpage = 141; // 外观设置页面
             }
             else if (childElement is AboutQuickerGrid)
             {
-                lastpage = 15; // 关于Quicker页面
+                var grid = FindGridByName(childElement, "Privacy_StatementButtonGrid");
+                if (grid != null && grid.Visibility == Visibility.Visible)
+                {
+                    lastpage = 152;
+                }
+                else if (lastpage == 0)
+                {
+                    lastpage = 151; // 关于Quicker页面
+                }
             }
             SettingDatabase.RecordLastPage(lastpage); // 保存最后打开的页面
+        }
+
+        /// <summary>
+        /// 递归查找名为指定名称的 Grid
+        /// </summary>
+        /// <param name="parent"> 父级元素 </param>
+        /// <param name="name"> Grid 名称 </param>
+        /// <returns> 名为指定名称的 Grid </returns>
+        private Grid FindGridByName(DependencyObject parent, string name)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i); // 获取子元素
+                if (child is Grid grid && grid.Name == name)
+                {
+                    return grid; // 找到 Grid 元素
+                }
+                var result = FindGridByName(child, name); // 递归查找
+                if (result != null)
+                {
+                    return result; // 找到 Grid 元素
+                }
+            }
+            return null; // 没找到 Grid 元素
         }
 
         // 关闭窗口前，释放资源

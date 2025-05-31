@@ -12,6 +12,7 @@ namespace Quicker.UserControls
 {
     public partial class AboutQuickerGrid : UserControl
     {
+        private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\TempData"; // 文件夹路径
         private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
         SettingManager settingManager; // 读取设置的管理器
 
@@ -22,6 +23,7 @@ namespace Quicker.UserControls
             weakSettingWindow = new(settingWindow); // 保存设置窗口
             settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
+            GetTempDataSize(); // 获取临时数据大小
         }
 
         // 基础设置-关于Quicker-关于Quicker
@@ -83,7 +85,7 @@ namespace Quicker.UserControls
         }
 
         // 基础设置-关于Quicker-隐私声明
-        private void Privacy_StatementButton_Click(object sender, RoutedEventArgs e)
+        public void Privacy_StatementButton_Click(object sender, RoutedEventArgs e)
         {
             settingManager.SetGridVisible(Privacy_StatementButtonGrid, MainGrid); // 设置Grid可见性
             settingManager.ButtonStyle3_Click(Privacy_StatementButton, MainGrid); // 保存Button类型3边框设置
@@ -127,7 +129,10 @@ namespace Quicker.UserControls
             }
         }
 
-        // 打开程序文件夹
+        /// <summary>
+        /// 打开程序文件夹
+        /// </summary>
+        /// <param name="folderPath"> 文件夹路径 </param>
         private void OpenFolder(string folderPath)
         {
             if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath); // 创建文件夹
@@ -167,22 +172,75 @@ namespace Quicker.UserControls
             }
         }
 
+        // 获取临时数据大小
+        private async void GetTempDataSize()
+        {
+            TempSize.Text = await GetTempDataSizeAsync();
+        }
+
+        // 获取临时数据大小（异步）
+        public async Task<string> GetTempDataSizeAsync()
+        {
+            if (Directory.Exists(folderPath))
+            {
+                try
+                {
+                    long folderSize = 0;
+                    string folderSizeString = "B"; // 默认单位为字节
+                    DirectoryInfo directoryInfo = new DirectoryInfo(folderPath);
+
+                    // 获取所有文件（包括子文件夹）
+                    var files = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories);
+
+                    // 遍历所有文件并累加大小
+                    foreach (var file in files)
+                    {
+                        folderSize += file.Length;
+                    }
+
+                    // 使用 DataConversionManager 转换数据大小和单位
+                    using var convertionManager = new DataConversionManager();
+                    folderSize = convertionManager.ConversionData((int)folderSize);
+                    folderSizeString = convertionManager.ConversionUnits((int)folderSize);
+
+                    return $"{folderSize}{folderSizeString}";
+                }
+                catch (Exception ex)
+                {
+                    // 记录异常信息
+                    Debug.WriteLine($"获取临时数据大小时出错: {ex.Message}");
+                }
+            }
+            return "0B";
+        }
+
+        // 清理临时数据
+        private void CleanTempDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Directory.Exists(folderPath))
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(folderPath); // 创建 DirectoryInfo 对象
+                foreach (FileInfo file in directoryInfo.GetFiles()) // 遍历并删除所有文件
+                {
+                    file.Delete(); // 删除文件
+                }
+                foreach (DirectoryInfo subDirectory in directoryInfo.GetDirectories()) // 遍历并删除所有子文件夹
+                {
+                    subDirectory.Delete(true); // 递归删除子文件夹
+                }
+            }
+            using var toast = new ToastManager(); // 创建 ToastManager 的实例
+            toast.Show("清理完成！", "Success"); // 显示提示
+        }
+
         // 控件关闭释放资源
         private void AboutQuickerGrid_Unloaded(object sender, RoutedEventArgs e)
         {
             MainGrid.Children.Clear(); // 清理UI元素
 
             // 清理事件处理程序
-            AboutQuickerButton.Click -= AboutQuickerButton_Click;
-            Privacy_StatementButton.Click -= Privacy_StatementButton_Click;
-            UpdateHistory.MouseLeftButtonDown -= OpenUpdateHistory;
-            www_iconfont_cn.MouseLeftButtonDown -= www_iconfont_cn_MouseLeftButtonDown;
-            icons8_com.MouseLeftButtonDown -= icons8_com_MouseLeftButtonDown;
-            fontawesome_com.MouseLeftButtonDown -= fontawesome_com_MouseLeftButtonDown;
-            FeedBack.MouseLeftButtonDown -= FeedBack_MouseLeftButtonDown;
-
             VersionLabel.Content = string.Empty; // 清理文本内容
-            MainGrid.Background = null;
+            TempSize.Text = null; // 清理文本内容
         }
     }
 }

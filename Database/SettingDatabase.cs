@@ -74,7 +74,7 @@ public static class SettingDatabase
     private static void InsertDefaultConventionData()
     {
         using var connection = OpenConnection(); // 打开数据库连接
-        var defaults = (currentVersion, false, true, true, 0.0, false, 300, 50, true, false, 11, true); // 使用参数元组封装默认值
+        var defaults = (currentVersion, false, true, true, 0.0, false, 300, 50, true, false, 111, true); // 使用参数元组封装默认值
         var parameters = new Dictionary<string, object>
         {
             ["@Version"] = defaults.Item1,

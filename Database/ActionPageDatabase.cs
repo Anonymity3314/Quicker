@@ -1,5 +1,6 @@
-﻿using System.Data.SQLite;
+﻿using Quicker.Managers;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 
 namespace Quicker.Database
@@ -47,9 +48,7 @@ namespace Quicker.Database
             transaction.Commit(); // 提交事务
         }
 
-        /// <summary>
-        /// 场景配置数据
-        /// </summary>
+        // 场景配置数据
         private static class SceneConfig
         {
             public static readonly Dictionary<string, (string Process, string ActionPageName, string IconPath, string Tag)> Configs = new()
@@ -385,7 +384,9 @@ namespace Quicker.Database
             using var reader = command.ExecuteReader(); // 执行查询SQL语句
             var sceneTableNames = new List<string>(); // 场景数据表名称
             while (reader.Read()) // 获取所有场景数据表名称
+            {
                 sceneTableNames.Add(reader.GetString(0)); // 添加场景数据表名称
+            }
 
             foreach (var tableName in sceneTableNames)
             {
@@ -521,7 +522,7 @@ namespace Quicker.Database
         /// <param name="tableName"> 动作页数据表名称 </param>
         /// <param name="actionPageIndex"> 动作页索引 </param>
         /// <returns> 动作页大小 </returns>
-        public int GetActionPageSize(string tableName, int actionPageIndex)
+        public string GetActionPageSize(string tableName, int actionPageIndex)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             var buttonDatas = db2.GetPagesOfButtons(tableName, actionPageIndex); // 获取动作页按钮数据
@@ -542,7 +543,10 @@ namespace Quicker.Database
                 size += 8; // LatestEditTime (DateTime)
                 size += 4; // UsedTimes (int)
             }
-            return size; // 返回动作页大小（字节）
+            using var convertion = new DataConversionManager(); // 数据转换管理器
+            size = convertion.ConversionData(size); // 转换数据
+            string sizeString = convertion.ConversionUnits(size); // 转换单位
+            return $"{size} {sizeString}"; // 返回动作页大小
         }
 
         /// <summary>

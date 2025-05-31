@@ -216,6 +216,7 @@ namespace Quicker.Windows.Menus
                 timer.Tick -= Timer_Tick; // 移除计时器事件
             } // 释放所有计时器资源
             timerDictionary.Clear(); // 清空字典
+            ToastStackPanel = null; // 释放ToastStackPanel
             GC.Collect(); // 垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次进行垃圾回收
