@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls;
 using Quicker.Windows.Forms;
 using Quicker.UserControls;
+using System.Windows.Media;
 using Quicker.Managers;
 using System.Windows;
 
@@ -9,6 +10,7 @@ namespace Quicker.UserControls
     public partial class AppearanceGrid : UserControl
     {
         private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
+        private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
         SettingManager settingManager; // 设置管理器
 
         public AppearanceGrid(SettingWindow settingWindow)
@@ -66,6 +68,78 @@ namespace Quicker.UserControls
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             settingManager.CheckBox_Click(sender); // 调用设置管理器的复选框点击事件
+        }
+
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button; // 获取按钮
+            if (button == null) return; // 如果按钮为null，则返回
+
+            // 获取按钮中的SolidColorBrush
+            _currentBrush = null; // 初始化brush为null
+            switch (button.Name)
+            {
+                case "BackgroundColorButton":
+                    _currentBrush = BackgroundColorBrush;
+                    break; // 背景颜色
+                case "ToolbarColorButton":
+                    _currentBrush = ToolbarColorBrush;
+                    break; // 工具栏颜色
+                case "ToolbarIconColorButton":
+                    _currentBrush = ToolbarIconColorBrush;
+                    break; // 工具栏图标颜色
+                case "ActionButtonColorButton":
+                    _currentBrush = ActionButtonColorBrush;
+                    break; // 动作按钮颜色
+                case "ActionButtonMouseOverColorButton":
+                    _currentBrush = ActionButtonMouseOverColorBrush;
+                    break; // 动作按钮鼠标悬停颜色
+                case "BlankButtonColorButton":
+                    _currentBrush = BlankButtonColorBrush;
+                    break; // 空白按钮颜色
+                case "BlankButtonMouseOverColorButton":
+                    _currentBrush = BlankButtonMouseOverColorBrush;
+                    break; // 空白按钮鼠标悬停颜色
+                case "ButtonTextColorButton":
+                    _currentBrush = ButtonTextColorBrush;
+                    break; // 按钮文字颜色
+                case "ActionIconColorButton":
+                    _currentBrush = ActionIconColorBrush;
+                    break; // 动作图标颜色
+                case "TriggerKeyTextColorButton":
+                    _currentBrush = TriggerKeyTextColorBrush;
+                    break; // 触发键文字颜色
+                case "OtherIconColorButton":
+                    _currentBrush = OtherIconColorBrush;
+                    break; // 其他位置图标颜色
+            }
+            if (_currentBrush == null) return; // 如果brush为null，则返回
+            
+            // 设置颜色选择器的初始颜色
+            PopupColorPicker.SelectedColor = _currentBrush.Color;
+            
+            // 设置Popup的位置并打开
+            ColorPickerPopup.PlacementTarget = button;
+            ColorPickerPopup.IsOpen = true;
+        }
+
+        // 处理颜色选择器颜色变化事件
+        private void PopupColorPicker_SelectedColorChanged(object sender, ColorChangedEventArgs e)
+        {
+            if (_currentBrush != null)
+            {
+                // 实时更新按钮颜色
+                _currentBrush.Color = e.NewColor;
+            }
+        }
+
+        // 释放资源
+        private void AppearanceGrid_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // 释放资源
+            settingManager = null; // 释放设置管理器
+            weakSettingWindow = null; // 释放弱引用设置窗口
+            _currentBrush = null; // 释放当前选中的颜色画刷
         }
     }
 }

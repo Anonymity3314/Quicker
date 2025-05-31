@@ -5,14 +5,14 @@
     <!-- MainWindow -->
     <!-- 标题栏Button -->
     <Style x:Key="Task" TargetType="Button">
-        <Setter Property="AllowDrop" Value="True"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="#FFF3F3F3"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="#FFF3F3F3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="AllowDrop" Value="True"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Margin" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -31,13 +31,13 @@
 
     <!-- 标题栏的关闭主面板 Button -->
     <Style x:Key="CloseMainWindowButton" TargetType="Button">
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="#FFF3F3F3"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="#FFF3F3F3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Margin" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -56,16 +56,17 @@
 
     <!-- 主Button-->
     <Style x:Key="Button" TargetType="Button">
-        <Setter Property="Width" Value="77.6"/>
-        <Setter Property="Height" Value="77.6"/>
-        <Setter Property="Tag" Value="{x:Null}"/>
-        <Setter Property="Content" Value="{x:Null}"/>
-        <Setter Property="Background" Value="#F3F3F3"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Background" Value="#F3F3F3"/>
+        <Setter Property="Content" Value="{x:Null}"/>
+        <Setter Property="AllowDrop" Value="True"/>
+        <Setter Property="Tag" Value="{x:Null}"/>
+        <Setter Property="Height" Value="77.6"/>
+        <Setter Property="Width" Value="77.6"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -86,12 +87,13 @@
 
     <!-- 主 Button 中左下角和右下角的Button -->
     <Style x:Key="SpecialButton1" TargetType="Button">
+        <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+        <Setter Property="Background" Value="#F3F3F3"/>
+        <Setter Property="AllowDrop" Value="True"/>
         <Setter Property="Height" Value="77.6"/>
         <Setter Property="Width" Value="77.6"/>
-        <Setter Property="Background" Value="#F3F3F3"/>
-        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-        <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -110,12 +112,13 @@
         </Setter>
     </Style>
     <Style x:Key="SpecialButton2" TargetType="Button">
+        <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+        <Setter Property="Background" Value="#F3F3F3"/>
+        <Setter Property="AllowDrop" Value="True"/>
         <Setter Property="Height" Value="77.6"/>
         <Setter Property="Width" Value="77.6"/>
-        <Setter Property="Background" Value="#F3F3F3"/>
-        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-        <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -155,11 +158,11 @@
     <!-- AddWindow -->
     <!--“选择”Button -->
     <Style x:Key="Select" TargetType="Button">
-        <Setter Property="Width" Value="39"/>
-        <Setter Property="Height" Value="28"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Width" Value="39"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -178,13 +181,13 @@
     
     <!-- “选择图片”的按钮样式 -->
     <Style x:Key="ImageButton" TargetType="Button">
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="Background" Value="White"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -205,9 +208,9 @@
     <!-- SettingWindow -->
     <!-- 侧边栏1的Button -->
     <Style x:Key="Button1" TargetType="Button">
-        <Setter Property="Height" Value="45" />
-        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Height" Value="45" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -228,11 +231,11 @@
     
     <!-- 侧边栏2的Button -->
     <Style x:Key="Button2" TargetType="Button">
-        <Setter Property="Height" Value="38" />
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="Background" Value="{x:Null}" />
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Height" Value="38" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -253,14 +256,14 @@
     
     <!-- 设置菜单的Button -->
     <Style x:Key="Button3" TargetType="Button">
+        <Setter Property="BorderThickness" Value="0,0,0,1.3"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="BorderBrush" Value="#FF326CF3"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Background" Value="{x:Null}" />
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Height" Value="30" />
         <Setter Property="Width" Value="60"/>
-        <Setter Property="BorderBrush" Value="#FF326CF3"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1.3"/>
-        <Setter Property="Background" Value="{x:Null}" />
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -281,13 +284,13 @@
 
     <!-- 移除黑名单进程的Button -->
     <Style x:Key="DeleteBlacklistItem" TargetType="Button">
-        <Setter Property="Width" Value="20"/>
-        <Setter Property="Height" Value="20"/>
-        <Setter Property="Margin" Value="0,0,2,0"/>
-        <Setter Property="BorderBrush" Value="{x:Null}"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="Margin" Value="0,0,2,0"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Width" Value="20"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -308,17 +311,17 @@
     <!-- ActionPageManageWindow -->
     <!-- 动作 Button -->
     <Style x:Key="ActionButton" TargetType="Button">
-        <Setter Property="Width" Value="65"/>
-        <Setter Property="Height" Value="65"/>
-        <Setter Property="FontSize" Value="9"/>
-        <Setter Property="Tag" Value="{x:Null}"/>
-        <Setter Property="Content" Value="{x:Null}"/>
-        <Setter Property="Background" Value="#F3F3F3"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Background" Value="#F3F3F3"/>
+        <Setter Property="Content" Value="{x:Null}"/>
+        <Setter Property="Tag" Value="{x:Null}"/>
+        <Setter Property="FontSize" Value="9"/>
+        <Setter Property="Height" Value="65"/>
+        <Setter Property="Width" Value="65"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -357,11 +360,11 @@
     
     <!-- 添加动作场景的 Button -->
     <Style x:Key="AddSceneButton" TargetType="Button">
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -384,11 +387,11 @@
 
     <!-- 编辑动作场景的 Button -->
     <Style x:Key="EditSceneButton" TargetType="Button">
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -474,13 +477,13 @@
     <!-- ToastWindow -->
     <!-- 关闭 Toast 的 Button -->
     <Style x:Key="CloseToastButton" TargetType="Button">
-        <Setter Property="Width" Value="14"/>
-        <Setter Property="Height" Value="14"/>
-        <Setter Property="Margin" Value="0,6,6,0"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Margin" Value="0,6,6,0"/>
+        <Setter Property="Height" Value="14"/>
+        <Setter Property="Width" Value="14"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -548,12 +551,12 @@
     <!-- 其他 Button -->
     <!-- 蓝色背景圆角Button -->
     <Style x:Key="BlueButton" TargetType="Button">
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -575,11 +578,11 @@
 
     <!-- 白色背景，灰色边框圆角Button -->
     <Style x:Key="WhiteButton" TargetType="Button">
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Margin" Value="0,0,0,0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
