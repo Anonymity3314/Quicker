@@ -8,16 +8,11 @@
     mc:Ignorable="d"
    
     Background="White"
-    d:DesignHeight="345"
-    d:DesignWidth="345"
+    Height="280"
+    Width="245"
 >
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <Border Grid.Row="0" Margin="8,10,35,10" BorderBrush="LightGray" BorderThickness="1">
+        <Border Margin="8,10,0,0" BorderBrush="LightGray" BorderThickness="1" VerticalAlignment="Top" Height="100" HorizontalAlignment="Left" Width="202">
             <Canvas x:Name="ColorCanvas" MouseMove="ColorCanvas_MouseMove" MouseUp="ColorCanvas_MouseUp" MouseDown="ColorCanvas_MouseDown">
                 <!-- 水平渐变：从白色到红色 -->
                 <Rectangle Width="{Binding ActualWidth, ElementName=ColorCanvas}" Height="{Binding ActualHeight, ElementName=ColorCanvas}">
@@ -38,22 +33,14 @@
                     </Rectangle.Fill>
                 </Rectangle>
 
-                
+
                 <!-- 可拖动的圆形 -->
-                <Border x:Name="ColorThumb" 
-                    Width="16"
-                    Height="16" 
-                    Canvas.Left="0" 
-                    Canvas.Top="0"
-                    Background="Transparent"
-                    BorderBrush="White"
-                    BorderThickness="3.5"
-                    CornerRadius="8"/>
+                <Border x:Name="ColorThumb" Width="8" Height="8" Canvas.Left="0" Canvas.Top="0" Background="Transparent" BorderBrush="White" BorderThickness="2.5" CornerRadius="4"/>
             </Canvas>
         </Border>
 
         <!-- 颜色选择器滑块 -->
-        <Slider x:Name="HueSlider" Value="0" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Margin="319,10,10,0" Height="174" ValueChanged="HueSlider_ValueChanged">
+        <Slider x:Name="HueSlider" Value="0" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Height="130" ValueChanged="HueSlider_ValueChanged" HorizontalAlignment="Left" Margin="215,10,0,0">
             <Slider.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
                     <GradientStop Color="#FF0000" />
@@ -67,79 +54,62 @@
             </Slider.Background>
         </Slider>
 
-        <StackPanel Grid.Row="1" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="325">
-            <!-- 颜色预览 -->
-            <Grid Margin="0,0,0,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock Text="颜色预览:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                
-                <Border Grid.Column="1" Height="25" BorderBrush="LightGray" BorderThickness="1">
-                    <Rectangle x:Name="ColorPreview">
-                        <Rectangle.Fill>
-                            <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-                        </Rectangle.Fill>
-                    </Rectangle>
-                </Border>
-            </Grid>
-            
-            <!-- 十六进制颜色值 -->
-            <Grid Margin="0,0,0,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock Text="十六进制:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <TextBox x:Name="HexValue" Text="#FFFFFFFF" Grid.Column="1" TextChanged="HexValue_TextChanged"/>
-            </Grid>
-            
+        <!-- 颜色预览 -->
+        <Border Height="25" BorderBrush="LightGray" BorderThickness="1" Margin="10,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="109">
+            <Rectangle x:Name="ColorPreview">
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Border>
+
+        <!-- 十六进制颜色值 -->
+        <TextBox x:Name="HexValue" Style="{StaticResource RoundedTextBox}" Text="#FFFFFFFF" TextChanged="HexValue_TextChanged" Margin="124,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+        <StackPanel Margin="10,145,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="221">
             <!-- R 值滑块 -->
-            <Grid>
+            <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="144"/>
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="R" VerticalAlignment="Center"/>
+                <TextBlock Text="R" VerticalAlignment="Center" Height="16"/>
                 <Slider x:Name="RedSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                <TextBox x:Name="RedValue" Text="{Binding ElementName=RedSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
+                <TextBox x:Name="RedValue" Text="{Binding ElementName=RedSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- G 值滑块 -->
-            <Grid Margin="0,2,0,0">
+            <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="144"/>
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="G" VerticalAlignment="Center"/>
                 <Slider x:Name="GreenSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                <TextBox x:Name="GreenValue" Text="{Binding ElementName=GreenSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
+                <TextBox x:Name="GreenValue" Text="{Binding ElementName=GreenSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- B 值滑块 -->
-            <Grid Margin="0,2,0,0">
+            <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="144"/>
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="B" VerticalAlignment="Center"/>
                 <Slider x:Name="BlueSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                <TextBox x:Name="BlueValue" Text="{Binding ElementName=BlueSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
+                <TextBox x:Name="BlueValue" Text="{Binding ElementName=BlueSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- A 值滑块 -->
-            <Grid Margin="0,2,0,0">
+            <Grid Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="144"/>
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="A" VerticalAlignment="Center"/>
                 <Slider x:Name="AlphaSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                <TextBox x:Name="AlphaValue" Text="{Binding ElementName=AlphaSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Margin="55,0,-45,0" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
+                <TextBox x:Name="AlphaValue" Text="{Binding ElementName=AlphaSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
         </StackPanel>
     </Grid>
