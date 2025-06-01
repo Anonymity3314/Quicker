@@ -54,6 +54,7 @@ Quicker/
 │   ├─AppUpdateManager.cs                         # 应用更新管理器
 │   ├─ButtonManager.cs                            # 按钮管理器
 │   ├─DatabaseUpdateManager.cs                    # 数据库更新管理器
+│   ├─DataConversionManager.cs                    # 数据转换管理器
 │   ├─IconManager.cs                              # 图标管理器
 │   ├─SettingManager.cs                           # 设置管理器
 │   ├─SingleInstanceManager.cs                    # 互斥锁管理器

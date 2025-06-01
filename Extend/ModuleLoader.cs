@@ -21,21 +21,16 @@ namespace Quicker.Extend
         {
             if (!Directory.Exists(modulesDirectory))
             {
-                Directory.CreateDirectory(modulesDirectory);
+                Directory.CreateDirectory(modulesDirectory); // 创建模块目录
                 _toast.Show($"模块目录 {modulesDirectory} 不存在，已创建。", "Common");
                 return;
             }
 
             try
             {
-                // 第一步：加载所有程序集
-                LoadAllAssemblies(modulesDirectory);
-
-                // 第二步：发现所有模块
-                DiscoverModules();
-
-                // 第三步：按依赖关系排序并初始化模块
-                InitializeModulesInOrder();
+                LoadAllAssemblies(modulesDirectory); // 加载所有程序集
+                DiscoverModules(); // 发现所有模块
+                InitializeModulesInOrder(); // 按依赖关系排序并初始化模块
             }
             catch (Exception ex)
             {
@@ -51,7 +46,7 @@ namespace Quicker.Extend
             string[] moduleFiles = Directory.GetFiles(modulesDirectory, "*.dll");
             if (moduleFiles.Length == 0)
             {
-                _toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", "Error");
+                _toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", "Error"); // 通知用户
                 return;
             }
 
@@ -59,9 +54,9 @@ namespace Quicker.Extend
             {
                 try
                 {
-                    string assemblyName = Path.GetFileNameWithoutExtension(moduleFile);
-                    Assembly moduleAssembly = Assembly.LoadFrom(moduleFile);
-                    _loadedAssemblies[assemblyName] = moduleAssembly;
+                    string assemblyName = Path.GetFileNameWithoutExtension(moduleFile); // 获取程序集名称
+                    Assembly moduleAssembly = Assembly.LoadFrom(moduleFile); // 加载程序集
+                    _loadedAssemblies[assemblyName] = moduleAssembly; // 加入已加载的程序集列表
                 }
                 catch (Exception ex)
                 {
@@ -70,23 +65,20 @@ namespace Quicker.Extend
             }
         }
 
-        /// <summary>
-        /// 发现所有模块
-        /// </summary>
+        // 发现所有模块
         private void DiscoverModules()
         {
-            foreach (var assembly in _loadedAssemblies.Values)
+            foreach (var assembly in _loadedAssemblies.Values) // 遍历所有程序集
             {
                 try
                 {
-                    Type[] types = assembly.GetTypes();
+                    Type[] types = assembly.GetTypes(); // 获取所有类型
                     foreach (Type type in types)
                     {
                         if (typeof(IExtensionModule).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                         {
-                            IExtensionModule module = (IExtensionModule)Activator.CreateInstance(type);
-                            _loadedModules[module.Name] = module;
-                            _toast.Show($"发现模块：{module.Name} v{module.Version} by {module.Author}", "Common");
+                            IExtensionModule module = (IExtensionModule)Activator.CreateInstance(type); // 创建模块实例
+                            _loadedModules[module.Name] = module; // 加入已加载的模块列表
                         }
                     }
                 }
@@ -107,15 +99,12 @@ namespace Quicker.Extend
                 {
                     try
                     {
-                        module.Initialize();
-                        module.Start();
-                        
-                        if (module.HasUI)
+                        module.Initialize(); // 初始化模块
+                        module.Start(); // 启动模块
+                        if (module.HasUI) // 如果模块有UI
                         {
-                            module.ShowWindow();
+                            module.ShowWindow(); // 显示模块UI
                         }
-                        
-                        _toast.Show($"模块 {module.Name} 已成功加载", "Success");
                     }
                     catch (Exception ex)
                     {
@@ -131,54 +120,59 @@ namespace Quicker.Extend
         /// <returns> 已排序的模块名称列表 </returns>
         private List<string> SortModulesByDependency()
         {
-            Dictionary<string, bool> visited = new Dictionary<string, bool>();
-            Dictionary<string, bool> inProgress = new Dictionary<string, bool>();
-            List<string> sortedModules = new List<string>();
-
+            Dictionary<string, bool> visited = new Dictionary<string, bool>(); // 已访问的模块
+            Dictionary<string, bool> inProgress = new Dictionary<string, bool>(); // 正在处理的模块
+            List<string> sortedModules = new List<string>(); // 已排序的模块
             foreach (var moduleName in _loadedModules.Keys)
             {
                 if (!visited.ContainsKey(moduleName))
                 {
-                    VisitModule(moduleName, visited, inProgress, sortedModules);
+                    VisitModule(moduleName, visited, inProgress, sortedModules); // 处理模块
                 }
             }
-
-            return sortedModules;
+            return sortedModules; // 返回已排序的模块名称列表
         }
 
+        /// <summary>
+        /// 处理模块
+        /// </summary>
+        /// <param name="moduleName"> 模块名称 </param>
+        /// <param name="visited"> 已访问的模块 </param>
+        /// <param name="inProgress"> 正在处理的模块 </param>
+        /// <param name="sortedModules"> 已排序的模块 </param>
         private void VisitModule(string moduleName, Dictionary<string, bool> visited, Dictionary<string, bool> inProgress, List<string> sortedModules)
         {
-            if (inProgress.ContainsKey(moduleName) && inProgress[moduleName])
+            if (inProgress.ContainsKey(moduleName) && inProgress[moduleName]) // 如果正在处理
             {
-                throw new Exception($"检测到循环依赖：{moduleName}");
+                throw new Exception($"检测到循环依赖：{moduleName}"); // 循环依赖
             }
 
-            if (visited.ContainsKey(moduleName) && visited[moduleName])
+            if (visited.ContainsKey(moduleName) && visited[moduleName]) // 如果已访问过
             {
-                return;
+                return; // 已访问过
             }
 
-            if (!_loadedModules.ContainsKey(moduleName))
+            if (!_loadedModules.ContainsKey(moduleName)) // 如果找不到模块
             {
-                _toast.Show($"找不到依赖的模块：{moduleName}", "Error");
-                return;
+                _toast.Show($"找不到依赖的模块：{moduleName}", "Error"); // 找不到依赖的模块
+                return; // 退出
             }
 
-            inProgress[moduleName] = true;
+            inProgress[moduleName] = true; // 标记正在处理
 
             // 处理依赖
-            var dependencies = _loadedModules[moduleName].Dependencies;
+            var dependencies = _loadedModules[moduleName].Dependencies; // 获取依赖
             if (dependencies != null)
             {
                 foreach (var dependency in dependencies)
                 {
-                    VisitModule(dependency, visited, inProgress, sortedModules);
+                    VisitModule(dependency, visited, inProgress, sortedModules); // 处理依赖
                 }
             }
 
-            visited[moduleName] = true;
-            inProgress[moduleName] = false;
-            sortedModules.Add(moduleName);
+            visited[moduleName] = true; // 标记已访问
+            inProgress[moduleName] = false; // 标记处理结束
+            sortedModules.Add(moduleName); // 加入已排序的模块列表
         }
 
         // 卸载所有模块
@@ -189,17 +183,15 @@ namespace Quicker.Extend
             {
                 try
                 {
-                    module.Stop();
-                    _toast.Show($"模块 {module.Name} 已停止", "Common");
+                    module.Stop(); // 停止模块
                 }
                 catch (Exception ex)
                 {
-                    _toast.Show($"停止模块 {module.Name} 时出错：{ex.Message}", "Error");
+                    _toast.Show($"停止模块 {module.Name} 时出错：{ex.Message}", "Error"); // 通知用户
                 }
             }
-            
-            _loadedModules.Clear();
-            _loadedAssemblies.Clear();
+            _loadedModules.Clear(); // 清空已加载的模块
+            _loadedAssemblies.Clear(); // 清空已加载的程序集
         }
     }
 }

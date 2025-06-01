@@ -59,7 +59,7 @@
                         <Label Content="颜色" Margin="10,240,494,631" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 颜色-背景 -->
                         <Label Content="背景：" Margin="10,276,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BackgroundColorButton" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="BackgroundColorBrush" Color="#FFFFFFFF"/>
@@ -68,7 +68,7 @@
                         </Button>
                         <!-- 颜色-工具栏 -->
                         <Label Content="工具栏：" Margin="10,302,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ToolbarColorButton" HorizontalAlignment="Left" Margin="167,305,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ToolbarColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,305,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="ToolbarColorBrush" Color="#FFFFFFFF"/>
@@ -77,7 +77,7 @@
                         </Button>
                         <!-- 颜色-工具栏图标 -->
                         <Label Content="工具栏图标：" Margin="10,328,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Button x:Name="ToolbarIconColorButton" HorizontalAlignment="Left" Margin="167,331,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ToolbarIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,331,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="ToolbarIconColorBrush" Color="#FFFFFFFF"/>
@@ -86,7 +86,7 @@
                         </Button>
                         <!-- 颜色-动作按钮 -->
                         <Label Content="动作按钮：" Margin="10,354,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ActionButtonColorButton" HorizontalAlignment="Left" Margin="167,357,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ActionButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,357,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="ActionButtonColorBrush" Color="#FFFFFFFF"/>
@@ -95,7 +95,7 @@
                         </Button>
                         <!-- 颜色-动作按钮鼠标悬浮 -->
                         <Label Content="动作按钮鼠标悬浮：" Margin="10,380,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ActionButtonMouseOverColorButton" HorizontalAlignment="Left" Margin="167,383,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ActionButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,383,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="ActionButtonMouseOverColorBrush" Color="#FFFFFFFF"/>
@@ -104,7 +104,7 @@
                         </Button>
                         <!-- 颜色-空白按钮 -->
                         <Label Content="空白按钮：" Margin="10,406,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonColorButton" HorizontalAlignment="Left" Margin="167,409,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,409,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="BlankButtonColorBrush" Color="#FFFFFFFF"/>
@@ -113,7 +113,7 @@
                         </Button>
                         <!-- 颜色-空白按钮鼠标悬浮 -->
                         <Label Content="空白按钮鼠标悬浮：" Margin="10,432,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonMouseOverColorButton" HorizontalAlignment="Left" Margin="167,435,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,435,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="BlankButtonMouseOverColorBrush" Color="#FFFFFFFF"/>
@@ -122,7 +122,7 @@
                         </Button>
                         <!-- 颜色-按钮文字 -->
                         <Label Content="按钮文字：" Margin="10,458,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ButtonTextColorButton" HorizontalAlignment="Left" Margin="167,461,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ButtonTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,461,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="ButtonTextColorBrush" Color="#FFFFFFFF"/>
@@ -131,7 +131,7 @@
                         </Button>
                         <!-- 颜色-动作矢量图标色 -->
                         <Label Content="动作矢量图标色：" Margin="10,484,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ActionIconColorButton" HorizontalAlignment="Left" Margin="167,487,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ActionIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,487,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="ActionIconColorBrush" Color="#FFFFFFFF"/>
@@ -140,7 +140,7 @@
                         </Button>
                         <!-- 颜色-触发键文字颜色 -->
                         <Label Content="触发键文字颜色：" Margin="10,510,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="TriggerKeyTextColorButton" HorizontalAlignment="Left" Margin="167,513,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="TriggerKeyTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,513,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="TriggerKeyTextColorBrush" Color="#FFFFFFFF"/>
@@ -149,7 +149,7 @@
                         </Button>
                         <!-- 颜色-其他位置矢量图标色 -->
                         <Label Content="其他位置矢量图标色：" Margin="10,536,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left" Width="152"/>
-                        <Button x:Name="OtherIconColorButton" HorizontalAlignment="Left" Margin="167,539,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="OtherIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,539,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="OtherIconColorBrush" Color="#FFFFFFFF"/>

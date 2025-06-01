@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using IWshRuntimeLibrary;
 using System.Diagnostics;
-using Quicker.Windows;
 using Quicker.Database;
 using Microsoft.Win32;
+using Quicker.Windows;
 using System.Windows;
 using System.IO;
 
