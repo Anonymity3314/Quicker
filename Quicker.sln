@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backup", "..\QuickerExtensi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoClicker", "..\QuickerExtensions\AutoClicker\AutoClicker.csproj", "{7169D08E-2C85-EB02-9FD2-90C6560FF972}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instructions", "..\Instructions\Instructions.csproj", "{1B22E382-DB80-4E08-A7C7-6AFA207548B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
