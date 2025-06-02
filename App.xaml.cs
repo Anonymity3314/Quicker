@@ -259,10 +259,14 @@ namespace Quicker
         private bool GetCtrlKeyState()
         {
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
-            this.Dispatcher.Invoke(() =>
+            try
             {
-                isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-            }); // 获取 Ctrl 键状态
+                this.Dispatcher.Invoke(() =>
+                {
+                    isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+                }); // 获取 Ctrl 键状态
+            }
+            catch { }
             return isCtrlPressed; // 返回 Ctrl 键状态
         }
 

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Quicker.Windows;
 using System.Windows;
 using System.Text;
+using System;
 
 namespace Quicker.Managers
 {
@@ -85,6 +86,17 @@ namespace Quicker.Managers
         private const int GWL_STYLE = -20; // 窗口样式
         private const int SM_CXSCREEN = 0; // 屏幕宽度
         private const int SM_CYSCREEN = 1; // 屏幕高度
+
+        [DllImport("user32.dll")]
+        private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowTextLength(IntPtr hWnd);
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
         /// <summary>
         /// 将窗口置顶
@@ -280,10 +292,33 @@ namespace Quicker.Managers
             SetWindowPosition(window, left, top); // 设置窗口位置
         }
 
+        /// <summary>
+        /// 获取当前前台窗口句柄
+        /// </summary>
+        /// <returns> 当前前台窗口句柄 </returns>
+        public IntPtr GetForegroundWindowHandle()
+        {
+            return GetForegroundWindow(); // 获取当前前台窗口句柄
+        }
+
+        /// <summary>
+        /// 获取窗口标题
+        /// </summary>
+        /// <param name="hWnd"> 窗口句柄 </param>
+        /// <returns> 窗口标题 </returns>
+        public string GetWindowTitle(IntPtr hWnd)
+        {
+            int length = GetWindowTextLength(hWnd); // 获取窗口标题长度
+            if (length == 0) return string.Empty; // 如果长度为0，返回空字符串
+            StringBuilder title = new StringBuilder(length + 1); // 创建标题缓冲区
+            GetWindowText(hWnd, title, title.Capacity); // 获取窗口标题
+            return title.ToString(); // 返回窗口标题
+        }
+
         // 释放资源
         public void Dispose()
         {
-            // 释放资源
+            GC.SuppressFinalize(this); // 释放资源
         }
     }
 }

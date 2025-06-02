@@ -19,6 +19,7 @@ namespace Quicker.Windows.MainWindows
         private CancellationTokenSource _cancellationTokenSource = new(); // 取消令牌源,管理异步任务
         public event ApplicationSelectedEventHandler ApplicationSelected; // 选中应用事件
         private ObservableCollection<AppInfo> _allApplications = new(); // 所有应用
+        private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
         private List<AppInfo> _searchResults = new(); // 搜索结果
         private ICollectionView _applicationView; // ICollectionView接口
         private ScrollViewer scrollViewer; // 滚动条
@@ -182,6 +183,59 @@ namespace Quicker.Windows.MainWindows
             OpenFile openFile = addWindow.ActionInfoGrid.Children[0] as OpenFile;
             openFile.ChooseProcess(null, null); // 调用选择进程的方法
         }
+        
+        // 选择窗口按钮点击事件
+        private void SelectWindowButton_Click(object sender, RoutedEventArgs e)
+        {
+            selectWindowWindow = new(); // 创建 SelectWindowWindow 实例
+            selectWindowWindow.WindowSelected += OnWindowSelected; // 订阅 WindowSelected 事件
+            selectWindowWindow.StartSelecting(this); // 开始选择窗口
+        }
+        
+        // 处理选中的窗口
+        private void OnWindowSelected(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.ProcessPath))
+            {
+                try
+                {
+                    // 创建新的AppInfo对象
+                    AppInfo selectedApp = new AppInfo
+                    {
+                        Name = Path.GetFileNameWithoutExtension(e.ProcessPath),
+                        Location = e.ProcessPath,
+                        Tag = e.ProcessPath
+                    };
+                    
+                    // 设置图标 - 直接使用传递过来的图标
+                    if (e.ProcessIcon != null)
+                    {
+                        selectedApp.Icon = e.ProcessIcon;
+                    }
+                    
+                    // 设置为选中的应用
+                    SelectedApp = selectedApp;
+                    
+                    // 触发应用选中事件
+                    ApplicationSelected?.Invoke(this, new ApplicationSelectedEventArgs { SelectedApp = selectedApp });
+                    
+                    // 关闭窗口
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"处理窗口选择时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // 关闭选择窗口
+                    if (selectWindowWindow != null)
+                    {
+                        selectWindowWindow.Close();
+                    }
+                }
+            }
+        }
 
         // 鼠标移入ListView显示滚动条
         private void ShowScrollBar(object sender, System.Windows.Input.MouseEventArgs e)
@@ -293,6 +347,14 @@ namespace Quicker.Windows.MainWindows
         // 关闭窗口前，释放资源
         protected override void OnClosed(EventArgs e)
         {
+            // 取消事件订阅
+            if (selectWindowWindow != null)
+            {
+                selectWindowWindow.WindowSelected -= OnWindowSelected;
+                selectWindowWindow.Close();
+                selectWindowWindow = null;
+            }
+            
             ApplicationSelected = null; // 清理事件
             _applicationView = null; // 清理视图
 

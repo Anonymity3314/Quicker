@@ -1,0 +1,29 @@
+<Window
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    x:Class="Quicker.Windows.ToolWindows.SelectWindowWindow"
+    xmlns:local="clr-namespace:Quicker.Windows.ToolWindows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    mc:Ignorable="d"
+
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="CanMinimize"
+    Height="200"
+    Width="400"
+    Title="选择窗口"
+>
+    <Grid>
+        <TextBlock Text="请将鼠标移动到目标窗口上，然后点击选择按钮" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0"/>
+        <TextBlock Text="或按下Ctrl键进行选择" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,0,0"/>
+        
+        <TextBlock Text="当前窗口：" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,70,0,0"/>
+        <TextBlock x:Name="CurrentWindowTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,70,0,0" Width="280" TextWrapping="Wrap"/>
+        
+        <TextBlock Text="程序路径：" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,100,0,0"/>
+        <TextBlock x:Name="ProcessPathTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="90,100,0,0" Width="280" TextWrapping="Wrap"/>
+        
+        <Button x:Name="SelectButton" Content="选择(S)" HorizontalAlignment="Left" Margin="120,140,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button Content="取消(C)" HorizontalAlignment="Left" Margin="210,140,0,0" VerticalAlignment="Top" Width="75"/>
+    </Grid>
+</Window> 

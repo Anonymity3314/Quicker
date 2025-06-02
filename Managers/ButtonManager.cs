@@ -613,6 +613,7 @@ namespace Quicker.Managers
         /// <param name="window"> 要关闭面板窗口的窗口 </param>
         public void CloseMainWindow(Window window)
         {
+            if (Application.Current == null) return; // 如果当前应用程序不存在，直接返回
             var windowList = Application.Current.Windows.OfType<MainWindow>(); // 查找所有主窗口
             foreach (var w in windowList)
                 w.Close(); // 关闭所有主窗口

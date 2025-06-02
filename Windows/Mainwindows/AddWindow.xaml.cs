@@ -1,5 +1,6 @@
 ﻿using Quicker.UserControls.AddWindow;
 using System.Windows.Media.Imaging;
+using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
@@ -16,6 +17,7 @@ namespace Quicker.Windows.MainWindows
     {
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
+        private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
@@ -202,11 +204,13 @@ namespace Quicker.Windows.MainWindows
                 case 0:
                     OpenFile openFile = (OpenFile)ActionInfoGrid.Children[0]; // 获取 OpenFile 控件
                     openFile.Save(); // 保存打开文件动作
-                    break;
+                    break; // 选择文件
                 case 1:
                     OpenWebsite openWebsite = (OpenWebsite)ActionInfoGrid.Children[0]; // 获取 OpenWebsite 控件
                     openWebsite.Save(); // 保存打开网址动作
-                    break;
+                    break; // 选择网址
+                default:
+                    break; // 其他情况
             }
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
@@ -260,7 +264,7 @@ namespace Quicker.Windows.MainWindows
             ButtonView.ToolTip = string.IsNullOrEmpty(toolTipText) ? null : toolTipText; // 设置按钮提示文本
         }
 
-        // 如果FindAppsWindow存在，则闪烁窗口并响起提示音
+        // 如果FindAppsWindow或SelectWindowWindow存在，则闪烁窗口并响起提示音
         private void AddWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (findAppsWindow != null)
@@ -268,15 +272,78 @@ namespace Quicker.Windows.MainWindows
                 SystemSounds.Beep.Play(); // 播放提示音
                 findAppsWindow.Focus(); // 设置焦点
             }
+            else if (selectWindowWindow != null)
+            {
+                SystemSounds.Beep.Play(); // 播放提示音
+                selectWindowWindow.Focus(); // 设置焦点
+            }
         }
 
         // 选择本地图片
         private void SelectImage(object sender, RoutedEventArgs e)
         {
-            SelectImageWindow selectImageWindow = new SelectImageWindow(); // 创建 SelectImageWindow 实例
+            SelectImageWindow selectImageWindow = new(); // 创建 SelectImageWindow 实例
             selectImageWindow.ImageConfirmed += OnImageConfirmed; // 订阅 ImageConfirmed 事件
             selectImageWindow.Owner = this; // 设置所有者为当前窗口
             selectImageWindow.ShowDialog(); // 显示为模式对话框
+        }
+
+        // 选择窗口
+        private void SelectWindow(object sender, RoutedEventArgs e)
+        {
+            // 检查当前是否为OpenFile控件
+            if (ActionInfoGrid.Children.Count == 0 || !(ActionInfoGrid.Children[0] is OpenFile))
+            {
+                ChoiceComboBox.SelectedIndex = 0; // 切换到OpenFile控件
+            }
+            
+            selectWindowWindow = new(); // 创建 SelectWindowWindow 实例
+            selectWindowWindow.WindowSelected += OnWindowSelected; // 订阅 WindowSelected 事件
+            selectWindowWindow.StartSelecting(this); // 开始选择窗口
+        }
+        
+        // 处理选中的窗口
+        private void OnWindowSelected(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.ProcessPath))
+            {
+                try
+                {
+                    // 更新控件数据
+                    TitleTextBox.Text = Path.GetFileNameWithoutExtension(e.ProcessPath); // 设置标题为进程名
+                    
+                    // 更新OpenFile控件中的路径
+                    if (ActionInfoGrid.Children.Count > 0 && ActionInfoGrid.Children[0] is OpenFile openFile)
+                    {
+                        openFile.LocationTextBox.Text = e.ProcessPath; // 设置路径
+                        
+                        // 启用保存按钮
+                        SaveButton.IsEnabled = true;
+                    }
+                    
+                    // 设置图标
+                    if (e.ProcessIcon != null)
+                    {
+                        ButtonImage.Source = e.ProcessIcon; // 设置图标
+                        ButtonImage.Visibility = Visibility.Visible; // 显示图标
+                    }
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    // 取消事件订阅并关闭选择窗口
+                    if (selectWindowWindow != null)
+                    {
+                        selectWindowWindow.WindowSelected -= OnWindowSelected;
+                        selectWindowWindow.Close();
+                        selectWindowWindow = null;
+                    }
+                }
+            }
+            this.Activate();
         }
 
         // 处理选择的图片
@@ -337,7 +404,14 @@ namespace Quicker.Windows.MainWindows
                 findAppsWindow.ApplicationSelected -= OnApplicationSelected; // 取消事件订阅
                 findAppsWindow = null; // 清理静态引用
             }
-
+            
+            if (selectWindowWindow != null)
+            {
+                selectWindowWindow.WindowSelected -= OnWindowSelected; // 取消事件订阅
+                selectWindowWindow.Close(); // 关闭选择窗口
+                selectWindowWindow = null; // 清理静态引用
+            }
+            
             // 清理控件资源
             if (ButtonImage != null)
             {
