@@ -13,25 +13,47 @@ using System.IO;
 
 namespace Quicker.Managers
 {
+    /// <summary>
+    /// 应用管理器，负责加载和管理应用信息
+    /// </summary>
     public class AppManager
     {
-        private static readonly ConcurrentDictionary<string, ImageSource> iconCache = new(); // 图标缓存
-        private ConcurrentDictionary<string, string> linkTargetCache = new(); // 快捷方式目标路径缓存
-        private ConcurrentDictionary<string, string> fileHashCache = new(); // 文件哈希缓存
-        private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
+        #region 字段和常量
 
-        // 私有构造函数，确保单例模式
+        private static readonly ConcurrentDictionary<string, ImageSource> _iconCache = new(); // 图标缓存
+        private ConcurrentDictionary<string, string> _linkTargetCache = new(); // 快捷方式目标路径缓存
+        private ConcurrentDictionary<string, string> _fileHashCache = new(); // 文件哈希缓存
+        
+        private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
+        private const int MAX_PATH = 260; // 最大路径长度
+        private const int MAX_FOLDER_DEPTH = 2; // 文件夹递归最大深度
+        private const int MAX_FILE_SIZE_FOR_HASH = 1024 * 1024; // 计算哈希的最大文件大小 (1MB)
+
+        #endregion
+
+        #region 构造函数
+
+        // 构造函数
         public AppManager() { }
 
-        // 清除缓存
+        #endregion
+
+        #region 公共方法
+
+        /// <summary>
+        /// 清除所有缓存
+        /// </summary>
         public void ClearCache()
         {
-            iconCache.Clear();
-            linkTargetCache.Clear();
-            fileHashCache.Clear();
+            _iconCache.Clear();
+            _linkTargetCache.Clear();
+            _fileHashCache.Clear();
         }
 
-        // 加载所有应用
+        /// <summary>
+        /// 异步加载所有应用
+        /// </summary>
+        /// <returns>应用信息列表</returns>
         public async Task<List<AppInfo>> LoadAllApplicationsAsync()
         {
             var allApps = new ConcurrentBag<AppInfo>();
@@ -55,6 +77,20 @@ namespace Quicker.Managers
             return allApps.OrderBy(app => app.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
+        /// <summary>
+        /// 清理资源
+        /// </summary>
+        public void Cleanup()
+        {
+            CleanupIconCache();
+            _linkTargetCache?.Clear();
+            _fileHashCache?.Clear();
+        }
+
+        #endregion
+
+        #region 应用加载方法
+
         // 从注册表加载应用路径
         private async Task LoadFromRegistryAsync(ConcurrentBag<AppInfo> appsList)
         {
@@ -62,34 +98,40 @@ namespace Quicker.Managers
             {
                 using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths"))
                 {
-                    if (key != null)
+                    if (key == null) return;
+                    
+                    string[] subKeyNames = key.GetSubKeyNames(); // 获取所有子键名称
+                    
+                    // 创建并行任务来处理每个注册表项
+                    var loadTasks = new List<Task>();
+                    foreach (string subKeyName in subKeyNames)
                     {
-                        string[] subKeyNames = key.GetSubKeyNames(); // 获取所有子键名称
-                        foreach (string subKeyName in subKeyNames)
-                        {
+                        loadTasks.Add(Task.Run(async () => {
                             try
                             {
                                 using (RegistryKey subKey = key.OpenSubKey(subKeyName))
                                 {
-                                    if (subKey != null)
-                                    {
-                                        string path = (string)subKey.GetValue(""); // 获取默认值
-                                        if (!string.IsNullOrEmpty(path))
-                                        {
-                                            // 检查目标文件是否存在
-                                            if (File.Exists(path))
-                                            {
-                                                string appName = Path.GetFileNameWithoutExtension(path); // 获取文件名（去掉扩展名）
-                                                var icon = await GetIconAsync(path);
-                                                appsList.Add(new AppInfo { Name = appName, Location = path, Icon = icon, Tag = path }); // 添加到应用列表
-                                            }
-                                        }
-                                    }
+                                    if (subKey == null) return;
+                                    
+                                    string path = (string)subKey.GetValue(""); // 获取默认值
+                                    if (string.IsNullOrEmpty(path) || !File.Exists(path)) return;
+                                    
+                                    string appName = Path.GetFileNameWithoutExtension(path);
+                                    var icon = await GetIconAsync(path);
+                                    appsList.Add(new AppInfo { 
+                                        Name = appName, 
+                                        Location = path, 
+                                        Icon = icon, 
+                                        Tag = path 
+                                    });
                                 }
                             }
                             catch { } // 忽略单个注册表项的错误
-                        }
+                        }));
                     }
+                    
+                    // 等待所有任务完成
+                    await Task.WhenAll(loadTasks);
                 }
             }
             catch { } // 忽略注册表加载的总体错误
@@ -103,31 +145,50 @@ namespace Quicker.Managers
                 "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs"    // 系统开始菜单程序
             };
 
-            foreach (var path in commonPaths) // 遍历当前路径下的所有文件和2级子文件夹
+            var tasks = new List<Task>();
+            foreach (var path in commonPaths)
             {
-                await EnumerateFilesAsync(path, new[] { ".exe", ".lnk" }, 2, appsList);
-            } // 遍历当前路径下的所有文件和2级子文件夹
+                if (Directory.Exists(path))
+                {
+                    tasks.Add(EnumerateFilesAsync(path, new[] { ".exe", ".lnk" }, MAX_FOLDER_DEPTH, appsList));
+                }
+            }
+            await Task.WhenAll(tasks);
         }
 
-        // 递归遍历至2级文件夹（异步版本）
+        // 递归遍历文件夹（异步版本）
         private async Task EnumerateFilesAsync(string directoryPath, string[] allowedExtensions, int maxDepth, ConcurrentBag<AppInfo> appsList)
         {
             try
             {
+                // 处理当前目录中的文件
+                var fileTasks = new List<Task>();
                 foreach (var file in Directory.EnumerateFiles(directoryPath, "*.*", SearchOption.TopDirectoryOnly))
                 {
                     if (allowedExtensions.Contains(Path.GetExtension(file).ToLower()))
                     {
-                        await LoadApplicationAsync(file, appsList); // 加载单个应用
+                        fileTasks.Add(LoadApplicationAsync(file, appsList));
                     }
                 }
-
+                
+                // 递归处理子目录
                 if (maxDepth > 0)
                 {
+                    var dirTasks = new List<Task>();
                     foreach (var subDir in Directory.EnumerateDirectories(directoryPath, "*", SearchOption.TopDirectoryOnly))
                     {
-                        await EnumerateFilesAsync(subDir, allowedExtensions, maxDepth - 1, appsList); // 递归遍历
+                        dirTasks.Add(EnumerateFilesAsync(subDir, allowedExtensions, maxDepth - 1, appsList));
                     }
+                    
+                    if (dirTasks.Count > 0)
+                    {
+                        await Task.WhenAll(dirTasks);
+                    }
+                }
+                
+                if (fileTasks.Count > 0)
+                {
+                    await Task.WhenAll(fileTasks);
                 }
             }
             catch { } // 忽略异常
@@ -141,14 +202,16 @@ namespace Quicker.Managers
                 string appName;
                 ImageSource icon = null;
                 string location = filePath; // 默认使用文件本身的路径
-                if (Path.GetExtension(filePath).ToLower() == ".lnk") // 解析文件扩展名
+                string extension = Path.GetExtension(filePath).ToLower();
+                
+                if (extension == ".lnk") // 解析快捷方式
                 {
-                    appName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名（去掉 .lnk 扩展）
-                    icon = await Task.Run(() => ShellIconFromLink(filePath)); // 获取快捷方式的图标
+                    appName = Path.GetFileNameWithoutExtension(filePath);
+                    icon = await Task.Run(() => ShellIconFromLink(filePath));
                 }
-                else if (Path.GetExtension(filePath).ToLower() == ".exe")
+                else if (extension == ".exe") // 处理可执行文件
                 {
-                    appName = Path.GetFileNameWithoutExtension(filePath); // .exe 文件直接处理
+                    appName = Path.GetFileNameWithoutExtension(filePath);
                     icon = await GetIconAsync(filePath);
                 }
                 else
@@ -163,18 +226,15 @@ namespace Quicker.Managers
 
                 if (!IsAppAlreadyAdded(appName, location, appsList))
                 {
-                    appsList.Add(new AppInfo { Name = appName, Location = location, Icon = icon, Tag = location }); // 添加到应用列表
+                    appsList.Add(new AppInfo { 
+                        Name = appName, 
+                        Location = location, 
+                        Icon = icon, 
+                        Tag = location 
+                    });
                 }
             }
             catch { } // 忽略异常
-        }
-
-        // 添加应用前检查是否已存在
-        private bool IsAppAlreadyAdded(string appName, string location, ConcurrentBag<AppInfo> appsList)
-        {
-            return appsList.Any(app => 
-                app.Name.Equals(appName, StringComparison.OrdinalIgnoreCase) && 
-                app.Location.Equals(location, StringComparison.OrdinalIgnoreCase));
         }
 
         // 加载应用商店应用
@@ -184,46 +244,53 @@ namespace Quicker.Managers
             {
                 PackageManager packageManager = new(); // 创建包管理器实例
                 var packages = packageManager.FindPackagesForUser(""); // 获取所有包信息
+                
+                var loadTasks = new List<Task>();
+                
                 foreach (var package in packages)
                 {
-                    try
-                    {
-                        if (package.IsFramework || package.IsResourcePackage || package.IsBundle ||
-                            string.IsNullOrWhiteSpace(package.DisplayName) ||
-                            package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase) ||
-                            package.IsDevelopmentMode ||
-                            package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
-                            package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase))
+                    loadTasks.Add(Task.Run(async () => {
+                        try
                         {
-                            continue; // 跳过框架包、资源包、系统组件、没有显示名称或显示名称是包ID、开发模式安装的应用、Microsoft系统应用
-                        }
+                            // 跳过系统组件和不需要的包
+                            if (ShouldSkipPackage(package))
+                            {
+                                return;
+                            }
 
-                        var displayName = package.DisplayName; // 获取显示名称
-                        var packageFamilyName = package.Id.FamilyName; // 获取包ID
-                        
-                        // 构建shell:AppsFolder协议使用的应用标识符
-                        var appFolderID = packageFamilyName + "_" + packageFamilyName.Split('_')[0];
-                        
-                        ImageSource icon = await Task.Run(() => ExtractUWPAppIcon(packageFamilyName)); // 获取应用图标
-                        
-                        appsList.Add(new AppInfo
-                        {
-                            Name = displayName,
-                            Location = appFolderID, // 使用shell:AppsFolder兼容的ID
-                            Icon = icon,
-                            Tag = "[Windows 商店应用]" // 保存包ID
-                        }); // 添加到应用列表
-                    }
-                    catch { } // 忽略单个包的错误
+                            var displayName = package.DisplayName; // 获取显示名称
+                            var packageFamilyName = package.Id.FamilyName; // 获取包ID
+                            
+                            // 构建shell:AppsFolder协议使用的应用标识符
+                            var appFolderID = $"{packageFamilyName}_{packageFamilyName.Split('_')[0]}";
+                            
+                            ImageSource icon = await Task.Run(() => ExtractUWPAppIcon(packageFamilyName));
+                            
+                            appsList.Add(new AppInfo
+                            {
+                                Name = displayName,
+                                Location = appFolderID, // 使用shell:AppsFolder兼容的ID
+                                Icon = icon,
+                                Tag = "[Windows 商店应用]" // 保存包ID
+                            });
+                        }
+                        catch { } // 忽略单个包的错误
+                    }));
                 }
+                
+                await Task.WhenAll(loadTasks);
             }
             catch { } // 忽略异常
         }
 
+        #endregion
+
+        #region 图标处理方法
+
         // 异步加载图标
         private async Task<ImageSource> GetIconAsync(string filePath)
         {
-            if (iconCache.TryGetValue(filePath, out var icon))
+            if (_iconCache.TryGetValue(filePath, out var icon))
             {
                 return icon;
             }
@@ -246,45 +313,16 @@ namespace Quicker.Managers
 
             if (icon != null)
             {
-                iconCache[filePath] = icon;
+                _iconCache[filePath] = icon;
             }
             return icon;
-        }
-
-        // 从快捷方式文件中获取目标路径
-        private string GetTargetPathFromLinkFile(string linkFilePath)
-        {
-            // 检查缓存
-            if (linkTargetCache.TryGetValue(linkFilePath, out var targetPath))
-            {
-                return targetPath; // 如果缓存中有目标路径，直接返回
-            }
-
-            try
-            {
-                IShellLink shellLink = (IShellLink)new ShellLink(); // 创建ShellLink实例
-                shellLink.SetPath(linkFilePath); // 设置快捷方式路径
-
-                StringBuilder path = new StringBuilder(260); // 目标路径缓冲区
-                int flags = 0; // 解析标志
-                shellLink.GetPath(path, path.Capacity, out flags, SLR_NO_UI); // 获取目标路径
-                targetPath = path.ToString(); // 获取目标路径
-
-                // 缓存解析结果
-                linkTargetCache[linkFilePath] = targetPath; // 添加到缓存
-                return targetPath; // 返回目标路径
-            }
-            catch
-            {
-                return null; // 解析失败返回空
-            }
         }
 
         // 获取图标的优化方法
         private ImageSource GetIcon(string filePath)
         {
             string cacheKey = GetCacheKey(filePath); // 文件哈希值作为缓存键           
-            if (iconCache.TryGetValue(cacheKey, out var icon)) // 检查缓存
+            if (_iconCache.TryGetValue(cacheKey, out var icon)) // 检查缓存
             {
                 return icon;
             }
@@ -296,7 +334,7 @@ namespace Quicker.Managers
         {
             // 检查缓存
             string cacheKey = GetCacheKey(linkFilePath);
-            if (iconCache.TryGetValue(cacheKey, out var icon))
+            if (_iconCache.TryGetValue(cacheKey, out var icon))
             {
                 return icon;
             }
@@ -311,7 +349,7 @@ namespace Quicker.Managers
                     icon = ExtractIconFromPath(targetPath);
                     if (icon != null)
                     {
-                        iconCache[cacheKey] = icon;
+                        _iconCache[cacheKey] = icon;
                         return icon;
                     }
                 }
@@ -320,45 +358,12 @@ namespace Quicker.Managers
                 icon = ExtractIconFromPath(linkFilePath);
                 if (icon != null)
                 {
-                    iconCache[cacheKey] = icon;
+                    _iconCache[cacheKey] = icon;
                     return icon;
                 }
             }
             catch { } // 忽略图标加载错误
             return null;
-        }
-
-        // 获取文件的哈希值作为缓存键
-        private string GetCacheKey(string filePath)
-        {           
-            if (fileHashCache.TryGetValue(filePath, out var cacheKey)) // 检查文件是否已缓存
-            {
-                return cacheKey;
-            }
-                       
-            var fileInfo = new FileInfo(filePath); // 获取文件的最后修改时间
-            if (!fileInfo.Exists)
-            {
-                return null;
-            }
-
-            // 如果文件较小，计算哈希值；否则使用文件大小和最后修改时间作为缓存键
-            if (fileInfo.Length < 1024 * 1024)
-            {
-                using (var md5 = MD5.Create())
-                using (var stream = File.OpenRead(filePath))
-                {
-                    byte[] hashBytes = md5.ComputeHash(stream);
-                    cacheKey = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                }
-            } // 小于1MB的文件计算哈希值
-            else
-            {               
-                cacheKey = $"{fileInfo.Length}_{fileInfo.LastWriteTimeUtc.Ticks}";
-            } // 对于较大的文件，使用文件大小和最后修改时间作为缓存键
-
-            fileHashCache[filePath] = cacheKey; // 添加到缓存
-            return cacheKey;
         }
 
         // 从文件路径提取图标
@@ -385,8 +390,8 @@ namespace Quicker.Managers
         /// <summary>
         /// 获取 UWP 应用的图标
         /// </summary>
-        /// <param name="packageFamilyName"> 包名 </param>
-        /// <returns> 图标 </returns>
+        /// <param name="packageFamilyName">包名</param>
+        /// <returns>图标</returns>
         private ImageSource ExtractUWPAppIcon(string packageFamilyName)
         {
             try
@@ -407,10 +412,7 @@ namespace Quicker.Managers
                 if (visualElements == null)
                     return null;
 
-                string iconPath = visualElements.Attribute("Square150x150Logo")?.Value
-                               ?? visualElements.Attribute("Square44x44Logo")?.Value
-                               ?? visualElements.Attribute("Logo")?.Value; // 优先使用 150x150 图标，其次使用 44x44 图标，最后使用 Logo 图标
-
+                string iconPath = GetIconPathFromVisualElements(visualElements);
                 if (string.IsNullOrEmpty(iconPath))
                     return null; // 图标路径为空
 
@@ -426,31 +428,10 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 获取 UWP 应用的安装目录路径
-        /// </summary>
-        /// <param name="packageFamilyName"> 包名 </param>
-        /// <returns> 安装目录路径 </returns>
-        private string GetUWPAppInstallPath(string packageFamilyName)
-        {
-            try
-            {
-                var packageManager = new PackageManager(); // 创建包管理器实例
-                var package = packageManager.FindPackageForUser("", packageFamilyName); // 获取包信息
-                if (package == null)
-                    return null; // 包不存在
-                return package.InstalledLocation.Path; // 获取包的安装目录路径
-            }
-            catch
-            {
-                return null; // 包不存在或其他错误
-            }
-        }
-
-        /// <summary>
         /// 从文件路径加载图标
         /// </summary>
-        /// <param name="filePath"> 文件路径 </param>
-        /// <returns> 图标 </returns>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>图标</returns>
         private ImageSource LoadIconFromPath(string filePath)
         {
             try
@@ -458,24 +439,10 @@ namespace Quicker.Managers
                 // 检查文件是否存在
                 if (!File.Exists(filePath))
                 {
-                    // 尝试查找带有缩放限定符的文件
-                    string directory = Path.GetDirectoryName(filePath);
-                    string fileName = Path.GetFileNameWithoutExtension(filePath);
-                    string extension = Path.GetExtension(filePath);
-                    
-                    // 尝试常见的缩放限定符
-                    foreach (var scale in new[] { ".scale-100", ".scale-200", ".scale-400" })
-                    {
-                        string scaledPath = Path.Combine(directory, fileName + scale + extension);
-                        if (File.Exists(scaledPath))
-                        {
-                            filePath = scaledPath;
-                            break;
-                        }
-                    }
+                    filePath = TryFindScaledIconPath(filePath);
                     
                     // 如果仍然找不到文件，返回null
-                    if (!File.Exists(filePath))
+                    if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                         return null;
                 }
                 
@@ -498,20 +465,86 @@ namespace Quicker.Managers
             }
         }
 
-        // 清理资源
-        public void Cleanup()
+        #endregion
+
+        #region 辅助方法
+
+        // 添加应用前检查是否已存在
+        private bool IsAppAlreadyAdded(string appName, string location, ConcurrentBag<AppInfo> appsList)
         {
-            CleanupIconCache();
-            linkTargetCache?.Clear();
-            fileHashCache?.Clear();
+            return appsList.Any(app => 
+                app.Name.Equals(appName, StringComparison.OrdinalIgnoreCase) && 
+                app.Location.Equals(location, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // 从快捷方式文件中获取目标路径
+        private string GetTargetPathFromLinkFile(string linkFilePath)
+        {
+            // 检查缓存
+            if (_linkTargetCache.TryGetValue(linkFilePath, out var targetPath))
+            {
+                return targetPath; // 如果缓存中有目标路径，直接返回
+            }
+
+            try
+            {
+                IShellLink shellLink = (IShellLink)new ShellLink(); // 创建ShellLink实例
+                shellLink.SetPath(linkFilePath); // 设置快捷方式路径
+
+                StringBuilder path = new StringBuilder(MAX_PATH); // 目标路径缓冲区
+                int flags = 0; // 解析标志
+                shellLink.GetPath(path, path.Capacity, out flags, SLR_NO_UI); // 获取目标路径
+                targetPath = path.ToString(); // 获取目标路径
+
+                // 缓存解析结果
+                _linkTargetCache[linkFilePath] = targetPath; // 添加到缓存
+                return targetPath; // 返回目标路径
+            }
+            catch
+            {
+                return null; // 解析失败返回空
+            }
+        }
+
+        // 获取文件的哈希值作为缓存键
+        private string GetCacheKey(string filePath)
+        {           
+            if (_fileHashCache.TryGetValue(filePath, out var cacheKey)) // 检查文件是否已缓存
+            {
+                return cacheKey;
+            }
+                       
+            var fileInfo = new FileInfo(filePath); // 获取文件的最后修改时间
+            if (!fileInfo.Exists)
+            {
+                return null;
+            }
+
+            // 如果文件较小，计算哈希值；否则使用文件大小和最后修改时间作为缓存键
+            if (fileInfo.Length < MAX_FILE_SIZE_FOR_HASH)
+            {
+                using (var md5 = MD5.Create())
+                using (var stream = File.OpenRead(filePath))
+                {
+                    byte[] hashBytes = md5.ComputeHash(stream);
+                    cacheKey = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                }
+            }
+            else
+            {               
+                cacheKey = $"{fileInfo.Length}_{fileInfo.LastWriteTimeUtc.Ticks}";
+            }
+
+            _fileHashCache[filePath] = cacheKey; // 添加到缓存
+            return cacheKey;
         }
 
         // 清理图标缓存
         private void CleanupIconCache()
         {
-            if (iconCache != null)
+            if (_iconCache != null)
             {
-                foreach (var icon in iconCache.Values)
+                foreach (var icon in _iconCache.Values)
                 {
                     if (icon is IDisposable disposableIcon)
                     {
@@ -522,9 +555,75 @@ namespace Quicker.Managers
                         catch { }
                     }
                 }
-                iconCache.Clear(); // 清空图标缓存
+                _iconCache.Clear(); // 清空图标缓存
             }
         }
+
+        // 判断是否应该跳过此UWP包
+        private bool ShouldSkipPackage(Windows.ApplicationModel.Package package)
+        {
+            return package.IsFramework || 
+                   package.IsResourcePackage || 
+                   package.IsBundle ||
+                   string.IsNullOrWhiteSpace(package.DisplayName) ||
+                   package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase) ||
+                   package.IsDevelopmentMode ||
+                   package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
+                   package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // 从VisualElements中获取图标路径
+        private string GetIconPathFromVisualElements(XElement visualElements)
+        {
+            return visualElements.Attribute("Square150x150Logo")?.Value
+                ?? visualElements.Attribute("Square44x44Logo")?.Value
+                ?? visualElements.Attribute("Logo")?.Value;
+        }
+
+        // 尝试查找带有缩放限定符的图标文件
+        private string TryFindScaledIconPath(string filePath)
+        {
+            string directory = Path.GetDirectoryName(filePath);
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            string extension = Path.GetExtension(filePath);
+            
+            // 尝试常见的缩放限定符
+            foreach (var scale in new[] { ".scale-100", ".scale-200", ".scale-400" })
+            {
+                string scaledPath = Path.Combine(directory, fileName + scale + extension);
+                if (File.Exists(scaledPath))
+                {
+                    return scaledPath;
+                }
+            }
+            
+            return null;
+        }
+
+        /// <summary>
+        /// 获取 UWP 应用的安装目录路径
+        /// </summary>
+        /// <param name="packageFamilyName">包名</param>
+        /// <returns>安装目录路径</returns>
+        private string GetUWPAppInstallPath(string packageFamilyName)
+        {
+            try
+            {
+                var packageManager = new PackageManager(); // 创建包管理器实例
+                var package = packageManager.FindPackageForUser("", packageFamilyName); // 获取包信息
+                if (package == null)
+                    return null; // 包不存在
+                return package.InstalledLocation.Path; // 获取包的安装目录路径
+            }
+            catch
+            {
+                return null; // 包不存在或其他错误
+            }
+        }
+
+        #endregion
+
+        #region COM接口定义
 
         // 操作Windows快捷方式(.lnk文件)
         [ComImport]
@@ -576,17 +675,40 @@ namespace Quicker.Managers
         [ClassInterface(ClassInterfaceType.None)]
         [ProgId("Shell.Application")]
         public class ShellLink { }
+
+        #endregion
     }
 
-    // 定义应用信息类
+    /// <summary>
+    /// 应用信息类，存储应用的基本信息
+    /// </summary>
     public class AppInfo
     {
-        public string Name { get; set; } // 应用名称
-        public string Location { get; set; } // 应用路径
-        public ImageSource Icon { get; set; } // 应用图标
-        public string Tag { get; set; } // 自定义数据
+        #region 属性
+
+        /// <summary>
+        /// 应用名称
+        /// </summary>
+        public string Name { get; set; }
         
-        // 获取应用名称的首字母，用于分组
+        /// <summary>
+        /// 应用路径
+        /// </summary>
+        public string Location { get; set; }
+        
+        /// <summary>
+        /// 应用图标
+        /// </summary>
+        public ImageSource Icon { get; set; }
+        
+        /// <summary>
+        /// 自定义数据
+        /// </summary>
+        public string Tag { get; set; }
+        
+        /// <summary>
+        /// 获取应用名称的首字母，用于分组
+        /// </summary>
         public string FirstLetter
         {
             get
@@ -601,5 +723,7 @@ namespace Quicker.Managers
                     return "#";
             }
         }
+
+        #endregion
     }
 } 

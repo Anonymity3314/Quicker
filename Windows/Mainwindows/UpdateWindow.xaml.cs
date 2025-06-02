@@ -9,126 +9,204 @@ using System.IO;
 
 namespace Quicker.Windows.MainWindows
 {
+    /// <summary>
+    /// UpdateWindow 窗口用于检查和下载软件更新
+    /// </summary>
     public partial class UpdateWindow : Window
     {
-        private string downloadUrl; // 下载地址
+        #region 字段
+
+        private const string _releaseUrl = "https://github.com/Anonymity3314/Quicker/releases"; // 发布页面地址
+        private string _downloadUrl; // 下载地址
+
+        #endregion
+
+        #region 构造函数
 
         public UpdateWindow()
         {
             InitializeComponent();
             CheckNewVersion(); // 检查新版本
-            this.Activate(); // 激活窗口
+            Activate(); // 激活窗口
         }
 
-        // 点击按钮关闭窗口
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close(); // 关闭窗口
-        }
+        #endregion
 
-        // 点击按钮下载
-        private void DownloadButton_Click(object sender, RoutedEventArgs e)
-        {
-            using var folderDialog = new FolderBrowserDialog() { Description = "选择下载路径" }; // 创建文件夹对话框
-            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                var toast = new ToastManager(); // 创建Toast提示
-                var fileName = Path.GetFileName(new Uri(downloadUrl).AbsolutePath); // 获取文件名
-                string destinationPath = Path.Combine(folderDialog.SelectedPath, fileName); // 保存路径
-                var downloadWindow = DownloadWindow.GetInstance(downloadUrl, destinationPath); // 创建下载窗口
-                downloadWindow.Show(); // 确保调用 Show 方法显示窗口
-            }
-        }
+        #region 事件处理
 
-        // 前往下载地址查看详细信息
-        private void LatestVersionTextBlock_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            using var actionManager = new ActionManager(); // 创建动作管理器
-            actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker/releases"); // 打开下载地址
-        }
-
-        // 获取更新信息
+        // 窗口加载时获取更新信息
         private void UpdateWindow_Loaded(object sender, RoutedEventArgs e)
         {
             VersionTextBlock.Text = $"当前版本：{SettingDatabase.currentVersion}"; // 显示当前版本号
         }
 
-        // 检查新版本
-        private void CheckNewVersion()
+        // 点击按钮关闭窗口
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (AppStateManager.HasNewVersion)
-            {
-                using var updateManager = new AppUpdateManager(); // 创建更新管理器
-                updateManager.ReadJsonFromUrl(); // 读取更新信息
-                if (updateManager.LatestUpdateInfo != null)
-                    LoadUpdateInfo(updateManager.LatestUpdateInfo); // 加载更新信息
-                else
-                {
-                    using var toast = new ToastManager(); // 创建Toast提示
-                    toast.Show("获取更新失败！", "Common"); // 显示Toast提示
-                }
-            }
-            else
-            {
-                TitleTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF7D4D")); // 显示标题颜色
-                LatestVersionTextBlock1.Text = SettingDatabase.currentVersion; // 显示当前版本号
-                LatestVersionTextBlock1.FontWeight = FontWeights.Normal; // 显示最新版本号
-                DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
-                TitleTextBlock.Text = "暂无新版本。"; // 显示标题
-                LineRectangle.Width = 350; // 调整分界线宽度
-                this.LocateCenter(); // 窗口居中
-                this.Height = 266; // 隐藏更新信息
-                this.Width = 400; // 调整窗口大小
-            }
+            Close(); // 关闭窗口
         }
 
-        // 窗口居中
-        private void LocateCenter()
+        // 点击按钮下载
+        private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight; // 获取屏幕高度
-            double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth; // 获取屏幕宽度
-            double windowHeight = this.Height; // 获取窗口高度
-            double windowWidth = this.Width; // 获取窗口宽度
-            this.Left = (screenWidth / 2) - (windowWidth / 2); // 窗口居中
-            this.Top = (screenHeight / 2) - (windowHeight / 2); // 窗口居中
+            SelectDownloadLocation();
         }
 
-        /// <summary>
-        /// 加载更新信息
-        /// </summary>
-        /// <param name="updateInfo"> 更新信息 </param>
-        private void LoadUpdateInfo(UpdateInfo updateInfo)
+        // 前往下载地址查看详细信息
+        private void LatestVersionTextBlock_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            downloadUrl = updateInfo.DownloadUrl; // 获取下载地址
-            string newVersion = updateInfo.NewVersion; // 最新版本号
-            int count = updateInfo.Changelog.Count(c => c == '~'); // 获取更新内容的行数
-            LatestVersionTextBlock1.Text = newVersion; // 显示最新版本号
-            LatestVersionTextBlock2.Text = newVersion; // 显示最新版本号
-            VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
-            UpdateDateTextBlock.Text = updateInfo.ReleaseDate; // 显示更新日期
-            UpdateInfoTextBlock.Text = updateInfo.Changelog; // 显示更新内容
-            UpdateInfoGrid.Height += count * 18; // 设置更新内容的高度
-            UpdateInfoBorder.Height += count * 18; // 设置更新内容的高度
+            OpenReleaseWebPage();
         }
 
         // 窗口关闭清理资源
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类方法
-
-            downloadUrl = null; // 清理下载地址
-
-            VersionTextBlock.Text = null; // 清理版本号
-            LatestVersionTextBlock1.Text = null; // 清理最新版本号
-            LatestVersionTextBlock2.Text = null; // 清理最新版本号
-            VersionChangeTextBlock.Text = null; // 清理版本号变更
-            UpdateDateTextBlock.Text = null; // 清理更新日期
-            UpdateInfoTextBlock.Text = null; // 清理更新内容
-
-            this.Content = null;
-            this.DataContext = null; // 清理数据绑定
-
-            GC.Collect(); // 回收资源
+            CleanupResources();
         }
+
+        #endregion
+
+        #region 业务逻辑
+
+        // 检查新版本
+        private void CheckNewVersion()
+        {
+            if (AppStateManager.HasNewVersion)
+            {
+                LoadLatestVersionInfo();
+            }
+            else
+            {
+                DisplayNoUpdateAvailable();
+            }
+        }
+
+        // 加载最新版本信息
+        private void LoadLatestVersionInfo()
+        {
+            using var updateManager = new AppUpdateManager(); // 创建更新管理器
+            updateManager.ReadJsonFromUrl(); // 读取更新信息
+            
+            if (updateManager.LatestUpdateInfo != null)
+            {
+                LoadUpdateInfo(updateManager.LatestUpdateInfo); // 加载更新信息
+            }
+            else
+            {
+                ShowUpdateFailedMessage();
+            }
+        }
+
+        // 显示更新失败消息
+        private void ShowUpdateFailedMessage()
+        {
+            using var toast = new ToastManager(); // 创建Toast提示
+            toast.Show("获取更新失败！", "Common"); // 显示Toast提示
+        }
+
+        // 显示无更新可用信息
+        private void DisplayNoUpdateAvailable()
+        {
+            // 更新UI显示
+            TitleTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF7D4D")); // 设置标题颜色
+            LatestVersionTextBlock1.Text = SettingDatabase.currentVersion; // 显示当前版本号
+            LatestVersionTextBlock1.FontWeight = FontWeights.Normal; // 设置字体粗细
+            DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
+            TitleTextBlock.Text = "暂无新版本。"; // 更新标题文本
+            LineRectangle.Width = 350; // 调整分界线宽度
+            
+            // 调整窗口大小和位置
+            Height = 266; // 设置窗口高度
+            Width = 400; // 设置窗口宽度
+            LocateCenter(); // 窗口居中
+        }
+
+        /// <summary>
+        /// 加载更新信息
+        /// </summary>
+        /// <param name="updateInfo">更新信息</param>
+        private void LoadUpdateInfo(UpdateInfo updateInfo)
+        {
+            _downloadUrl = updateInfo.DownloadUrl; // 保存下载地址
+            string newVersion = updateInfo.NewVersion; // 获取最新版本号
+            
+            // 计算更新内容的行数并调整UI
+            int changelogLineCount = updateInfo.Changelog.Count(c => c == '~');
+            
+            // 更新UI显示
+            LatestVersionTextBlock1.Text = newVersion; // 显示最新版本号
+            LatestVersionTextBlock2.Text = newVersion; // 显示最新版本号
+            VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
+            UpdateDateTextBlock.Text = updateInfo.ReleaseDate; // 显示更新日期
+            UpdateInfoTextBlock.Text = updateInfo.Changelog; // 显示更新内容
+            
+            // 调整UI元素高度
+            UpdateInfoGrid.Height += changelogLineCount * 18; // 设置更新内容的高度
+            UpdateInfoBorder.Height += changelogLineCount * 18; // 设置更新内容的高度
+        }
+
+        // 选择下载位置
+        private void SelectDownloadLocation()
+        {
+            using var folderDialog = new FolderBrowserDialog() { Description = "选择下载路径" }; // 创建文件夹对话框
+            
+            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
+                string destinationPath = Path.Combine(folderDialog.SelectedPath, fileName); // 构建保存路径
+                
+                // 创建并显示下载窗口
+                var downloadWindow = DownloadWindow.GetInstance(_downloadUrl, destinationPath);
+                downloadWindow.Show();
+            }
+        }
+
+        // 打开发布页面
+        private void OpenReleaseWebPage()
+        {
+            using var actionManager = new ActionManager(); // 创建动作管理器
+            actionManager.LaunchDefaultBrowser(_releaseUrl); // 打开下载地址
+        }
+
+        #endregion
+
+        #region 辅助方法
+
+        // 窗口居中
+        private void LocateCenter()
+        {
+            double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight; // 获取屏幕高度
+            double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth; // 获取屏幕宽度
+            double windowHeight = Height; // 获取窗口高度
+            double windowWidth = Width; // 获取窗口宽度
+            
+            Left = (screenWidth / 2) - (windowWidth / 2); // 计算水平居中位置
+            Top = (screenHeight / 2) - (windowHeight / 2); // 计算垂直居中位置
+        }
+
+        // 清理资源
+        private void CleanupResources()
+        {
+            // 清理字段
+            _downloadUrl = null;
+
+            // 清理UI元素引用
+            VersionTextBlock.Text = null;
+            LatestVersionTextBlock1.Text = null;
+            LatestVersionTextBlock2.Text = null;
+            VersionChangeTextBlock.Text = null;
+            UpdateDateTextBlock.Text = null;
+            UpdateInfoTextBlock.Text = null;
+
+            // 清理数据绑定
+            Content = null;
+            DataContext = null;
+
+            // 强制垃圾回收
+            GC.Collect();
+        }
+
+        #endregion
     }
 }
