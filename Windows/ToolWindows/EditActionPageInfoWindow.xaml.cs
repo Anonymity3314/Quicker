@@ -1,4 +1,4 @@
-﻿using Quicker.Windows.Forms;
+﻿using Quicker.Windows.MainWindows;
 using Quicker.Database;
 using System.Windows;
 

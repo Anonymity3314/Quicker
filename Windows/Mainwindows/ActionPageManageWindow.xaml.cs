@@ -1,9 +1,5 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
-<<<<<<<< HEAD:Windows/Mainwindows/ActionPageManageWindow.xaml.cs
-using Quicker.Windows.EditWindows;
-========
->>>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d:Windows/MainWindows/ActionPageManageWindow.xaml.cs
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;

@@ -8,8 +8,8 @@
 
 该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
 
-- [扩展/插件仓库](https://github.com/LJZ-Anonymity/Extensions)
-- [使用说明/文档](https://github.com/LJZ-Anonymity/Instructions)
+- [扩展/插件仓库](https://github.com/LJZ-Anonymity/Extensions "查看Quicker扩展项目")
+- [使用说明/文档](https://github.com/LJZ-Anonymity/Instructions "查看Quicker说明项目")
 
 ## 功能特点
 

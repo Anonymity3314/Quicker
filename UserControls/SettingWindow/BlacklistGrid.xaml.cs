@@ -1,11 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
-<<<<<<< HEAD
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
-=======
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using System.Windows.Forms;

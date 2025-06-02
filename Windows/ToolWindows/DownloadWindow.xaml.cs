@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 ﻿using Quicker.Windows.MainWindows;
 using System.Windows.Threading;
-=======
-﻿using System.Windows.Threading;
-using Quicker.Windows.Forms;
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
 using System.ComponentModel;
 using Quicker.Managers;
 using System.Net.Http;

@@ -1,13 +1,8 @@
 ﻿<Window
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-<<<<<<< HEAD
     x:Class="Quicker.Windows.ToolWindows.ActionInformationWindow"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-=======
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    x:Class="Quicker.Windows.ToolWindows.ActionInformationWindow"
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
     xmlns:local="clr-namespace:Quicker.Windows.ToolWindows"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     mc:Ignorable="d"

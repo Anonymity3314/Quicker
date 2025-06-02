@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoClicker", "..\Extension
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backup", "..\Extensions\Backup\Backup.csproj", "{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quicker", "Quicker.csproj", "{8FC9CC97-BBA3-A96C-801D-D2E012CB00B7}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "..\Setup\Setup.vdproj", "{4D1AC582-8087-5490-FCC2-03CEC5D22547}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FC9CC97-BBA3-A96C-801D-D2E012CB00B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FC9CC97-BBA3-A96C-801D-D2E012CB00B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FC9CC97-BBA3-A96C-801D-D2E012CB00B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FC9CC97-BBA3-A96C-801D-D2E012CB00B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Debug|Any CPU.ActiveCfg = Debug
+		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Debug|Any CPU.Build.0 = Debug
+		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Release|Any CPU.ActiveCfg = Release
+		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,6 @@
 ﻿using Quicker.UserControls.AddWindow;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.Windows.Forms;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;

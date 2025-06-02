@@ -20,11 +20,7 @@ namespace Quicker.Windows.ToolWindows
         {
             InitializeComponent();
             double screenHeight = SystemParameters.WorkArea.Height; // 获取屏幕高度
-<<<<<<< HEAD
-            this.Height = screenHeight; // 设置窗口高度为屏幕高度
-=======
             Height = screenHeight; // 设置窗口高度为屏幕高度
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
         }
 
         /// <summary>
@@ -42,12 +38,6 @@ namespace Quicker.Windows.ToolWindows
         // 检查并显示消息
         private void CheckAndDisplayToast()
         {
-<<<<<<< HEAD
-            if (ToastStackPanel.Children.Count < 5 && messageQueue.Count > 0) // 判断消息数量是否达到上限
-            {
-                var msg = messageQueue.Dequeue(); // 从队列中取出消息
-                ShowToast(msg); // 显示消息
-=======
             if (ToastStackPanel.Children.Count < 5) // 判断消息数量是否达到上限
             {
                 if (messageQueue.Count > 0) // 判断消息队列是否有消息
@@ -59,7 +49,6 @@ namespace Quicker.Windows.ToolWindows
                 {
                     Close(); // 关闭窗口
                 }
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
             }
         }
 
@@ -213,22 +202,12 @@ namespace Quicker.Windows.ToolWindows
             if (timerDictionary.ContainsKey(border)) // 判断计时器是否存在
             {
                 DispatcherTimer timer = timerDictionary[border]; // 获取计时器
-<<<<<<< HEAD
                 ToastStackPanel.Children.Remove(border); // 从消息面板中删除消息边框
                 timerDictionary.Remove(border); // 从字典中移除计时器
                 timer.Stop(); // 停止计时器
                 timer.Tick -= Timer_Tick; // 移除计时器事件
                 timer = null; // 释放计时器
             }
-=======
-                timer.Stop(); // 停止计时器
-                timer.Tick -= Timer_Tick; // 移除计时器事件
-                timerDictionary.Remove(border); // 从字典中移除计时器
-                timer = null; // 释放计时器
-            }
-
-            ToastStackPanel.Children.Remove(border); // 从消息面板中删除消息边框
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
             CheckAndDisplayToast(); // 检查并显示新的消息
         }
 
@@ -243,10 +222,6 @@ namespace Quicker.Windows.ToolWindows
                 timer.Tick -= Timer_Tick; // 移除计时器事件
             } // 释放所有计时器资源
             timerDictionary.Clear(); // 清空字典
-<<<<<<< HEAD
-=======
-            ToastStackPanel = null; // 释放ToastStackPanel
->>>>>>> a26158ce282b08bad0a21f384958db8ad3ed400d
             GC.Collect(); // 垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次进行垃圾回收
