@@ -7,18 +7,18 @@ using Quicker.Windows;
 using System.Windows;
 using Quicker;
 
-namespace Quicker.UserControls
+namespace Quicker.UserControls.SettingWindow
 {
     public partial class ConventionGrid : UserControl
     {
-        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
+        private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
         private double totalUsageTime; // 总使用时长
         private DispatcherTimer timer; // 定时器
 
 
-        public ConventionGrid(SettingWindow settingWindow)
+        public ConventionGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent();
             weakSettingWindow = new(settingWindow); // 保存设置窗口

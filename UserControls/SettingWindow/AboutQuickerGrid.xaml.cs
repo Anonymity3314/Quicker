@@ -8,15 +8,15 @@ using Quicker.Managers;
 using System.Windows;
 using System.IO;
 
-namespace Quicker.UserControls
+namespace Quicker.UserControls.SettingWindow
 {
     public partial class AboutQuickerGrid : UserControl
     {
         private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\TempData"; // 文件夹路径
-        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
+        private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         SettingManager settingManager; // 读取设置的管理器
 
-        public AboutQuickerGrid(SettingWindow settingWindow)
+        public AboutQuickerGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent();
             settingManager = settingWindow._settingManager; // 创建设置管理器

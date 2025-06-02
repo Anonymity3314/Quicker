@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 
-namespace Quicker.UserControls
+namespace Quicker.UserControls.SettingWindow
 {
     public partial class ColorPicker : UserControl
     {

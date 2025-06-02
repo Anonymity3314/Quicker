@@ -5,15 +5,15 @@ using System.Windows.Media;
 using Quicker.Managers;
 using System.Windows;
 
-namespace Quicker.UserControls
+namespace Quicker.UserControls.SettingWindow
 {
     public partial class AppearanceGrid : UserControl
     {
-        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
+        private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
         SettingManager settingManager; // 设置管理器
 
-        public AppearanceGrid(SettingWindow settingWindow)
+        public AppearanceGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent(); // 初始化xaml界面
             settingManager = settingWindow._settingManager; // 初始化设置管理器

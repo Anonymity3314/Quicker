@@ -1,7 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using Quicker.UserControls.SettingWindow;
+using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Shapes;
-using Quicker.UserControls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Database;

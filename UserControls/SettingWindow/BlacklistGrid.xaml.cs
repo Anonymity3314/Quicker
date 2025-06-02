@@ -13,17 +13,17 @@ using Quicker.Managers;
 using System.Windows;
 using System.IO;
 
-namespace Quicker.UserControls
+namespace Quicker.UserControls.SettingWindow
 {
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
-        private WeakReference<SettingWindow> weakSettingWindow; // 弱引用设置窗口
+        private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
         private IconManager iconManager = new(); // 图标管理器
         SettingManager settingManager; // 设置管理器
         private bool isLoading = true; // 是否全屏禁用
 
-        public BlacklistGrid(SettingWindow settingWindow)
+        public BlacklistGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent();
             settingManager = settingWindow._settingManager; // 创建设置管理器
@@ -231,7 +231,7 @@ namespace Quicker.UserControls
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
+                    Quicker.Windows.MainWindows.SettingWindow settingWindow = System.Windows.Application.Current.Windows.OfType<Quicker.Windows.MainWindows.SettingWindow>().FirstOrDefault(); // 尝试查找现有的设置窗口
                     LoadingWindow loadingWindow = new() { Owner = settingWindow }; // 创建加载窗口
                     loadingWindow.Show(); // 显示加载窗口
                     string selectedPath = dialog.SelectedPath; // 获取选择的文件夹路径
