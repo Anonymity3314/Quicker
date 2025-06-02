@@ -311,14 +311,11 @@ namespace Quicker.Windows.MainWindows
                 {
                     // 更新控件数据
                     TitleTextBox.Text = Path.GetFileNameWithoutExtension(e.ProcessPath); // 设置标题为进程名
-                    
                     // 更新OpenFile控件中的路径
                     if (ActionInfoGrid.Children.Count > 0 && ActionInfoGrid.Children[0] is OpenFile openFile)
                     {
                         openFile.LocationTextBox.Text = e.ProcessPath; // 设置路径
-                        
-                        // 启用保存按钮
-                        SaveButton.IsEnabled = true;
+                        SaveButton.IsEnabled = true; // 启用保存按钮
                     }
                     
                     // 设置图标

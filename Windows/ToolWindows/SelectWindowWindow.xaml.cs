@@ -5,6 +5,7 @@ using Quicker.Managers;
 using System.Windows;
 using System.Windows.Input;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Quicker.Windows.ToolWindows
 {
@@ -45,7 +46,7 @@ namespace Quicker.Windows.ToolWindows
             }
         }
 
-        private void MouseHook_MouseDown(object sender, MouseButtonEventArgs e)
+        private async void MouseHook_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (!isSelecting) return;
 
@@ -84,7 +85,8 @@ namespace Quicker.Windows.ToolWindows
                     }
                 }
 
-                // 恢复所有者窗口
+                // 延时10毫秒后恢复所有者窗口
+                await Task.Delay(10);
                 if (ownerWindow != null)
                 {
                     ownerWindow.WindowState = WindowState.Normal;

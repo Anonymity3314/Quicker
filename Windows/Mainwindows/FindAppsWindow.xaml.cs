@@ -215,16 +215,15 @@ namespace Quicker.Windows.MainWindows
                     
                     // 设置为选中的应用
                     SelectedApp = selectedApp;
-                    
                     // 触发应用选中事件
                     ApplicationSelected?.Invoke(this, new ApplicationSelectedEventArgs { SelectedApp = selectedApp });
                     
                     // 关闭窗口
                     this.Close();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    MessageBox.Show($"处理窗口选择时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 }
                 finally
                 {
