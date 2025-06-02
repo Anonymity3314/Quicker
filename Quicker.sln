@@ -3,15 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quicker", "Quicker.csproj", "{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "..\Setup\Setup.vdproj", "{4D1AC582-8087-5490-FCC2-03CEC5D22547}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backup", "..\QuickerExtensions\Backup\Backup.csproj", "{586CB964-8445-133B-E50C-1647C6564319}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoClicker", "..\QuickerExtensions\AutoClicker\AutoClicker.csproj", "{7169D08E-2C85-EB02-9FD2-90C6560FF972}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instructions", "..\Instructions\Instructions.csproj", "{1B22E382-DB80-4E08-A7C7-6AFA207548B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoClicker", "..\Extensions\AutoClicker\AutoClicker.csproj", "{8803C997-B6D9-B01D-06FD-A5D5DDEF78F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backup", "..\Extensions\Backup\Backup.csproj", "{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,24 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7CF2B363-2A7B-41AD-91F0-463EEDB599F3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Debug|Any CPU.ActiveCfg = Debug
-		{4D1AC582-8087-5490-FCC2-03CEC5D22547}.Release|Any CPU.ActiveCfg = Release
-		{586CB964-8445-133B-E50C-1647C6564319}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{586CB964-8445-133B-E50C-1647C6564319}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{586CB964-8445-133B-E50C-1647C6564319}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{586CB964-8445-133B-E50C-1647C6564319}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7169D08E-2C85-EB02-9FD2-90C6560FF972}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B22E382-DB80-4E08-A7C7-6AFA207548B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8803C997-B6D9-B01D-06FD-A5D5DDEF78F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8803C997-B6D9-B01D-06FD-A5D5DDEF78F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8803C997-B6D9-B01D-06FD-A5D5DDEF78F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8803C997-B6D9-B01D-06FD-A5D5DDEF78F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B44E8C2-F7FC-3B41-8C83-C87C2FB8116A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

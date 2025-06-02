@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using Quicker.Windows.Forms;
+﻿using Quicker.Windows.MainWindows;
+using System.Windows.Controls;
 using Quicker.UserControls;
 using System.Windows.Input;
 using Quicker.Managers;

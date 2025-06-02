@@ -1,4 +1,4 @@
-﻿using Quicker.Windows.Menus;
+﻿using Quicker.Windows.ToolWindows;
 using Quicker.Windows;
 using System.Windows;
 

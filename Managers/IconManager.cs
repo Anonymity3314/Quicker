@@ -1,12 +1,12 @@
 ﻿using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
+using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
 using Quicker.Database;
-using Quicker.Windows;
 using System.Windows;
 using System.Drawing;
 using System.Net;
@@ -179,7 +179,7 @@ namespace Quicker.Managers
         /// <returns> 网站图标 </returns>
         public ImageSource GetWebsiteIcon(string websiteUrl)
         {
-            LoadingWindow loadingWindow = new LoadingWindow(); // 创建加载窗口
+            LoadingWindow loadingWindow = new(); // 创建加载窗口
             loadingWindow.Show(); // 显示加载窗口
             try
             {

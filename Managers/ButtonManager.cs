@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media.Imaging;
+using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
-using Quicker.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Database;

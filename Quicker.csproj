@@ -54,8 +54,6 @@
     <None Remove="Resources\Images\Add.png" />
     <None Remove="Resources\Images\BasicSettingButton.png" />
     <None Remove="Resources\Images\BasicSettingButton.png" />
-    <None Remove="Resources\Images\Book.png" />
-    <None Remove="Resources\Images\Book.png" />
     <None Remove="Resources\Images\ClearButton.png" />
     <None Remove="Resources\Images\CloseDownloadWindow.png" />
     <None Remove="Resources\Images\CloseQuicker.png" />
@@ -65,8 +63,6 @@
     <None Remove="Resources\Images\DeleteImage.png" />
     <None Remove="Resources\Images\DeleteImage.png" />
     <None Remove="Resources\Images\DesktopSceneImage.png" />
-    <None Remove="Resources\Images\Disbook.png" />
-    <None Remove="Resources\Images\Disbook.png" />
     <None Remove="Resources\Images\EditButton.png" />
     <None Remove="Resources\Images\EditButton.png" />
     <None Remove="Resources\Images\Locked.png" />
@@ -118,7 +114,7 @@
     <Resource Include="Resources\Images\MessageImage.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="InformationData\UpdateHistory.txt">
+    <Resource Include="InfoData\UpdateHistory.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
@@ -151,7 +147,7 @@
     <Resource Include="Resources\Images\BasicSettingButton.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\Book.png">
+    <Resource Include="Resources\Images\PinToDesktop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\ClearButton.png">
@@ -172,7 +168,7 @@
     <Resource Include="Resources\Images\DesktopSceneImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\Disbook.png">
+    <Resource Include="Resources\Images\UnpinFromDesktop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\EditButton.png">
@@ -241,7 +237,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Windows\Forms\SettingWindow.xaml">
+    <Page Update="Windows\MainWindows\SettingWindow.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
   </ItemGroup>

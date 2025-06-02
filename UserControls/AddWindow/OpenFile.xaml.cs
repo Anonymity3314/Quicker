@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
+using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
-using Quicker.Windows.Forms;
 using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Managers;
@@ -13,12 +13,12 @@ namespace Quicker.UserControls.AddWindow
     public partial class OpenFile : UserControl
     {
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private Quicker.Windows.Forms.AddWindow AddWindow; // AddWindow 的静态引用
+        private Quicker.Windows.MainWindows.AddWindow AddWindow; // AddWindow 的静态引用
         private readonly IconManager iconManager = new(); // 图标管理器接口
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的静态引用
         private ButtonDatabase db2 = new(); // 初始换按钮数据库
 
-        public OpenFile(Quicker.Windows.Forms.AddWindow addWindow)
+        public OpenFile(Quicker.Windows.MainWindows.AddWindow addWindow)
         {
             AddWindow = addWindow; // 保存 AddWindow 的静态引用
             InitializeComponent();

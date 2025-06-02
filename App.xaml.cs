@@ -1,5 +1,6 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
-using Quicker.Windows.Forms;
+using Quicker.Windows.MainWindows;
+using Quicker.Windows.ToolWindows;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Diagnostics;

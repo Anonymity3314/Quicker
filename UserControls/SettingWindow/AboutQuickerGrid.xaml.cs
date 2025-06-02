@@ -1,6 +1,6 @@
-﻿using System.Windows.Resources;
+﻿using Quicker.Windows.MainWindows;
+using System.Windows.Resources;
 using System.Windows.Controls;
-using Quicker.Windows.Forms;
 using Quicker.UserControls;
 using System.Windows.Input;
 using System.Diagnostics;
@@ -81,7 +81,7 @@ namespace Quicker.UserControls
         private void FeedBack_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://github.com/Anonymity3314/Quicker/issues"); // 前往Github反馈
+            actionManager.LaunchDefaultBrowser("https://github.com/LJZ-Anonymity/Quicker/issues"); // 前往Github反馈
         }
 
         // 基础设置-关于Quicker-隐私声明

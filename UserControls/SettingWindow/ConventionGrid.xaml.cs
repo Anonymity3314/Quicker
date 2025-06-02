@@ -1,6 +1,6 @@
-﻿using System.Windows.Threading;
+﻿using Quicker.Windows.MainWindows;
+using System.Windows.Threading;
 using System.Windows.Controls;
-using Quicker.Windows.Forms;
 using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Windows;

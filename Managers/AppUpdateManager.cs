@@ -1,5 +1,4 @@
-﻿using Quicker.Windows.Forms;
-using Quicker.Managers;
+﻿using Quicker.Managers;
 using System.Text.Json;
 using System.Net;
 using System.IO;
@@ -7,7 +6,7 @@ using Quicker;
 
 public class AppUpdateManager : IDisposable
 {
-    private const string UpdateInfoUrl = "https://raw.githubusercontent.com/Anonymity3314/Quicker/main/InformationData/VersionInfo.json"; // 更新信息的 URL 地址
+    private const string UpdateInfoUrl = "https://raw.githubusercontent.com/LJZ-Anonymity/Quicker/Quicker/InfoData/VersionInfo.json"; // 更新信息的 URL 地址
     public UpdateInfo LatestUpdateInfo { get; private set; } // 最新版本信息
     private bool isDisposed = false; // 是否已释放资源
 

@@ -1,0 +1,38 @@
+﻿<Window
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Quicker.Windows.ToolWindows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Quicker.Windows.ToolWindows.MessageWindow"
+    mc:Ignorable="d"
+    
+    Icon="/Resources/Images/Quicker1.png"
+    WindowStartupLocation="CenterScreen"
+    Background="Transparent"
+    AllowsTransparency="True"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+>
+    <Grid Height="171" Width="338" MouseDown="Grid_MouseDown">
+        <!-- 窗口阴影 -->
+        <Rectangle Fill="White" Margin="5,7">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="25" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <Border CornerRadius="8" Background="#FFFFFF" BorderThickness="1" BorderBrush="DarkGray">
+            <Grid Background="Transparent">
+                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Height="28">
+                    <Image Source="/Resources/Images/Quicker1.png" Height="16" Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+                    <TextBlock x:Name="TitileTextBlock" Margin="34,0,230,0" VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource CloseMessageButton}" Click="Button_Click"/>
+                </Grid>
+                <Image Source="/Resources/Images/MessageImage.jpg" Margin="16,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="30" Width="30"/>
+                <TextBlock x:Name="MessageTextBlock" Margin="60,60,0,0" VerticalAlignment="Top" TextAlignment="Left" Height="51" HorizontalAlignment="Left"/>
+                <Button Content="确定" Style="{StaticResource WhiteButton}" Height="27" Width="88" Margin="0,126,0,0" VerticalAlignment="Top" Click="Button_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

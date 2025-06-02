@@ -1,10 +1,24 @@
-﻿# 项目简介
+﻿# Quicker
+
+[![Version](https://img.shields.io/github/v/release/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/releases)
+
+## 项目简介
 
 这是由作者重构的 WPF 应用Quicker，主要功能包括动作管理、应用状态管理、按钮管理等。
 
 该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
 
-# 声明
+- [扩展/插件仓库](https://github.com/LJZ-Anonymity/Extensions)
+- [使用说明/文档](https://github.com/LJZ-Anonymity/Instructions)
+
+## 功能特点
+
+- **高效便捷的操作界面**：直观的用户界面，帮助用户快速执行各种任务。
+- **强大的动作管理**：支持创建、编辑和组织各种动作，提高工作效率。
+- **灵活的扩展机制**：通过扩展模块增强应用功能，满足不同用户的需求。
+- **按钮管理**：自定义和管理界面按钮。
+
+## 声明
 
 本项目为开源项目，作者非计算机专业，项目仍有很多地方需要优化。
 
@@ -12,7 +26,11 @@
 
 如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
 
-# NuGet 程序包
+## 快速开始指南
+
+克隆项目仓库：https://github.com/LJZ-Anonymity/Quicker.git
+
+安装必要的依赖项，包括以下 NuGet 程序包。
 
 | 程序包                                 | 说明                              |
 | :-----------------------------------: | :------------------------------: |
@@ -21,17 +39,56 @@
 | Svg                                   | 提供加载、解析和渲染 SVG 图像的功能   |
 | System.Data.SQLite                    | 提供 SQLite 数据库支持              |
 
-# 文件结构
+打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
+
+## 贡献指南
+
+如果你发现项目中有问题或有改进建议，可以通过以下方式参与贡献：
+
+1. 提交 Issue：如果你发现问题或有功能建议，可以提交 Issue 详细描述问题或建议。
+
+2. Fork 项目：Fork 项目仓库到你的 GitHub 账号。
+
+3. 本地开发：在本地克隆你的 Fork 仓库，并进行开发。
+
+4. 提交 Pull Request：完成开发后，提交 Pull Request 到原始仓库，等待审核。
+
+## 扩展开发
+
+Quicker 支持通过创建扩展模块来增强应用功能。你可以通过以下步骤开发扩展模块：
+
+1. 创建一个 WPF 类库项目。
+
+2. 引用Quicker的扩展接口（Extend/IExtensionModule.cs）。
+
+3. 实现扩展接口，开发你的扩展功能。
+
+4. 将编译后的扩展 DLL 文件放置在 Quicker 的扩展目录中，应用将会在需要时加载。
+
+更多详情请见 [Extensions](https://github.com/LJZ-Anonymity/Extensions "查看Quicker扩展项目")。
+
+## 致谢
+
+感谢为该项目提供参考的 [Quicker 软件](https://getquicker.net/ "访问 Quicker 官方网站")。
+
+## 联系作者
+
+如需进一步了解项目或有任何问题，请通过以下方式联系作者：
+
+- **GitHub Issues**：https://github.com/LJZ-Anonymity/Quicker/issues
+- **邮箱**：331433038@qq.com
+
+## 项目文件结构
 
 ```
 Quicker/
-│   App.xaml                                      # 应用入口点
-│   App.xaml.cs                                   # 应用入口点的代码后台
-│   AssemblyInfo.cs                               # 项目的属性和版本信息
-│   installer.idproj                              # 安装程序项目文件
-│   Quicker.csproj                                # 项目的核心配置文件
-│   Quicker.png                                   # 应用图标
-│   Quicker.sln                                   # 项目解决方案文件
+├─App.xaml                                        # 应用入口点
+├─App.xaml.cs                                     # 应用入口点的代码后台
+├─AssemblyInfo.cs                                 # 项目的属性和版本信息
+├─installer.idproj                                # 安装程序项目文件
+├─Quicker.csproj                                  # 项目的核心配置文件
+├─Quicker.png                                     # 应用图标
+├─Quicker.sln                                     # 项目解决方案文件
 │
 ├─Database/                                       # 数据库文件夹
 │   ├─ActionPageDatabase.cs                       # 动作页数据库
@@ -43,7 +100,7 @@ Quicker/
 │   ├─IExtensionModule.cs                         # 实现扩展的接口
 │   └─ModuleLoader.cs                             # 扩展模块加载器
 |
-├─InformationData/                                # 信息数据文件夹
+├─InforData/                                      # 信息数据文件夹
 │   ├─Extensions.json                             # 扩展信息
 │   ├─UpdateHistory.txt                           # 更新历史
 │   └─VersionInfo.json                            # 版本信息
@@ -68,14 +125,12 @@ Quicker/
 │   │   ├─ActionPagesManager.jpg                  # 动作场景的图片
 │   │   ├─Add.png                                 # 主面板添加动作的图片
 │   │   ├─BasicSettingButton.png                  # 基础设置按钮的图片
-│   │   ├─Book.png                                # 订住主面板的图片
 │   │   ├─ClearButton.png                         # 下载窗口中清理按钮发图片
 │   │   ├─CloseDownloadWindow.png                 # 关闭下载窗口的按钮图片
 │   │   ├─CloseQuicker.png                        # 退出Quicker的图片
 │   │   ├─CloseWindow.png                         # 关闭主面板的图片
 │   │   ├─DeleteImage.png                         # 删除动作按钮图像的图片
 │   │   ├─DesktopSceneImage.png                   # 桌面场景的图片
-│   │   ├─Disbook.png                             # 不订住Quicker的图片
 │   │   ├─EditButton.png                          # 编辑动作的图片
 │   │   ├─Locked.png                              # 锁住通用动作页的图片
 │   │   ├─MessageImage.jpg                        # 消息弹窗的图片
@@ -84,6 +139,7 @@ Quicker/
 │   │   ├─OpenMainWindow1.png                     # 菜单中打开主面板的图片
 │   │   ├─OpenMainWindow2.png                     # 设置窗口中弹出面板按钮的图片
 │   │   ├─Pause.png                               # 暂停Quicker的图片
+│   │   ├─PinToDesktop.png                        # 订住主面板的图片
 │   │   ├─Quicker1.png                            # Quicker运行中的图片
 │   │   ├─Quicker2.png                            # Quicker暂停时的图片
 │   │   ├─RestartQuicker.png                      # 重启Quicker的图片
@@ -91,7 +147,8 @@ Quicker/
 │   │   ├─SettingImage1.png                       # 菜单中打开设置窗口的按钮图片
 │   │   ├─SettingImage2.png                       # 主面板打开设置面板的图片
 │   │   ├─SettingWindow.png                       # 设置面板的图片
-│   │   └─UnLocked.png                            # 不锁住通用动作页的图片
+│   │   ├─UnLocked.png                            # 不锁住通用动作页的图片
+│   │   └─UnpinFromDesktop.png                    # 不订住Quicker的图片
 │   │
 │   └─Styles/                                     # 样式资源文件夹
 │       ├─ButtonStyles.xaml                       # 按钮样式
@@ -127,7 +184,7 @@ Quicker/
 │           └─OpenMainWindowGrid.xaml.cs
 │
 └─Windows/                                        # 界面文件夹
-    ├─Forms/                                      # 窗口文件夹
+    ├─MainWindows/                                # 窗口文件夹
     │   ├─ActionPageManageWindow.xaml             # 编辑动作页窗口
     │   │   └─ActionPageManageWindow.xaml.cs
     │   ├─AddWindow.xaml                          # 添加动作窗口
@@ -167,27 +224,3 @@ Quicker/
         └─ToastWindow.xaml                        # 消息弹窗
              └─ToastWindow.xaml.cs
 ```
-
-# 快速开始指南
-
-克隆项目仓库：https://github.com/Anonymity3314/Quicker.git
-
-安装必要的依赖项，包括上述列出的 NuGet 程序包。
-
-打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
-
-# 贡献指南
-
-如果你发现项目中有问题或有改进建议，可以通过提交 Issue 的方式告知作者。
-
-你可以 Fork 项目仓库，在本地进行开发后，通过 Pull Request 的方式提交你的代码贡献。
-
-# 关于扩展
-
-可以通过创建 WPF 类库项目 并添加引用来创建扩展模块，增强应用功能
-
-详情请见 [QuickerExtensions](https://github.com/Anonymity3314/QuickerExtensions "查看Quicker扩展项目")。
-
-# 致谢
-
-感谢为该项目提供参考的 [Quicker 软件](https://getquicker.net/ "访问 Quicker 官方网站")。

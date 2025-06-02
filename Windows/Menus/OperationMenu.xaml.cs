@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
+using Quicker.Windows.MainWindows;
+using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
-using Quicker.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Database;
