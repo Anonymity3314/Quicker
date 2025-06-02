@@ -12,8 +12,8 @@ namespace Quicker.UserControls.AddWindow
 {
     public partial class OpenFile : UserControl
     {
-        private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private Quicker.Windows.MainWindows.AddWindow AddWindow; // AddWindow 的静态引用
+        private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器接口
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的静态引用
         private ButtonDatabase db2 = new(); // 初始换按钮数据库
