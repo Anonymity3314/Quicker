@@ -408,6 +408,11 @@ namespace Quicker.Windows.MainWindows
                 case "OpenActionPage":
                     OpenActionPage(data); // 打开动作页
                     break; // 打开动作页
+                case "LoadExtension":
+                    actionManager.LoadExtension(data); // 加载扩展
+                    break; // 加载扩展
+                default:
+                    return; // 未知动作
             }
         }
 

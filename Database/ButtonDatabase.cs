@@ -493,26 +493,14 @@ namespace Quicker.Database
         }
     }
 
-    // ButtonData 类
-    public class ButtonData
-    {
-        public int ButtonID { get; set; } // 动作ID，通常为Button的名称
-        public string Title { get; set; } // 动作名称
-        public string Location { get; set; } // 位置
-        public string ImagePath { get; set; } // 图片路径
-        public string Data1 { get; set; } // 动作数据1
-        public string Data2 { get; set; } // 动作数据2
-        public string Data3 { get; set; } // 动作数据3
-        public string Description { get; set; } // 对动作的描述
-        public DateTime CreateTime { get; set; } // 创建时间
-        public DateTime LatestEditTime { get; set; } // 最近修改时间
-        public string ActionType { get; set; } // 动作类型
-        public int UsedTimes { get; set; } // 使用次数
-    }
-
     // ButtonData 帮助类
     public static class ButtonDataHelper
     {
+        /// <summary>
+        /// 从 SQLiteDataReader 中读取数据并构造 ButtonData 对象
+        /// </summary>
+        /// <param name="reader"> SQLiteDataReader </param>
+        /// <returns> 按钮数据 </returns>
         public static ButtonData FromReader(SQLiteDataReader reader)
         {
             return new ButtonData
@@ -532,4 +520,67 @@ namespace Quicker.Database
             }; // 返回 ButtonData 对象
         }
     }
+
+    // ButtonData 类
+    public class ButtonData
+    {
+        public int ButtonID { get; set; } // 动作ID，通常为Button的名称
+        public string Title { get; set; } // 动作名称
+        public string Location { get; set; } // 位置
+        public string ImagePath { get; set; } // 图片路径
+        public string Data1 { get; set; } // 动作数据1
+        public string Data2 { get; set; } // 动作数据2
+        public string Data3 { get; set; } // 动作数据3
+        public string Description { get; set; } // 对动作的描述
+        public DateTime CreateTime { get; set; } // 创建时间
+        public DateTime LatestEditTime { get; set; } // 最近修改时间
+        public string ActionType { get; set; } // 动作类型
+        public int UsedTimes { get; set; } // 使用次数
+    }
+    // ButtonData 字段说明
+    /*
+     * ButtonID: 动作ID，通常为Button的名称
+     * ButtonID一般是动作所在按钮去除前缀后的数字，如Global111，则ButtonID为111
+     */
+    /*
+     * Title: 动作名称，通常为按钮上的文字
+     * Title可以为空字符串，但不能为空
+     */
+    /*
+     * Location：位置，通常为
+     */
+    /*
+     * ImagePath: 图片路径，通常为按钮上的图片路径
+     * ImagePath可以为空字符串，但不能为空
+     */
+    /*
+     * Data1: 动作数据1
+     * Data1可以为空字符串，但不能为空
+     */
+    /*
+     * Data2: 动作数据2
+     * Data2可以为空字符串，但不能为空
+     */
+    /*
+     * Data3: 动作数据3
+     * Data3可以为空字符串，但不能为空
+     */
+    /*
+     * Description: 对动作的描述，通常为按钮的 Tooltip 的文字
+     * Description可以为空字符串，但不能为空
+     */
+    /*
+     * CreateTime: 动作创建的时间
+     */
+    /*
+     * LatestEditTime: 动作最近一次修改的时间
+     */
+    /*
+     * ActionType: 动作类型
+     * ActionType可以为空字符串，但不能为空
+     */
+    /*
+     * UsedTimes: 使用次数
+     * UsedTimes为0表示未使用，为1表示已使用一次，以此类推
+     */
 }

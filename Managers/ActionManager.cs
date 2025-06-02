@@ -1,17 +1,19 @@
-﻿using System.Runtime.InteropServices;
-using IWshRuntimeLibrary;
-using System.Diagnostics;
-using Quicker.Database;
+﻿using IWshRuntimeLibrary;
 using Microsoft.Win32;
+using Quicker.Database;
+using Quicker.Extend;
 using Quicker.Windows;
-using System.Windows;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace Quicker.Managers
 {
     public class ActionManager : IDisposable
     {
         private const string tempDir = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\TempData"; // 临时目录
+        private const string extensionDir = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Extensions"; // 扩展目录
         private bool isDisposed = false; // 是否释放
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
@@ -330,6 +332,26 @@ namespace Quicker.Managers
             }
         }
 
+        /// <summary>
+        /// 加载扩展
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public void LoadExtension(ButtonData data)
+        {
+            string extensionFolderName = Path.Combine(extensionDir, data.Location); // 获取扩展文件夹路径
+            if (!Directory.Exists(extensionFolderName)) // 如果扩展文件夹不存在，则创建
+            {
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.Show($"扩展{data.Data1}不存在", "Error"); // 弹出消息提醒
+                return; // 直接返回
+            }
+            else
+            {
+                ModuleLoader moduleLoader = new(); // 创建模块加载器
+                moduleLoader.LoadModules(extensionFolderName); // 加载扩展
+            }
+        }
+
         // 实现IDisposable接口
         public void Dispose()
         {
@@ -337,7 +359,10 @@ namespace Quicker.Managers
             GC.SuppressFinalize(this); // 告知垃圾回收器不需要调用终结器
         }
 
-        // 释放资源
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        /// <param name="disposing"> 是否释放托管资源 </param>
         protected virtual void Dispose(bool disposing)
         {
             if (!isDisposed) isDisposed = true;

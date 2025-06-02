@@ -1,18 +1,18 @@
 ﻿{
   "extensions": [
     {
-      "name": "Backup",
+      "name": "文件备份",
       "version": "1.0.0",
       "author": "Anonymity",
       "description": "备份文件到指定目录",
-      "path": "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Extensions\\Backup"
+      "folderName": "Backup"
     },
     {
-      "name": "Auto-Clicker",
+      "name": "连点器",
       "version": "1.0.0",
       "author": "Anonymity",
       "description": "连点器",
-      "path": "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Extensions\\Auto-Clicker"
+      "folderName": "AutoClicker"
     }
   ]
 }

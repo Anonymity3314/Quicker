@@ -6,12 +6,10 @@ namespace Quicker.Extend
 {
     public class ModuleLoader
     {
+        public IReadOnlyDictionary<string, IExtensionModule> LoadedModules => _loadedModules; // 已加载的模块列表
         private readonly Dictionary<string, IExtensionModule> _loadedModules = new(); // 已加载的模块
         private readonly Dictionary<string, Assembly> _loadedAssemblies = new(); // 已加载的程序集
         private readonly ToastManager _toast = new(); // 通知管理器
-
-        // 获取已加载的模块列表
-        public IReadOnlyDictionary<string, IExtensionModule> LoadedModules => _loadedModules;
 
         /// <summary>
         /// 加载模块
@@ -19,13 +17,6 @@ namespace Quicker.Extend
         /// <param name="modulesDirectory"> 模块目录 </param>
         public void LoadModules(string modulesDirectory)
         {
-            if (!Directory.Exists(modulesDirectory))
-            {
-                Directory.CreateDirectory(modulesDirectory); // 创建模块目录
-                _toast.Show($"模块目录 {modulesDirectory} 不存在，已创建。", "Common");
-                return;
-            }
-
             try
             {
                 LoadAllAssemblies(modulesDirectory); // 加载所有程序集
@@ -34,13 +25,14 @@ namespace Quicker.Extend
             }
             catch (Exception ex)
             {
-                _toast.Show($"加载模块时出错：{ex.Message}", "Error");
+                _toast.Show($"加载模块时出错：{ex.Message}", "Error"); // 通知用户
             }
         }
 
         /// <summary>
         /// 加载目录中的所有程序集
         /// </summary>
+        /// <param name="modulesDirectory"> 模块目录 </param>
         private void LoadAllAssemblies(string modulesDirectory)
         {
             string[] moduleFiles = Directory.GetFiles(modulesDirectory, "*.dll");
