@@ -1,0 +1,29 @@
+name: Merge C# Project
+
+on:
+  pull_request:
+    branches: [ main, Quicker ]
+    types: [closed]
+
+jobs:
+  build-and-test:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'   # 可根据你的项目更换.NET版本
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --no-build --verbosity normal
