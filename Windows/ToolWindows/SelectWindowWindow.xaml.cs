@@ -1,11 +1,11 @@
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
 using System.Windows;
-using System.Windows.Input;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Quicker.Windows.ToolWindows
 {
@@ -49,7 +49,6 @@ namespace Quicker.Windows.ToolWindows
         private async void MouseHook_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (!isSelecting) return;
-
             // 只处理鼠标左键点击事件
             if (e.LeftButton == MouseButtonState.Released)
             {
@@ -138,6 +137,7 @@ namespace Quicker.Windows.ToolWindows
 
             // 释放资源
             windowManager.Dispose();
+            iconManager.Dispose();
         }
 
         #region Win32 API

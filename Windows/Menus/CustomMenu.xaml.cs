@@ -91,8 +91,6 @@ namespace Quicker.Windows.Menus
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             GC.Collect(); // 强制回收非托管资源
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 再次强制回收非托管资源
         }
     }
 }

@@ -49,7 +49,13 @@ namespace Quicker.Windows.Menus
         private void InitializeMenu()
         {
             ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
-            if(buttonData.ActionType == "OpenWebsite")
+            if (buttonData == null) // 按钮数据不存在
+            {
+                MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
+                if (mainWindow != null)
+                    mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
+            }
+            else if(buttonData.ActionType == "OpenWebsite")
             {
                 MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
                 MainStackPanel.Height -= 25; // 设置窗口高度

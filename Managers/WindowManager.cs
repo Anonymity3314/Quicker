@@ -88,15 +88,15 @@ namespace Quicker.Managers
         private const int SM_CYSCREEN = 1; // 屏幕高度
 
         [DllImport("user32.dll")]
-        private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
+        private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam); // 枚举窗口
 
         [DllImport("user32.dll")]
-        private static extern bool IsWindowVisible(IntPtr hWnd);
+        private static extern bool IsWindowVisible(IntPtr hWnd); // 判断窗口是否可见
 
         [DllImport("user32.dll")]
-        private static extern int GetWindowTextLength(IntPtr hWnd);
+        private static extern int GetWindowTextLength(IntPtr hWnd); // 获取窗口标题长度
 
-        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam); // 枚举窗口委托
 
         /// <summary>
         /// 将窗口置顶
@@ -104,8 +104,8 @@ namespace Quicker.Managers
         /// <param name="window"> 窗口对象 </param>
         public void SetWindowTopmost(Window window)
         {
-            nint hWnd = new WindowInteropHelper(window).Handle;
-            SetWindowPos(hWnd, new nint(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+            nint hWnd = new WindowInteropHelper(window).Handle; // 获取窗口句柄
+            SetWindowPos(hWnd, new nint(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE); // 设置窗口置顶
         }
 
         /// <summary>
