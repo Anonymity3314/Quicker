@@ -110,7 +110,7 @@ namespace Quicker.Managers
         {
             try
             {
-                switch (int.Parse(data.Data3))
+                switch (int.Parse(data.Data1))
                 {
                     case 0:
                         LaunchDefaultBrowser(data.Location);

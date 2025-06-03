@@ -15,14 +15,18 @@ namespace Quicker.Windows.MainWindows
 {
     public partial class AddWindow : Window
     {
+        private const string OPEN_FILE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenFileImage.png";
+        private const string OPEN_WEBSITE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenWebSiteImage.png";
+        private const string DEFAULT_IMAGE_PATH = "pack://application:,,,/Resources/Images/Quicker1.png";
+
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
-        public TextBlock ButtonTitle; // 按钮标题
-        public Image ButtonImage; // 按钮图片
+        public TextBlock ButtonTitle { get; private set; } // 按钮标题
+        public Image ButtonImage { get; private set; } // 按钮图片
         public string iconPath; // 图标路径
 
         public int CurrentButton { get; private set; } // 当前按钮
@@ -43,6 +47,7 @@ namespace Quicker.Windows.MainWindows
         {
             InitializeTitle(); // 初始化标题
             InitializeButtonView(); // 初始化Button视图
+            SetDefaultImage(); // 设置默认图标
             SetWindowHeight(ChoiceComboBox.SelectedIndex); // 设置窗口高度
             isLoading = false; // 加载完成
         }
@@ -176,8 +181,8 @@ namespace Quicker.Windows.MainWindows
         // 删除图标
         private void DeleteImage(object sender, RoutedEventArgs e)
         {
-            ButtonImage.Source = null; // 清空图标
-            ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
+            ButtonImage.Source = null;
+            ButtonImage.Visibility = Visibility.Collapsed;
         }
 
         // 处理选中的应用
@@ -348,8 +353,7 @@ namespace Quicker.Windows.MainWindows
         {           
             if (!string.IsNullOrEmpty(selectedImagePath))
             {
-                ButtonImage.Source = iconManager.ProcessIcon(selectedImagePath); // 设置图标
-                ButtonImage.Visibility = Visibility.Visible; // 显示图标
+                SetImageSource(selectedImagePath);
             }
         }
 
@@ -364,6 +368,13 @@ namespace Quicker.Windows.MainWindows
         {
             if (isLoading) return; // 如果正在加载，则不执行命令
             ActionInfoGrid.Children.Clear(); // 清除子控件
+            SetAddWindowChild(); // 设置子控件
+            SetDefaultImage(); // 设置默认图标
+        }
+
+        // 设置子控件
+        public void SetAddWindowChild()
+        {
             switch (ChoiceComboBox.SelectedIndex)
             {
                 case 0:
@@ -383,10 +394,13 @@ namespace Quicker.Windows.MainWindows
             }
         }
 
-        // 设置窗口高度
+        /// <summary>
+        /// 根据选择的选项设置窗口高度
+        /// </summary>
+        /// <param name="choice"> 选择的选项 </param>
         private void SetWindowHeight(int choice)
         {
-            switch(choice)
+            switch (choice)
             {
                 case 0:
                     this.Height = 450; // 打开文件的窗口高度
@@ -394,7 +408,41 @@ namespace Quicker.Windows.MainWindows
                 case 1:
                     this.Height = 370; // 打开网址的窗口高度
                     break; // 打开网站
+                default:
+                    break; // 其他情况
             }
+        }
+
+        /// <summary>
+        /// 设置图片源
+        /// </summary>
+        /// <param name="imagePath"> 图片路径 </param>
+        private void SetImageSource(string imagePath)
+        {
+            try
+            {
+                ButtonImage.Source = new BitmapImage(new Uri(imagePath)); // 设置图片源
+                ButtonImage.Visibility = Visibility.Visible; // 显示图标
+            }
+            catch
+            {
+                using var toast = new ToastManager(); // 创建 ToastManager 实例
+                toast.Show("加载图片失败!", "Error"); // 显示提示消息
+                ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
+            }
+        }
+
+        // 根据选择的选项设置默认图标
+        private void SetDefaultImage()
+        {
+            ButtonImage.Source = null; // 清空图标
+            string imagePath = ChoiceComboBox.SelectedIndex switch
+            {
+                0 => OPEN_FILE_IMAGE_PATH,
+                1 => OPEN_WEBSITE_IMAGE_PATH,
+                _ => DEFAULT_IMAGE_PATH
+            }; // 根据选择的选项设置默认图标路径
+            SetImageSource(imagePath); // 设置图标
         }
 
         // 关闭窗口前，释放资源

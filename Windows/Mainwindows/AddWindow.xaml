@@ -21,19 +21,19 @@
         <ComboBox x:Name="ChoiceComboBox" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top" Width="270" SelectedIndex="0" BorderBrush="#FFFBFBFB" Height="26" Background="White" SelectionChanged="ChoiceComboBox_SelectionChanged" VerticalContentAlignment="Center">
             <ComboBoxItem>
                 <Grid>
-                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                    <Image Source="/Resources/Images/OpenFileImage.png" Style="{StaticResource MenuButtonImage}"/>
                     <TextBlock Text="运行程序或打开文件" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>
             <ComboBoxItem>
                 <Grid>
-                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                    <Image Source="/Resources/Images/OpenWebsiteImage.png" Style="{StaticResource MenuButtonImage}"/>
                     <TextBlock Text="打开网址" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>
             <ComboBoxItem>
                 <Grid>
-                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                     <TextBlock Text="加载扩展" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>

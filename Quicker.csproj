@@ -42,9 +42,7 @@
     <None Remove="App.xaml.cs~RF119692ff.TMP" />
     <None Remove="Quicker.png" />
     <None Remove="Resources\Images\1372BCD4FF819A292E9B6CD87E818C9D965C848D.png" />
-    <None Remove="Resources\Images\2686D17D552D34E87B3B6186D788F27CB08E3F6A.png" />
     <None Remove="Resources\Images\6BEAA5E098C1BF0BD7305BD14DE6C8658DC00FF5.png" />
-    <None Remove="Resources\Images\6DCBD7BAAA9CAF359D6413931A422ECB3B1AD83C.png" />
     <None Remove="Resources\Images\AboutQuicker.png" />
     <None Remove="Resources\Images\AboutQuicker.png" />
     <None Remove="Resources\Images\ActionInformation.png" />
@@ -123,13 +121,13 @@
     <Resource Include="Resources\Images\1372BCD4FF819A292E9B6CD87E818C9D965C848D.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\2686D17D552D34E87B3B6186D788F27CB08E3F6A.png">
+    <Resource Include="Resources\Images\OpenWebsiteImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\6BEAA5E098C1BF0BD7305BD14DE6C8658DC00FF5.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\6DCBD7BAAA9CAF359D6413931A422ECB3B1AD83C.png">
+    <Resource Include="Resources\Images\OpenFileImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\AboutQuicker.png">

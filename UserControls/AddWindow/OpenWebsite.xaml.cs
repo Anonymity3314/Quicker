@@ -112,7 +112,7 @@ namespace Quicker.UserControls.AddWindow
             _addWindow.TitleTextBox.Text = buttonData.Title;
             
             // 设置地址和浏览器
-            if (buttonData.Data3 == "8") // 如果是自定义浏览器
+            if (buttonData.Data1 == "8") // 如果是自定义浏览器
             {
                 string[] locationAndBrowser = GetLocationAndBrowser(buttonData.Location);
                 LocationTextBox.Text = locationAndBrowser[0];
@@ -138,7 +138,7 @@ namespace Quicker.UserControls.AddWindow
             }
             
             // 设置其他选项
-            BrowserComboBox.SelectedIndex = int.Parse(buttonData.Data3);
+            BrowserComboBox.SelectedIndex = int.Parse(buttonData.Data1);
             _addWindow.DescriptionTextBox.Text = buttonData.Description;
             _addWindow.UpdateTooltip();
         }
