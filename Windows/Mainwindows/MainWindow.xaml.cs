@@ -412,6 +412,10 @@ namespace Quicker.Windows.MainWindows
                     actionManager.LoadExtension(data); // 加载扩展
                     break; // 加载扩展
                 default:
+                    {
+                        using var toast = new ToastManager(); // 创建 ToastManager 的实例
+                        toast.Show("未知动作", "Error"); // 显示 Toast 提示
+                    }
                     return; // 未知动作
             }
         }

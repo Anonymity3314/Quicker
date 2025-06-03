@@ -537,50 +537,22 @@ namespace Quicker.Database
         public string ActionType { get; set; } // 动作类型
         public int UsedTimes { get; set; } // 使用次数
     }
-    // ButtonData 字段说明
+    // ActionType 及其相关字段说明
     /*
-     * ButtonID: 动作ID，通常为Button的名称
-     * ButtonID一般是动作所在按钮去除前缀后的数字，如Global111，则ButtonID为111
+     * OpenFile：打开文件/文件夹
+     * Location：文件(夹)绝对路径，多个路径用分号分隔
+     * Data1：是否用管理员身份运行（True/False）
+     * Data2：是否打开当前存在的窗口（True/False）
+     * Data3：打开窗口时设置窗口的状态（Normal：0/Minimized：1/Maximized：2）
      */
     /*
-     * Title: 动作名称，通常为按钮上的文字
-     * Title可以为空字符串，但不能为空
+     * OpenWebsite：打开网页
+     * Location：网页地址
+     * Data1：使用浏览器类型（0~7）
+     * Data2：自定义浏览器地址
      */
     /*
-     * Location：位置，通常为
-     */
-    /*
-     * ImagePath: 图片路径，通常为按钮上的图片路径
-     * ImagePath可以为空字符串，但不能为空
-     */
-    /*
-     * Data1: 动作数据1
-     * Data1可以为空字符串，但不能为空
-     */
-    /*
-     * Data2: 动作数据2
-     * Data2可以为空字符串，但不能为空
-     */
-    /*
-     * Data3: 动作数据3
-     * Data3可以为空字符串，但不能为空
-     */
-    /*
-     * Description: 对动作的描述，通常为按钮的 Tooltip 的文字
-     * Description可以为空字符串，但不能为空
-     */
-    /*
-     * CreateTime: 动作创建的时间
-     */
-    /*
-     * LatestEditTime: 动作最近一次修改的时间
-     */
-    /*
-     * ActionType: 动作类型
-     * ActionType可以为空字符串，但不能为空
-     */
-    /*
-     * UsedTimes: 使用次数
-     * UsedTimes为0表示未使用，为1表示已使用一次，以此类推
+     * LoadExtension：加载扩展程序
+     * Location：扩展程序的绝对路径
      */
 }

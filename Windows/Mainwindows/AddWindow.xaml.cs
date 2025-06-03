@@ -374,6 +374,12 @@ namespace Quicker.Windows.MainWindows
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加控件
                     SetWindowHeight(1); // 设置窗口高度
                     break; // 选择应用程序
+                default:
+                    {
+                        using var toast = new ToastManager(); // 创建 ToastManager 实例
+                        toast.Show("正在开发中，敬请期待！", "Common"); // 显示提示消息
+                    }
+                    break; // 其他情况
             }
         }
 

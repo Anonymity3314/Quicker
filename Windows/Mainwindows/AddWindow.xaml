@@ -31,6 +31,12 @@
                     <TextBlock Text="打开网址" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>
+            <ComboBoxItem>
+                <Grid>
+                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                    <TextBlock Text="加载扩展" Margin="25,0" VerticalAlignment="Center"/>
+                </Grid>
+            </ComboBoxItem>
         </ComboBox>
         <Button x:Name="SaveButton" Style="{StaticResource BlueButton}" Content="保存(S)" HorizontalAlignment="Left" Margin="256,0,0,31" VerticalAlignment="Bottom" BorderBrush="{x:Null}" Width="81" Height="30" Click="SaveAction" IsEnabled="False"/>
         <Button Style="{StaticResource WhiteButton}" Content="取消(C)" HorizontalAlignment="Left" Margin="348,0,0,31" VerticalAlignment="Bottom" Click="CloseAddWindow" Height="30" Width="81"/>

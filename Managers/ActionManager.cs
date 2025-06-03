@@ -158,7 +158,7 @@ namespace Quicker.Managers
             {
                 FileName = website,
                 UseShellExecute = true
-            });
+            }); // 启动默认浏览器
         }
 
         /// <summary>

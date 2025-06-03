@@ -171,20 +171,16 @@ namespace Quicker.UserControls.AddWindow
             // 获取旧数据并保留创建时间
             var oldData = _buttonDb.GetButtonDataByID(_addWindow.CurrentButton, _addWindow.TableName);
             DateTime createdTime = oldData != null ? oldData.CreateTime : DateTime.Now;
-            
-            // 确定位置信息
-            string location = BrowserComboBox.SelectedIndex == 8
-                ? $"{LocationTextBox.Text};{BrowserLocation.Text}"
-                : LocationTextBox.Text;
-            
+                        
             // 创建按钮数据对象
             var buttonData = new ButtonData
             {
                 ButtonID = _addWindow.CurrentButton,
                 Title = _addWindow.TitleTextBox.Text,
-                Location = location,
+                Location = LocationTextBox.Text,
                 ImagePath = _addWindow.iconPath,
-                Data3 = BrowserComboBox.SelectedIndex.ToString(),
+                Data1 = BrowserComboBox.SelectedIndex.ToString(),
+                Data2 = BrowserLocation.Text,
                 Description = _addWindow.DescriptionTextBox.Text,
                 CreateTime = createdTime,
                 LatestEditTime = DateTime.Now,
