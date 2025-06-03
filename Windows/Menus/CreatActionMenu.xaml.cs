@@ -88,9 +88,14 @@ namespace Quicker.Windows.Menus
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
                 actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
-            if (mainWindow != null)
-                mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
+            var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 尝试查找主窗口
+            if (mainWindowList != null)
+            {
+                foreach (MainWindow mainWindow in mainWindowList) // 遍历主窗口列表
+                {
+                    mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
+                }
+            }
             this.Close(); // 关闭窗口
         }
 
@@ -162,9 +167,14 @@ namespace Quicker.Windows.Menus
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
                 actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
-            MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
-            if (mainWindow != null)
-                mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
+            var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 尝试查找主窗口
+            if (mainWindowList != null)
+            {
+                foreach (MainWindow mainWindow in mainWindowList) // 遍历主窗口列表
+                {
+                    mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
+                }
+            }
             close = true; // 关闭窗口
             this.Close(); // 关闭窗口
         }

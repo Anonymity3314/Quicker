@@ -85,9 +85,8 @@ Quicker/
 ├─App.xaml                                        # 应用入口点
 ├─App.xaml.cs                                     # 应用入口点的代码后台
 ├─AssemblyInfo.cs                                 # 项目的属性和版本信息
-├─installer.idproj                                # 安装程序项目文件
 ├─Quicker.csproj                                  # 项目的核心配置文件
-├─Quicker.png                                     # 应用图标
+├─Quicker.ico                                     # 应用图标
 ├─Quicker.sln                                     # 项目解决方案文件
 │
 ├─Database/                                       # 数据库文件夹
