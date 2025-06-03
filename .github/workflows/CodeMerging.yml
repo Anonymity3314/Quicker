@@ -1,0 +1,23 @@
+name: Code Merging
+
+on:
+  pull_request:
+    branches: [ main, Quicker ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore Quicker/Quicker.sln
+
+      - name: Build with MSBuild
+        run: msbuild Quicker/Quicker.sln /p:Configuration=Release

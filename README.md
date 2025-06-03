@@ -1,5 +1,6 @@
 ﻿# Quicker
 
+[![Merge Project](https://github.com/LJZ-Anonymity/Quicker/actions/workflows/CodeMerging.yml/badge.svg?branch=Quicker)](https://github.com/LJZ-Anonymity/Quicker/actions/workflows/CodeMerging.yml)
 [![Version](https://img.shields.io/github/v/release/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/releases)
 
 ## 项目简介
@@ -164,6 +165,8 @@ Quicker/
 │
 ├─UserControls/                                   # 自定义控件文件夹
 │   ├─AddWindow/                                  # 添加窗口的自定义控件文件夹
+│   │   ├─LoadExtension.xaml                      # 添加窗口中添加扩展项目的界面
+│   │   │   └─LoadExtension.xaml.cs
 │   │   ├─OpenFile.xaml                           # 添加窗口中添加打开文件动作的界面
 │   │   │   └─OpenFile.xaml.cs
 │   │   └─OpenWebsite.xaml                        # 添加窗口中添加打开网站动作的界面
