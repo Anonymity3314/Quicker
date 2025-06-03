@@ -25,8 +25,6 @@ namespace Quicker.Windows.MainWindows
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
         private bool isLoading = true; // 是否正在加载
-        public TextBlock ButtonTitle { get; private set; } // 按钮标题
-        public Image ButtonImage { get; private set; } // 按钮图片
         public string iconPath; // 图标路径
 
         public int CurrentButton { get; private set; } // 当前按钮
@@ -46,7 +44,6 @@ namespace Quicker.Windows.MainWindows
         private void AddWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitializeTitle(); // 初始化标题
-            InitializeButtonView(); // 初始化Button视图
             SetDefaultImage(); // 设置默认图标
             SetWindowHeight(ChoiceComboBox.SelectedIndex); // 设置窗口高度
             isLoading = false; // 加载完成
@@ -80,44 +77,6 @@ namespace Quicker.Windows.MainWindows
             int row = (CurrentButton / 10) % 10; // 计算行号
             int column = CurrentButton % 10; // 计算列号
             Title = $"新动作--{pageName}第{page}页{row}行{column}列--编辑动作"; // 设置标题
-        }
-
-        // 初始化Button视图
-        private void InitializeButtonView()
-        {
-            Grid grid = new() // 创建一个新的Grid
-            {
-                Name = "ButtonView", // 设置名称
-                VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center // 水平居中
-            }; // 设置对齐方式
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-
-            ButtonImage = new() // 创建一个新的Image
-            {
-                Width = 36, // 设置宽度
-                Height = 36, // 设置高度
-                Name = "ButtonImage", // 设置名称
-                Visibility = Visibility.Collapsed, // 初始隐藏
-                VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center // 水平居中
-            }; // 设置对齐方式
-            grid.Children.Add(ButtonImage); // 添加到Grid
-            Grid.SetRow(ButtonImage, 0); // 设置行索引
-
-            ButtonTitle = new() // 创建一个新的TextBlock
-            {
-                Name = "ButtonTitle", // 设置名称
-                Visibility = Visibility.Collapsed, // 初始隐藏
-                TextWrapping = TextWrapping.NoWrap, // 不换行
-                VerticalAlignment = System.Windows.VerticalAlignment.Center, // 垂直居中
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center, // 水平居中
-            };
-            grid.Children.Add(ButtonTitle); // 添加到Grid
-            Grid.SetRow(ButtonTitle, 1); // 设置行索引
-
-            ButtonView.Content = grid; // 设置ButtonView的内容为Grid
         }
 
         // 根据上个窗口数据执行对应命令
@@ -472,8 +431,6 @@ namespace Quicker.Windows.MainWindows
             if (ButtonTitle != null)
                 ButtonTitle = null; // 清理引用
             iconPath = null;
-
-            ButtonView.Content = null; // 清空 ButtonView 的内容
 
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成

@@ -53,7 +53,16 @@
         <Button Style="{StaticResource ImageButton}" ToolTip="选择网络或文件图标" HorizontalAlignment="Left" Margin="548,103,0,0" VerticalAlignment="Top" Click="AddImage">
             <Image Source="/Resources/Images/SelectLocalImage.png" Width="16" Height="16"/>
         </Button>
-        <Button x:Name="ButtonView" Width="78" Height="78" BorderBrush="#FF707070" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="1.5,1.5,1.5,1.5" Margin="547,20,0,0" Background="White" Click="SelectImage"/>
+        <Button x:Name="ButtonView" Width="78" Height="78" BorderBrush="#FF707070" HorizontalAlignment="Left" VerticalAlignment="Top" BorderThickness="1.5,1.5,1.5,1.5" Margin="547,20,0,0" Background="White" Click="SelectImage">
+            <Grid x:Name="ButtonViewGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image x:Name="ButtonImage" Width="36" Height="36" Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0"/>
+                <TextBlock x:Name="ButtonTitle" Visibility="Collapsed" TextWrapping="NoWrap" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1"/>
+            </Grid>
+        </Button>
         <Grid x:Name="ActionInfoGrid" Margin="0,66,207,80"/>
     </Grid>
 </Window>
