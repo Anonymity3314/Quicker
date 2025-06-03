@@ -20,7 +20,7 @@
     Loaded="OperationMenu_Loaded"
 >
     <Grid>
-        <Grid x:Name="MainGrid" Height="117" Width="204" Margin="15,13,565,321">
+        <Grid x:Name="MainGrid" Height="167" Width="204" Margin="15,13,565,271">
             <!-- 窗口阴影 -->
             <Rectangle Fill="White" Margin="5,7">
                 <Rectangle.Effect>
@@ -36,7 +36,26 @@
                         </Grid>
                     </Button>
                     <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
-                    <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="DeleteAction_Click">
+                    <Button x:Name="CopyAction" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="CopyAction_Click">
+                        <Button.ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="复制动作"/>
+                                <TextBlock Text="Ctrl+点击可连同复制动作ID"/>
+                                <TextBlock Text="【面板窗口快速复制】Ctrl+拖动动作"/>
+                            </StackPanel>
+                        </Button.ToolTip>
+                        <Grid Width="199">
+                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="复制"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="CutAction" ToolTip="复制并删除动作" Style="{StaticResource MenuButton}" Click="CutAction_Click">
+                        <Grid Width="199">
+                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="剪切"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="DeleteAction" ToolTip="删除动作" Style="{StaticResource MenuButton}" Click="DeleteAction_Click">
                         <Grid Width="199">
                             <Image Source="/Resources/Images/DeleteImage.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="删除"/>
@@ -57,7 +76,7 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <Grid x:Name="ChiildGrid" Margin="219,72,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid x:Name="ChiildGrid" Margin="219,122,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <Grid x:Name="FirstChildGrid" Margin="0,0,0,0" MouseLeave="FirstChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <!-- 窗口阴影 -->
                 <Rectangle Fill="White" Margin="5,7">

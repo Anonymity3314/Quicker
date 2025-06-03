@@ -93,7 +93,8 @@ namespace Quicker.Managers
             var sourceData = SourceButton.Tag as ButtonData; // 获取源按钮数据
             var targetData = targetButton.Tag as ButtonData; // 获取目标按钮数据
 
-            RefreshButtonDisplay(SourceButton, targetData, 60, isMainWindow); // 更新 sourceButton 的内容
+            if(!(Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))) // 如果没有按住 Ctrl 键
+                RefreshButtonDisplay(SourceButton, targetData, 60, isMainWindow); // 更新 sourceButton 的内容
             RefreshButtonDisplay(targetButton, sourceData, 60, isMainWindow); // 更新 targetButton 的内容
             SourceButton = null; // 清空源按钮
         }

@@ -73,6 +73,23 @@ namespace Quicker.Windows.Menus
             buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }
 
+        // 复制动作
+        private void CopyAction_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
+            Clipboard.SetText($"{ButtonID}"); // 复制文本到剪贴板
+            Clipboard.SetText($"CopyAction;{TableName};{ButtonID};QuickerCommand"); // 复制文本到剪贴板
+            this.Close(); // 关闭窗口
+        }
+
+        // 剪切动作
+        private void CutAction_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
+            Clipboard.SetText($"CutAction;{TableName};{ButtonID};QuickerCommand"); // 复制文本到剪贴板
+            this.Close(); // 关闭窗口
+        }
+
         // 删除动作
         private void DeleteAction_Click(object sender, RoutedEventArgs e)
         {

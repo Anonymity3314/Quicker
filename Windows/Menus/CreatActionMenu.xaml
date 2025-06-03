@@ -61,13 +61,13 @@
                     </Grid>
                 </Button>
                 <Rectangle Height="1" Fill="#FFF0F0F0"/>
-                <Button Click="LoadExtension" Style="{StaticResource MenuButton}">
+                <Button Click="LoadExtension" Style="{StaticResource MenuButton}" Margin="0,3,0,0">
                     <Grid>
                         <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="加载扩展"/>
                     </Grid>
                 </Button>
-                <Button Click="ImportActionData" Style="{StaticResource MenuButton}" Margin="0,3">
+                <Button Click="ImportActionData" Style="{StaticResource MenuButton}" Margin="0,0,0,3">
                     <Grid>
                         <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="导入动作"/>

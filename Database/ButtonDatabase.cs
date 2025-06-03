@@ -1,6 +1,8 @@
-﻿using System.Data.SQLite;
-using System.Text.Json;
+﻿using Quicker.Managers;
+using System.Data.SQLite;
 using System.IO;
+using System.Text.Json;
+using System.Windows.Input;
 
 namespace Quicker.Database
 {
@@ -219,6 +221,7 @@ namespace Quicker.Database
         /// <param name="buttonID2"> ButtonID2 </param>
         public void ExchangeButtonID(int buttonID1, int buttonID2, string tableName1, string tableName2)
         {
+            bool isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 判断是否按下了 Ctrl 键
             using var connection = OpenConnection(); // 打开连接
             var data1 = GetButtonDataByID(buttonID1, tableName1); // 获取 ButtonID1 的数据
             var data2 = GetButtonDataByID(buttonID2, tableName2); // 获取 ButtonID2 的数据
@@ -238,24 +241,34 @@ namespace Quicker.Database
                 UsedTimes = data1.UsedTimes
             }; // 构造新的 ButtonData
             ButtonData newButtonData2 = new(); // 构造新的 ButtonData
-            DeleteAction(buttonID1, tableName1); // 删除 ButtonID1
+            if (!isCtrlPressed)
+                DeleteAction(buttonID1, tableName1); // 删除 ButtonID1
             if (data2 != null)
             {
-                newButtonData2.ButtonID = buttonID1; // 新的 ButtonID
-                newButtonData2.Title = data2.Title;
-                newButtonData2.Location = data2.Location;
-                newButtonData2.ImagePath = data2.ImagePath;
-                newButtonData2.Data1 = data2.Data1;
-                newButtonData2.Data2 = data2.Data2;
-                newButtonData2.Data3 = data2.Data3;
-                newButtonData2.Description = data2.Description;
-                newButtonData2.CreateTime = data2.CreateTime;
-                newButtonData2.LatestEditTime = data2.LatestEditTime;
-                newButtonData2.ActionType = data2.ActionType;
-                newButtonData2.UsedTimes = data2.UsedTimes;
+                if (isCtrlPressed)
+                {
+                    using var toast = new ToastManager(); // 实例化 ToastManager
+                    toast.Show("目标位置已有动作，不可再添加新动作。", "Error"); // 显示提示
+                    return; // 退出函数
+                }
+                else
+                {
+                    newButtonData2.ButtonID = buttonID1; // 新的 ButtonID
+                    newButtonData2.Title = data2.Title;
+                    newButtonData2.Location = data2.Location;
+                    newButtonData2.ImagePath = data2.ImagePath;
+                    newButtonData2.Data1 = data2.Data1;
+                    newButtonData2.Data2 = data2.Data2;
+                    newButtonData2.Data3 = data2.Data3;
+                    newButtonData2.Description = data2.Description;
+                    newButtonData2.CreateTime = data2.CreateTime;
+                    newButtonData2.LatestEditTime = data2.LatestEditTime;
+                    newButtonData2.ActionType = data2.ActionType;
+                    newButtonData2.UsedTimes = data2.UsedTimes;
 
-                DeleteAction(buttonID2, tableName2); // 删除 ButtonID2
-                UpdateAction(newButtonData2, tableName1); // 更新 ButtonID2 到 ButtonID1
+                    DeleteAction(buttonID2, tableName2); // 删除 ButtonID2
+                    UpdateAction(newButtonData2, tableName1); // 更新 ButtonID2 到 ButtonID1
+                }
             }
             UpdateAction(newButtonData1, tableName2); // 更新 ButtonID1 到 ButtonID2
         }

@@ -752,7 +752,7 @@ namespace Quicker.Windows.MainWindows
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取场景名称
-            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};OpenActionPageCommand"; // 生成打开动作页指令
+            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};QuickerCommand"; // 生成打开动作页指令
             Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
             toast.Show("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 弹出消息提醒

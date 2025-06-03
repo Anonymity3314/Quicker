@@ -38,23 +38,37 @@ namespace Quicker.Windows.Menus
         private void SetButtonVisbility()
         {
             clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
-            if(!(clipboardText.StartsWith("OpenActionPage") && clipboardText.EndsWith("OpenActionPageCommand")))
+            if (!clipboardText.EndsWith("QuickerCommand")) // 剪切板文本不是快捷指令
             {
-                if(!hasChanged)
+                if (!hasChanged)
                 {
-                    MainGrid.Height -= 33; // 减少高度
+                    MainGrid.Height -= 32; // 减少高度
                     Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
                     PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
                     hasChanged = !hasChanged;
                 }
             }
-            else
+            else if (clipboardText.StartsWith("OpenActionPage"))
             {
                 string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
                 PasteActionTextBlock.Text = $"粘贴动作：{actionInfo[1]}{actionInfo[2]}"; // 设置文本
-                if(hasChanged)
+                if (hasChanged)
                 {
-                    MainGrid.Height += 33; // 增加高度
+                    MainGrid.Height += 32; // 增加高度
+                    Line1.Visibility = Visibility.Visible; // 显示分割线
+                    PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
+                    hasChanged = !hasChanged;
+                }
+            }
+            else if (clipboardText.StartsWith("CopyAction") ||
+                clipboardText.StartsWith("CutAction")) // 剪切板文本是动作
+            {
+                string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
+                var buttonData = db2.GetButtonDataByID(int.Parse(actionInfo[2]), actionInfo[1]); // 获取按钮数据
+                PasteActionTextBlock.Text = $"粘贴动作：{buttonData.Title}"; // 设置文本
+                if (hasChanged)
+                {
+                    MainGrid.Height += 32; // 增加高度
                     Line1.Visibility = Visibility.Visible; // 显示分割线
                     PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
                     hasChanged = !hasChanged;
@@ -71,20 +85,8 @@ namespace Quicker.Windows.Menus
         // 粘贴动作
         private void PasteActionButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Visibility = Visibility.Hidden; // 隐藏窗口
-            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
-            ButtonData buttonData = new()
-            {
-                ButtonID = ButtonID,
-                Title = actionInfo[1] + actionInfo[2],
-                Location = "",
-                Data1 = actionInfo[1],
-                Data2 = actionInfo[2],
-                ImagePath = "",
-                Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
-                ActionType = "OpenActionPage"
-            }; // 创建按钮数据
-            db2.UpdateAction(buttonData, TableName); // 保存按钮数据
+            Visibility = Visibility.Hidden; // 隐藏窗口
+            PasteAction(); // 粘贴动作
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
                 actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
@@ -96,7 +98,65 @@ namespace Quicker.Windows.Menus
                     mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
                 }
             }
-            this.Close(); // 关闭窗口
+            Close(); // 关闭窗口
+        }
+
+        // 粘贴动作
+        private void PasteAction()
+        {
+            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
+            switch (actionInfo[0])
+            {
+                case "CopyAction":
+                case "CutAction":
+                    var buttonData = db2.GetButtonDataByID(int.Parse(actionInfo[2]), actionInfo[1]); // 获取按钮数据
+                    ButtonData buttonData1 = new()
+                    {
+                        ButtonID = ButtonID,
+                        Title = buttonData.Title,
+                        Location = buttonData.Location,
+                        ImagePath = buttonData.ImagePath,
+                        Data1 = buttonData.Data1,
+                        Data2 = buttonData.Data2,
+                        Data3 = buttonData.Data3,
+                        Description = buttonData.Description,
+                        CreateTime = DateTime.Now,
+                        ActionType = buttonData.ActionType,
+                        UsedTimes = buttonData.UsedTimes
+                    }; // 创建按钮数据
+                    db2.UpdateAction(buttonData1, TableName); // 保存按钮数据
+                    if(actionInfo[0] == "CutAction")
+                    {
+                        db2.DeleteAction(int.Parse(actionInfo[2]), actionInfo[1]); // 删除动作
+                        var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 尝试查找主窗口
+                        if (mainWindowList != null)
+                        {
+                            foreach (MainWindow mainWindow in mainWindowList) // 遍历主窗口列表
+                            {
+                                mainWindow.UpdateButtonContent(int.Parse(actionInfo[2]), actionInfo[1]); // 更新主窗口按钮
+                            }
+                        }
+                    }
+                    break;
+                case "OpenActionPage":
+                    ButtonData buttonData3 = new()
+                    {
+                        ButtonID = ButtonID,
+                        Title = actionInfo[1] + actionInfo[2],
+                        Location = "",
+                        Data1 = actionInfo[1],
+                        Data2 = actionInfo[2],
+                        ImagePath = "",
+                        Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
+                        CreateTime = DateTime.Now,
+                        ActionType = "OpenActionPage",
+                        UsedTimes = 0
+                    }; // 创建按钮数据
+                    db2.UpdateAction(buttonData3, TableName); // 保存按钮数据
+                    break;
+                default:
+                    break;
+            }
         }
 
         // 启动软件
