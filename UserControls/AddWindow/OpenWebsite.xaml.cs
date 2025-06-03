@@ -99,7 +99,7 @@ namespace Quicker.UserControls.AddWindow
         // 编辑动作 加载动作信息
         private void LoadButtonInformation()
         {
-            ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.CurrentButton, _addWindow.TableName); // 获取按钮数据
+            ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
             if (buttonData.ActionType != "OpenWebsite") return; // 如果不是打开网站动作，则不执行操作
 
             // 设置按钮标题
@@ -169,13 +169,13 @@ namespace Quicker.UserControls.AddWindow
                 : "";
 
             // 获取旧数据并保留创建时间
-            var oldData = _buttonDb.GetButtonDataByID(_addWindow.CurrentButton, _addWindow.TableName);
+            var oldData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName);
             DateTime createdTime = oldData != null ? oldData.CreateTime : DateTime.Now;
                         
             // 创建按钮数据对象
             var buttonData = new ButtonData
             {
-                ButtonID = _addWindow.CurrentButton,
+                ButtonID = _addWindow.ButtonID,
                 Title = _addWindow.TitleTextBox.Text,
                 Location = LocationTextBox.Text,
                 ImagePath = _addWindow.iconPath,

@@ -17,12 +17,12 @@ namespace Quicker.UserControls.AddWindow
     {
         #region 字段
 
+        private const string DefaultLocationText = "可以用英文分号隔开不同路径来添加多个文件";
         private Quicker.Windows.MainWindows.AddWindow _addWindow; // AddWindow 的引用
         private readonly ButtonManager _buttonManager = new(); // 按钮管理器
         private readonly IconManager _iconManager = new(); // 图标管理器接口
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的引用
         private ButtonDatabase _buttonDb = new(); // 按钮数据库
-        private const string DefaultLocationText = "可以用英文分号隔开不同路径来添加多个文件";
 
         #endregion
 
@@ -195,7 +195,7 @@ namespace Quicker.UserControls.AddWindow
         // 编辑动作 加载动作信息
         private void LoadButtonInformation()
         {
-            ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.CurrentButton, _addWindow.TableName); // 获取按钮数据
+            ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
             
             // 检查动作类型是否为打开文件相关
             switch (buttonData.ActionType)
@@ -256,11 +256,11 @@ namespace Quicker.UserControls.AddWindow
             string actionType = DetermineActionType();
 
             // 获取旧数据并保留创建时间
-            var oldData = _buttonDb.GetButtonDataByID(_addWindow.CurrentButton, _addWindow.TableName);
+            var oldData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName);
             DateTime createdTime = oldData != null ? oldData.CreateTime : DateTime.Now;
             var buttonData = new ButtonData
             {
-                ButtonID = _addWindow.CurrentButton,
+                ButtonID = _addWindow.ButtonID,
                 Title = _addWindow.TitleTextBox.Text,
                 Location = LocationTextBox.Text,
                 ImagePath = _addWindow.iconPath,

@@ -20,7 +20,7 @@
     Deactivated="CreatActionMenu_Deactivated"
     Loaded="CreatActionMenu_Loaded"
 >
-    <Grid x:Name="MainGrid" Width="178" Height="171" Margin="9,8,571,261">
+    <Grid x:Name="MainGrid" Width="178" Height="196" Margin="9,8,571,236">
         <!-- 窗口阴影 -->
         <Rectangle Fill="White" Margin="5,7">
             <Rectangle.Effect>
@@ -61,6 +61,12 @@
                     </Grid>
                 </Button>
                 <Rectangle Height="1" Fill="#FFF0F0F0"/>
+                <Button Click="LoadExtension" Style="{StaticResource MenuButton}">
+                    <Grid>
+                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="加载扩展"/>
+                    </Grid>
+                </Button>
                 <Button Click="ImportActionData" Style="{StaticResource MenuButton}" Margin="0,3">
                     <Grid>
                         <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>

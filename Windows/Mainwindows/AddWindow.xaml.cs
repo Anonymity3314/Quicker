@@ -27,13 +27,30 @@ namespace Quicker.Windows.MainWindows
         private bool isLoading = true; // 是否正在加载
         public string iconPath; // 图标路径
 
-        public int CurrentButton { get; private set; } // 当前按钮
+        public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
         public int Choice { get; private set; } // 选择添加动作类型
 
+        /*
+         * 构造函数参数说明：
+         * choice：
+         * 0：编辑动作
+         * 1：启动软件
+         * 2：打开文件
+         * 3：打开文件夹
+         * 4：打开网址
+         * 5：加载扩展
+         */
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentbutton"> 当前按钮 </param>
+        /// <param name="tableName"> 表名 </param>
+        /// <param name="choice"> 选择添加动作类型 </param>
         public AddWindow(int currentbutton, string tableName, int choice)
         {
-            CurrentButton = currentbutton; // 当前按钮
+            ButtonID = currentbutton; // 当前按钮
             TableName = tableName; // 表名
             Choice = choice; // 选择添加动作类型
             InitializeComponent(); // 初始化窗口组件
@@ -73,9 +90,9 @@ namespace Quicker.Windows.MainWindows
             }
             else // 如果是编辑动作
                 pageName = ""; // 页面名称
-            int page = (CurrentButton / 100) + 1; // 计算页码
-            int row = (CurrentButton / 10) % 10; // 计算行号
-            int column = CurrentButton % 10; // 计算列号
+            int page = (ButtonID / 100) + 1; // 计算页码
+            int row = (ButtonID / 10) % 10; // 计算行号
+            int column = ButtonID % 10; // 计算列号
             Title = $"新动作--{pageName}第{page}页{row}行{column}列--编辑动作"; // 设置标题
         }
 
@@ -97,13 +114,23 @@ namespace Quicker.Windows.MainWindows
                     ChoiceComboBox.SelectedIndex = 1;
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
                     break; // 选择网址
+                case 5:
+                    ChoiceComboBox.SelectedIndex = 2;
+                    ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
+                    {
+                        using var toast = new ToastManager(); // 创建 ToastManager 实例
+                        toast.Show("功能开发中，敬请期待！", "Common"); // 显示提示消息
+                    }
+                    break; // 加载扩展
+                default:
+                    break; // 其他情况
             }
         }
 
         // 编辑动作，加载动作信息
         private void LoadActionInfo()
         {
-            ButtonData buttonData = db2.GetButtonDataByID(CurrentButton, TableName); // 获取按钮数据
+            ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             switch (buttonData.ActionType)
             {
                 case "OpenFile":
@@ -116,6 +143,8 @@ namespace Quicker.Windows.MainWindows
                     ChoiceComboBox.SelectedIndex = 1;
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
                     break;
+                default:
+                    break; // 其他情况
             }
         }
 
@@ -178,7 +207,7 @@ namespace Quicker.Windows.MainWindows
             }
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
-                actionPageManageWindow.UpdateButton(CurrentButton); // 更新菜单栏按钮
+                actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
             this.Close(); // 关闭窗口
         }
 
@@ -347,7 +376,7 @@ namespace Quicker.Windows.MainWindows
                 default:
                     {
                         using var toast = new ToastManager(); // 创建 ToastManager 实例
-                        toast.Show("正在开发中，敬请期待！", "Common"); // 显示提示消息
+                        toast.Show("功能开发中，敬请期待！", "Common"); // 显示提示消息
                     }
                     break; // 其他情况
             }
@@ -421,15 +450,6 @@ namespace Quicker.Windows.MainWindows
                 selectWindowWindow.Close(); // 关闭选择窗口
                 selectWindowWindow = null; // 清理静态引用
             }
-            
-            // 清理控件资源
-            if (ButtonImage != null)
-            {
-                ButtonImage.Source = null; // 释放图片资源
-                ButtonImage = null; // 清理引用
-            }
-            if (ButtonTitle != null)
-                ButtonTitle = null; // 清理引用
             iconPath = null;
 
             GC.Collect(); // 强制垃圾回收

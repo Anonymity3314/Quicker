@@ -15,6 +15,8 @@ namespace Quicker.Windows.MainWindows
         public string SelectedImagePath { get; private set; } = string.Empty; // 选中的图片路径
         public event EventHandler<string> ImageConfirmed; // 图片确认事件
         private ScrollViewer listViewScrollViewer; // 图片列表的 ScrollViewer
+        private int loadedImageCount = 0; // 已加载的图片数量
+        private string[] allImageFiles; // 存储所有图片文件路径
 
         public SelectImageWindow()
         {
@@ -98,6 +100,19 @@ namespace Quicker.Windows.MainWindows
         // 从文件夹加载图片
         private void LoadImagesFromFolder()
         {
+            string targetFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
+            if (!Directory.Exists(targetFolderPath))
+            {
+                Directory.CreateDirectory(targetFolderPath); // 创建文件夹
+                DirectoryInfo dirInfo = new DirectoryInfo(Path.GetDirectoryName(targetFolderPath)); // 获取文件夹信息
+                return; // 返回
+            }
+
+            string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif" }; // 支持的图片格式
+            allImageFiles = Directory.GetFiles(targetFolderPath)
+                .Where(file => supportedExtensions.Contains(Path.GetExtension(file).ToLower()))
+                .ToArray();
+
             LoadImages(45); // 加载图片
             UpdateWrapPanelHeight(); // 重新计算 WrapPanel 的高度
         }
@@ -108,29 +123,29 @@ namespace Quicker.Windows.MainWindows
         /// <param name="maxImagesToLoad"> 一次加载的最大图片数量 </param>
         private void LoadImages(int maxImagesToLoad)
         {
-            string targetFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
-            if (!Directory.Exists(targetFolderPath))
+            if (allImageFiles == null || loadedImageCount >= allImageFiles.Length)
             {
-                Directory.CreateDirectory(targetFolderPath); // 创建文件夹
-                DirectoryInfo dirInfo = new DirectoryInfo(Path.GetDirectoryName(targetFolderPath)); // 获取文件夹信息
-                return; // 返回
-            } // 如果文件夹不存在，则创建文件夹
-            string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif" }; // 支持的图片格式
-            string[] imageFiles = Directory.GetFiles(targetFolderPath); // 获取文件夹中的所有文件
-            for (int i = 0; i < imageFiles.Length && i < maxImagesToLoad; i++) // 使用 for 循环遍历文件夹中的文件
-            {
-                FileInfo fileInfo = new FileInfo(imageFiles[i]); // 获取文件信息
-                if (supportedExtensions.Contains(fileInfo.Extension.ToLower())) // 检查文件扩展名
-                {
-                    var imageItem = new ImageItem // 创建图片项
-                    {
-                        FilePath = imageFiles[i], // 文件路径
-                        FileName = fileInfo.Name, // 文件名
-                        ImageSource = LoadImage(imageFiles[i]) // 加载图片
-                    };
-                    ImageItems.Add(imageItem); // 添加到图片项集合
-                }
+                return; // 如果所有图片都已加载，则返回
             }
+
+            int remainingImages = allImageFiles.Length - loadedImageCount;
+            int imagesToLoad = Math.Min(maxImagesToLoad, remainingImages);
+
+            for (int i = 0; i < imagesToLoad; i++)
+            {
+                string imagePath = allImageFiles[loadedImageCount + i];
+                FileInfo fileInfo = new FileInfo(imagePath);
+                
+                var imageItem = new ImageItem // 创建图片项
+                {
+                    FilePath = imagePath, // 文件路径
+                    FileName = fileInfo.Name, // 文件名
+                    ImageSource = LoadImage(imagePath) // 加载图片
+                };
+                ImageItems.Add(imageItem); // 添加到图片项集合
+            }
+
+            loadedImageCount += imagesToLoad;
         }
 
         // 加载图片
@@ -257,8 +272,11 @@ namespace Quicker.Windows.MainWindows
         // 继续加载图片
         private void LoadImages(object sender, RoutedEventArgs e)
         {
-            LoadImages(27); // 加载图片
-            UpdateWrapPanelHeight(); // 重新计算 WrapPanel 的高度
+            if (loadedImageCount < allImageFiles.Length)
+            {
+                LoadImages(27); // 加载图片
+                UpdateWrapPanelHeight(); // 重新计算 WrapPanel 的高度
+            }
         }
 
         // 关闭窗口前，释放资源

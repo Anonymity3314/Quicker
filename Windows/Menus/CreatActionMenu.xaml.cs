@@ -179,6 +179,16 @@ namespace Quicker.Windows.Menus
             this.Close(); // 关闭窗口
         }
 
+        // 加载扩展
+        private void LoadExtension(object sender, RoutedEventArgs e)
+        {
+            haveAction = true; // 有动作
+            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            AddWindow addWindow = new(ButtonID, TableName, 5); // 传递当前按钮和类型
+            addWindow.Show(); // 显示窗口
+            buttonManager.CloseMainWindow(this); // 关闭主窗口
+        }
+
         // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
         {
