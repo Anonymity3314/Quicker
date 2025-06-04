@@ -23,6 +23,7 @@ namespace Quicker.UserControls.AddWindow
         private readonly IconManager _iconManager = new(); // 图标管理器接口
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的引用
         private ButtonDatabase _buttonDb = new(); // 按钮数据库
+        private bool isLoading = true; // 是否正在加载
 
         #endregion
 
@@ -42,6 +43,7 @@ namespace Quicker.UserControls.AddWindow
         private void OpenFile_Loaded(object sender, RoutedEventArgs e)
         {
             ExecuteChoiceAction(); // 根据上个窗口数据执行对应命令
+            isLoading = false; // 加载完成
         }
 
         // 打开菜单
@@ -166,6 +168,27 @@ namespace Quicker.UserControls.AddWindow
         private void OpenFile_Unloaded(object sender, RoutedEventArgs e)
         {
             CleanupResources();
+        }
+
+        // 调整窗口高度
+        private void LocationTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (isLoading) return; // 防止在加载过程中调整大小
+            if (_addWindow != null)
+            {
+                // 计算文本框高度变化量
+                double heightChange = e.NewSize.Height - e.PreviousSize.Height;
+                // 调整窗口高度
+                _addWindow.Height += heightChange;
+                // 获取当前的Margin
+                Thickness currentMargin = Grid1.Margin;
+
+                // 创建一个新的Margin对象，只修改Top属性
+                Thickness newMargin = new Thickness(currentMargin.Left, currentMargin.Top + heightChange, 0, 0);
+
+                // 将新的Margin赋给Grid1
+                Grid1.Margin = newMargin;
+            }
         }
 
         #endregion

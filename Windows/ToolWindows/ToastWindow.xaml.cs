@@ -38,17 +38,14 @@ namespace Quicker.Windows.ToolWindows
         // 检查并显示消息
         private void CheckAndDisplayToast()
         {
-            if (ToastStackPanel.Children.Count < 5) // 判断消息数量是否达到上限
+            if (messageQueue.Count > 0 && ToastStackPanel.Children.Count < 5) // 判断消息队列是否有消息并且当前消息数量未达到上限
             {
-                if (messageQueue.Count > 0) // 判断消息队列是否有消息
-                {
-                    var msg = messageQueue.Dequeue(); // 从队列中取出消息
-                    ShowToast(msg); // 显示消息
-                }
-                else // 没有消息
-                {
-                    Close(); // 关闭窗口
-                }
+                var msg = messageQueue.Dequeue(); // 从队列中取出消息
+                ShowToast(msg); // 显示消息
+            }
+            else if (messageQueue.Count == 0 && ToastStackPanel.Children.Count == 0) // 判断消息队列是否为空且没有消息显示
+            {
+                Close(); // 关闭窗口
             }
         }
 

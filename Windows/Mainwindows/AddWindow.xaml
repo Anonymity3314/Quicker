@@ -63,6 +63,6 @@
                 <TextBlock x:Name="ButtonTitle" Visibility="Collapsed" TextWrapping="NoWrap" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1"/>
             </Grid>
         </Button>
-        <Grid x:Name="ActionInfoGrid" Margin="0,66,207,80"/>
+        <Grid x:Name="ActionInfoGrid" Margin="0,66,207,80" Panel.ZIndex="-1"/>
     </Grid>
 </Window>

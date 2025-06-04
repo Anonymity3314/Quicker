@@ -4,12 +4,15 @@
 >
     <!-- 添加动作窗口地址文本框 -->
     <Style x:Key="AddressTextBox" TargetType="TextBox">
-        <Setter Property="Height" Value="25"/>
+        <Setter Property="MinHeight" Value="25"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
                     <Border x:Name="border" CornerRadius="3,0,0,3" BorderThickness="1" BorderBrush="#FFD5D5D5">
-                        <TextBox Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}" BorderThickness="0" Background="{x:Null}" VerticalAlignment="Center" Margin="2,0" Foreground="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"/>
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Margin="2,0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled"/>
                     </Border>
 
                     <ControlTemplate.Triggers>
