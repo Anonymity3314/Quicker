@@ -525,8 +525,7 @@ namespace Quicker
                 }
                 else
                 {
-                    mainWindow.Visibility = Visibility.Visible; // 显示主窗口
-                    AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
+                    mainWindow.Close(); // 关闭主窗口
                 }
             });
         }

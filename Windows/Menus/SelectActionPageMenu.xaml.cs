@@ -20,13 +20,16 @@ namespace Quicker.Windows.Menus
         // 加载动作页切换按钮
         private void SelectActionPageMenu_Loaded(object sender, RoutedEventArgs e)
         {
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+
             var sceneData = db3.GetAllSceneData(); // 获取所有场景数据
             foreach (var data in sceneData) // 遍历所有场景
             {
                 if (data.SceneCount == 0 || data.SceneName == "Global") continue; // 跳过没有动作页的场景和全局场景
                 IncreaseMenuSize(); // 增加菜单大小
                 Button button = GenerateButton(data); // 生成切换动作页按钮
-                Grid grid = new(); // 创建按钮容器
+                Grid grid = new() { Width = MainGrid.Width }; // 创建按钮容器
                 button.Content = grid; // 设置按钮内容
                 Image image = GenerateImage(data); // 生成按钮图片
                 grid.Children.Add(image);
@@ -40,8 +43,8 @@ namespace Quicker.Windows.Menus
         // 增加菜单大小
         private void IncreaseMenuSize()
         {
-            this.Height += 25;
             MainGrid.Height += 25;
+            Height += 25;
         }
 
         /// <summary>
@@ -54,7 +57,8 @@ namespace Quicker.Windows.Menus
             Button button = new()
             {
                 Style = FindResource("MenuButton") as Style, // 加载按钮样式
-                Name = data.SceneName, // 设置按钮名称
+                ToolTip = data.SceneTag, // 设置按钮提示
+                Name = data.SceneName // 设置按钮名称
             }; // 生成切换动作页按钮
             return button; // 返回按钮
         }
@@ -83,7 +87,7 @@ namespace Quicker.Windows.Menus
         /// <summary>
         /// 生成按钮文字
         /// </summary>
-        /// <param name="text"> 按钮文字 </param>
+        /// <param name="data"> 场景数据 </param>
         /// <returns> 按钮文字 </returns>
         private TextBlock GenerateTextBlock(SceneData data)
         {
@@ -102,7 +106,7 @@ namespace Quicker.Windows.Menus
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口
             if (mainWindow != null) // 如果主窗口存在
                 mainWindow.OnCommonStyleChanged(button.Name); // 切换动作页时更新样式
-            this.Close(); // 关闭菜单
+            Close(); // 关闭菜单
         }
 
         // 失去焦点关闭窗口
@@ -111,7 +115,7 @@ namespace Quicker.Windows.Menus
             ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件处理器
             using var windowMananger = new WindowManager(); // 创建窗口管理器
             windowMananger.SetMainWindowFocused(); // 关闭窗口
-            this.Visibility = Visibility.Hidden; // 失去焦点关闭窗口
+            Visibility = Visibility.Hidden; // 失去焦点关闭窗口
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.CloseMenuAsync(this); // 延时关闭窗口
         }
@@ -121,10 +125,7 @@ namespace Quicker.Windows.Menus
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件处理器
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            GC.Collect(); // 强制垃圾回收
         }
     }
 }

@@ -16,10 +16,10 @@ namespace Quicker
         public static BitmapImage _trayIcon1 = new(new Uri("pack://application:,,,/Resources/Images/Quicker1.png")); // 托盘图标1
         public static BitmapImage _trayIcon2 = new(new Uri("pack://application:,,,/Resources/Images/Quicker2.png")); // 托盘图标2
 
-        public static readonly string DisBookIconPath = "/Resources/Images/UnpinFromDesktop.png"; // 禁订住图标路径
-        public static readonly string BookIconPath = "/Resources/Images/PinToDesktop.png"; // 订住图标路径
-        public static readonly string UnLockIconPath = "/Resources/Images/UnLocked.png"; // 解锁图标路径
-        public static readonly string LockIconPath = "/Resources/Images/Locked.png"; // 锁定图标路径
+        public const string DisBookIconPath = "/Resources/Images/UnpinFromDesktop.png"; // 禁订住图标路径
+        public const string BookIconPath = "/Resources/Images/PinToDesktop.png"; // 订住图标路径
+        public const string UnLockIconPath = "/Resources/Images/UnLocked.png"; // 解锁图标路径
+        public const string LockIconPath = "/Resources/Images/Locked.png"; // 锁定图标路径
 
         private static List<BlacklistApplication> _blacklistApplications; // 黑名单应用
         private static OpenMainWindow _openMainWindowConditions; // 打开主窗口条件
