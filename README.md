@@ -2,10 +2,14 @@
 
 [![Merge Project](https://github.com/LJZ-Anonymity/Quicker/actions/workflows/CodeMerging.yml/badge.svg?branch=Quicker)](https://github.com/LJZ-Anonymity/Quicker/actions/workflows/CodeMerging.yml)
 [![Version](https://img.shields.io/github/v/release/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/releases)
+[![最后更新](https://img.shields.io/github/last-commit/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/commits)
+[![开源协议](https://img.shields.io/github/license/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/blob/main/LICENSE)
+[![代码行数](https://img.shields.io/tokei/lines/github/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
+[![主要语言](https://img.shields.io/github/languages/top/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 
 ## 项目简介
 
-这是由作者重构的 WPF 应用Quicker，主要功能包括动作管理、应用状态管理、按钮管理等。
+这是由作者重构的 WPF 应用 Quicker，主要功能包括动作管理、应用状态管理、按钮管理等。
 
 该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
 
@@ -26,6 +30,14 @@
 项目仍在持续更新中，如有侵权，请联系作者删除。
 
 如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
+
+## 开源协议
+
+本项目采用 [MIT](LICENSE) 协议开源。
+
+本项目是参照原版 Quicker 的界面和功能，使用 WPF 重新实现的独立项目。
+
+本项目与原版 Quicker 无直接关联，仅作为学习交流使用。
 
 ## 快速开始指南
 
@@ -87,6 +99,7 @@ Quicker/
 ├─App.xaml.cs                                     # 应用入口点的代码后台
 ├─AssemblyInfo.cs                                 # 项目的属性和版本信息
 ├─Quicker.csproj                                  # 项目的核心配置文件
+├─Quicker.csproj.user                             # 项目用户配置文件
 ├─Quicker.ico                                     # 应用图标
 ├─Quicker.sln                                     # 项目解决方案文件
 │
@@ -95,12 +108,12 @@ Quicker/
 │   ├─ButtonDatabase.cs                           # 按钮数据库
 │   ├─SettingDatabase.cs                          # 设置数据库
 │   └─TemporaryDatabase.cs                        # 临时数据库
-|
+│
 ├─Extend/                                         # 扩展文件夹
 │   ├─IExtensionModule.cs                         # 实现扩展的接口
 │   └─ModuleLoader.cs                             # 扩展模块加载器
-|
-├─InforData/                                      # 信息数据文件夹
+│
+├─InfoData/                                       # 信息数据文件夹
 │   ├─Extensions.json                             # 扩展信息
 │   ├─UpdateHistory.txt                           # 更新历史
 │   └─VersionInfo.json                            # 版本信息
@@ -118,6 +131,9 @@ Quicker/
 │   ├─ToastManager.cs                             # 消息管理器
 │   └─WindowManager.cs                            # 窗口管理器
 │
+├─Properties/                                     # 项目属性文件夹
+│   └─AssemblyInfo.cs                             # 程序集信息
+│
 ├─Resources/                                      # 资源文件夹
 │   ├─Images/                                     # 图像资源文件夹
 │   │   ├─AboutQuicker.png                        # 关于Quicker的图片
@@ -125,7 +141,7 @@ Quicker/
 │   │   ├─ActionPagesManager.jpg                  # 动作场景的图片
 │   │   ├─Add.png                                 # 主面板添加动作的图片
 │   │   ├─BasicSettingButton.png                  # 基础设置按钮的图片
-│   │   ├─ClearButton.png                         # 下载窗口中清理按钮发图片
+│   │   ├─ClearButton.png                         # 下载窗口中清理按钮的图片
 │   │   ├─CloseDownloadWindow.png                 # 关闭下载窗口的按钮图片
 │   │   ├─CloseQuicker.png                        # 退出Quicker的图片
 │   │   ├─CloseWindow.png                         # 关闭主面板的图片
@@ -186,7 +202,7 @@ Quicker/
 │           └─OpenMainWindowGrid.xaml.cs
 │
 └─Windows/                                        # 界面文件夹
-    ├─MainWindows/                                # 窗口文件夹
+    ├─MainWindows/                                # 主窗口文件夹
     │   ├─ActionPageManageWindow.xaml             # 编辑动作页窗口
     │   │   └─ActionPageManageWindow.xaml.cs
     │   ├─AddWindow.xaml                          # 添加动作窗口
@@ -198,9 +214,9 @@ Quicker/
     │   ├─SelectImageWindow.xaml                  # 选择图片窗口
     │   │   └─SelectImageWindow.xaml.cs
     │   ├─SettingWindow.xaml                      # 设置窗口
-    │   │    └─SettingWindow.xaml.cs
+    │   │   └─SettingWindow.xaml.cs
     │   └─UpdateWindow.xaml                       # 更新窗口
-    │        └─UpdateWindow.xaml.cs
+    │       └─UpdateWindow.xaml.cs
     │
     └─Menus/                                      # 菜单文件夹
         ├─ActionInformationWindow.xaml            # 动作信息菜单
@@ -222,7 +238,7 @@ Quicker/
         ├─OperationMenu.xaml                      # 动作按钮操作菜单
         │   └─OperationMenu.xaml.cs
         ├─SelectActionPageMenu.xaml               # 选择动作页菜单
-        │    └─SelectActionPageMenu.xaml.cs
+        │   └─SelectActionPageMenu.xaml.cs
         └─ToastWindow.xaml                        # 消息弹窗
-             └─ToastWindow.xaml.cs
+            └─ToastWindow.xaml.cs
 ```

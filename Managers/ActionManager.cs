@@ -1,12 +1,12 @@
-﻿using IWshRuntimeLibrary;
-using Microsoft.Win32;
-using Quicker.Database;
-using Quicker.Extend;
-using Quicker.Windows;
+﻿using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
+using IWshRuntimeLibrary;
+using Quicker.Database;
+using Microsoft.Win32;
+using Quicker.Windows;
+using Quicker.Extend;
 using System.Windows;
+using System.IO;
 
 namespace Quicker.Managers
 {
