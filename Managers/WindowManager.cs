@@ -315,6 +315,21 @@ namespace Quicker.Managers
             return title.ToString(); // 返回窗口标题
         }
 
+        /// <summary>
+        /// 将窗口中心定位到鼠标位置
+        /// </summary>
+        /// <param name="window"> 要定位的窗口 </param>
+        public void SetWindowCenterAtMouse(Window window)
+        {
+            GetCursorPos(out POINT cursorPos); // 获取鼠标位置
+
+            // 计算窗口中心的位置
+            int left = cursorPos.X - (int)(window.ActualWidth / 2); // 窗口左边界
+            int top = cursorPos.Y - (int)(window.ActualHeight / 2); // 窗口上边界
+
+            SetWindowPosition(window, left, top); // 设置窗口位置
+        }
+
         // 释放资源
         public void Dispose()
         {

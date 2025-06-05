@@ -138,8 +138,7 @@ namespace Quicker
         private void ProcessLongPress(Convention conventions)
         {
             TimeSpan pressDuration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下时间
-            double longPressThreshold = conventions.LongPressThreshold / 1000.0; // 将毫秒转换为秒
-            if (pressDuration.TotalSeconds >= longPressThreshold)
+            if (pressDuration.TotalMilliseconds >= conventions.LongPressThreshold) // 直接使用毫秒比较
             {
                 CloseOrShowMainWindow(); // 如果按键时间超过阈值，触发功能
                 AppStateManager.KeyPressStartTime = null; // 重置按键时间
@@ -191,6 +190,7 @@ namespace Quicker
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
             if (!CanProcessHook()) return; // 如果不能处理钩子，返回
+            if (AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间已记录，返回
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             bool isCtrlPressed = GetCtrlKeyState(); // 获取 Ctrl 键状态
             
@@ -201,12 +201,12 @@ namespace Quicker
         private void Hook_MouseReleased(object? sender, MouseHookEventArgs e)
         {
             AppStateManager.PressTimer?.Stop(); // 停止计时器
-            if (!AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键时间未记录，返回
+            if (!AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间未记录，返回
 
             var conventions = AppStateManager.Conventions; // 获取设置
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
-            TimeSpan pressDuration = GetPressDuration(); // 获取按键按下时间
-            
+            TimeSpan pressDuration = GetMousePressDuration(); // 获取鼠标按下时间
+
             ProcessMouseButtonRelease(e.Data.Button, openMainWindowConditions, conventions, pressDuration); // 处理鼠标松开事件
         }
 
@@ -214,7 +214,7 @@ namespace Quicker
         private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
             if (!CanProcessHook()) return; // 如果不能处理钩子，返回
-            if (IsKeyPressAlreadyRecorded()) return; // 如果按键已经记录，返回
+            if (AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键已经记录，返回
 
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             ProcessControlKeyPress(e.Data.KeyCode, openMainWindowConditions); // 处理按键按下事件
@@ -227,7 +227,7 @@ namespace Quicker
 
             var conventions = AppStateManager.Conventions; // 获取设置
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
-            TimeSpan pressDuration = GetPressDuration(); // 获取按键按下时间
+            TimeSpan pressDuration = GetKeyPressDuration(); // 获取按键按下时间
             
             ProcessControlKeyRelease(e.Data.KeyCode, openMainWindowConditions, conventions, pressDuration); // 处理按键松开事件
         }
@@ -239,17 +239,6 @@ namespace Quicker
         private bool CanProcessHook()
         {
             return !IsBannedFormQuicker() && !FullScreenDisable(); // 如果禁用Quicker或全屏禁用Quicker，返回
-        }
-
-        /// <summary>
-        /// 判断是否已经记录按键按下时间
-        /// </summary>
-        /// <returns> 是否已经记录按键按下时间 </returns>
-        private bool IsKeyPressAlreadyRecorded()
-        {
-            if (!AppStateManager.KeyPressStartTime.HasValue) return false; // 如果按键时间未记录，返回
-            AppStateManager.KeyPressStartTime = null; // 重置按键时间
-            return true; // 返回是否已经记录按键按下时间
         }
 
         /// <summary>
@@ -271,10 +260,21 @@ namespace Quicker
         }
 
         /// <summary>
+        /// 获取鼠标按下时间
+        /// </summary>
+        /// <returns> 鼠标按下时间 </returns>
+        private TimeSpan GetMousePressDuration()
+        {
+            var duration = DateTime.Now - AppStateManager.MousePressStartTime.Value; // 获取鼠标按下时间
+            AppStateManager.MousePressStartTime = null; // 重置鼠标按下时间
+            return duration; // 返回鼠标按下时间，不除以1000
+        }
+
+        /// <summary>
         /// 获取按键按下时间
         /// </summary>
         /// <returns> 按键按下时间 </returns>
-        private TimeSpan GetPressDuration()
+        private TimeSpan GetKeyPressDuration()
         {
             var duration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 获取按键按下时间
             AppStateManager.KeyPressStartTime = null; // 重置按键时间
@@ -402,7 +402,7 @@ namespace Quicker
         /// <param name="pressDuration"> 按键按下时间 </param>
         private void ProcessMiddleMouseButtonRelease(OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
         {
-            if (pressDuration.TotalSeconds <= conventions.LongPressThreshold &&
+            if (pressDuration.TotalMilliseconds <= conventions.LongPressThreshold &&
                 conditions.OpenMainWindowByMiddleMouseClick)
             {
                 CloseOrShowMainWindow(); // 关闭或显示主窗口
@@ -419,7 +419,7 @@ namespace Quicker
         {
             if ((conditions.OpenMainWindowByX1MouseClick ||
                  conditions.OpenMainWindowByX2MouseClick) &&
-                pressDuration.TotalSeconds <= conventions.LongPressThreshold)
+                pressDuration.TotalMilliseconds <= conventions.LongPressThreshold) // 使用毫秒比较
             {
                 CloseOrShowMainWindow(); // 关闭或显示主窗口
             }
@@ -440,7 +440,6 @@ namespace Quicker
             {
                 PreLoadMainWindow(); // 预加载主窗口
             }
-
         }
 
         /// <summary>
@@ -455,7 +454,7 @@ namespace Quicker
             if ((keyCode == SharpHook.Data.KeyCode.VcLeftControl ||
                  keyCode == SharpHook.Data.KeyCode.VcRightControl) &&
                 conditions.OpenMainWindowByCtrl &&
-                pressDuration.TotalSeconds <= conventions.LongPressThreshold)
+                pressDuration.TotalMilliseconds <= conventions.LongPressThreshold)
             {
                 CloseOrShowMainWindow(); // 关闭或显示主窗口
             }
@@ -538,7 +537,9 @@ namespace Quicker
         {
             this.Dispatcher.Invoke(() =>
             {
-                AppStateManager.KeyPressStartTime = DateTime.Now; // 记录按键按下时间
+                DateTime dateTime = DateTime.Now; // 获取当前时间
+                AppStateManager.KeyPressStartTime = dateTime; // 记录鼠标按下时间
+                AppStateManager.MousePressStartTime = dateTime; // 记录鼠标按下时间
                 if (startTimer) AppStateManager.PressTimer.Start(); // 启动按键计时器
 
                 var actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 获取动作页面管理窗口

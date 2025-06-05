@@ -52,12 +52,11 @@ namespace Quicker.Windows.MainWindows
             InitializeActionPages(); // 初始化动作页
             InitializeButtons(); // 初始化按钮
             CheckUpdate(); // 检查更新
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowTopmost(this);// 设置窗口置顶
+            SetMainWindowState(); // 设置窗口状态
             this.Activate(); // 激活窗口
         }
 
-        /// 初始化动作页面
+        // 初始化动作页面
         private void InitializeActionPages()
         {
             GlobalGrid.Children.Remove(ViewGlobalUniformGrid); // 从主网格中移除
@@ -94,6 +93,17 @@ namespace Quicker.Windows.MainWindows
                 HasNewVersionTip.Visibility = Visibility.Collapsed; // 隐藏提示
                 TitlePop.Height -= 25; // 减少高度
                 UpdateButton.Visibility = Visibility.Collapsed; // 隐藏更新按钮
+            }
+        }
+
+        // 设置窗口状态
+        private void SetMainWindowState()
+        {
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.SetWindowTopmost(this);// 设置窗口置顶
+            if (AppStateManager.OpenByMouse)
+            {
+                windowManager.SetWindowCenterAtMouse(this); // 设置窗口居中
             }
         }
 
