@@ -267,7 +267,8 @@ namespace Quicker
         {
             var duration = DateTime.Now - AppStateManager.MousePressStartTime.Value; // 获取鼠标按下时间
             AppStateManager.MousePressStartTime = null; // 重置鼠标按下时间
-            return duration; // 返回鼠标按下时间，不除以1000
+            AppStateManager.KeyPressStartTime = null; // 重置键盘按下时间
+            return duration; // 返回鼠标按下时间
         }
 
         /// <summary>
