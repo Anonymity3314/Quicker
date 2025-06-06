@@ -373,25 +373,63 @@ namespace Quicker.Windows.MainWindows
                 if (!AppStateManager.Book && data.ActionType != "OpenActionPage") 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
 
+                if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
+
                 DoAction(data); // 执行动作
                 db2.IncreaseActionUsedTimes(data.ButtonID, buttonType); // 增加动作使用次数
 
-                bool autoReturn = db3.GetAutoReturnToFirstPage(buttonType); // 获取是否自动返回第一页
-                if(autoReturn) // 如果自动返回第一页，清空按钮所在容器
-                {
-                    if (buttonType == "Global")
-                        GlobalGrid.Children.Clear();
-                    else
-                        CommonGrid.Children.Clear();
-                    GenerateUniformGrid(0, buttonType); // 重新生成第一页内容
-                }
+                HandleAutoReturn(buttonType); // 处理自动返回
             }
             else
             {
-                var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
-                if (Convention.ShowAddImage) // 如果显示添加按钮
-                    buttonManager.OpenMenu(sender, true, "CreatActionMenu", this, buttonType); // 点击打开菜单
+                HandleEmptyButtonClick(sender, buttonType); // 处理空按钮点击
             }
+        }
+
+        /// <summary>
+        /// 处理Shift键动作
+        /// </summary>
+        /// <param name="button">按钮对象</param>
+        /// <param name="buttonType">按钮类型</param>
+        /// <returns>是否已处理动作</returns>
+        private bool HandleShiftKeyAction(Button button, string buttonType)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftShift))
+            {
+                AddWindow addWindow = new(int.Parse(button.Name.Replace($"{buttonType}", "")), buttonType, 0); // 创建添加窗口
+                addWindow.Show(); // 显示添加窗口
+                return true; // 处理Shift键动作
+            }
+            return false; // 未处理Shift键动作
+        }
+
+        /// <summary>
+        /// 处理自动返回第一页
+        /// </summary>
+        /// <param name="buttonType">按钮类型</param>
+        private void HandleAutoReturn(string buttonType)
+        {
+            bool autoReturn = db3.GetAutoReturnToFirstPage(buttonType); // 获取是否自动返回第一页
+            if(autoReturn) // 如果自动返回第一页，清空按钮所在容器
+            {
+                if (buttonType == "Global")
+                    GlobalGrid.Children.Clear(); // 清空按钮所在容器
+                else
+                    CommonGrid.Children.Clear(); // 清空按钮所在容器
+                GenerateUniformGrid(0, buttonType); // 重新生成第一页内容
+            }
+        }
+
+        /// <summary>
+        /// 处理空按钮点击
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="buttonType">按钮类型</param>
+        private void HandleEmptyButtonClick(object sender, string buttonType)
+        {
+            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
+            if (Convention.ShowAddImage) // 如果显示添加按钮
+                buttonManager.OpenMenu(sender, true, "CreatActionMenu", this, buttonType); // 点击打开菜单
         }
 
         /// <summary>
@@ -796,6 +834,12 @@ namespace Quicker.Windows.MainWindows
             buttonManager.RefreshButtonDisplay(button, buttonData, 60, true); // 更新按钮内容
         }
 
+        // 拖拽动作按钮到上面删除动作
+        private void CloseMainWindowButton_Drop(object sender, DragEventArgs e)
+        {
+            buttonManager.DeleteActionByDrag(GetButtonType(sender), this); // 删除动作
+        }
+
         // 窗口关闭时强制垃圾回收
         protected override void OnClosed(EventArgs e)
         {
@@ -828,25 +872,25 @@ namespace Quicker.Windows.MainWindows
                 foreach (Button button in buttonManager.FindVisualChildren<Button>(uniformGrid))
                 {
                     // 移除所有事件处理器
-                    button.Click -= DoAction;
-                    button.Drop -= Button_Drop;
-                    button.MouseEnter -= Button_MouseEnter;
-                    button.MouseLeave -= Button_MouseLeave;
-                    button.PreviewDragOver -= Button_PreviewDragOver;
-                    button.MouseRightButtonDown -= OpenCreatActionMenu;
-                    button.PreviewMouseMove -= Button_PreviewMouseMove;
-                    button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp;
-                    button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown;
+                    button.Click -= DoAction; // 左键点击事件
+                    button.Drop -= Button_Drop; // 拖拽事件
+                    button.MouseEnter -= Button_MouseEnter; // 鼠标移入事件
+                    button.MouseLeave -= Button_MouseLeave; // 鼠标移出事件
+                    button.PreviewDragOver -= Button_PreviewDragOver; // 添加拖拽事件
+                    button.MouseRightButtonDown -= OpenCreatActionMenu; // 右键点击事件
+                    button.PreviewMouseMove -= Button_PreviewMouseMove; // 鼠标移动事件
+                    button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 鼠标左键释放事件
+                    button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
 
                     // 清理按钮内容和资源
-                    button.Content = null;
-                    button.Tag = null;
-                    button.Background = null;
+                    button.Content = null; // 清理按钮内容
+                    button.Tag = null; // 清理按钮标签
+                    button.Background = null; // 清理按钮背景
                 }
 
                 // 移除UniformGrid事件
-                uniformGrid.IsVisibleChanged -= GlobalUniformGrid_IsVisibleChanged;
-                uniformGrid.IsVisibleChanged -= CommonUniformGrid_IsVisibleChanged;
+                uniformGrid.IsVisibleChanged -= GlobalUniformGrid_IsVisibleChanged; // 全局动作页可见性变化事件
+                uniformGrid.IsVisibleChanged -= CommonUniformGrid_IsVisibleChanged; // 通用动作页可见性变化事件
 
                 uniformGrid.Children.Clear(); // 清空UniformGrid
             }
@@ -858,16 +902,16 @@ namespace Quicker.Windows.MainWindows
         {
             foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 清理全局按钮面板事件
             {
-                button.Click -= SwitchToGlobalUniformGrid;
-                button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter;
-                button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave;
+                button.Click -= SwitchToGlobalUniformGrid; // 切换到全局动作页
+                button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter; // 全局动作页鼠标移入事件
+                button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave; // 全局动作页鼠标移出事件
             }
 
             foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 清理公共按钮面板事件
             {
-                button.Click -= SwitchToCommonUniformGrid;
-                button.MouseEnter -= CommonActionPageChangeButton_MouseEnter;
-                button.MouseLeave -= CommonActionPageChangeButton_MouseLeave;
+                button.Click -= SwitchToCommonUniformGrid; // 切换到通用动作页
+                button.MouseEnter -= CommonActionPageChangeButton_MouseEnter; // 通用动作页鼠标移入事件
+                button.MouseLeave -= CommonActionPageChangeButton_MouseLeave; // 通用动作页鼠标移出事件
             }
         }
     }

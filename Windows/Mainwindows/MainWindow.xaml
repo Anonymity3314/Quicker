@@ -84,7 +84,7 @@
                         </Button.ToolTip>
                         <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Style="{StaticResource CloseMainWindowButton}" Click="CloseMainWindow" ToolTip="关闭面板窗口" Margin="283,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource CloseMainWindowButton}" Click="CloseMainWindow" ToolTip="关闭面板窗口" Margin="283,0,0,0" Drop="CloseMainWindowButton_Drop"/>
                 </Grid>
             </Border>
             <!-- 全局动作 -->

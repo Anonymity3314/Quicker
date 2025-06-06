@@ -718,6 +718,20 @@ namespace Quicker.Managers
             return location; // 返回处理后的地址文本内容
         }
 
+        /// <summary>
+        /// 通过拖拽删除动作
+        /// </summary>
+        /// <param name="tableName"> 按钮类型 </param>
+        /// <param name="mainWindow"> 主窗口 </param>
+        public void DeleteActionByDrag(string tableName, MainWindow mainWindow)
+        {
+            if (SourceButton == null) return; // 如果按钮不存在，直接返回
+            int buttonID = int.Parse(SourceButton.Name.Replace($"{tableName}", "")); // 获取按钮ID
+            db2.DeleteAction(buttonID, tableName); // 删除动作
+
+            mainWindow.UpdateButtonContent(buttonID, tableName); // 更新按钮内容
+        }
+
         // 手动释放资源
         public void Dispose()
         {
