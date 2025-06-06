@@ -278,6 +278,7 @@ namespace Quicker
         private TimeSpan GetKeyPressDuration()
         {
             var duration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 获取按键按下时间
+            AppStateManager.MousePressStartTime = null; // 重置鼠标按下时间
             AppStateManager.KeyPressStartTime = null; // 重置按键时间
             return duration; // 返回按键按下时间
         }
@@ -566,7 +567,11 @@ namespace Quicker
             this.Dispatcher.Invoke(() =>
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
-                AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示主窗口
+                var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
+                if(mainWindowList.Count() > 1 && AppStateManager.Book)
+                    AppStateManager.PreLoadMainWindow.Close(); // 关闭主窗口
+                else
+                    AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示主窗口
                 AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
             });
         }

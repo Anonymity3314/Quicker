@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/github/v/release/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/releases)
 [![最后更新](https://img.shields.io/github/last-commit/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/commits)
 [![开源协议](https://img.shields.io/github/license/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/blob/main/LICENSE)
-[![代码行数](https://img.shields.io/tokei/lines/github/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
+[![代码行数](https://aschey.tech/tokei/github/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 [![主要语言](https://img.shields.io/github/languages/top/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 
 ## 项目简介
@@ -27,7 +27,7 @@
 
 本项目为开源项目，作者非计算机专业，项目仍有很多地方需要优化。
 
-项目仍在持续更新中，如有侵权，请联系作者删除。
+项目仍在持续更新中，如有侵权，请[联系作者]删除。
 
 如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
 
