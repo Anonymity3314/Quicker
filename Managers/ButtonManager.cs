@@ -14,10 +14,16 @@ namespace Quicker.Managers
     public class ButtonManager
     {
         private readonly SolidColorBrush HasActionBrush =
-            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White"));
+            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 有动作的背景色
         private readonly SolidColorBrush NoActionBrush =
-            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3"));
+            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 无动作的背景色
 
+        /// <summary>
+        /// 查找所有指定类型的子元素
+        /// </summary>
+        /// <typeparam name="T"> 目标类型 </typeparam>
+        /// <param name="obj"> 目标对象 </param>
+        /// <returns> 所有指定类型的子元素 </returns>
         public IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
         {
             if (obj == null) yield break; // 如果对象为空，停止枚举
@@ -61,19 +67,28 @@ namespace Quicker.Managers
         {
             Button TargetButton = sender as Button; // 获取目标按钮
             if (TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
+            
             if (e.Data.GetDataPresent(typeof(ButtonData))) // 如果拖拽的是按钮
-            {
                 ProcessButtonDrop(TargetButton, isMainWindow, SourceTableName, tableName); // 处理按钮拖拽
-            }
             else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
-            {
                 ProcessFileDrop(e, TargetButton, isMainWindow, tableName); // 处理文件拖拽
-            }
-            else if (e.Data.GetDataPresent(DataFormats.Text)) // 如果拖拽的是文本（可能是 URL）
+            else if (e.Data.GetDataPresent(DataFormats.Text)) // 如果拖拽的是文本（可能是 URL） 
+                ProcessTextDrop(e, TargetButton, isMainWindow, tableName); // 处理文本拖拽
+        }
+
+        /// <summary>
+        /// 处理文本拖拽
+        /// </summary>
+        /// <param name="e">拖拽事件参数</param>
+        /// <param name="targetButton">目标按钮</param>
+        /// <param name="isMainWindow">是否为主窗口</param>
+        /// <param name="tableName">数据库表名</param>
+        private void ProcessTextDrop(DragEventArgs e, Button targetButton, bool isMainWindow, string tableName)
+        {
+            string text = (string)e.Data.GetData(DataFormats.Text).ToString();
+            if (Uri.TryCreate(text, UriKind.Absolute, out Uri url))
             {
-                string text = (string)e.Data.GetData(DataFormats.Text).ToString(); // 获取文本
-                if (Uri.TryCreate(text, UriKind.Absolute, out Uri url))
-                    ProcessUrlDrop(TargetButton, url.ToString(), isMainWindow, tableName); // 处理 URL 拖拽
+                ProcessUrlDrop(targetButton, url.ToString(), isMainWindow, tableName);
             }
         }
 
@@ -107,17 +122,27 @@ namespace Quicker.Managers
         /// <param name="isMainWindow"> 是否为主窗口 </param>
         private void ProcessFileDrop(DragEventArgs e, Button TargetButton, bool isMainWindow, string tableName)
         {
-            string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
-            if (filePaths.Length <= 0) return; // 如果没有文件，直接返回
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // 获取文件路径
+            if (files.Length <= 0) return; // 如果没有文件，直接返回
 
             if (files.Length == 1) // 如果只有一个文件
-                ProcessSingleFileDrop(TargetButton, files[0], isMainWindow, tableName); // 处理文件拖拽
-            else // 如果有多个文件
+                ProcessSingleFileDrop(TargetButton, files[0], isMainWindow, tableName); // 处理单个文件拖拽
+            else // 如果有多于一个文件
                 ProcessMultipleFileDrop(TargetButton, files, isMainWindow, tableName); // 处理多个文件拖拽
 
-            var TargetData = db2.GetButtonDataByID(int.Parse(TargetButton.Name), tableName); // 获取目标按钮数据
-            RefreshButtonDisplay(TargetButton, TargetData, 60, isMainWindow); // 更新目标按钮的内容
+            UpdateButtonDisplay(TargetButton, tableName, isMainWindow); // 更新按钮显示 
+        }
+
+        /// <summary>
+        /// 更新按钮显示
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="tableName"> 数据库表名 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void UpdateButtonDisplay(Button button, string tableName, bool isMainWindow)
+        {
+            var buttonData = db2.GetButtonDataByID(int.Parse(button.Name), tableName); // 获取按钮数据
+            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮显示
         }
 
         /// <summary>
@@ -241,8 +266,7 @@ namespace Quicker.Managers
         /// <param name="tableName"> 数据库表名 </param>
         private void ProcessMultipleFileDrop(Button button, string[] filePaths, bool isMainWindow, string tableName)
         {
-            // 用“；”分隔文件路径
-            string filePath = string.Join(";", filePaths);
+            string filePath = string.Join(";", filePaths); // 用" ; "分隔文件路径
             ImageSource iconSource = iconManager.GetIcon(filePaths[0]); // 获取图标
             string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
@@ -361,47 +385,97 @@ namespace Quicker.Managers
         /// <param name="maxWidth"> 最大宽度 </param>
         public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth, bool isMainWindow)
         {
-            if (buttonInformation != null) // 如果Button的数据存在
+            if (buttonInformation == null || buttonInformation.Location == null)
             {
-                if(buttonInformation.Location == null) return; // 如果文件路径不存在，直接返回
-                button.Tag = buttonInformation; // 更新按钮标签
-                button.Background = HasActionBrush; // 设置按钮背景
-
-                Grid grid = new(); // 创建Grid对象
-                if (!string.IsNullOrEmpty(buttonInformation.ImagePath))
-                {
-                    try
-                    {
-                        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                        Image image = LoadActionIcon(buttonInformation, isMainWindow); // 创建图像对象
-                        grid.Children.Add(image); // 添加图像到Grid
-                        Grid.SetRow(image, 0); // 设置图像所在行
-                    }
-                    catch // 如果失败，发送信息提示
-                    {
-                        using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
-                    }
-                } // 如果图标路径不为空
-
-                if (!string.IsNullOrEmpty(buttonInformation.Title))
-                {
-                    grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-                    TextBlock textBlock = LoadActionTitle(buttonInformation, maxWidth); // 创建文本块对象
-                    grid.Children.Add(textBlock); // 添加文本块到Grid
-                    Grid.SetRow(textBlock, 1); // 设置文本块所在行
-                } // 如果按钮名称不为空
-                button.Content = grid; // 设置按钮内容
-
-                LoadActionTooltip(button, buttonInformation); // 加载动作提示
+                ResetButtonDisplay(button); // 重置按钮显示
+                return; // 直接返回
             }
-            else // 如果Button的数据不存在
+
+            UpdateButtonProperties(button, buttonInformation); // 更新按钮属性
+            var grid = CreateButtonGrid(buttonInformation, maxWidth, isMainWindow); // 创建按钮网格
+            button.Content = grid; // 设置按钮内容
+            LoadActionTooltip(button, buttonInformation); // 加载动作提示
+        }
+
+        /// <summary>
+        /// 重置按钮显示
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        private void ResetButtonDisplay(Button button)
+        {
+            button.Content = null; // 清空按钮内容
+            button.ToolTip = null; // 清空提示文本
+            button.Tag = null; // 清空标签
+            button.Background = NoActionBrush; // 设置背景色
+        }
+
+        /// <summary>
+        /// 更新按钮属性
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        private void UpdateButtonProperties(Button button, ButtonData buttonInformation)
+        {
+            button.Tag = buttonInformation; // 设置按钮标签
+            button.Background = HasActionBrush; // 设置背景色
+        }
+
+        /// <summary>
+        /// 创建按钮网格
+        /// </summary>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="maxWidth"> 最大宽度 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private Grid CreateButtonGrid(ButtonData buttonInformation, int maxWidth, bool isMainWindow)
+        {
+            Grid grid = new(); // 创建网格
+            if (!string.IsNullOrEmpty(buttonInformation.ImagePath)) // 如果图像路径不为空
             {
-                button.Content = null; // 清空按钮内容
-                button.ToolTip = null; // 清空按钮提示文本
-                button.Tag = null; // 清空按钮标签
-                button.Background = NoActionBrush; // 重置按钮背景
+                AddImageToGrid(grid, buttonInformation, isMainWindow); // 添加图像到网格
             }
+
+            if (!string.IsNullOrEmpty(buttonInformation.Title)) // 如果标题不为空
+            {
+                AddTitleToGrid(grid, buttonInformation, maxWidth); // 添加标题到网格
+            }
+
+            return grid; // 返回网格
+        }
+
+        /// <summary>
+        /// 添加图像到网格
+        /// </summary>
+        /// <param name="grid"> 目标网格 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private void AddImageToGrid(Grid grid, ButtonData buttonInformation, bool isMainWindow)
+        {
+            try
+            {
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+                Image image = LoadActionIcon(buttonInformation, isMainWindow); // 加载动作图标
+                grid.Children.Add(image); // 添加图像到网格
+                Grid.SetRow(image, 0); // 设置图像行
+            }
+            catch
+            {
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.Show($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
+            }
+        }
+
+        /// <summary>
+        /// 添加标题到网格
+        /// </summary>
+        /// <param name="grid"> 目标网格 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="maxWidth"> 最大宽度 </param>
+        private void AddTitleToGrid(Grid grid, ButtonData buttonInformation, int maxWidth)
+        {
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+            TextBlock textBlock = LoadActionTitle(buttonInformation, maxWidth); // 加载动作标题
+            grid.Children.Add(textBlock); // 添加标题到网格
+            Grid.SetRow(textBlock, 1); // 设置标题行
         }
 
         /// <summary>
@@ -639,7 +713,7 @@ namespace Quicker.Managers
         /// <param name="location"> 地址文本内容 </param>
         public string ProcessLocation(string location)
         {
-            if (location.StartsWith("\"") && location.EndsWith("\"")) // 如果文本含有“”符号，则去掉
+            if (location.StartsWith("\"") && location.EndsWith("\"")) // 如果文本含有""符号，则去掉
                 return location = location.Substring(1, location.Length - 2);
             return location; // 返回处理后的地址文本内容
         }

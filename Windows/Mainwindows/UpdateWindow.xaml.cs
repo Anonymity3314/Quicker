@@ -157,7 +157,7 @@ namespace Quicker.Windows.MainWindows
                 string destinationPath = Path.Combine(folderDialog.SelectedPath, fileName); // 构建保存路径
                 
                 // 创建并显示下载窗口
-                var downloadWindow = DownloadWindow.GetInstance(_downloadUrl, destinationPath);
+                var downloadWindow = DownloadWindow.Create(_downloadUrl, destinationPath);
                 downloadWindow.Show();
             }
         }
