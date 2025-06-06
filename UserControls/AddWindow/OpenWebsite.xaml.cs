@@ -133,17 +133,12 @@ namespace Quicker.UserControls.AddWindow
             }
             
             _addWindow.TitleTextBox.Text = buttonData.Title;
-            
+
             // 设置地址和浏览器
+            LocationTextBox.Text = buttonData.Location;
             if (buttonData.Data1 == "8") // 如果是自定义浏览器
             {
-                string[] locationAndBrowser = GetLocationAndBrowser(buttonData.Location);
-                LocationTextBox.Text = locationAndBrowser[0];
-                BrowserLocation.Text = locationAndBrowser[1];
-            }
-            else
-            {
-                LocationTextBox.Text = buttonData.Location;
+                BrowserLocation.Text = buttonData.Data2;
             }
 
             // 设置图标
@@ -206,7 +201,6 @@ namespace Quicker.UserControls.AddWindow
                 Data2 = BrowserLocation.Text,
                 Description = _addWindow.DescriptionTextBox.Text,
                 CreateTime = createdTime,
-                LatestEditTime = DateTime.Now,
                 ActionType = "OpenWebsite"
             };
             

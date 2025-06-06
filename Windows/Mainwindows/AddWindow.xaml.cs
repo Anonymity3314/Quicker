@@ -143,6 +143,10 @@ namespace Quicker.Windows.MainWindows
                     ChoiceComboBox.SelectedIndex = 1;
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
                     break;
+                case "LoadExtension":
+                    ChoiceComboBox.SelectedIndex = 2;
+                    ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
+                    break; // 加载扩展
                 default:
                     break; // 其他情况
             }
@@ -202,6 +206,10 @@ namespace Quicker.Windows.MainWindows
                     OpenWebsite openWebsite = (OpenWebsite)ActionInfoGrid.Children[0]; // 获取 OpenWebsite 控件
                     openWebsite.Save(); // 保存打开网址动作
                     break; // 选择网址
+                case 2:
+                    LoadExtension loadExtension = (LoadExtension)ActionInfoGrid.Children[0]; // 获取 LoadExtension 控件
+                    loadExtension.Save(); // 保存加载扩展动作
+                    break; // 加载扩展
                 default:
                     break; // 其他情况
             }

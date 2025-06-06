@@ -10,8 +10,22 @@
     Background="White"
     d:DesignHeight="289"
     d:DesignWidth="493"
->
-    <Grid>
 
+    Unloaded="LoadExtension_Unloaded"
+    Loaded="LoadExtension_Loaded"
+>
+    <Grid Visibility="Hidden">
+        <Button Name="SelectExtensionButton" Content="选择扩展..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="242,31,0,0" VerticalAlignment="Top" Width="85" Click="SelectExtensionButton_Click"/>
+        <Grid>
+            <TextBlock HorizontalAlignment="Left" Margin="82,23,0,0" Text="名称：" VerticalAlignment="Top"/>
+            <TextBlock Name="NameTextBlock" HorizontalAlignment="Left" Margin="123,23,0,0" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Margin="82,48,0,0" Text="版本：" VerticalAlignment="Top"/>
+            <TextBlock Name="VersionTextBlock" HorizontalAlignment="Left" Margin="123,48,0,0" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Margin="82,101,0,0" Text="描述：" VerticalAlignment="Top"/>
+            <TextBlock Name="DescriptionTextBlock" HorizontalAlignment="Left" Margin="123,101,0,0" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Margin="82,76,0,0" Text="作者：" VerticalAlignment="Top"/>
+            <TextBlock Name="AuthorTextBlock" HorizontalAlignment="Left" Margin="123,76,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="LocationTextBox" HorizontalAlignment="Left" Margin="115,157,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        </Grid>
     </Grid>
 </UserControl>

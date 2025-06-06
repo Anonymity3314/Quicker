@@ -292,7 +292,6 @@ namespace Quicker.UserControls.AddWindow
                 Data3 = windowState.ToString(),
                 Description = _addWindow.DescriptionTextBox.Text,
                 CreateTime = createdTime,
-                LatestEditTime = DateTime.Now,
                 ActionType = actionType
             }; // 创建按钮数据对象
             
