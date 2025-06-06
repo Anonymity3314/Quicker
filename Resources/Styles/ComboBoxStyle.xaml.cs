@@ -14,16 +14,38 @@ namespace Quicker.Resources.Styles
 {
     public partial class ComboBoxStyle
     {
-        // 用于跟踪最后一次更新的时间戳
-        private static readonly ConcurrentDictionary<ComboBox, long> _lastUpdateTicks = new ConcurrentDictionary<ComboBox, long>();
+        // 用于跟踪最后一次更新的时间戳，使用弱引用避免内存泄漏
+        private static readonly ConcurrentDictionary<WeakReference<ComboBox>, long> _lastUpdateTicks = new();
+        private static readonly Timer _cleanupTimer; // 清理过期引用的定时器
+        
+        static ComboBoxStyle()
+        {
+            // 每5分钟清理一次过期的引用
+            _cleanupTimer = new Timer(CleanupExpiredReferences, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+        }
+        
+        /// <summary>
+        /// 清理过期的引用
+        /// </summary>
+        /// <param name="state">状态</param>
+        private static void CleanupExpiredReferences(object state)
+        {
+            var expiredKeys = _lastUpdateTicks.Keys
+                .Where(wr => !wr.TryGetTarget(out _))
+                .ToList(); // 获取所有过期的引用
+                
+            foreach (var key in expiredKeys)
+            {
+                _lastUpdateTicks.TryRemove(key, out _); // 移除过期的引用
+            }
+        }
         
         // ComboBox选择项改变事件处理程序
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ComboBox comboBox && comboBox.SelectedItem != null)
             {
-                // 强制刷新显示内容
-                ForceRefreshComboBoxDisplay(comboBox);
+                ForceRefreshComboBoxDisplay(comboBox); // 强制刷新显示内容
             }
         }
         
@@ -32,8 +54,7 @@ namespace Quicker.Resources.Styles
         {
             if (sender is ComboBox comboBox && comboBox.SelectedItem != null)
             {
-                // 强制刷新显示内容
-                ForceRefreshComboBoxDisplay(comboBox);
+                ForceRefreshComboBoxDisplay(comboBox); // 强制刷新显示内容
             }
         }
         
@@ -43,19 +64,18 @@ namespace Quicker.Resources.Styles
         /// <param name="comboBox">要刷新的ComboBox</param>
         private void ForceRefreshComboBoxDisplay(ComboBox comboBox)
         {
-            if (comboBox == null) return;
-            
-            // 获取当前时间戳
-            long currentTicks = DateTime.Now.Ticks;
+            if (comboBox == null) return; // 如果ComboBox为null，返回
+            long currentTicks = DateTime.Now.Ticks; // 获取当前时间戳
             
             // 更新最后一次更新的时间戳
-            _lastUpdateTicks[comboBox] = currentTicks;
+            var weakRef = new WeakReference<ComboBox>(comboBox); // 创建弱引用
+            _lastUpdateTicks[weakRef] = currentTicks; // 更新最后一次更新的时间戳
             
             // 使用Dispatcher延迟执行，确保UI已经更新
             comboBox.Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             {
                 // 检查是否是最新的更新请求
-                if (!_lastUpdateTicks.TryGetValue(comboBox, out long lastTicks) || lastTicks != currentTicks)
+                if (!_lastUpdateTicks.TryGetValue(weakRef, out long lastTicks) || lastTicks != currentTicks)
                 {
                     return; // 不是最新的，放弃更新
                 }
@@ -89,12 +109,34 @@ namespace Quicker.Resources.Styles
     // 内容克隆转换器，用于解决ComboBox中视觉树冲突问题
     public class ContentCloneConverter : IValueConverter
     {
-        // 单例实例
-        private static ContentCloneConverter _instance; // 单例实例
-        public static ContentCloneConverter Instance => _instance ?? (_instance = new ContentCloneConverter()); // 获取单例实例
+        private static readonly Lazy<ContentCloneConverter> _instance = new(() => new ContentCloneConverter()); // 延迟初始化
+        public static ContentCloneConverter Instance => _instance.Value; // 获取实例
         
-        // 缓存已克隆的元素，避免重复克隆
-        private static readonly ConcurrentDictionary<int, WeakReference> _cloneCache = new ConcurrentDictionary<int, WeakReference>();
+        // 使用弱引用缓存，并添加清理机制
+        private static readonly ConcurrentDictionary<int, WeakReference> _cloneCache = new(); // 缓存克隆结果
+        private static readonly Timer _cleanupTimer; // 清理过期缓存的定时器
+        
+        static ContentCloneConverter()
+        {
+            // 每10分钟清理一次过期的缓存
+            _cleanupTimer = new Timer(CleanupExpiredCache, null, TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(10));
+        }
+        
+        /// <summary>
+        /// 清理过期的缓存
+        /// </summary>
+        /// <param name="state">状态</param>
+        private static void CleanupExpiredCache(object state)
+        {
+            var expiredKeys = _cloneCache.Keys
+                .Where(key => !_cloneCache[key].IsAlive)
+                .ToList(); // 获取所有过期的缓存键
+                
+            foreach (var key in expiredKeys)
+            {
+                _cloneCache.TryRemove(key, out _); // 移除过期的缓存
+            }
+        }
 
         /// <summary>
         /// 将值转换为克隆后的元素

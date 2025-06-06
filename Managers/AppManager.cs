@@ -15,19 +15,38 @@ namespace Quicker.Managers
 {
     public class AppManager
     {
-        private static readonly ConcurrentDictionary<string, ImageSource> iconCache = new(); // 图标缓存
-        private ConcurrentDictionary<string, string> linkTargetCache = new(); // 快捷方式目标路径缓存
-        private ConcurrentDictionary<string, string> fileHashCache = new(); // 文件哈希缓存
+        private static readonly ConcurrentDictionary<string, WeakReference<ImageSource>> _iconCache = new();
+        private static readonly Timer _cleanupTimer;
+        private readonly ConcurrentDictionary<string, string> _linkTargetCache = new();
+        private readonly ConcurrentDictionary<string, string> _fileHashCache = new();
         private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
+
+        static AppManager()
+        {
+            // 每5分钟清理一次过期的图标缓存
+            _cleanupTimer = new Timer(CleanupIconCache, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+        }
+
+        private static void CleanupIconCache(object state)
+        {
+            var expiredKeys = _iconCache.Keys
+                .Where(key => !_iconCache[key].TryGetTarget(out _))
+                .ToList();
+                
+            foreach (var key in expiredKeys)
+            {
+                _iconCache.TryRemove(key, out _);
+            }
+        }
 
         public AppManager() { }
 
         // 清除缓存
         public void ClearCache()
         {
-            iconCache.Clear();
-            linkTargetCache.Clear();
-            fileHashCache.Clear();
+            _iconCache.Clear();
+            _linkTargetCache.Clear();
+            _fileHashCache.Clear();
         }
 
         // 加载所有应用
@@ -222,11 +241,13 @@ namespace Quicker.Managers
         // 异步加载图标
         private async Task<ImageSource> GetIconAsync(string filePath)
         {
-            if (iconCache.TryGetValue(filePath, out var icon))
+            if (_iconCache.TryGetValue(filePath, out var weakRef) && 
+                weakRef.TryGetTarget(out var cachedIcon))
             {
-                return icon;
+                return cachedIcon;
             }
 
+            ImageSource icon = null;
             try
             {
                 using (var iconEx = await Task.Run(() => System.Drawing.Icon.ExtractAssociatedIcon(filePath)))
@@ -245,7 +266,7 @@ namespace Quicker.Managers
 
             if (icon != null)
             {
-                iconCache[filePath] = icon;
+                _iconCache[filePath] = new WeakReference<ImageSource>(icon);
             }
             return icon;
         }
@@ -254,7 +275,7 @@ namespace Quicker.Managers
         private string GetTargetPathFromLinkFile(string linkFilePath)
         {
             // 检查缓存
-            if (linkTargetCache.TryGetValue(linkFilePath, out var targetPath))
+            if (_linkTargetCache.TryGetValue(linkFilePath, out var targetPath))
             {
                 return targetPath; // 如果缓存中有目标路径，直接返回
             }
@@ -270,7 +291,7 @@ namespace Quicker.Managers
                 targetPath = path.ToString(); // 获取目标路径
 
                 // 缓存解析结果
-                linkTargetCache[linkFilePath] = targetPath; // 添加到缓存
+                _linkTargetCache[linkFilePath] = targetPath; // 添加到缓存
                 return targetPath; // 返回目标路径
             }
             catch
@@ -283,9 +304,10 @@ namespace Quicker.Managers
         private ImageSource GetIcon(string filePath)
         {
             string cacheKey = GetCacheKey(filePath); // 文件哈希值作为缓存键           
-            if (iconCache.TryGetValue(cacheKey, out var icon)) // 检查缓存
+            if (_iconCache.TryGetValue(cacheKey, out var weakRef) && 
+                weakRef.TryGetTarget(out var cachedIcon)) // 检查缓存
             {
-                return icon;
+                return cachedIcon;
             }
             return null; // 如果图标不存在于缓存中，返回空
         }
@@ -295,9 +317,10 @@ namespace Quicker.Managers
         {
             // 检查缓存
             string cacheKey = GetCacheKey(linkFilePath);
-            if (iconCache.TryGetValue(cacheKey, out var icon))
+            if (_iconCache.TryGetValue(cacheKey, out var weakRef) && 
+                weakRef.TryGetTarget(out var cachedIcon))
             {
-                return icon;
+                return cachedIcon;
             }
 
             try
@@ -307,20 +330,20 @@ namespace Quicker.Managers
                 if (!string.IsNullOrEmpty(targetPath))
                 {
                     // 从目标路径提取图标
-                    icon = ExtractIconFromPath(targetPath);
-                    if (icon != null)
+                    var icon1 = ExtractIconFromPath(targetPath);
+                    if (icon1 != null)
                     {
-                        iconCache[cacheKey] = icon;
-                        return icon;
+                        _iconCache[cacheKey] = new WeakReference<ImageSource>(icon1);
+                        return icon1;
                     }
                 }
 
                 // 如果目标路径无效，从快捷方式文件本身提取图标
-                icon = ExtractIconFromPath(linkFilePath);
-                if (icon != null)
+                var icon2 = ExtractIconFromPath(linkFilePath);
+                if (icon2 != null)
                 {
-                    iconCache[cacheKey] = icon;
-                    return icon;
+                    _iconCache[cacheKey] = new WeakReference<ImageSource>(icon2);
+                    return icon2;
                 }
             }
             catch { } // 忽略图标加载错误
@@ -330,7 +353,7 @@ namespace Quicker.Managers
         // 获取文件的哈希值作为缓存键
         private string GetCacheKey(string filePath)
         {
-            if (fileHashCache.TryGetValue(filePath, out var cacheKey)) // 检查文件是否已缓存
+            if (_fileHashCache.TryGetValue(filePath, out var cacheKey)) // 检查文件是否已缓存
             {
                 return cacheKey;
             }
@@ -356,7 +379,7 @@ namespace Quicker.Managers
                 cacheKey = $"{fileInfo.Length}_{fileInfo.LastWriteTimeUtc.Ticks}";
             } // 对于较大的文件，使用文件大小和最后修改时间作为缓存键
 
-            fileHashCache[filePath] = cacheKey; // 添加到缓存
+            _fileHashCache[filePath] = cacheKey; // 添加到缓存
             return cacheKey;
         }
 
@@ -501,18 +524,18 @@ namespace Quicker.Managers
         public void Cleanup()
         {
             CleanupIconCache();
-            linkTargetCache?.Clear();
-            fileHashCache?.Clear();
+            _linkTargetCache?.Clear();
+            _fileHashCache?.Clear();
         }
 
         // 清理图标缓存
         private void CleanupIconCache()
         {
-            if (iconCache != null)
+            if (_iconCache != null)
             {
-                foreach (var icon in iconCache.Values)
+                foreach (var weakRef in _iconCache.Values)
                 {
-                    if (icon is IDisposable disposableIcon)
+                    if (weakRef.TryGetTarget(out var icon) && icon is IDisposable disposableIcon)
                     {
                         try
                         {
@@ -521,7 +544,7 @@ namespace Quicker.Managers
                         catch { }
                     }
                 }
-                iconCache.Clear(); // 清空图标缓存
+                _iconCache.Clear(); // 清空图标缓存
             }
         }
 

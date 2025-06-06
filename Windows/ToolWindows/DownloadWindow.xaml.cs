@@ -13,7 +13,6 @@ namespace Quicker.Windows.ToolWindows
     {
         private CancellationTokenSource _cancellationTokenSource;
         private string _downloadUrl, _downloadPath; // 下载地址和保存路径
-        private static DownloadWindow _instance; // 静态实例变量
         private DispatcherTimer _updateTimer; // 更新UI的定时器
         private long _lastDownloadedBytes; // 上一次速度更新时的下载字节数
         private DateTime _lastSpeedUpdate; // 上次速度更新时间
@@ -22,7 +21,7 @@ namespace Quicker.Windows.ToolWindows
         private long _totalBytes; // 总字节数
         private bool _isClosed; // 标记窗口是否已经关闭
 
-        private DownloadWindow(string downloadUrl, string downloadPath)
+        public DownloadWindow(string downloadUrl, string downloadPath)
         {
             InitializeComponent();
             _isClosed = false; // 初始化标记
@@ -38,18 +37,18 @@ namespace Quicker.Windows.ToolWindows
             _isClosed = true; // 标记窗口已关闭
         }
 
-        // 获取窗口实例的静态方法
-        public static DownloadWindow GetInstance(string downloadUrl, string downloadPath)
+        // 工厂方法，用于创建和管理DownloadWindow实例
+        public static DownloadWindow Create(string downloadUrl, string downloadPath)
         {
-            if (_instance == null || _instance._isClosed) // 实例不存在或已关闭
-                _instance = new DownloadWindow(downloadUrl, downloadPath); // 创建实例
-            else
+            var existingWindow = Application.Current.Windows.OfType<DownloadWindow>().FirstOrDefault();
+            if (existingWindow != null && !existingWindow._isClosed)
             {
-                var toast = new ToastManager(); // 创建Toast提示
-                toast.Show("下载中，请勿重复操作", "Common"); // 显示Toast提示
-                _instance.EnableDownloadButton(false); // 通过实例禁用下载按钮
+                var toast = new ToastManager();
+                toast.Show("下载中，请勿重复操作", "Common");
+                existingWindow.EnableDownloadButton(false);
+                return existingWindow;
             }
-            return _instance; // 返回实例
+            return new DownloadWindow(downloadUrl, downloadPath);
         }
 
         // 初始化定时器
@@ -283,7 +282,6 @@ namespace Quicker.Windows.ToolWindows
             _updateTimer = null; // 释放更新UI的定时器
             _downloadPath = null; // 释放下载路径
             _downloadUrl = null; // 释放下载地址
-            _instance = null; // 释放静态实例变量
             _isClosed = true; // 标记窗口已关闭
             _lastDownloadedBytes = 0; // 释放上一次速度更新时的下载字节数
             if (_cancellationTokenSource != null)
