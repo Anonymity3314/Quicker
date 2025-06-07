@@ -19,6 +19,71 @@ namespace Quicker.Managers
         public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
         public ConventionsSettingsCache conventions; // 常规设置缓存对象
 
+        // 原始设置缓存
+        private ConventionsSettingsCache _originalConventions;
+        private OpenMainWindowConditionsSettingsCache _originalOpenMainWindowConditions;
+        private BlacklistSettingsSettingsCache _originalBlacklistSettings;
+        private AppearanceConditionsSettingsCache _originalAppearanceConditions;
+
+        /// <summary>
+        /// 缓存窗口加载时的原始设置
+        /// </summary>
+        public async Task CacheOriginalSettingsAsync()
+        {
+            // 确保设置已加载
+            await LoadConventionsAsync(); // 加载常规设置
+            await LoadOpenMainWindowConditionsAsync(); // 加载弹出面板设置
+            await LoadBlacklistSettingsAsync(); // 加载黑名单设置
+            await LoadAppearanceAsync(); // 加载外观设置
+
+            // 复制当前设置作为原始设置
+            _originalConventions = CloneSettingsCache(conventions); // 复制常规设置
+            _originalOpenMainWindowConditions = CloneSettingsCache(openMainWindowConditions); // 复制弹出面板设置
+            _originalBlacklistSettings = CloneSettingsCache(blacklistSettings); // 复制黑名单设置
+            _originalAppearanceConditions = CloneSettingsCache(appearanceConditions); // 复制外观设置
+        }
+
+        /// <summary>
+        /// 恢复到原始设置
+        /// </summary>
+        public void RestoreOriginalSettings()
+        {
+            // 恢复原始设置
+            if (_originalConventions != null)
+                conventions = CloneSettingsCache(_originalConventions);
+            
+            if (_originalOpenMainWindowConditions != null)
+                openMainWindowConditions = CloneSettingsCache(_originalOpenMainWindowConditions);
+            
+            if (_originalBlacklistSettings != null)
+                blacklistSettings = CloneSettingsCache(_originalBlacklistSettings);
+            
+            if (_originalAppearanceConditions != null)
+                appearanceConditions = CloneSettingsCache(_originalAppearanceConditions);
+        }
+
+        /// <summary>
+        /// 克隆设置缓存对象
+        /// </summary>
+        /// <typeparam name="T">设置缓存类型</typeparam>
+        /// <param name="source">源设置对象</param>
+        /// <returns>克隆的设置对象</returns>
+        private T CloneSettingsCache<T>(T source) where T : class
+        {
+            if (source == null) return null; // 如果源设置对象为空，返回空
+            var clone = Activator.CreateInstance<T>(); // 创建新的设置对象
+            var properties = typeof(T).GetProperties(); // 获取设置对象的属性
+            foreach (var property in properties)
+            {
+                if (property.CanRead && property.CanWrite)
+                {
+                    var value = property.GetValue(source); // 获取源设置对象的属性值
+                    property.SetValue(clone, value); // 设置新设置对象的属性值
+                }
+            }
+            return clone; // 返回克隆的设置对象
+        }
+
         // 异步加载常规设置信息
         public async Task LoadConventionsAsync()
         {
@@ -347,19 +412,105 @@ namespace Quicker.Managers
             }
         }
 
+        /// <summary>
+        /// 判断当前设置是否与原始设置相同
+        /// </summary>
+        /// <returns>是否相同</returns>
+        public bool IsSettingsChanged()
+        {
+            // 判断常规设置是否变化
+            if (_originalConventions != null && conventions != null && !AreSettingsEqual(_originalConventions, conventions))
+                return true;
+                
+            // 判断弹出面板设置是否变化
+            if (_originalOpenMainWindowConditions != null && openMainWindowConditions != null && 
+                !AreSettingsEqual(_originalOpenMainWindowConditions, openMainWindowConditions))
+                return true;
+                
+            // 判断黑名单设置是否变化
+            if (_originalBlacklistSettings != null && blacklistSettings != null &&
+                !AreSettingsEqual(_originalBlacklistSettings, blacklistSettings))
+                return true;
+                
+            // 判断外观设置是否变化
+            if (_originalAppearanceConditions != null && appearanceConditions != null &&
+                !AreSettingsEqual(_originalAppearanceConditions, appearanceConditions))
+                return true;
+                
+            return false;
+        }
+        
+        /// <summary>
+        /// 比较两个设置对象是否相等
+        /// </summary>
+        private bool AreSettingsEqual<T>(T obj1, T obj2) where T : class
+        {
+            if (obj1 == null && obj2 == null) return true;
+            if (obj1 == null || obj2 == null) return false;
+            
+            var properties = typeof(T).GetProperties();
+            
+            foreach (var property in properties)
+            {
+                if (property.CanRead)
+                {
+                    var value1 = property.GetValue(obj1);
+                    var value2 = property.GetValue(obj2);
+                    
+                    if (value1 == null && value2 == null) continue;
+                    if (value1 == null || value2 == null) return false;
+                    
+                    if (!value1.Equals(value2))
+                        return false;
+                }
+            }
+            
+            return true;
+        }
+
+        #region IDisposable实现
+
+        // 是否已释放资源标志
+        private bool _disposed = false;
+
         // 手动释放资源
         public void Dispose()
         {
-            conventions = null; // 常规设置
-            openMainWindowConditions = null; // 弹出面板设置
-            blacklistSettings = null; // 黑名单设置
-            appearanceConditions = null; // 外观设置
-
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            Dispose(true);
+            GC.SuppressFinalize(this); // 告知垃圾回收器不需要调用终结器
         }
+
+        // 释放资源
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return; // 如果已经释放，直接返回
+            if (disposing)
+            {
+                // 释放托管资源
+                // 清除原始设置缓存
+                _originalConventions = null;
+                _originalOpenMainWindowConditions = null;
+                _originalBlacklistSettings = null;
+                _originalAppearanceConditions = null;
+                
+                // 清除当前设置缓存
+                conventions = null;
+                openMainWindowConditions = null;
+                blacklistSettings = null;
+                appearanceConditions = null;
+            }
+
+            // 释放非托管资源
+            _disposed = true; // 标记为已释放
+        }
+
+        // 析构函数
+        ~SettingManager()
+        {
+            Dispose(false);
+        }
+
+        #endregion
 
         // 常规设置
         public class ConventionsSettingsCache
