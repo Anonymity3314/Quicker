@@ -179,7 +179,7 @@ namespace Quicker.UserControls.AddWindow
                 double heightChange = e.NewSize.Height - e.PreviousSize.Height; // 计算文本框高度变化量
                 _addWindow.Height += heightChange; // 调整窗口高度
                 Thickness currentMargin = Grid1.Margin; // 获取当前的Margin
-                Thickness newMargin = new Thickness(0, currentMargin.Top + heightChange, 0, 0); // 创建一个新的Margin对象，只修改Top属性
+                Thickness newMargin = new Thickness(93, currentMargin.Top + heightChange, 0, 0); // 创建一个新的Margin对象，只修改Top属性
                 Grid1.Margin = newMargin; // 将新的Margin赋给Grid1
             }
         }

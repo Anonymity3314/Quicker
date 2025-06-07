@@ -76,6 +76,7 @@ namespace Quicker.UserControls.AddWindow
             UpdateIconFromButtonData(buttonData); // 更新图标
             _addWindow.DescriptionTextBox.Text = buttonData.Description; // 设置描述
             _addWindow.UpdateTooltip(); // 更新提示
+            LoadExtensionInfo(_selectedPath); // 加载扩展信息
         }
         
         /// <summary>
@@ -171,9 +172,7 @@ namespace Quicker.UserControls.AddWindow
         {
             var infoJsonPath = Path.Combine(extensionPath, "info.json"); // 获取info.json文件路径
             using var toast = new ToastManager(); // 创建ToastManager
-            
-            // 检查info.json文件是否存在
-            if (!File.Exists(infoJsonPath))
+            if (!File.Exists(infoJsonPath)) // 检查info.json文件是否存在
             {
                 toast.Show("未找到扩展信息文件", "Error"); // 如果info.json文件不存在，则显示错误提示
                 return;
