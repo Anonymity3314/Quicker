@@ -14,18 +14,44 @@
     Unloaded="LoadExtension_Unloaded"
     Loaded="LoadExtension_Loaded"
 >
-    <Grid Visibility="Hidden">
-        <Button Name="SelectExtensionButton" Content="选择扩展..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="242,31,0,0" VerticalAlignment="Top" Width="85" Click="SelectExtensionButton_Click"/>
-        <Grid>
-            <TextBlock HorizontalAlignment="Left" Margin="82,23,0,0" Text="名称：" VerticalAlignment="Top"/>
-            <TextBlock Name="NameTextBlock" HorizontalAlignment="Left" Margin="123,23,0,0" VerticalAlignment="Top"/>
-            <TextBlock HorizontalAlignment="Left" Margin="82,48,0,0" Text="版本：" VerticalAlignment="Top"/>
-            <TextBlock Name="VersionTextBlock" HorizontalAlignment="Left" Margin="123,48,0,0" VerticalAlignment="Top"/>
-            <TextBlock HorizontalAlignment="Left" Margin="82,101,0,0" Text="描述：" VerticalAlignment="Top"/>
-            <TextBlock Name="DescriptionTextBlock" HorizontalAlignment="Left" Margin="123,101,0,0" VerticalAlignment="Top"/>
-            <TextBlock HorizontalAlignment="Left" Margin="82,76,0,0" Text="作者：" VerticalAlignment="Top"/>
-            <TextBlock Name="AuthorTextBlock" HorizontalAlignment="Left" Margin="123,76,0,0" VerticalAlignment="Top"/>
-            <TextBox x:Name="LocationTextBox" HorizontalAlignment="Left" Margin="115,157,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+    <Grid>
+        <Label Content="扩展文件夹" HorizontalAlignment="Left" Margin="87,15,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource ResourceKey=AddressTextBox}" HorizontalAlignment="Left" Margin="162,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="231" SizeChanged="LocationTextBox_SizeChanged" TextChanged="LocationTextBox_TextChanged"/>
+        <Button x:Name="SelectButton" Content="···" Style="{StaticResource Select}" HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Width="40" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Click="OpenContextMenu"/>
+        <Popup x:Name="LoadExtensionPopup" PopupAnimation="Fade" Width="180" Height="62" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+            <Grid>
+                <Rectangle Fill="White" Margin="3,5">
+                    <Rectangle.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Rectangle.Effect>
+                </Rectangle>
+                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                    <StackPanel>
+                        <Button Name="SelectExtensionButton" Style="{StaticResource MenuButton}" Click="SelectExtensionButton_Click" Margin="0,3,0,0">
+                            <Grid Width="174" Height="20">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                <TextBlock Text="选择扩展" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource MenuButton}" Click="CopyLocation" Margin="0,0,0,3">
+                            <Grid Width="174" Height="20">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                <TextBlock Text="插入剪切贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Popup>
+        <Grid Name="Grid1" Margin="0,45,0,0" Visibility="Collapsed">
+            <TextBlock Name="NameTextBlock" Text="未知" Margin="162,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="版本：" Margin="121,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Name="VersionTextBlock" Text="未知" Margin="162,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Text="描述：" Margin="121,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Name="DescriptionTextBlock" Text="未知" HorizontalAlignment="Left" Margin="162,100,0,0" VerticalAlignment="Top"/>
+            <TextBlock Text="作者：" Margin="121,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBlock Name="AuthorTextBlock" Text="未知" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top"/>
+            <TextBlock Text="名称：" Margin="121,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
     </Grid>
 </UserControl>

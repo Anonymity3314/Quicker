@@ -116,7 +116,7 @@ namespace Quicker.Windows.MainWindows
                     break; // 选择网址
                 case 5:
                     ChoiceComboBox.SelectedIndex = 2;
-                    ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
+                    //ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
                     {
                         using var toast = new ToastManager(); // 创建 ToastManager 实例
                         toast.Show("功能开发中，敬请期待！", "Common"); // 显示提示消息

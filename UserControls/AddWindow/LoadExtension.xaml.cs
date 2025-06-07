@@ -16,14 +16,16 @@ namespace Quicker.UserControls.AddWindow
         
         private const string folderPath = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Extensions\\"; // 扩展文件夹路径
         private Quicker.Windows.MainWindows.AddWindow _addWindow; // AddWindow 的引用
+        private readonly ButtonManager _buttonManager = new(); // 按钮管理器接口
         private readonly IconManager _iconManager = new(); // 图标管理器接口
         private ButtonDatabase _buttonDb = new(); // 按钮数据库
         private string _selectedPath; // 选中的文件夹路径
-        
+        private bool isLoading = true; // 是否正在加载
+
         #endregion
 
         #region 构造函数和初始化
-        
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -38,6 +40,7 @@ namespace Quicker.UserControls.AddWindow
         private void LoadExtension_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             ExecuteChoiceAction(); // 根据上个窗口数据执行对应命令
+            isLoading = false; // 加载完成
         }
 
         #endregion
@@ -110,6 +113,30 @@ namespace Quicker.UserControls.AddWindow
         #endregion
 
         #region 扩展选择和加载
+
+        // 打开菜单
+        private void OpenContextMenu(object sender, RoutedEventArgs e)
+        {
+            LoadExtensionPopup.IsOpen = true; // 打开弹出菜单
+        }
+
+
+        // 复制地址
+        private void CopyLocation(object sender, RoutedEventArgs e)
+        {
+            string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
+            LocationTextBox.Text = _buttonManager.ProcessLocation(clipboardText); // 设置地址栏文本
+            try
+            {
+                LoadExtensionInfo(LocationTextBox.Text); // 加载扩展信息
+            }
+            catch
+            {
+                using var toast = new ToastManager(); // 创建ToastManager
+                toast.Show("扩展信息加载失败", "Error"); // 显示错误提示
+            }
+            LoadExtensionPopup.IsOpen = false; // 关闭弹出菜单
+        }
 
         // 点击选择扩展按钮
         private void SelectExtensionButton_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -185,6 +212,9 @@ namespace Quicker.UserControls.AddWindow
             AuthorTextBlock.Text = info.Author; // 更新扩展作者
             DescriptionTextBlock.Text = info.Description; // 更新扩展描述
             LocationTextBox.Text = _selectedPath; // 更新扩展路径
+            _addWindow.TitleTextBox.Text = info.Name; // 更新扩展标题
+            _addWindow.DescriptionTextBox.Text = info.Description; // 更新扩展描述
+            _addWindow.UpdateTooltip(); // 更新提示
         }
 
         /// <summary>
@@ -196,6 +226,35 @@ namespace Quicker.UserControls.AddWindow
             if (Directory.GetFiles(extensionPath, "*.dll").Length > 0)
             {
                 _addWindow.SaveButton.IsEnabled = true; // 如果文件夹里有.dll文件，则启用保存按钮
+            }
+        }
+
+        // 调整地址栏高度
+        private void LocationTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (isLoading) return; // 防止在加载过程中调整大小
+            if (_addWindow != null)
+            {
+                double heightChange = e.NewSize.Height - e.PreviousSize.Height; // 计算文本框高度变化量
+                _addWindow.Height += heightChange; // 调整窗口高度
+                Thickness currentMargin = Grid1.Margin; // 获取当前的Margin
+                Thickness newMargin = new Thickness(0, currentMargin.Top + heightChange, 0, 0); // 创建一个新的Margin对象，只修改Top属性
+                Grid1.Margin = newMargin; // 将新的Margin赋给Grid1
+            }
+        }
+
+        // 地址栏文本变化事件
+        private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(string.IsNullOrWhiteSpace(LocationTextBox.Text))
+            {
+                _addWindow.SaveButton.IsEnabled = false; // 如果地址栏为空，则禁用保存按钮
+                Grid1.Visibility = Visibility.Collapsed; // 隐藏Grid1
+            }
+            else
+            {
+                _addWindow.SaveButton.IsEnabled = true; // 如果地址栏不为空，则启用保存按钮
+                Grid1.Visibility = Visibility.Visible; // 显示Grid1
             }
         }
 
@@ -255,7 +314,7 @@ namespace Quicker.UserControls.AddWindow
             public string Description { get; set; } // 扩展描述
             public string Author { get; set; } // 扩展作者
         }
-        
+
         #endregion
     }
 }
