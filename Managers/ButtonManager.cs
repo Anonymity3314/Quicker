@@ -88,7 +88,7 @@ namespace Quicker.Managers
             string text = (string)e.Data.GetData(DataFormats.Text).ToString();
             if (Uri.TryCreate(text, UriKind.Absolute, out Uri url))
             {
-                ProcessUrlDrop(targetButton, url.ToString(), isMainWindow, tableName);
+                ProcessUrlDrop(url.ToString(), int.Parse(targetButton.Name.Replace(tableName, "")), tableName, isMainWindow);
             }
         }
 
@@ -154,12 +154,12 @@ namespace Quicker.Managers
         {
             if (IsImaege(filePath)) // 如果是图片文件
             {
-                ProcessImageDrop(filePath, button, isMainWindow, tableName); // 处理图片拖拽
+                ProcessImageDrop(filePath, int.Parse(button.Name.Replace(tableName,"")), tableName); // 处理图片拖拽
                 return; // 直接返回
             }
             else if (Path.GetExtension(filePath).ToLower() == ".url") // 判断是否为 .url 文件
             {
-                ProcessUrlShortcutDrop(button, filePath, isMainWindow);
+                ProcessUrlShortcutDrop(filePath, int.Parse(button.Name.Replace(tableName,"")), tableName);
                 return;
             }
 
@@ -204,10 +204,10 @@ namespace Quicker.Managers
         /// <summary>
         /// 处理图片拖拽
         /// </summary>
-        /// <param name="e"> 拖拽事件参数 </param>
-        /// <param name="button"> 目标按钮 </param>
-        /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessImageDrop(string filePath, Button button, bool isMainWindow, string tableName)
+        /// <param name="filePath"> 文件路径 </param>
+        /// <param name="buttonID"> 按钮ID </param>
+        /// <param name="tableName"> 表名 </param>
+        private void ProcessImageDrop(string filePath, int buttonID, string tableName)
         {
             BitmapImage bitmap = new BitmapImage(new Uri(filePath)); // 创建 BitmapImage 对象
             string iconPath = ""; // 默认图标路径
@@ -221,7 +221,7 @@ namespace Quicker.Managers
             string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
             ButtonData buttonData = new ButtonData
             {
-                ButtonID = int.Parse(button.Name.Replace(tableName,"")),
+                ButtonID = buttonID,
                 Title = fileName,
                 Location = filePath,
                 ImagePath = iconPath,
@@ -232,17 +232,16 @@ namespace Quicker.Managers
                 CreateTime = DateTime.Now,
                 ActionType = "OpenFile",
             };
-            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
 
         /// <summary>
         /// 处理 Internet 快捷方式文件拖拽
         /// </summary>
-        /// <param name="button"> 目标按钮 </param>
         /// <param name="filePath"> 文件路径 </param>
-        /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessUrlShortcutDrop(Button button, string filePath, bool isMainWindow)
+        /// <param name="buttonID"> 按钮ID </param>
+        /// <param name="tableName"> 表名 </param>
+        private void ProcessUrlShortcutDrop(string filePath, int buttonID, string tableName)
         {
             string url = File.ReadAllText(filePath); // 读取 .url 文件内容以获取实际的 URL
             string[] lines = File.ReadAllLines(filePath);
@@ -254,7 +253,7 @@ namespace Quicker.Managers
                     break;
                 }
             }
-            ProcessUrlDrop(button, url, isMainWindow, filePath); // 调用处理 URL 的方法
+            ProcessUrlDrop(url, buttonID, tableName, true); // 调用处理 URL 的方法
         }
 
         /// <summary>
@@ -297,10 +296,11 @@ namespace Quicker.Managers
         /// <summary>
         /// 处理 URL 拖拽
         /// </summary>
-        /// <param name="button"> 目标按钮 </param>
         /// <param name="url"> URL 地址 </param>
+        /// <param name="buttonID"> 按钮ID </param>
+        /// <param name="tableName"> 表名 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessUrlDrop(Button button, string url, bool isMainWindow, string tableName, string filePath = null)
+        private void ProcessUrlDrop(string url, int buttonID, string tableName, bool isMainWindow)
         {
             ImageSource iconSource = iconManager.GetWebsiteIcon(url); // 获取图标
             string iconPath = ""; // 默认图标路径
@@ -313,8 +313,8 @@ namespace Quicker.Managers
 
             ButtonData buttonData = new ButtonData
             {
-                ButtonID = int.Parse(button.Name.Replace(tableName,"")),
-                Title = filePath == null ? GetWebsiteNameFromUrl(url) : Path.GetFileNameWithoutExtension(filePath),
+                ButtonID = buttonID,
+                Title = GetWebsiteNameFromUrl(url),
                 Location = url,
                 ImagePath = iconPath,
                 Data3 = 0.ToString(),
@@ -322,7 +322,6 @@ namespace Quicker.Managers
                 CreateTime = DateTime.Now,
                 ActionType = "OpenWebsite",
             }; // 设置按钮数据
-            RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
 
@@ -739,6 +738,58 @@ namespace Quicker.Managers
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
+        }
+
+        /// <summary>
+        /// 从剪贴板创建文件动作
+        /// </summary>
+        /// <param name="buttonID">按钮ID</param>
+        /// <param name="tableName">表名</param>
+        /// <returns>是否成功创建动作</returns>
+        public bool CreateFileActionFromClipboard(int buttonID, string tableName)
+        {
+            if (!Clipboard.ContainsFileDropList()) return false;
+
+            var fileList = Clipboard.GetFileDropList(); // 获取文件列表
+            if (fileList.Count <= 0) return false;
+
+            string filePath = fileList[0]; // 获取第一个文件路径
+            if (IsImaege(filePath)) // 如果是图片文件
+            {
+                ProcessImageDrop(filePath, buttonID, tableName); // 处理图片拖拽
+                return true;
+            }
+            else if (Path.GetExtension(filePath).ToLower() == ".url") // 判断是否为 .url 文件
+            {
+                ProcessUrlShortcutDrop(filePath, buttonID, tableName);
+                return true;
+            }
+
+            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
+            string iconPath = ""; // 默认图标路径
+            if (iconSource != null) // 如果图标存在
+            {
+                iconPath = iconManager.CheckCachedIcon(filePath); // 检查已经保存的图标
+                if (string.IsNullOrEmpty(iconPath)) // 如果不存在保存的图标
+                    iconPath = iconManager.SaveIconToFile(iconSource); // 保存图标到文件
+            }
+
+            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            ButtonData buttonData = new ButtonData
+            {
+                ButtonID = buttonID, // 使用当前按钮ID
+                Title = fileName, // 设置按钮名称
+                Location = filePath, // 设置文件路径
+                ImagePath = iconPath, // 设置图标路径
+                Data1 = false.ToString(), // 是否使用管理员身份运行
+                Data2 = true.ToString(), // 尝试打开已存在的窗口
+                Data3 = 0.ToString(), // 设置窗口状态
+                Description = $"打开文件: {fileName}", // 设置用途
+                CreateTime = DateTime.Now,
+                ActionType = "OpenFile", // 设置动作类型
+            }; // 设置按钮数据
+            db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
+            return true;
         }
     }
 }

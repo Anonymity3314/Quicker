@@ -20,7 +20,7 @@
     Loaded="OperationMenu_Loaded"
 >
     <Grid>
-        <Grid x:Name="MainGrid" Height="167" Width="204" Margin="15,13,565,271">
+        <Grid x:Name="MainGrid" Height="192" Width="204" Margin="15,13,565,246">
             <!-- 窗口阴影 -->
             <Rectangle Fill="White" Margin="5,7">
                 <Rectangle.Effect>
@@ -67,6 +67,12 @@
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="删除"/>
                         </Grid>
                     </Button>
+                    <Button x:Name="PasteIcon" ToolTip="设置动作图标为剪贴板图片" Style="{StaticResource MenuButton}" Click="PasteIcon_Click">
+                        <Grid Width="199">
+                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="粘贴图标"/>
+                        </Grid>
+                    </Button>
                     <Button x:Name="OtherFunction" ToolTip="其它功能" Style="{StaticResource MenuButton}" MouseEnter="OtherFunction_MouseEnter" MouseLeave="OtherFunction_MouseLeave">
                         <Grid Width="198">
                             <Image Source="/Resources/Images/ActionInformation.png" Style="{StaticResource MenuButtonImage}"/>
@@ -82,7 +88,7 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <Grid x:Name="ChiildGrid" Margin="219,122,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Grid x:Name="ChiildGrid" Margin="219,147,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <Grid x:Name="FirstChildGrid" Margin="0,0,0,0" MouseLeave="FirstChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <!-- 窗口阴影 -->
                 <Rectangle Fill="White" Margin="5,7">

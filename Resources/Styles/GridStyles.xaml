@@ -18,4 +18,11 @@
         <Setter Property="Height" Value="20"/>
         <Setter Property="Width" Value="260"/>
     </Style>
+
+    <!-- 菜单按钮的内容网格 -->
+    <Style x:Key="MenuButtonContentGrid" TargetType="Grid">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="5,0"/>
+    </Style>
 </ResourceDictionary>
