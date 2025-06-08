@@ -60,7 +60,7 @@
             <Label Content="临时文件" HorizontalAlignment="Left" Margin="0,661,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
             <Label Content="大小：" HorizontalAlignment="Left" Margin="18,696,0,0" VerticalAlignment="Top"/>
             <TextBlock x:Name="TempSize" HorizontalAlignment="Left" Margin="58,701,0,0" TextWrapping="Wrap" Text="计算中...·" VerticalAlignment="Top"/>
-            <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="23,726,0,0" VerticalAlignment="Top" Width="61" Click="CleanTempDataButton_Click"/>
+            <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="23,726,0,0" VerticalAlignment="Top" Width="61" Click="CleanTempDataButton_Click" IsEnabled="False"/>
         </Grid>
 
         <!-- 基础设置-关于Quicker-隐私声明 -->

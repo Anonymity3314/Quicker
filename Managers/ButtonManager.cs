@@ -326,53 +326,20 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 获取网站名称
+        /// 从URL中获取网站名称
         /// </summary>
-        /// <param name="url"> 网站地址 </param>
-        /// <returns> 网站名称 </returns>
+        /// <param name="url">URL地址</param>
+        /// <returns>网站名称</returns>
         public string GetWebsiteNameFromUrl(string url)
         {
             try
             {
-                var uri = new Uri(url); // 尝试解析URL
-                string host = uri.Host; // 获取主机名
-                if (host.Contains('.')) // 如果主机名包含子域名，则只保留顶级域名
-                {
-                    string[] parts = host.Split('.');
-                    if (parts.Length > 1)
-                    {
-                        // 移除常见的顶级域名后缀
-                        string[] commonTlds = { "com", "cn", "net", "org", "gov", "edu", "info", "biz", "co", "me", "io", "app" };
-                        bool hasCommonTld = false; // 是否包含常见的顶级域名后缀
-
-                        foreach (string tld in commonTlds)
-                        {
-                            if (parts[parts.Length - 1].Equals(tld, StringComparison.OrdinalIgnoreCase))
-                            {
-                                hasCommonTld = true; // 发现常见的顶级域名后缀
-                                break;
-                            }
-                        }
-
-                        if (hasCommonTld) // 如果包含常见的顶级域名后缀
-                        {
-                            if (parts.Length > 2)
-                                host = string.Join(".", parts, parts.Length - 2, 2); // 保留二级域名
-                            else
-                                host = parts[0]; // 如果只有顶级域名，如 example.com
-                        }
-                        else
-                            host = parts[0]; // 如果不包含常见的顶级域名后缀，则取第一个部分
-                    }
-                }
-
-                return host;
+                Uri uri = new Uri(url);
+                return uri.Host;
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("无效的URI：未能解析主机名。", "Error"); // 弹出消息提醒
-                return ""; // 返回空字符
+                return url;
             }
         }
 

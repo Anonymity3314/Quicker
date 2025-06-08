@@ -203,7 +203,9 @@ namespace Quicker.UserControls.SettingWindow
                     folderSize = convertionManager.ConversionData((int)folderSize);
                     folderSizeString = convertionManager.ConversionUnits((int)folderSize);
 
-                    return $"{folderSize}{folderSizeString}";
+                    if (folderSize > 0)
+                        CleanTempDataButton.IsEnabled = true; // 启用清理按钮
+                    return $"{folderSize} {folderSizeString}";
                 }
                 catch (Exception ex)
                 {
@@ -211,7 +213,7 @@ namespace Quicker.UserControls.SettingWindow
                     Debug.WriteLine($"获取临时数据大小时出错: {ex.Message}");
                 }
             }
-            return "0B";
+            return "0 B";
         }
 
         // 清理临时数据

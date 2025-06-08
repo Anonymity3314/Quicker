@@ -200,7 +200,6 @@ namespace Quicker.Windows.Menus
                 BitmapSource bitmapSource = Clipboard.GetImage(); // 获取图像
                 if (bitmapSource != null) // 图像不为空
                 {
-                    buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
                     var iconManager = new IconManager(); // 创建图标管理器
                     string iconPath = iconManager.SaveIconToFile(bitmapSource); // 保存图像到文件
                     if (!string.IsNullOrEmpty(iconPath)) // 图像路径不为空
