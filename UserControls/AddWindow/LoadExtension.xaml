@@ -43,12 +43,14 @@
                 </Border>
             </Grid>
         </Popup>
-        <Grid Name="Grid1" Margin="0,45,0,0" Visibility="Collapsed">
+        <Grid Name="Grid1" Margin="0,45,0,0">
             <TextBlock Name="NameTextBlock" Text="未知" Margin="162,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <TextBlock Text="版本：" Margin="121,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <TextBlock Name="VersionTextBlock" Text="未知" Margin="162,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <ScrollViewer Margin="162,100,20,20">
+                <TextBlock Name="DescriptionTextBlock" Text="未知" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </ScrollViewer>
             <TextBlock Text="描述：" Margin="121,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <TextBlock Name="DescriptionTextBlock" Text="未知" HorizontalAlignment="Left" Margin="162,100,0,0" VerticalAlignment="Top"/>
             <TextBlock Text="作者：" Margin="121,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <TextBlock Name="AuthorTextBlock" Text="未知" HorizontalAlignment="Left" Margin="162,40,0,0" VerticalAlignment="Top"/>
             <TextBlock Text="名称：" Margin="121,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>

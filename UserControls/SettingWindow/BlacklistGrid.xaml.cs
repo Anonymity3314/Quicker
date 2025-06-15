@@ -368,7 +368,10 @@ namespace Quicker.UserControls.SettingWindow
                 if (border == targetBorder)
                     border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置背景色
                 else
+                {
+                    border.Tag = false; // 标记为未选中
                     border.Background = System.Windows.Media.Brushes.Transparent; // 设置背景色
+                }
             }
         }
 
