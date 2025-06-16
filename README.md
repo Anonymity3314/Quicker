@@ -3,7 +3,7 @@
 [![Merge Project](https://github.com/LJZ-Anonymity/Quicker/actions/workflows/CodeMerging.yml/badge.svg?branch=Quicker)](https://github.com/LJZ-Anonymity/Quicker/actions/workflows/CodeMerging.yml)
 [![Version](https://img.shields.io/github/v/release/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/releases)
 [![最后更新](https://img.shields.io/github/last-commit/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/commits)
-[![开源协议](https://img.shields.io/github/license/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker/blob/main/LICENSE)
+[![开源协议](https://img.shields.io/badge/License-GNU%20AGPL%20v3.0-blue.svg)](https://github.com/LJZ-Anonymity/Quicker/blob/main/LICENSE)
 [![代码行数](https://aschey.tech/tokei/github/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 [![主要语言](https://img.shields.io/github/languages/top/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 
