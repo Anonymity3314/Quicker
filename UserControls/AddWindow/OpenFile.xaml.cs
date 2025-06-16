@@ -67,39 +67,69 @@ namespace Quicker.UserControls.AddWindow
             AppInfo selectedApp = e.SelectedApp; // 获取选中的应用信息
             if (selectedApp != null)
             {
-                // 更新控件数据
-                _addWindow.TitleTextBox.Text = selectedApp.Name; // 设置标题
-                LocationTextBox.Text = selectedApp.Location; // 设置地址
-                if (selectedApp.Icon != null)
-                {
-                    _addWindow.ButtonImage.Source = selectedApp.Icon; // 设置图标
-                    _addWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
-                }
+                UpdateUIWithAppInfo(selectedApp); // 更新UI
+            }
+        }
+
+        /// <summary>
+        /// 更新UI
+        /// </summary>
+        /// <param name="appInfo">应用信息</param>
+        private void UpdateUIWithAppInfo(AppInfo appInfo)
+        {
+            _addWindow.TitleTextBox.Text = appInfo.Name; // 设置标题
+            LocationTextBox.Text = appInfo.Location; // 设置地址
+            if (appInfo.Icon != null)
+            {
+                _addWindow.ButtonImage.Source = appInfo.Icon; // 设置图标
+                _addWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
             }
         }
 
         // 选择打开程序
         public void ChooseProcess(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            var openFileDialog = CreateOpenFileDialog(); // 创建打开文件对话框
+            if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了"确定"
+            {
+                ProcessSelectedFile(openFileDialog.FileName); // 处理选中的文件
+            }
+        }
+
+        /// <summary>
+        /// 创建打开文件对话框
+        /// </summary>
+        /// <returns>打开文件对话框</returns>
+        private Microsoft.Win32.OpenFileDialog CreateOpenFileDialog()
+        {
+            return new Microsoft.Win32.OpenFileDialog
             {
                 Filter = "任意文件(*.*)|*.*|可执行程序(*.exe)|*.exe" // 设置文件类型过滤器
             };
-            
-            if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了"确定"
-            {
-                string filePath = openFileDialog.FileName;
-                string fileName = Path.GetFileNameWithoutExtension(filePath);
-                
-                // 更新UI
-                LocationTextBox.Text = filePath;
-                _addWindow.TitleTextBox.Text = fileName;
-                _addWindow.ButtonTitle.Text = fileName;
-                _buttonManager.AutoEllipsisTextBlock(_addWindow.ButtonTitle, 70);
+        }
 
-                // 设置图标
-                SetIconFromPath(filePath);
-            }
+        /// <summary>
+        /// 处理选中的文件
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        private void ProcessSelectedFile(string filePath)
+        {
+            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
+            UpdateUIWithFileInfo(filePath, fileName); // 更新UI
+        }
+
+        /// <summary>
+        /// 更新UI
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <param name="fileName">文件名</param>
+        private void UpdateUIWithFileInfo(string filePath, string fileName)
+        {
+            LocationTextBox.Text = filePath; // 设置地址
+            _addWindow.TitleTextBox.Text = fileName; // 设置标题
+            _addWindow.ButtonTitle.Text = fileName; // 设置按钮标题
+            _buttonManager.AutoEllipsisTextBlock(_addWindow.ButtonTitle, 70); // 自动省略文本
+            SetIconFromPath(filePath); // 设置图标
         }
 
         // 选择打开文件夹
@@ -108,22 +138,41 @@ namespace Quicker.UserControls.AddWindow
             using System.Windows.Forms.FolderBrowserDialog folderDialog = new(); // 创建文件夹选择对话框
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string folderPath = folderDialog.SelectedPath;
-                
-                // 更新UI
-                LocationTextBox.Text = folderPath;
-                _addWindow.TitleTextBox.Text = Path.GetFileName(folderPath);
-                
-                // 设置图标
-                SetIconFromPath(folderPath);
+                ProcessSelectedFolder(folderDialog.SelectedPath); // 处理选中的文件夹
             }
+        }
+
+        /// <summary>
+        /// 处理选中的文件夹
+        /// </summary>
+        /// <param name="folderPath">文件夹路径</param> 
+        private void ProcessSelectedFolder(string folderPath)
+        {
+            LocationTextBox.Text = folderPath; // 设置地址
+            _addWindow.TitleTextBox.Text = Path.GetFileName(folderPath); // 设置标题
+            SetIconFromPath(folderPath); // 设置图标
         }
 
         // 复制地址
         private void CopyLocation(object sender, RoutedEventArgs e)
         {
             string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
-            LocationTextBox.Text = _buttonManager.ProcessLocation(clipboardText); // 设置地址栏文本
+            string processedLocation = _buttonManager.ProcessLocation(clipboardText); // 处理地址
+            ProcessLocationFromClipboard(processedLocation); // 处理剪贴板中的地址
+            OpenFilePopup.IsOpen = false; // 关闭弹出菜单
+        }
+
+        /// <summary>
+        /// 处理剪贴板中的地址
+        /// </summary>
+        /// <param name="location">地址</param>
+        private void ProcessLocationFromClipboard(string location)
+        {
+            LocationTextBox.Text = location; // 设置地址
+            SetIconFromPath(location); // 设置图标
+            _addWindow.TitleTextBox.Text = Directory.Exists(location)
+                ? Path.GetFileName(location) // 如果是文件夹，则设置为文件夹名
+                : Path.GetFileNameWithoutExtension(location); // 否则设置为文件名
         }
 
         // 如果地址栏不为空，则启用保存按钮
