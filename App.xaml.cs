@@ -511,24 +511,8 @@ namespace Quicker
         // 弹出主窗口
         private void ShowMainWindow(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口
-                if (mainWindow == null)
-                {
-                    string windowType = DetermineWindowType(); // 确定窗口类型
-                    mainWindow = new MainWindow(windowType); // 创建主窗口
-                    var settings = AppStateManager.OpenMainWindowConditions; // 获取设置
-                    SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                    AppStateManager.Left = (float)mainWindow.Left; // 记录主窗口位置
-                    AppStateManager.Top = (float)mainWindow.Top; // 记录主窗口位置
-                    mainWindow.Show(); // 显示主窗口
-                }
-                else
-                {
-                    mainWindow.Close(); // 关闭主窗口
-                }
-            });
+            PreLoadMainWindow(); // 预加载主窗口
+            CloseOrShowMainWindow(); // 关闭或显示主窗口
         }
 
         /// <summary>
