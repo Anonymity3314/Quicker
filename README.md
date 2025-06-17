@@ -88,7 +88,7 @@ Quicker 支持通过创建扩展模块来增强应用功能。你可以通过以
 
 4. 将编译后的扩展 DLL 文件放置在 Quicker 的扩展目录中，应用将会在需要时加载。
 
-更多详情请见 [Extensions](https://github.com/LJZ-Anonymity/Extensions "查看Quicker扩展项目")。
+更多详情请见[扩展项目](https://github.com/LJZ-Anonymity/Extensions "查看Quicker 扩展项目")。
 
 ## 致谢
 
@@ -151,10 +151,12 @@ Quicker/
 │   │   ├─ActionPagesManager.jpg                  # 动作场景的图片
 │   │   ├─Add.png                                 # 主面板添加动作的图片
 │   │   ├─BasicSettingButton.png                  # 基础设置按钮的图片
+│   │   ├─BlackList.png                           # 黑名单设置按钮的图片
 │   │   ├─ClearButton.png                         # 下载窗口中清理按钮的图片
 │   │   ├─CloseDownloadWindow.png                 # 关闭下载窗口的按钮图片
 │   │   ├─CloseQuicker.png                        # 退出Quicker的图片
 │   │   ├─CloseWindow.png                         # 关闭主面板的图片
+│   │   ├─CopyAction.png                          # 复制动作按钮的图片
 │   │   ├─DeleteImage.png                         # 删除动作按钮图像的图片
 │   │   ├─DesktopSceneImage.png                   # 桌面场景的图片
 │   │   ├─EditButton.png                          # 编辑动作的图片

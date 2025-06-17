@@ -10,6 +10,7 @@
     WindowStartupLocation="CenterScreen"
     Background="Transparent"
     AllowsTransparency="True"
+    ShowActivated="False"
     ShowInTaskbar="False"
     WindowStyle="None"
     Topmost="True"

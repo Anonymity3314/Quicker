@@ -552,7 +552,7 @@ namespace Quicker
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
-                if(mainWindowList.Count() > 1 && AppStateManager.Book)
+                if(mainWindowList.Count() > 1 && AppStateManager.Pinned)
                     AppStateManager.PreLoadMainWindow.Close(); // 关闭主窗口
                 else
                     AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示主窗口

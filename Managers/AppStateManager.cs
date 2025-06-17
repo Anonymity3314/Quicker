@@ -52,8 +52,8 @@ namespace Quicker
 
         // 窗口状态
         public static bool Locked { get; set; } = false; // 锁定状态
+        public static bool Pinned { get; set; } = false; // 订住状态
         public static bool Pause { get; set; } = false; // 暂停状态
-        public static bool Book { get; set; } = false; // 订住状态
 
         // 时间记录
         public static DateTime RecordedTime { get; set; } = DateTime.Now; // 记录时间

@@ -75,7 +75,7 @@ namespace Quicker.Windows.MainWindows
         private void InitializeButtons()
         {
             // 加载BookButton图标
-            string iconPath = AppStateManager.Book ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
+            string iconPath = AppStateManager.Pinned ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
             BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
             Book.Source = bookImage; // 设置Book按钮的图标
 
@@ -211,10 +211,10 @@ namespace Quicker.Windows.MainWindows
         // 订住功能面板
         private void BookQuicker(object sender, EventArgs e)
         {
-            AppStateManager.Book = !AppStateManager.Book; // 更新数据库中的设置
+            AppStateManager.Pinned = !AppStateManager.Pinned; // 更新数据库中的设置
             BitmapImage bookimage = new(); // 创建图像对象
             bookimage.BeginInit(); // 开始初始化
-            bookimage.UriSource = AppStateManager.Book
+            bookimage.UriSource = AppStateManager.Pinned
                 ? new Uri(AppStateManager.BookIconPath, UriKind.Relative) // 设置为订住样式
                 : new Uri(AppStateManager.DisBookIconPath, UriKind.Relative); // 设置为不订住样式
             bookimage.EndInit(); // 结束初始化
@@ -241,7 +241,7 @@ namespace Quicker.Windows.MainWindows
             ActionInformationWindow actionInformationWindow = App.Current.Windows.OfType<ActionInformationWindow>().FirstOrDefault(); // 查找ActionInformationWindow
             if (actionInformationWindow != null) // 如果存在ActionInformationWindow
                 this.Activate(); // 激活窗口
-            else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Book)
+            else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
@@ -370,7 +370,7 @@ namespace Quicker.Windows.MainWindows
             string buttonType = GetButtonType(sender); // 获取按钮类型
             if (button.Tag is ButtonData data)
             {
-                if (!AppStateManager.Book && data.ActionType != "OpenActionPage") 
+                if (!AppStateManager.Pinned && data.ActionType != "OpenActionPage") 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
 
                 if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
