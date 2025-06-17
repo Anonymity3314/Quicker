@@ -288,6 +288,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="ToolTip" Value="删除此应用"/>
         <Setter Property="Margin" Value="0,0,2,0"/>
         <Setter Property="Height" Value="20"/>
         <Setter Property="Width" Value="20"/>

@@ -25,4 +25,47 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="5,0"/>
     </Style>
+
+    <!-- 黑名单项网格 -->
+    <Style x:Key="BlacklistItemGrid" TargetType="Grid">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Margin" Value="2,0"/>
+    </Style>
+
+    <!-- 黑名单项内容网格 -->
+    <Style x:Key="BlacklistItemContentGrid" TargetType="Grid">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Margin" Value="2,0,2,0"/>
+    </Style>
+
+    <!-- 黑名单项边框 -->
+    <Style x:Key="BlacklistItemBorder" TargetType="Border">
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="CornerRadius" Value="3"/>
+        <Setter Property="Margin" Value="2,2,2,0"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <!-- 黑名单项内容面板 -->
+    <Style x:Key="BlacklistItemStackPanel" TargetType="StackPanel">
+        <Setter Property="Width" Value="250"/>
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Margin" Value="2,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- 黑名单项图标面板 -->
+    <Style x:Key="BlacklistItemIconStackPanel" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Margin" Value="2,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
 </ResourceDictionary>

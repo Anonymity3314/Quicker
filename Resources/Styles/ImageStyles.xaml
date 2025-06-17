@@ -37,4 +37,22 @@
         <Setter Property="Height" Value="36"/>
         <Setter Property="Width" Value="36"/>
     </Style>
+
+    <!-- 黑名单项图标 -->
+    <Style x:Key="BlacklistItemIcon" TargetType="Image">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="5,0,5,0"/>
+        <Setter Property="Height" Value="16"/>
+        <Setter Property="Width" Value="16"/>
+    </Style>
+
+    <!-- 黑名单项删除图标 -->
+    <Style x:Key="BlacklistItemDeleteIcon" TargetType="Image">
+        <Setter Property="Source" Value="/Resources/Images/DeleteImage.png"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Width" Value="20"/>
+    </Style>
 </ResourceDictionary>
