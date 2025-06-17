@@ -52,12 +52,14 @@
     <None Remove="Resources\Images\Add.png" />
     <None Remove="Resources\Images\BasicSettingButton.png" />
     <None Remove="Resources\Images\BasicSettingButton.png" />
+    <None Remove="Resources\Images\BlackList.png" />
     <None Remove="Resources\Images\ClearButton.png" />
     <None Remove="Resources\Images\CloseDownloadWindow.png" />
     <None Remove="Resources\Images\CloseQuicker.png" />
     <None Remove="Resources\Images\CloseQuicker.png" />
     <None Remove="Resources\Images\CloseWindow.png" />
     <None Remove="Resources\Images\CloseWindow.png" />
+    <None Remove="Resources\Images\CopyAction.png" />
     <None Remove="Resources\Images\DeleteImage.png" />
     <None Remove="Resources\Images\DeleteImage.png" />
     <None Remove="Resources\Images\DesktopSceneImage.png" />
@@ -109,6 +111,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Images\BlackList.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\CopyAction.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Images\MessageImage.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

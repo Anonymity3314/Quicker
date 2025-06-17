@@ -51,7 +51,7 @@
                 </Button>
                 <Button x:Name="Blacklist" ToolTip="在某些应用上停止使用Quicker" Style="{StaticResource Button2}" Click="Blacklist_Click" MouseLeave="Blacklist_MouseLeave">
                     <Grid Width="195">
-                        <Image Source="/Resources/Images/Quicker1.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <Image Source="/Resources/Images/BlackList.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="黑名单" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>

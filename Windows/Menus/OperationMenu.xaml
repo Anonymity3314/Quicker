@@ -51,7 +51,7 @@
                             </StackPanel>
                         </Button.ToolTip>
                         <Grid Width="199">
-                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <Image Source="/Resources/Images/CopyAction.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="复制"/>
                         </Grid>
                     </Button>
