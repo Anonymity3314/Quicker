@@ -293,6 +293,11 @@ namespace Quicker.Windows.MainWindows
 
                     var data = db2.GetButtonDataByID(int.Parse(buttonName.Replace(style, "")), type); // 获取按钮数据
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
+
+                    if (button.Tag is ButtonData) // 如果按钮有数据
+                        button.Background = isDarkModle
+                            ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
+                            : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
                 }
             }
             return dynamicCanvas; // 返回画布
@@ -419,7 +424,6 @@ namespace Quicker.Windows.MainWindows
             {
                 if(showUsedTimes) // 如果显示使用次数
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
-
                 button.Background = isDarkModle
                     ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
                     : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
