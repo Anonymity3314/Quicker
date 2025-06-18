@@ -51,10 +51,13 @@ namespace Quicker
         }
 
         // 检查应用更新
-        private void CheckAppUpdate()
+        private async void CheckAppUpdate()
         {
-            using var updateManager = new AppUpdateManager(); // 创建更新管理器
-            updateManager.CheckForUpdate(); // 检查并安装更新
+            await Task.Run(() =>
+            {
+                using var updateManager = new AppUpdateManager(); // 创建更新管理器
+                updateManager.CheckForUpdate(); // 检查并安装更新
+            });
         }
 
         // 初始化托盘图标
@@ -74,13 +77,16 @@ namespace Quicker
         }
 
         // 弹出消息提醒
-        private void ShowNotification()
+        private async void ShowNotification()
         {
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
             if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("成功启动！", "Common"); // 弹出消息提醒
+                await Task.Run(() =>
+                {
+                    using var toast = new ToastManager(); // 消息提醒管理器
+                    toast.Show("成功启动！", "Common"); // 弹出消息提醒
+                });
             }
         }
 

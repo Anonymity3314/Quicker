@@ -17,10 +17,10 @@ namespace Quicker.Managers
                 toastWindow = Application.Current.Windows.OfType<ToastWindow>().FirstOrDefault();
                 if (toastWindow == null)
                 {
-                    toastWindow = new ToastWindow();
-                    toastWindow.Show();
+                    toastWindow = new ToastWindow(); // 创建新的ToastWindow实例
+                    toastWindow.Show(); // 显示ToastWindow
                 }
-                toastWindow.AddToast(message, toastType);
+                toastWindow.AddToast(message, toastType); // 添加Toast消息
             });
         }
 
@@ -31,16 +31,19 @@ namespace Quicker.Managers
             GC.SuppressFinalize(this); // 告知垃圾回收器不需要调用终结器
         }
 
-        // 释放资源
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        /// <param name="disposing">是否释放资源</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!isDisposed) isDisposed = true;
+            if (!isDisposed) isDisposed = true; // 设置为已释放
         }
 
         // 析构函数
         ~ToastManager()
         {
-            Dispose(false);
+            Dispose(false); // 释放非托管资源
         }
     }
 }

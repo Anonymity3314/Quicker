@@ -23,12 +23,12 @@
         <Grid Background="#F9F9F9" Height="28" VerticalAlignment="Top">
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="Quicker" Foreground="#909090" Margin="5,0" FontSize="11" FontWeight="Bold"/>
             <Button x:Name="ClearButton" Margin="270,6,10,0" ToolTip="清理" Style="{StaticResource DownloadWindowButton}" Click="ClearButton_Click">
-                <Image Source="/Resources/Images/SourseImages/ClearButton.png" Width="16"/>
+                <Image Source="/Resources/Images/ClearButton.png" Width="16"/>
             </Button>
         </Grid>
         <TextBlock x:Name="DownloadFileName" FontWeight="Bold" Margin="10,38,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="11"/>
         <Button x:Name="CancelButton" Margin="0,33,10,0" ToolTip="取消" Style="{StaticResource DownloadWindowButton}" Click="CancelButton_Click">
-            <Image Source="/Resources/Images/SourseImages/CloseDownloadWindow.png" Width="16"/>
+            <Image Source="/Resources/Images/CloseDownloadWindow.png" Width="16"/>
         </Button>
         <ProgressBar x:Name="DownloadProgressBar" Margin="10,54,10,33"/>
         <TextBlock x:Name="DownloadSpeed" Text="0 B/S" Margin="10,66,0,0" FontSize="11" Foreground="Gray" VerticalAlignment="Top" HorizontalAlignment="Left"/>

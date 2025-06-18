@@ -213,6 +213,7 @@ namespace Quicker.Windows.ToolWindows
             }
             else
                 toast.Show($"系统错误：{ex.Message}", "Error"); // 其他错误
+            Close(); // 关闭下载窗口
             EnableDownloadButton(true); // 启用下载按钮
         }
 

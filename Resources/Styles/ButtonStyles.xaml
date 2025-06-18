@@ -510,7 +510,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="0">
-                        <Path StrokeThickness="2" Stroke="Black" Margin="1" Stretch="Uniform" Data="M 0 0 L 10 10 M 10 0 L 0 10"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
