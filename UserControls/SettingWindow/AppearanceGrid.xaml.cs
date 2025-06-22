@@ -115,8 +115,8 @@ namespace Quicker.UserControls.SettingWindow
             }
             if (_currentBrush == null) return; // 如果brush为null，则返回
             
-            // 设置颜色选择器的初始颜色
-            PopupColorPicker.SelectedColor = _currentBrush.Color;
+            // 使用新方法强制刷新色彩选择器
+            PopupColorPicker.ResetColorControls(_currentBrush.Color);
             
             // 设置Popup的位置并打开
             ColorPickerPopup.PlacementTarget = button;
@@ -128,8 +128,7 @@ namespace Quicker.UserControls.SettingWindow
         {
             if (_currentBrush != null)
             {
-                // 实时更新按钮颜色
-                _currentBrush.Color = e.NewColor;
+                _currentBrush.Color = e.NewColor; // 实时更新按钮颜色
             }
         }
 

@@ -12,6 +12,7 @@ namespace Quicker.UserControls.SettingWindow
         private bool _updatingControls = false; //  确保颜色变化事件只被触发一次
         private Color _currentColor = Colors.White; // 当前颜色
         private double _saturation = 1;  // 饱和度
+        private Rectangle _colorRect; // 用于存储颜色画布中的矩形，方便直接访问
         private double _value = 1;  // 亮度
         private double _hue = 0; // 色相
 
@@ -77,7 +78,17 @@ namespace Quicker.UserControls.SettingWindow
                     RedSlider != null && GreenSlider != null && 
                     BlueSlider != null && AlphaSlider != null)
                 {
+                    // 存储第一个矩形引用以便直接访问
+                    if (ColorCanvas.Children.Count > 0 && ColorCanvas.Children[0] is Rectangle rect)
+                    {
+                        _colorRect = rect;
+                    }
+                    
                     HueSlider.Value = _hue; // 色相
+                    
+                    // 确保设置初始颜色
+                    UpdateHueColorRect(_hue);
+                    
                     UpdateControlsFromColor(); // 更新控件状态
                     UpdateColorThumbPosition(); // 更新色彩画布
                 }
@@ -87,13 +98,81 @@ namespace Quicker.UserControls.SettingWindow
                 // 处理异常，防止崩溃
             }
         }
+        
+        /// <summary>
+        /// 更新色相矩形的颜色
+        /// </summary>
+        /// <param name="hue">色相值</param>
+        private void UpdateHueColorRect(double hue)
+        {
+            if (_colorRect != null)
+            {
+                Color hueColor = GetColorFromHue(hue);
+                
+                // 创建新的渐变画刷
+                LinearGradientBrush gradientBrush = new LinearGradientBrush();
+                gradientBrush.StartPoint = new Point(0, 0);
+                gradientBrush.EndPoint = new Point(1, 0);
+                gradientBrush.GradientStops.Add(new GradientStop(Colors.White, 0));
+                gradientBrush.GradientStops.Add(new GradientStop(hueColor, 1));
+                
+                // 应用到矩形
+                _colorRect.Fill = gradientBrush;
+            }
+        }
+        
+        /// <summary>
+        /// 强制刷新颜色选择器的所有控件状态
+        /// </summary>
+        /// <param name="color">要设置的颜色</param>
+        public void ResetColorControls(Color color)
+        {
+            _currentColor = color;
+            
+            // 先将控件更新标志设为false，确保后续更新能正常进行
+            _updatingControls = false;
+            
+            // 更新RGB和HSV值
+            RgbToHsv(_currentColor.R, _currentColor.G, _currentColor.B, out _hue, out _saturation, out _value);
+            
+            if (HueSlider != null)
+            {
+                // 开始更新控件，避免循环触发事件
+                _updatingControls = true;
+                
+                try
+                {
+                    // 1. 先更新色相滑块的值
+                    HueSlider.Value = _hue;
+                    
+                    // 2. 直接更新颜色选择区域的背景色
+                    UpdateHueColorRect(_hue);
+                    
+                    // 3. 更新RGB滑块
+                    if (RedSlider != null) RedSlider.Value = _currentColor.R;
+                    if (GreenSlider != null) GreenSlider.Value = _currentColor.G;
+                    if (BlueSlider != null) BlueSlider.Value = _currentColor.B;
+                    if (AlphaSlider != null) AlphaSlider.Value = _currentColor.A;
+                    
+                    // 4. 更新色彩选择点的位置
+                    UpdateColorThumbPosition();
+                    
+                    // 5. 更新十六进制值
+                    UpdateHexValue();
+                }
+                finally
+                {
+                    // 恢复控件更新标志
+                    _updatingControls = false;
+                }
+            }
+        }
 
         // 更新控件状态
         private void UpdateControlsFromColor()
         {
-            if (_updatingControls || RedSlider == null || GreenSlider == null || 
-                BlueSlider == null || AlphaSlider == null || HueSlider == null || 
-                ColorThumb == null || HexValue == null) 
+            if (_updatingControls || RedSlider == null || GreenSlider == null || BlueSlider == null ||
+                AlphaSlider == null || HueSlider == null || ColorThumb == null || HexValue == null) 
             {
                 return; // 如果控件尚未初始化或者正在更新，则返回
             }
@@ -109,6 +188,10 @@ namespace Quicker.UserControls.SettingWindow
 
                 RgbToHsv(_currentColor.R, _currentColor.G, _currentColor.B, out _hue, out _saturation, out _value); // 将RGB转换为HSV
                 HueSlider.Value = _hue; // 更新色相
+                
+                // 更新色相对应的颜色选择区域背景色
+                UpdateHueColorRect(_hue);
+                
                 if (ColorCanvas != null && ColorCanvas.ActualWidth > 0 && ColorCanvas.ActualHeight > 0)
                 {
                     UpdateColorThumbPosition(); // 如果颜色画布已正确初始化，则更新颜色块位置
@@ -128,8 +211,7 @@ namespace Quicker.UserControls.SettingWindow
         // 更新颜色块位置
         private void UpdateColorThumbPosition()
         {
-            if (ColorCanvas == null || ColorThumb == null || 
-                ColorCanvas.ActualWidth <= 0 || ColorCanvas.ActualHeight <= 0)
+            if (ColorCanvas == null || ColorThumb == null || ColorCanvas.ActualWidth <= 0 || ColorCanvas.ActualHeight <= 0)
             {
                 return; // 确保ColorCanvas和ColorThumb不为null且已正确初始化
             }
@@ -275,22 +357,11 @@ namespace Quicker.UserControls.SettingWindow
             if (_updatingControls) return; // 确保控件已初始化
             _hue = ((Slider)sender).Value; // 获取色相值
 
-            // 更新颜色画布
-            Color hueColor = GetColorFromHue(_hue); // 获取色相对应的颜色
-            LinearGradientBrush gradientBrush = new(); // 创建线性渐变画刷
-            gradientBrush.StartPoint = new(0, 0); // 设置渐变起点
-            gradientBrush.EndPoint = new(1, 0); // 设置渐变终点
-            gradientBrush.GradientStops.Add(new(Colors.White, 0)); // 添加白色渐变
-            gradientBrush.GradientStops.Add(new(hueColor, 1)); // 添加色相对应的颜色渐变
-            foreach (var child in ColorCanvas.Children) //  遍历子元素
-            {
-                if (child is Rectangle rect) // 找到颜色块
-                {
-                    rect.Fill = gradientBrush; // 设置颜色画布颜色
-                    break;
-                }
-            }
-            UpdateColorFromHsv(); // 更新颜色
+            // 更新颜色选择区域背景色
+            UpdateHueColorRect(_hue);
+            
+            // 更新颜色
+            UpdateColorFromHsv(); 
         }
 
         /// <summary>
@@ -309,6 +380,8 @@ namespace Quicker.UserControls.SettingWindow
         {
             if (e.LeftButton == MouseButtonState.Pressed) // 左键按下
             {
+                // 捕获鼠标以获得更流畅的拖动体验
+                ColorCanvas.CaptureMouse();
                 var position = e.GetPosition(ColorCanvas); // 获取鼠标位置
                 UpdateColorFromCanvasPosition(position); // 更新颜色
             }
@@ -317,7 +390,7 @@ namespace Quicker.UserControls.SettingWindow
         //  鼠标移动
         private void ColorCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed) // 左键按下
+            if (e.LeftButton == MouseButtonState.Pressed && ColorCanvas.IsMouseCaptured) // 左键按下且已捕获鼠标
             {
                 var position = e.GetPosition(ColorCanvas); // 获取鼠标位置
                 UpdateColorFromCanvasPosition(position); // 更新颜色
@@ -327,8 +400,13 @@ namespace Quicker.UserControls.SettingWindow
         //  鼠标抬起
         private void ColorCanvas_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            var position = e.GetPosition(ColorCanvas); // 获取鼠标位置
-            UpdateColorFromCanvasPosition(position);  // 更新颜色
+            if (ColorCanvas.IsMouseCaptured)
+            {
+                // 释放鼠标捕获
+                ColorCanvas.ReleaseMouseCapture();
+                var position = e.GetPosition(ColorCanvas); // 获取鼠标位置
+                UpdateColorFromCanvasPosition(position);  // 更新颜色
+            }
         }
 
         /// <summary>

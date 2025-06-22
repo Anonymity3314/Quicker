@@ -8,7 +8,7 @@
     mc:Ignorable="d"
 
     Background="White"
-    d:DesignHeight="870"
+    d:DesignHeight="1200"
     d:DesignWidth="982"
     
     Unloaded="AppearanceGrid_Unloaded"
@@ -188,14 +188,14 @@
                         <Label Content="模糊与圆角" Margin="15,858,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 模糊与圆角-模糊模式 -->
                         <Label Content="模糊模式：" Margin="10,893,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,892,0,0" VerticalAlignment="Top" Width="120">
+                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,895,0,0" VerticalAlignment="Top" Width="120" Height="24">
                             <ComboBoxItem Content="无"/>
                             <ComboBoxItem Content="毛玻璃"/>
                             <ComboBoxItem Content="无（去除窗口阴影）"/>
                         </ComboBox>
                         <!-- 模糊与圆角-Win11圆角模式 -->
                         <Label Content="Win11圆角模式：" Margin="10,926,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,929,0,0" VerticalAlignment="Top" Width="120">
+                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,928,0,0" VerticalAlignment="Top" Width="120" Height="24">
                             <ComboBoxItem Content="默认"/>
                             <ComboBoxItem Content="无"/>
                             <ComboBoxItem Content="圆角"/>
