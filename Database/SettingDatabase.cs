@@ -41,6 +41,40 @@ public static class SettingDatabase
      * IsInBlacklist: 此项用于标识该应用程序是否在黑名单中。
      * IsFolder: 此项用于标识ApplicationName是否为文件夹路径。
      */
+    /* [Appearance]
+     * ButtonSize: 按钮大小，默认为77.6。
+     * ButtonGap: 按钮间隙，默认为0.2。
+     * BorderWidth: 边框宽度，默认为0.0。
+     * ButtonCornerRadius: 按钮圆角，默认为0.0。
+     *
+     * BackgroundColor: 背景颜色，默认为#C5CCCCCC。
+     * ToolbarColor: 工具栏颜色，默认为#00999999。
+     * ToolbarIconColor: 工具栏图标颜色，默认为#FF666666。
+     * ActionButtonColor: 动作按钮颜色，默认为#FFFFFFFF。
+     * ActionButtonMouseOverColor: 动作按钮鼠标悬停颜色，默认为#59B2F2FF。
+     * BlankButtonColor: 空白按钮颜色，默认为#32C8C8C8。
+     * BlankButtonMouseOverColor: 空白按钮鼠标悬停颜色，默认为#05000000。
+     * ButtonTextColor: 按钮文字颜色，默认为#FF000000。
+     * ActionIconColor: 动作图标颜色，默认为#FF696969。
+     * TriggerKeyTextColor: 触发键文字颜色，默认为#D0FF8C00。
+     * OtherIconColor: 其他位置图标颜色，默认为#FF666666。
+     *
+     * Font1: 字体1，默认为0。
+     * Font2: 字体2，默认为0。
+     * FontSize: 字体大小，默认为12。
+     * FontWeight: 字体粗细，默认为400。
+     *
+     * BackgroundImagePath: 背景图片路径，默认为空。
+     * BackgroundImageOpacity: 背景图片不透明度，默认为1.0。
+     *
+     * Blur: 模糊模式，默认为0。
+     * Win11CornerRadius: Win11圆角模式，默认为0。
+     *
+     * AutoHideTitleBar: 自动缩小动作名称文字，默认为false。
+     * ShowActionButtonMouseOver: 鼠标悬浮在动作按钮上时，放大显示按钮，默认为false。
+     * HideActionNameAfterIcon: 设置动作图标后隐藏动作名称，默认为false。
+     * ShowActionIconShadow: 动作图标显示阴影，默认为false。
+     */
 
     // 数据库连接
     private const string db1 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
@@ -59,6 +93,7 @@ public static class SettingDatabase
             InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
             InitializeBlacklist(); // 初始化 Blacklist 表
             InitializeBlacklistApplication(); // 初始化 BlacklistApplication 表
+            InitializeAppearance(); // 初始化 Appearance 表
         }
     }
 
@@ -158,6 +193,56 @@ public static class SettingDatabase
         using var connection = OpenConnection(); // 打开数据库连接
         using var createBlacklistApplicationCommand = new SQLiteCommand(SQLStatements.CreateBlacklistApplicationTable, connection); // 创建 SQLiteCommand 对象
         createBlacklistApplicationCommand.ExecuteNonQuery(); // 执行创建表的命令
+    }
+
+    // 初始化 Appearance 表
+    private static void InitializeAppearance()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        using var createAppearanceCommand = new SQLiteCommand(SQLStatements.CreateAppearanceTable, connection); // 创建 SQLiteCommand 对象
+        createAppearanceCommand.ExecuteNonQuery(); // 执行创建表的命令
+        InsertDefaultAppearanceData(); // 插入默认数据
+    }
+
+    // 插入默认数据
+    private static void InsertDefaultAppearanceData()
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        var defaults = (77.6, 0.2, 0.0, 0.0, "#C5CCCCCC", "#00999999", "#FF666666", "#FFFFFFFF", "#59B2F2FF", "#32C8C8C8", "#05000000", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 1, false, false, false, false); // 使用参数元组封装默认值
+        var parameters = new Dictionary<string, object>
+        {
+            ["@ButtonSize"] = defaults.Item1, // 按钮大小
+            ["@ButtonGap"] = defaults.Item2, // 按钮间隙
+            ["@BorderWidth"] = defaults.Item3, // 边框宽度
+            ["@ButtonCornerRadius"] = defaults.Item4, // 按钮圆角
+            ["@BackgroundColor"] = defaults.Item5, // 背景颜色
+            ["@ToolbarColor"] = defaults.Item6, // 工具栏颜色
+            ["@ToolbarIconColor"] = defaults.Item7, // 工具栏图标颜色
+            ["@ActionButtonColor"] = defaults.Item8, // 动作按钮颜色
+            ["@ActionButtonMouseOverColor"] = defaults.Item9, // 动作按钮鼠标悬停颜色
+            ["@BlankButtonColor"] = defaults.Item10, // 空白按钮颜色
+            ["@BlankButtonMouseOverColor"] = defaults.Item11, // 空白按钮鼠标悬停颜色
+            ["@ButtonTextColor"] = defaults.Item12, // 按钮文字颜色
+            ["@ActionIconColor"] = defaults.Item13, // 动作图标颜色
+            ["@TriggerKeyTextColor"] = defaults.Item14, // 触发键文字颜色
+            ["@OtherIconColor"] = defaults.Item15, // 其他位置图标颜色
+            ["@Font1"] = defaults.Item16, // 字体1
+            ["@Font2"] = defaults.Item17, // 字体2
+            ["@FontSize"] = defaults.Item18, // 字体大小
+            ["@FontWeight"] = defaults.Item19, // 字体粗细
+            ["@BackgroundImagePath"] = defaults.Item20, // 背景图片路径
+            ["@BackgroundImageOpacity"] = defaults.Item21, // 背景图片不透明度
+            ["@Blur"] = defaults.Item22, // 模糊模式
+            ["@Win11CornerRadius"] = defaults.Item23, // Win11圆角模式
+            ["@AutoHideTitleBar"] = defaults.Item24, // 自动缩小动作名称文字
+            ["@ShowActionButtonMouseOver"] = defaults.Item25, // 鼠标悬浮在动作按钮上时，放大显示按钮
+            ["@HideActionNameAfterIcon"] = defaults.Item26, // 设置动作图标后隐藏动作名称
+            ["@ShowActionIconShadow"] = defaults.Item27 // 动作图标显示阴影
+        };
+        using var command = new SQLiteCommand(SQLStatements.InsertAppearance, connection); // 创建 SQLiteCommand 对象
+        foreach (var param in parameters)
+            command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
+        command.ExecuteNonQuery(); // 执行插入命令
     }
 
     /// <summary>
@@ -415,6 +500,65 @@ public static class SettingDatabase
     }
 
     /// <summary>
+    /// 获取外观设置
+    /// </summary>
+    /// <returns> Appearance 类 </returns>
+    public static List<Appearance> GetAllAppearanceSettings()
+    {
+        var appearances = new List<Appearance>(); // 创建一个空的 Appearance 列表
+        using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
+        using var command = new SQLiteCommand(SQLStatements.GetAllAppearanceSettings, connection); // 创建 SQLiteCommand 对象
+        using var reader = command.ExecuteReader(); // 执行查询并获取结果
+        while (reader.Read())
+        {
+            appearances.Add(new Appearance()); // 将读取到的数据添加到列表中
+        }
+        transaction.Commit(); // 提交事务
+        return appearances; // 返回所有 Appearance 数据
+    }
+
+    /// <summary>
+    /// 更新外观设置
+    /// </summary>
+    /// <param name="appearance"> Appearance 类 </param>
+    public static void UpdateAppearance(Appearance appearance)
+    {
+        using var connection = OpenConnection(); // 打开数据库连接
+        using var transaction = connection.BeginTransaction(); // 开启事务
+        using var command = new SQLiteCommand(SQLStatements.UpdateAppearance, connection); // 创建 SQLiteCommand 对象
+        command.Parameters.AddWithValue("@ButtonSize", appearance.ButtonSize); // 设置参数
+        command.Parameters.AddWithValue("@ButtonGap", appearance.ButtonGap); // 设置参数
+        command.Parameters.AddWithValue("@BorderWidth", appearance.BorderWidth); // 设置参数
+        command.Parameters.AddWithValue("@ButtonCornerRadius", appearance.ButtonCornerRadius); // 设置参数
+        command.Parameters.AddWithValue("@BackgroundColor", appearance.BackgroundColor); // 设置参数
+        command.Parameters.AddWithValue("@ToolbarColor", appearance.ToolbarColor); // 设置参数
+        command.Parameters.AddWithValue("@ToolbarIconColor", appearance.ToolbarIconColor); // 设置参数
+        command.Parameters.AddWithValue("@ActionButtonColor", appearance.ActionButtonColor); // 设置参数
+        command.Parameters.AddWithValue("@ActionButtonMouseOverColor", appearance.ActionButtonMouseOverColor); // 设置参数
+        command.Parameters.AddWithValue("@BlankButtonColor", appearance.BlankButtonColor); // 设置参数
+        command.Parameters.AddWithValue("@BlankButtonMouseOverColor", appearance.BlankButtonMouseOverColor); // 设置参数
+        command.Parameters.AddWithValue("@ButtonTextColor", appearance.ButtonTextColor); // 设置参数
+        command.Parameters.AddWithValue("@ActionIconColor", appearance.ActionIconColor); // 设置参数
+        command.Parameters.AddWithValue("@TriggerKeyTextColor", appearance.TriggerKeyTextColor); // 设置参数
+        command.Parameters.AddWithValue("@OtherIconColor", appearance.OtherIconColor); // 设置参数
+        command.Parameters.AddWithValue("@Font1", appearance.Font1); // 设置参数
+        command.Parameters.AddWithValue("@Font2", appearance.Font2); // 设置参数
+        command.Parameters.AddWithValue("@FontSize", appearance.FontSize); // 设置参数
+        command.Parameters.AddWithValue("@FontWeight", appearance.FontWeight); // 设置参数
+        command.Parameters.AddWithValue("@BackgroundImagePath", appearance.BackgroundImagePath); // 设置参数
+        command.Parameters.AddWithValue("@BackgroundImageOpacity", appearance.BackgroundImageOpacity); // 设置参数
+        command.Parameters.AddWithValue("@Blur", appearance.Blur); // 设置参数
+        command.Parameters.AddWithValue("@Win11CornerRadius", appearance.Win11CornerRadius); // 设置参数
+        command.Parameters.AddWithValue("@AutoHideTitleBar", appearance.AutoHideTitleBar); // 设置参数
+        command.Parameters.AddWithValue("@ShowActionButtonMouseOver", appearance.ShowActionButtonMouseOver); // 设置参数
+        command.Parameters.AddWithValue("@HideActionNameAfterIcon", appearance.HideActionNameAfterIcon); // 设置参数
+        command.Parameters.AddWithValue("@ShowActionIconShadow", appearance.ShowActionIconShadow); // 设置参数
+        command.ExecuteNonQuery(); // 执行命令
+        transaction.Commit(); // 提交事务
+    }
+
+    /// <summary>
     /// 打开数据库连接
     /// </summary>
     /// <returns> SQLiteConnection 对象 </returns>
@@ -598,6 +742,131 @@ public static class SettingDatabase
         UPDATE Convention SET 
             LastPage = @LastPage
         WHERE ID = 1;";
+        // 外观设置表
+        public const string CreateAppearanceTable = @"
+        CREATE TABLE IF NOT EXISTS Appearance
+        (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ButtonSize REAL,
+            ButtonGap REAL,
+            BorderWidth REAL,
+            ButtonCornerRadius REAL,
+            BackgroundColor TEXT,
+            ToolbarColor TEXT,
+            ToolbarIconColor TEXT,
+            ActionButtonColor TEXT,
+            ActionButtonMouseOverColor TEXT,
+            BlankButtonColor TEXT,
+            BlankButtonMouseOverColor TEXT,
+            ButtonTextColor TEXT,
+            ActionIconColor TEXT,
+            TriggerKeyTextColor TEXT,
+            OtherIconColor TEXT,
+            Font1 INTEGER,
+            Font2 INTEGER,
+            FontSize REAL,
+            FontWeight REAL,
+            BackgroundImagePath TEXT,
+            BackgroundImageOpacity REAL,
+            Blur INTEGER,
+            Win11CornerRadius INTEGER,
+            AutoHideTitleBar BOOLEAN,
+            ShowActionButtonMouseOver BOOLEAN,
+            HideActionNameAfterIcon BOOLEAN,
+            ShowActionIconShadow BOOLEAN
+        );";
+        public const string InsertAppearance = @"
+        INSERT INTO Appearance
+        (
+            ButtonSize,
+            ButtonGap,
+            BorderWidth,
+            ButtonCornerRadius,
+            BackgroundColor,
+            ToolbarColor,
+            ToolbarIconColor,
+            ActionButtonColor,
+            ActionButtonMouseOverColor,
+            BlankButtonColor,
+            BlankButtonMouseOverColor,
+            ButtonTextColor,
+            ActionIconColor,
+            TriggerKeyTextColor,
+            OtherIconColor,
+            Font1,
+            Font2,
+            FontSize,
+            FontWeight,
+            BackgroundImagePath,
+            BackgroundImageOpacity,
+            Blur,
+            Win11CornerRadius,
+            AutoHideTitleBar,
+            ShowActionButtonMouseOver,
+            HideActionNameAfterIcon,
+            ShowActionIconShadow
+        )
+        VALUES
+        (
+            @ButtonSize,
+            @ButtonGap,
+            @BorderWidth,
+            @ButtonCornerRadius,
+            @BackgroundColor,
+            @ToolbarColor,
+            @ToolbarIconColor,
+            @ActionButtonColor,
+            @ActionButtonMouseOverColor,
+            @BlankButtonColor,
+            @BlankButtonMouseOverColor,
+            @ButtonTextColor,
+            @ActionIconColor,
+            @TriggerKeyTextColor,
+            @OtherIconColor,
+            @Font1,
+            @Font2,
+            @FontSize,
+            @FontWeight,
+            @BackgroundImagePath,
+            @BackgroundImageOpacity,
+            @Blur,
+            @Win11CornerRadius,
+            @AutoHideTitleBar,
+            @ShowActionButtonMouseOver,
+            @HideActionNameAfterIcon,
+            @ShowActionIconShadow
+        );"; // 插入外观设置
+        public const string GetAllAppearanceSettings = "SELECT * FROM Appearance;"; // 获取所有外观设置
+        public const string UpdateAppearance = @"
+        UPDATE Appearance SET
+            ButtonSize = @ButtonSize,
+            ButtonGap = @ButtonGap,
+            BorderWidth = @BorderWidth,
+            ButtonCornerRadius = @ButtonCornerRadius,
+            BackgroundColor = @BackgroundColor,
+            ToolbarColor = @ToolbarColor,
+            ToolbarIconColor = @ToolbarIconColor,
+            ActionButtonColor = @ActionButtonColor,
+            ActionButtonMouseOverColor = @ActionButtonMouseOverColor,
+            BlankButtonColor = @BlankButtonColor,
+            BlankButtonMouseOverColor = @BlankButtonMouseOverColor,
+            ButtonTextColor = @ButtonTextColor,
+            ActionIconColor = @ActionIconColor,
+            TriggerKeyTextColor = @TriggerKeyTextColor,
+            OtherIconColor = @OtherIconColor,
+            Font1 = @Font1,
+            Font2 = @Font2,
+            FontSize = @FontSize,
+            FontWeight = @FontWeight,
+            BackgroundImagePath = @BackgroundImagePath,
+            BackgroundImageOpacity = @BackgroundImageOpacity,
+            Blur = @Blur,
+            Win11CornerRadius = @Win11CornerRadius,
+            AutoHideTitleBar = @AutoHideTitleBar,
+            ShowActionButtonMouseOver = @ShowActionButtonMouseOver,
+            HideActionNameAfterIcon = @HideActionNameAfterIcon,
+            ShowActionIconShadow = @ShowActionIconShadow
+        WHERE ID = @ID;"; // 更新外观设置
     }
 }
 
@@ -663,8 +932,42 @@ public class BlacklistApplication
 // 外观设置
 public class Appearance
 {
+    // 尺寸
     public double ButtonSize { get; set; } // 按钮大小
     public double ButtonGap { get; set; } // 按钮间隙
     public double BorderWidth { get; set; } // 边框宽度
     public double ButtonCornerRadius { get; set; } // 按钮圆角
+
+    // 颜色
+    public string BackgroundColor { get; set; } // 背景颜色
+    public string ToolbarColor { get; set; } // 工具栏颜色
+    public string ToolbarIconColor { get; set; } // 工具栏图标颜色
+    public string ActionButtonColor { get; set; } // 动作按钮颜色
+    public string ActionButtonMouseOverColor { get; set; } // 动作按钮鼠标悬停颜色
+    public string BlankButtonColor { get; set; } // 空白按钮颜色
+    public string BlankButtonMouseOverColor { get; set; } // 空白按钮鼠标悬停颜色
+    public string ButtonTextColor { get; set; } // 按钮文字颜色
+    public string ActionIconColor { get; set; } // 动作矢量图标颜色
+    public string TriggerKeyTextColor { get; set; } // 触发键文字颜色
+    public string OtherIconColor { get; set; } // 其他位置矢量图标颜色
+
+    // 字体
+    public int Font1 { get; set; } // 字体1
+    public int Font2 { get; set; } // 字体2
+    public double FontSize { get; set; } // 字体大小
+    public double FontWeight { get; set; } // 字体粗细
+
+    // 背景图片
+    public string BackgroundImagePath { get; set; } // 背景图片路径
+    public double BackgroundImageOpacity { get; set; } // 背景图片不透明度
+
+    // 模糊与圆角
+    public int Blur { get; set; }// 模糊模式
+    public int Win11CornerRadius { get; set; }// Win11圆角模式
+
+    // 选项
+    public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字
+    public bool ShowActionButtonMouseOver { get; set; } // 鼠标悬浮在动作按钮上时，放大显示按钮
+    public bool HideActionNameAfterIcon { get; set; } // 设置动作图标后隐藏动作名称
+    public bool ShowActionIconShadow { get; set; } // 动作图标显示阴影
 }

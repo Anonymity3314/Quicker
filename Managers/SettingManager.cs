@@ -141,13 +141,47 @@ namespace Quicker.Managers
         public async Task LoadAppearanceAsync()
         {
             if (appearanceConditions != null) return; // 如果已经初始化了数据，直接返回
-            //var Appearance = SettingDatabase.GetAllAppearance().FirstOrDefault(); // 获取外观设置信息
-            //settingsCache = new SettingsCache // 外观设置
+            var Appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault(); // 获取外观设置信息
+            appearanceConditions = new AppearanceConditionsSettingsCache // 外观设置
             {
-                //AutoHideTitleBar = Appearance.AutoHideTitleBar,
-                //ShowActionButtonMouseOver = Appearance.ShowActionButtonMouseOver,
-                //HideActionNameAfterIcon = Appearance.HideActionNameAfterIcon,
-                //ShowActionIconShadow = Appearance.ShowActionIconShadow
+                // 按钮
+                ButtonSize = Appearance.ButtonSize, // 按钮大小
+                ButtonGap = Appearance.ButtonGap, // 按钮间距
+                BorderWidth = Appearance.BorderWidth, // 边框宽度
+                ButtonCornerRadius = Appearance.ButtonCornerRadius, // 按钮圆角半径
+
+                // 颜色
+                BackgroundColor = Appearance.BackgroundColor, // 背景颜色
+                ToolbarColor = Appearance.ToolbarColor, // 工具栏颜色
+                ToolbarIconColor = Appearance.ToolbarIconColor, // 工具栏图标颜色
+                ActionButtonColor = Appearance.ActionButtonColor, // 动作按钮颜色
+                ActionButtonMouseOverColor = Appearance.ActionButtonMouseOverColor, // 动作按钮鼠标悬停颜色
+                BlankButtonColor = Appearance.BlankButtonColor, // 空白按钮颜色
+                BlankButtonMouseOverColor = Appearance.BlankButtonMouseOverColor, // 空白按钮鼠标悬停颜色
+                ButtonTextColor = Appearance.ButtonTextColor, // 按钮文字颜色
+                ActionIconColor = Appearance.ActionIconColor, // 动作图标颜色
+                TriggerKeyTextColor = Appearance.TriggerKeyTextColor, // 触发键文字颜色
+                OtherIconColor = Appearance.OtherIconColor, // 其他位置图标颜色
+
+                // 字体
+                Font1 = Appearance.Font1, // 字体1
+                Font2 = Appearance.Font2, // 字体2
+                FontSize = Appearance.FontSize, // 字体大小
+                FontWeight = Appearance.FontWeight, // 字体粗细
+
+                // 背景图片
+                BackgroundImagePath = Appearance.BackgroundImagePath, // 背景图片路径
+                BackgroundImageOpacity = Appearance.BackgroundImageOpacity, // 背景图片不透明度
+
+                // 模糊与圆角
+                Blur = Appearance.Blur, // 模糊模式
+                Win11CornerRadius = Appearance.Win11CornerRadius, // Win11圆角模式
+
+                // 选项
+                AutoHideTitleBar = Appearance.AutoHideTitleBar, // 自动隐藏标题栏
+                ShowActionButtonMouseOver = Appearance.ShowActionButtonMouseOver, // 鼠标悬停显示动作按钮
+                HideActionNameAfterIcon = Appearance.HideActionNameAfterIcon, // 隐藏动作名称
+                ShowActionIconShadow = Appearance.ShowActionIconShadow, // 显示动作图标阴影
             }; // 加载设置数据到缓存
         }
 
@@ -553,6 +587,40 @@ namespace Quicker.Managers
         // 外观设置
         public class AppearanceConditionsSettingsCache
         {
+            // 尺寸
+            public double ButtonSize { get; set; } // 按钮大小
+            public double ButtonGap { get; set; } // 按钮间距
+            public double BorderWidth { get; set; } // 边框宽度
+            public double ButtonCornerRadius { get; set; } // 按钮圆角半径
+
+            // 颜色
+            public string BackgroundColor { get; set; } // 背景颜色
+            public string ToolbarColor { get; set; } // 工具栏颜色
+            public string ToolbarIconColor { get; set; } // 工具栏图标颜色
+            public string ActionButtonColor { get; set; } // 动作按钮颜色
+            public string ActionButtonMouseOverColor { get; set; } // 动作按钮鼠标悬停颜色
+            public string BlankButtonColor { get; set; } // 空白按钮颜色
+            public string BlankButtonMouseOverColor { get; set; } // 空白按钮鼠标悬停颜色
+            public string ButtonTextColor { get; set; } // 按钮文字颜色
+            public string ActionIconColor { get; set; } // 动作图标颜色
+            public string TriggerKeyTextColor { get; set; } // 触发键文字颜色
+            public string OtherIconColor { get; set; } // 其他位置图标颜色
+
+            // 字体
+            public int Font1 { get; set; } // 字体1
+            public int Font2 { get; set; } // 字体2
+            public double FontSize { get; set; } // 字体大小
+            public double FontWeight { get; set; } // 字体粗细
+
+            // 背景图片
+            public string BackgroundImagePath { get; set; } // 背景图片路径
+            public double BackgroundImageOpacity { get; set; } // 背景图片不透明度
+
+            // 模糊与圆角
+            public int Blur { get; set; } // 模糊模式
+            public int Win11CornerRadius { get; set; } // Win11圆角模式
+
+            // 选项
             public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字
             public bool ShowActionButtonMouseOver { get; set; } // 鼠标悬浮在动作按钮上时放大显示按钮
             public bool HideActionNameAfterIcon { get; set; } // 设置动作图标后隐藏动作名称

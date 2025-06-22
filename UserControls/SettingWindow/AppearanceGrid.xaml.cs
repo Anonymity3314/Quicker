@@ -32,11 +32,57 @@ namespace Quicker.UserControls.SettingWindow
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                //AutoHideTitleBarCheckBox.IsChecked = settingManager.settingsCache.AutoHideTitleBar; // 设置自动隐藏标题栏复选框
-                //ShowActionButtonMouseOverCheckBox.IsChecked = settingManager.settingsCache.ShowActionButtonMouseOver; // 设置显示动作按钮鼠标悬停复选框
-                //HideActionNameAfterIconCheckBox.IsChecked = settingManager.settingsCache.HideActionNameAfterIcon; // 设置隐藏动作名称后面的图标复选框
-                //ShowActionIconShadowCheckBox.IsChecked = settingManager.settingsCache.ShowActionIconShadow; // 设置显示动作图标阴影复选框
-            });
+                // 按钮
+                ButtonSizeSlider.Value = settingManager.appearanceConditions.ButtonSize; // 设置按钮大小
+                ButtonGapSlider.Value = settingManager.appearanceConditions.ButtonGap; // 设置按钮间距
+                BorderWidthSlider.Value = settingManager.appearanceConditions.BorderWidth; // 设置边框宽度
+                ButtonCornerRadiusSlider.Value = settingManager.appearanceConditions.ButtonCornerRadius; // 设置按钮圆角半径
+
+                // 颜色
+                var backgroundColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor));
+                var toolbarColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor));
+                var toolbarIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor));
+                var actionButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor));
+                var actionButtonMouseOverColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonMouseOverColor));
+                var blankButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonColor));
+                var blankButtonMouseOverColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor));
+                var buttonTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor));
+                var actionIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor));
+                var triggerKeyTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
+                var otherIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
+
+                BackgroundColorButton.Background = backgroundColorBrush; // 设置背景颜色
+                ToolbarColorButton.Background = toolbarColorBrush; // 设置工具栏颜色
+                ToolbarIconColorButton.Background = toolbarIconColorBrush; // 设置工具栏图标颜色
+                ActionButtonColorButton.Background = actionButtonColorBrush; // 设置动作按钮颜色
+                ActionButtonMouseOverColorButton.Background = actionButtonMouseOverColorBrush; // 设置动作按钮鼠标悬停颜色
+                BlankButtonColorButton.Background = blankButtonColorBrush; // 设置空白按钮颜色
+                BlankButtonMouseOverColorButton.Background = blankButtonMouseOverColorBrush; // 设置空白按钮鼠标悬停颜色
+                ButtonTextColorButton.Background = buttonTextColorBrush; // 设置按钮文字颜色
+                ActionIconColorButton.Background = actionIconColorBrush; // 设置动作图标颜色
+                TriggerKeyTextColorButton.Background = triggerKeyTextColorBrush; // 设置触发键文字颜色
+                OtherIconColorButton.Background = otherIconColorBrush; // 设置其他位置图标颜色
+
+                // 字体
+                FontSizeComboBox1.SelectedIndex = settingManager.appearanceConditions.Font1; // 设置字体1
+                FontSizeComboBox2.SelectedIndex = settingManager.appearanceConditions.Font2; // 设置字体2
+                FontSizeSlider.Value = settingManager.appearanceConditions.FontSize; // 设置字体大小
+                FontWeightTextBox.Text = settingManager.appearanceConditions.FontWeight.ToString(); // 设置字体粗细
+
+                // 背景图片
+                BackgroundImagePathTextBox.Text = settingManager.appearanceConditions.BackgroundImagePath; // 设置背景图片路径
+                BackgroundImageOpacitySlider.Value = settingManager.appearanceConditions.BackgroundImageOpacity; // 设置背景图片不透明度
+
+                // 模糊与圆角
+                BlurComboBox.SelectedIndex = settingManager.appearanceConditions.Blur; // 设置模糊模式
+                Win11CornerRadiusComboBox.SelectedIndex = settingManager.appearanceConditions.Win11CornerRadius; // 设置Win11圆角模式
+
+                // 选项
+                AutoHideTitleBarCheckBox.IsChecked = settingManager.appearanceConditions.AutoHideTitleBar; // 设置自动隐藏标题栏
+                ShowActionButtonMouseOverCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionButtonMouseOver; // 设置鼠标悬停显示动作按钮
+                HideActionNameAfterIconCheckBox.IsChecked = settingManager.appearanceConditions.HideActionNameAfterIcon; // 设置隐藏动作名称
+                ShowActionIconShadowCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionIconShadow; // 设置显示动作图标阴影
+            }); // 异步加载设置
         }
 
         // 同步滚动条数据
