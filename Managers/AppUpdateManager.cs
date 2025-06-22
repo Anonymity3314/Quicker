@@ -71,6 +71,7 @@ public class AppUpdateManager : IDisposable
     {
         public string NewVersion { get; set; } // 版本号
         public string DownloadUrl { get; set; } // 下载地址
+        public string DownloadUrlWithNet { get; set; } // 下载地址（内置.NET 运行时）
         public string Changelog { get; set; } // 更新日志
         public string ReleaseDate { get; set; } // 发布日期
     }

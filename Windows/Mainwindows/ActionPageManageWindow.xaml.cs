@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
+using Quicker.Windows.EditWindows;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
@@ -171,10 +172,43 @@ namespace Quicker.Windows.MainWindows
         /// <param name="button"> 按钮 </param>
         private void SetupButtonEvents(Button button)
         {
-            button.Drop += ChangeActionPageScene; // 设置拖拽事件
             button.Click += new RoutedEventHandler(ChanceSceneButton_Click); // 设置按钮点击事件
+            button.DragEnter += ChangeSceneButtonBackground; // 设置拖拽事件
+            button.DragLeave += ResetSceneButtonBackground; // 还原背景色
             button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
             button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
+            button.Drop += ChangeActionPageScene; // 设置拖拽事件
+        }
+
+        // 设置场景按钮背景色
+        private void ChangeSceneButtonBackground(object sender, DragEventArgs e)
+        {
+            Button button = sender as Button; // 转换为按钮
+            if (button.Name == type)
+                button.AllowDrop = false; // 不允许拖拽
+            else
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9E9E9")); // 设置按钮背景色
+
+            var targetSceneData = db3.GetSceneData(button.Name).FirstOrDefault(); // 获取目标场景数据
+            if (targetSceneData.SceneCount == 10)
+            {
+                button.AllowDrop = false; // 不允许拖拽
+            }
+        }
+
+        // 还原背景色
+        private void ResetSceneButtonBackground(object sender, DragEventArgs e)
+        {
+            Button button = sender as Button; // 转换为按钮
+            if (button.Name != type)
+            {
+                button.Background = System.Windows.Media.Brushes.Transparent; // 还原背景色
+                var targetSceneData = db3.GetSceneData(button.Name).FirstOrDefault(); // 添加场景数量检查，只有未达到上限时才允许拖拽
+                if (targetSceneData.SceneCount < 10)
+                {
+                    button.AllowDrop = true; // 允许拖拽
+                }
+            }
         }
 
         // 设置场景标题
@@ -855,58 +889,50 @@ namespace Quicker.Windows.MainWindows
             {
                 Button targetButton = sender as Button; // 获取目标按钮
                 var targetSceneData = db3.GetSceneData(targetButton.Name).FirstOrDefault(); // 获取目标场景数据
-                if (targetSceneData.SceneCount == 10) 
+                string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
+                if (!string.IsNullOrEmpty(sourceButtonName))
                 {
-                    using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"{targetSceneData.SceneName}场景动作页数量已达上限。", "Error"); // 弹出消息提醒
-                }
-                else
-                {
-                    string sourceButtonName = e.Data.GetData("ButtonData")?.ToString(); // 获取传递的 Button Name
-                    if (!string.IsNullOrEmpty(sourceButtonName))
+                    int sourceIndex = int.Parse(sourceButtonName.Replace(type, "")); // 获取源动作页索引
+                    if (targetSceneData.SceneCount == 0)
                     {
-                        int sourceIndex = int.Parse(sourceButtonName.Replace(type, "")); // 获取源动作页索引
-                        if (targetSceneData.SceneCount == 0)
-                        {
-                            db2.CreateButtonTable(targetSceneData.SceneName); // 创建按钮数据表
-                            db3.CreateActionPageTable(targetSceneData.SceneName); // 创建动作页数据表
-                        }
-                        var buttons = db2.GetPagesOfButtons(type, sourceIndex); // 获取源动作页按钮数据
-                        foreach (var button in buttons)
-                        {
-                            ButtonData newButtonData = new()
-                            {
-                                ButtonID = targetSceneData.SceneCount * 100 + button.ButtonID % 100,
-                                Title = button.Title,
-                                Location = button.Location,
-                                ImagePath = button.ImagePath,
-                                Data1 = button.Data1,
-                                Data2 = button.Data2,
-                                Data3 = button.Data3,
-                                Description = button.Description,
-                                CreateTime = button.CreateTime,
-                                LatestEditTime = DateTime.Now,
-                                ActionType = button.ActionType,
-                                UsedTimes = button.UsedTimes
-                            }; // 创建新按钮数据
-                            db2.UpdateAction(newButtonData, targetSceneData.SceneName); // 更新按钮数据
-                        }
-                        var sourceActionPageData = db3.GetActionPageData(type, sourceIndex); // 获取源动作页数据
-                        db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName)); // 更新动作页数据表
-                        db3.UpdateSceneCount(targetSceneData.SceneName, targetSceneData.SceneCount + 1); // 更新场景数据表
-                        db3.DeleteActionPage(type, sourceIndex); // 删除源动作页
-                        db2.DeletePageOfButtons(type, sourceIndex); // 删除源动作页按钮数据
-                        MainListView.Items.RemoveAt(sourceIndex); // 从主列表视图中移除画布
-
-                        if (MainListView.Items.Count == 0)
-                        {
-                            db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
-                            db3.DeleteActionPageTable(type); // 删除动作页数据表
-                            if (!new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果不是默认场景
-                                db3.DeleteSceneTable(type); // 删除场景数据表
-                        }
-                        TypeChanged(targetSceneData.SceneName); // 刷新界面
+                        db2.CreateButtonTable(targetSceneData.SceneName); // 创建按钮数据表
+                        db3.CreateActionPageTable(targetSceneData.SceneName); // 创建动作页数据表
                     }
+                    var buttons = db2.GetPagesOfButtons(type, sourceIndex); // 获取源动作页按钮数据
+                    foreach (var button in buttons)
+                    {
+                        ButtonData newButtonData = new()
+                        {
+                            ButtonID = targetSceneData.SceneCount * 100 + button.ButtonID % 100,
+                            Title = button.Title,
+                            Location = button.Location,
+                            ImagePath = button.ImagePath,
+                            Data1 = button.Data1,
+                            Data2 = button.Data2,
+                            Data3 = button.Data3,
+                            Description = button.Description,
+                            CreateTime = button.CreateTime,
+                            LatestEditTime = DateTime.Now,
+                            ActionType = button.ActionType,
+                            UsedTimes = button.UsedTimes
+                        }; // 创建新按钮数据
+                        db2.UpdateAction(newButtonData, targetSceneData.SceneName); // 更新按钮数据
+                    }
+                    var sourceActionPageData = db3.GetActionPageData(type, sourceIndex); // 获取源动作页数据
+                    db3.UpdateActionPageTable(targetSceneData.SceneName, targetSceneData.SceneName + targetSceneData.SceneCount.ToString(), GetActionPageName(targetSceneData.SceneName, sourceActionPageData.ActionPageName)); // 更新动作页数据表
+                    db3.UpdateSceneCount(targetSceneData.SceneName, targetSceneData.SceneCount + 1); // 更新场景数据表
+                    db3.DeleteActionPage(type, sourceIndex); // 删除源动作页
+                    db2.DeletePageOfButtons(type, sourceIndex); // 删除源动作页按钮数据
+                    MainListView.Items.RemoveAt(sourceIndex); // 从主列表视图中移除画布
+
+                    if (MainListView.Items.Count == 0)
+                    {
+                        db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
+                        db3.DeleteActionPageTable(type); // 删除动作页数据表
+                        if (!new List<string> { "Global", "Common", "Taskbar", "Desktop" }.Contains(type)) // 如果不是默认场景
+                            db3.DeleteSceneTable(type); // 删除场景数据表
+                    }
+                    TypeChanged(targetSceneData.SceneName); // 刷新界面
                 }
             }
         }

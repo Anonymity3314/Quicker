@@ -7,18 +7,22 @@
 [![代码行数](https://aschey.tech/tokei/github/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 [![主要语言](https://img.shields.io/github/languages/top/LJZ-Anonymity/Quicker)](https://github.com/LJZ-Anonymity/Quicker)
 
+---
+
 ## 项目简介
 
 这是一个基于WPF开发的学习项目，参考了Quicker软件的界面和功能，但代码完全独立实现。
+
+该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
 
 主要功能包括动作管理、应用状态管理、按钮管理等。
 
 **本项目仅供学习和研究使用，不用于任何商业目的。**
 
-该项目旨在提供一个高效、便捷的操作界面，帮助用户快速执行各种任务。
-
 - [扩展/插件仓库](https://github.com/LJZ-Anonymity/Extensions "查看Quicker扩展项目")
 - [使用说明/文档](https://github.com/LJZ-Anonymity/Instructions "查看Quicker说明项目")
+
+---
 
 ## 功能特点
 
@@ -26,6 +30,8 @@
 - **强大的动作管理**：支持创建、编辑和组织各种动作，提高工作效率。
 - **灵活的扩展机制**：通过扩展模块增强应用功能，满足不同用户的需求。
 - **按钮管理**：自定义和管理界面按钮。
+
+---
 
 ## 声明
 
@@ -36,6 +42,8 @@
 **重要说明**：本项目是作者出于学习目的独立开发的，所有代码均为自行编写，与原版Quicker软件无任何代码关联。界面和功能设计参考了原版Quicker，但实现方式完全不同。
 
 如有能力或想体验更多功能，请支持正版：https://getquicker.net/ 。
+
+---
 
 ## 开源协议
 
@@ -49,20 +57,24 @@
 - 任何修改必须开源
 - 必须保留原始版权声明和许可证声明
 
+---
+
 ## 快速开始指南
 
 克隆项目仓库：https://github.com/LJZ-Anonymity/Quicker.git
 
-安装必要的依赖项，包括以下 NuGet 程序包。
+安装必要的依赖项，包括以下 NuGet 程序包：
 
-| 程序包                                 | 说明                              |
-| :-----------------------------------: | :------------------------------: |
-| Hardcodet.NotifyIcon.Wpf              | 实现 WPF 应用的系统托盘图标功能      |
-| SharpHook                             | 提供键盘和鼠标钩子功能               |
-| Svg                                   | 提供加载、解析和渲染 SVG 图像的功能   |
-| System.Data.SQLite                    | 提供 SQLite 数据库支持              |
+| 程序包                      | 说明                              |
+| :------------------------: | :------------------------------: |
+| Hardcodet.NotifyIcon.Wpf   | 实现 WPF 应用的系统托盘图标功能      |
+| SharpHook                  | 提供键盘和鼠标钩子功能               |
+| Svg                        | 提供加载、解析和渲染 SVG 图像的功能   |
+| System.Data.SQLite         | 提供 SQLite 数据库支持              |
 
 打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
+
+---
 
 ## 贡献指南
 
@@ -75,6 +87,14 @@
 3. 本地开发：在本地克隆你的 Fork 仓库，并进行开发。
 
 4. 提交 Pull Request：完成开发后，提交 Pull Request 到原始仓库，等待审核。
+
+---
+
+## 贡献者版权说明
+
+所有贡献者提交的代码将自动采用 GNU AGPL v3.0 协议开源。提交代码即视为同意本项目的开源协议和相关声明。
+
+---
 
 ## 扩展开发
 
@@ -90,9 +110,27 @@ Quicker 支持通过创建扩展模块来增强应用功能。你可以通过以
 
 更多详情请见[扩展项目](https://github.com/LJZ-Anonymity/Extensions "查看Quicker 扩展项目")。
 
+---
+
 ## 致谢
 
 感谢为该项目提供界面和功能参考的 [Quicker 软件](https://getquicker.net/ "访问 Quicker 官方网站")。
+
+---
+
+## 版权声明
+
+本项目部分界面设计、图标及图片等资源参考或来源于正版 Quicker 软件，仅用于学习和非商业用途。
+
+相关版权归原作者及 Quicker 官方所有。如有侵权请及时联系删除。
+
+---
+
+## 免责声明
+
+本项目为非商业学习项目，未获得 Quicker 官方或其他第三方的商业授权。因使用本项目造成的任何后果，作者不承担任何责任。
+
+---
 
 ## <a id="contact"></a>联系作者
 
@@ -100,6 +138,8 @@ Quicker 支持通过创建扩展模块来增强应用功能。你可以通过以
 
 - **GitHub Issues**：https://github.com/LJZ-Anonymity/Quicker/issues
 - **邮箱**：331433038@qq.com
+
+---
 
 ## 项目文件结构
 
@@ -254,3 +294,8 @@ Quicker/
         └─ToastWindow.xaml                        # 消息弹窗
             └─ToastWindow.xaml.cs
 ```
+---
+
+<p align="center">
+  ⭐️ 如果你觉得本项目有帮助，欢迎 Star 支持！也欢迎 Issue 和 PR 共同完善！
+</p>

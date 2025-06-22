@@ -17,6 +17,8 @@ namespace Quicker.Windows.MainWindows
         #region 字段
 
         private const string _releaseUrl = "https://github.com/Anonymity3314/Quicker/releases"; // 发布页面地址
+        private const string _downLoadPath = "C:\\Users\\LENOVO\\Downloads"; // 下载路径
+        private string _downloadUrlWithNet; // 下载地址
         private string _downloadUrl; // 下载地址
 
         #endregion
@@ -113,6 +115,7 @@ namespace Quicker.Windows.MainWindows
             LatestVersionTextBlock1.Text = SettingDatabase.currentVersion; // 显示当前版本号
             LatestVersionTextBlock1.FontWeight = FontWeights.Normal; // 设置字体粗细
             DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
+            DownloadWithFrameButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
             TitleTextBlock.Text = "暂无新版本。"; // 更新标题文本
             LineRectangle.Width = 350; // 调整分界线宽度
             
@@ -129,6 +132,7 @@ namespace Quicker.Windows.MainWindows
         private void LoadUpdateInfo(UpdateInfo updateInfo)
         {
             _downloadUrl = updateInfo.DownloadUrl; // 保存下载地址
+            _downloadUrlWithNet = updateInfo.DownloadUrlWithNet; // 保存下载地址
             string newVersion = updateInfo.NewVersion; // 获取最新版本号
             
             // 计算更新内容的行数并调整UI
@@ -146,20 +150,24 @@ namespace Quicker.Windows.MainWindows
             UpdateInfoBorder.Height += changelogLineCount * 18; // 设置更新内容的高度
         }
 
-        // 选择下载位置
+        // 下载不内置.NET框架的版本
         private void SelectDownloadLocation()
         {
-            using var folderDialog = new FolderBrowserDialog() { Description = "选择下载路径" }; // 创建文件夹对话框
-            
-            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
-                string destinationPath = Path.Combine(folderDialog.SelectedPath, fileName); // 构建保存路径
-                
-                // 创建并显示下载窗口
-                var downloadWindow = DownloadWindow.Create(_downloadUrl, destinationPath);
-                downloadWindow.Show();
-            }
+            var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
+            string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
+
+            var downloadWindow = DownloadWindow.Create(_downloadUrl, destinationPath); // 创建下载窗口
+            downloadWindow.Show(); // 显示下载窗口
+        }
+
+        // 下载内置.NET框架的版本
+        private void DownloadWithFrameButton_Click(object sender, RoutedEventArgs e)
+        {
+            var fileName = Path.GetFileName(new Uri(_downloadUrlWithNet).AbsolutePath); // 获取文件名
+            string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
+
+            var downloadWindow = DownloadWindow.Create(_downloadUrlWithNet, destinationPath); // 创建下载窗口
+            downloadWindow.Show(); // 显示下载窗口
         }
 
         // 打开发布页面
