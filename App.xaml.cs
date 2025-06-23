@@ -558,8 +558,13 @@ namespace Quicker
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
-                if(mainWindowList.Count() > 1 && AppStateManager.Pinned)
+                if (mainWindowList.Count() > 1 && (AppStateManager.Pinned || AppStateManager.Pause)) // 如果有多个主窗口且窗口已固定或已暂停
+                {
                     AppStateManager.PreLoadMainWindow.Close(); // 关闭主窗口
+                    if(AppStateManager.Pause)
+                        foreach (var window in mainWindowList)
+                            window.Close(); // 关闭其他窗口
+                }
                 else
                     AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示主窗口
                 AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
@@ -720,12 +725,15 @@ namespace Quicker
         // 释放钩子绑定的事件
         private void DisposeHook()
         {
-            hook.KeyPressed -= Hook_KeyPressed; // 移除按键按下事件处理器
-            hook.KeyReleased -= Hook_KeyReleased; // 移除按键松开事件处理器
-            hook.MousePressed -= Hook_MousePressed; // 移除鼠标按下事件处理器
-            hook.MouseReleased -= Hook_MouseReleased; // 移除鼠标松开事件处理器
-            hook?.Dispose(); // 释放钩子
-            hook = null; // 清空钩子
+            if (hook != null) 
+            {
+                hook.MouseReleased -= Hook_MouseReleased; // 移除鼠标松开事件处理器
+                hook.MousePressed -= Hook_MousePressed; // 移除鼠标按下事件处理器
+                hook.KeyReleased -= Hook_KeyReleased; // 移除按键松开事件处理器
+                hook.KeyPressed -= Hook_KeyPressed; // 移除按键按下事件处理器
+                hook?.Dispose(); // 释放钩子
+                hook = null; // 清空钩子
+            }
         }
     }
 }
