@@ -161,10 +161,10 @@ namespace Quicker.UserControls.SettingWindow
                     break; // 其他位置图标颜色
             }
             if (_currentBrush == null) return; // 如果brush为null，则返回
-            
-            // 使用新方法强制刷新色彩选择器
-            PopupColorPicker.ResetColorControls(_currentBrush.Color);
-            
+
+            PopupColorPicker.ResetColorControls(_currentBrush.Color); // 重置色彩选择器
+            PopupColorPicker.SelectedColor = _currentBrush.Color; // 同步SelectedColor依赖属性
+
             // 设置Popup的位置并打开
             ColorPickerPopup.PlacementTarget = button;
             ColorPickerPopup.IsOpen = true;

@@ -14,14 +14,33 @@ namespace Quicker.Extend
         /// <summary>
         /// 加载模块
         /// </summary>
-        /// <param name="modulesDirectory"> 模块目录 </param>
-        public void LoadModules(string modulesDirectory)
+        /// <param name="modulePath"> 模块路径 </param>
+        public void LoadModule(string modulePath)
         {
             try
             {
-                LoadAllAssemblies(modulesDirectory); // 加载所有程序集
-                DiscoverModules(); // 发现所有模块
-                InitializeModulesInOrder(); // 按依赖关系排序并初始化模块
+                string assemblyName = Path.GetFileNameWithoutExtension(modulePath);
+                Assembly moduleAssembly = Assembly.LoadFrom(modulePath);
+                _loadedAssemblies[assemblyName] = moduleAssembly;
+
+                // 只查找并加载指定 DLL 里的扩展模块
+                foreach (Type type in moduleAssembly.GetTypes())
+                {
+                    if (typeof(IExtensionModule).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+                    {
+                        IExtensionModule module = (IExtensionModule)Activator.CreateInstance(type);
+                        _loadedModules[module.Name] = module;
+
+                        module.Initialize();
+                        module.Start();
+                        if (module.HasUI)
+                        {
+                            module.ShowWindow();
+                        }
+                        // 如果只允许一个模块，找到后直接 break
+                        break;
+                    }
+                }
             }
             catch (Exception ex)
             {
