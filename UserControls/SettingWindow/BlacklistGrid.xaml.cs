@@ -1,11 +1,13 @@
 ﻿using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
+using Quicker.Models.Settings;
 using System.Windows.Forms;
 using Quicker.UserControls;
 using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Managers;
+using Quicker.Database;
 using System.Windows;
 using System.IO;
 

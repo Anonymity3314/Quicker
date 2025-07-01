@@ -1,6 +1,7 @@
 ﻿using Quicker.Windows.MainWindows;
 using Quicker.Database;
 using System.Windows;
+using Quicker.Models;
 
 namespace Quicker.Windows.EditWindows
 {

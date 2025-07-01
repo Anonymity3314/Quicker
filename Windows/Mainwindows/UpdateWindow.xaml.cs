@@ -4,6 +4,7 @@ using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Forms;
 using Quicker.Managers;
+using Quicker.Database;
 using System.Windows;
 using System.IO;
 

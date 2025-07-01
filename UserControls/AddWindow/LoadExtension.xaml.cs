@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
+using Quicker.Models;
 using System.IO;
 
 namespace Quicker.UserControls.AddWindow

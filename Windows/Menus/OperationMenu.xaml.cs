@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
+using Quicker.Models;
 using System.IO;
 
 namespace Quicker.Windows.Menus

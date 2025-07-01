@@ -2,6 +2,7 @@
 using System.Data.SQLite;
 using Quicker.Database;
 using Quicker.Windows;
+using Quicker.Models;
 using System.IO;
 
 namespace Quicker.Managers

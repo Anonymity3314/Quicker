@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using Quicker.Windows;
 using Quicker.Extend;
 using System.Windows;
+using Quicker.Models;
 using System.IO;
 
 namespace Quicker.Managers

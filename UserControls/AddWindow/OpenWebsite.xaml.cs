@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
+using Quicker.Models;
 using System.Net;
 using System.IO;
 

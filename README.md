@@ -183,8 +183,22 @@ Quicker/
 │   ├─ToastManager.cs                             # 消息管理器
 │   └─WindowManager.cs                            # 窗口管理器
 │
+├─Models/                                         # 数据模型
+│   ├─ButtonData.cs                               # 按钮数据模型
+│   ├─SceneData.cs                                # 场景数据模型
+│   ├─ActionPageData.cs                           # 动作页数据模型
+│   └─Settings/                                   # 设置相关数据模型
+│       ├─Convention.cs                           # 常规设置数据模型
+│       ├─OpenMainWindow.cs                       # 打开主窗口条件数据模型
+│       ├─Blacklist.cs                            # 黑名单设置数据模型
+│       ├─Appearance.cs                           # 外观设置数据模型
+│       └─BlacklistApplication.cs                 # 黑名单应用数据模型
+│
 ├─Properties/                                     # 项目属性文件夹
-│   └─AssemblyInfo.cs                             # 程序集信息
+│   ├─AssemblyInfo.cs                             # 程序集信息
+│   ├─Settings.Designer.cs                        # 自动生成的设置代码
+│   ├─Settings.settings                           # 应用程序设置
+│   └─PublishProfiles/                            # 发布配置文件夹
 │
 ├─Resources/                                      # 资源文件夹
 │   ├─Images/                                     # 图像资源文件夹

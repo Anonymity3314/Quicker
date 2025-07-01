@@ -1,12 +1,13 @@
-﻿using Quicker.Windows.MainWindows;
+﻿using System.Windows.Media.Imaging;
+using Quicker.Windows.MainWindows;
+using System.Collections.Generic;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
-using System.Collections.Generic;
+using Quicker.Models;
 using System.IO;
-using System.Windows.Media.Imaging;
 
 namespace Quicker.Windows.Menus
 {

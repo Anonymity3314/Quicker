@@ -8,6 +8,7 @@ using Quicker.Managers;
 using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
+using Quicker.Models;
 using System.Media;
 using System.IO;
 

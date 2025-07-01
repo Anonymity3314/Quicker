@@ -6,6 +6,7 @@ using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using Quicker;
+using Quicker.Database;
 
 namespace Quicker.UserControls.SettingWindow
 {

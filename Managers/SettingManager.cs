@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Diagnostics;
+using Quicker.Database;
 using System.Windows;
 using System;
 

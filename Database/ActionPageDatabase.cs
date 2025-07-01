@@ -1,6 +1,7 @@
-﻿using Quicker.Managers;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
+using Quicker.Managers;
+using Quicker.Models;
 using System.IO;
 
 namespace Quicker.Database
@@ -560,24 +561,5 @@ namespace Quicker.Database
             connection.Open(); // 打开数据库连接
             return connection; // 返回数据库连接
         }
-    }
-
-    // 场景数据
-    public class SceneData
-    {
-        public string SceneName { get; set; } // 场景名称
-        public string SceneIconPath { get; set; } // 场景图标路径
-        public int SceneCount { get; set; } // 场景数量
-        public string SceneTag { get; set; } // 场景标签
-        public bool AutoReturnToFirstPage { get; set; } // 是否自动返回第一个页面
-        public string SceneProcess { get; set; } // 场景所属程序名称
-    }
-
-    // 动作页信息
-    public class ActionPageData
-    {
-        public string DefaultActionPageName { get; set; } // 内部默认的动作页名称，例如"Global0"
-        public string ActionPageName { get; set; } // 动作页名称
-        public DateTime LastEditTime { get; set; } // 最后编辑时间
     }
 }

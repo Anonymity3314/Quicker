@@ -2,10 +2,8 @@
 using Quicker.Windows.MainWindows;
 using System.Windows.Interop;
 using System.Diagnostics;
-using Quicker.Windows;
 using System.Windows;
 using System.Text;
-using System;
 
 namespace Quicker.Managers
 {
@@ -290,15 +288,6 @@ namespace Quicker.Managers
             int top = cursorPos.Y - 290; // 窗口上边界（鼠标Y坐标减去窗口高度）
 
             SetWindowPosition(window, left, top); // 设置窗口位置
-        }
-
-        /// <summary>
-        /// 获取当前前台窗口句柄
-        /// </summary>
-        /// <returns> 当前前台窗口句柄 </returns>
-        public IntPtr GetForegroundWindowHandle()
-        {
-            return GetForegroundWindow(); // 获取当前前台窗口句柄
         }
 
         /// <summary>

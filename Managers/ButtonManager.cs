@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
+using Quicker.Models;
 using System.IO;
 
 namespace Quicker.Managers

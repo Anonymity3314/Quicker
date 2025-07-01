@@ -9,6 +9,7 @@ using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Database;
 using System.Windows;
+using Quicker.Models;
 
 namespace Quicker.Windows.MainWindows
 {

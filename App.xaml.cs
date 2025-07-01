@@ -1,10 +1,12 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
+using Quicker.Models.Settings;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
+using Quicker.Database;
 using System.Windows;
 using SharpHook;
 
@@ -79,15 +81,15 @@ namespace Quicker
         // 弹出消息提醒
         private async void ShowNotification()
         {
-            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
-            if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
+            await Task.Run(() =>
             {
-                await Task.Run(() =>
+                var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
+                if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
                     toast.Show("成功启动！", "Common"); // 弹出消息提醒
-                });
-            }
+                }
+            });
         }
 
         // 初始化定时器
@@ -645,9 +647,8 @@ namespace Quicker
         public bool IsMouseOnDesktop()
         {
             using var windowManager = new WindowManager(); // 创建窗口管理器
-            IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 调用封装方法
-            if (foregroundWindow == IntPtr.Zero) return true; // 没有前台窗口
-            else return false; // 鼠标在桌面上
+            IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
+            return foregroundWindow == IntPtr.Zero; // 如果前台窗口为空，返回 true
         }
 
         // 弹出菜单栏
@@ -683,19 +684,12 @@ namespace Quicker
             var text = AppStateManager.Pause ? "暂停" : "恢复"; // 消息提醒
             CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
             customMenu.PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
-            ChangeTrayIcon(AppStateManager.Pause); // 切换托盘图标
+            taskbarIcon.IconSource = AppStateManager.Pause
+                ? AppStateManager._trayIcon1
+                : AppStateManager._trayIcon2; // 切换托盘图标
 
             AppStateManager.Pause = !AppStateManager.Pause; // 切换暂停状态
             toast.Show(toastMessage, AppStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
-        }
-
-        /// <summary>
-        /// 切换托盘图标
-        /// </summary>
-        /// <param name="isPaused"> 是否暂停 </param>
-        public void ChangeTrayIcon(bool isPaused)
-        {
-            taskbarIcon.IconSource = isPaused ? AppStateManager._trayIcon1 : AppStateManager._trayIcon2; // 切换托盘图标
         }
 
         // 退出应用释放资源
