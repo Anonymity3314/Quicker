@@ -12,6 +12,37 @@
     d:DesignWidth="982"
 >
     <Grid>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="953*"/>
+        </Grid.ColumnDefinitions>
+        <!-- 功能快捷键 -->
+        <Button Content="功能快捷键" Style="{StaticResource Button3}" Margin="1,14,0,0" Width="102" Grid.Column="1" Height="30" BorderThickness="0,0,0,2"/>
+        <!-- 主要 -->
+        <Label Content="主要" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Grid.ColumnSpan="2"/>
+        <Label Grid.Column="1" Content="停止运行中的动作：" HorizontalAlignment="Left" Margin="1,91,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="暂停/恢复Quicker：" HorizontalAlignment="Left" Margin="1,124,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="打开搜索框：" HorizontalAlignment="Left" Margin="1,157,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <!-- 次要 -->
+        <Label Content="次要" HorizontalAlignment="Left" Margin="10,228,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Grid.ColumnSpan="2"/>
+        <Label Grid.Column="1" Content="打开设置窗口：" HorizontalAlignment="Left" Margin="1,263,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="打开场景与动作管理窗口：" HorizontalAlignment="Left" Margin="1,296,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="运行最后使用的动作：" HorizontalAlignment="Left" Margin="1,329,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="打开仪表盘窗口：" HorizontalAlignment="Left" Margin="1,362,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="关闭所有浮动按钮：" HorizontalAlignment="Left" Margin="1,395,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="重新加载键鼠挂钩：" HorizontalAlignment="Left" Margin="1,428,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="打开/关闭文本悬浮窗：" HorizontalAlignment="Left" Margin="1,461,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Label Grid.Column="1" Content="启用APP语音输入：" HorizontalAlignment="Left" Margin="1,494,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <!-- 选项 -->
+        <Label Content="选项" HorizontalAlignment="Left" Margin="10,560,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Grid.ColumnSpan="2"/>
+        <Label Grid.Column="1" Content="暂停Quicker时保留快捷键：" HorizontalAlignment="Left" Margin="1,595,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <ComboBox Grid.Column="1" HorizontalAlignment="Left" Margin="194,597,0,0" VerticalAlignment="Top" Width="212" FontSize="14" Height="24">
+            <ComboBoxItem Content="保留所有快捷键"/>
+            <ComboBoxItem Content="仅保留 暂停/恢复 快捷键"/>
+            <ComboBoxItem Content="清除所有快捷键"/>
+        </ComboBox>
+        <!-- 说明 -->
+        <Label Grid.Column="1" Content="设置用于触发Quicker功能的全局快捷键。" HorizontalAlignment="Left" Margin="649,56,0,0" VerticalAlignment="Top" Foreground="Gray" FontSize="13"/>
+        <Label Grid.Column="1" Content="即使在黑名单应用下，快捷键也生效。" HorizontalAlignment="Left" Margin="649,73,0,0" VerticalAlignment="Top" Foreground="Gray" FontSize="13"/>
     </Grid>
 </UserControl>
