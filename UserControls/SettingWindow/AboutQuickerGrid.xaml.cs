@@ -36,7 +36,7 @@ namespace Quicker.UserControls.SettingWindow
         // 打开更新历史文件
         private void OpenUpdateHistory(object sender, MouseButtonEventArgs e)
         {
-            string resourceName = "InformationData/UpdateHistory.txt"; // 确保资源名称正确
+            string resourceName = "InfoData/UpdateHistory.txt"; // 确保资源名称正确
             Uri resourceUri = new Uri(resourceName, UriKind.Relative); // 构造资源URI
             StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流信息
             using (StreamReader reader = new StreamReader(streamInfo.Stream)) // 读取资源流
@@ -49,39 +49,44 @@ namespace Quicker.UserControls.SettingWindow
             }
         }
 
+        /// <summary>
+        /// 在默认浏览器中打开URL
+        /// </summary>
+        /// <param name="url"> URL </param>
+        private void OpenUrlInDefaultBrowser(string url)
+        {
+            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
+            actionManager.LaunchDefaultBrowser(url); // 在默认浏览器中打开URL
+        }
+
         // 前往图标网站www.iconfont.cn
         private void www_iconfont_cn_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://www.iconfont.cn"); // 打开图标网站www.iconfont.cn
+            OpenUrlInDefaultBrowser("https://www.iconfont.cn"); // 在默认浏览器中打开URL
         }
 
         // 前往图标网站icons8.com
         private void icons8_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://icons8.com/"); // 打开图标网站icons8.com
+            OpenUrlInDefaultBrowser("https://icons8.com/"); // 在默认浏览器中打开URL
         }
 
         // 前往图标网站fontawesome.com
         private void fontawesome_com_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://fontawesome.com/"); // 打开图标网站fontawesome.com
+            OpenUrlInDefaultBrowser("https://fontawesome.com/"); // 在默认浏览器中打开URL
         }
 
         // 前往icon11社区图标库
         private void icon11_community_github_io_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://icon11-community.github.io/icons/"); // 前往icon11社区图标库
+            OpenUrlInDefaultBrowser("https://icon11-community.github.io/icons/"); // 在默认浏览器中打开URL
         }
 
         // BUG反馈、需求
         private void FeedBack_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            actionManager.LaunchDefaultBrowser("https://github.com/LJZ-Anonymity/Quicker/issues"); // 前往Github反馈
+            OpenUrlInDefaultBrowser("https://github.com/LJZ-Anonymity/Quicker/issues"); // 在默认浏览器中打开URL
         }
 
         // 基础设置-关于Quicker-隐私声明
@@ -91,52 +96,52 @@ namespace Quicker.UserControls.SettingWindow
             settingManager.ButtonStyle3_Click(Privacy_StatementButton, MainGrid); // 保存Button类型3边框设置
         }
 
+        /// <summary>
+        /// 打开指定文件夹
+        /// </summary>
+        /// <param name="folderPath"> 文件夹路径 </param>
+        private void OpenFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true });
+        }
+
         // 前往程序数据根目录
         private void RootFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\"; // 文件夹路径
-            OpenFolder(folderPath); // 打开文件夹
+            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\");
         }
 
         // 前往程序数据库目录
         private void DatabaseFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database\"; // 文件夹路径
-            OpenFolder(folderPath); // 打开文件夹
+            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database\");
         }
 
         // 前往程序图标目录
         private void LocalIconsFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
-            OpenFolder(folderPath); // 打开文件夹
+            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\");
         }
 
         // 备份数据
         private void BackupDataButton_Click(object sender, RoutedEventArgs e)
         {
-            using var folderDialog = new System.Windows.Forms.FolderBrowserDialog() { Description = "选择备份路径" }; // 创建文件夹对话框
+            using var folderDialog = new System.Windows.Forms.FolderBrowserDialog() { Description = "选择备份路径" };
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string folderPath = folderDialog.SelectedPath; // 获取选择的路径
-                string sourceFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker"; // 源文件夹路径
-                string backupFolderPath = Path.Combine(folderPath, "QuickerData"); // 构造备份文件夹路径
-                if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath); // 创建备份文件夹
-                CopyFolder(sourceFolderPath, backupFolderPath); // 复制文件夹内容到目标路径
-                using var toast = new ToastManager(); // 创建 ToastManager 的实例
-                toast.Show("操作完成！", "Success"); // 显示提示
-                OpenFolder(folderPath); // 打开文件夹
+                string folderPath = folderDialog.SelectedPath;
+                string sourceFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker";
+                string backupFolderPath = Path.Combine(folderPath, "QuickerData");
+                if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath);
+                CopyFolder(sourceFolderPath, backupFolderPath);
+                using var toast = new ToastManager();
+                toast.Show("操作完成！", "Success");
+                OpenFolder(folderPath);
             }
-        }
-
-        /// <summary>
-        /// 打开程序文件夹
-        /// </summary>
-        /// <param name="folderPath"> 文件夹路径 </param>
-        private void OpenFolder(string folderPath)
-        {
-            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath); // 创建文件夹
-            Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true }); // 打开文件夹
         }
 
         /// <summary>
@@ -181,58 +186,51 @@ namespace Quicker.UserControls.SettingWindow
         // 获取临时数据大小（异步）
         public async Task<string> GetTempDataSizeAsync()
         {
-            if (Directory.Exists(folderPath))
+            if (Directory.Exists(folderPath)) // 检查文件夹是否存在
             {
                 try
                 {
                     long folderSize = 0;
                     string folderSizeString = "B"; // 默认单位为字节
-                    DirectoryInfo directoryInfo = new DirectoryInfo(folderPath);
-
-                    // 获取所有文件（包括子文件夹）
-                    var files = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories);
-
-                    // 遍历所有文件并累加大小
-                    foreach (var file in files)
+                    DirectoryInfo directoryInfo = new DirectoryInfo(folderPath); // 创建 DirectoryInfo 对象
+                    var files = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories); // 获取所有文件（包括子文件夹）                 
+                    foreach (var file in files) // 遍历所有文件并累加大小
                     {
                         folderSize += file.Length;
                     }
 
                     // 使用 DataConversionManager 转换数据大小和单位
                     using var convertionManager = new DataConversionManager();
-                    folderSize = convertionManager.ConversionData((int)folderSize);
-                    folderSizeString = convertionManager.ConversionUnits((int)folderSize);
+                    folderSize = convertionManager.ConversionData((int)folderSize); // 转换数据大小
+                    folderSizeString = convertionManager.ConversionUnits((int)folderSize); // 转换单位
 
                     if (folderSize > 0)
                         CleanTempDataButton.IsEnabled = true; // 启用清理按钮
-                    return $"{folderSize} {folderSizeString}";
+                    return $"{folderSize} {folderSizeString}"; // 返回数据大小和单位
                 }
-                catch (Exception ex)
-                {
-                    // 记录异常信息
-                    Debug.WriteLine($"获取临时数据大小时出错: {ex.Message}");
-                }
+                catch{}
             }
-            return "0 B";
+            return "0 B"; // 返回0字节
         }
 
         // 清理临时数据
         private void CleanTempDataButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(folderPath))
+            try
             {
-                DirectoryInfo directoryInfo = new DirectoryInfo(folderPath); // 创建 DirectoryInfo 对象
-                foreach (FileInfo file in directoryInfo.GetFiles()) // 遍历并删除所有文件
+                if (Directory.Exists(folderPath))
                 {
-                    file.Delete(); // 删除文件
+                    Directory.Delete(folderPath, true); // 递归删除整个文件夹
                 }
-                foreach (DirectoryInfo subDirectory in directoryInfo.GetDirectories()) // 遍历并删除所有子文件夹
-                {
-                    subDirectory.Delete(true); // 递归删除子文件夹
-                }
+                Directory.CreateDirectory(folderPath); // 重新创建空文件夹
+                using var toastSuccess = new ToastManager();
+                toastSuccess.Show("清理完成！", "Success");
             }
-            using var toast = new ToastManager(); // 创建 ToastManager 的实例
-            toast.Show("清理完成！", "Success"); // 显示提示
+            catch (Exception ex)
+            {
+                using var toastError = new ToastManager();
+                toastError.Show("清理失败：" + ex.Message, "Error");
+            }
         }
 
         // 控件关闭释放资源
