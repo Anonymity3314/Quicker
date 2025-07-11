@@ -1,4 +1,4 @@
-﻿using Quicker.UserControls.SettingWindow;
+﻿using Quicker.UserControls.SettingWindow.BasicSettings;
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.ComponentModel;
@@ -42,7 +42,7 @@ namespace Quicker.Windows.MainWindows
                 SetLastPage(Convention.LastPage); // 设置上一次关闭时的状态
             else
             {
-                BasicSetting_Click(null, null); // 显示常规设置面板
+                BasicSettings_Click(null, null); // 显示常规设置面板
                 Convention_Click(null, null); // 显示常规设置
             }
             
@@ -226,7 +226,7 @@ namespace Quicker.Windows.MainWindows
             switch (num1)
             {
                 case 1:
-                    BasicSetting_Click(null, null); // 点击基础设置按钮
+                    BasicSettings_Click(null, null); // 点击基础设置按钮
                     break;
                 case 2:
                     Auxiliary_Functions_Click(null, null); // 点击辅助功能按钮
@@ -419,14 +419,14 @@ namespace Quicker.Windows.MainWindows
         #region 基础设置按钮事件
 
         // 基础设置
-        private void BasicSetting_Click(object sender, RoutedEventArgs e)
+        private void BasicSettings_Click(object sender, RoutedEventArgs e)
         {
-            _settingManager.ButtonStyle1_Click(BasicSettingStackPanel, BasicSetting, MainStackPanel, MenuGrid); // 设置Button类型1样式
+            _settingManager.ButtonStyle1_Click(BasicSettingsStackPanel, BasicSettings, MainStackPanel, MenuGrid); // 设置Button类型1样式
         }
         // 鼠标移出Button恢复Background
-        private void BasicSetting_MouseLeave(object sender, MouseEventArgs e)
+        private void BasicSettings_MouseLeave(object sender, MouseEventArgs e)
         {
-            _settingManager.ButtonStyle1_MouseLeave(sender, BasicSettingStackPanel); // 鼠标移出Button恢复Background
+            _settingManager.ButtonStyle1_MouseLeave(sender, BasicSettingsStackPanel); // 鼠标移出Button恢复Background
         }
 
 
@@ -434,7 +434,7 @@ namespace Quicker.Windows.MainWindows
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
             var ConventionGrid = new ConventionGrid(this) { Name = "ConventionGrid" }; // 创建常规设置Grid            
-            _settingManager.ButtonStyle2_Click(Convention, BasicSettingStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(Convention, BasicSettingsStackPanel, ConventionGrid, ResultGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = Visibility.Visible; // 设置SettingButtonsGrid可见性
         }
         // 鼠标移出Button恢复Background
@@ -448,7 +448,7 @@ namespace Quicker.Windows.MainWindows
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
             var OpenMainWindowGrid = new OpenMainWindowGrid(this) { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
-            _settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingsStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = Visibility.Visible; // 设置SettingButtonsGrid可见性
         }
         // 鼠标移出Button恢复Background
@@ -462,7 +462,7 @@ namespace Quicker.Windows.MainWindows
         private void Blacklist_Click(object sender, RoutedEventArgs e)
         {
             var BlacklistGrid = new BlacklistGrid(this) { Name = "BlacklistGrid" }; // 创建黑名单设置Grid
-            _settingManager.ButtonStyle2_Click(Blacklist, BasicSettingStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(Blacklist, BasicSettingsStackPanel, BlacklistGrid, ResultGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = Visibility.Visible; // 设置SettingButtonsGrid可见性
         }
         // 鼠标移出Button恢复Background
@@ -476,7 +476,7 @@ namespace Quicker.Windows.MainWindows
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
             var AppearanceGrid = new AppearanceGrid(this) { Name = "AppearanceGrid" }; // 创建外观设置Grid
-            _settingManager.ButtonStyle2_Click(Appearance, BasicSettingStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(Appearance, BasicSettingsStackPanel, AppearanceGrid, ResultGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = Visibility.Visible; // 设置SettingButtonsGrid可见性
         }
         // 鼠标移出Button恢复Background
@@ -490,7 +490,7 @@ namespace Quicker.Windows.MainWindows
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
             var AboutQuickerGrid = new AboutQuickerGrid(this) { Name = "AboutQuickerGrid" }; // 创建关于Quicker设置Grid
-            _settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(AboutQuicker, BasicSettingsStackPanel, AboutQuickerGrid, ResultGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = Visibility.Collapsed; // 设置SettingButtonsGrid可见性
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             if (Convention.RememberLastPage && Convention.LastPage % 10 == 2) 

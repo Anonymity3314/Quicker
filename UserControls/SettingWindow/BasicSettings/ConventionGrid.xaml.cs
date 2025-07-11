@@ -3,12 +3,10 @@ using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Quicker.Managers;
-using Quicker.Windows;
-using System.Windows;
-using Quicker;
 using Quicker.Database;
+using System.Windows;
 
-namespace Quicker.UserControls.SettingWindow
+namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class ConventionGrid : UserControl
     {

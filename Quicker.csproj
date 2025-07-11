@@ -50,8 +50,6 @@
     <None Remove="Resources\Images\ActionPagesManager.jpg" />
     <None Remove="Resources\Images\Add.png" />
     <None Remove="Resources\Images\Add.png" />
-    <None Remove="Resources\Images\BasicSettingButton.png" />
-    <None Remove="Resources\Images\BasicSettingButton.png" />
     <None Remove="Resources\Images\BlackList.png" />
     <None Remove="Resources\Images\ClearButton.png" />
     <None Remove="Resources\Images\CloseDownloadWindow.png" />
@@ -150,7 +148,7 @@
     <Resource Include="Resources\Images\Add.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\BasicSettingButton.png">
+    <Resource Include="Resources\Images\BasicSettingsButton.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\PinToDesktop.png">
@@ -246,6 +244,11 @@
     <Page Update="Windows\MainWindows\SettingWindow.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UserControls\SettingWindow\Auxiliary_Functions\" />
+    <Folder Include="UserControls\SettingWindow\Tools\" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using System.Windows.Media;
 using Quicker.Managers;
 using System.Windows;
 
-namespace Quicker.UserControls.SettingWindow
+namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class AppearanceGrid : UserControl
     {

@@ -8,7 +8,7 @@ using Quicker.Managers;
 using System.Windows;
 using System.IO;
 
-namespace Quicker.UserControls.SettingWindow
+namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class AboutQuickerGrid : UserControl
     {

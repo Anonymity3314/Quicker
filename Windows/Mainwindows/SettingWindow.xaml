@@ -23,8 +23,8 @@
         </Grid.ColumnDefinitions>
         <!-- 侧边栏1 -->
         <StackPanel x:Name="MainStackPanel" Background="#FFE0E0E0" Width="49" HorizontalAlignment="Center">
-            <Button x:Name="BasicSetting" Style="{StaticResource Button1}" ToolTip="基础设置" Background="#FFF4F4F4" Click="BasicSetting_Click" MouseLeave="BasicSetting_MouseLeave">
-                <Image Source="/Resources/Images/BasicSettingButton.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
+            <Button x:Name="BasicSettings" Style="{StaticResource Button1}" ToolTip="基础设置" Background="#FFF4F4F4" Click="BasicSettings_Click" MouseLeave="BasicSettings_MouseLeave">
+                <Image Source="/Resources/Images/BasicSettingsButton.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
             </Button>
             <Button x:Name="Auxiliary_Functions" Style="{StaticResource Button1}" ToolTip="辅助功能" Background="#FFE0E0E0" Click="Auxiliary_Functions_Click" MouseLeave="Auxiliary_Functions_MouseLeave">
                 <!--<Image Source="/Resources/Images/Quicker1.png"/>-->
@@ -36,7 +36,7 @@
         <!-- 侧边栏2 -->
         <Grid x:Name="MenuGrid" HorizontalAlignment="Center" Grid.Column="1" Width="192">
             <!-- 基础设置 -->
-            <StackPanel x:Name="BasicSettingStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Visible">
+            <StackPanel x:Name="BasicSettingsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Visible">
                 <Button x:Name="Convention" ToolTip="自动启动、鼠标挂钩、版本等" Style="{StaticResource Button2}" Background="#FFFAFAFA" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/SettingImage2.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>

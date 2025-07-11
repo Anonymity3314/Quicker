@@ -4,9 +4,8 @@ using Quicker.UserControls;
 using System.Windows.Input;
 using Quicker.Managers;
 using System.Windows;
-using Quicker;
 
-namespace Quicker.UserControls.SettingWindow
+namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class OpenMainWindowGrid : UserControl
     {

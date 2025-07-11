@@ -40,15 +40,18 @@
         </Border>
 
         <!-- 颜色选择器滑块 -->
-        <Slider x:Name="HueSlider" Value="0" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Height="130" ValueChanged="HueSlider_ValueChanged" HorizontalAlignment="Left" Margin="215,10,0,0">
+        <Slider x:Name="HueSlider" Value="0" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Height="130" ValueChanged="HueSlider_ValueChanged" HorizontalAlignment="Left" Margin="215,140,0,0">
+            <Slider.RenderTransform>
+                <ScaleTransform ScaleY="-1"/>
+            </Slider.RenderTransform>
             <Slider.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                    <GradientStop Color="#FF0000" />
-                    <GradientStop Offset="0.1667" Color="#FFFF00" />
-                    <GradientStop Offset="0.333" Color="#00FF00" />
+                    <GradientStop Color="#FF0000" Offset="0"/>
+                    <GradientStop Offset="0.1667" Color="#FF00FF" />
+                    <GradientStop Offset="0.333" Color="#0000FF" />
                     <GradientStop Offset="0.500" Color="#00FFFF" />
-                    <GradientStop Offset="0.667" Color="#0000FF" />
-                    <GradientStop Offset="0.83" Color="#FF00FF" />
+                    <GradientStop Offset="0.667" Color="#00FF00" />
+                    <GradientStop Offset="0.83" Color="#FFFF00" />
                     <GradientStop Offset="1.00" Color="#FF0000" />
                 </LinearGradientBrush>
             </Slider.Background>

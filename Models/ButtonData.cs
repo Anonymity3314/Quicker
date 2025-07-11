@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Quicker.Models
+﻿namespace Quicker.Models
 {
     /// <summary>
     /// 按钮数据模型

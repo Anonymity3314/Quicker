@@ -11,7 +11,7 @@ using Quicker.Database;
 using System.Windows;
 using System.IO;
 
-namespace Quicker.UserControls.SettingWindow
+namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class BlacklistGrid : System.Windows.Controls.UserControl
     {
