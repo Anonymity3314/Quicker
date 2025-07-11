@@ -46,14 +46,14 @@ namespace Quicker.Windows.MainWindows
         private void TypeChanged(string targetType)
         {
             if (type == targetType) return; // 如果目标类型与当前类型相同，直接返回
-            LoadingWindow loadingWindow = new(); // 创建加载窗口
-            loadingWindow.Show(); // 显示加载窗口
+            //LoadingWindow loadingWindow = new(); // 创建加载窗口
+            //loadingWindow.Show(); // 显示加载窗口
             type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
             LoadSettings(); // 加载设置
             SetButtonBackground(); // 设置场景按钮背景色
             SetSceneTitle(); // 设置场景标题
-            loadingWindow?.Close(); // 关闭加载窗口
+            //loadingWindow?.Close(); // 关闭加载窗口
         }
 
         // 加载设置
