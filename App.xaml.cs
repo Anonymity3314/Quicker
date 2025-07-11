@@ -41,7 +41,6 @@ namespace Quicker
                 messageWindow.ShowInTaskbar = true; // 显示在任务栏
                 messageWindow.ShowDialog(); // 显示消息窗口
                 Application.Current.Shutdown(); // 如果不是新实例，关闭当前实例
-                return; // 退出程序
             }
         }
 
@@ -509,8 +508,8 @@ namespace Quicker
             nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
             if (foregroundWindow == IntPtr.Zero) return false; // 如果当前前台窗口为空，返回
 
-            uint processId = windowManager.GetWindowProcessId(foregroundWindow);
-            string processName = Process.GetProcessById((int)processId).ProcessName;
+            uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+            string processName = Process.GetProcessById((int)processId).ProcessName; // 获取进程名称
 
             return AppStateManager.BlacklistApplications
                 .Any(p => p.ProcessName == processName && p.IsInBlacklist); // 如果进程名称在黑名单中，返回
@@ -536,12 +535,6 @@ namespace Quicker
                 AppStateManager.MousePressStartTime = dateTime; // 记录鼠标按下时间
                 if (startTimer) AppStateManager.PressTimer.Start(); // 启动按键计时器
 
-                var actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 获取动作页面管理窗口
-                if (actionPageManageWindow != null && actionPageManageWindow.WindowState != WindowState.Minimized) return; // 如果动作页面管理窗口打开，返回
-
-                var settingWindow = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault(); // 获取设置窗口
-                if (settingWindow != null && settingWindow.WindowState != WindowState.Minimized) return; // 如果设置窗口打开，返回
-
                 string windowType = DetermineWindowType(); // 确定窗口类型
                 AppStateManager.PreLoadMainWindow = new MainWindow(windowType); // 创建主窗口
 
@@ -560,15 +553,16 @@ namespace Quicker
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
-                if (mainWindowList.Count() > 1 && (AppStateManager.Pinned || AppStateManager.Pause)) // 如果有多个主窗口且窗口已固定或已暂停
+                bool hasVisibleWindow = mainWindowList.Any(window => window.Visibility == Visibility.Visible); // 是否有可见窗口
+                if (hasVisibleWindow && (AppStateManager.Pause || AppStateManager.Pinned))
                 {
-                    AppStateManager.PreLoadMainWindow.Close(); // 关闭主窗口
-                    if(AppStateManager.Pause)
+                    AppStateManager.PreLoadMainWindow.Close(); // 有可见窗口且处于暂停或固定状态，关闭预加载窗口
+                    if (AppStateManager.Pause && !AppStateManager.Pinned) // 如果是暂停状态，关闭所有主窗口
                         foreach (var window in mainWindowList)
                             window.Close(); // 关闭其他窗口
                 }
-                else
-                    AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible; // 显示主窗口
+                else // 否则显示预加载窗口
+                    AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible;
                 AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
             });
         }
