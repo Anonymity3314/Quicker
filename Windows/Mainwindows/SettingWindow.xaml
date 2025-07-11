@@ -49,6 +49,12 @@
                         <TextBlock Text="弹出面板" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
+                <Button x:Name="FunctionShortcutKeys" ToolTip="Quicker功能快捷键" Style="{StaticResource Button2}" Click="FunctionShortcutKeys_Click" MouseLeave="FunctionShortcutKeys_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Quicker1.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="功能快捷键" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                </Button>
                 <Button x:Name="Blacklist" ToolTip="在某些应用上停止使用Quicker" Style="{StaticResource Button2}" Click="Blacklist_Click" MouseLeave="Blacklist_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/BlackList.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
