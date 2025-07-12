@@ -182,10 +182,21 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 释放资源
         private void AppearanceGrid_Unloaded(object sender, RoutedEventArgs e)
         {
-            // 释放资源
             settingManager = null; // 释放设置管理器
             weakSettingWindow = null; // 释放弱引用设置窗口
             _currentBrush = null; // 释放当前选中的颜色画刷
+        }
+
+        // 点击按钮打开预设菜单
+        private void PresetStyleButton_Click(object sender, RoutedEventArgs e)
+        {
+            PresetStylePopup.IsOpen = true; // 打开预设样式弹出窗口
+        }
+
+        // 点击预设样式按钮
+        private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            AppearancePreviewScrollViewer.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2); // 根据勾选框状态切换设置预览可见性
         }
     }
 }
