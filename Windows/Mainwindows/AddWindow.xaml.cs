@@ -117,11 +117,7 @@ namespace Quicker.Windows.MainWindows
                     break; // 选择网址
                 case 5:
                     ChoiceComboBox.SelectedIndex = 2;
-                    //ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
-                    {
-                        using var toast = new ToastManager(); // 创建 ToastManager 实例
-                        toast.Show("功能开发中，敬请期待！", "Common"); // 显示提示消息
-                    }
+                    ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
                     break; // 加载扩展
                 default:
                     break; // 其他情况
@@ -382,6 +378,10 @@ namespace Quicker.Windows.MainWindows
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加控件
                     SetWindowHeight(1); // 设置窗口高度
                     break; // 选择应用程序
+                case 2:
+                    ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
+                    SetWindowHeight(0); // 设置窗口高度
+                    break; // 加载扩展
                 default:
                     {
                         using var toast = new ToastManager(); // 创建 ToastManager 实例

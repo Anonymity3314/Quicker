@@ -204,9 +204,17 @@ namespace Quicker.UserControls.AddWindow
                 _addWindow.DescriptionTextBox.Text = module.Description;
                 _addWindow.UpdateTooltip();
             }
-            catch (Exception ex)
+            catch
             {
-                toast.Show("扩展信息加载失败: " + ex.Message, "Error"); // 如果加载扩展信息失败，则显示错误提示
+                toast.Show("扩展信息加载失败！", "Error"); // 如果加载扩展信息失败，则显示错误提示
+                NameTextBlock.Text = "未知";
+                VersionTextBlock.Text = "未知";
+                AuthorTextBlock.Text = "未知";
+                DescriptionTextBlock.Text = "未知";
+                LocationTextBox.Text = dllPath;
+                _addWindow.TitleTextBox.Text = Path.GetFileNameWithoutExtension(dllPath);
+                _addWindow.DescriptionTextBox.Text = "运行扩展" + Path.GetFileNameWithoutExtension(dllPath);
+                _addWindow.UpdateTooltip();
             }
         }
 

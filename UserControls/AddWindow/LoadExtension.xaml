@@ -15,7 +15,7 @@
     Loaded="LoadExtension_Loaded"
 >
     <Grid>
-        <Label Content="扩展文件夹" HorizontalAlignment="Left" Margin="87,15,0,0" VerticalAlignment="Top"/>
+        <Label Content="扩展路径" HorizontalAlignment="Left" Margin="87,15,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="LocationTextBox" Style="{StaticResource ResourceKey=AddressTextBox}" HorizontalAlignment="Left" Margin="162,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="231" SizeChanged="LocationTextBox_SizeChanged" TextChanged="LocationTextBox_TextChanged"/>
         <Button x:Name="SelectButton" Content="···" Style="{StaticResource Select}" HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Width="40" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Click="OpenContextMenu"/>
         <Popup x:Name="LoadExtensionPopup" PopupAnimation="Fade" Width="180" Height="62" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">

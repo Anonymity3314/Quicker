@@ -19,12 +19,10 @@ namespace Quicker.Extend
         {
             try
             {
-                string assemblyName = Path.GetFileNameWithoutExtension(modulePath);
+                string assemblyName = Path.GetFileNameWithoutExtension(modulePath); // 获取文件名
                 Assembly moduleAssembly = Assembly.LoadFrom(modulePath);
                 _loadedAssemblies[assemblyName] = moduleAssembly;
-
-                // 只查找并加载指定 DLL 里的扩展模块
-                foreach (Type type in moduleAssembly.GetTypes())
+                foreach (Type type in moduleAssembly.GetTypes()) // 只查找并加载指定 DLL 里的扩展模块
                 {
                     if (typeof(IExtensionModule).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                     {
