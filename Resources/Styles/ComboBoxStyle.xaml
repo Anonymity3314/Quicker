@@ -79,8 +79,8 @@
                             </ToggleButton.Template>
                         </ToggleButton>
 
-                        <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="Slide" Width="{Binding ActualWidth, ElementName=ToggleButton}" Placement="Bottom">
-                            <Border x:Name="dropDownBorder" Background="White" CornerRadius="4" Margin="2" Padding="3">
+                        <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="Slide" Placement="Bottom" PlacementTarget="{Binding ElementName=ToggleButton}">
+                            <Border x:Name="dropDownBorder" Background="White" CornerRadius="4" Margin="2" Padding="3" MinWidth="{Binding ActualWidth, ElementName=ToggleButton}">
                                 <Border.Effect>
                                     <DropShadowEffect Color="#22000000" Direction="270" BlurRadius="8" RenderingBias="Quality" ShadowDepth="2" Opacity="0.5"/>
                                 </Border.Effect>
