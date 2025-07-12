@@ -33,9 +33,8 @@
                     </Rectangle.Fill>
                 </Rectangle>
 
-
                 <!-- 可拖动的圆形 -->
-                <Border x:Name="ColorThumb" Width="8" Height="8" Canvas.Left="0" Canvas.Top="0" Background="Transparent" BorderBrush="White" BorderThickness="2.5" CornerRadius="4"/>
+                <Border x:Name="ColorThumb" Width="8" Height="8" Canvas.Left="0" Canvas.Top="0" Background="Transparent" BorderBrush="White" BorderThickness="2.5" CornerRadius="4" Panel.ZIndex="2"/>
             </Canvas>
         </Border>
 
