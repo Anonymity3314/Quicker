@@ -69,7 +69,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                FullScreenDisableCheckBox.IsChecked = settingManager.blacklistSettings.FullScreenDisable;
+                FullScreenDisableCheckBox.IsChecked = settingManager.blacklistSettings.IsFullScreenDisabled;
             });
         }
 

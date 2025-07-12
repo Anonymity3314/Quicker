@@ -153,8 +153,8 @@ namespace Quicker.Windows.MainWindows
                     ); // 更新弹出面板设置
                 if (_settingManager.blacklistSettings != null)
                     SettingDatabase.ApplyBlacklistSettings(
-                        _settingManager.blacklistSettings.FullScreenDisable,
-                        _settingManager.blacklistSettings.ApplyBlacklistToExpandHotkeys); // 更新黑名单设置
+                        _settingManager.blacklistSettings.IsFullScreenDisabled,
+                        _settingManager.blacklistSettings.IsBlacklistEnabledForExtendedHotkey); // 更新黑名单设置
 
                 try
                 {

@@ -1,10 +1,10 @@
-﻿using System.Windows.Controls;
+﻿using Quicker.Models.Settings;
+using System.Windows.Controls;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Database;
 using System.Windows;
-using System;
 
 namespace Quicker.Managers
 {
@@ -15,16 +15,16 @@ namespace Quicker.Managers
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮颜色
 
-        public OpenMainWindowConditionsSettingsCache openMainWindowConditions; // 弹出面板设置缓存对象
-        public AppearanceConditionsSettingsCache appearanceConditions; // 外观设置缓存对象
-        public BlacklistSettingsSettingsCache blacklistSettings; // 黑名单设置缓存对象
-        public ConventionsSettingsCache conventions; // 常规设置缓存对象
+        public OpenMainWindow openMainWindowConditions; // 弹出面板设置缓存对象
+        public Appearance appearanceConditions; // 外观设置缓存对象
+        public Blacklist blacklistSettings; // 黑名单设置缓存对象
+        public Convention conventions; // 常规设置缓存对象
 
         // 原始设置缓存
-        private ConventionsSettingsCache _originalConventions;
-        private OpenMainWindowConditionsSettingsCache _originalOpenMainWindowConditions;
-        private BlacklistSettingsSettingsCache _originalBlacklistSettings;
-        private AppearanceConditionsSettingsCache _originalAppearanceConditions;
+        private Convention _originalConventions;
+        private OpenMainWindow _originalOpenMainWindowConditions;
+        private Blacklist _originalBlacklistSettings;
+        private Appearance _originalAppearanceConditions;
 
         /// <summary>
         /// 缓存窗口加载时的原始设置
@@ -90,7 +90,7 @@ namespace Quicker.Managers
         {
             if (conventions != null) return; // 如果已经初始化了数据，直接返回
             var Conventions = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
-            conventions = new ConventionsSettingsCache // 常规设置
+            conventions = new Convention // 常规设置
             {
                 Version = Conventions.Version, // 版本号
                 AutoStart = Conventions.AutoStart, // 开机自启
@@ -111,7 +111,7 @@ namespace Quicker.Managers
         {
             if (openMainWindowConditions != null) return; // 如果已经初始化了数据，直接返回
             var OpenMainWindowConditions = SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取弹出面板设置信息
-            openMainWindowConditions = new OpenMainWindowConditionsSettingsCache // 弹出面板设置
+            openMainWindowConditions = new OpenMainWindow // 弹出面板设置
             {
                 OpenMainWindowByMiddleMouseClick = OpenMainWindowConditions.OpenMainWindowByMiddleMouseClick,
                 OpenMainWindowByX1MouseClick = OpenMainWindowConditions.OpenMainWindowByX1MouseClick,
@@ -131,10 +131,10 @@ namespace Quicker.Managers
         {
             if (blacklistSettings != null) return; // 如果已经初始化了数据，直接返回
             var BlacklistSettings = SettingDatabase.GetAllBlacklistSettings().FirstOrDefault(); // 获取黑名单设置信息
-            blacklistSettings = new BlacklistSettingsSettingsCache // 黑名单设置
+            blacklistSettings = new Blacklist // 黑名单设置
             {
-                FullScreenDisable = BlacklistSettings.IsFullScreenDisabled, // 启用黑名单
-                ApplyBlacklistToExpandHotkeys = BlacklistSettings.IsBlacklistEnabledForExtendedHotkey // 是否将黑名单与全屏禁用设置应用于扩展热键功能
+                IsFullScreenDisabled = BlacklistSettings.IsFullScreenDisabled, // 启用黑名单
+                IsBlacklistEnabledForExtendedHotkey = BlacklistSettings.IsBlacklistEnabledForExtendedHotkey // 是否将黑名单与全屏禁用设置应用于扩展热键功能
             }; // 加载设置数据到缓存
         }
 
@@ -143,7 +143,7 @@ namespace Quicker.Managers
         {
             if (appearanceConditions != null) return; // 如果已经初始化了数据，直接返回
             var Appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault(); // 获取外观设置信息
-            appearanceConditions = new AppearanceConditionsSettingsCache // 外观设置
+            appearanceConditions = new Appearance // 外观设置
             {
                 // 按钮
                 ButtonSize = Appearance.ButtonSize, // 按钮大小
@@ -351,10 +351,10 @@ namespace Quicker.Managers
                     openMainWindowConditions.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
                     break; // 单击Ctrl键
                 case "FullScreenDisableCheckBox":
-                    blacklistSettings.FullScreenDisable = isChecked == true; // 全屏禁用Quicker
+                    blacklistSettings.IsFullScreenDisabled = isChecked == true; // 全屏禁用Quicker
                     break; // 全屏禁用Quicker
                 case "ApplyBlacklistToExpandHotkeysCheckBox":
-                    blacklistSettings.ApplyBlacklistToExpandHotkeys = isChecked == true; // 黑名单应用到热键扩展
+                    blacklistSettings.IsBlacklistEnabledForExtendedHotkey = isChecked == true; // 黑名单应用到热键扩展
                     break; // 黑名单应用到热键扩展
                 //case "AutoHideTitleBarCheckBox":
                 //    settingsCache.AutoHideTitleBar = isChecked == true; // 自动缩小动作名称文字
@@ -546,86 +546,5 @@ namespace Quicker.Managers
         }
 
         #endregion
-
-        // 常规设置
-        public class ConventionsSettingsCache
-        {
-            public string Version { get; set; } // 版本号
-            public bool AutoStart { get; set; } // 开机自启动
-            public bool ShowNotification { get; set; } // 显示启动完成提示
-            public bool ShowAddImage { get; set; } // 左键点击空白按钮时显示创建动作菜单
-            public bool HideTooltip { get; set; } // 隐藏提示框
-            public int LongPressThreshold { get; set; } // 长按阈值
-            public int MouseMovePixels { get; set; } // 鼠标移动像素
-            public bool LoopPageFlipping { get; set; } // 循环翻页
-            public bool RememberLastPage { get; set; } // 是否记住设置窗口中最后打开的页面
-            public int LastPage { get; set; } // 设置窗口中最后打开的页面
-            public bool EnableMemoryOptimization { get; set; } // 是否启用内存优化
-        }
-
-        // 弹出面板设置
-        public class OpenMainWindowConditionsSettingsCache
-        {
-            public bool OpenMainWindowByMiddleMouseClick { get; set; } // 按下中键
-            public bool OpenMainWindowByX1MouseClick { get; set; } // 按下X1键
-            public bool OpenMainWindowByX2MouseClick { get; set; } // 按下X2键
-            public bool OpenMainWindowByCtrl_MiddleMouseClick { get; set; } // Ctrl+中键单击
-            public bool OpenMainWindowByCtrl_RightMouseClick { get; set; } // Ctrl+右键单击
-            public bool OpenMainWindowByMiddleMouseClickLonger { get; set; } // 长按中键
-            public bool OpenMainWindowByRightMouseClickLonger { get; set; } // 长按右键
-            public bool OpenMainWindowByRightMouseClick_Move { get; set; } // 按右键移动
-            public bool OpenMainWindowByCtrl { get; set; } // 单击Ctrl键
-            public int WindowStartupLocation { get; set; } // 功能面板打开位置
-        }
-  
-        // 黑名单设置
-        public class BlacklistSettingsSettingsCache
-        {
-            public bool FullScreenDisable { get; set; } // 全屏禁用Quicker
-            public bool ApplyBlacklistToExpandHotkeys { get; set; } // 黑名单应用到热键扩展
-        }
-
-        // 外观设置
-        public class AppearanceConditionsSettingsCache
-        {
-            // 尺寸
-            public double ButtonSize { get; set; } // 按钮大小
-            public double ButtonGap { get; set; } // 按钮间距
-            public double BorderWidth { get; set; } // 边框宽度
-            public double ButtonCornerRadius { get; set; } // 按钮圆角半径
-
-            // 颜色
-            public string BackgroundColor { get; set; } // 背景颜色
-            public string ToolbarColor { get; set; } // 工具栏颜色
-            public string ToolbarIconColor { get; set; } // 工具栏图标颜色
-            public string ActionButtonColor { get; set; } // 动作按钮颜色
-            public string ActionButtonMouseOverColor { get; set; } // 动作按钮鼠标悬停颜色
-            public string BlankButtonColor { get; set; } // 空白按钮颜色
-            public string BlankButtonMouseOverColor { get; set; } // 空白按钮鼠标悬停颜色
-            public string ButtonTextColor { get; set; } // 按钮文字颜色
-            public string ActionIconColor { get; set; } // 动作图标颜色
-            public string TriggerKeyTextColor { get; set; } // 触发键文字颜色
-            public string OtherIconColor { get; set; } // 其他位置图标颜色
-
-            // 字体
-            public int Font1 { get; set; } // 字体1
-            public int Font2 { get; set; } // 字体2
-            public double FontSize { get; set; } // 字体大小
-            public double FontWeight { get; set; } // 字体粗细
-
-            // 背景图片
-            public string BackgroundImagePath { get; set; } // 背景图片路径
-            public double BackgroundImageOpacity { get; set; } // 背景图片不透明度
-
-            // 模糊与圆角
-            public int Blur { get; set; } // 模糊模式
-            public int Win11CornerRadius { get; set; } // Win11圆角模式
-
-            // 选项
-            public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字
-            public bool ShowActionButtonMouseOver { get; set; } // 鼠标悬浮在动作按钮上时放大显示按钮
-            public bool HideActionNameAfterIcon { get; set; } // 设置动作图标后隐藏动作名称
-            public bool ShowActionIconShadow { get; set; } // 动作图标显示阴影
-        }
     }
 }
