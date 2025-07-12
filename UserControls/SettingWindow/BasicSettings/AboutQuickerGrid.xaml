@@ -44,23 +44,24 @@
             <Label HorizontalAlignment="Left" Margin="0,186,0,0" VerticalAlignment="Top" Content="支持" Foreground="Black" FontSize="16" Grid.Column="1"/>
             <TextBlock x:Name="FeedBack" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
             <TextBlock x:Name="icon11_community_github_io" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
+            <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="419" Margin="0,0,0,55">
+                <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+                <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,30,0,0" VerticalAlignment="Top" FontSize="14"/>
+                <TextBlock x:Name="RootFolderPath" HorizontalAlignment="Left" Margin="23,60,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="RootFolderPath_MouseDown"/>
+                <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,80,0,0" VerticalAlignment="Top" FontSize="14"/>
+                <TextBlock x:Name="DatabaseFolderPath" HorizontalAlignment="Left" Margin="23,108,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="DatabaseFolderPath_MouseDown"/>
+                <Label Content="图标文件夹：" HorizontalAlignment="Left" Margin="18,128,0,0" VerticalAlignment="Top" FontSize="14"/>
+                <TextBlock x:Name="LocalIconsFolderPath" HorizontalAlignment="Left" Margin="23,156,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="LocalIconsFolderPath_MouseDown"/>
 
-            <Label Content="数据文件夹" HorizontalAlignment="Left" Margin="0,383,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-            <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,413,0,0" VerticalAlignment="Top" FontSize="14"/>
-            <TextBlock x:Name="RootFolderPath" HorizontalAlignment="Left" Margin="23,443,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="RootFolderPath_MouseDown"/>
-            <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,463,0,0" VerticalAlignment="Top" FontSize="14"/>
-            <TextBlock x:Name="DatabaseFolderPath" HorizontalAlignment="Left" Margin="23,491,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="DatabaseFolderPath_MouseDown"/>
-            <Label Content="图标文件夹：" HorizontalAlignment="Left" Margin="18,511,0,0" VerticalAlignment="Top" FontSize="14"/>
-            <TextBlock x:Name="LocalIconsFolderPath" HorizontalAlignment="Left" Margin="23,539,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="LocalIconsFolderPath_MouseDown"/>
+                <Label Content="备份数据" HorizontalAlignment="Left" Margin="0,191,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+                <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" Margin="14,226,0,0" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>
+                <Label Content="仅作为备份用途，不支持导入。" HorizontalAlignment="Left" Margin="14,250,0,0" VerticalAlignment="Top" FontSize="10" Foreground="#FFB4B4B4"/>
 
-            <Label Content="备份数据" HorizontalAlignment="Left" Margin="0,574,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-            <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" Margin="14,609,0,0" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>
-            <Label Content="仅作为备份用途，不支持导入。" HorizontalAlignment="Left" Margin="14,633,0,0" VerticalAlignment="Top" FontSize="10" Foreground="#FFB4B4B4"/>
-
-            <Label Content="临时文件" HorizontalAlignment="Left" Margin="0,661,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-            <Label Content="大小：" HorizontalAlignment="Left" Margin="18,696,0,0" VerticalAlignment="Top"/>
-            <TextBlock x:Name="TempSize" HorizontalAlignment="Left" Margin="58,701,0,0" TextWrapping="Wrap" Text="计算中...·" VerticalAlignment="Top"/>
-            <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="23,726,0,0" VerticalAlignment="Top" Width="61" Click="CleanTempDataButton_Click" IsEnabled="False"/>
+                <Label Content="临时文件" HorizontalAlignment="Left" Margin="0,278,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                <Label Content="大小：" HorizontalAlignment="Left" Margin="18,313,0,0" VerticalAlignment="Top"/>
+                <TextBlock x:Name="TempSize" HorizontalAlignment="Left" Margin="58,318,0,0" TextWrapping="Wrap" Text="计算中..." VerticalAlignment="Top"/>
+                <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="23,343,0,0" VerticalAlignment="Top" Width="61" Click="CleanTempDataButton_Click" IsEnabled="False"/>
+            </Grid>
         </Grid>
 
         <!-- 基础设置-关于Quicker-隐私声明 -->
