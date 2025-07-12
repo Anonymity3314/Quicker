@@ -235,6 +235,7 @@ namespace Quicker.Windows.MainWindows
                     Tools_Click(null, null); // 点击工具按钮
                     break;
                 default:
+                    BasicSettings_Click(null, null); // 点击基础设置按钮
                     break;
             }
         }
@@ -248,22 +249,26 @@ namespace Quicker.Windows.MainWindows
             switch (num2)
             {
                 case 1:
-                    Convention_Click(null, null); // 点击常规设置按钮
-                    break;
+                    Convention_Click(null, null);
+                    break; // 点击常规设置按钮
                 case 2:
-                    OpenMainWindow_Click(null, null); // 点击弹出面板设置按钮
-                    break;
+                    OpenMainWindow_Click(null, null);
+                    break; // 点击弹出面板设置按钮
                 case 3:
-                    Blacklist_Click(null, null); // 点击黑名单设置按钮
-                    break;
+                    FunctionShortcutKeys_Click(null, null);
+                    break; // 点击功能快捷键设置按钮
                 case 4:
-                    Appearance_Click(null, null); // 点击外观设置按钮
-                    break;
+                    Blacklist_Click(null, null);
+                    break; // 点击黑名单设置按钮
                 case 5:
-                    AboutQuicker_Click(null, null); // 点击关于按钮
-                    break;
+                    Appearance_Click(null, null);
+                    break; // 点击外观设置按钮
+                case 6:
+                    AboutQuicker_Click(null, null);
+                    break; // 点击关于按钮
                 default:
-                    break;
+                    Convention_Click(null, null);
+                    break; // 点击常规设置按钮
             }
         }
 
@@ -318,22 +323,26 @@ namespace Quicker.Windows.MainWindows
             {
                 return 121; // 弹出面板设置页面
             }
-            else if(element is BlacklistGrid)
+            else if(element is FunctionShortcutKeysGrid)
             {
-                return 131; // 黑名单设置页面
+                return 131; // 功能快捷键设置界面
+            }
+            else if (element is BlacklistGrid)
+            {
+                return 141; // 黑名单设置页面
             }
             else if (element is AppearanceGrid)
             {
-                return 141; // 外观设置页面
+                return 151; // 外观设置页面
             }
             else if (element is AboutQuickerGrid)
             {
                 var grid = FindGridByName(element, "Privacy_StatementButtonGrid");
                 if (grid != null && grid.Visibility == Visibility.Visible)
                 {
-                    return 152; // 隐私声明页面
+                    return 162; // 隐私声明页面
                 }
-                return 151; // 关于Quicker页面
+                return 161; // 关于Quicker页面
             }
             return 0;
         }
