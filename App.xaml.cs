@@ -504,15 +504,22 @@ namespace Quicker
         /// <returns> 是否禁用Quicker </returns>
         private bool IsBannedFormQuicker()
         {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
-            if (foregroundWindow == IntPtr.Zero) return false; // 如果当前前台窗口为空，返回
+            try
+            {
+                using var windowManager = new WindowManager(); // 创建窗口管理器
+                nint foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
+                if (foregroundWindow == IntPtr.Zero) return false; // 如果当前前台窗口为空，返回
 
-            uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
-            string processName = Process.GetProcessById((int)processId).ProcessName; // 获取进程名称
+                uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+                string processName = Process.GetProcessById((int)processId).ProcessName; // 获取进程名称
 
-            return AppStateManager.BlacklistApplications
-                .Any(p => p.ProcessName == processName && p.IsInBlacklist); // 如果进程名称在黑名单中，返回
+                return AppStateManager.BlacklistApplications
+                    .Any(p => p.ProcessName == processName && p.IsInBlacklist); // 如果进程名称在黑名单中，返回
+            }
+            catch
+            {
+                return false; // 如果发生异常，返回 false
+            }
         }
 
         // 弹出主窗口
