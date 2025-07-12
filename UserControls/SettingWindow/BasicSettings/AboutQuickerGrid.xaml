@@ -44,7 +44,7 @@
             <Label HorizontalAlignment="Left" Margin="0,186,0,0" VerticalAlignment="Top" Content="支持" Foreground="Black" FontSize="16" Grid.Column="1"/>
             <TextBlock x:Name="FeedBack" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
             <TextBlock x:Name="icon11_community_github_io" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
-            <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="419" Margin="0,0,0,55">
+            <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="447" Margin="0,0,0,55">
                 <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,30,0,0" VerticalAlignment="Top" FontSize="14"/>
                 <TextBlock x:Name="RootFolderPath" HorizontalAlignment="Left" Margin="23,60,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="RootFolderPath_MouseDown"/>

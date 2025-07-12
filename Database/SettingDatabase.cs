@@ -77,6 +77,7 @@ namespace Quicker.Database
          * ShowActionButtonMouseOver: 鼠标悬浮在动作按钮上时，放大显示按钮，默认为false。
          * HideActionNameAfterIcon: 设置动作图标后隐藏动作名称，默认为false。
          * ShowActionIconShadow: 动作图标显示阴影，默认为false。
+         * EnablePreview: 开启预览功能，默认为false。
          */
 
         // 数据库连接
@@ -211,7 +212,7 @@ namespace Quicker.Database
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#C5CCCCCC", "#00999999", "#FF666666", "#FFFFFFFF", "#59B2F2FF", "#32C8C8C8", "#05000000", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 1, false, false, false, false); // 使用参数元组封装默认值
+            var defaults = (77.6, 0.2, 0.0, 0.0, "#C5CCCCCC", "#00999999", "#FF666666", "#FFFFFFFF", "#59B2F2FF", "#32C8C8C8", "#05000000", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 1, false, false, false, false, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@ButtonSize"] = defaults.Item1, // 按钮大小
@@ -240,7 +241,8 @@ namespace Quicker.Database
                 ["@AutoHideTitleBar"] = defaults.Item24, // 自动缩小动作名称文字
                 ["@ShowActionButtonMouseOver"] = defaults.Item25, // 鼠标悬浮在动作按钮上时，放大显示按钮
                 ["@HideActionNameAfterIcon"] = defaults.Item26, // 设置动作图标后隐藏动作名称
-                ["@ShowActionIconShadow"] = defaults.Item27 // 动作图标显示阴影
+                ["@ShowActionIconShadow"] = defaults.Item27, // 动作图标显示阴影
+                ["@EnablePreview"] = defaults.Item28 // 开启预览功能
             };
             using var command = new SQLiteCommand(SQLStatements.InsertAppearance, connection); // 创建 SQLiteCommand 对象
             foreach (var param in parameters)
@@ -557,6 +559,7 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@ShowActionButtonMouseOver", appearance.ShowActionButtonMouseOver); // 设置参数
             command.Parameters.AddWithValue("@HideActionNameAfterIcon", appearance.HideActionNameAfterIcon); // 设置参数
             command.Parameters.AddWithValue("@ShowActionIconShadow", appearance.ShowActionIconShadow); // 设置参数
+            command.Parameters.AddWithValue("@EnablePreview", appearance.EnablePreview); // 设置参数
             command.ExecuteNonQuery(); // 执行命令
             transaction.Commit(); // 提交事务
         }
@@ -776,7 +779,8 @@ namespace Quicker.Database
                 AutoHideTitleBar BOOLEAN,
                 ShowActionButtonMouseOver BOOLEAN,
                 HideActionNameAfterIcon BOOLEAN,
-                ShowActionIconShadow BOOLEAN
+                ShowActionIconShadow BOOLEAN,
+                EnablePreview BOOLEAN
             );";
             public const string InsertAppearance = @"
             INSERT INTO Appearance
@@ -807,7 +811,8 @@ namespace Quicker.Database
                 AutoHideTitleBar,
                 ShowActionButtonMouseOver,
                 HideActionNameAfterIcon,
-                ShowActionIconShadow
+                ShowActionIconShadow,
+                EnablePreview
             )
             VALUES
             (
@@ -837,7 +842,8 @@ namespace Quicker.Database
                 @AutoHideTitleBar,
                 @ShowActionButtonMouseOver,
                 @HideActionNameAfterIcon,
-                @ShowActionIconShadow
+                @ShowActionIconShadow,
+                @EnablePreview
             );"; // 插入外观设置
             public const string GetAllAppearanceSettings = "SELECT * FROM Appearance;"; // 获取所有外观设置
             public const string UpdateAppearance = @"
@@ -868,26 +874,9 @@ namespace Quicker.Database
                 AutoHideTitleBar = @AutoHideTitleBar,
                 ShowActionButtonMouseOver = @ShowActionButtonMouseOver,
                 HideActionNameAfterIcon = @HideActionNameAfterIcon,
-                ShowActionIconShadow = @ShowActionIconShadow
+                ShowActionIconShadow = @ShowActionIconShadow,
+                EnablePreview = @EnablePreview
             WHERE ID = @ID;"; // 更新外观设置
         }
     }
-}
-
-// 基础设置
-public class Convention
-{
-    public int ID { get; set; } // 主键
-    public string Version { get; set; } // 版本号
-    public bool AutoStart { get; set; } // 是否开机自启
-    public bool ShowNotification { get; set; } // 是否显示通知
-    public bool ShowAddImage { get; set; } // 是否显示添加图片
-    public double TotalUsageTime { get; set; } // 总使用时长
-    public bool HideTooltip { get; set; } // 是否隐藏提示
-    public int LongPressThreshold { get; set; } // 长按阈值
-    public int MouseMovePixels { get; set; } // 鼠标移动像素
-    public bool LoopPageFlipping { get; set; } // 是否循环翻页
-    public bool RememberLastPage { get; set; } // 是否记住设置窗口中最后打开的页面
-    public int LastPage { get; set; } // 设置窗口中最后打开的页面
-    public bool EnableMemoryOptimization { get; set; } // 是否启用内存优化
 }

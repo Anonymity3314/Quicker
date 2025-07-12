@@ -43,5 +43,6 @@
         public bool ShowActionButtonMouseOver { get; set; } // 鼠标悬浮在动作按钮上时，放大显示按钮
         public bool HideActionNameAfterIcon { get; set; } // 设置动作图标后隐藏动作名称
         public bool ShowActionIconShadow { get; set; } // 动作图标显示阴影
+        public bool EnablePreview { get; set; } // 开启预览功能
     }
 }
