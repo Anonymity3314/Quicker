@@ -19,16 +19,12 @@ namespace Quicker.Windows.MainWindows
         private const string DefaultButtonColor2 = "#FFF0F0F0"; // 默认按钮类型2颜色
         private const string SelectedButtonColor2 = "#FFFAFAFA"; // 选中按钮类型2颜色
 
-        private readonly DispatcherTimer _settingsChangeTimer = new(); // 设置变化检测定时器
         public readonly SettingManager _settingManager = new(); // 设置管理器
+        private bool _hasAppliedSettings = false; // 标记是否已经应用过设置
 
         public SettingWindow()
         {
             InitializeComponent(); // 初始化xaml文件
-            
-            // 初始化设置变化检测定时器
-            _settingsChangeTimer.Interval = TimeSpan.FromMilliseconds(100); // 设置检查间隔为100毫秒
-            _settingsChangeTimer.Tick += SettingsChangeTimer_Tick;
         }
 
         #region 窗口生命周期
@@ -48,32 +44,11 @@ namespace Quicker.Windows.MainWindows
             
             // 初始化时隐藏撤销按钮，因为还没有修改
             CancelSettingsButton.Visibility = Visibility.Hidden;
-            
-            // 启动设置变化检测定时器
-            _settingsChangeTimer.Start();
-        }
-
-        // 设置变化检测定时器回调
-        private void SettingsChangeTimer_Tick(object sender, EventArgs e)
-        {
-            // 检查设置是否变化，更新撤销按钮可见性
-            UpdateCancelButtonVisibility();
-        }
-
-        // 更新撤销按钮可见性
-        private void UpdateCancelButtonVisibility()
-        {
-            CancelSettingsButton.Visibility = _settingManager.IsSettingsChanged() 
-                ? Visibility.Visible
-                : Visibility.Hidden; // 如果设置已变化，显示撤销按钮，否则隐藏
         }
 
         // 关闭窗口时保存最后打开的页面
         protected override void OnClosing(CancelEventArgs e)
         {
-            // 停止设置变化检测定时器
-            _settingsChangeTimer.Stop();
-            
             base.OnClosing(e);
             SetLastPage(); // 保存最后打开的页面
         }
@@ -82,10 +57,6 @@ namespace Quicker.Windows.MainWindows
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e); // 调用基类的 OnClosed 方法
-
-            // 停止并清理定时器资源
-            _settingsChangeTimer.Stop();
-            _settingsChangeTimer.Tick -= SettingsChangeTimer_Tick;
 
             _settingManager.Dispose(); // 清空缓存
 
@@ -106,28 +77,45 @@ namespace Quicker.Windows.MainWindows
         #region 设置保存与撤销
 
         // 撤销修改
-        private void CancelSettingsButton_Click(object sender, RoutedEventArgs e)
+        private async void CancelSettingsButton_Click(object sender, RoutedEventArgs e)
         {
             _settingManager.RestoreOriginalSettings(); // 恢复原始设置
             RefreshCurrentSettingsDisplay(); // 刷新当前显示的界面
+            await SaveSettingsAsync(); // 只保存设置，不显示信息
             CancelSettingsButton.Visibility = Visibility.Hidden; // 设置已恢复，隐藏撤销按钮
         }
 
         // 应用设置
         private async void ApplySettings(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => // 在后台线程中执行保存操作
+            _hasAppliedSettings = true; // 标记已经应用过设置
+            if (_settingManager.IsSettingsChanged()) // 检查是否需要显示撤销按钮
             {
-                bool succeed = true; // 保存成功标志
+                CancelSettingsButton.Visibility = Visibility.Visible;
+            }
+
+            var result = await SaveSettingsAsync(); // 保存设置并获取结果
+            ShowSaveResultMessage(result); // 显示保存结果信息
+        }
+
+        /// <summary>
+        /// 异步保存设置
+        /// </summary>
+        /// <returns>保存结果信息</returns>
+        private async Task<(bool autostartSuccess, bool settingsLoadSuccess)> SaveSettingsAsync()
+        {
+            return await Task.Run(() =>
+            {
+                bool autostartSuccess = true; // 开机自启动设置成功标志
                 var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
                 bool originalAutoStart = Convention.AutoStart; // 保存原始的开机自启动设置
                 bool newAutoStart = _settingManager.conventions.AutoStart; // 新的开机自启动设置
                 if (originalAutoStart != newAutoStart)// 更新开机自启动设置
-                    succeed = UpdateAutostart(newAutoStart);
+                    autostartSuccess = UpdateAutostart(newAutoStart);
 
                 if (_settingManager.conventions != null)
                     SettingDatabase.ApplyConventionSettings(
-                        succeed
+                        autostartSuccess
                             ? _settingManager.conventions.AutoStart
                             : Convention.AutoStart,
                         _settingManager.conventions.ShowNotification,
@@ -156,21 +144,42 @@ namespace Quicker.Windows.MainWindows
                         _settingManager.blacklistSettings.IsFullScreenDisabled,
                         _settingManager.blacklistSettings.IsBlacklistEnabledForExtendedHotkey); // 更新黑名单设置
 
+                bool settingsLoadSuccess = true; // 设置加载成功标志
                 try
                 {
                     AppStateManager.LoadSettings(); // 刷新弹出面板设置
                 }
                 catch
                 {
-                    using var toast1 = new ToastManager(); // 消息提醒管理器
-                    toast1.Show("设置应用失败！", "Error"); // 弹出消息提醒
+                    settingsLoadSuccess = false; // 设置加载失败
                 }
 
-                // 显示设置成功通知
-                string message = succeed ? "设置应用成功！" : "设置开机自启动失败！";
-                using var toast2 = new ToastManager(); // 消息提醒管理器
-                toast2.Show(message, "Common"); // 弹出消息提醒
+                return (autostartSuccess, settingsLoadSuccess);
             });
+        }
+
+        /// <summary>
+        /// 显示保存结果消息
+        /// </summary>
+        /// <param name="result">保存结果</param>
+        private void ShowSaveResultMessage((bool autostartSuccess, bool settingsLoadSuccess) result)
+        {
+            string message;
+            if (!result.autostartSuccess)
+            {
+                message = "设置开机自启动失败！";
+            }
+            else if (!result.settingsLoadSuccess)
+            {
+                message = "设置应用失败！";
+            }
+            else
+            {
+                message = "已保存设置！";
+            }
+            
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.Show(message, "Common"); // 弹出消息提醒
         }
 
         /// <summary>
