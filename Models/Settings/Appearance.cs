@@ -1,10 +1,10 @@
-﻿namespace Quicker.Models.Settings
-{
+﻿namespace Quicker.Models.Settings{
     /// <summary>
     /// 外观设置模型
     /// </summary>
     public class Appearance
     {
+        public int ID { get; set; } // 主键
         // 尺寸
         public double ButtonSize { get; set; } // 按钮大小
         public double ButtonGap { get; set; } // 按钮间隙

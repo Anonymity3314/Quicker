@@ -130,7 +130,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 备份数据
         private void BackupDataButton_Click(object sender, RoutedEventArgs e)
         {
-            using var folderDialog = new System.Windows.Forms.FolderBrowserDialog() { Description = "选择备份路径" };
+            using var folderDialog = new System.Windows.Forms.FolderBrowserDialog() { Description = "选择备份路径", UseDescriptionForTitle = true };
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string folderPath = folderDialog.SelectedPath;

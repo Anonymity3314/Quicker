@@ -183,6 +183,8 @@ namespace Quicker.Managers
                 ShowActionButtonMouseOver = Appearance.ShowActionButtonMouseOver, // 鼠标悬停显示动作按钮
                 HideActionNameAfterIcon = Appearance.HideActionNameAfterIcon, // 隐藏动作名称
                 ShowActionIconShadow = Appearance.ShowActionIconShadow, // 显示动作图标阴影
+
+                EnablePreview = Appearance.EnablePreview // 显示设置应用效果
             }; // 加载设置数据到缓存
         }
 

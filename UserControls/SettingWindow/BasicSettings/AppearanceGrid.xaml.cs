@@ -1,7 +1,9 @@
 ﻿using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
 using Quicker.UserControls;
+using System.Globalization;
 using System.Windows.Media;
+using System.Windows.Data;
 using Quicker.Managers;
 using System.Windows;
 
@@ -32,7 +34,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             settingManager.LoadAppearanceAsync(); // 初始化缓存数据
             Application.Current.Dispatcher.Invoke(() =>
-            {                
+            {
                 // 按钮
                 ButtonSizeSlider.Value = settingManager.appearanceConditions.ButtonSize; // 设置按钮大小
                 ButtonGapSlider.Value = settingManager.appearanceConditions.ButtonGap; // 设置按钮间距
@@ -83,6 +85,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ShowActionButtonMouseOverCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionButtonMouseOver; // 设置鼠标悬停显示动作按钮
                 HideActionNameAfterIconCheckBox.IsChecked = settingManager.appearanceConditions.HideActionNameAfterIcon; // 设置隐藏动作名称
                 ShowActionIconShadowCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionIconShadow; // 设置显示动作图标阴影
+
+                EnablePreviewCheckBox.IsChecked = settingManager.appearanceConditions.EnablePreview; // 设置显示设置应用效果
             }); // 异步加载设置
         }
 
@@ -197,6 +201,28 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
             AppearancePreviewScrollViewer.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2); // 根据勾选框状态切换设置预览可见性
+        }
+    }
+
+    // 内联定义 ThicknessConverter
+    public class ThicknessConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double d)
+            {
+                return new Thickness(d);
+            }
+            return new Thickness(0);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Thickness thickness)
+            {
+                return thickness.Left;
+            }
+            return 0.0;
         }
     }
 }

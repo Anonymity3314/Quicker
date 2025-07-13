@@ -510,17 +510,48 @@ namespace Quicker.Database
         /// <returns> Appearance 类 </returns>
         public static List<Appearance> GetAllAppearanceSettings()
         {
-            var appearances = new List<Appearance>(); // 创建一个空的 Appearance 列表
-            using var connection = OpenConnection(); // 打开数据库连接
-            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启事务
-            using var command = new SQLiteCommand(SQLStatements.GetAllAppearanceSettings, connection); // 创建 SQLiteCommand 对象
-            using var reader = command.ExecuteReader(); // 执行查询并获取结果
+            var appearances = new List<Appearance>();
+            using var connection = OpenConnection();
+            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+            using var command = new SQLiteCommand(SQLStatements.GetAllAppearanceSettings, connection);
+            using var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                appearances.Add(new Appearance()); // 将读取到的数据添加到列表中
+                appearances.Add(new Appearance
+                {
+                    ID = reader.GetInt32(0),
+                    ButtonSize = reader.GetDouble(1),
+                    ButtonGap = reader.GetDouble(2),
+                    BorderWidth = reader.GetDouble(3),
+                    ButtonCornerRadius = reader.GetDouble(4),
+                    BackgroundColor = reader.GetString(5),
+                    ToolbarColor = reader.GetString(6),
+                    ToolbarIconColor = reader.GetString(7),
+                    ActionButtonColor = reader.GetString(8),
+                    ActionButtonMouseOverColor = reader.GetString(9),
+                    BlankButtonColor = reader.GetString(10),
+                    BlankButtonMouseOverColor = reader.GetString(11),
+                    ButtonTextColor = reader.GetString(12),
+                    ActionIconColor = reader.GetString(13),
+                    TriggerKeyTextColor = reader.GetString(14),
+                    OtherIconColor = reader.GetString(15),
+                    Font1 = reader.GetInt32(16),
+                    Font2 = reader.GetInt32(17),
+                    FontSize = reader.GetDouble(18),
+                    FontWeight = reader.GetDouble(19),
+                    BackgroundImagePath = reader.GetString(20),
+                    BackgroundImageOpacity = reader.GetDouble(21),
+                    Blur = reader.GetInt32(22),
+                    Win11CornerRadius = reader.GetInt32(23),
+                    AutoHideTitleBar = reader.GetBoolean(24),
+                    ShowActionButtonMouseOver = reader.GetBoolean(25),
+                    HideActionNameAfterIcon = reader.GetBoolean(26),
+                    ShowActionIconShadow = reader.GetBoolean(27),
+                    EnablePreview = reader.GetBoolean(28)
+                });
             }
-            transaction.Commit(); // 提交事务
-            return appearances; // 返回所有 Appearance 数据
+            transaction.Commit();
+            return appearances;
         }
 
         /// <summary>
