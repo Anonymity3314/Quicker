@@ -23,7 +23,7 @@
         <Button x:Name="CloseButton" Content="关闭(C)" Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,181,33,0" VerticalAlignment="Top" Width="69" Click="CloseButton_Click" Height="28"/>
         <TextBlock x:Name="VersionTextBlock" Text="当前版本：" HorizontalAlignment="Left" Margin="10,45,0,0" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" Margin="25,95,0,0" TextWrapping="Wrap" Text="最新版本：" VerticalAlignment="Top"/>
-        <TextBlock x:Name="LatestVersionTextBlock1" MouseDown="LatestVersionTextBlock_MouseDown" Cursor="Hand" HorizontalAlignment="Left" Margin="85,92,0,0" VerticalAlignment="Top" FontWeight="Bold"  Foreground="#3180F3" FontSize="16"/>
+        <TextBlock x:Name="LatestVersionTextBlock1" ToolTip="查看此版本详细信息" MouseDown="LatestVersionTextBlock_MouseDown" Cursor="Hand" HorizontalAlignment="Left" Margin="85,92,0,0" VerticalAlignment="Top" FontWeight="Bold"  Foreground="#3180F3" FontSize="16"/>
         <ScrollViewer Margin="20,218,20,20" Background="#E0E0E0" BorderBrush="DarkGray" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Hidden">
             <Grid Margin="0">
                 <TextBlock TextWrapping="Wrap" Text="版本更新历史" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="53,31,0,0"/>

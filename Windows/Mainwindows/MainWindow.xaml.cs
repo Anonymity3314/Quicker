@@ -232,8 +232,7 @@ namespace Quicker.Windows.MainWindows
         // 关闭功能面板
         private void CloseMainWindow(object sender, EventArgs e)
         {
-            buttonManager.isClosing = true; // 设置关闭标志
-            this.Close(); // 关闭窗口
+            MainWindow_Deactivated(null, null); // 点击关闭视为失去焦点
         }
 
         // 失去焦点时关闭功能面板

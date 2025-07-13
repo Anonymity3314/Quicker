@@ -20,13 +20,11 @@
     Loaded="MainWindow_Loaded"
 >
     <Border CornerRadius="5" Width="310.4" Height="596">
+        <!-- 窗口阴影 -->
+        <Border.Effect>
+            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
+        </Border.Effect>
         <Grid x:Name="MainGrid">
-            <!-- 窗口阴影 -->
-            <Rectangle Fill="White" Margin="5,7">
-                <Rectangle.Effect>
-                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
-                </Rectangle.Effect>
-            </Rectangle>
             <!-- 标题栏 -->
             <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3">
                 <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
@@ -84,7 +82,9 @@
                         </Button.ToolTip>
                         <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
-                    <Button Style="{StaticResource CloseMainWindowButton}" Click="CloseMainWindow" ToolTip="关闭面板窗口" Margin="283,0,0,0" Drop="CloseMainWindowButton_Drop"/>
+                    <Button Style="{StaticResource Task}" Click="CloseMainWindow" ToolTip="关闭面板窗口" Margin="283,0,0,0" Drop="CloseMainWindowButton_Drop">
+                        <Image x:Name="Close" Source="/Resources/Images/CloseWindow.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
                 </Grid>
             </Border>
             <!-- 全局动作 -->
@@ -105,11 +105,11 @@
                 </UniformGrid>
             </Grid>
             <!-- 功能栏 -->
-            <Grid VerticalAlignment="Top" Height="25" Background="#F3F3F3" Margin="0,261,0,0" >
+            <Grid VerticalAlignment="Top" Height="25" Background="{x:Null}" Margin="0,261,0,0" >
                 <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF8D8D8D" TextAlignment="Center" MouseDown="CommonTextBlock_MouseDown" Margin="10,0" Cursor="Hand"/>
                 <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                 <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="253,0,0,0">
+                <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" CornerRadius="5" Padding="1" Width="24" Height="24" Margin="253,0,0,0">
                     <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" Click="LockCommonActionPage" MouseRightButtonDown="OpenSelectActionPageMenu">
                         <Button.ToolTip>
                             <ToolTip>

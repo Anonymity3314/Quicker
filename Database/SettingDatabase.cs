@@ -9,7 +9,7 @@ namespace Quicker.Database
     public static class SettingDatabase
     {
         // 配置项默认说明：
-        /* [Convention]
+        /* [Convention] 常规
          * Version: 软件的当前版本号，默认为程序版本。
          * AutoStart: 是否开机自启，默认为false（关闭）。
          * ShowNotification: 是否显示系统通知，默认为true（开启）。
@@ -22,7 +22,7 @@ namespace Quicker.Database
          * LastPage: 最后打开的页面ID，默认为11。
          * EnableMemoryOptimization: 是否启用内存优化，默认为true（开启）。
          */
-        /* [OpenMainWindow]
+        /* [OpenMainWindow] 弹出面板
          * OpenMainWindowByMiddleMouseClick: 按中键点击打开设置窗口，默认为false（关闭）。
          * OpenMainWindowByX1MouseClick: 按X1键点击打开设置窗口，默认为false（关闭）。
          * OpenMainWindowByX2MouseClick: 按X2键点击打开设置窗口，默认为false（关闭）。
@@ -34,29 +34,29 @@ namespace Quicker.Database
          * OpenMainWindowByCtrl: 按Ctrl打开设置窗口，默认为true（开启）。
          * WindowStartupLocation: 设置窗口启动位置，默认为2（可能代表屏幕中央或其他位置）。
          */
-        /* [Blacklist]
+        /* [Blacklist] 黑名单
          * IsFullScreenDisabled: 是否禁用全屏功能，默认为false（不禁用）。
          * IsBlacklistEnabledForExtendedHotkey: 扩展快捷键是否启用黑名单，默认为false（不启用）。
          */
-        /* [BlacklistApplication]
+        /* [BlacklistApplication] 黑名单列表
          * ApplicationName: 黑名单列表显示的文字，可以是文件夹路径，也可以是应用程序名称。
          * ProcessName: 确切的应用程序进程名称，应用程序的可执行文件名称。
          * IsInBlacklist: 此项用于标识该应用程序是否在黑名单中。
          * IsFolder: 此项用于标识ApplicationName是否为文件夹路径。
          */
-        /* [Appearance]
+        /* [Appearance] 外观
          * ButtonSize: 按钮大小，默认为77.6。
          * ButtonGap: 按钮间隙，默认为0.2。
          * BorderWidth: 边框宽度，默认为0.0。
          * ButtonCornerRadius: 按钮圆角，默认为0.0。
          *
-         * BackgroundColor: 背景颜色，默认为#C5CCCCCC。
+         * BackgroundColor: 背景颜色，默认为#FFF3F3F3。
          * ToolbarColor: 工具栏颜色，默认为#00999999。
          * ToolbarIconColor: 工具栏图标颜色，默认为#FF666666。
          * ActionButtonColor: 动作按钮颜色，默认为#FFFFFFFF。
-         * ActionButtonMouseOverColor: 动作按钮鼠标悬停颜色，默认为#59B2F2FF。
-         * BlankButtonColor: 空白按钮颜色，默认为#32C8C8C8。
-         * BlankButtonMouseOverColor: 空白按钮鼠标悬停颜色，默认为#05000000。
+         * ActionButtonMouseOverColor: 动作按钮鼠标悬停颜色，默认为#FFBEE6FD。
+         * BlankButtonColor: 空白按钮颜色，默认为#FFF3F3F3。
+         * BlankButtonMouseOverColor: 空白按钮鼠标悬停颜色，默认为#FFEAEAEA。
          * ButtonTextColor: 按钮文字颜色，默认为#FF000000。
          * ActionIconColor: 动作图标颜色，默认为#FF696969。
          * TriggerKeyTextColor: 触发键文字颜色，默认为#D0FF8C00。
@@ -212,7 +212,7 @@ namespace Quicker.Database
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#C5CCCCCC", "#00999999", "#FF666666", "#FFFFFFFF", "#59B2F2FF", "#32C8C8C8", "#05000000", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 1, false, false, false, false, false); // 使用参数元组封装默认值
+            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#00999999", "#FF666666", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 1, false, false, false, false, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@ButtonSize"] = defaults.Item1, // 按钮大小

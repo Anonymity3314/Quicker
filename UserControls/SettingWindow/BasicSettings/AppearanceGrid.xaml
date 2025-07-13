@@ -11,7 +11,7 @@
     Background="White"
     d:DesignHeight="1200"
     d:DesignWidth="982"
-    
+
     Unloaded="AppearanceGrid_Unloaded"
 >
     <!-- d:DesignHeight="870" -->
@@ -20,9 +20,9 @@
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
         <Style x:Key="PreviewButtonStyle" TargetType="Button">
             <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Background" Value="#F3F3F3"/>
             <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="Content" Value="{x:Null}"/>
             <Setter Property="AllowDrop" Value="True"/>
             <Setter Property="Tag" Value="{x:Null}"/>
@@ -41,22 +41,22 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FFEAEAEA"/>
+                                <Setter Property="Background" Value="{Binding ElementName=BlankButtonMouseOverColorButton, Path=Background}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!-- 预览用的SpecialButton1样式 -->
         <Style x:Key="PreviewSpecialButton1Style" TargetType="Button">
             <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-            <Setter Property="Background" Value="#F3F3F3"/>
-            <Setter Property="AllowDrop" Value="True"/>
+            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="Content" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="True"/>
             <Setter Property="Tag" Value="{x:Null}"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -72,20 +72,20 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FFEAEAEA"/>
+                                <Setter Property="Background" Value="{Binding ElementName=BlankButtonMouseOverColorButton, Path=Background}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <!-- 预览用的SpecialButton2样式 -->
         <Style x:Key="PreviewSpecialButton2Style" TargetType="Button">
             <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-            <Setter Property="Background" Value="#F3F3F3"/>
+            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="AllowDrop" Value="True"/>
             <Setter Property="Content" Value="{x:Null}"/>
             <Setter Property="Tag" Value="{x:Null}"/>
@@ -103,7 +103,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FFEAEAEA"/>
+                                <Setter Property="Background" Value="{Binding ElementName=BlankButtonMouseOverColorButton, Path=Background}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -135,11 +135,11 @@
                         <Label Content="尺寸" Margin="10,50,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 尺寸-按钮大小 -->
                         <Label Content="按钮大小：" Margin="10,90,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="77.6"/>
                         <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="261,92,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮间隙 -->
                         <Label Content="按钮间隙：" Margin="10,125,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" VerticalAlignment="Top" Minimum="-0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" Value="0.2" VerticalAlignment="Top" Minimum="-0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
                         <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,126,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-边框宽度 -->
                         <Label Content="边框宽度：" Margin="10,160,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -154,7 +154,7 @@
                         <Label Content="颜色" Margin="10,240,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 颜色-背景 -->
                         <Label Content="背景：" Margin="10,276,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" Background="#F3F3F3" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BackgroundColorButton" Path="Background"/>
@@ -199,7 +199,7 @@
                         </Button>
                         <!-- 颜色-空白按钮 -->
                         <Label Content="空白按钮：" Margin="10,406,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,409,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" Background="#FFF3F3F3" HorizontalAlignment="Left" Margin="167,409,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BlankButtonColorButton" Path="Background"/>
@@ -208,7 +208,7 @@
                         </Button>
                         <!-- 颜色-空白按钮鼠标悬浮 -->
                         <Label Content="空白按钮鼠标悬浮：" Margin="10,432,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,435,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" Background="#FFEAEAEA" HorizontalAlignment="Left" Margin="167,435,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BlankButtonMouseOverColorButton" Path="Background"/>
@@ -336,19 +336,18 @@
             <Button x:Name="WheelAppearanceSettingsButton" Grid.Column="1" Content="轮盘外观设置" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="236,50,0,0" VerticalAlignment="Top" Width="122"/>
             <Button x:Name="SharedSavedAppearanceButton" Grid.Column="1" Content="已分享或保存的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="236,20,0,0" VerticalAlignment="Top" Width="122"/>
             <CheckBox x:Name="EnablePreviewCheckBox" Grid.Column="1" Content="开启预览" ToolTip="查看应用设置后的功能面板外观" HorizontalAlignment="Left" Margin="46,79,0,0" VerticalAlignment="Top" FontSize="14" Click="EnablePreviewCheckBox_Click" Panel.ZIndex="1"/>
+            <Label Grid.Column="1" Content="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="127,76,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4"/>
 
             <!-- 设置预览 -->
             <ScrollViewer x:Name="AppearancePreviewScrollViewer" Grid.Column="1" Margin="10,80,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Width="385" Height="639">
                 <Border CornerRadius="5" Width="311" Height="596">
+                    <!-- 窗口阴影 -->
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Border.Effect>
                     <Grid x:Name="MainGrid">
-                        <!-- 窗口阴影 -->
-                        <Rectangle Fill="White" Margin="5,7">
-                            <Rectangle.Effect>
-                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-                            </Rectangle.Effect>
-                        </Rectangle>
                         <!-- 标题栏 -->
-                        <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3">
+                        <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="{Binding ElementName=BackgroundColorButton, Path=Background}">
                             <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
                                 <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#A1A1A1" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                                 <Button Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
@@ -363,7 +362,9 @@
                                 <Button Style="{StaticResource Task}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
                                     <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Button>
-                                <Button Style="{StaticResource CloseMainWindowButton}" Margin="283,0,0,0"/>
+                                <Button Style="{StaticResource Task}" Margin="283,0,0,0">
+                                    <Image x:Name="Close" Source="/Resources/Images/CloseWindow.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
                             </Grid>
                         </Border>
                         <!-- 全局动作 -->
@@ -381,22 +382,16 @@
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource PreviewSpecialButton1Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource PreviewSpecialButton2Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                             </UniformGrid>
                         </Grid>
                         <!-- 功能栏 -->
-                        <Grid VerticalAlignment="Top" Height="25" Background="#F3F3F3" Margin="0,261,0,0" >
+                        <Grid VerticalAlignment="Top" Height="25" Background="{x:Null}" Margin="0,261,0,0" >
                             <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF8D8D8D" TextAlignment="Center" Margin="10,0"/>
                             <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                             <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                            <Border HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3" Width="24" Height="24" Margin="253,0,0,0">
-                                <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}">
-                                    <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Button>
-                            </Border>
+                            <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="253,0,0,0">
+                                <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
                         </Grid>
                         <!-- 通用动作 -->
                         <Grid x:Name="CommonGrid" Height="310.4" Width="310.4" Margin="0,286,0,0">

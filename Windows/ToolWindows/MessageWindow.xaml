@@ -17,11 +17,9 @@
 >
     <Grid Height="171" Width="338" MouseDown="Grid_MouseDown">
         <!-- 窗口阴影 -->
-        <Rectangle Fill="White" Margin="5,7">
-            <Rectangle.Effect>
-                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="25" RenderingBias="Quality" ShadowDepth="1"/>
-            </Rectangle.Effect>
-        </Rectangle>
+        <Grid.Effect>
+            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="25" RenderingBias="Quality" ShadowDepth="1"/>
+        </Grid.Effect>
         <Border CornerRadius="8" Background="#FFFFFF" BorderThickness="1" BorderBrush="DarkGray">
             <Grid Background="Transparent">
                 <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Height="28">

@@ -17,7 +17,7 @@ namespace Quicker.Windows.MainWindows
     {
         #region 字段
 
-        private const string _releaseUrl = "https://github.com/Anonymity3314/Quicker/releases"; // 发布页面地址
+        private const string _releaseUrl = "https://github.com/Anonymity3314/Quicker/releases/"; // 发布页面地址
         private const string _downLoadPath = "C:\\Users\\LENOVO\\Downloads"; // 下载路径
         private string _downloadUrlWithNet; // 下载地址
         private string _downloadUrl; // 下载地址
@@ -49,16 +49,31 @@ namespace Quicker.Windows.MainWindows
             Close(); // 关闭窗口
         }
 
-        // 点击按钮下载
+        // 下载不内置.NET框架的版本
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectDownloadLocation();
+            var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
+            string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
+
+            var downloadWindow = DownloadWindow.Create(_downloadUrl, destinationPath); // 创建下载窗口
+            downloadWindow.Show(); // 显示下载窗口
+        }
+
+        // 下载内置.NET框架的版本
+        private void DownloadWithFrameButton_Click(object sender, RoutedEventArgs e)
+        {
+            var fileName = Path.GetFileName(new Uri(_downloadUrlWithNet).AbsolutePath); // 获取文件名
+            string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
+
+            var downloadWindow = DownloadWindow.Create(_downloadUrlWithNet, destinationPath); // 创建下载窗口
+            downloadWindow.Show(); // 显示下载窗口
         }
 
         // 前往下载地址查看详细信息
         private void LatestVersionTextBlock_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            OpenReleaseWebPage();
+            using var actionManager = new ActionManager(); // 创建动作管理器
+            actionManager.LaunchDefaultBrowser(_releaseUrl + LatestVersionTextBlock1.Text); // 查看详细信息
         }
 
         // 窗口关闭清理资源
@@ -149,33 +164,6 @@ namespace Quicker.Windows.MainWindows
             // 调整UI元素高度
             UpdateInfoGrid.Height += changelogLineCount * 18; // 设置更新内容的高度
             UpdateInfoBorder.Height += changelogLineCount * 18; // 设置更新内容的高度
-        }
-
-        // 下载不内置.NET框架的版本
-        private void SelectDownloadLocation()
-        {
-            var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
-            string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
-
-            var downloadWindow = DownloadWindow.Create(_downloadUrl, destinationPath); // 创建下载窗口
-            downloadWindow.Show(); // 显示下载窗口
-        }
-
-        // 下载内置.NET框架的版本
-        private void DownloadWithFrameButton_Click(object sender, RoutedEventArgs e)
-        {
-            var fileName = Path.GetFileName(new Uri(_downloadUrlWithNet).AbsolutePath); // 获取文件名
-            string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
-
-            var downloadWindow = DownloadWindow.Create(_downloadUrlWithNet, destinationPath); // 创建下载窗口
-            downloadWindow.Show(); // 显示下载窗口
-        }
-
-        // 打开发布页面
-        private void OpenReleaseWebPage()
-        {
-            using var actionManager = new ActionManager(); // 创建动作管理器
-            actionManager.LaunchDefaultBrowser(_releaseUrl); // 打开下载地址
         }
 
         #endregion

@@ -21,11 +21,9 @@
 >
     <Grid x:Name="MainGrid" Width="178" Height="221" Margin="9,8,571,211">
         <!-- 窗口阴影 -->
-        <Rectangle Fill="White" Margin="5,7">
-            <Rectangle.Effect>
-                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-            </Rectangle.Effect>
-        </Rectangle>
+        <Grid.Effect>
+            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+        </Grid.Effect>
         <Border CornerRadius="3" Background="White">
             <StackPanel>
                 <Button x:Name="PasteActionButton" Click="PasteActionButton_Click" Style="{StaticResource MenuButton}" Margin="0,3,0,3">
