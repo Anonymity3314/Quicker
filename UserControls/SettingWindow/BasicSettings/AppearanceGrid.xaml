@@ -169,8 +169,8 @@
                         <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,648,0,0" VerticalAlignment="Top" Width="120"/>
                         <!-- 字体-字体大小 -->
                         <Label Content="字体大小：" Margin="10,684,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,689,0,0" VerticalAlignment="Top" Width="120"/>
-                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,685,0,0" VerticalAlignment="Top" Width="80"/>
+                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,689,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True"/>
+                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,685,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F0}'}"/>
                         <!-- 字体-字体粗细 -->
                         <Label Content="字体粗细：" Margin="10,724,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <TextBox x:Name="FontWeightTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="107,725,0,0" VerticalAlignment="Top" Width="120"/>

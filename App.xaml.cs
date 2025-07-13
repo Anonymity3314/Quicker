@@ -245,7 +245,69 @@ namespace Quicker
         /// <returns> 是否可以处理钩子 </returns>
         private bool CanProcessHook()
         {
-            return !IsBannedFormQuicker() && !FullScreenDisable(); // 如果禁用Quicker或全屏禁用Quicker，返回
+            return !IsBannedFormQuicker() && !FullScreenDisable() && !IsMouseOnTestButton(); // 如果禁用Quicker或全屏禁用Quicker或鼠标在测试按键区域上，返回
+        }
+
+        /// <summary>
+        /// 检查鼠标是否在测试按键区域上
+        /// </summary>
+        /// <returns> 鼠标是否在测试按键区域上 </returns>
+        private bool IsMouseOnTestButton()
+        {
+            bool isMouseOnTestButton = false;
+            try
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    var mousePosition = System.Windows.Forms.Cursor.Position; // 获取当前鼠标位置
+                    var settingWindows = Application.Current.Windows.OfType<SettingWindow>(); // 检查是否有设置窗口打开
+                    foreach (var settingWindow in settingWindows)
+                    {
+                        if (settingWindow.IsVisible)
+                        {
+                            var testButton = FindButtonByName(settingWindow, "TestButton"); // 递归查找名为 "TestButton" 的按钮
+                            if (testButton != null)
+                            {
+                               
+                                var buttonPoint = testButton.PointFromScreen(new System.Windows.Point(mousePosition.X, mousePosition.Y)); // 将屏幕坐标转换为按钮坐标
+                                if (buttonPoint.X >= 0 && buttonPoint.X <= testButton.ActualWidth &&
+                                    buttonPoint.Y >= 0 && buttonPoint.Y <= testButton.ActualHeight) // 检查鼠标是否在按钮范围内
+                                {
+                                    isMouseOnTestButton = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            catch { }
+            return isMouseOnTestButton;
+        }
+
+        /// <summary>
+        /// 递归查找指定名称的按钮
+        /// </summary>
+        /// <param name="parent">父元素</param>
+        /// <param name="buttonName">按钮名称</param>
+        /// <returns>找到的按钮</returns>
+        private System.Windows.Controls.Button? FindButtonByName(System.Windows.DependencyObject parent, string buttonName)
+        {
+            for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
+                if (child is System.Windows.Controls.Button button && button.Name == buttonName)
+                {
+                    return button;
+                }
+
+                var result = FindButtonByName(child, buttonName);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
         }
 
         /// <summary>
