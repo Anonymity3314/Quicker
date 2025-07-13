@@ -1,13 +1,13 @@
-﻿using Quicker.Database;
-using Quicker.Managers;
-using Quicker.UserControls;
-using Quicker.Windows.MainWindows;
-using System.Globalization;
-using System.Windows;
+﻿using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
+using Quicker.UserControls;
+using System.Globalization;
+using System.Windows.Data;
+using Quicker.Database;
+using Quicker.Managers;
 using System.Xml.Linq;
+using System.Windows;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -155,6 +155,13 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 释放资源
         private void AppearanceGrid_Unloaded(object sender, RoutedEventArgs e)
         {
+            foreach (Button btn in ViewGlobalUniformGrid.Children.OfType<Button>())
+            {
+                btn.MouseEnter -= PreviewButton_MouseEnter;
+                btn.MouseLeave -= PreviewButton_MouseLeave;
+            }
+            ViewGlobalUniformGrid.Children.Clear(); // 解绑全局预览按钮的事件
+
             settingManager = null; // 释放设置管理器
             weakSettingWindow = null; // 释放弱引用设置窗口
             _currentBrush = null; // 释放当前选中的颜色画刷
@@ -171,6 +178,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             ViewGlobalUniformGrid.Children.Clear(); // 清空现有的预览按钮
             var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据（第一页，即pageIndex=0）
+            double buttonSize = ButtonSizeSlider.Value; // 获取当前按钮大小
             for (int row = 0; row < 3; row++) // 为每个按钮位置创建预览按钮
             {
                 for (int col = 0; col < 4; col++)
@@ -180,14 +188,35 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     Button previewButton = new Button
                     {
                         Style = FindResource("PreviewButtonStyle") as Style,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        MinHeight = buttonSize,
+                        MaxHeight = buttonSize,
+                        MinWidth = buttonSize,
+                        MaxWidth = buttonSize,
+                        Height = buttonSize,
+                        Width = buttonSize,
                         Name = buttonName
-                    }; // 创建预览按钮
-                    ViewGlobalUniformGrid.Children.Add(previewButton);
-                    var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex); // 查找对应的按钮数据
+                    };
+
+                    var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex);
                     if (buttonData != null)
                     {
-                        buttonManager.RefreshButtonDisplay(previewButton, buttonData, 60, false); // 使用ButtonManager刷新按钮显示
+                        previewButton.Tag = buttonData;
+                        previewButton.Background = ActionButtonColorButton.Background;
+                        buttonManager.RefreshButtonDisplay(previewButton, buttonData, (int)buttonSize, false);
                     }
+                    else
+                    {
+                        previewButton.Tag = null;
+                        previewButton.Background = BlankButtonColorButton.Background;
+                    }
+
+                    // 悬浮事件
+                    previewButton.MouseEnter += PreviewButton_MouseEnter;
+                    previewButton.MouseLeave += PreviewButton_MouseLeave;
+
+                    ViewGlobalUniformGrid.Children.Add(previewButton);
                 }
             }
         }
@@ -198,8 +227,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             AppearancePreviewScrollViewer.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
             if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
             {
-                //LoadGlobalButtonsForPreview();
+                LoadGlobalButtonsForPreview();
             }
+        }
+
+        // 鼠标移入 Button 切换 Background
+        private void PreviewButton_MouseEnter(object sender, EventArgs e)
+        {
+            var btn = sender as Button; // 获取按钮
+            btn.Background = btn.Tag == null
+                ? BlankButtonMouseOverColorButton.Background
+                : ActionButtonMouseOverColorButton.Background; // 绑定颜色选择
+        }
+
+        // 鼠标移入 Button 还原 Background
+        private void PreviewButton_MouseLeave(object sender, EventArgs e)
+        {
+            var btn = sender as Button; // 获取按钮
+            btn.Background = btn.Tag == null
+                ? BlankButtonColorButton.Background
+                : ActionButtonColorButton.Background; // 绑定颜色选择
         }
     }
 
@@ -223,5 +270,39 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             return 0.0;
         }
+    }
+
+    public class GridHeightConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            // values[0]: 按钮大小, values[1]: 按钮间隙, parameter: 行数
+            if (values.Length >= 2 && double.TryParse(values[0]?.ToString(), out double btnSize) && double.TryParse(values[1]?.ToString(), out double gap))
+            {
+                int rows = 3; // 默认3行
+                if (parameter != null && int.TryParse(parameter.ToString(), out int pRows))
+                    rows = pRows;
+                return btnSize * rows + gap * (rows - 1);
+            }
+            return 0;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class GridWidthConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            // values[0]: 按钮大小, values[1]: 按钮间隙, parameter: 列数
+            if (values.Length >= 2 && double.TryParse(values[0]?.ToString(), out double btnSize) && double.TryParse(values[1]?.ToString(), out double gap))
+            {
+                int cols = 4; // 默认4列
+                if (parameter != null && int.TryParse(parameter.ToString(), out int pCols))
+                    cols = pCols;
+                return btnSize * cols + gap * (cols - 1);
+            }
+            return 0;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

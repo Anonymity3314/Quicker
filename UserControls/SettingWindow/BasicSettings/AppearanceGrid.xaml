@@ -18,6 +18,8 @@
     <UserControl.Resources>
         <!-- ThicknessConverter 用于 BorderThickness 绑定 -->
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
+        <local:GridHeightConverter x:Key="GridHeightConverter"/>
+        <local:GridWidthConverter x:Key="GridWidthConverter"/>
         <Style x:Key="PreviewButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -308,7 +310,19 @@
                             </Grid>
                         </Border>
                         <!-- 全局动作 -->
-                        <Grid x:Name="GlobalGrid" VerticalAlignment="Top" Height="232.8" Width="310.4" Margin="0,28,0,0">
+                        <Grid x:Name="GlobalGrid" VerticalAlignment="Top" Margin="0,28,0,0">
+                            <Grid.Height>
+                                <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="3">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Height>
+                            <Grid.Width>
+                                <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Width>
                             <UniformGrid x:Name="ViewGlobalUniformGrid" Rows="3" Columns="4">
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
@@ -334,7 +348,19 @@
                             </Button>
                         </Grid>
                         <!-- 通用动作 -->
-                        <Grid x:Name="CommonGrid" Height="310.4" Width="310.4" Margin="0,286,0,0">
+                        <Grid x:Name="CommonGrid" Margin="0,286,0,0">
+                            <Grid.Height>
+                                <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="4">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Height>
+                            <Grid.Width>
+                                <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Width>
                             <UniformGrid x:Name="ViewCommonUniformGrid" Rows="4" Columns="4">
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>

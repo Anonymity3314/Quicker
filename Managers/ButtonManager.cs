@@ -358,7 +358,7 @@ namespace Quicker.Managers
                 return; // 直接返回
             }
 
-            UpdateButtonProperties(button, buttonInformation); // 更新按钮属性
+            button.Tag = buttonInformation; // 设置按钮标签
             var grid = CreateButtonGrid(buttonInformation, maxWidth, isMainWindow); // 创建按钮网格
             button.Content = grid; // 设置按钮内容
             LoadActionTooltip(button, buttonInformation); // 加载动作提示
@@ -374,17 +374,6 @@ namespace Quicker.Managers
             button.ToolTip = null; // 清空提示文本
             button.Tag = null; // 清空标签
             button.Background = NoActionBrush; // 设置背景色
-        }
-
-        /// <summary>
-        /// 更新按钮属性
-        /// </summary>
-        /// <param name="button"> 目标按钮 </param>
-        /// <param name="buttonInformation"> 按钮数据 </param>
-        private void UpdateButtonProperties(Button button, ButtonData buttonInformation)
-        {
-            button.Tag = buttonInformation; // 设置按钮标签
-            button.Background = HasActionBrush; // 设置背景色
         }
 
         /// <summary>
@@ -453,13 +442,18 @@ namespace Quicker.Managers
         /// <returns> 图像对象 </returns>
         private Image LoadActionIcon(ButtonData buttonInformation, bool isMainWindow)
         {
+            double buttonSize = isMainWindow ? 77.6 : 65;
+            double imageSize = buttonSize / 2.0;
             Image image = new()
             {
-                Width = isMainWindow ? 36 : 30, // 设置宽度
-                Height = isMainWindow ? 36 : 30, // 设置高度
-                Source = new BitmapImage(new Uri(buttonInformation.ImagePath)) // 设置图像源
-            }; // 创建图像对象
-            return image; // 返回图像对象
+                Width = imageSize,
+                Height = imageSize,
+                Stretch = Stretch.Uniform,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Source = new BitmapImage(new Uri(buttonInformation.ImagePath))
+            };
+            return image;
         }
 
         /// <summary>
