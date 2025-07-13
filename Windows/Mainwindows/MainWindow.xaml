@@ -20,11 +20,13 @@
     Loaded="MainWindow_Loaded"
 >
     <Border CornerRadius="5" Width="310.4" Height="596">
-        <!-- 窗口阴影 -->
-        <Border.Effect>
-            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
-        </Border.Effect>
         <Grid x:Name="MainGrid">
+            <!-- 窗口阴影 -->
+            <Rectangle Fill="White" Margin="5,7">
+                <Rectangle.Effect>
+                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
+                </Rectangle.Effect>
+            </Rectangle>
             <!-- 标题栏 -->
             <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="#F3F3F3">
                 <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
@@ -138,10 +140,44 @@
                     <Button Style="{StaticResource Button}"/>
                     <Button Style="{StaticResource Button}"/>
                     <Button Style="{StaticResource Button}"/>
-                    <Button Style="{StaticResource SpecialButton1}"/>
+                    <Button Style="{StaticResource Button}">
+                        <Button.Clip>
+                            <PathGeometry>
+                                <PathFigure StartPoint="0,0" IsClosed="True">
+                                    <!-- 上边 -->
+                                    <LineSegment Point="77.6,0"/>
+                                    <!-- 右边 -->
+                                    <LineSegment Point="77.6,77.6"/>
+                                    <!-- 下边（右下到左下圆角起点） -->
+                                    <LineSegment Point="5,77.6"/>
+                                    <!-- 左下角圆弧 -->
+                                    <ArcSegment Point="0,72.6" Size="5,5" SweepDirection="Clockwise" IsLargeArc="False"/>
+                                    <!-- 左边 -->
+                                    <LineSegment Point="0,0"/>
+                                </PathFigure>
+                            </PathGeometry>
+                        </Button.Clip>
+                    </Button>
                     <Button Style="{StaticResource Button}"/>
                     <Button Style="{StaticResource Button}"/>
-                    <Button Style="{StaticResource SpecialButton2}"/>
+                    <Button Style="{StaticResource Button}">
+                        <Button.Clip>
+                            <PathGeometry>
+                                <PathFigure StartPoint="0,0" IsClosed="True">
+                                    <!-- 上边 -->
+                                    <LineSegment Point="77.6,0"/>
+                                    <!-- 右边（右上到右下圆角起点） -->
+                                    <LineSegment Point="77.6,72.6"/>
+                                    <!-- 右下角圆弧 -->
+                                    <ArcSegment Point="72.6,77.6" Size="5,5" SweepDirection="Clockwise" IsLargeArc="False"/>
+                                    <!-- 下边 -->
+                                    <LineSegment Point="0,77.6"/>
+                                    <!-- 左边 -->
+                                    <LineSegment Point="0,0"/>
+                                </PathFigure>
+                            </PathGeometry>
+                        </Button.Clip>
+                    </Button>
                 </UniformGrid>
             </Grid>
         </Grid>

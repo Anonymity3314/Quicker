@@ -19,10 +19,10 @@
         <!-- ThicknessConverter 用于 BorderThickness 绑定 -->
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
         <Style x:Key="PreviewButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="Content" Value="{x:Null}"/>
             <Setter Property="AllowDrop" Value="True"/>
             <Setter Property="Tag" Value="{x:Null}"/>
@@ -36,68 +36,6 @@
                                 BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"/>
-                            </Border>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{Binding ElementName=BlankButtonMouseOverColorButton, Path=Background}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- 预览用的SpecialButton1样式 -->
-        <Style x:Key="PreviewSpecialButton1Style" TargetType="Button">
-            <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
-            <Setter Property="Content" Value="{x:Null}"/>
-            <Setter Property="AllowDrop" Value="True"/>
-            <Setter Property="Tag" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Border x:Name="border" 
-                                    BorderBrush="{TemplateBinding BorderBrush}" 
-                                    BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" 
-                                    Background="{TemplateBinding Background}" 
-                                    CornerRadius="0,0,0,5">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"/>
-                            </Border>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{Binding ElementName=BlankButtonMouseOverColorButton, Path=Background}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- 预览用的SpecialButton2样式 -->
-        <Style x:Key="PreviewSpecialButton2Style" TargetType="Button">
-            <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-            <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
-            <Setter Property="AllowDrop" Value="True"/>
-            <Setter Property="Content" Value="{x:Null}"/>
-            <Setter Property="Tag" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Border x:Name="border" 
-                                    BorderBrush="{TemplateBinding BorderBrush}" 
-                                    BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" 
-                                    Background="{TemplateBinding Background}" 
-                                    CornerRadius="0,0,5,0">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"/>
                             </Border>
                         </Grid>
@@ -313,7 +251,7 @@
 
             <!-- 其他 -->
             <Button x:Name="PresetStyleButton" Grid.Column="1" Content="预置风格..." Foreground="#FF00B3FF" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,20,0,0" VerticalAlignment="Top" Width="122" Click="PresetStyleButton_Click"/>
-            <Popup x:Name="PresetStylePopup" PopupAnimation="Fade" Width="154" Height="135" PlacementTarget="{Binding ElementName=PresetStyleButton}" AllowsTransparency="True" StaysOpen="False">
+            <Popup x:Name="PresetStylePopup" PopupAnimation="Fade" Width="154" Height="140" PlacementTarget="{Binding ElementName=PresetStyleButton}" AllowsTransparency="True" StaysOpen="False">
                 <Grid>
                     <!-- 阴影 -->
                     <Rectangle Fill="White" Margin="3,5">
@@ -339,13 +277,15 @@
             <Label Grid.Column="1" Content="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="127,76,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4"/>
 
             <!-- 设置预览 -->
-            <ScrollViewer x:Name="AppearancePreviewScrollViewer" Grid.Column="1" Margin="10,80,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Width="385" Height="639">
+            <ScrollViewer x:Name="AppearancePreviewScrollViewer" Grid.Column="1" Margin="10,90,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Width="385" Height="639">
                 <Border CornerRadius="5" Width="311" Height="596">
-                    <!-- 窗口阴影 -->
-                    <Border.Effect>
-                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-                    </Border.Effect>
                     <Grid x:Name="MainGrid">
+                        <!-- 窗口阴影 -->
+                        <Rectangle Fill="White" Margin="5,7">
+                            <Rectangle.Effect>
+                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Rectangle.Effect>
+                        </Rectangle>
                         <!-- 标题栏 -->
                         <Border BorderThickness="0" CornerRadius="5" Padding="1" Background="{Binding ElementName=BackgroundColorButton, Path=Background}">
                             <Grid VerticalAlignment="Top" Height="27" Background="{x:Null}">
@@ -408,10 +348,44 @@
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource PreviewSpecialButton1Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}">
+                                    <Button.Clip>
+                                        <PathGeometry>
+                                            <PathFigure StartPoint="0,0" IsClosed="True">
+                                                <!-- 上边 -->
+                                                <LineSegment Point="77.6,0"/>
+                                                <!-- 右边 -->
+                                                <LineSegment Point="77.6,77.6"/>
+                                                <!-- 下边（右下到左下圆角起点） -->
+                                                <LineSegment Point="5,77.6"/>
+                                                <!-- 左下角圆弧 -->
+                                                <ArcSegment Point="0,72.6" Size="5,5" SweepDirection="Clockwise" IsLargeArc="False"/>
+                                                <!-- 左边 -->
+                                                <LineSegment Point="0,0"/>
+                                            </PathFigure>
+                                        </PathGeometry>
+                                    </Button.Clip>
+                                </Button>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource PreviewSpecialButton2Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}">
+                                    <Button.Clip>
+                                        <PathGeometry>
+                                            <PathFigure StartPoint="0,0" IsClosed="True">
+                                                <!-- 上边 -->
+                                                <LineSegment Point="77.6,0"/>
+                                                <!-- 右边（右上到右下圆角起点） -->
+                                                <LineSegment Point="77.6,72.6"/>
+                                                <!-- 右下角圆弧 -->
+                                                <ArcSegment Point="72.6,77.6" Size="5,5" SweepDirection="Clockwise" IsLargeArc="False"/>
+                                                <!-- 下边 -->
+                                                <LineSegment Point="0,77.6"/>
+                                                <!-- 左边 -->
+                                                <LineSegment Point="0,0"/>
+                                            </PathFigure>
+                                        </PathGeometry>
+                                    </Button.Clip>
+                                </Button>
                             </UniformGrid>
                         </Grid>
                     </Grid>

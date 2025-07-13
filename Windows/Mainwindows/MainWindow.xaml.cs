@@ -630,7 +630,7 @@ namespace Quicker.Windows.MainWindows
             if (targetUniformGridIndex == sceneData.SceneCount || targetUniformGridIndex < 0) // 如果目标UniformGrid编号超出范围
             {
                 if (Convention.LoopPageFlipping) // 如果循环翻页
-                    targetUniformGridIndex = isNext ? 0 : sceneData.SceneCount; // 循环到第一页或最后一页
+                    targetUniformGridIndex = isNext ? 0 : sceneData.SceneCount - 1; // 循环到第一页或最后一页
                 else return; // 如果不循环翻页，直接返回
             }
 
@@ -711,13 +711,92 @@ namespace Quicker.Windows.MainWindows
         /// <param name="row">Button 的行</param>
         /// <param name="col">Button的列</param>
         /// <returns>生成的 Button</returns>
-        private Button CreateButton(string name, Style style,int row = 0, int col = 0)
+        private Button CreateButton(string name, Style style, int row = 0, int col = 0)
         {
             Button button = new Button { Name = name, Style = style }; // 创建 Button 对象
-            if (row == 3 && col == 0) button.Style = FindResource("SpecialButton1") as Style; // 设置特殊样式
-            else if (row == 3 && col == 3) button.Style = FindResource("SpecialButton2") as Style; // 设置特殊样式
+            double buttonSize = 77.6; // 按钮大小
+            double cornerRadius = 5; // 圆角半径
+
+            // 为特定位置的按钮添加裁剪
+            if (row == 3 && col == 0) // 左下角按钮
+            {
+                button.Clip = CreateBottomLeftCornerClip(buttonSize, cornerRadius);
+            }
+            else if (row == 3 && col == 3) // 右下角按钮
+            {
+                button.Clip = CreateBottomRightCornerClip(buttonSize, cornerRadius);
+            }
+
             BindButtonEvents(button); // 绑定按钮事件
             return button; // 返回创建的按钮
+        }
+
+        /// <summary>
+        /// 创建左下角圆角裁剪
+        /// </summary>
+        /// <param name="size"> 按钮大小 </param>
+        /// <param name="radius"> 圆角半径 </param>
+        /// <returns> 裁剪几何体 </returns>
+        private Geometry CreateBottomLeftCornerClip(double size, double radius)
+        {
+            var pathGeometry = new PathGeometry(); // 创建路径几何体
+            var pathFigure = new PathFigure
+            {
+                StartPoint = new Point(0, 0), // 设置起始点
+                IsClosed = true // 设置路径闭合
+            };
+
+            pathFigure.Segments.Add(new LineSegment(new Point(size, 0), true)); // 上边
+            pathFigure.Segments.Add(new LineSegment(new Point(size, size), true)); // 右边
+            pathFigure.Segments.Add(new LineSegment(new Point(radius, size), true)); // 下边（右下到左下圆角起点）
+
+            var arcSegment = new ArcSegment
+            {
+                Point = new Point(0, size - radius), // 圆弧终点
+                Size = new Size(radius, radius), // 圆弧大小
+                SweepDirection = SweepDirection.Clockwise, // 顺时针方向
+                IsLargeArc = false // 小圆弧
+            };
+            pathFigure.Segments.Add(arcSegment); // 左下角圆弧
+
+            pathFigure.Segments.Add(new LineSegment(new Point(0, 0), true)); // 左边
+            pathGeometry.Figures.Add(pathFigure); // 添加路径图形
+
+            return pathGeometry; // 返回路径几何体
+        }
+
+        /// <summary>
+        /// 创建右下角圆角裁剪
+        /// </summary>
+        /// <param name="size"> 按钮大小 </param>
+        /// <param name="radius"> 圆角半径 </param>
+        /// <returns> 裁剪几何体 </returns>
+        private Geometry CreateBottomRightCornerClip(double size, double radius)
+        {
+            var pathGeometry = new PathGeometry(); // 创建路径几何体
+            var pathFigure = new PathFigure
+            {
+                StartPoint = new Point(0, 0), // 设置起始点
+                IsClosed = true // 设置路径闭合
+            };
+
+            pathFigure.Segments.Add(new LineSegment(new Point(size, 0), true)); // 上边
+            pathFigure.Segments.Add(new LineSegment(new Point(size, size - radius), true)); // 右边（右上到右下圆角起点）
+
+            var arcSegment = new ArcSegment
+            {
+                Point = new Point(size - radius, size), // 圆弧终点
+                Size = new Size(radius, radius), // 圆弧大小
+                SweepDirection = SweepDirection.Clockwise, // 顺时针方向
+                IsLargeArc = false // 小圆弧
+            };
+            pathFigure.Segments.Add(arcSegment); // 右下角圆弧
+
+            pathFigure.Segments.Add(new LineSegment(new Point(0, size), true)); // 下边
+            pathFigure.Segments.Add(new LineSegment(new Point(0, 0), true)); // 左边
+            pathGeometry.Figures.Add(pathFigure); // 添加路径图形
+
+            return pathGeometry; // 返回路径几何体
         }
 
         /// <summary>

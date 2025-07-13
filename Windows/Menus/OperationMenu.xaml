@@ -21,9 +21,11 @@
 >
     <Grid>
         <!-- 窗口阴影 -->
-        <Grid.Effect>
-            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-        </Grid.Effect>
+        <Rectangle Fill="White" Margin="5,7">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
         <Grid x:Name="MainGrid" Height="192" Width="204" Margin="15,13,565,246">
             <Border CornerRadius="5" Background="White">
                 <StackPanel x:Name="MainStackPanel">

@@ -1,11 +1,13 @@
-﻿using Quicker.Windows.MainWindows;
-using System.Windows.Controls;
-using Quicker.UserControls;
-using System.Globalization;
-using System.Windows.Media;
-using System.Windows.Data;
+﻿using Quicker.Database;
 using Quicker.Managers;
+using Quicker.UserControls;
+using Quicker.Windows.MainWindows;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -14,6 +16,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
         SettingManager settingManager; // 设置管理器
+        private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
+        private readonly ButtonDatabase db2 = new(); // 添加按钮数据库
 
         public AppearanceGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
@@ -162,10 +166,40 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             PresetStylePopup.IsOpen = true; // 打开预设样式弹出窗口
         }
 
+        // 为预览加载全局按钮
+        private void LoadGlobalButtonsForPreview()
+        {
+            ViewGlobalUniformGrid.Children.Clear(); // 清空现有的预览按钮
+            var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据（第一页，即pageIndex=0）
+            for (int row = 0; row < 3; row++) // 为每个按钮位置创建预览按钮
+            {
+                for (int col = 0; col < 4; col++)
+                {
+                    int buttonIndex = 0 * 100 + (row + 1) * 10 + (col + 1); // 按钮索引
+                    string buttonName = $"Global{buttonIndex}"; // 按钮名称
+                    Button previewButton = new Button
+                    {
+                        Style = FindResource("PreviewButtonStyle") as Style,
+                        Name = buttonName
+                    }; // 创建预览按钮
+                    ViewGlobalUniformGrid.Children.Add(previewButton);
+                    var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex); // 查找对应的按钮数据
+                    if (buttonData != null)
+                    {
+                        buttonManager.RefreshButtonDisplay(previewButton, buttonData, 60, false); // 使用ButtonManager刷新按钮显示
+                    }
+                }
+            }
+        }
+
         // 点击预设样式按钮
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            AppearancePreviewScrollViewer.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2); // 根据勾选框状态切换设置预览可见性
+            AppearancePreviewScrollViewer.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
+            if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
+            {
+                //LoadGlobalButtonsForPreview();
+            }
         }
     }
 

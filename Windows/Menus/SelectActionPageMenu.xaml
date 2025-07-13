@@ -21,9 +21,11 @@
 >
     <Grid x:Name="MainGrid" Height="10" Width="150" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
         <!-- 窗口阴影 -->
-        <Grid.Effect>
-            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
-        </Grid.Effect>
+        <Rectangle Fill="White" Margin="5,7">
+            <Rectangle.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+            </Rectangle.Effect>
+        </Rectangle>
         <Border BorderThickness="0" CornerRadius="5" Padding="1,6" Background="White">
             <StackPanel x:Name="ChangeSceneButtonStackPanel" Margin="-1,-1,-1,-1"/>
         </Border>
