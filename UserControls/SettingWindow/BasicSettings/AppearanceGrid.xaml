@@ -48,6 +48,68 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <!-- 预览用的SpecialButton1样式 -->
+        <Style x:Key="PreviewSpecialButton1Style" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+            <Setter Property="Background" Value="#F3F3F3"/>
+            <Setter Property="AllowDrop" Value="True"/>
+            <Setter Property="Content" Value="{x:Null}"/>
+            <Setter Property="Tag" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="border" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" 
+                                    Background="{TemplateBinding Background}" 
+                                    CornerRadius="0,0,0,5">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFEAEAEA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 预览用的SpecialButton2样式 -->
+        <Style x:Key="PreviewSpecialButton2Style" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
+            <Setter Property="Background" Value="#F3F3F3"/>
+            <Setter Property="AllowDrop" Value="True"/>
+            <Setter Property="Content" Value="{x:Null}"/>
+            <Setter Property="Tag" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="border" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" 
+                                    Background="{TemplateBinding Background}" 
+                                    CornerRadius="0,0,5,0">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFEAEAEA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -95,7 +157,7 @@
                         <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="BackgroundColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="BackgroundColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -104,7 +166,7 @@
                         <Button x:Name="ToolbarColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,305,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="ToolbarColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="ToolbarColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -113,7 +175,7 @@
                         <Button x:Name="ToolbarIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,331,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="ToolbarIconColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="ToolbarIconColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -122,7 +184,7 @@
                         <Button x:Name="ActionButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,357,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="ActionButtonColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="ActionButtonColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -131,7 +193,7 @@
                         <Button x:Name="ActionButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,383,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="ActionButtonMouseOverColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="ActionButtonMouseOverColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -140,7 +202,7 @@
                         <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,409,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="BlankButtonColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="BlankButtonColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -149,7 +211,7 @@
                         <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,435,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="BlankButtonMouseOverColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="BlankButtonMouseOverColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -158,7 +220,7 @@
                         <Button x:Name="ButtonTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,461,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="ButtonTextColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="ButtonTextColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -167,7 +229,7 @@
                         <Button x:Name="ActionIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,487,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="ActionIconColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="ActionIconColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -176,7 +238,7 @@
                         <Button x:Name="TriggerKeyTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,513,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="TriggerKeyTextColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="TriggerKeyTextColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -185,7 +247,7 @@
                         <Button x:Name="OtherIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,539,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <SolidColorBrush x:Name="OtherIconColorBrush" Color="#FFFFFFFF"/>
+                                    <Binding ElementName="OtherIconColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -319,6 +381,10 @@
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
+                                <Button Style="{StaticResource PreviewSpecialButton1Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
+                                <Button Style="{StaticResource PreviewSpecialButton2Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                             </UniformGrid>
                         </Grid>
                         <!-- 功能栏 -->
@@ -347,10 +413,10 @@
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource SpecialButton1}"/>
+                                <Button Style="{StaticResource PreviewSpecialButton1Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                 <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                <Button Style="{StaticResource SpecialButton2}"/>
+                                <Button Style="{StaticResource PreviewSpecialButton2Style}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                             </UniformGrid>
                         </Grid>
                     </Grid>

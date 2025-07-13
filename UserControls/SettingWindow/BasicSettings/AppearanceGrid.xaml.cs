@@ -42,29 +42,29 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ButtonCornerRadiusSlider.Value = settingManager.appearanceConditions.ButtonCornerRadius; // 设置按钮圆角半径
 
                 // 颜色
-                //var backgroundColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor));
-                //var toolbarColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor));
-                //var toolbarIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor));
-                //var actionButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor));
-                //var actionButtonMouseOverColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonMouseOverColor));
-                //var blankButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonColor));
-                //var blankButtonMouseOverColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor));
-                //var buttonTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor));
-                //var actionIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor));
-                //var triggerKeyTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
-                //var otherIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
+                var backgroundColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor));
+                var toolbarColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor));
+                var toolbarIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor));
+                var actionButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor));
+                var actionButtonMouseOverColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonMouseOverColor));
+                var blankButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonColor));
+                var blankButtonMouseOverColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor));
+                var buttonTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor));
+                var actionIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor));
+                var triggerKeyTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
+                var otherIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
 
-                //BackgroundColorButton.Background = backgroundColorBrush; // 设置背景颜色
-                //ToolbarColorButton.Background = toolbarColorBrush; // 设置工具栏颜色
-                //ToolbarIconColorButton.Background = toolbarIconColorBrush; // 设置工具栏图标颜色
-                //ActionButtonColorButton.Background = actionButtonColorBrush; // 设置动作按钮颜色
-                //ActionButtonMouseOverColorButton.Background = actionButtonMouseOverColorBrush; // 设置动作按钮鼠标悬停颜色
-                //BlankButtonColorButton.Background = blankButtonColorBrush; // 设置空白按钮颜色
-                //BlankButtonMouseOverColorButton.Background = blankButtonMouseOverColorBrush; // 设置空白按钮鼠标悬停颜色
-                //ButtonTextColorButton.Background = buttonTextColorBrush; // 设置按钮文字颜色
-                //ActionIconColorButton.Background = actionIconColorBrush; // 设置动作图标颜色
-                //TriggerKeyTextColorButton.Background = triggerKeyTextColorBrush; // 设置触发键文字颜色
-                //OtherIconColorButton.Background = otherIconColorBrush; // 设置其他位置图标颜色
+                BackgroundColorButton.Background = backgroundColorBrush; // 设置背景颜色
+                ToolbarColorButton.Background = toolbarColorBrush; // 设置工具栏颜色
+                ToolbarIconColorButton.Background = toolbarIconColorBrush; // 设置工具栏图标颜色
+                ActionButtonColorButton.Background = actionButtonColorBrush; // 设置动作按钮颜色
+                ActionButtonMouseOverColorButton.Background = actionButtonMouseOverColorBrush; // 设置动作按钮鼠标悬停颜色
+                BlankButtonColorButton.Background = blankButtonColorBrush; // 设置空白按钮颜色
+                BlankButtonMouseOverColorButton.Background = blankButtonMouseOverColorBrush; // 设置空白按钮鼠标悬停颜色
+                ButtonTextColorButton.Background = buttonTextColorBrush; // 设置按钮文字颜色
+                ActionIconColorButton.Background = actionIconColorBrush; // 设置动作图标颜色
+                TriggerKeyTextColorButton.Background = triggerKeyTextColorBrush; // 设置触发键文字颜色
+                OtherIconColorButton.Background = otherIconColorBrush; // 设置其他位置图标颜色
 
                 // 字体
                 FontSizeComboBox1.SelectedIndex = settingManager.appearanceConditions.Font1; // 设置字体1
@@ -87,6 +87,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ShowActionIconShadowCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionIconShadow; // 设置显示动作图标阴影
 
                 EnablePreviewCheckBox.IsChecked = settingManager.appearanceConditions.EnablePreview; // 设置显示设置应用效果
+                EnablePreviewCheckBox_Click(null, null); // 切换预览可见性
             }); // 异步加载设置
         }
 
@@ -126,44 +127,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Button button = sender as Button; // 获取按钮
             if (button == null) return; // 如果按钮为null，则返回
 
-            // 获取按钮中的SolidColorBrush
-            _currentBrush = null; // 初始化brush为null
-            switch (button.Name)
-            {
-                case "BackgroundColorButton":
-                    _currentBrush = BackgroundColorBrush;
-                    break; // 背景颜色
-                case "ToolbarColorButton":
-                    _currentBrush = ToolbarColorBrush;
-                    break; // 工具栏颜色
-                case "ToolbarIconColorButton":
-                    _currentBrush = ToolbarIconColorBrush;
-                    break; // 工具栏图标颜色
-                case "ActionButtonColorButton":
-                    _currentBrush = ActionButtonColorBrush;
-                    break; // 动作按钮颜色
-                case "ActionButtonMouseOverColorButton":
-                    _currentBrush = ActionButtonMouseOverColorBrush;
-                    break; // 动作按钮鼠标悬停颜色
-                case "BlankButtonColorButton":
-                    _currentBrush = BlankButtonColorBrush;
-                    break; // 空白按钮颜色
-                case "BlankButtonMouseOverColorButton":
-                    _currentBrush = BlankButtonMouseOverColorBrush;
-                    break; // 空白按钮鼠标悬停颜色
-                case "ButtonTextColorButton":
-                    _currentBrush = ButtonTextColorBrush;
-                    break; // 按钮文字颜色
-                case "ActionIconColorButton":
-                    _currentBrush = ActionIconColorBrush;
-                    break; // 动作图标颜色
-                case "TriggerKeyTextColorButton":
-                    _currentBrush = TriggerKeyTextColorBrush;
-                    break; // 触发键文字颜色
-                case "OtherIconColorButton":
-                    _currentBrush = OtherIconColorBrush;
-                    break; // 其他位置图标颜色
-            }
+            // 获取按钮的Background作为当前选中的颜色画刷
+            _currentBrush = button.Background as SolidColorBrush;
             if (_currentBrush == null) return; // 如果brush为null，则返回
 
             PopupColorPicker.ResetColorControls(_currentBrush.Color); // 重置色彩选择器
