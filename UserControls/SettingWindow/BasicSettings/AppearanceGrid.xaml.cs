@@ -131,8 +131,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Button button = sender as Button; // 获取按钮
             if (button == null) return; // 如果按钮为null，则返回
 
-            // 获取按钮的Background作为当前选中的颜色画刷
-            _currentBrush = button.Background as SolidColorBrush;
+            _currentBrush = button.Background as SolidColorBrush; // 获取按钮的Background作为当前选中的颜色画刷
             if (_currentBrush == null) return; // 如果brush为null，则返回
 
             PopupColorPicker.ResetColorControls(_currentBrush.Color); // 重置色彩选择器
@@ -224,7 +223,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击预设样式按钮
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            AppearancePreviewScrollViewer.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
+            ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
             if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
             {
                 LoadGlobalButtonsForPreview();

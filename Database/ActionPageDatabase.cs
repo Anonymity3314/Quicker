@@ -69,11 +69,8 @@ namespace Quicker.Database
         /// <param name="sceneTag">场景标签</param>
         public void CreateAndInitTable(string tableName, string sceneIconPath = "", string sceneTag = "")
         {
-            // 添加到Application_Master表
-            AddToApplication_MasterTable(tableName);
-
-            // 创建场景数据表
-            CreateSceneTable(tableName);
+            AddToApplication_MasterTable(tableName); // 添加到Application_Master表
+            CreateSceneTable(tableName); // 创建场景数据表
 
             // 获取场景配置
             var (sceneProcess, actionPageName, defaultIconPath, defaultTag) =
@@ -86,8 +83,6 @@ namespace Quicker.Database
 
             // 获取动作页数量
             int actionPageCount = db2.TableExists(tableName) ? db2.GetTotalAntionPageIndex(tableName) : 0;
-
-            // 创建并初始化场景数据
             var sceneData = new SceneData
             {
                 SceneName = tableName,
@@ -96,13 +91,10 @@ namespace Quicker.Database
                 SceneTag = sceneTag,
                 AutoReturnToFirstPage = false,
                 SceneProcess = sceneProcess
-            };
+            }; // 创建并初始化场景数据
+            UpdateSceneTable(tableName, sceneData); // 更新场景数据表
 
-            // 更新场景数据表
-            UpdateSceneTable(tableName, sceneData);
-
-            // 创建并初始化动作页
-            for (int i = 0; i < actionPageCount; i++)
+            for (int i = 0; i < actionPageCount; i++) // 创建并初始化动作页
             {
                 CreateActionPageTable(tableName);
 

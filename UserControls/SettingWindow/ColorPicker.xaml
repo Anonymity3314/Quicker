@@ -35,7 +35,11 @@
 
                 <!-- 可拖动的圆形 -->
                 <Border x:Name="ColorThumb" Width="10" Height="10" Canvas.Left="0" Canvas.Top="0" Background="Transparent" BorderBrush="Black" BorderThickness="0.8" CornerRadius="5" Panel.ZIndex="2">
-                    <Border Background="Transparent" BorderBrush="White" BorderThickness="2.5" CornerRadius="3"/>
+                    <Border Background="Transparent" BorderBrush="White" BorderThickness="2.5" CornerRadius="3">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="0" Color="Black" Opacity="0.5"/>
+                        </Border.Effect>
+                    </Border>
                 </Border>
             </Canvas>
         </Border>
