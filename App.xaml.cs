@@ -197,11 +197,19 @@ namespace Quicker
         private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
         {
             if (!CanProcessHook()) return; // 如果不能处理钩子，返回
+            // 优先处理Ctrl+鼠标的情况
+            if (GetCtrlKeyState() &&
+                (e.Data.Button == SharpHook.Data.MouseButton.Button2 || e.Data.Button == SharpHook.Data.MouseButton.Button3))
+            {
+                CloseOrShowMainWindow();
+                return;
+            }
+
+            // 其他情况
             if (AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间已记录，返回
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
-            bool isCtrlPressed = GetCtrlKeyState(); // 获取 Ctrl 键状态
             
-            ProcessMouseButtonPress(e.Data.Button, openMainWindowConditions, isCtrlPressed); // 处理鼠标按下事件
+            ProcessMouseButtonPress(e.Data.Button, openMainWindowConditions); // 处理鼠标按下事件
         }
 
         // 鼠标松开事件
@@ -357,16 +365,15 @@ namespace Quicker
         /// </summary>
         /// <param name="button"> 鼠标按钮 </param>
         /// <param name="conditions"> 设置 </param>
-        /// <param name="isCtrlPressed"> Ctrl 键状态 </param>
-        private void ProcessMouseButtonPress(SharpHook.Data.MouseButton button, OpenMainWindow conditions, bool isCtrlPressed)
+        private void ProcessMouseButtonPress(SharpHook.Data.MouseButton button, OpenMainWindow conditions)
         {
             switch (button)
             {
                 case SharpHook.Data.MouseButton.Button2:
-                    ProcessRightMouseButtonPress(conditions, isCtrlPressed);
+                    ProcessRightMouseButtonPress(conditions);
                     break; // 右键按下
                 case SharpHook.Data.MouseButton.Button3:
-                    ProcessMiddleMouseButtonPress(conditions, isCtrlPressed);
+                    ProcessMiddleMouseButtonPress(conditions);
                     break; // 中键按下
                 case SharpHook.Data.MouseButton.Button4:
                     ProcessX1MouseButtonPress(conditions);
@@ -381,17 +388,12 @@ namespace Quicker
         /// 处理右键按下事件
         /// </summary>
         /// <param name="conditions"> 设置 </param>
-        /// <param name="isCtrlPressed"> Ctrl 键状态 </param>
-        private void ProcessRightMouseButtonPress(OpenMainWindow conditions, bool isCtrlPressed)
+        private void ProcessRightMouseButtonPress(OpenMainWindow conditions)
         {
             if (conditions.OpenMainWindowByRightMouseClick_Move)
             {
                 RecordMousePosition(); // 记录鼠标位置
                 PreLoadMainWindow(true); // 预加载主窗口
-            }
-            else if (isCtrlPressed && conditions.OpenMainWindowByCtrl_RightMouseClick)
-            {
-                CloseOrShowMainWindow(); // 关闭或显示主窗口
             }
             else if (conditions.OpenMainWindowByRightMouseClickLonger)
             {
@@ -403,14 +405,9 @@ namespace Quicker
         /// 处理中键按下事件
         /// </summary>
         /// <param name="conditions"> 设置 </param>
-        /// <param name="isCtrlPressed"> Ctrl 键状态 </param>
-        private void ProcessMiddleMouseButtonPress(OpenMainWindow conditions, bool isCtrlPressed)
+        private void ProcessMiddleMouseButtonPress(OpenMainWindow conditions)
         {
-            if (isCtrlPressed && conditions.OpenMainWindowByCtrl_MiddleMouseClick)
-            {
-                CloseOrShowMainWindow(); // 关闭或显示主窗口
-            }
-            else if (conditions.OpenMainWindowByMiddleMouseClick)
+            if (conditions.OpenMainWindowByMiddleMouseClick)
             {
                 PreLoadMainWindow(); // 预加载主窗口
             }

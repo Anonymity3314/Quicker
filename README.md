@@ -324,7 +324,9 @@ Quicker/
         │   └─EditActionPageInfoWindow.xaml.cs
         └─EditSceneWindow.xaml                    # 编辑场景窗口
             └─EditSceneWindow.xaml.cs
-```---
+```
+
+---
 
 <p align="center">
   ⭐️ 如果你觉得本项目有帮助，欢迎 Star 支持！也欢迎 Issue 和 PR 共同完善！
