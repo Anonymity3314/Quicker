@@ -298,7 +298,7 @@
             <TextBlock Grid.Column="1" Text="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="173,49,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4" TextWrapping="Wrap" MaxWidth="210"/>
 
             <!-- 设置预览 -->
-            <Border x:Name="ViewPreviewBorder" CornerRadius="5" Margin="46,49,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1">
+            <Border x:Name="ViewPreviewBorder" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="46,49,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1">
                 <Border.Height>
                     <MultiBinding Converter="{StaticResource PreviewBorderHeightConverter}">
                         <Binding ElementName="ButtonSizeSlider" Path="Value"/>
@@ -318,7 +318,7 @@
                             <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
                         </Rectangle.Effect>
                     </Rectangle>
-                    <Border Background="{Binding ElementName=BackgroundColorButton, Path=Background}" CornerRadius="5">
+                    <Border Background="{Binding ElementName=BackgroundColorButton, Path=Background}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}">
                         <Grid x:Name="MainGrid">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="27"/>
@@ -327,7 +327,7 @@
                                 <RowDefinition Height="310*"/>
                             </Grid.RowDefinitions>
                             <!-- 标题栏 -->
-                            <Border BorderThickness="0" CornerRadius="5,5,0,0" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
+                            <Border BorderThickness="0" CornerRadius="{Binding TitleBarCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
                                 <Grid>
                                     <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                                     <Button Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">

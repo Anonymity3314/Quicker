@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
+using System.ComponentModel;
 using System.Windows.Media;
 using Quicker.UserControls;
 using System.Globalization;
@@ -13,7 +14,7 @@ using Quicker.Models;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
-    public partial class AppearanceGrid : UserControl
+    public partial class AppearanceGrid : UserControl, INotifyPropertyChanged // 实现INotifyPropertyChanged接口，支持属性变更通知
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
@@ -22,11 +23,49 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private Button _currentColorButton; // 记录当前按钮
         SettingManager settingManager; // 设置管理器
 
+        // INotifyPropertyChanged接口实现
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        // 预览区圆角属性，绑定到XAML的CornerRadius
+        private CornerRadius _previewCornerRadius = new CornerRadius(5); // 默认圆角为5
+        public CornerRadius PreviewCornerRadius
+        {
+            get => _previewCornerRadius;
+            set
+            {
+                if (_previewCornerRadius != value)
+                {
+                    _previewCornerRadius = value;
+                    OnPropertyChanged(nameof(PreviewCornerRadius)); // 通知界面属性变更
+                }
+            }
+        }
+
+        // 标题栏圆角属性，绑定到XAML
+        private CornerRadius _titleBarCornerRadius = new CornerRadius(5, 5, 0, 0); // 默认5,5,0,0
+        public CornerRadius TitleBarCornerRadius
+        {
+            get => _titleBarCornerRadius;
+            set
+            {
+                if (_titleBarCornerRadius != value)
+                {
+                    _titleBarCornerRadius = value;
+                    OnPropertyChanged(nameof(TitleBarCornerRadius));
+                }
+            }
+        }
+
         public AppearanceGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent(); // 初始化xaml界面
             settingManager = settingWindow._settingManager; // 初始化设置管理器
             weakSettingWindow = new(settingWindow); // 保存设置窗口
+            this.DataContext = this; // 设置自身为DataContext，便于属性绑定
             InitializeAsync(); // 异步初始化
         }
 
@@ -97,6 +136,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             BlurComboBox.SelectedIndex = settingManager.appearanceConditions.Blur; // 设置模糊模式
             Win11CornerRadiusComboBox.SelectedIndex = settingManager.appearanceConditions.Win11CornerRadius; // 设置Win11圆角模式
+            UpdatePreviewCornerRadiusByComboBox(); // 同步预览区圆角显示
         }
 
         // 选项相关设置
@@ -537,6 +577,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                         break;
                     case "Win11CornerRadiusComboBox":
                         settingManager.appearanceConditions.Win11CornerRadius = comboBox.SelectedIndex; // 设置Win11圆角模式
+                        UpdatePreviewCornerRadiusByComboBox(); // 变更预览区圆角
                         break;
                     case "FontSizeComboBox1":
                         settingManager.appearanceConditions.Font1 = comboBox.SelectedIndex; // 设置字体1
@@ -549,6 +590,28 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
             }
+        }
+
+        /// <summary>
+        /// 根据Win11圆角模式ComboBox的选项，动态设置预览区圆角
+        /// </summary>
+        private void UpdatePreviewCornerRadiusByComboBox()
+        {
+            double previewRadius;
+            switch (Win11CornerRadiusComboBox.SelectedIndex) // 0: 默认 1: 无 2: 圆角 3: 小圆角
+            {
+                case 1: // 无
+                    previewRadius = 0;
+                    break;
+                case 3: // 小圆角
+                    previewRadius = 3;
+                    break;
+                default: // 默认、圆角
+                    previewRadius = 5;
+                    break;
+            }
+            PreviewCornerRadius = new CornerRadius(previewRadius); // 预览区圆角
+            TitleBarCornerRadius = new CornerRadius(previewRadius, previewRadius, 0, 0); // 标题栏只上面有圆角
         }
 
         // “开启预览”复选框点击事件
