@@ -111,36 +111,37 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 复选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            var checkBox = sender as CheckBox;
+            var checkBox = sender as CheckBox; // 获取CheckBox控件
             if (checkBox == null) return;
-            bool value = checkBox.IsChecked == true;
-            switch (checkBox.Name)
+            bool value = checkBox.IsChecked == true; // 获取当前勾选状态
+            switch (checkBox.Name) // 根据控件名称区分处理
             {
                 case "AutoHideTitleBarCheckBox":
-                    settingManager.appearanceConditions.AutoHideTitleBar = value;
+                    settingManager.appearanceConditions.AutoHideTitleBar = value; // 自动隐藏标题栏
                     break;
                 case "ShowActionButtonMouseOverCheckBox":
-                    settingManager.appearanceConditions.ShowActionButtonMouseOver = value;
+                    settingManager.appearanceConditions.ShowActionButtonMouseOver = value; // 鼠标悬浮放大动作按钮
                     break;
                 case "HideActionNameAfterIconCheckBox":
-                    settingManager.appearanceConditions.HideActionNameAfterIcon = value;
+                    settingManager.appearanceConditions.HideActionNameAfterIcon = value; // 设置动作图标后隐藏动作名称
                     break;
                 case "ShowActionIconShadowCheckBox":
-                    settingManager.appearanceConditions.ShowActionIconShadow = value;
+                    settingManager.appearanceConditions.ShowActionIconShadow = value; // 动作图标显示阴影
                     break;
                 case "EnablePreviewCheckBox":
-                    settingManager.appearanceConditions.EnablePreview = value;
+                    settingManager.appearanceConditions.EnablePreview = value; // 开启/关闭预览
                     // 预览区显示/隐藏逻辑
                     ViewPreviewBorder.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
                     if (value)
-                        LoadGlobalButtonsForPreview();
+                        LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
                     break;
                 default:
-                    return;
+                    return; // 其它CheckBox不处理
             }
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
         }
 
+        // 颜色按钮点击事件，弹出颜色选择器并初始化为当前颜色
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button; // 获取按钮
@@ -149,12 +150,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             _currentBrush = button.Background as SolidColorBrush; // 获取按钮的Background作为当前选中的颜色画刷
             if (_currentBrush == null) return; // 如果brush为null，则返回
 
-            PopupColorPicker.ResetColorControls(_currentBrush.Color); // 重置色彩选择器
+            PopupColorPicker.ResetColorControls(_currentBrush.Color); // 重置色彩选择器为当前颜色
             PopupColorPicker.SelectedColor = _currentBrush.Color; // 同步SelectedColor依赖属性
 
             // 设置Popup的位置并打开
-            ColorPickerPopup.PlacementTarget = button;
-            ColorPickerPopup.IsOpen = true;
+            ColorPickerPopup.PlacementTarget = button; // 设置弹窗目标为当前按钮
+            ColorPickerPopup.IsOpen = true; // 打开颜色选择器弹窗
         }
 
         // 处理颜色选择器颜色变化事件
@@ -169,14 +170,17 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        /// <summary>
+        /// 根据传入的画刷，更新对应的外观颜色属性
+        /// </summary>
+        /// <param name="brush">当前选中的颜色画刷</param>
+        /// <param name="color">新颜色</param>
         private void UpdateAppearanceColorProperty(SolidColorBrush brush, Color color)
         {
-            // 这里你可以通过判断brush是哪个按钮的Background，来设置对应的属性
             if (brush == BackgroundColorButton.Background)
-                settingManager.appearanceConditions.BackgroundColor = color.ToString();
+                settingManager.appearanceConditions.BackgroundColor = color.ToString(); // 设置背景颜色
             else if (brush == ToolbarColorButton.Background)
-                settingManager.appearanceConditions.ToolbarColor = color.ToString();
-            // 其它颜色同理
+                settingManager.appearanceConditions.ToolbarColor = color.ToString(); // 设置工具栏颜色
         }
 
         // 释放资源
@@ -184,11 +188,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             foreach (Button btn in ViewGlobalUniformGrid.Children.OfType<Button>())
             {
-                btn.MouseEnter -= PreviewButton_MouseEnter;
-                btn.MouseLeave -= PreviewButton_MouseLeave;
                 ClipHelper.SetEnableCustomClip(btn, false); // 解绑自定义裁剪事件，防止内存泄漏
             }
-            ViewGlobalUniformGrid.Children.Clear(); // 解绑全局预览按钮的事件
+            ViewGlobalUniformGrid.Children.Clear(); // 清空按钮
 
             settingManager = null; // 释放设置管理器
             weakSettingWindow = null; // 释放弱引用设置窗口
@@ -246,10 +248,36 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 : ActionButtonColorButton.Background; // 绑定颜色选择
         }
 
-        // 按钮大小滑块值改变事件
-        private void ButtonSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        // 滑块值改变事件，统一处理所有相关Slider
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            settingManager.appearanceConditions.ButtonSize = ButtonSizeSlider.Value; // 设置按钮大小
+            var slider = sender as Slider; // 获取Slider控件
+            if (slider == null || settingManager == null) return; // 防止空引用
+            switch (slider.Name)
+            {
+                case "ButtonSizeSlider":
+                    settingManager.appearanceConditions.ButtonSize = slider.Value; // 设置按钮大小
+                    LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+                    break;
+                case "ButtonGapSlider":
+                    settingManager.appearanceConditions.ButtonGap = slider.Value; // 设置按钮间距
+                    LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+                    break;
+                case "BorderWidthSlider":
+                    settingManager.appearanceConditions.BorderWidth = slider.Value; // 设置边框宽度
+                    break;
+                case "ButtonCornerRadiusSlider":
+                    settingManager.appearanceConditions.ButtonCornerRadius = slider.Value; // 设置按钮圆角
+                    break;
+                case "FontSizeSlider":
+                    settingManager.appearanceConditions.FontSize = slider.Value; // 设置字体大小
+                    break;
+                case "BackgroundImageOpacitySlider":
+                    settingManager.appearanceConditions.BackgroundImageOpacity = slider.Value; // 设置背景图片不透明度
+                    break;
+                default:
+                    return;
+            }
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
         }
 
@@ -261,56 +289,41 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
         }
 
-        // 模糊模式下拉框选择改变事件
-        private void BlurComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        // 下拉框选择改变事件
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            settingManager.appearanceConditions.Blur = BlurComboBox.SelectedIndex; // 设置模糊模式
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+            if (sender is ComboBox comboBox) // 判断事件源是否为ComboBox
+            {
+                switch (comboBox.Name) // 根据ComboBox的Name区分处理
+                {
+                    case "BlurComboBox":
+                        settingManager.appearanceConditions.Blur = comboBox.SelectedIndex; // 设置模糊模式
+                        break;
+                    case "Win11CornerRadiusComboBox":
+                        settingManager.appearanceConditions.Win11CornerRadius = comboBox.SelectedIndex; // 设置Win11圆角模式
+                        break;
+                    case "FontSizeComboBox1":
+                        settingManager.appearanceConditions.Font1 = comboBox.SelectedIndex; // 设置字体1
+                        break;
+                    case "FontSizeComboBox2":
+                        settingManager.appearanceConditions.Font2 = comboBox.SelectedIndex; // 设置字体2
+                        break;
+                    default:
+                        return; // 其它ComboBox不处理
+                }
+                SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+            }
         }
 
-        // Win11圆角模式下拉框选择改变事件
-        private void Win11CornerRadiusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            settingManager.appearanceConditions.Win11CornerRadius = Win11CornerRadiusComboBox.SelectedIndex; // 设置Win11圆角模式
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-        }
-
-        // 自动隐藏标题栏复选框点击事件
-        private void AutoHideTitleBarCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            settingManager.appearanceConditions.AutoHideTitleBar = AutoHideTitleBarCheckBox.IsChecked == true; // 设置自动隐藏标题栏
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-        }
-
-        // 鼠标悬浮在动作按钮上时放大显示按钮复选框点击事件
-        private void ShowActionButtonMouseOverCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            settingManager.appearanceConditions.ShowActionButtonMouseOver = ShowActionButtonMouseOverCheckBox.IsChecked == true; // 设置鼠标悬浮放大显示按钮
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-        }
-
-        // 设置动作图标后隐藏动作名称复选框点击事件
-        private void HideActionNameAfterIconCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            settingManager.appearanceConditions.HideActionNameAfterIcon = HideActionNameAfterIconCheckBox.IsChecked == true; // 设置隐藏动作名称
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-        }
-
-        // 动作图标显示阴影复选框点击事件
-        private void ShowActionIconShadowCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            settingManager.appearanceConditions.ShowActionIconShadow = ShowActionIconShadowCheckBox.IsChecked == true; // 设置动作图标显示阴影
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-        }
-
+        // “开启预览”复选框点击事件
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.appearanceConditions.EnablePreview = EnablePreviewCheckBox.IsChecked == true; // 同步到缓存
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 应用于设置
-            ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
-            if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
+            settingManager.appearanceConditions.EnablePreview = EnablePreviewCheckBox.IsChecked == true; // 同步复选框状态到缓存
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+            ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2); // 切换预览区可见性
+            if (EnablePreviewCheckBox.IsChecked == true) // 如果开启预览
             {
-                LoadGlobalButtonsForPreview();
+                LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
             }
         }
     }

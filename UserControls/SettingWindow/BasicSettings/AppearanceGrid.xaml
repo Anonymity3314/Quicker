@@ -73,19 +73,19 @@
                         <Label Content="尺寸" Margin="10,50,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 尺寸-按钮大小 -->
                         <Label Content="按钮大小：" Margin="10,90,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="77.6"/>
+                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="77.6" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="261,92,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮间隙 -->
                         <Label Content="按钮间隙：" Margin="10,125,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" Value="0.2" VerticalAlignment="Top" Minimum="-0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" Value="0.2" VerticalAlignment="Top" Minimum="-0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,126,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-边框宽度 -->
                         <Label Content="边框宽度：" Margin="10,160,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Minimum="0" Maximum="15" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Minimum="0" Maximum="15" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="BorderWidthTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,161,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=BorderWidthSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮圆角 -->
                         <Label Content="按钮圆角：" Margin="10,195,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonCornerRadiusSlider" HorizontalAlignment="Left" Margin="121,200,0,0" VerticalAlignment="Top" Minimum="0" Maximum="40" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="ButtonCornerRadiusSlider" HorizontalAlignment="Left" Margin="121,200,0,0" VerticalAlignment="Top" Minimum="0" Maximum="40" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="ButtonCornerRadiusTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,196,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
 
                         <!-- 颜色 -->
@@ -203,17 +203,17 @@
                         <Label Content="字体" Margin="15,598,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 字体-字体1 -->
                         <Label Content="字体1：" Margin="10,620,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="107,624,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="107,624,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
                         <!-- 字体-字体2 -->
                         <Label Content="字体2：" Margin="10,655,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,659,0,0" VerticalAlignment="Top" Width="120"/>
+                        <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,659,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged"/>
                         <!-- 字体-字体大小 -->
                         <Label Content="字体大小：" Margin="10,688,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,693,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True"/>
+                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,693,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,689,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F0}'}"/>
                         <!-- 字体-字体粗细 -->
                         <Label Content="字体粗细：" Margin="10,728,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="FontWeightTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="107,729,0,0" VerticalAlignment="Top" Width="120"/>
+                        <TextBox x:Name="FontWeightTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="107,729,0,0" VerticalAlignment="Top" Width="120" TextChanged="FontWeightTextBox_TextChanged"/>
 
                         <!-- 背景图片 -->
                         <Label Content="背景图片" Margin="15,761,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
@@ -223,21 +223,21 @@
                         <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="291,799,0,0" VerticalAlignment="Top" Width="43"/>
                         <!-- 背景图片-不透明度 -->
                         <Label Content="不透明度：" Margin="10,832,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,837,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,837,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,833,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=BackgroundImageOpacitySlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
 
                         <!-- 模糊与圆角 -->
                         <Label Content="模糊与圆角" Margin="15,862,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 模糊与圆角-模糊模式 -->
                         <Label Content="模糊模式：" Margin="10,897,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,899,0,0" VerticalAlignment="Top" Width="120" Height="24">
+                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,899,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBoxItem Content="无"/>
                             <ComboBoxItem Content="毛玻璃"/>
                             <ComboBoxItem Content="无（去除窗口阴影）"/>
                         </ComboBox>
                         <!-- 模糊与圆角-Win11圆角模式 -->
                         <Label Content="Win11圆角模式：" Margin="10,930,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,932,0,0" VerticalAlignment="Top" Width="120" Height="24">
+                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,932,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBoxItem Content="默认"/>
                             <ComboBoxItem Content="无"/>
                             <ComboBoxItem Content="圆角"/>
