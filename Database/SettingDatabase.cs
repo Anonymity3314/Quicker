@@ -513,48 +513,48 @@ namespace Quicker.Database
         public static List<Appearance> GetAllAppearanceSettings()
         {
             var appearances = new List<Appearance>();
-            using var connection = OpenConnection();
-            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
-            using var command = new SQLiteCommand(SQLStatements.GetAllAppearanceSettings, connection);
-            using var reader = command.ExecuteReader();
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启只读事务
+            using var command = new SQLiteCommand(SQLStatements.GetAllAppearanceSettings, connection); // 创建 SQLiteCommand 对象
+            using var reader = command.ExecuteReader(); // 执行查询并获取数据读取器
             while (reader.Read())
             {
                 appearances.Add(new Appearance
                 {
-                    ID = reader.GetInt32(0),
-                    ButtonSize = reader.GetDouble(1),
-                    ButtonGap = reader.GetDouble(2),
-                    BorderWidth = reader.GetDouble(3),
-                    ButtonCornerRadius = reader.GetDouble(4),
-                    BackgroundColor = reader.GetString(5),
-                    BorderColor = reader.GetString(6),
-                    ToolbarColor = reader.GetString(7),
-                    ToolbarIconColor = reader.GetString(8),
-                    ActionButtonColor = reader.GetString(9),
-                    ActionButtonMouseOverColor = reader.GetString(10),
-                    BlankButtonColor = reader.GetString(11),
-                    BlankButtonMouseOverColor = reader.GetString(12),
-                    ButtonTextColor = reader.GetString(13),
-                    ActionIconColor = reader.GetString(14),
-                    TriggerKeyTextColor = reader.GetString(15),
-                    OtherIconColor = reader.GetString(16),
-                    Font1 = reader.GetInt32(17),
-                    Font2 = reader.GetInt32(18),
-                    FontSize = reader.GetDouble(19),
-                    FontWeight = reader.GetDouble(20),
-                    BackgroundImagePath = reader.GetString(21),
-                    BackgroundImageOpacity = reader.GetDouble(22),
-                    Blur = reader.GetInt32(23),
-                    Win11CornerRadius = reader.GetInt32(24),
-                    AutoHideTitleBar = reader.GetBoolean(25),
-                    ShowActionButtonMouseOver = reader.GetBoolean(26),
-                    HideActionNameAfterIcon = reader.GetBoolean(27),
-                    ShowActionIconShadow = reader.GetBoolean(28),
-                    EnablePreview = reader.GetBoolean(29)
+                    ID = reader.GetInt32(0), // 外观ID
+                    ButtonSize = reader.GetDouble(1), // 按钮大小
+                    ButtonGap = reader.GetDouble(2), // 按钮间隙
+                    BorderWidth = reader.GetDouble(3), // 边框宽度
+                    ButtonCornerRadius = reader.GetDouble(4), // 按钮圆角
+                    BackgroundColor = reader.GetString(5), // 背景颜色
+                    BorderColor = reader.GetString(6), // 边框颜色
+                    ToolbarColor = reader.GetString(7), // 工具栏颜色
+                    ToolbarIconColor = reader.GetString(8), // 工具栏图标颜色
+                    ActionButtonColor = reader.GetString(9), // 动作按钮颜色
+                    ActionButtonMouseOverColor = reader.GetString(10), // 动作按钮悬浮颜色
+                    BlankButtonColor = reader.GetString(11), // 空白按钮颜色
+                    BlankButtonMouseOverColor = reader.GetString(12), // 空白按钮悬浮颜色
+                    ButtonTextColor = reader.GetString(13), // 按钮文字颜色
+                    ActionIconColor = reader.GetString(14), // 动作图标颜色
+                    TriggerKeyTextColor = reader.GetString(15), // 触发键文字颜色
+                    OtherIconColor = reader.GetString(16), // 其他图标颜色
+                    Font1 = reader.GetInt32(17), // 字体1
+                    Font2 = reader.GetInt32(18), // 字体2
+                    FontSize = reader.GetDouble(19), // 字体大小
+                    FontWeight = reader.GetDouble(20), // 字体粗细
+                    BackgroundImagePath = reader.GetString(21), // 背景图片路径
+                    BackgroundImageOpacity = reader.GetDouble(22), // 背景图片不透明度
+                    Blur = reader.GetInt32(23), // 模糊模式
+                    Win11CornerRadius = reader.GetInt32(24), // Win11圆角模式
+                    AutoHideTitleBar = reader.GetBoolean(25), // 自动隐藏标题栏
+                    ShowActionButtonMouseOver = reader.GetBoolean(26), // 动作按钮悬浮放大
+                    HideActionNameAfterIcon = reader.GetBoolean(27), // 设置动作图标后隐藏名称
+                    ShowActionIconShadow = reader.GetBoolean(28), // 动作图标显示阴影
+                    EnablePreview = reader.GetBoolean(29) // 启用预览
                 });
             }
-            transaction.Commit();
-            return appearances;
+            transaction.Commit(); // 提交事务
+            return appearances; // 返回所有外观设置
         }
 
         /// <summary>
@@ -566,35 +566,35 @@ namespace Quicker.Database
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             using var command = new SQLiteCommand(SQLStatements.UpdateAppearance, connection); // 创建 SQLiteCommand 对象
-            command.Parameters.AddWithValue("@ButtonSize", appearance.ButtonSize); // 设置参数
-            command.Parameters.AddWithValue("@ButtonGap", appearance.ButtonGap); // 设置参数
-            command.Parameters.AddWithValue("@BorderWidth", appearance.BorderWidth); // 设置参数
-            command.Parameters.AddWithValue("@ButtonCornerRadius", appearance.ButtonCornerRadius); // 设置参数
-            command.Parameters.AddWithValue("@BackgroundColor", appearance.BackgroundColor); // 设置参数
-            command.Parameters.AddWithValue("@BorderColor", appearance.BorderColor); // 设置参数
-            command.Parameters.AddWithValue("@ToolbarColor", appearance.ToolbarColor); // 设置参数
-            command.Parameters.AddWithValue("@ToolbarIconColor", appearance.ToolbarIconColor); // 设置参数
-            command.Parameters.AddWithValue("@ActionButtonColor", appearance.ActionButtonColor); // 设置参数
-            command.Parameters.AddWithValue("@ActionButtonMouseOverColor", appearance.ActionButtonMouseOverColor); // 设置参数
-            command.Parameters.AddWithValue("@BlankButtonColor", appearance.BlankButtonColor); // 设置参数
-            command.Parameters.AddWithValue("@BlankButtonMouseOverColor", appearance.BlankButtonMouseOverColor); // 设置参数
-            command.Parameters.AddWithValue("@ButtonTextColor", appearance.ButtonTextColor); // 设置参数
-            command.Parameters.AddWithValue("@ActionIconColor", appearance.ActionIconColor); // 设置参数
-            command.Parameters.AddWithValue("@TriggerKeyTextColor", appearance.TriggerKeyTextColor); // 设置参数
-            command.Parameters.AddWithValue("@OtherIconColor", appearance.OtherIconColor); // 设置参数
-            command.Parameters.AddWithValue("@Font1", appearance.Font1); // 设置参数
-            command.Parameters.AddWithValue("@Font2", appearance.Font2); // 设置参数
-            command.Parameters.AddWithValue("@FontSize", appearance.FontSize); // 设置参数
-            command.Parameters.AddWithValue("@FontWeight", appearance.FontWeight); // 设置参数
-            command.Parameters.AddWithValue("@BackgroundImagePath", appearance.BackgroundImagePath); // 设置参数
-            command.Parameters.AddWithValue("@BackgroundImageOpacity", appearance.BackgroundImageOpacity); // 设置参数
-            command.Parameters.AddWithValue("@Blur", appearance.Blur); // 设置参数
-            command.Parameters.AddWithValue("@Win11CornerRadius", appearance.Win11CornerRadius); // 设置参数
-            command.Parameters.AddWithValue("@AutoHideTitleBar", appearance.AutoHideTitleBar); // 设置参数
-            command.Parameters.AddWithValue("@ShowActionButtonMouseOver", appearance.ShowActionButtonMouseOver); // 设置参数
-            command.Parameters.AddWithValue("@HideActionNameAfterIcon", appearance.HideActionNameAfterIcon); // 设置参数
-            command.Parameters.AddWithValue("@ShowActionIconShadow", appearance.ShowActionIconShadow); // 设置参数
-            command.Parameters.AddWithValue("@EnablePreview", appearance.EnablePreview); // 设置参数
+            command.Parameters.AddWithValue("@ButtonSize", appearance.ButtonSize); // 按钮大小
+            command.Parameters.AddWithValue("@ButtonGap", appearance.ButtonGap); // 按钮间隙
+            command.Parameters.AddWithValue("@BorderWidth", appearance.BorderWidth); // 边框宽度
+            command.Parameters.AddWithValue("@ButtonCornerRadius", appearance.ButtonCornerRadius); // 按钮圆角
+            command.Parameters.AddWithValue("@BackgroundColor", appearance.BackgroundColor); // 背景颜色
+            command.Parameters.AddWithValue("@BorderColor", appearance.BorderColor); // 边框颜色
+            command.Parameters.AddWithValue("@ToolbarColor", appearance.ToolbarColor); // 工具栏颜色
+            command.Parameters.AddWithValue("@ToolbarIconColor", appearance.ToolbarIconColor); // 工具栏图标颜色
+            command.Parameters.AddWithValue("@ActionButtonColor", appearance.ActionButtonColor); // 动作按钮颜色
+            command.Parameters.AddWithValue("@ActionButtonMouseOverColor", appearance.ActionButtonMouseOverColor); // 动作按钮悬浮颜色
+            command.Parameters.AddWithValue("@BlankButtonColor", appearance.BlankButtonColor); // 空白按钮颜色
+            command.Parameters.AddWithValue("@BlankButtonMouseOverColor", appearance.BlankButtonMouseOverColor); // 空白按钮悬浮颜色
+            command.Parameters.AddWithValue("@ButtonTextColor", appearance.ButtonTextColor); // 按钮文字颜色
+            command.Parameters.AddWithValue("@ActionIconColor", appearance.ActionIconColor); // 动作图标颜色
+            command.Parameters.AddWithValue("@TriggerKeyTextColor", appearance.TriggerKeyTextColor); // 触发键文字颜色
+            command.Parameters.AddWithValue("@OtherIconColor", appearance.OtherIconColor); // 其他图标颜色
+            command.Parameters.AddWithValue("@Font1", appearance.Font1); // 字体1
+            command.Parameters.AddWithValue("@Font2", appearance.Font2); // 字体2
+            command.Parameters.AddWithValue("@FontSize", appearance.FontSize); // 字体大小
+            command.Parameters.AddWithValue("@FontWeight", appearance.FontWeight); // 字体粗细
+            command.Parameters.AddWithValue("@BackgroundImagePath", appearance.BackgroundImagePath); // 背景图片路径
+            command.Parameters.AddWithValue("@BackgroundImageOpacity", appearance.BackgroundImageOpacity); // 背景图片不透明度
+            command.Parameters.AddWithValue("@Blur", appearance.Blur); // 模糊模式
+            command.Parameters.AddWithValue("@Win11CornerRadius", appearance.Win11CornerRadius); // Win11圆角模式
+            command.Parameters.AddWithValue("@AutoHideTitleBar", appearance.AutoHideTitleBar); // 自动隐藏标题栏
+            command.Parameters.AddWithValue("@ShowActionButtonMouseOver", appearance.ShowActionButtonMouseOver); // 动作按钮悬浮放大
+            command.Parameters.AddWithValue("@HideActionNameAfterIcon", appearance.HideActionNameAfterIcon); // 设置动作图标后隐藏名称
+            command.Parameters.AddWithValue("@ShowActionIconShadow", appearance.ShowActionIconShadow); // 动作图标显示阴影
+            command.Parameters.AddWithValue("@EnablePreview", appearance.EnablePreview); // 启用预览
             command.ExecuteNonQuery(); // 执行命令
             transaction.Commit(); // 提交事务
         }

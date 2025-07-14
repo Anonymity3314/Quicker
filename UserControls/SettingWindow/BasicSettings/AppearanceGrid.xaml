@@ -13,8 +13,8 @@
 
     Unloaded="AppearanceGrid_Unloaded"
 >
-    <!-- d:DesignHeight="870" -->
     <UserControl.Resources>
+        <local:PreviewBorderHeightConverter x:Key="PreviewBorderHeightConverter"/>
         <local:GridHeightConverter x:Key="GridHeightConverter"/>
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
         <local:GridWidthConverter x:Key="GridWidthConverter"/>
@@ -81,7 +81,7 @@
                         <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,126,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-边框宽度 -->
                         <Label Content="边框宽度：" Margin="10,160,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Minimum="0" Maximum="30" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
+                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Minimum="0" Maximum="15" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120"/>
                         <TextBox x:Name="BorderWidthTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,161,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=BorderWidthSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮圆角 -->
                         <Label Content="按钮圆角：" Margin="10,195,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -298,7 +298,19 @@
             <TextBlock Grid.Column="1" Text="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="173,49,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4" TextWrapping="Wrap" MaxWidth="210"/>
 
             <!-- 设置预览 -->
-            <Border x:Name="ViewPreviewBorder" CornerRadius="5" Width="311" Height="596" Margin="46,50,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1">
+            <Border x:Name="ViewPreviewBorder" CornerRadius="5" Margin="46,49,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1">
+                <Border.Height>
+                    <MultiBinding Converter="{StaticResource PreviewBorderHeightConverter}">
+                        <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                        <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                    </MultiBinding>
+                </Border.Height>
+                <Border.Width>
+                    <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
+                        <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                        <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                    </MultiBinding>
+                </Border.Width>
                 <Grid>
                     <!-- 窗口阴影 -->
                     <Rectangle Fill="White" Margin="5,7">
@@ -308,10 +320,16 @@
                     </Rectangle>
                     <Border Background="{Binding ElementName=BackgroundColorButton, Path=Background}" CornerRadius="5">
                         <Grid x:Name="MainGrid">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="27"/>
+                                <RowDefinition Height="234*"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="310*"/>
+                            </Grid.RowDefinitions>
                             <!-- 标题栏 -->
-                            <Border BorderThickness="0" CornerRadius="5,5,0,0" Margin="0,0,0,568" Background="{Binding ElementName=ToolbarColorButton, Path=Background}">
+                            <Border BorderThickness="0" CornerRadius="5,5,0,0" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
                                 <Grid>
-                                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                                     <Button Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
                                         <Image Source="/Resources/Images/SettingImage2.png" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Button>
@@ -324,13 +342,13 @@
                                     <Button Style="{StaticResource Task}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
                                         <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Button>
-                                    <Button Style="{StaticResource Task}" Margin="283,0,0,0">
+                                    <Button Style="{StaticResource Task}" HorizontalAlignment="Right" Margin="0,0,1,0">
                                         <Image x:Name="Close" Source="/Resources/Images/CloseWindow.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Button>
                                 </Grid>
                             </Border>
                             <!-- 全局动作 -->
-                            <Grid x:Name="GlobalGrid" VerticalAlignment="Top" Margin="0,28,0,0" HorizontalAlignment="Left">
+                            <Grid x:Name="GlobalGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="1">
                                 <Grid.Height>
                                     <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="3">
                                         <Binding ElementName="ButtonSizeSlider" Path="Value"/>
@@ -359,16 +377,16 @@
                                 </UniformGrid>
                             </Grid>
                             <!-- 功能栏 -->
-                            <Grid VerticalAlignment="Top" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Margin="0,261,0,0" >
+                            <Grid VerticalAlignment="Center" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.Row="2" >
                                 <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" TextAlignment="Center" Margin="10,0"/>
                                 <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                                 <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                                <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="253,0,0,0">
+                                <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" HorizontalAlignment="Right" Margin="0,0,34,0">
                                     <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Button>
                             </Grid>
                             <!-- 通用动作 -->
-                            <Grid x:Name="CommonGrid" Margin="0,286,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <Grid x:Name="CommonGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3">
                                 <Grid.Height>
                                     <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="4">
                                         <Binding ElementName="ButtonSizeSlider" Path="Value"/>
@@ -394,44 +412,10 @@
                                     <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                     <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                     <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}">
-                                        <Button.Clip>
-                                            <PathGeometry>
-                                                <PathFigure StartPoint="0,0" IsClosed="True">
-                                                    <!-- 上边 -->
-                                                    <LineSegment Point="77.6,0"/>
-                                                    <!-- 右边 -->
-                                                    <LineSegment Point="77.6,77.6"/>
-                                                    <!-- 下边（右下到左下圆角起点） -->
-                                                    <LineSegment Point="5,77.6"/>
-                                                    <!-- 左下角圆弧 -->
-                                                    <ArcSegment Point="0,72.6" Size="5,5" SweepDirection="Clockwise" IsLargeArc="False"/>
-                                                    <!-- 左边 -->
-                                                    <LineSegment Point="0,0"/>
-                                                </PathFigure>
-                                            </PathGeometry>
-                                        </Button.Clip>
-                                    </Button>
+                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" x:Name="LeftBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
                                     <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
                                     <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}">
-                                        <Button.Clip>
-                                            <PathGeometry>
-                                                <PathFigure StartPoint="0,0" IsClosed="True">
-                                                    <!-- 上边 -->
-                                                    <LineSegment Point="77.6,0"/>
-                                                    <!-- 右边（右上到右下圆角起点） -->
-                                                    <LineSegment Point="77.6,72.6"/>
-                                                    <!-- 右下角圆弧 -->
-                                                    <ArcSegment Point="72.6,77.6" Size="5,5" SweepDirection="Clockwise" IsLargeArc="False"/>
-                                                    <!-- 下边 -->
-                                                    <LineSegment Point="0,77.6"/>
-                                                    <!-- 左边 -->
-                                                    <LineSegment Point="0,0"/>
-                                                </PathFigure>
-                                            </PathGeometry>
-                                        </Button.Clip>
-                                    </Button>
+                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" x:Name="RightBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
                                 </UniformGrid>
                             </Grid>
                         </Grid>

@@ -47,7 +47,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 
                 // 颜色
                 var backgroundColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor));
-                var borderColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BorderColor));
                 var toolbarColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor));
                 var toolbarIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor));
                 var actionButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor));
@@ -59,9 +58,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 var triggerKeyTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
                 var otherIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
 
-                // 颜色按钮赋值
                 BackgroundColorButton.Background = backgroundColorBrush; // 设置背景颜色
-                BorderColorButton.Background = borderColorBrush; // 设置边框颜色
                 ToolbarColorButton.Background = toolbarColorBrush; // 设置工具栏颜色
                 ToolbarIconColorButton.Background = toolbarIconColorBrush; // 设置工具栏图标颜色
                 ActionButtonColorButton.Background = actionButtonColorBrush; // 设置动作按钮颜色
@@ -149,6 +146,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 btn.MouseEnter -= PreviewButton_MouseEnter;
                 btn.MouseLeave -= PreviewButton_MouseLeave;
+                ClipHelper.SetEnableCustomClip(btn, false); // 解绑自定义裁剪事件，防止内存泄漏
             }
             ViewGlobalUniformGrid.Children.Clear(); // 解绑全局预览按钮的事件
 
@@ -217,7 +215,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
             if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
             {
-                LoadGlobalButtonsForPreview();
+                //LoadGlobalButtonsForPreview();
             }
         }
 
@@ -294,5 +292,105 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             return 0;
         }
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class PreviewBorderHeightConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            // values[0]: 按钮高度, values[1]: 按钮间隙
+            if (values.Length >= 2 && double.TryParse(values[0]?.ToString(), out double btnHeight) && double.TryParse(values[1]?.ToString(), out double gap))
+            {
+                return 27 + 25 + btnHeight * 7 + gap * 5;
+            }
+            return 0;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// 附加属性帮助类，用于为按钮动态设置自定义裁剪（圆角）
+    /// </summary>
+    public static class ClipHelper
+    {
+        // 定义附加属性 EnableCustomClip，控制是否启用自定义裁剪
+        public static readonly DependencyProperty EnableCustomClipProperty =
+            DependencyProperty.RegisterAttached(
+                "EnableCustomClip",
+                typeof(bool),
+                typeof(ClipHelper),
+                new PropertyMetadata(false, OnEnableCustomClipChanged));
+
+        // 设置附加属性方法
+        public static void SetEnableCustomClip(UIElement element, bool value)
+            => element.SetValue(EnableCustomClipProperty, value);
+
+        // 获取附加属性方法
+        public static bool GetEnableCustomClip(UIElement element)
+            => (bool)element.GetValue(EnableCustomClipProperty);
+
+        // 附加属性值变化时的回调
+        private static void OnEnableCustomClipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Button btn)
+            {
+                if ((bool)e.NewValue)
+                {
+                    btn.SizeChanged += Btn_SizeChanged; // 启用时，注册 SizeChanged 事件，并立即设置一次裁剪
+                    UpdateButtonClip(btn);
+                }
+                else
+                {
+                    btn.SizeChanged -= Btn_SizeChanged; // 关闭时，移除事件并清除裁剪
+                    btn.Clip = null;
+                }
+            }
+        }
+
+        // 按钮尺寸变化时，更新裁剪路径
+        private static void Btn_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                UpdateButtonClip(btn);
+            }
+        }
+
+        /// <summary>
+        /// 根据按钮名称，动态设置左下角或右下角圆角裁剪，圆角半径固定为5
+        /// </summary>
+        /// <param name="btn">需要裁剪的按钮</param>
+        private static void UpdateButtonClip(Button btn)
+        {
+            double height = btn.ActualHeight; // 按钮实际高度
+            double width = btn.ActualWidth;   // 按钮实际宽度
+            double radius = 5;                // 固定圆角半径
+
+            // 判断是左下角还是右下角圆角（通过按钮 Name 区分）
+            if (btn.Name.Contains("LeftBottom")) // 左下角圆角裁剪
+            {
+                var geometry = new PathGeometry();
+                var figure = new PathFigure { StartPoint = new Point(0, 0), IsClosed = true };
+                figure.Segments.Add(new LineSegment(new Point(width, 0), true));                // 上边
+                figure.Segments.Add(new LineSegment(new Point(width, height), true));           // 右边
+                figure.Segments.Add(new LineSegment(new Point(radius, height), true));          // 下边（右下到左下圆角起点）
+                figure.Segments.Add(new ArcSegment(new Point(0, height - radius), new Size(radius, radius), 0, false, SweepDirection.Clockwise, true)); // 左下角圆弧
+                figure.Segments.Add(new LineSegment(new Point(0, 0), true));                    // 左边
+                geometry.Figures.Add(figure);
+                btn.Clip = geometry;
+            }
+            else if (btn.Name.Contains("RightBottom")) // 右下角圆角裁剪
+            {
+                var geometry = new PathGeometry();
+                var figure = new PathFigure { StartPoint = new Point(0, 0), IsClosed = true };
+                figure.Segments.Add(new LineSegment(new Point(width, 0), true));                // 上边
+                figure.Segments.Add(new LineSegment(new Point(width, height - radius), true));  // 右边（右上到右下圆角起点）
+                figure.Segments.Add(new ArcSegment(new Point(width - radius, height), new Size(radius, radius), 0, false, SweepDirection.Clockwise, true)); // 右下角圆弧
+                figure.Segments.Add(new LineSegment(new Point(0, height), true));               // 下边
+                figure.Segments.Add(new LineSegment(new Point(0, 0), true));                    // 左边
+                geometry.Figures.Add(figure);
+                btn.Clip = geometry;
+            }
+        }
     }
 }
