@@ -246,10 +246,10 @@
 
                         <!-- 选项 -->
                         <Label Content="选项" Margin="15,958,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" HorizontalAlignment="Left" Margin="31,998,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" HorizontalAlignment="Left" Margin="31,1018,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" HorizontalAlignment="Left" Margin="31,1038,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" HorizontalAlignment="Left" Margin="31,1058,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" ToolTip="按钮文字过长时自动缩小以显示全部" HorizontalAlignment="Left" Margin="31,998,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" ToolTip="鼠标移动到动作上时自动放大按钮" HorizontalAlignment="Left" Margin="31,1018,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" ToolTip="如果动作设置了图标，则只显示图标不显示名称" HorizontalAlignment="Left" Margin="31,1038,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" ToolTip="动作图标显示阴影效果" HorizontalAlignment="Left" Margin="31,1058,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
 
                         <!-- 用于扩展可见范围，无功能 -->
                         <Label Margin="10,1227,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
@@ -322,9 +322,9 @@
                         <Grid x:Name="MainGrid">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="27"/>
-                                <RowDefinition Height="234*"/>
+                                <RowDefinition Height="{Binding ElementName=GlobalGrid, Path=ActualHeight}"/>
                                 <RowDefinition Height="25"/>
-                                <RowDefinition Height="310*"/>
+                                <RowDefinition Height="{Binding ElementName=CommonGrid, Path=ActualHeight}"/>
                             </Grid.RowDefinitions>
                             <!-- 标题栏 -->
                             <Border BorderThickness="0" CornerRadius="{Binding TitleBarCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
@@ -361,20 +361,37 @@
                                         <Binding ElementName="ButtonGapSlider" Path="Value"/>
                                     </MultiBinding>
                                 </Grid.Width>
-                                <UniformGrid x:Name="ViewGlobalUniformGrid" Rows="3" Columns="4">
-                                    <Button x:Name="GlobalButton1" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton2" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton3" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton4" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton5" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton6" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton7" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton8" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton9" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton10" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton11" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                    <Button x:Name="GlobalButton12" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                </UniformGrid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <!-- 第一行 -->
+                                <Button x:Name="GlobalButton1" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton2" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton3" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton4" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <!-- 第二行 -->
+                                <Button x:Name="GlobalButton5" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton6" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton7" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton8" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <!-- 第三行 -->
+                                <Button x:Name="GlobalButton9" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton10" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton11" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                                <Button x:Name="GlobalButton12" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
                             </Grid>
                             <!-- 功能栏 -->
                             <Grid VerticalAlignment="Center" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.Row="2" >
@@ -386,7 +403,7 @@
                                 </Button>
                             </Grid>
                             <!-- 通用动作 -->
-                            <Grid x:Name="CommonGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3">
+                            <Grid x:Name="CommonGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="3">
                                 <Grid.Height>
                                     <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="4">
                                         <Binding ElementName="ButtonSizeSlider" Path="Value"/>
@@ -399,24 +416,55 @@
                                         <Binding ElementName="ButtonGapSlider" Path="Value"/>
                                     </MultiBinding>
                                 </Grid.Width>
-                                <UniformGrid x:Name="ViewCommonUniformGrid" Rows="4" Columns="4">
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" x:Name="LeftBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"/>
-                                    <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Margin="{Binding ElementName=ButtonGapSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" x:Name="RightBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
-                                </UniformGrid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <!-- 第一行 -->
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="0"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="2"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="4"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="6"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="8"/>
+                                <!-- 第二行 -->
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="0"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="2"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="4"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="6"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="8"/>
+                                <!-- 第三行 -->
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="0"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="2"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="4"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="8"/>
+                                <!-- 第四行 -->
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="0"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="2"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="4"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="6"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="8"/>
+                                <!-- 左下角和右下角裁剪按钮 -->
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="8" Grid.Column="0" x:Name="LeftBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
+                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="8" Grid.Column="8" x:Name="RightBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
                             </Grid>
                         </Grid>
                     </Border>

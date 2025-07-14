@@ -245,11 +245,11 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 释放资源
         private void AppearanceGrid_Unloaded(object sender, RoutedEventArgs e)
         {
-            foreach (Button btn in ViewGlobalUniformGrid.Children.OfType<Button>())
+            foreach (Button btn in GlobalGrid.Children.OfType<Button>())
             {
                 ClipHelper.SetEnableCustomClip(btn, false); // 解绑自定义裁剪事件，防止内存泄漏
             }
-            ViewGlobalUniformGrid.Children.Clear(); // 清空按钮
+            GlobalGrid.Children.Clear(); // 清空按钮
 
             settingManager = null; // 释放设置管理器
             weakSettingWindow = null; // 释放弱引用设置窗口
@@ -267,7 +267,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private void LoadGlobalButtonsForPreview()
         {
             var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据
-            var buttons = ViewGlobalUniformGrid.Children.OfType<Button>().ToList(); // 获取UniformGrid中的所有Button
+            var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 获取UniformGrid中的所有Button
             for (int i = 0; i < buttons.Count; i++)
             {
                 var btn = buttons[i];
