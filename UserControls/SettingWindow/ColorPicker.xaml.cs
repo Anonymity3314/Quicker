@@ -525,18 +525,16 @@ namespace Quicker.UserControls.SettingWindow
             b = (byte)Math.Round((blue + m) * 255); // 计算蓝色通道的值
         }
 
-        // 十六进制值文本框变化事件处理方法
-        private void HexValue_TextChanged(object sender, TextChangedEventArgs e)
+        // 十六进制颜色输入框失去焦点事件处理方法
+        private void HexValue_LostFocus(object sender, RoutedEventArgs e)
         {
             if (_updatingControls) return; // 防止重复触发
-            string hexText = HexValue.Text.Trim(); // 去除两端空格
-            if (!hexText.StartsWith("#")) // 如果不以#开头，则添加#
+            string hexText = HexValue.Text.Trim(); // 获取并去除两端空格
+
+            // 自动补#，如果没有
+            if (!hexText.StartsWith("#"))
             {
-                hexText = "#" + hexText; // 添加#
-                _updatingControls = true; // 设置标志，表示正在更新控件状态
-                HexValue.Text = hexText; // 更新文本框
-                HexValue.CaretIndex = hexText.Length; // 光标移到末尾
-                _updatingControls = false; // 重置标志
+                hexText = "#" + hexText; // 如果没有#，则自动补全
             }
 
             if (IsValidHexColor(hexText)) // 如果是有效的十六进制颜色格式
@@ -563,20 +561,23 @@ namespace Quicker.UserControls.SettingWindow
                     {
                         return; // 无效的颜色格式
                     }
-                    
+
                     _currentColor = newColor; // 新颜色
                     SelectedColor = _currentColor; // 新颜色
-                    
-                    // 更新控件状态
+
                     _updatingControls = true; // 设置标志，表示正在更新控件状态
                     UpdateControlsFromColor(); // 更新控件状态
                     _updatingControls = false; // 重置标志
                 }
                 catch
                 {
-
+                    // 处理异常，防止崩溃
                 }
             }
+            // 自动补全#后，回写到输入框
+            _updatingControls = true; // 设置标志，表示正在更新控件状态
+            HexValue.Text = hexText; // 更新文本框
+            _updatingControls = false; // 重置标志
         }
         
         /// <summary>

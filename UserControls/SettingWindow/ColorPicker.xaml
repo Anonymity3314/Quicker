@@ -72,7 +72,7 @@
         </Border>
 
         <!-- 十六进制颜色值 -->
-        <TextBox x:Name="HexValue" Style="{StaticResource RoundedTextBox}" Text="#FFFFFFFF" TextChanged="HexValue_TextChanged" Margin="124,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <TextBox x:Name="HexValue" Style="{StaticResource RoundedTextBox}" LostFocus="HexValue_LostFocus" Margin="124,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="86"/>
 
         <StackPanel Margin="10,145,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="221">
             <!-- R 值滑块 -->
