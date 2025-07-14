@@ -13,6 +13,7 @@
 
         // 颜色
         public string BackgroundColor { get; set; } // 背景颜色
+        public string BorderColor { get; set; } // 边框颜色
         public string ToolbarColor { get; set; } // 工具栏颜色
         public string ToolbarIconColor { get; set; } // 工具栏图标颜色
         public string ActionButtonColor { get; set; } // 动作按钮颜色

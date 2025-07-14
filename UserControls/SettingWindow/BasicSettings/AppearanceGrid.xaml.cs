@@ -47,6 +47,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 
                 // 颜色
                 var backgroundColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor));
+                var borderColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BorderColor));
                 var toolbarColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor));
                 var toolbarIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor));
                 var actionButtonColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor));
@@ -58,7 +59,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 var triggerKeyTextColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
                 var otherIconColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
 
+                // 颜色按钮赋值
                 BackgroundColorButton.Background = backgroundColorBrush; // 设置背景颜色
+                BorderColorButton.Background = borderColorBrush; // 设置边框颜色
                 ToolbarColorButton.Background = toolbarColorBrush; // 设置工具栏颜色
                 ToolbarIconColorButton.Background = toolbarIconColorBrush; // 设置工具栏图标颜色
                 ActionButtonColorButton.Background = actionButtonColorBrush; // 设置动作按钮颜色

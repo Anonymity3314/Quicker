@@ -153,6 +153,7 @@ namespace Quicker.Managers
 
                 // 颜色
                 BackgroundColor = Appearance.BackgroundColor, // 背景颜色
+                BorderColor = Appearance.BorderColor, // 边框颜色
                 ToolbarColor = Appearance.ToolbarColor, // 工具栏颜色
                 ToolbarIconColor = Appearance.ToolbarIconColor, // 工具栏图标颜色
                 ActionButtonColor = Appearance.ActionButtonColor, // 动作按钮颜色

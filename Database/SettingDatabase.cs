@@ -51,6 +51,7 @@ namespace Quicker.Database
          * ButtonCornerRadius: 按钮圆角，默认为0.0。
          *
          * BackgroundColor: 背景颜色，默认为#FFF3F3F3。
+         * BorderColor：边框颜色，默认为#FFD3D3D3。
          * ToolbarColor: 工具栏颜色，默认为#00F3F3F3。
          * ToolbarIconColor: 工具栏图标颜色，默认为#FFA1A1A1。
          * ActionButtonColor: 动作按钮颜色，默认为#FFFFFFFF。
@@ -212,7 +213,7 @@ namespace Quicker.Database
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", 0, 0, 12, 400, "", 1.0, 1, 0, false, false, false, false, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@ButtonSize"] = defaults.Item1, // 按钮大小
@@ -220,29 +221,30 @@ namespace Quicker.Database
                 ["@BorderWidth"] = defaults.Item3, // 边框宽度
                 ["@ButtonCornerRadius"] = defaults.Item4, // 按钮圆角
                 ["@BackgroundColor"] = defaults.Item5, // 背景颜色
-                ["@ToolbarColor"] = defaults.Item6, // 工具栏颜色
-                ["@ToolbarIconColor"] = defaults.Item7, // 工具栏图标颜色
-                ["@ActionButtonColor"] = defaults.Item8, // 动作按钮颜色
-                ["@ActionButtonMouseOverColor"] = defaults.Item9, // 动作按钮鼠标悬停颜色
-                ["@BlankButtonColor"] = defaults.Item10, // 空白按钮颜色
-                ["@BlankButtonMouseOverColor"] = defaults.Item11, // 空白按钮鼠标悬停颜色
-                ["@ButtonTextColor"] = defaults.Item12, // 按钮文字颜色
-                ["@ActionIconColor"] = defaults.Item13, // 动作图标颜色
-                ["@TriggerKeyTextColor"] = defaults.Item14, // 触发键文字颜色
-                ["@OtherIconColor"] = defaults.Item15, // 其他位置图标颜色
-                ["@Font1"] = defaults.Item16, // 字体1
-                ["@Font2"] = defaults.Item17, // 字体2
-                ["@FontSize"] = defaults.Item18, // 字体大小
-                ["@FontWeight"] = defaults.Item19, // 字体粗细
-                ["@BackgroundImagePath"] = defaults.Item20, // 背景图片路径
-                ["@BackgroundImageOpacity"] = defaults.Item21, // 背景图片不透明度
-                ["@Blur"] = defaults.Item22, // 模糊模式
-                ["@Win11CornerRadius"] = defaults.Item23, // Win11圆角模式
-                ["@AutoHideTitleBar"] = defaults.Item24, // 自动缩小动作名称文字
-                ["@ShowActionButtonMouseOver"] = defaults.Item25, // 鼠标悬浮在动作按钮上时，放大显示按钮
-                ["@HideActionNameAfterIcon"] = defaults.Item26, // 设置动作图标后隐藏动作名称
-                ["@ShowActionIconShadow"] = defaults.Item27, // 动作图标显示阴影
-                ["@EnablePreview"] = defaults.Item28 // 开启预览功能
+                ["@BorderColor"] = defaults.Item6, // 边框颜色
+                ["@ToolbarColor"] = defaults.Item7, // 工具栏颜色
+                ["@ToolbarIconColor"] = defaults.Item8, // 工具栏图标颜色
+                ["@ActionButtonColor"] = defaults.Item9, // 动作按钮颜色
+                ["@ActionButtonMouseOverColor"] = defaults.Item10, // 动作按钮鼠标悬停颜色
+                ["@BlankButtonColor"] = defaults.Item11, // 空白按钮颜色
+                ["@BlankButtonMouseOverColor"] = defaults.Item12, // 空白按钮鼠标悬停颜色
+                ["@ButtonTextColor"] = defaults.Item13, // 按钮文字颜色
+                ["@ActionIconColor"] = defaults.Item14, // 动作图标颜色
+                ["@TriggerKeyTextColor"] = defaults.Item15, // 触发键文字颜色
+                ["@OtherIconColor"] = defaults.Item16, // 其他位置图标颜色
+                ["@Font1"] = defaults.Item17, // 字体1
+                ["@Font2"] = defaults.Item18, // 字体2
+                ["@FontSize"] = defaults.Item19, // 字体大小
+                ["@FontWeight"] = defaults.Item20, // 字体粗细
+                ["@BackgroundImagePath"] = defaults.Item21, // 背景图片路径
+                ["@BackgroundImageOpacity"] = defaults.Item22, // 背景图片不透明度
+                ["@Blur"] = defaults.Item23, // 模糊模式
+                ["@Win11CornerRadius"] = defaults.Item24, // Win11圆角模式
+                ["@AutoHideTitleBar"] = defaults.Item25, // 自动缩小动作名称文字
+                ["@ShowActionButtonMouseOver"] = defaults.Item26, // 鼠标悬浮在动作按钮上时，放大显示按钮
+                ["@HideActionNameAfterIcon"] = defaults.Item27, // 设置动作图标后隐藏动作名称
+                ["@ShowActionIconShadow"] = defaults.Item28, // 动作图标显示阴影
+                ["@EnablePreview"] = defaults.Item29 // 开启预览功能
             };
             using var command = new SQLiteCommand(SQLStatements.InsertAppearance, connection); // 创建 SQLiteCommand 对象
             foreach (var param in parameters)
@@ -525,29 +527,30 @@ namespace Quicker.Database
                     BorderWidth = reader.GetDouble(3),
                     ButtonCornerRadius = reader.GetDouble(4),
                     BackgroundColor = reader.GetString(5),
-                    ToolbarColor = reader.GetString(6),
-                    ToolbarIconColor = reader.GetString(7),
-                    ActionButtonColor = reader.GetString(8),
-                    ActionButtonMouseOverColor = reader.GetString(9),
-                    BlankButtonColor = reader.GetString(10),
-                    BlankButtonMouseOverColor = reader.GetString(11),
-                    ButtonTextColor = reader.GetString(12),
-                    ActionIconColor = reader.GetString(13),
-                    TriggerKeyTextColor = reader.GetString(14),
-                    OtherIconColor = reader.GetString(15),
-                    Font1 = reader.GetInt32(16),
-                    Font2 = reader.GetInt32(17),
-                    FontSize = reader.GetDouble(18),
-                    FontWeight = reader.GetDouble(19),
-                    BackgroundImagePath = reader.GetString(20),
-                    BackgroundImageOpacity = reader.GetDouble(21),
-                    Blur = reader.GetInt32(22),
-                    Win11CornerRadius = reader.GetInt32(23),
-                    AutoHideTitleBar = reader.GetBoolean(24),
-                    ShowActionButtonMouseOver = reader.GetBoolean(25),
-                    HideActionNameAfterIcon = reader.GetBoolean(26),
-                    ShowActionIconShadow = reader.GetBoolean(27),
-                    EnablePreview = reader.GetBoolean(28)
+                    BorderColor = reader.GetString(6),
+                    ToolbarColor = reader.GetString(7),
+                    ToolbarIconColor = reader.GetString(8),
+                    ActionButtonColor = reader.GetString(9),
+                    ActionButtonMouseOverColor = reader.GetString(10),
+                    BlankButtonColor = reader.GetString(11),
+                    BlankButtonMouseOverColor = reader.GetString(12),
+                    ButtonTextColor = reader.GetString(13),
+                    ActionIconColor = reader.GetString(14),
+                    TriggerKeyTextColor = reader.GetString(15),
+                    OtherIconColor = reader.GetString(16),
+                    Font1 = reader.GetInt32(17),
+                    Font2 = reader.GetInt32(18),
+                    FontSize = reader.GetDouble(19),
+                    FontWeight = reader.GetDouble(20),
+                    BackgroundImagePath = reader.GetString(21),
+                    BackgroundImageOpacity = reader.GetDouble(22),
+                    Blur = reader.GetInt32(23),
+                    Win11CornerRadius = reader.GetInt32(24),
+                    AutoHideTitleBar = reader.GetBoolean(25),
+                    ShowActionButtonMouseOver = reader.GetBoolean(26),
+                    HideActionNameAfterIcon = reader.GetBoolean(27),
+                    ShowActionIconShadow = reader.GetBoolean(28),
+                    EnablePreview = reader.GetBoolean(29)
                 });
             }
             transaction.Commit();
@@ -568,6 +571,7 @@ namespace Quicker.Database
             command.Parameters.AddWithValue("@BorderWidth", appearance.BorderWidth); // 设置参数
             command.Parameters.AddWithValue("@ButtonCornerRadius", appearance.ButtonCornerRadius); // 设置参数
             command.Parameters.AddWithValue("@BackgroundColor", appearance.BackgroundColor); // 设置参数
+            command.Parameters.AddWithValue("@BorderColor", appearance.BorderColor); // 设置参数
             command.Parameters.AddWithValue("@ToolbarColor", appearance.ToolbarColor); // 设置参数
             command.Parameters.AddWithValue("@ToolbarIconColor", appearance.ToolbarIconColor); // 设置参数
             command.Parameters.AddWithValue("@ActionButtonColor", appearance.ActionButtonColor); // 设置参数
@@ -789,6 +793,7 @@ namespace Quicker.Database
                 BorderWidth REAL,
                 ButtonCornerRadius REAL,
                 BackgroundColor TEXT,
+                BorderColor TEXT,
                 ToolbarColor TEXT,
                 ToolbarIconColor TEXT,
                 ActionButtonColor TEXT,
@@ -821,6 +826,7 @@ namespace Quicker.Database
                 BorderWidth,
                 ButtonCornerRadius,
                 BackgroundColor,
+                BorderColor,
                 ToolbarColor,
                 ToolbarIconColor,
                 ActionButtonColor,
@@ -852,6 +858,7 @@ namespace Quicker.Database
                 @BorderWidth,
                 @ButtonCornerRadius,
                 @BackgroundColor,
+                @BorderColor,
                 @ToolbarColor,
                 @ToolbarIconColor,
                 @ActionButtonColor,
@@ -884,6 +891,7 @@ namespace Quicker.Database
                 BorderWidth = @BorderWidth,
                 ButtonCornerRadius = @ButtonCornerRadius,
                 BackgroundColor = @BackgroundColor,
+                BorderColor = @BorderColor,
                 ToolbarColor = @ToolbarColor,
                 ToolbarIconColor = @ToolbarIconColor,
                 ActionButtonColor = @ActionButtonColor,
