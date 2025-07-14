@@ -1,4 +1,5 @@
-﻿using Quicker.Windows.MainWindows;
+﻿using System.Windows.Media.Imaging;
+using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Quicker.UserControls;
@@ -8,6 +9,7 @@ using Quicker.Database;
 using Quicker.Managers;
 using System.Xml.Linq;
 using System.Windows;
+using Quicker.Models;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -40,12 +42,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             settingManager.LoadAppearanceAsync(); // 初始化缓存数据
             Application.Current.Dispatcher.Invoke(() =>
             {
-                ApplyButtonSettings();
-                ApplyColorSettings();
-                ApplyFontSettings();
-                ApplyBackgroundImageSettings();
-                ApplyBlurAndCornerSettings();
-                ApplyOptionSettings();
+                ApplyButtonSettings(); // 应用按钮相关设置
+                ApplyColorSettings(); // 应用颜色相关设置
+                ApplyFontSettings(); // 应用字体相关设置
+                ApplyBackgroundImageSettings(); // 应用背景图片设置
+                ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
+                ApplyOptionSettings(); // 应用选项设置
             }); // 异步加载设置
         }
 
@@ -131,7 +133,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             switch (checkBox.Name) // 根据控件名称区分处理
             {
                 case "AutoHideTitleBarCheckBox":
-                    settingManager.appearanceConditions.AutoHideTitleBar = value; // 自动隐藏标题栏
+                    settingManager.appearanceConditions.AutoHideTitleBar = value; // 自动缩小动作名称文字
                     break;
                 case "ShowActionButtonMouseOverCheckBox":
                     settingManager.appearanceConditions.ShowActionButtonMouseOver = value; // 鼠标悬浮放大动作按钮
@@ -152,6 +154,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 default:
                     return; // 其它CheckBox不处理
             }
+            LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
         }
 
@@ -178,7 +181,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             if (_currentBrush != null)
             {
                 _currentBrush.Color = e.NewColor;
-                // 假设你有个方法可以根据_currentBrush找到对应的属性
                 UpdateAppearanceColorProperty(_currentBrush, e.NewColor);
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
             }
@@ -238,7 +240,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 {
                     btn.Tag = buttonData; // 绑定按钮数据到Tag
                     btn.Background = ActionButtonColorButton.Background; // 设置为动作按钮颜色
-                    buttonManager.RefreshButtonDisplay(btn, buttonData, (int)ButtonSizeSlider.Value, false); // 刷新按钮显示内容
+                    RefreshButtonDisplay(btn, buttonData); // 刷新按钮显示内容
                 }
                 else
                 {
@@ -246,6 +248,207 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     btn.Background = BlankButtonColorButton.Background; // 设置为空白按钮颜色
                     btn.Content = null; // 清空内容或设置为空白样式
                 }
+            }
+        }
+
+        /// <summary>
+        /// 刷新按钮显示内容
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        public void RefreshButtonDisplay(Button button, ButtonData buttonInformation)
+        {
+            if (buttonInformation == null || buttonInformation.Location == null)
+            {
+                ResetButtonDisplay(button); // 重置按钮显示
+                return; // 直接返回
+            }
+
+            button.Tag = buttonInformation; // 设置按钮标签
+            var grid = CreateButtonGrid(buttonInformation); // 创建按钮网格
+            button.Content = grid; // 设置按钮内容
+        }
+
+        /// <summary>
+        /// 重置按钮显示
+        /// </summary>
+        /// <param name="button"> 目标按钮 </param>
+        private void ResetButtonDisplay(Button button)
+        {
+            button.Content = null; // 清空按钮内容
+            button.Tag = null; // 清空标签
+            button.Background = BlankButtonColorButton.Background; // 设置背景色
+        }
+
+        /// <summary>
+        /// 创建按钮网格
+        /// </summary>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <param name="maxWidth"> 最大宽度 </param>
+        /// <param name="isMainWindow"> 是否为主窗口 </param>
+        private Grid CreateButtonGrid(ButtonData buttonInformation)
+        {
+            Grid grid = new(); // 创建网格
+            if (!string.IsNullOrEmpty(buttonInformation.ImagePath)) // 如果图像路径不为空
+            {
+                AddImageToGrid(grid, buttonInformation); // 添加图像到网格
+            }
+
+            if (!string.IsNullOrEmpty(buttonInformation.Title)) // 如果标题不为空
+            {
+                AddTitleToGrid(grid, buttonInformation); // 添加标题到网格
+            }
+
+            return grid; // 返回网格
+        }
+
+        /// <summary>
+        /// 添加图像到网格
+        /// </summary>
+        /// <param name="grid"> 目标网格 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        private void AddImageToGrid(Grid grid, ButtonData buttonInformation)
+        {
+            try
+            {
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+                Image image = LoadActionIcon(buttonInformation); // 加载动作图标
+                grid.Children.Add(image); // 添加图像到网格
+                Grid.SetRow(image, 0); // 设置图像行
+            }
+            catch
+            {
+                using var toast = new ToastManager(); // 消息提醒管理器
+                toast.Show($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
+            }
+        }
+
+        /// <summary>
+        /// 向指定Grid中添加标题TextBlock，并根据设置自动调整字号或省略号，控制可见性和颜色
+        /// </summary>
+        /// <param name="grid"> 目标网格 </param>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        private void AddTitleToGrid(Grid grid, ButtonData buttonInformation)
+        {
+            double buttonSize = double.Parse(ButtonSizeTextBox.Text); // 获取按钮大小
+            double borderWidth = BorderWidthSlider.Value; // 获取边框宽度
+            double maxWidth = buttonSize - borderWidth * 2; // 计算最大可用宽度
+
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
+            TextBlock textBlock = LoadActionTitle(buttonInformation); // 创建标题TextBlock
+            textBlock.Visibility = HideActionNameAfterIconCheckBox != null && HideActionNameAfterIconCheckBox.IsChecked == true
+                ? Visibility.Collapsed : Visibility.Visible; // 根据设置控制可见性
+
+            if (AutoHideTitleBarCheckBox != null && AutoHideTitleBarCheckBox.IsChecked == true)
+            {
+                ShrinkTextBlockFontToFit(textBlock, buttonSize, borderWidth); // 自动缩小字号以适应宽度
+            }
+            else
+            {
+                AutoEllipsisTextBlock(textBlock, (int)maxWidth); // 超出宽度时自动省略号
+            }
+            grid.Children.Add(textBlock); // 添加TextBlock到网格
+            Grid.SetRow(textBlock, 1); // 设置TextBlock所在行
+        }
+
+        /// <summary>
+        /// 加载动作图标
+        /// </summary>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <returns> 图像对象 </returns>
+        private Image LoadActionIcon(ButtonData buttonInformation)
+        {
+            double buttonSize = double.Parse(ButtonSizeTextBox.Text); // 获取按钮大小
+            double imageSize = buttonSize / 2.0; // 图片大小
+            Image image = new()
+            {
+                Width = imageSize,
+                Height = imageSize,
+                Stretch = Stretch.Uniform,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Source = new BitmapImage(new Uri(buttonInformation.ImagePath))
+            };
+
+            image.Effect = ShowActionIconShadowCheckBox.IsChecked == true
+                ? new System.Windows.Media.Effects.DropShadowEffect
+                {
+                    Color = Colors.Black,
+                    BlurRadius = 8,
+                    ShadowDepth = 2,
+                    Opacity = 0.5
+                }
+                : null; // 判断是否需要阴影
+
+            return image;
+        }
+
+        /// <summary>
+        /// 加载动作名称TextBlock，并绑定文字颜色
+        /// </summary>
+        /// <param name="buttonInformation"> 按钮数据 </param>
+        /// <returns> 文本块对象 </returns>
+        private TextBlock LoadActionTitle(ButtonData buttonInformation)
+        {
+            var binding = new System.Windows.Data.Binding
+            {
+                ElementName = "ButtonTextColorButton", // 绑定到按钮文字颜色按钮
+                Path = new PropertyPath("Background") // 绑定其Background属性
+            };
+            var textBlock = new TextBlock
+            {
+                Text = buttonInformation.Title, // 设置文本内容
+                TextAlignment = TextAlignment.Center, // 文本居中
+                HorizontalAlignment = HorizontalAlignment.Stretch // 水平拉伸填满
+            };
+            textBlock.SetBinding(TextBlock.ForegroundProperty, binding); // 绑定前景色为按钮文字颜色
+            return textBlock; // 返回TextBlock对象
+        }
+
+        /// <summary>
+        /// 动态调整TextBlock的字体大小以适应最大宽度
+        /// </summary>
+        /// <param name="textBlock">指定的TextBlock</param>
+        /// <param name="maxWidth">最大宽度</param>
+        public void AutoEllipsisTextBlock(TextBlock textBlock, int maxWidth)
+        {
+            if (string.IsNullOrEmpty(textBlock.Text)) return; // 如果文本为空，直接返回
+            textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量文本块的大小
+            double textWidth = textBlock.DesiredSize.Width; // 获取文本宽度           
+            if (textWidth <= maxWidth) return; // 如果文本宽度小于等于最大宽度，直接返回
+
+            string originalText = textBlock.Text; // 获取原始文本
+            string ellipsis = "..."; // 设置省略号
+            string truncatedText = originalText; // 初始化截断文本
+            while (true) // 循环直到文本宽度小于等于最大宽度
+            {
+                truncatedText = truncatedText.Substring(0, truncatedText.Length - 1); // 截断文本
+                string newText = truncatedText + ellipsis; // 添加省略号
+                textBlock.Text = newText; // 更新 TextBlock 的文本
+                textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量文本块的大小
+                double newWidth = textBlock.DesiredSize.Width; // 获取新文本宽度
+                if (newWidth <= maxWidth) break; // 如果新文本宽度小于等于最大宽度，退出循环
+            }
+            textBlock.Text = truncatedText + ellipsis; // 更新 TextBlock 的文本
+        }
+
+        /// <summary>
+        /// 缩小TextBlock字号直到文本宽度小于等于按钮大小 - 按钮边框 * 2
+        /// </summary>
+        /// <param name="textBlock"> 要调整的TextBlock </param>
+        /// <param name="buttonSize"> 按钮大小 </param>
+        /// <param name="borderWidth"> 按钮边框宽度 </param>
+        public void ShrinkTextBlockFontToFit(TextBlock textBlock, double buttonSize, double borderWidth)
+        {
+            if (textBlock == null || string.IsNullOrEmpty(textBlock.Text)) return; // 防止空引用或空文本
+            double maxWidth = buttonSize - borderWidth * 2; // 计算最大允许宽度
+            double fontSize = double.Parse(FontSizeTextBox.Text); // 获取初始字号
+            textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量当前文本块宽度
+            while (textBlock.DesiredSize.Width >= maxWidth)
+            {
+                fontSize -= 0.1; // 递减字号
+                textBlock.FontSize = fontSize; // 应用新字号
+                textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 重新测量宽度
             }
         }
 
@@ -276,11 +479,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 case "ButtonSizeSlider":
                     settingManager.appearanceConditions.ButtonSize = slider.Value; // 设置按钮大小
-                    LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
                     break;
                 case "ButtonGapSlider":
                     settingManager.appearanceConditions.ButtonGap = slider.Value; // 设置按钮间距
-                    LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
                     break;
                 case "BorderWidthSlider":
                     settingManager.appearanceConditions.BorderWidth = slider.Value; // 设置边框宽度
@@ -297,6 +498,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 default:
                     return;
             }
+            LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
         }
 

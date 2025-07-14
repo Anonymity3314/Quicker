@@ -36,7 +36,7 @@
                                 BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"/>
+                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
