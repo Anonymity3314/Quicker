@@ -49,13 +49,56 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.CheckBox_Click(sender); // 调用父窗体的勾选框点击事件
+            var checkBox = sender as CheckBox;
+            if (checkBox == null) return;
+            bool value = checkBox.IsChecked == true;
+            switch (checkBox.Name)
+            {
+                case "OpenMainWindowByMiddleMouseClickCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick = value;
+                    break;
+                case "OpenMainWindowByX1MouseClickCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByX1MouseClick = value;
+                    break;
+                case "OpenMainWindowByX2MouseClickCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByX2MouseClick = value;
+                    break;
+                case "OpenMainWindowByCtrl_MiddleMouseClickCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick = value;
+                    break;
+                case "OpenMainWindowByCtrl_RightMouseClickCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick = value;
+                    break;
+                case "OpenMainWindowByMiddleMouseClickLongerCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger = value;
+                    break;
+                case "OpenMainWindowByRightMouseClickLongerCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClickLonger = value;
+                    break;
+                case "OpenMainWindowByRightMouseClick_MoveCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByRightMouseClick_Move = value;
+                    break;
+                case "OpenMainWindowByCtrlCheckBox":
+                    settingManager.openMainWindowConditions.OpenMainWindowByCtrl = value;
+                    break;
+                default:
+                    return;
+            }
         }
 
         // 下拉框选择改变事件
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            settingManager.ComboBox_SelectionChanged(sender); // 调用父窗体的下拉框选择改变事件
+            var comboBox = sender as ComboBox;
+            if (comboBox == null) return;
+            switch (comboBox.Name)
+            {
+                case "WindowStartupLocationComboBox":
+                    settingManager.openMainWindowConditions.WindowStartupLocation = comboBox.SelectedIndex;
+                    break;
+                default:
+                    return;
+            }
         }
 
         // 基础设置-弹出面板-弹出面板

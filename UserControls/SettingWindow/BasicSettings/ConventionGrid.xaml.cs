@@ -104,13 +104,59 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.CheckBox_Click(sender); // 调用父类方法
+            var checkBox = sender as CheckBox;
+            if (checkBox == null) return;
+            bool value = checkBox.IsChecked == true;
+            switch (checkBox.Name)
+            {
+                case "AutoStartCheckBox":
+                    settingManager.conventions.AutoStart = value;
+                    break;
+                case "ShowNotificationCheckBox":
+                    settingManager.conventions.ShowNotification = value;
+                    break;
+                case "ShowAddImageCheckBox":
+                    settingManager.conventions.ShowAddImage = value;
+                    break;
+                case "HideTooltipCheckBox":
+                    settingManager.conventions.HideTooltip = value;
+                    break;
+                case "LoopPageFlippingCheckBox":
+                    settingManager.conventions.LoopPageFlipping = value;
+                    break;
+                case "RememberLastPageCheckBox":
+                    settingManager.conventions.RememberLastPage = value;
+                    break;
+                case "EnableMemoryOptimizationCheckBox":
+                    settingManager.conventions.EnableMemoryOptimization = value;
+                    break;
+                default:
+                    return;
+            }
         }
 
         // 文本框内容改变事件
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            settingManager.TextBox_TextChanged(sender); // 调用父类方法
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
+            switch (textBox.Name)
+            {
+                case "LongPressThresholdTextBox":
+                    if (int.TryParse(textBox.Text, out int longPress))
+                    {
+                        settingManager.conventions.LongPressThreshold = Math.Clamp(longPress, 30, 3000);
+                    }
+                    break;
+                case "MouseMovePixelsTextBox":
+                    if (int.TryParse(textBox.Text, out int movePixels))
+                    {
+                        settingManager.conventions.MouseMovePixels = Math.Clamp(movePixels, 1, 200);
+                    }
+                    break;
+                default:
+                    return;
+            }
         }
 
         // 窗体关闭释放资源

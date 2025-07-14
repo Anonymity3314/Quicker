@@ -14,10 +14,10 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
     public partial class AppearanceGrid : UserControl
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
-        private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
-        SettingManager settingManager; // 设置管理器
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
         private readonly ButtonDatabase db2 = new(); // 添加按钮数据库
+        private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
+        SettingManager settingManager; // 设置管理器
 
         public AppearanceGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
@@ -111,7 +111,34 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 复选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.CheckBox_Click(sender); // 调用设置管理器的复选框点击事件
+            var checkBox = sender as CheckBox;
+            if (checkBox == null) return;
+            bool value = checkBox.IsChecked == true;
+            switch (checkBox.Name)
+            {
+                case "AutoHideTitleBarCheckBox":
+                    settingManager.appearanceConditions.AutoHideTitleBar = value;
+                    break;
+                case "ShowActionButtonMouseOverCheckBox":
+                    settingManager.appearanceConditions.ShowActionButtonMouseOver = value;
+                    break;
+                case "HideActionNameAfterIconCheckBox":
+                    settingManager.appearanceConditions.HideActionNameAfterIcon = value;
+                    break;
+                case "ShowActionIconShadowCheckBox":
+                    settingManager.appearanceConditions.ShowActionIconShadow = value;
+                    break;
+                case "EnablePreviewCheckBox":
+                    settingManager.appearanceConditions.EnablePreview = value;
+                    // 预览区显示/隐藏逻辑
+                    ViewPreviewBorder.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                    if (value)
+                        LoadGlobalButtonsForPreview();
+                    break;
+                default:
+                    return;
+            }
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
         }
 
         private void ColorButton_Click(object sender, RoutedEventArgs e)
@@ -135,8 +162,21 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             if (_currentBrush != null)
             {
-                _currentBrush.Color = e.NewColor; // 实时更新按钮颜色
+                _currentBrush.Color = e.NewColor;
+                // 假设你有个方法可以根据_currentBrush找到对应的属性
+                UpdateAppearanceColorProperty(_currentBrush, e.NewColor);
+                SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
             }
+        }
+
+        private void UpdateAppearanceColorProperty(SolidColorBrush brush, Color color)
+        {
+            // 这里你可以通过判断brush是哪个按钮的Background，来设置对应的属性
+            if (brush == BackgroundColorButton.Background)
+                settingManager.appearanceConditions.BackgroundColor = color.ToString();
+            else if (brush == ToolbarColorButton.Background)
+                settingManager.appearanceConditions.ToolbarColor = color.ToString();
+            // 其它颜色同理
         }
 
         // 释放资源
@@ -164,58 +204,27 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 为预览加载全局按钮
         private void LoadGlobalButtonsForPreview()
         {
-            ViewGlobalUniformGrid.Children.Clear(); // 清空现有的预览按钮
-            var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据（第一页，即pageIndex=0）
-            double buttonSize = ButtonSizeSlider.Value; // 获取当前按钮大小
-            for (int row = 0; row < 3; row++) // 为每个按钮位置创建预览按钮
+            var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据
+            var buttons = ViewGlobalUniformGrid.Children.OfType<Button>().ToList(); // 依次获取UniformGrid里的Button
+            for (int i = 0; i < buttons.Count; i++)
             {
-                for (int col = 0; col < 4; col++)
+                var btn = buttons[i];
+                int buttonIndex = 0 * 100 + (i / 4 + 1) * 10 + (i % 4 + 1); // 按你原来的索引规则
+                string buttonName = $"Global{buttonIndex}";
+
+                var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex);
+                if (buttonData != null)
                 {
-                    int buttonIndex = 0 * 100 + (row + 1) * 10 + (col + 1); // 按钮索引
-                    string buttonName = $"Global{buttonIndex}"; // 按钮名称
-                    Button previewButton = new Button
-                    {
-                        Style = FindResource("PreviewButtonStyle") as Style,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Top,
-                        MinHeight = buttonSize,
-                        MaxHeight = buttonSize,
-                        MinWidth = buttonSize,
-                        MaxWidth = buttonSize,
-                        Height = buttonSize,
-                        Width = buttonSize,
-                        Name = buttonName
-                    };
-
-                    var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex);
-                    if (buttonData != null)
-                    {
-                        previewButton.Tag = buttonData;
-                        previewButton.Background = ActionButtonColorButton.Background;
-                        buttonManager.RefreshButtonDisplay(previewButton, buttonData, (int)buttonSize, false);
-                    }
-                    else
-                    {
-                        previewButton.Tag = null;
-                        previewButton.Background = BlankButtonColorButton.Background;
-                    }
-
-                    // 悬浮事件
-                    previewButton.MouseEnter += PreviewButton_MouseEnter;
-                    previewButton.MouseLeave += PreviewButton_MouseLeave;
-
-                    ViewGlobalUniformGrid.Children.Add(previewButton);
+                    btn.Tag = buttonData;
+                    btn.Background = ActionButtonColorButton.Background;
+                    buttonManager.RefreshButtonDisplay(btn, buttonData, (int)ButtonSizeSlider.Value, false);
                 }
-            }
-        }
-
-        // 点击预设样式按钮
-        private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
-            if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
-            {
-                //LoadGlobalButtonsForPreview();
+                else
+                {
+                    btn.Tag = null;
+                    btn.Background = BlankButtonColorButton.Background;
+                    btn.Content = null; // 或者其他空白样式
+                }
             }
         }
 
@@ -235,6 +244,74 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             btn.Background = btn.Tag == null
                 ? BlankButtonColorButton.Background
                 : ActionButtonColorButton.Background; // 绑定颜色选择
+        }
+
+        // 按钮大小滑块值改变事件
+        private void ButtonSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            settingManager.appearanceConditions.ButtonSize = ButtonSizeSlider.Value; // 设置按钮大小
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 字体粗细文本框内容改变事件
+        private void FontWeightTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (double.TryParse(FontWeightTextBox.Text, out double fw))
+                settingManager.appearanceConditions.FontWeight = fw; // 设置字体粗细
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 模糊模式下拉框选择改变事件
+        private void BlurComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            settingManager.appearanceConditions.Blur = BlurComboBox.SelectedIndex; // 设置模糊模式
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // Win11圆角模式下拉框选择改变事件
+        private void Win11CornerRadiusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            settingManager.appearanceConditions.Win11CornerRadius = Win11CornerRadiusComboBox.SelectedIndex; // 设置Win11圆角模式
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 自动隐藏标题栏复选框点击事件
+        private void AutoHideTitleBarCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            settingManager.appearanceConditions.AutoHideTitleBar = AutoHideTitleBarCheckBox.IsChecked == true; // 设置自动隐藏标题栏
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 鼠标悬浮在动作按钮上时放大显示按钮复选框点击事件
+        private void ShowActionButtonMouseOverCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            settingManager.appearanceConditions.ShowActionButtonMouseOver = ShowActionButtonMouseOverCheckBox.IsChecked == true; // 设置鼠标悬浮放大显示按钮
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 设置动作图标后隐藏动作名称复选框点击事件
+        private void HideActionNameAfterIconCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            settingManager.appearanceConditions.HideActionNameAfterIcon = HideActionNameAfterIconCheckBox.IsChecked == true; // 设置隐藏动作名称
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 动作图标显示阴影复选框点击事件
+        private void ShowActionIconShadowCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            settingManager.appearanceConditions.ShowActionIconShadow = ShowActionIconShadowCheckBox.IsChecked == true; // 设置动作图标显示阴影
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            settingManager.appearanceConditions.EnablePreview = EnablePreviewCheckBox.IsChecked == true; // 同步到缓存
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 应用于设置
+            ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2);
+            if (EnablePreviewCheckBox.IsChecked == true) // 当开启预览时，加载全局按钮
+            {
+                LoadGlobalButtonsForPreview();
+            }
         }
     }
 

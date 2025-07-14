@@ -915,7 +915,7 @@ namespace Quicker.Database
                 HideActionNameAfterIcon = @HideActionNameAfterIcon,
                 ShowActionIconShadow = @ShowActionIconShadow,
                 EnablePreview = @EnablePreview
-            WHERE ID = @ID;"; // 更新外观设置
+            WHERE ID = 1;"; // 更新外观设置
         }
     }
 }

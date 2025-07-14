@@ -278,178 +278,6 @@ namespace Quicker.Managers
                 button.BorderThickness = button == clickedButton ? new Thickness(0, 0, 0, 2) : new Thickness(0);
         }
 
-        // 下拉框选择改变事件
-        public void ComboBox_SelectionChanged(object sender)
-        {
-            if (sender is ComboBox comboBox)
-            {
-                string comboBoxName = comboBox.Name; // 获取ComboBox名称
-                int selectedIndex = comboBox.SelectedIndex; // 获取选中项索引
-                switch (comboBoxName)
-                {
-                    case "WindowStartupLocationComboBox":
-                        openMainWindowConditions.WindowStartupLocation = selectedIndex; // 设置窗口启动位置
-                        break; // 功能面板打开位置
-                }
-            }
-        }
-
-        /// <summary>
-        /// 勾选框点击事件
-        /// </summary>
-        /// <param name="sender"> 勾选框 </param>
-        public void CheckBox_Click(object sender)
-        {
-            CheckBox checkBox = (CheckBox)sender; // 获取勾选框
-            string checkBoxName = checkBox.Name; // 获取勾选框名称
-            bool? isChecked = checkBox.IsChecked; // 获取勾选框状态
-            switch (checkBoxName)
-            {
-                case "AutoStartCheckBox":
-                    conventions.AutoStart = isChecked == true;
-                    break; // 开机自启动
-                case "ShowNotificationCheckBox":
-                    conventions.ShowNotification = isChecked == true;
-                    break;  // 显示启动完成提示
-                case "ShowAddImageCheckBox":
-                    conventions.ShowAddImage = isChecked == true;
-                    break; // 左键点击空白按钮时显示创建动作菜单
-                case "HideTooltipCheckBox":
-                    conventions.HideTooltip = isChecked == true;
-                    break; // 隐藏提示框
-                case "LoopPageFlippingCheckBox":
-                    conventions.LoopPageFlipping = isChecked == true;
-                    break; // 循环翻页
-                case "RememberLastPageCheckBox":
-                    conventions.RememberLastPage = isChecked == true;
-                    break; // 记住设置窗口中最后打开的页面
-                case "EnableMemoryOptimizationCheckBox":
-                    conventions.EnableMemoryOptimization = isChecked == true;
-                    break; // 启用内存优化
-                case "OpenMainWindowByMiddleMouseClickCheckBox":
-                    openMainWindowConditions.OpenMainWindowByMiddleMouseClick = isChecked == true;
-                    break; // 按下中键
-                case "OpenMainWindowByX1MouseClickCheckBox":
-                    openMainWindowConditions.OpenMainWindowByX1MouseClick = isChecked == true; // 按下X1键
-                    break; // 按下X1键
-                case "OpenMainWindowByX2MouseClickCheckBox":
-                    openMainWindowConditions.OpenMainWindowByX2MouseClick = isChecked == true; // 按下X2键
-                    break; // 按下X2键
-                case "OpenMainWindowByCtrl_MiddleMouseClickCheckBox":
-                    openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick = isChecked == true; // Ctrl+中键单击
-                    break; // Ctrl+中键单击
-                case "OpenMainWindowByCtrl_RightMouseClickCheckBox":
-                    openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick = isChecked == true; // Ctrl+右键单击
-                    break; // Ctrl+右键单击
-                case "OpenMainWindowByMiddleMouseClickLongerCheckBox":
-                    openMainWindowConditions.OpenMainWindowByMiddleMouseClickLonger = isChecked == true; // 长按中键
-                    break; // 长按中键
-                case "OpenMainWindowByRightMouseClickLongerCheckBox":
-                    openMainWindowConditions.OpenMainWindowByRightMouseClickLonger = isChecked == true; // 长按右键
-                    break; // 长按右键
-                case "OpenMainWindowByRightMouseClick_MoveCheckBox":
-                    openMainWindowConditions.OpenMainWindowByRightMouseClick_Move = isChecked == true; // 按右键移动
-                    break; // 按右键移动
-                case "OpenMainWindowByCtrlCheckBox":
-                    openMainWindowConditions.OpenMainWindowByCtrl = isChecked == true; // 单击Ctrl键
-                    break; // 单击Ctrl键
-                case "FullScreenDisableCheckBox":
-                    blacklistSettings.IsFullScreenDisabled = isChecked == true; // 全屏禁用Quicker
-                    break; // 全屏禁用Quicker
-                case "ApplyBlacklistToExpandHotkeysCheckBox":
-                    blacklistSettings.IsBlacklistEnabledForExtendedHotkey = isChecked == true; // 黑名单应用到热键扩展
-                    break; // 黑名单应用到热键扩展
-                //case "AutoHideTitleBarCheckBox":
-                //    settingsCache.AutoHideTitleBar = isChecked == true; // 自动缩小动作名称文字
-                //    break; // 自动缩小动作名称文字
-                //case "ShowActionButtonMouseOverCheckBox":
-                //    settingsCache.ShowActionButtonMouseOver = isChecked == true; // 鼠标悬浮在动作按钮上时放大显示按钮
-                //    break; // 鼠标悬浮在动作按钮上时放大显示按钮
-                //case "HideActionNameAfterIconCheckBox":
-                //    settingsCache.HideActionNameAfterIcon = isChecked == true; // 设置动作图标后隐藏动作名称
-                //    break; // 设置动作图标后隐藏动作名称
-                //case "ShowActionIconShadowCheckBox":
-                //    settingsCache.ShowActionIconShadow = isChecked == true; // 动作图标显示阴影
-                //    break; // 动作图标显示阴影
-            }
-        }
-
-        // 文本框内容改变事件
-        public void TextBox_TextChanged(object sender)
-        {
-            TextBox textBox = sender as TextBox;
-            string textBoxName = textBox.Name; // 获取文本框名称
-            string textBoxValue = textBox.Text; // 获取文本框内容
-            switch (textBoxName)
-            {
-                case "LongPressThresholdTextBox":
-                    if (int.TryParse(textBoxValue, out int shortPressThreshold))
-                    {
-                        if (shortPressThreshold < 30) // 长按阈值不能小于30
-                        {
-                            textBox.Text = "30"; // 设置最小值
-                            conventions.LongPressThreshold = 30; // 设置最小值
-                        }
-                        else if (shortPressThreshold > 3000) // 长按阈值不能大于3000
-                        {
-                            textBox.Text = "3000"; // 设置最大值
-                            conventions.LongPressThreshold = 3000; // 设置最大值
-                        }
-                        else conventions.LongPressThreshold = shortPressThreshold; // 设置长按阈值
-                    }
-                    else // 返回原来的数值
-                    {
-                        textBox.Text = conventions.LongPressThreshold.ToString(); // 设置原来的数值
-                    } // 设置长按阈值
-                    break; // 长按阈值
-                case "MouseMovePixelsTextBox":
-                    if (int.TryParse(textBoxValue, out int mouseMovePixels))
-                    {
-                        if ((int)mouseMovePixels < 1) // 鼠标移动像素不能小于 1
-                        {
-                            textBox.Text = "1"; // 设置最小值
-                            conventions.MouseMovePixels = 1; // 设置最小值
-                        }
-                        else if ((int)mouseMovePixels > 200) // 鼠标移动像素不能大于 200
-                        {
-                            textBox.Text = "200"; // 设置最大值
-                            conventions.MouseMovePixels = 200; // 设置最大值
-                        }
-                        else conventions.MouseMovePixels = mouseMovePixels; // 设置鼠标移动像素
-                    }
-                    else // 返回原来的数值
-                    {
-                        textBox.Text = conventions.MouseMovePixels.ToString(); // 设置原来的数值
-                    } // 设置鼠标移动像素
-                    break; // 鼠标移动像素
-                case "ButtonSizeTextBox":
-                    break;
-                case "ButtonGapTextBox":
-                    break;
-                case "BorderWidthTextBox":
-                    break;
-                case "ButtonCornerRadiusTextBox":
-                    break;
-            }
-        }
-
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e, TextBox targetTextBox)
-        {
-            Slider slider = sender as Slider;
-            string sliderName = slider.Name;
-            switch(sliderName)
-            {
-                case "ButtonSizeSlider":
-                    break;
-                case "ButtonGapSlider":
-                    break;
-                case "BorderWidthSlider":
-                    break;
-                case "ButtonCornerRadiusSlider":
-                    break;
-            }
-        }
-
         /// <summary>
         /// 判断当前设置是否与原始设置相同
         /// </summary>
@@ -481,35 +309,36 @@ namespace Quicker.Managers
         /// <summary>
         /// 比较两个设置对象是否相等
         /// </summary>
+        /// <typeparam name="T">设置对象类型</typeparam>
+        /// <param name="obj1">第一个设置对象</param>
+        /// <param name="obj2">第二个设置对象</param>
+        /// <returns>是否相等</returns>
         private bool AreSettingsEqual<T>(T obj1, T obj2) where T : class
         {
-            if (obj1 == null && obj2 == null) return true;
-            if (obj1 == null || obj2 == null) return false;
-            
-            var properties = typeof(T).GetProperties();
-            
+            if (obj1 == null && obj2 == null) return true; // 如果两个对象都为null，认为相等
+            if (obj1 == null || obj2 == null) return false; // 只有一个为null，认为不相等
+
+            var properties = typeof(T).GetProperties(); // 获取所有属性
             foreach (var property in properties)
             {
                 if (property.CanRead)
                 {
-                    var value1 = property.GetValue(obj1);
-                    var value2 = property.GetValue(obj2);
-                    
-                    if (value1 == null && value2 == null) continue;
-                    if (value1 == null || value2 == null) return false;
-                    
+                    var value1 = property.GetValue(obj1); // 获取第一个对象的属性值
+                    var value2 = property.GetValue(obj2); // 获取第二个对象的属性值
+
+                    if (value1 == null && value2 == null) continue; // 都为null，继续比较下一个属性
+                    if (value1 == null || value2 == null) return false; // 只有一个为null，不相等
+
                     if (!value1.Equals(value2))
-                        return false;
+                        return false; // 属性值不相等，返回false
                 }
             }
-            
-            return true;
+            return true; // 所有属性都相等，返回true
         }
 
         #region IDisposable实现
 
-        // 是否已释放资源标志
-        private bool _disposed = false;
+        private bool _disposed = false; // 是否已释放资源标志
 
         // 手动释放资源
         public void Dispose()

@@ -403,7 +403,20 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            settingManager.CheckBox_Click(sender);
+            var checkBox = sender as System.Windows.Controls.CheckBox;
+            if (checkBox == null) return;
+            bool value = checkBox.IsChecked == true;
+            switch (checkBox.Name)
+            {
+                case "FullScreenDisableCheckBox":
+                    settingManager.blacklistSettings.IsFullScreenDisabled = value;
+                    break;
+                case "ApplyBlacklistToExpandHotkeysCheckBox":
+                    settingManager.blacklistSettings.IsBlacklistEnabledForExtendedHotkey = value;
+                    break;
+                default:
+                    return;
+            }
         }
 
         // 黑名单添加按钮点击事件
