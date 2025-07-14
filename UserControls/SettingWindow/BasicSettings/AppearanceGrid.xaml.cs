@@ -108,18 +108,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ScrollViewer.ScrollToVerticalOffset(AppearanceScrollBar.Value); // 设置滚动条值
         }
 
-        // 鼠标移入界面显示滚动条
-        private void SettingGrid_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            AppearanceScrollBar.Visibility = Visibility.Visible; // 显示滚动条
-        }
-
-        // 鼠标移出界面隐藏滚动条
-        private void SettingGrid_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            AppearanceScrollBar.Visibility = Visibility.Collapsed; // 隐藏滚动条
-        }
-
         // 复选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {

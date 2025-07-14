@@ -524,18 +524,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             });
         }
 
-        // 鼠标移入Grid显示滚动条
-        private void ShowBlacklistScrollBar(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            BlacklistScrollBar.Visibility = Visibility.Visible; // 显示滚动条
-        }
-
-        // 鼠标移出Grid隐藏滚动条
-        private void HideBlacklistScrollBar(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            BlacklistScrollBar.Visibility = Visibility.Hidden; // 隐藏滚动条
-        }
-
         // 同步滚动条
         private void BlacklistScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {

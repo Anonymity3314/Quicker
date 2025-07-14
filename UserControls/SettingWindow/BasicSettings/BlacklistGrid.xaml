@@ -24,12 +24,33 @@
                 <ColumnDefinition Width="79*"/>
             </Grid.ColumnDefinitions>
             <Label Content="禁用Quicker的应用程序" HorizontalAlignment="Left" Margin="0,16,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="184"/>
-            <Border BorderBrush="#FFD5D5D5" BorderThickness="1" Margin="10,52,0,565" CornerRadius="3" MouseEnter="ShowBlacklistScrollBar" MouseLeave="HideBlacklistScrollBar" VerticalAlignment="Top">
+            <Border BorderBrush="#FFD5D5D5" BorderThickness="1" Margin="10,52,0,565" CornerRadius="3" VerticalAlignment="Top">
                 <Grid>
+                    <Grid.Triggers>
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BlacklistScrollBar" Storyboard.TargetProperty="Visibility">
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
+                                    </ObjectAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BlacklistScrollBar" Storyboard.TargetProperty="Visibility">
+                                        <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Hidden}"/>
+                                    </ObjectAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Grid.Triggers>
+                    
                     <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
                         <StackPanel x:Name="BlacklistStackPanel" Margin="0,0,0,2"/>
                     </ScrollViewer>
-                    <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171"/>
+                    <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Hidden"/>
                 </Grid>
             </Border>
             <Button x:Name="BlacklistDragButton" Content="拖动到要禁用Quicker的窗口上" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click" IsEnabled="False"/>

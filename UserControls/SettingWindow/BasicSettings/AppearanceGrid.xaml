@@ -64,7 +64,7 @@
                 <ColumnDefinition Width="133*"/>
             </Grid.ColumnDefinitions>
             <!-- 设置界面 -->
-            <Grid x:Name="SettingGrid" Grid.Column="0" MouseEnter="SettingGrid_MouseEnter" MouseLeave="SettingGrid_MouseLeave" Margin="0,0,0,10">
+            <Grid x:Name="SettingGrid" Grid.Column="0" Margin="0,0,0,10">
                 <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
                     <Grid>
                         <Button Content="默认设置" Style="{StaticResource Button3}" Margin="7,10,0,0" Foreground="#FF0087FC" Width="70"/>
@@ -247,7 +247,18 @@
                         <Label Margin="7,1150,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                     </Grid>
                 </ScrollViewer>
-                <ScrollBar x:Name="AppearanceScrollBar" Visibility="Collapsed" HorizontalAlignment="Right" Width="18" ValueChanged="AppearanceScrollBar_ValueChanged" Margin="0,20,0,0"/>
+                <ScrollBar x:Name="AppearanceScrollBar" HorizontalAlignment="Right" Width="18" ValueChanged="AppearanceScrollBar_ValueChanged" Margin="0,20,0,0">
+                    <ScrollBar.Style>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver, ElementName=SettingGrid}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ScrollBar.Style>
+                </ScrollBar>
             </Grid>
 
             <!-- 其他 -->

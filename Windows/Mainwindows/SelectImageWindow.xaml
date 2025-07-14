@@ -24,7 +24,28 @@
         <Button Content="取消" Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,0,27,39" VerticalAlignment="Bottom" Width="63" Click="CancelSelect"/>
         <Button Content="搜索" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="157,31,0,0" VerticalAlignment="Top" Width="76"/>
         <TextBox Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="13,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" Height="24" FontSize="13"/>
-        <Grid Margin="13,84,6,105" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave">
+        <Grid Margin="13,84,6,105">
+            <Grid.Triggers>
+                <EventTrigger RoutedEvent="MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="Visibility">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalScrollBar" Storyboard.TargetProperty="Visibility">
+                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Collapsed}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Grid.Triggers>
+
             <ListView x:Name="ImageListView" Margin="0,0,4,0" SelectionMode="Single" BorderBrush="Gray" ScrollViewer.CanContentScroll="False" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" SelectionChanged="SelectImage" ScrollViewer.ScrollChanged="ListViewScrollViewer_ScrollChanged" MouseDoubleClick="ConfirmImage">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>

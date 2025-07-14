@@ -250,17 +250,6 @@ namespace Quicker.Windows.MainWindows
             return null; // 未找到返回空
         }
 
-        // 鼠标移入视图显示 Scrollbar
-        private void Grid_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            VerticalScrollBar.Visibility = Visibility.Visible; // 显示滚动条
-        }
-         // 鼠标移出视图隐藏 Scrollbar
-        private void Grid_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            VerticalScrollBar.Visibility = Visibility.Collapsed; // 隐藏滚动条
-        }
-
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
