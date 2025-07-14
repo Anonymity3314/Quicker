@@ -452,22 +452,37 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
-        // 鼠标移入 Button 切换 Background
+        // 鼠标移入 Button 切换 Background，并根据设置放大按钮
         private void PreviewButton_MouseEnter(object sender, EventArgs e)
         {
             var btn = sender as Button; // 获取按钮
             btn.Background = btn.Tag == null
                 ? BlankButtonMouseOverColorButton.Background
                 : ActionButtonMouseOverColorButton.Background; // 绑定颜色选择
+
+            // 判断是否需要放大按钮
+            if (ShowActionButtonMouseOverCheckBox != null &&
+                ShowActionButtonMouseOverCheckBox.IsChecked == true &&
+                btn.Tag != null)
+            {
+                btn.RenderTransformOrigin = new Point(0.5, 0.5); // 设置缩放中心为按钮中心
+                btn.RenderTransform = new ScaleTransform(1.05, 1.05); // 放大1.05倍
+            }
         }
 
-        // 鼠标移入 Button 还原 Background
+        // 鼠标移出 Button 还原 Background，并还原按钮大小
         private void PreviewButton_MouseLeave(object sender, EventArgs e)
         {
             var btn = sender as Button; // 获取按钮
             btn.Background = btn.Tag == null
                 ? BlankButtonColorButton.Background
                 : ActionButtonColorButton.Background; // 绑定颜色选择
+
+            // 判断是否需要还原按钮大小
+            if (ShowActionButtonMouseOverCheckBox != null && ShowActionButtonMouseOverCheckBox.IsChecked == true)
+            {
+                btn.RenderTransform = null; // 还原为默认大小
+            }
         }
 
         // 滑块值改变事件，统一处理所有相关Slider
