@@ -12,6 +12,7 @@ using Quicker.Managers;
 using System.Xml.Linq;
 using System.Windows;
 using Quicker.Models;
+using System.Linq;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -85,6 +86,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             this.DataContext = this; // 设置自身为DataContext，便于属性绑定
             InitializeAsync(); // 异步初始化
             InitializeSettingsChangeTimer(); // 初始化设置变化检测计时器
+            InitializeFontComboBoxes(); // 初始化字体下拉框
         }
 
         // 初始化设置变化检测计时器
@@ -163,6 +165,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             FontSizeComboBox2.SelectedIndex = settingManager.appearanceConditions.Font2; // 设置字体2
             FontSizeSlider.Value = settingManager.appearanceConditions.FontSize; // 设置字体大小
             FontWeightTextBox.Text = settingManager.appearanceConditions.FontWeight.ToString(); // 设置字体粗细
+            ApplyGlobalFontFamily(); // 应用全局字体
         }
 
         // 背景图片相关设置
@@ -634,6 +637,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     default:
                         return; // 其它ComboBox不处理
                 }
+                ApplyGlobalFontFamily(); // 每次字体选择后应用全局字体
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
             }
         }
@@ -708,6 +712,46 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新数据库
             }
+        }
+
+        // 初始化字体下拉框
+        private void InitializeFontComboBoxes()
+        {
+            var fontFamilies = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
+            fontFamilies.Add("(系统默认)"); // 在最后插入一个空项
+            FontSizeComboBox1.ItemsSource = fontFamilies;
+            FontSizeComboBox2.ItemsSource = fontFamilies;
+        }
+
+        // 应用全局字体方法
+        private void ApplyGlobalFontFamily()
+        {
+            // 获取当前选择的字体名
+            string font1 = FontSizeComboBox1.SelectedItem as string;
+            string font2 = FontSizeComboBox2.SelectedItem as string;
+
+            // 判断是否为“系统默认”
+            bool isDefault1 = string.IsNullOrEmpty(font1) || font1 == "(系统默认)";
+            bool isDefault2 = string.IsNullOrEmpty(font2) || font2 == "(系统默认)";
+            FontFamily fontFamily;
+            if (!isDefault1 && !isDefault2)
+            {
+                fontFamily = new FontFamily($"{font1}, {font2}");
+            }
+            else if (!isDefault1)
+            {
+                fontFamily = new FontFamily(font1);
+            }
+            else if (!isDefault2)
+            {
+                fontFamily = new FontFamily(font2);
+            }
+            else
+            {
+                fontFamily = new FontFamily("微软雅黑"); // 系统默认改为微软雅黑
+            }
+
+            Application.Current.Resources["GlobalFontFamily"] = fontFamily;
         }
     }
 

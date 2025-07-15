@@ -67,7 +67,7 @@
                                             <Button Style="{StaticResource MenuButton}" ToolTip="关闭Quicker软件" Click="QuitQuicker">
                                                 <Grid Width="176">
                                                     <Image Source="/Resources/Images/CloseQuicker.png" Style="{StaticResource SelectButtonImage}"/>
-                                                    <TextBlock Text="退出" TextAlignment="Left" Margin="26,0,0,0" FontSize="13"/>
+                                                    <TextBlock Text="退出" TextAlignment="Left" Margin="26,0,0,0" FontSize="13" VerticalAlignment="Center"/>
                                                 </Grid>
                                             </Button>
                                         </StackPanel>

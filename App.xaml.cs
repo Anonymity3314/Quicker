@@ -3,6 +3,7 @@ using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Models.Settings;
 using Quicker.Windows.Menus;
+using System.Windows.Media;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
@@ -23,6 +24,7 @@ namespace Quicker
             EnsureSingleInstance(); // 确保单例运行
             CheckAppUpdate(); // 检查应用更新
             CheckAndUpdateDatabase(); // 检查并升级数据库
+            RestoreGlobalFontFamilyFromDatabase(); // 恢复全局字体设置
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
             InitializeHookAsync(); // 初始化钩子
@@ -88,7 +90,47 @@ namespace Quicker
                     using var toast = new ToastManager(); // 消息提醒管理器
                     toast.Show("成功启动！", "Common"); // 弹出消息提醒
                 }
-            });
+            }); // 异步执行
+        }
+
+        // 重载全局字体设置
+        private void RestoreGlobalFontFamilyFromDatabase()
+        {
+            // 读取 Appearance 设置
+            var appearance = Quicker.Database.SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            if (appearance == null)
+            {
+                using var toast = new ToastManager();
+                toast.Show("获取字体设置失败！", "Error");
+                return;
+            }
+
+            // 获取系统字体列表
+            var fontFamilies = System.Windows.Media.Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
+            fontFamilies.Add("(系统默认)"); // 保持和界面一致
+
+            // 判断索引是否为最后一项（即“系统默认”）
+            string font1 = (appearance.Font1 >= 0 && appearance.Font1 < fontFamilies.Count - 1) ? fontFamilies[appearance.Font1] : null;
+            string font2 = (appearance.Font2 >= 0 && appearance.Font2 < fontFamilies.Count - 1) ? fontFamilies[appearance.Font2] : null;
+            FontFamily fontFamily; // 设置全局字体
+            if (!string.IsNullOrEmpty(font1) && !string.IsNullOrEmpty(font2))
+            {
+                fontFamily = new FontFamily($"{font1}, {font2}"); // 中英分字体
+            }
+            else if (!string.IsNullOrEmpty(font1))
+            {
+                fontFamily = new FontFamily(font1);
+            }
+            else if (!string.IsNullOrEmpty(font2))
+            {
+                fontFamily = new FontFamily(font2);
+            }
+            else
+            {
+                fontFamily = new FontFamily("微软雅黑"); // 系统默认改为微软雅黑
+            }
+
+            Application.Current.Resources["GlobalFontFamily"] = fontFamily; // 设置全局资源
         }
 
         // 初始化定时器

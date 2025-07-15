@@ -8,8 +8,23 @@
     ShutdownMode="OnMainWindowClose"
 >
     <Application.Resources>
-        <!--合并资源词典-->
         <ResourceDictionary>
+            <!-- 字体资源 -->
+            <FontFamily x:Key="GlobalFontFamily">微软雅黑</FontFamily>
+            <!-- 全局默认控件字体样式 -->
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
+            </Style>
+            <Style TargetType="Window">
+                <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
+            </Style>
+            <!-- 合并资源词典必须放最后 -->
             <ResourceDictionary.MergedDictionaries>
                 <!-- 文本块样式 -->
                 <ResourceDictionary Source="Resources/Styles/TextBlockStyles.xaml"/>

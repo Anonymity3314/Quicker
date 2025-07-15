@@ -261,6 +261,7 @@ namespace Quicker.UserControls.AddWindow
             // 获取旧数据并保留创建时间
             var oldData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName);
             DateTime createdTime = oldData != null ? oldData.CreateTime : DateTime.Now;
+            int usedTimes = oldData != null ? oldData.UsedTimes : 0;
             var buttonData = new ButtonData
             {
                 ButtonID = _addWindow.ButtonID,
@@ -269,7 +270,8 @@ namespace Quicker.UserControls.AddWindow
                 ImagePath = _addWindow.iconPath,
                 Description = _addWindow.DescriptionTextBox.Text,
                 CreateTime = createdTime,
-                ActionType = "LoadExtension"
+                ActionType = "LoadExtension",
+                UsedTimes = usedTimes
             }; // 创建按钮数据对象
             _buttonDb.UpdateAction(buttonData, _addWindow.TableName); // 更新数据库
         }

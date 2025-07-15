@@ -4,10 +4,11 @@
 >
     <!-- 添加动作窗口地址文本框 -->
     <Style x:Key="AddressTextBox" TargetType="TextBox">
-        <Setter Property="MinHeight" Value="25"/>
-        <Setter Property="TextWrapping" Value="Wrap"/>
-        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
         <Setter Property="VerticalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="MinHeight" Value="25"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -31,6 +32,7 @@
     
     <!-- 圆角文本框 -->
     <Style x:Key="RoundedTextBox" TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
         <Setter Property="Height" Value="25"/>
         <Setter Property="Template">
             <Setter.Value>
