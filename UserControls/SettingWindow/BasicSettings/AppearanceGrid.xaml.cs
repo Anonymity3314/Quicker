@@ -176,7 +176,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 背景图片相关设置
         private void ApplyBackgroundImageSettings()
         {
-            BackgroundImagePathTextBox.Text = settingManager.appearanceConditions.BackgroundImagePath; // 设置背景图片路径
+            BackgroundImagePath = settingManager.appearanceConditions.BackgroundImagePath; // 设置背景图片路径
             BackgroundImageOpacitySlider.Value = settingManager.appearanceConditions.BackgroundImageOpacity; // 设置背景图片不透明度
         }
 
@@ -786,8 +786,11 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击“选择...”按钮
         private void BackgroundImagePathButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.OpenFileDialog();
-            dialog.Filter = "图片文件|*.jpg;*.png;*.bmp";
+            var dialog = new System.Windows.Forms.OpenFileDialog()
+            {
+                Filter = "图片文件|*.jpg;*.png;*.bmp",
+                Title = "选择背景图片"
+            };
             var result = dialog.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
             {
@@ -809,7 +812,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             var opacity = BackgroundImageOpacitySlider.Value;
         }
 
-        private string _backgroundImagePath;
+        private string _backgroundImagePath; // 背景图片路径
         public string BackgroundImagePath
         {
             get => _backgroundImagePath;
@@ -823,7 +826,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
-        private double _backgroundImageOpacity = 1.0;
+        private double _backgroundImageOpacity = 1.0; // 背景图片不透明度
         public double BackgroundImageOpacity
         {
             get => _backgroundImageOpacity;
@@ -836,9 +839,18 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
             }
         }
+
+        // 文本框失去焦点时，保存背景图片路径
+        private void BackgroundImagePathTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            settingManager.appearanceConditions.BackgroundImagePath = BackgroundImagePathTextBox.Text; // 保存路径到缓存
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
     }
 
-    // 内联定义 ThicknessConverter
+    /// <summary>
+    /// ThicknessConverter：用于将double类型的值转换为Thickness类型，常用于XAML绑定时对Margin、Padding等Thickness类型值进行设置。
+    /// </summary>
     public class ThicknessConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -860,6 +872,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
     }
 
+    /// <summary>
+    /// GridWidthConverter：用于计算Grid的宽度，根据按钮大小、间隙、列数计算。
+    /// </summary>
     public class GridHeightConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -877,6 +892,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// GridHeightConverter：用于计算Grid的高度，根据按钮大小、间隙、行数计算。
+    /// </summary>
     public class GridWidthConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -894,17 +912,70 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// DoubleSubtractConverter：用于将double类型的值减去指定参数，常用于XAML绑定时对宽高等数值进行微调。
+    /// 宽度绑定为 ActualWidth-0.6，实现阴影Border略小于内容Border。
+    /// </summary>
+    public class DoubleSubtractConverter : IValueConverter
+    {
+        /// <summary>
+        /// 将value（double）减去parameter（double），返回结果。
+        /// </summary>
+        /// <param name="value">原始值（ActualWidth）</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">要减去的数值（0.6）</param>
+        /// <param name="culture">区域信息</param>
+        /// <returns>减去参数后的新值</returns>
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is double d && parameter != null && double.TryParse(parameter.ToString(), out double sub))
+            {
+                return d - sub; // 减去参数
+            }
+            return value; // 错误值
+        }
+        /// <summary>
+        /// 不支持反向转换。
+        /// </summary>
+        /// <param name="value">值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture"> 区域信息 </param>
+        /// <returns>null</returns>
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// PreviewBorderHeightConverter：用于计算预览区高度，根据按钮高度、间隙、行数计算。
+    /// </summary>
     public class PreviewBorderHeightConverter : IMultiValueConverter
     {
+        /// <summary>
+        /// 预览区高度转换器：根据按钮高度、间隙、行数计算预览区高度
+        /// </summary>
+        /// <param name="values"> [0]为按钮高度, [1]为按钮间隙, [2]为行数 </param>
+        /// <param name="targetType"> 目标类型 </param>
+        /// <param name="parameter"> 参数 </param>
+        /// <param name="culture"> 区域 </param>
+        /// <returns> 预览区高度 </returns>
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             // values[0]: 按钮高度, values[1]: 按钮间隙
             if (values.Length >= 2 && double.TryParse(values[0]?.ToString(), out double btnHeight) && double.TryParse(values[1]?.ToString(), out double gap))
             {
-                return 27 + 25 + btnHeight * 7 + gap * 5;
+                return 27 + 25 + btnHeight * 7 + gap * 5; // 预览区高度
             }
-            return 0;
+            return 0; // 错误值
         }
+        /// <summary>
+        /// 不支持反向转换
+        /// </summary>
+        /// <param name="value"> 值 </param>
+        /// <param name="targetTypes"> 目标类型 </param>
+        /// <param name="parameter"> 参数 </param>
+        /// <param name="culture"> 区域 </param>
+        /// <returns> null </returns>
+        /// <exception cref="NotImplementedException"></exception>
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
@@ -915,35 +986,23 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
     {
         // 定义附加属性 EnableCustomClip，控制是否启用自定义裁剪
         public static readonly DependencyProperty EnableCustomClipProperty =
-            DependencyProperty.RegisterAttached(
-                "EnableCustomClip",
-                typeof(bool),
-                typeof(ClipHelper),
-                new PropertyMetadata(false, OnEnableCustomClipChanged));
+            DependencyProperty.RegisterAttached("EnableCustomClip", typeof(bool), typeof(ClipHelper), new PropertyMetadata(false, OnEnableCustomClipChanged));
 
         // 定义附加属性 ClipToBounds，控制是否裁剪超出边界的子元素
         public static readonly DependencyProperty ClipToBoundsProperty =
-            DependencyProperty.RegisterAttached(
-                "ClipToBounds",
-                typeof(bool),
-                typeof(ClipHelper),
-                new PropertyMetadata(false, OnClipToBoundsChanged));
+            DependencyProperty.RegisterAttached("ClipToBounds", typeof(bool), typeof(ClipHelper), new PropertyMetadata(false, OnClipToBoundsChanged));
 
         // 设置附加属性方法
-        public static void SetEnableCustomClip(UIElement element, bool value)
-            => element.SetValue(EnableCustomClipProperty, value);
+        public static void SetEnableCustomClip(UIElement element, bool value) => element.SetValue(EnableCustomClipProperty, value);
 
         // 获取附加属性方法
-        public static bool GetEnableCustomClip(UIElement element)
-            => (bool)element.GetValue(EnableCustomClipProperty);
+        public static bool GetEnableCustomClip(UIElement element) => (bool)element.GetValue(EnableCustomClipProperty);
 
         // 设置裁剪边界属性
-        public static void SetClipToBounds(UIElement element, bool value)
-            => element.SetValue(ClipToBoundsProperty, value);
+        public static void SetClipToBounds(UIElement element, bool value) => element.SetValue(ClipToBoundsProperty, value);
 
         // 获取裁剪边界属性
-        public static bool GetClipToBounds(UIElement element)
-            => (bool)element.GetValue(ClipToBoundsProperty);
+        public static bool GetClipToBounds(UIElement element) => (bool)element.GetValue(ClipToBoundsProperty);
 
         // 附加属性值变化时的回调
         private static void OnEnableCustomClipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -984,7 +1043,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             if (sender is Border border)
             {
-                UpdateBorderClip(border);
+                UpdateBorderClip(border); // 更新裁剪路径
             }
         }
 
@@ -994,8 +1053,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <param name="border">需要裁剪的 Border</param>
         public static void UpdateBorderClip(Border border)
         {
-            double width = border.ActualWidth;
-            double height = border.ActualHeight;
+            double width = border.ActualWidth; // 边框实际宽度
+            double height = border.ActualHeight; // 边框实际高度
             double cornerRadius = border.CornerRadius.TopLeft; // 直接用Border的CornerRadius
             if (cornerRadius > 0)
             {
@@ -1079,10 +1138,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <param name="parameter">参数</param>
         /// <param name="culture">区域</param>
         /// <returns>null</returns>
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 
     /// <summary>
@@ -1167,12 +1223,23 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
     }
 
+    /// <summary>
+    /// 路径转图片源转换器：将路径转换为BitmapImage
+    /// </summary>
     public class PathToImageSourceConverter : IValueConverter
     {
+        /// <summary>
+        /// 将路径转换为BitmapImage
+        /// </summary>
+        /// <param name="value">路径（string）</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">区域</param>
+        /// <returns>BitmapImage或null</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string path = value as string;
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            string path = value as string; // 路径
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) // 路径不存在
                 return null;
             try
             {
@@ -1183,10 +1250,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 return null;
             }
         }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary>
+        /// 不支持反向转换
+        /// </summary>
+        /// <param name="value">值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">区域</param>
+        /// <returns>null</returns>
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

@@ -293,22 +293,17 @@ namespace Quicker.Managers
             // 判断常规设置是否变化
             if (_originalConventions != null && conventions != null && !AreSettingsEqual(_originalConventions, conventions))
                 return true;
-                
+
             // 判断弹出面板设置是否变化
             if (_originalOpenMainWindowConditions != null && openMainWindowConditions != null && 
                 !AreSettingsEqual(_originalOpenMainWindowConditions, openMainWindowConditions))
                 return true;
-                
+
             // 判断黑名单设置是否变化
             if (_originalBlacklistSettings != null && blacklistSettings != null &&
                 !AreSettingsEqual(_originalBlacklistSettings, blacklistSettings))
                 return true;
-                
-            // 判断外观设置是否变化
-            if (_originalAppearanceConditions != null && appearanceConditions != null &&
-                !AreSettingsEqual(_originalAppearanceConditions, appearanceConditions))
-                return true;
-                
+
             return false;
         }
 
