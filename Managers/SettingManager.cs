@@ -316,20 +316,6 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 判断外观设置是否与原始外观设置相同
-        /// </summary>
-        /// <returns>是否相同</returns>
-        public bool IsAppearanceSettingsChanged()
-        {
-            // 判断外观设置是否变化
-            if (_originalAppearanceConditions != null && appearanceConditions != null &&
-                !AreSettingsEqual(_originalAppearanceConditions, appearanceConditions))
-                return true;
-                
-            return false;
-        }
-
-        /// <summary>
         /// 判断主要外观设置（除预览设置外）是否与原始外观设置相同
         /// </summary>
         /// <returns>是否相同</returns>

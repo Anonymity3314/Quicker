@@ -1,4 +1,5 @@
 ﻿<UserControl
+    xmlns:conv="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
     xmlns:local="clr-namespace:Quicker.UserControls.SettingWindow.BasicSettings"
     x:Class="Quicker.UserControls.SettingWindow.BasicSettings.AppearanceGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,6 +7,7 @@
     xmlns:setting="clr-namespace:Quicker.UserControls.SettingWindow"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
 
     d:DesignHeight="1300"
@@ -15,6 +17,7 @@
 >
     <UserControl.Resources>
         <local:PreviewBorderHeightConverter x:Key="PreviewBorderHeightConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:GridHeightConverter x:Key="GridHeightConverter"/>
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
         <local:GridWidthConverter x:Key="GridWidthConverter"/>
@@ -164,10 +167,10 @@
                         </Button>
                         <!-- 颜色-按钮文字 -->
                         <Label Content="按钮文字：" Margin="10,487,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ButtonTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,490,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="TextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,490,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click" Background="{Binding ButtonTextColorBrush}">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <Binding ElementName="ButtonTextColorButton" Path="Background"/>
+                                    <Binding Path="ButtonTextColorBrush"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -270,6 +273,7 @@
             </Grid>
 
             <!-- 其他 -->
+            <Button x:Name="ResetAppearanceButton" Grid.Column="1" Content="重置" Style="{StaticResource WhiteButton}" ToolTip="还原到配置之前的设置" HorizontalAlignment="Left" Margin="46,49,0,0" VerticalAlignment="Top" Width="122" Click="ResetAppearanceButton_Click"/>
             <Button x:Name="PresetStyleButton" Grid.Column="1" Content="预置风格..." Foreground="#FF00B3FF" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,20,0,0" VerticalAlignment="Top" Width="122" Click="PresetStyleButton_Click"/>
             <Popup x:Name="PresetStylePopup" PopupAnimation="Fade" Width="154" Height="140" PlacementTarget="{Binding ElementName=PresetStyleButton}" AllowsTransparency="True" StaysOpen="False">
                 <Grid>
@@ -290,15 +294,20 @@
                     </Border>
                 </Grid>
             </Popup>
-            <Button x:Name="ShareSaveAppearanceButton" Grid.Column="1" Content="分享或保存外观" ToolTip="分享或保存当前的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,49,0,0" VerticalAlignment="Top" Width="122"/>
-            <Button x:Name="WheelAppearanceSettingsButton" Grid.Column="1" Content="轮盘外观设置" ToolTip="修改轮盘外观设置" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,107,0,0" VerticalAlignment="Top" Width="122"/>
-            <Button x:Name="SharedSavedAppearanceButton" Grid.Column="1" Content="已分享或保存的外观" ToolTip="查看已分享或保存的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,78,0,0" VerticalAlignment="Top" Width="122"/>
-            <Button x:Name="ResetAppearanceButton" Grid.Column="1" Content="重置" Style="{StaticResource WhiteButton}" ToolTip="还原到配置之前的设置" HorizontalAlignment="Left" Margin="46,136,0,0" VerticalAlignment="Top" Width="122" Click="ResetAppearanceButton_Click"/>
+            <Button x:Name="ShareSaveAppearanceButton" Grid.Column="1" Content="分享或保存外观" ToolTip="分享或保存当前的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,78,0,0" VerticalAlignment="Top" Width="122"/>
+            <Button x:Name="WheelAppearanceSettingsButton" Grid.Column="1" Content="轮盘外观设置" ToolTip="修改轮盘外观设置" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,136,0,0" VerticalAlignment="Top" Width="122"/>
+            <Button x:Name="SharedSavedAppearanceButton" Grid.Column="1" Content="已分享或保存的外观" ToolTip="查看已分享或保存的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,107,0,0" VerticalAlignment="Top" Width="122"/>
             <CheckBox x:Name="EnablePreviewCheckBox" Grid.Column="1" Content="开启预览" ToolTip="查看应用设置后的功能面板外观" HorizontalAlignment="Left" Margin="173,23,0,0" VerticalAlignment="Top" FontSize="14" Click="EnablePreviewCheckBox_Click" Panel.ZIndex="1"/>
-            <TextBlock Grid.Column="1" Text="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="173,49,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4" TextWrapping="Wrap" MaxWidth="210"/>
+            <TextBlock Grid.Column="1" Text="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="173,54,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4" TextWrapping="Wrap" MaxWidth="210"/>
 
+            <!-- 预览面板阴影 -->
+            <Border Background="#FFF3F3F3" Visibility="{Binding Visibility, ElementName=ViewPreviewBorder}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="46,78,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Width="{Binding ActualWidth, ElementName=ViewPreviewBorder}" Height="{Binding ActualHeight, ElementName=ViewPreviewBorder}">
+                <Border.Effect>
+                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                </Border.Effect>
+            </Border>
             <!-- 设置预览 -->
-            <Border x:Name="ViewPreviewBorder" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="46,49,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1">
+            <Border x:Name="ViewPreviewBorder" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="46,78,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" local:ClipHelper.ClipToBounds="True" Grid.Column="1" Visibility="{Binding IsChecked, ElementName=EnablePreviewCheckBox, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Border.Height>
                     <MultiBinding Converter="{StaticResource PreviewBorderHeightConverter}">
                         <Binding ElementName="ButtonSizeSlider" Path="Value"/>
@@ -311,164 +320,154 @@
                         <Binding ElementName="ButtonGapSlider" Path="Value"/>
                     </MultiBinding>
                 </Border.Width>
-                <Grid>
-                    <!-- 窗口阴影 -->
-                    <Rectangle Fill="White" Margin="5,7">
-                        <Rectangle.Effect>
-                            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="50" RenderingBias="Quality" ShadowDepth="1"/>
-                        </Rectangle.Effect>
-                    </Rectangle>
-                    <Border Background="{Binding ElementName=BackgroundColorButton, Path=Background}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                        <Grid x:Name="MainGrid">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="27"/>
-                                <RowDefinition Height="{Binding ElementName=GlobalGrid, Path=ActualHeight}"/>
-                                <RowDefinition Height="25"/>
-                                <RowDefinition Height="{Binding ElementName=CommonGrid, Path=ActualHeight}"/>
-                            </Grid.RowDefinitions>
-                            <!-- 标题栏 -->
-                            <Border BorderThickness="0" CornerRadius="{Binding TitleBarCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
+                <Border Background="{Binding ElementName=BackgroundColorButton, Path=Background}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                    <Grid x:Name="MainGrid">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="27"/>
+                            <RowDefinition Height="{Binding ElementName=GlobalGrid, Path=ActualHeight}"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="{Binding ElementName=CommonGrid, Path=ActualHeight}"/>
+                        </Grid.RowDefinitions>
+                        <!-- 标题栏 -->
+                        <Grid Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
+                            <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                            <Button Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
+                                <Image Source="/Resources/Images/SettingImage2.png" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                            <Button x:Name="ActionPageManager" Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="82,0,0,0">
                                 <Grid>
-                                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                                    <Button Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
-                                        <Image Source="/Resources/Images/SettingImage2.png" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Button>
-                                    <Button x:Name="ActionPageManager" Style="{StaticResource Task}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="82,0,0,0">
-                                        <Grid>
-                                            <Image Source="/Resources/Images/MoreSelection.png" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                            <Border x:Name="HasNewVersionTip" CornerRadius="4,4,4,4" Background="#11AD45" Margin="12,12,0,0"/>
-                                        </Grid>
-                                    </Button>
-                                    <Button Style="{StaticResource Task}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
-                                        <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Button>
-                                    <Button Style="{StaticResource Task}" HorizontalAlignment="Right" Margin="0,0,1,0">
-                                        <Image x:Name="Close" Source="/Resources/Images/CloseWindow.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Button>
+                                    <Image Source="/Resources/Images/MoreSelection.png" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Border x:Name="HasNewVersionTip" CornerRadius="4,4,4,4" Background="#11AD45" Margin="12,12,0,0"/>
                                 </Grid>
-                            </Border>
-                            <!-- 全局动作 -->
-                            <Grid x:Name="GlobalGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="1">
-                                <Grid.Height>
-                                    <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="3">
-                                        <Binding ElementName="ButtonSizeSlider" Path="Value"/>
-                                        <Binding ElementName="ButtonGapSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Grid.Height>
-                                <Grid.Width>
-                                    <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
-                                        <Binding ElementName="ButtonSizeSlider" Path="Value"/>
-                                        <Binding ElementName="ButtonGapSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Grid.Width>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <!-- 第一行 -->
-                                <Button x:Name="GlobalButton1" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton2" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton3" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton4" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <!-- 第二行 -->
-                                <Button x:Name="GlobalButton5" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton6" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton7" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton8" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <!-- 第三行 -->
-                                <Button x:Name="GlobalButton9" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton10" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton11" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                                <Button x:Name="GlobalButton12" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
-                            </Grid>
-                            <!-- 功能栏 -->
-                            <Grid VerticalAlignment="Center" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.Row="2" >
-                                <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" TextAlignment="Center" Margin="10,0"/>
-                                <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                                <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                                <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" HorizontalAlignment="Right" Margin="0,0,34,0">
-                                    <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Button>
-                            </Grid>
-                            <!-- 通用动作 -->
-                            <Grid x:Name="CommonGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="3">
-                                <Grid.Height>
-                                    <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="4">
-                                        <Binding ElementName="ButtonSizeSlider" Path="Value"/>
-                                        <Binding ElementName="ButtonGapSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Grid.Height>
-                                <Grid.Width>
-                                    <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
-                                        <Binding ElementName="ButtonSizeSlider" Path="Value"/>
-                                        <Binding ElementName="ButtonGapSlider" Path="Value"/>
-                                    </MultiBinding>
-                                </Grid.Width>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <!-- 第一行 -->
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="0"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="2"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="4"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="6"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="8"/>
-                                <!-- 第二行 -->
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="0"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="2"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="4"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="6"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="8"/>
-                                <!-- 第三行 -->
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="0"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="2"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="4"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="8"/>
-                                <!-- 第四行 -->
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="0"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="2"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="4"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="6"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="8"/>
-                                <!-- 左下角和右下角裁剪按钮 -->
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="8" Grid.Column="0" x:Name="LeftBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
-                                <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="8" Grid.Column="8" x:Name="RightBottomClipButton" local:ClipHelper.EnableCustomClip="True"/>
-                            </Grid>
+                            </Button>
+                            <Button Style="{StaticResource Task}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
+                                <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                            <Button Style="{StaticResource Task}" HorizontalAlignment="Right" Margin="0,0,1,0">
+                                <Image x:Name="Close" Source="/Resources/Images/CloseWindow.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
                         </Grid>
-                    </Border>
-                </Grid>
+                        <!-- 全局动作 -->
+                        <Grid x:Name="GlobalGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="1">
+                            <Grid.Height>
+                                <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="3">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Height>
+                            <Grid.Width>
+                                <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Width>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <!-- 第一行 -->
+                            <Button x:Name="GlobalButton1" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton2" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton3" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton4" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <!-- 第二行 -->
+                            <Button x:Name="GlobalButton5" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton6" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton7" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton8" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <!-- 第三行 -->
+                            <Button x:Name="GlobalButton9" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="0" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton10" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="2" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton11" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="4" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                            <Button x:Name="GlobalButton12" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
+                        </Grid>
+                        <!-- 功能栏 -->
+                        <Grid VerticalAlignment="Center" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.Row="2" >
+                            <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" TextAlignment="Center" Margin="10,0"/>
+                            <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
+                            <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
+                            <Button x:Name="ActionPageSelecter" Style="{StaticResource Task}" HorizontalAlignment="Right" Margin="0,0,34,0">
+                                <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                        </Grid>
+                        <!-- 通用动作 -->
+                        <Grid x:Name="CommonGrid" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="3">
+                            <Grid.Height>
+                                <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="4">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Height>
+                            <Grid.Width>
+                                <MultiBinding Converter="{StaticResource GridWidthConverter}" ConverterParameter="4">
+                                    <Binding ElementName="ButtonSizeSlider" Path="Value"/>
+                                    <Binding ElementName="ButtonGapSlider" Path="Value"/>
+                                </MultiBinding>
+                            </Grid.Width>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="{Binding ElementName=ButtonGapSlider, Path=Value}"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <!-- 第一行 -->
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="0"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="2"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="4"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="6"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="0" Grid.Column="8"/>
+                            <!-- 第二行 -->
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="0"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="2"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="4"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="6"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="2" Grid.Column="8"/>
+                            <!-- 第三行 -->
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="0"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="2"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="4"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="8"/>
+                            <!-- 第四行 -->
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="0"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="2"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="4"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="6"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="6" Grid.Column="8"/>
+                            <!-- 左下角和右下角裁剪按钮 -->
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="8" Grid.Column="0" x:Name="LeftBottomClipButton"/>
+                            <Button Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="8" Grid.Column="8" x:Name="RightBottomClipButton"/>
+                        </Grid>
+                    </Grid>
+                </Border>
             </Border>
         </Grid>
 

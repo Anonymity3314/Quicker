@@ -62,6 +62,21 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        // 按钮文字颜色Brush属性，供XAML和代码绑定
+        private SolidColorBrush _buttonTextColorBrush = new SolidColorBrush(Colors.Black);
+        public SolidColorBrush ButtonTextColorBrush
+        {
+            get => _buttonTextColorBrush;
+            set
+            {
+                if (_buttonTextColorBrush != value)
+                {
+                    _buttonTextColorBrush = value;
+                    OnPropertyChanged(nameof(ButtonTextColorBrush));
+                }
+            }
+        }
+
         public AppearanceGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent(); // 初始化xaml界面
@@ -134,7 +149,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ActionButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonMouseOverColor)); // 设置动作按钮鼠标悬停颜色
             BlankButtonColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonColor)); // 设置空白按钮颜色
             BlankButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor)); // 设置空白按钮鼠标悬停颜色
-            ButtonTextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor)); // 设置按钮文字颜色
+            TextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor)); // 设置按钮文字颜色
+            ButtonTextColorBrush = TextColorButton.Background as SolidColorBrush; // 同步ViewModel属性
             ActionIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor)); // 设置动作图标颜色
             TriggerKeyTextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor)); // 设置触发键文字颜色
             OtherIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor)); // 设置其他位置图标颜色
@@ -211,10 +227,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     break;
                 case "EnablePreviewCheckBox":
                     settingManager.appearanceConditions.EnablePreview = value; // 开启/关闭预览
-                    // 预览区显示/隐藏逻辑
-                    ViewPreviewBorder.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
-                    if (value)
-                        LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
                     break;
                 default:
                     return; // 其它CheckBox不处理
@@ -247,6 +259,11 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 _currentBrush.Color = e.NewColor;
                 UpdateAppearanceColorProperty(_currentBrush, e.NewColor);
+                if (_currentColorButton != null && _currentColorButton.Name == "TextColorButton") // 如果当前是文字颜色按钮，顺便同步ViewModel属性
+                {
+                    ButtonTextColorBrush.Color = e.NewColor;
+                    settingManager.appearanceConditions.ButtonTextColor = e.NewColor.ToString(); // 同步更新数据库字段
+                }
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
             }
         }
@@ -278,10 +295,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 _settingsChangeTimer = null;
             }
 
-            foreach (Button btn in GlobalGrid.Children.OfType<Button>())
-            {
-                ClipHelper.SetEnableCustomClip(btn, false); // 解绑自定义裁剪事件，防止内存泄漏
-            }
             GlobalGrid.Children.Clear(); // 清空按钮
 
             settingManager = null; // 释放设置管理器
@@ -465,8 +478,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             var binding = new System.Windows.Data.Binding
             {
-                ElementName = "ButtonTextColorButton", // 绑定到按钮文字颜色按钮
-                Path = new PropertyPath("Background") // 绑定其Background属性
+                Path = new PropertyPath("ButtonTextColorBrush"),
+                Source = this
             };
             var textBlock = new TextBlock
             {
@@ -645,6 +658,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             PreviewCornerRadius = new CornerRadius(previewRadius); // 预览区圆角
             TitleBarCornerRadius = new CornerRadius(previewRadius, previewRadius, 0, 0); // 标题栏只上面有圆角
+
+            // 延迟到UI刷新后再裁剪
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                ClipHelper.UpdateBorderClip(ViewPreviewBorder);
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
 
         // "开启预览"复选框点击事件
@@ -660,12 +679,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             
             // 检测预览设置变化
             bool previewChanged = settingManager.IsPreviewSettingChanged();
-            // 这里可以添加预览设置变化时的特殊处理逻辑
         }
 
         // 重置外观设置按钮点击事件
         private void ResetAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
+            ResetAppearanceButton.Visibility = Visibility.Collapsed; // 隐藏按钮
             if (settingManager != null)
             {
                 // 保存当前预览设置
@@ -775,6 +794,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 typeof(ClipHelper),
                 new PropertyMetadata(false, OnEnableCustomClipChanged));
 
+        // 定义附加属性 ClipToBounds，控制是否裁剪超出边界的子元素
+        public static readonly DependencyProperty ClipToBoundsProperty =
+            DependencyProperty.RegisterAttached(
+                "ClipToBounds",
+                typeof(bool),
+                typeof(ClipHelper),
+                new PropertyMetadata(false, OnClipToBoundsChanged));
+
         // 设置附加属性方法
         public static void SetEnableCustomClip(UIElement element, bool value)
             => element.SetValue(EnableCustomClipProperty, value);
@@ -782,6 +809,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 获取附加属性方法
         public static bool GetEnableCustomClip(UIElement element)
             => (bool)element.GetValue(EnableCustomClipProperty);
+
+        // 设置裁剪边界属性
+        public static void SetClipToBounds(UIElement element, bool value)
+            => element.SetValue(ClipToBoundsProperty, value);
+
+        // 获取裁剪边界属性
+        public static bool GetClipToBounds(UIElement element)
+            => (bool)element.GetValue(ClipToBoundsProperty);
 
         // 附加属性值变化时的回调
         private static void OnEnableCustomClipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -801,12 +836,62 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        // 裁剪边界属性变化时的回调
+        private static void OnClipToBoundsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Border border)
+            {
+                if ((bool)e.NewValue)
+                {
+                    border.SizeChanged += Border_SizeChanged; // 启用时，注册 SizeChanged 事件
+                    UpdateBorderClip(border);
+                }
+                else
+                {
+                    border.SizeChanged -= Border_SizeChanged; // 关闭时，移除事件并清除裁剪
+                    border.Clip = null;
+                }
+            }
+        }
+
+        // Border 尺寸变化时，更新裁剪路径
+        private static void Border_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (sender is Border border)
+            {
+                UpdateBorderClip(border);
+            }
+        }
+
         // 按钮尺寸变化时，更新裁剪路径
         private static void Btn_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (sender is Button btn)
             {
                 UpdateButtonClip(btn);
+            }
+        }
+
+        /// <summary>
+        /// 为 Border 设置裁剪路径，使其子元素超出边界时被裁剪
+        /// </summary>
+        /// <param name="border">需要裁剪的 Border</param>
+        public static void UpdateBorderClip(Border border)
+        {
+            double width = border.ActualWidth;
+            double height = border.ActualHeight;
+            double cornerRadius = border.CornerRadius.TopLeft; // 直接用Border的CornerRadius
+            if (cornerRadius > 0)
+            {
+                // 创建圆角矩形裁剪路径
+                var geometry = new RectangleGeometry(new Rect(0, 0, width, height), cornerRadius, cornerRadius);
+                border.Clip = geometry;
+            }
+            else
+            {
+                // 创建矩形裁剪路径
+                var geometry = new RectangleGeometry(new Rect(0, 0, width, height));
+                border.Clip = geometry;
             }
         }
 
