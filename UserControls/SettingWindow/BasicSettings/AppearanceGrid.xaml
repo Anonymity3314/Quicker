@@ -20,9 +20,12 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:BlurEffectConverter x:Key="BlurEffectConverter"/>
         <local:GridHeightConverter x:Key="GridHeightConverter"/>
+        <local:FontWeightConverter x:Key="FontWeightConverter"/>
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
         <local:GridWidthConverter x:Key="GridWidthConverter"/>
+        <!-- 按钮模板 -->
         <Style x:Key="PreviewButtonStyle" TargetType="Button">
+            <Setter Property="FontWeight" Value="{Binding ElementName=FontWeightComboBox, Path=SelectedIndex, Converter={StaticResource FontWeightConverter}}"/>
             <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="BorderBrush" Value="{Binding ElementName=BorderColorButton,Path=Background}"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -217,7 +220,24 @@
                         <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,698,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F0}'}"/>
                         <!-- 字体-字体粗细 -->
                         <Label Content="字体粗细：" Margin="10,737,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="FontWeightTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="107,738,0,0" VerticalAlignment="Top" Width="120" TextChanged="FontWeightTextBox_TextChanged"/>
+                        <ComboBox x:Name="FontWeightComboBox" HorizontalAlignment="Left" Margin="107,738,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Thin" FontWeight="Thin"/>
+                            <ComboBoxItem Content="ExtraLight" FontWeight="ExtraLight"/>
+                            <ComboBoxItem Content="UltraLight" FontWeight="UltraLight"/>
+                            <ComboBoxItem Content="Light" FontWeight="Light"/>
+                            <ComboBoxItem Content="Normal" FontWeight="Normal"/>
+                            <ComboBoxItem Content="Regular" FontWeight="Regular"/>
+                            <ComboBoxItem Content="Medium" FontWeight="Medium"/>
+                            <ComboBoxItem Content="DemiBold" FontWeight="DemiBold"/>
+                            <ComboBoxItem Content="SemiBold" FontWeight="SemiBold"/>
+                            <ComboBoxItem Content="Bold" FontWeight="Bold"/>
+                            <ComboBoxItem Content="ExtraBold" FontWeight="ExtraBold"/>
+                            <ComboBoxItem Content="UltraBold" FontWeight="UltraBold"/>
+                            <ComboBoxItem Content="Black" FontWeight="Black"/>
+                            <ComboBoxItem Content="Heavy" FontWeight="Heavy"/>
+                            <ComboBoxItem Content="ExtraBlack" FontWeight="ExtraBlack"/>
+                            <ComboBoxItem Content="UltraBlack" FontWeight="UltraBlack"/>
+                        </ComboBox>
 
                         <!-- 背景图片 -->
                         <Label Content="背景图片" Margin="15,783,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>

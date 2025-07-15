@@ -29,7 +29,7 @@
         public int Font1 { get; set; } // 字体1
         public int Font2 { get; set; } // 字体2
         public double FontSize { get; set; } // 字体大小
-        public double FontWeight { get; set; } // 字体粗细
+        public int FontWeight { get; set; } // 字体粗细
 
         // 背景图片
         public string BackgroundImagePath { get; set; } // 背景图片路径

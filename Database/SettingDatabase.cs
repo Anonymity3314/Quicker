@@ -66,7 +66,7 @@ namespace Quicker.Database
          * Font1: 字体1，默认为-1。
          * Font2: 字体2，默认为-1。
          * FontSize: 字体大小，默认为12。
-         * FontWeight: 字体粗细，默认为400。
+         * FontWeight: 字体粗细，默认为4。
          *
          * BackgroundImagePath: 背景图片路径，默认为空。
          * BackgroundImageOpacity: 背景图片不透明度，默认为1.0。
@@ -213,7 +213,7 @@ namespace Quicker.Database
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 400, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 4, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@ButtonSize"] = defaults.Item1, // 按钮大小
@@ -541,7 +541,7 @@ namespace Quicker.Database
                     Font1 = reader.GetInt32(17), // 字体1
                     Font2 = reader.GetInt32(18), // 字体2
                     FontSize = reader.GetDouble(19), // 字体大小
-                    FontWeight = reader.GetDouble(20), // 字体粗细
+                    FontWeight = reader.GetInt32(20), // 字体粗细
                     BackgroundImagePath = reader.GetString(21), // 背景图片路径
                     BackgroundImageOpacity = reader.GetDouble(22), // 背景图片不透明度
                     Blur = reader.GetInt32(23), // 模糊模式
@@ -807,7 +807,7 @@ namespace Quicker.Database
                 Font1 INTEGER,
                 Font2 INTEGER,
                 FontSize REAL,
-                FontWeight REAL,
+                FontWeight INTEGER,
                 BackgroundImagePath TEXT,
                 BackgroundImageOpacity REAL,
                 Blur INTEGER,

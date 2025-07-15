@@ -165,7 +165,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             FontSizeComboBox1.SelectedIndex = settingManager.appearanceConditions.Font1; // 设置字体1
             FontSizeComboBox2.SelectedIndex = settingManager.appearanceConditions.Font2; // 设置字体2
             FontSizeSlider.Value = settingManager.appearanceConditions.FontSize; // 设置字体大小
-            FontWeightTextBox.Text = settingManager.appearanceConditions.FontWeight.ToString(); // 设置字体粗细
+            FontWeightComboBox.SelectedIndex = settingManager.appearanceConditions.FontWeight; // 设置字体粗细
             ApplyGlobalFontFamily(); // 应用全局字体
         }
 
@@ -607,14 +607,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
         }
 
-        // 字体粗细文本框内容改变事件
-        private void FontWeightTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (double.TryParse(FontWeightTextBox.Text, out double fw))
-                settingManager.appearanceConditions.FontWeight = fw; // 设置字体粗细
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-        }
-
         // 下拉框选择改变事件
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -634,6 +626,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                         break;
                     case "FontSizeComboBox2":
                         settingManager.appearanceConditions.Font2 = comboBox.SelectedIndex; // 设置字体2
+                        break;
+                    case "FontWeightComboBox":
+                        settingManager.appearanceConditions.FontWeight = comboBox.SelectedIndex; // 设置字体粗细
                         break;
                     default:
                         return; // 其它ComboBox不处理
@@ -870,12 +865,10 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 if ((bool)e.NewValue)
                 {
-                    btn.SizeChanged += Btn_SizeChanged; // 启用时，注册 SizeChanged 事件，并立即设置一次裁剪
                     UpdateButtonClip(btn);
                 }
                 else
                 {
-                    btn.SizeChanged -= Btn_SizeChanged; // 关闭时，移除事件并清除裁剪
                     btn.Clip = null;
                 }
             }
@@ -905,15 +898,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             if (sender is Border border)
             {
                 UpdateBorderClip(border);
-            }
-        }
-
-        // 按钮尺寸变化时，更新裁剪路径
-        private static void Btn_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (sender is Button btn)
-            {
-                UpdateButtonClip(btn);
             }
         }
 
@@ -992,6 +976,68 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class FontWeightConverter : IValueConverter
+    {
+        private static readonly FontWeight[] FontWeightList = new FontWeight[]
+        {
+            FontWeights.Thin,        // 0
+            FontWeights.ExtraLight,  // 1
+            FontWeights.UltraLight,  // 2
+            FontWeights.Light,       // 3
+            FontWeights.Normal,      // 4
+            FontWeights.Regular,     // 5
+            FontWeights.Medium,      // 6
+            FontWeights.DemiBold,    // 7
+            FontWeights.SemiBold,    // 8
+            FontWeights.Bold,        // 9
+            FontWeights.ExtraBold,   // 10
+            FontWeights.UltraBold,   // 11
+            FontWeights.Black,       // 12
+            FontWeights.Heavy,       // 13
+            FontWeights.ExtraBlack,  // 14
+            FontWeights.UltraBlack   // 15
+        };
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // value 可能是 ComboBoxItem、string、int
+            int index = -1;
+            if (value is int i)
+                index = i;
+            else if (value is ComboBoxItem item && item.Parent is ComboBox combo)
+                index = combo.Items.IndexOf(item);
+            else if (value is string s)
+            {
+                // 尝试用字符串查找索引
+                for (int j = 0; j < FontWeightList.Length; j++)
+                {
+                    if (FontWeightList[j].ToString().Equals(s, StringComparison.OrdinalIgnoreCase))
+                    {
+                        index = j;
+                        break;
+                    }
+                }
+            }
+            if (index >= 0 && index < FontWeightList.Length)
+                return FontWeightList[index];
+            return FontWeights.Normal;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // 反向转换为索引
+            if (value is FontWeight fw)
+            {
+                for (int i = 0; i < FontWeightList.Length; i++)
+                {
+                    if (FontWeightList[i] == fw)
+                        return i;
+                }
+            }
+            return 4; // Normal
         }
     }
 }
