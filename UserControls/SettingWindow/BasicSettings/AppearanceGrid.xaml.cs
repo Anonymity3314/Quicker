@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media.Imaging;
 using System.Windows.Media.Effects;
 using Quicker.Windows.MainWindows;
+using System.Collections.Generic;
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.ComponentModel;
@@ -272,6 +273,23 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        // 按钮名到属性名的映射字典
+        private static readonly Dictionary<string, string> ColorButtonToProperty = new()
+        {
+            { "BackgroundColorButton", "BackgroundColor" },
+            { "BorderColorButton", "BorderColor" },
+            { "ToolbarColorButton", "ToolbarColor" },
+            { "ToolbarIconColorButton", "ToolbarIconColor" },
+            { "ActionButtonColorButton", "ActionButtonColor" },
+            { "ActionButtonMouseOverColorButton", "ActionButtonMouseOverColor" },
+            { "BlankButtonColorButton", "BlankButtonColor" },
+            { "BlankButtonMouseOverColorButton", "BlankButtonMouseOverColor" },
+            { "TextColorButton", "ButtonTextColor" },
+            { "ActionIconColorButton", "ActionIconColor" },
+            { "TriggerKeyTextColorButton", "TriggerKeyTextColor" },
+            { "OtherIconColorButton", "OtherIconColor" }
+        };
+
         /// <summary>
         /// 根据当前颜色按钮的Name，自动设置appearanceConditions的对应属性
         /// </summary>
@@ -279,12 +297,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <param name="color">新颜色</param>
         private void UpdateAppearanceColorProperty(SolidColorBrush brush, Color color)
         {
-            if (_currentColorButton == null) return; // 防止空引用
-            string propertyName = _currentColorButton.Name.Replace("Button", ""); // 通过按钮名去掉"Button"后缀，得到属性名
-            var prop = settingManager.appearanceConditions.GetType().GetProperty(propertyName); // 反射获取属性
-            if (prop != null && prop.CanWrite) // 如果属性存在且可写，则赋值为新颜色
+            if (_currentColorButton == null) return;
+            if (ColorButtonToProperty.TryGetValue(_currentColorButton.Name, out string propertyName))
             {
-                prop.SetValue(settingManager.appearanceConditions, color.ToString()); // 设置对应属性
+                var prop = settingManager.appearanceConditions.GetType().GetProperty(propertyName);
+                if (prop != null && prop.CanWrite)
+                {
+                    prop.SetValue(settingManager.appearanceConditions, color.ToString());
+                }
             }
         }
 
