@@ -28,6 +28,7 @@
             <Setter Property="FontWeight" Value="{Binding ElementName=FontWeightComboBox, Path=SelectedIndex, Converter={StaticResource FontWeightConverter}}"/>
             <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="BorderBrush" Value="{Binding ElementName=BorderColorButton,Path=Background}"/>
+            <Setter Property="FontSize" Value="{Binding ElementName=FontSizeSlider, Path=Value}"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="Content" Value="{x:Null}"/>

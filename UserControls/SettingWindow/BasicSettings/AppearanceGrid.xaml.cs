@@ -500,19 +500,28 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <returns> 文本块对象 </returns>
         private TextBlock LoadActionTitle(ButtonData buttonInformation)
         {
+          
             var binding = new System.Windows.Data.Binding
             {
-                Path = new PropertyPath("ButtonTextColorBrush"),
+                Path = new PropertyPath("ButtonTextColorBrush"), // 绑定到ViewModel属性
                 Source = this
-            };
+            };  // 创建绑定，绑定到按钮文字颜色Brush
+           
             var textBlock = new TextBlock
             {
                 Text = buttonInformation.Title, // 设置文本内容
                 TextAlignment = TextAlignment.Center, // 文本居中
                 HorizontalAlignment = HorizontalAlignment.Stretch // 水平拉伸填满
-            };
+            }; // 创建TextBlock用于显示按钮标题
+
+           
             textBlock.SetBinding(TextBlock.ForegroundProperty, binding); // 绑定前景色为按钮文字颜色
-            return textBlock; // 返回TextBlock对象
+            if (double.TryParse(FontSizeTextBox.Text, out double fontSize)) // 用滑块的值设置初始字体大小
+                textBlock.FontSize = fontSize; // 滑块值
+            else
+                textBlock.FontSize = 12; // 默认字号
+
+            return textBlock; // 返回TextBlock对象，由AddTitleToGrid后续决定是否自动缩小字号
         }
 
         /// <summary>
@@ -616,6 +625,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     break;
                 case "FontSizeSlider":
                     settingManager.appearanceConditions.FontSize = slider.Value; // 设置字体大小
+                    LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
                     break;
                 case "BackgroundImageOpacitySlider":
                     settingManager.appearanceConditions.BackgroundImageOpacity = slider.Value; // 设置背景图片不透明度
@@ -982,8 +992,19 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
     }
 
+    /// <summary>
+    /// 毛玻璃效果转换器：根据模糊下拉框选项返回BlurEffect或null
+    /// </summary>
     public class BlurEffectConverter : IMultiValueConverter
     {
+        /// <summary>
+        /// 将模糊下拉框选项转换为BlurEffect对象
+        /// </summary>
+        /// <param name="values">[0]为SelectedIndex</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">区域</param>
+        /// <returns>BlurEffect或null</returns>
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             int selectedIndex = (int)values[0];
@@ -993,14 +1014,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             return null;
         }
+        /// <summary>
+        /// 不支持反向转换
+        /// </summary>
+        /// <param name="value">值</param>
+        /// <param name="targetTypes">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">区域</param>
+        /// <returns>null</returns>
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
     }
 
+    /// <summary>
+    /// 字体粗细转换器：根据SelectedIndex返回对应FontWeight
+    /// </summary>
     public class FontWeightConverter : IValueConverter
     {
+        // WPF标准16种字体粗细枚举，顺序需与ComboBox一致
         private static readonly FontWeight[] FontWeightList = new FontWeight[]
         {
             FontWeights.Thin,        // 0
@@ -1021,6 +1054,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             FontWeights.UltraBlack   // 15
         };
 
+        /// <summary>
+        /// 将SelectedIndex或字符串转换为FontWeight
+        /// </summary>
+        /// <param name="value">SelectedIndex(int)或ComboBoxItem或string</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">区域</param>
+        /// <returns>对应FontWeight</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // value 可能是 ComboBoxItem、string、int
@@ -1046,6 +1087,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             return FontWeights.Normal;
         }
 
+        /// <summary>
+        /// 将FontWeight反向转换为索引
+        /// </summary>
+        /// <param name="value">FontWeight</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">区域</param>
+        /// <returns>索引（int）</returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // 反向转换为索引
