@@ -1,5 +1,6 @@
 ﻿using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -18,6 +19,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
+        private DispatcherTimer _settingsChangeTimer; // 设置变化检测计时器
         private readonly ButtonDatabase db2 = new(); // 添加按钮数据库
         private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
         private Button _currentColorButton; // 记录当前按钮
@@ -67,6 +69,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             weakSettingWindow = new(settingWindow); // 保存设置窗口
             this.DataContext = this; // 设置自身为DataContext，便于属性绑定
             InitializeAsync(); // 异步初始化
+            InitializeSettingsChangeTimer(); // 初始化设置变化检测计时器
+        }
+
+        // 初始化设置变化检测计时器
+        private void InitializeSettingsChangeTimer()
+        {
+            _settingsChangeTimer = new DispatcherTimer();
+            _settingsChangeTimer.Interval = TimeSpan.FromMilliseconds(500); // 每0.5秒检测一次
+            _settingsChangeTimer.Tick += SettingsChangeTimer_Tick;
+            _settingsChangeTimer.Start();
+        }
+
+        // 计时器事件处理
+        private void SettingsChangeTimer_Tick(object sender, EventArgs e)
+        {
+            if (settingManager != null)
+            {
+                bool hasChanges = settingManager.IsMainAppearanceSettingsChanged();
+                ResetAppearanceButton.Visibility = hasChanges ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         // 异步初始化方法
@@ -87,6 +109,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ApplyBackgroundImageSettings(); // 应用背景图片设置
                 ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
                 ApplyOptionSettings(); // 应用选项设置
+
+                // 初始化重置按钮为隐藏状态
+                ResetAppearanceButton.Visibility = Visibility.Collapsed;
             }); // 异步加载设置
         }
 
@@ -245,6 +270,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 释放资源
         private void AppearanceGrid_Unloaded(object sender, RoutedEventArgs e)
         {
+            // 停止并清理计时器
+            if (_settingsChangeTimer != null)
+            {
+                _settingsChangeTimer.Stop();
+                _settingsChangeTimer.Tick -= SettingsChangeTimer_Tick;
+                _settingsChangeTimer = null;
+            }
+
             foreach (Button btn in GlobalGrid.Children.OfType<Button>())
             {
                 ClipHelper.SetEnableCustomClip(btn, false); // 解绑自定义裁剪事件，防止内存泄漏
@@ -614,7 +647,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             TitleBarCornerRadius = new CornerRadius(previewRadius, previewRadius, 0, 0); // 标题栏只上面有圆角
         }
 
-        // “开启预览”复选框点击事件
+        // "开启预览"复选框点击事件
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
             settingManager.appearanceConditions.EnablePreview = EnablePreviewCheckBox.IsChecked == true; // 同步复选框状态到缓存
@@ -623,6 +656,38 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             if (EnablePreviewCheckBox.IsChecked == true) // 如果开启预览
             {
                 LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
+            }
+            
+            // 检测预览设置变化
+            bool previewChanged = settingManager.IsPreviewSettingChanged();
+            // 这里可以添加预览设置变化时的特殊处理逻辑
+        }
+
+        // 重置外观设置按钮点击事件
+        private void ResetAppearanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (settingManager != null)
+            {
+                // 保存当前预览设置
+                bool currentPreviewSetting = settingManager.appearanceConditions.EnablePreview;
+
+                // 恢复原始外观设置
+                settingManager.RestoreOriginalAppearanceSettings();
+
+                // 恢复预览设置为当前值（不重置预览设置）
+                settingManager.appearanceConditions.EnablePreview = currentPreviewSetting;
+
+                // 重新应用设置到界面
+                ApplyButtonSettings(); // 应用按钮相关设置
+                ApplyColorSettings(); // 应用颜色相关设置
+                ApplyFontSettings(); // 应用字体相关设置
+                ApplyBackgroundImageSettings(); // 应用背景图片设置
+                ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
+                ApplyOptionSettings(); // 应用选项设置
+
+                // 刷新预览区
+                LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+                SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新数据库
             }
         }
     }

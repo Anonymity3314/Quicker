@@ -64,6 +64,15 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 恢复原始外观设置
+        /// </summary>
+        public void RestoreOriginalAppearanceSettings()
+        {
+            if (_originalAppearanceConditions != null)
+                appearanceConditions = CloneSettingsCache(_originalAppearanceConditions);
+        }
+
+        /// <summary>
         /// 克隆设置缓存对象
         /// </summary>
         /// <typeparam name="T">设置缓存类型</typeparam>
@@ -304,6 +313,68 @@ namespace Quicker.Managers
                 return true;
                 
             return false;
+        }
+
+        /// <summary>
+        /// 判断外观设置是否与原始外观设置相同
+        /// </summary>
+        /// <returns>是否相同</returns>
+        public bool IsAppearanceSettingsChanged()
+        {
+            // 判断外观设置是否变化
+            if (_originalAppearanceConditions != null && appearanceConditions != null &&
+                !AreSettingsEqual(_originalAppearanceConditions, appearanceConditions))
+                return true;
+                
+            return false;
+        }
+
+        /// <summary>
+        /// 判断主要外观设置（除预览设置外）是否与原始外观设置相同
+        /// </summary>
+        /// <returns>是否相同</returns>
+        public bool IsMainAppearanceSettingsChanged()
+        {
+            if (_originalAppearanceConditions == null || appearanceConditions == null)
+                return false;
+
+            // 获取所有属性
+            var properties = typeof(Appearance).GetProperties();
+            foreach (var property in properties)
+            {
+                // 跳过预览相关属性
+                if (property.Name == "EnablePreview")
+                    continue;
+
+                if (property.CanRead)
+                {
+                    var value1 = property.GetValue(_originalAppearanceConditions);
+                    var value2 = property.GetValue(appearanceConditions);
+
+                    if (value1 == null && value2 == null) continue;
+                    if (value1 == null || value2 == null) return true;
+
+                    if (!value1.Equals(value2))
+                        return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 判断预览设置是否与原始预览设置相同
+        /// </summary>
+        /// <returns>是否相同</returns>
+        public bool IsPreviewSettingChanged()
+        {
+            if (_originalAppearanceConditions == null || appearanceConditions == null)
+                return false;
+
+            // 只检查预览相关属性
+            var originalPreview = _originalAppearanceConditions.EnablePreview;
+            var currentPreview = appearanceConditions.EnablePreview;
+
+            return !originalPreview.Equals(currentPreview);
         }
         
         /// <summary>
