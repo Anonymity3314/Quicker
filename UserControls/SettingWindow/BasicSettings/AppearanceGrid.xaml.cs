@@ -757,8 +757,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             string font2 = FontSizeComboBox2.SelectedItem as string;
 
             // 判断是否为“系统默认”
-            bool isDefault1 = string.IsNullOrEmpty(font1) || font1 == "(系统默认)";
-            bool isDefault2 = string.IsNullOrEmpty(font2) || font2 == "(系统默认)";
+            bool isDefault1 = font1 == "(系统默认)";
+            bool isDefault2 = font2 == "(系统默认)";
             FontFamily fontFamily;
             if (!isDefault1 && !isDefault2)
             {
