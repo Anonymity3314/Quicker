@@ -1,0 +1,40 @@
+﻿<Window
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Quicker.Windows.ToolWindows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Quicker.Windows.ToolWindows.ImageCropWindow"
+    mc:Ignorable="d"
+
+    WindowStartupLocation="CenterScreen"
+    Title="裁剪图片"
+    Height="1000"
+    Width="1000"
+
+    Loaded="ImageCropWindow_Loaded"
+    PreviewMouseWheel="CropImage_MouseWheel"
+>
+    <Canvas MouseWheel="CropImage_MouseWheel">
+        <Grid x:Name="ImageGrid" Canvas.Left="10" Canvas.Top="10" Width="802" Height="802" Background="Black" PreviewMouseWheel="CropImage_MouseWheel">
+            <Image x:Name="CropImage" Stretch="Uniform"/>
+            <Rectangle x:Name="MaskRect" Fill="Black" Opacity="0.5"/>
+        </Grid>
+        <Border x:Name="CropBorder"
+                Background="Transparent"
+                BorderBrush="Red"
+                BorderThickness="2"
+                Width="{Binding BorderWidth}"
+                Height="{Binding BorderHeight}"
+                CornerRadius="{Binding BorderCornerRadius}"
+                Canvas.Left="50"
+                Canvas.Top="50"
+                MouseLeftButtonDown="CropBorder_MouseLeftButtonDown"
+                MouseMove="CropBorder_MouseMove"
+                MouseLeftButtonUp="CropBorder_MouseLeftButtonUp"
+                Cursor="SizeAll"/>
+        <Button Content="旋转" Canvas.Left="849" Canvas.Top="161"/>
+        <Button x:Name="SaveButton" Style="{StaticResource WhiteButton}" Click="SaveButton_Click" Content="保存" Canvas.Left="849" Canvas.Top="201" HorizontalAlignment="Left" Width="108"/>
+        <Button x:Name="CancelButton" Click="CancelButton_Click" Content="取消" Style="{StaticResource WhiteButton}" Canvas.Left="849" Canvas.Top="230" HorizontalAlignment="Left" VerticalAlignment="Center" Width="108"/>
+    </Canvas>
+</Window>

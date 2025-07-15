@@ -316,13 +316,15 @@ Quicker/
     │   │   └─MessageWindow.xaml.cs
     │   ├─SelectWindowWindow.xaml                     # 选择窗口窗口
     │   │   └─SelectWindowWindow.xaml.cs
-    │   └─ToastWindow.xaml                            # 消息弹窗
-    │       └─ToastWindow.xaml.cs
+    │   ├─ToastWindow.xaml                            # 消息弹窗
+    │   │   └─ToastWindow.xaml.cs
+    │   └─ImageCropWindow.xaml                        # 图片裁剪窗口
+    │       └─ImageCropWindow.xaml.cs
     │
-    └─EditWindows/                                # 编辑窗口文件夹
-        ├─EditActionPageInfoWindow.xaml           # 编辑动作页信息窗口
+    └─EditWindows/                                    # 编辑窗口文件夹
+        ├─EditActionPageInfoWindow.xaml               # 编辑动作页信息窗口
         │   └─EditActionPageInfoWindow.xaml.cs
-        └─EditSceneWindow.xaml                    # 编辑场景窗口
+        └─EditSceneWindow.xaml                        # 编辑场景窗口
             └─EditSceneWindow.xaml.cs
 ```
 

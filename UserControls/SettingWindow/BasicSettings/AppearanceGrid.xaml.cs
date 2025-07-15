@@ -1,12 +1,13 @@
-﻿using System.Windows.Media.Imaging;
-using System.Windows.Media.Effects;
+﻿using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
+using Quicker.Windows.ToolWindows;
 using System.Collections.Generic;
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.ComponentModel;
-using System.Windows.Media;
 using Quicker.UserControls;
+using System.Windows.Media;
 using System.Globalization;
 using System.Windows.Data;
 using Quicker.Database;
@@ -15,6 +16,7 @@ using System.Xml.Linq;
 using System.Windows;
 using Quicker.Models;
 using System.Linq;
+using System.IO;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -146,18 +148,19 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 颜色相关设置
         private void ApplyColorSettings()
         {
-            BackgroundColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor)); // 设置背景颜色
-            ToolbarColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor)); // 设置工具栏颜色
-            ToolbarIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor)); // 设置工具栏图标颜色
-            ActionButtonColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor)); // 设置动作按钮颜色
-            ActionButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonMouseOverColor)); // 设置动作按钮鼠标悬停颜色
-            BlankButtonColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonColor)); // 设置空白按钮颜色
-            BlankButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor)); // 设置空白按钮鼠标悬停颜色
-            TextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor)); // 设置按钮文字颜色
-            ButtonTextColorBrush = TextColorButton.Background as SolidColorBrush; // 同步ViewModel属性
-            ActionIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor)); // 设置动作图标颜色
-            TriggerKeyTextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor)); // 设置触发键文字颜色
-            OtherIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor)); // 设置其他位置图标颜色
+            BackgroundColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BackgroundColor));
+            BorderColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BorderColor));
+            ToolbarColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarColor));
+            ToolbarIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ToolbarIconColor));
+            ActionButtonColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonColor));
+            ActionButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionButtonMouseOverColor));
+            BlankButtonColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonColor));
+            BlankButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor));
+            TextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor));
+            ButtonTextColorBrush = TextColorButton.Background as SolidColorBrush;
+            ActionIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor));
+            TriggerKeyTextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
+            OtherIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
         }
 
         // 字体相关设置
@@ -779,6 +782,55 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 
             Application.Current.Resources["GlobalFontFamily"] = fontFamily;
         }
+
+        // 点击“选择...”按钮
+        private void BackgroundImagePathButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.OpenFileDialog();
+            dialog.Filter = "图片文件|*.jpg;*.png;*.bmp";
+            var result = dialog.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                BackgroundImagePathButton.IsEnabled = false; // 防止重复选择
+                ImageCropWindow imageCropWindow = new(dialog.FileName, ViewPreviewBorder.ActualWidth, ViewPreviewBorder.ActualHeight, ViewPreviewBorder.CornerRadius);
+                imageCropWindow.Show();
+            }
+        }
+
+        // 设置背景
+        private void UpdateBackgroundImage()
+        {
+            var path = BackgroundImagePathTextBox.Text;
+            var opacity = BackgroundImageOpacitySlider.Value;
+        }
+
+        private string _backgroundImagePath;
+        public string BackgroundImagePath
+        {
+            get => _backgroundImagePath;
+            set
+            {
+                if (_backgroundImagePath != value)
+                {
+                    _backgroundImagePath = value;
+                    OnPropertyChanged(nameof(BackgroundImagePath));
+                }
+            }
+        }
+
+        private double _backgroundImageOpacity = 1.0;
+        public double BackgroundImageOpacity
+        {
+            get => _backgroundImageOpacity;
+            set
+            {
+                if (_backgroundImageOpacity != value)
+                {
+                    _backgroundImageOpacity = value;
+                    OnPropertyChanged(nameof(BackgroundImageOpacity));
+                }
+            }
+        }
     }
 
     // 内联定义 ThicknessConverter
@@ -1107,6 +1159,29 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
             }
             return 4; // Normal
+        }
+    }
+
+    public class PathToImageSourceConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string path = value as string;
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                return null;
+            try
+            {
+                return new BitmapImage(new Uri(path, UriKind.Absolute));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
