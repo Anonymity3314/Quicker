@@ -22,6 +22,8 @@ namespace Quicker.Windows.ToolWindows
         private const double MinScale = 0.1;
         private const double MaxScale = 10.0;
 
+        public string CroppedImagePath { get; private set; }
+
         /// <summary>
         /// 图片裁剪窗口
         /// </summary>
@@ -219,6 +221,9 @@ namespace Quicker.Windows.ToolWindows
                 encoder.Frames.Add(BitmapFrame.Create(cropped));
                 encoder.Save(fileStream);
             }
+            CroppedImagePath = filePath; // 保存路径
+            this.DialogResult = true;    // 设置对话框结果
+            this.Close();                // 关闭窗口
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

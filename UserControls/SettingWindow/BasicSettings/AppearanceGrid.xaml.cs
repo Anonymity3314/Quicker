@@ -793,7 +793,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 BackgroundImagePathButton.IsEnabled = false; // 防止重复选择
                 ImageCropWindow imageCropWindow = new(dialog.FileName, ViewPreviewBorder.ActualWidth, ViewPreviewBorder.ActualHeight, ViewPreviewBorder.CornerRadius);
-                imageCropWindow.Show();
+                var dialogResult = imageCropWindow.ShowDialog(); // 用ShowDialog阻塞等待
+                if (dialogResult == true && !string.IsNullOrEmpty(imageCropWindow.CroppedImagePath))
+                {
+                    BackgroundImagePathTextBox.Text = imageCropWindow.CroppedImagePath; // 设置新图片路径
+                }
+                BackgroundImagePathButton.IsEnabled = true; // 恢复可用
             }
         }
 

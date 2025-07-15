@@ -261,7 +261,7 @@
                         <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="298,820,0,0" VerticalAlignment="Top" Width="43" Click="BackgroundImagePathButton_Click"/>
                         <!-- 背景图片-不透明度 -->
                         <Label Content="不透明度：" Margin="10,854,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,859,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="{Binding BackgroundImageOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,859,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="{Binding BackgroundImageOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,855,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=BackgroundImageOpacitySlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
 
                         <!-- 模糊与圆角 -->

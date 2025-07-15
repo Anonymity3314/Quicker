@@ -58,9 +58,6 @@ namespace Quicker.Managers
             
             if (_originalBlacklistSettings != null)
                 blacklistSettings = CloneSettingsCache(_originalBlacklistSettings);
-            
-            if (_originalAppearanceConditions != null)
-                appearanceConditions = CloneSettingsCache(_originalAppearanceConditions);
         }
 
         /// <summary>
