@@ -213,7 +213,7 @@ namespace Quicker.Database
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 400, "", 1.0, 1, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 400, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@ButtonSize"] = defaults.Item1, // 按钮大小

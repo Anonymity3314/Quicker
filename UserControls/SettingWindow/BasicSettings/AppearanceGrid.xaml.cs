@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media.Imaging;
+using System.Windows.Media.Effects;
 using Quicker.Windows.MainWindows;
 using System.Windows.Threading;
 using System.Windows.Controls;
@@ -680,7 +681,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
             }
-            
+
             // 检测预览设置变化
             bool previewChanged = settingManager.IsPreviewSettingChanged();
         }
@@ -974,6 +975,23 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 geometry.Figures.Add(figure);
                 btn.Clip = geometry;
             }
+        }
+    }
+
+    public class BlurEffectConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            int selectedIndex = (int)values[0];
+            if (selectedIndex == 1) // 毛玻璃
+            {
+                return new BlurEffect { Radius = 15 };
+            }
+            return null;
+        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
