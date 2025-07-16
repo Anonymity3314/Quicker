@@ -794,14 +794,39 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             var result = dialog.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
             {
-                BackgroundImagePathButton.IsEnabled = false; // 防止重复选择
-                ImageCropWindow imageCropWindow = new(dialog.FileName, ViewPreviewBorder.ActualWidth, ViewPreviewBorder.ActualHeight, ViewPreviewBorder.CornerRadius);
-                var dialogResult = imageCropWindow.ShowDialog(); // 用ShowDialog阻塞等待
-                if (dialogResult == true && !string.IsNullOrEmpty(imageCropWindow.CroppedImagePath))
+                double aspectRatio = ViewPreviewBorder.ActualWidth / ViewPreviewBorder.ActualHeight; // 计算宽高比
+                var imageCropWindow = new ImageCropWindow(dialog.FileName, aspectRatio, ViewPreviewBorder.CornerRadius);
+                // 定义事件处理方法，便于后续解绑，防止内存泄漏
+                Action<object, string> cropCompletedHandler = null; // 裁剪完成事件处理器
+                EventHandler closedHandler = null; // 窗口关闭事件处理器
+
+                // 裁剪完成事件：设置图片路径，启用按钮，并解绑事件
+                cropCompletedHandler = (s, croppedPath) =>
                 {
-                    BackgroundImagePathTextBox.Text = imageCropWindow.CroppedImagePath; // 设置新图片路径
-                }
-                BackgroundImagePathButton.IsEnabled = true; // 恢复可用
+                    if (!string.IsNullOrEmpty(croppedPath))
+                    {
+                        BackgroundImagePathTextBox.Text = croppedPath; // 设置新图片路径
+                    }
+                    BackgroundImagePathButton.IsEnabled = true; // 启用选择按钮
+                    // 解绑事件，防止内存泄漏
+                    imageCropWindow.CropCompleted -= cropCompletedHandler;
+                    imageCropWindow.Closed -= closedHandler;
+                };
+
+                // 窗口关闭事件：无论是否裁剪，均启用按钮并解绑事件
+                closedHandler = (s, args) =>
+                {
+                    BackgroundImagePathButton.IsEnabled = true; // 启用选择按钮
+                    // 解绑事件，防止内存泄漏
+                    imageCropWindow.CropCompleted -= cropCompletedHandler;
+                    imageCropWindow.Closed -= closedHandler;
+                };
+
+                // 绑定事件，确保窗口关闭或裁剪完成后都能正确处理
+                imageCropWindow.CropCompleted += cropCompletedHandler;
+                imageCropWindow.Closed += closedHandler;
+                BackgroundImagePathButton.IsEnabled = false;
+                imageCropWindow.Show();
             }
         }
 

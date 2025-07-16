@@ -9,16 +9,16 @@
 
     WindowStartupLocation="CenterScreen"
     Title="裁剪图片"
-    Height="1000"
-    Width="1000"
+    Height="600"
+    Width="800"
 
     Loaded="ImageCropWindow_Loaded"
     PreviewMouseWheel="CropImage_MouseWheel"
 >
     <Canvas MouseWheel="CropImage_MouseWheel">
-        <Grid x:Name="ImageGrid" Canvas.Left="10" Canvas.Top="10" Width="802" Height="802" Background="Black" PreviewMouseWheel="CropImage_MouseWheel">
-            <Image x:Name="CropImage" Stretch="Uniform"/>
-            <Rectangle x:Name="MaskRect" Fill="Black" Opacity="0.5"/>
+        <Grid x:Name="ImageGrid" Canvas.Left="10" Canvas.Top="10" Width="600" Height="450" Background="Black" PreviewMouseWheel="CropImage_MouseWheel">
+            <Image x:Name="CropImage" Stretch="Uniform" MouseWheel="CropImage_MouseWheel"/>
+            <Rectangle x:Name="MaskRect" Fill="Black" Opacity="0.5" Height="{Binding ActualHeight, ElementName=ImageGrid}" Width="{Binding ActualWidth, ElementName=ImageGrid}"/>
         </Grid>
         <Border x:Name="CropBorder"
                 Background="Transparent"
@@ -26,15 +26,53 @@
                 BorderThickness="2"
                 Width="{Binding BorderWidth}"
                 Height="{Binding BorderHeight}"
+                MaxHeight="{Binding ActualHeight, ElementName=ImageGrid}"
                 CornerRadius="{Binding BorderCornerRadius}"
-                Canvas.Left="50"
-                Canvas.Top="50"
                 MouseLeftButtonDown="CropBorder_MouseLeftButtonDown"
                 MouseMove="CropBorder_MouseMove"
                 MouseLeftButtonUp="CropBorder_MouseLeftButtonUp"
-                Cursor="SizeAll"/>
-        <Button Content="旋转" Canvas.Left="849" Canvas.Top="161"/>
-        <Button x:Name="SaveButton" Style="{StaticResource WhiteButton}" Click="SaveButton_Click" Content="保存" Canvas.Left="849" Canvas.Top="201" HorizontalAlignment="Left" Width="108"/>
-        <Button x:Name="CancelButton" Click="CancelButton_Click" Content="取消" Style="{StaticResource WhiteButton}" Canvas.Left="849" Canvas.Top="230" HorizontalAlignment="Left" VerticalAlignment="Center" Width="108"/>
+                Cursor="SizeAll" Canvas.Left="10" Canvas.Top="10">
+            <!-- 调整大小的手柄 -->
+            <Grid>
+                <!-- 左上角 -->
+                <Rectangle x:Name="ResizeHandleTopLeft" Width="8" Height="8" Fill="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-4,-4,0,0" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeNWSE" Tag="TopLeft"/>
+                <!-- 右上角 -->
+                <Rectangle x:Name="ResizeHandleTopRight" Width="8" Height="8" Fill="Red" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-4,0" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeNESW" Tag="TopRight"/>
+                <!-- 左下角 -->
+                <Rectangle x:Name="ResizeHandleBottomLeft" Width="8" Height="8" Fill="Red" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-4,0,0,-4" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeNESW" Tag="BottomLeft"/>
+                <!-- 右下角 -->
+                <Rectangle x:Name="ResizeHandleBottomRight" Width="8" Height="8" Fill="Red" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-4,-4" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeNWSE" Tag="BottomRight"/>
+                <!-- 上边中点 -->
+                <Rectangle x:Name="ResizeHandleTop" Width="8" Height="8" Fill="Red" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-4,0,0" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeNS" Tag="Top"/>
+                <!-- 下边中点 -->
+                <Rectangle x:Name="ResizeHandleBottom" Width="8" Height="8" Fill="Red" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-4" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeNS" Tag="Bottom"/>
+                <!-- 左边中点 -->
+                <Rectangle x:Name="ResizeHandleLeft" Width="8" Height="8" Fill="Red" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-4,0,0,0" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeWE" Tag="Left"/>
+                <!-- 右边中点 -->
+                <Rectangle x:Name="ResizeHandleRight" Width="8" Height="8" Fill="Red" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,-4,0" 
+                       MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" 
+                       Cursor="SizeWE" Tag="Right"/>
+            </Grid>
+        </Border>
+        <Button Content="顺时针旋转" Canvas.Left="655" Canvas.Top="60" Style="{StaticResource WhiteButton}" Width="108" VerticalAlignment="Top"/>
+        <Button Content="逆时针旋转" Canvas.Left="655" Canvas.Top="31" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Width="108"/>
+        <Button Content="垂直翻转" Canvas.Left="655" Canvas.Top="129" Style="{StaticResource WhiteButton}" Width="108" VerticalAlignment="Top"/>
+        <Button Content="水平翻转" Canvas.Left="655" Canvas.Top="100" Style="{StaticResource WhiteButton}" Width="108" VerticalAlignment="Top"/>
+        <Button x:Name="SaveButton" Style="{StaticResource WhiteButton}" Click="SaveButton_Click" Content="保存" Canvas.Left="655" Canvas.Top="175" Width="108" VerticalAlignment="Top"/>
+        <Button x:Name="CancelButton" Click="CancelButton_Click" Content="取消" Style="{StaticResource WhiteButton}" Canvas.Left="655" Canvas.Top="204" VerticalAlignment="Top" Width="108"/>
     </Canvas>
 </Window>

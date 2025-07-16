@@ -16,6 +16,14 @@ namespace Quicker.Windows.ToolWindows
 
         private bool isDragging = false; // 是否正在拖动
         private Point mouseOffset; // 鼠标在Border内的偏移
+        private bool isResizing = false; // 是否正在调整大小
+        private string resizeHandle; // 当前调整大小的手柄位置
+        private Point resizeStartPoint; // 开始调整大小时的鼠标位置
+        private double resizeStartWidth; // 开始调整大小时的宽度
+        private double resizeStartHeight; // 开始调整大小时的高度
+        private double resizeStartLeft; // 开始调整大小时的左边距
+        private double resizeStartTop; // 开始调整大小时的上边距
+        private double aspectRatio; // 宽高比
 
         private double imageScale = 1.0;
         private const double ScaleStep = 0.1;
@@ -24,32 +32,46 @@ namespace Quicker.Windows.ToolWindows
 
         public string CroppedImagePath { get; private set; }
 
+        public event Action<object, string> CropCompleted;
+
+        private void OnCropCompleted(string path)
+        {
+            CropCompleted?.Invoke(this, path);
+            this.Close();
+        }
+
         /// <summary>
-        /// 图片裁剪窗口
+        /// 图片裁剪窗口，传递宽高比
         /// </summary>
-        /// <param name="filePath"> 图片路径 </param>
-        /// <param name="width"> 宽度 </param>
-        /// <param name="height"> 高度 </param>
-        /// <param name="cornerRadius"> 边框圆角 </param>
-        public ImageCropWindow(string filePath, double width, double height, CornerRadius cornerRadius)
+        /// <param name="filePath">图片路径</param>
+        /// <param name="aspectRatio">宽高比（宽/高）</param>
+        /// <param name="cornerRadius">边框圆角</param>
+        public ImageCropWindow(string filePath, double aspectRatio, CornerRadius cornerRadius)
         {
             InitializeComponent();
-            BorderWidth = width;
-            BorderHeight = height;
+            this.aspectRatio = aspectRatio;
             BorderCornerRadius = cornerRadius;
+            // 设置初始大小，避免CropBorder在Loaded事件之前尺寸为0
+            BorderWidth = 200; // 初始宽度
+            BorderHeight = 200 / aspectRatio; // 根据比例计算初始高度
             DataContext = this; // 绑定到自身
             CropImage.Source = new BitmapImage(new Uri(filePath, UriKind.Absolute));
 
-            // 注册鼠标滚轮事件
-            CropImage.MouseWheel += CropImage_MouseWheel;
+            // 在Loaded事件中会根据ImageGrid实际大小重新调整
         }
 
         private void CropBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // 如果鼠标点击的是调整手柄，不处理拖动
+            if (e.OriginalSource is Rectangle)
+                return;
+
             isDragging = true;
             // 记录鼠标在Border内的偏移
             mouseOffset = e.GetPosition(CropBorder);
             CropBorder.CaptureMouse();
+            // 拖动时隐藏调整手柄
+            HideResizeHandles();
         }
 
         private void UpdateMask()
@@ -89,14 +111,16 @@ namespace Quicker.Windows.ToolWindows
         // 在窗口加载和每次拖动后都调用
         private void ImageCropWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            MaskRect.Width = ImageGrid.ActualWidth;
-            MaskRect.Height = ImageGrid.ActualHeight;
-            UpdateMask();
+            UpdateMask(); // 更新蒙版
         }
 
         // 移动鼠标时，更新CropBorder的位置
         private void CropBorder_MouseMove(object sender, MouseEventArgs e)
         {
+            // 如果正在调整大小，不处理拖动
+            if (isResizing)
+                return;
+
             if (isDragging)
             {
                 // 获取Grid在Canvas中的位置
@@ -126,7 +150,192 @@ namespace Quicker.Windows.ToolWindows
         {
             isDragging = false;
             CropBorder.ReleaseMouseCapture();
+            // 拖动结束后显示调整手柄
+            ShowResizeHandles();
             UpdateMask();
+        }
+
+        /// <summary>
+        /// 调整大小手柄的鼠标按下事件
+        /// </summary>
+        private void ResizeHandle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isResizing = true;
+            var handle = sender as FrameworkElement;
+            resizeHandle = handle.Tag.ToString();
+            
+            // 记录开始调整时的状态
+            resizeStartPoint = e.GetPosition((Canvas)CropBorder.Parent);
+            resizeStartWidth = CropBorder.ActualWidth;
+            resizeStartHeight = CropBorder.ActualHeight;
+            resizeStartLeft = Canvas.GetLeft(CropBorder);
+            resizeStartTop = Canvas.GetTop(CropBorder);
+            
+            handle.CaptureMouse();
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// 调整大小手柄的鼠标移动事件
+        /// </summary>
+        private void ResizeHandle_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isResizing) return;
+
+            var currentPoint = e.GetPosition((Canvas)CropBorder.Parent);
+            double deltaX = currentPoint.X - resizeStartPoint.X;
+            double deltaY = currentPoint.Y - resizeStartPoint.Y;
+
+            // 获取Grid边界
+            double gridLeft = Canvas.GetLeft(ImageGrid);
+            double gridTop = Canvas.GetTop(ImageGrid);
+            double gridRight = gridLeft + ImageGrid.ActualWidth;
+            double gridBottom = gridTop + ImageGrid.ActualHeight;
+
+            double newWidth = resizeStartWidth;
+            double newHeight = resizeStartHeight;
+            double newLeft = resizeStartLeft;
+            double newTop = resizeStartTop;
+
+            // 根据不同的手柄位置计算新的尺寸和位置
+            switch (resizeHandle)
+            {
+                case "TopLeft":
+                    // 左上角：同时调整宽度、高度和位置
+                    newWidth = Math.Max(50, resizeStartWidth - deltaX);
+                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
+                    break;
+                case "TopRight":
+                    // 右上角：调整宽度、高度和上边距
+                    newWidth = Math.Max(50, resizeStartWidth + deltaX);
+                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
+                    break;
+                case "BottomLeft":
+                    // 左下角：调整宽度、高度和左边距
+                    newWidth = Math.Max(50, resizeStartWidth - deltaX);
+                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
+                    break;
+                case "BottomRight":
+                    // 右下角：调整宽度和高度
+                    newWidth = Math.Max(50, resizeStartWidth + deltaX);
+                    newHeight = newWidth / aspectRatio; // 保持比例
+                    break;
+                case "Top":
+                    // 上边中点：调整高度和上边距
+                    newHeight = Math.Max(50, resizeStartHeight - deltaY);
+                    newWidth = newHeight * aspectRatio; // 保持比例
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
+                    break;
+                case "Bottom":
+                    // 下边中点：调整高度
+                    newHeight = Math.Max(50, resizeStartHeight + deltaY);
+                    newWidth = newHeight * aspectRatio; // 保持比例
+                    break;
+                case "Left":
+                    // 左边中点：调整宽度和左边距
+                    newWidth = Math.Max(50, resizeStartWidth - deltaX);
+                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
+                    break;
+                case "Right":
+                    // 右边中点：调整宽度
+                    newWidth = Math.Max(50, resizeStartWidth + deltaX);
+                    newHeight = newWidth / aspectRatio; // 保持比例
+                    break;
+            }
+
+            // 边界检查并重新计算保持比例的尺寸
+            if (newLeft < gridLeft)
+            {
+                newLeft = gridLeft;
+                newWidth = resizeStartWidth - (gridLeft - resizeStartLeft);
+                newHeight = newWidth / aspectRatio;
+            }
+            if (newTop < gridTop)
+            {
+                newTop = gridTop;
+                newHeight = resizeStartHeight - (gridTop - resizeStartTop);
+                newWidth = newHeight * aspectRatio;
+            }
+            if (newLeft + newWidth > gridRight)
+            {
+                newWidth = gridRight - newLeft;
+                newHeight = newWidth / aspectRatio;
+            }
+            if (newTop + newHeight > gridBottom)
+            {
+                newHeight = gridBottom - newTop;
+                newWidth = newHeight * aspectRatio;
+            }
+
+            // 确保最小尺寸
+            if (newWidth < 50)
+            {
+                newWidth = 50;
+                newHeight = newWidth / aspectRatio;
+            }
+            if (newHeight < 50)
+            {
+                newHeight = 50;
+                newWidth = newHeight * aspectRatio;
+            }
+
+            // 应用新的尺寸和位置
+            CropBorder.Width = newWidth;
+            CropBorder.Height = newHeight;
+            Canvas.SetLeft(CropBorder, newLeft);
+            Canvas.SetTop(CropBorder, newTop);
+
+            // 更新绑定属性
+            BorderWidth = newWidth;
+            BorderHeight = newHeight;
+
+            UpdateMask();
+        }
+
+        /// <summary>
+        /// 调整大小手柄的鼠标松开事件
+        /// </summary>
+        private void ResizeHandle_MouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            isResizing = false;
+            var handle = sender as FrameworkElement;
+            handle.ReleaseMouseCapture();
+            UpdateMask();
+        }
+
+        /// <summary>
+        /// 隐藏所有调整手柄
+        /// </summary>
+        private void HideResizeHandles()
+        {
+            ResizeHandleTopLeft.Fill = Brushes.Transparent;
+            ResizeHandleTopRight.Fill = Brushes.Transparent;
+            ResizeHandleBottomLeft.Fill = Brushes.Transparent;
+            ResizeHandleBottomRight.Fill = Brushes.Transparent;
+            ResizeHandleTop.Fill = Brushes.Transparent;
+            ResizeHandleBottom.Fill = Brushes.Transparent;
+            ResizeHandleLeft.Fill = Brushes.Transparent;
+            ResizeHandleRight.Fill = Brushes.Transparent;
+        }
+
+        /// <summary>
+        /// 显示所有调整手柄
+        /// </summary>
+        private void ShowResizeHandles()
+        {
+            ResizeHandleTopLeft.Fill = Brushes.Red;
+            ResizeHandleTopRight.Fill = Brushes.Red;
+            ResizeHandleBottomLeft.Fill = Brushes.Red;
+            ResizeHandleBottomRight.Fill = Brushes.Red;
+            ResizeHandleTop.Fill = Brushes.Red;
+            ResizeHandleBottom.Fill = Brushes.Red;
+            ResizeHandleLeft.Fill = Brushes.Red;
+            ResizeHandleRight.Fill = Brushes.Red;
         }
 
         // 鼠标滚轮更改图片缩放
@@ -222,8 +431,7 @@ namespace Quicker.Windows.ToolWindows
                 encoder.Save(fileStream);
             }
             CroppedImagePath = filePath; // 保存路径
-            this.DialogResult = true;    // 设置对话框结果
-            this.Close();                // 关闭窗口
+            OnCropCompleted(CroppedImagePath); // 调用事件
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

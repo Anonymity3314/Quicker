@@ -259,7 +259,7 @@
                         <!-- 背景图片-路径 -->
                         <Label Content="路径：" Margin="10,818,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="107,819,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="176" Text="{Binding BackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" LostFocus="BackgroundImagePathTextBox_LostFocus"/>
-                        <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="298,820,0,0" VerticalAlignment="Top" Width="43" Click="BackgroundImagePathButton_Click"/>
+                        <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="288,820,0,0" VerticalAlignment="Top" Width="53" Click="BackgroundImagePathButton_Click"/>
                         <!-- 背景图片-不透明度 -->
                         <Label Content="不透明度：" Margin="10,854,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,859,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="{Binding BackgroundImageOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
@@ -352,7 +352,7 @@
             <!-- 预览面板 -->
             <Grid Margin="46,78,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1">
                 <!-- 预览面板阴影 -->
-                <Border x:Name="ShadowBorder" Background="#FFF3F3F3" Visibility="{Binding Visibility, ElementName=ViewPreviewBorder}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" Width="{Binding ActualWidth, ElementName=ViewPreviewBorder, Converter={StaticResource DoubleSubtractConverter}, ConverterParameter=0.6}" Height="{Binding ActualHeight, ElementName=ViewPreviewBorder, Converter={StaticResource DoubleSubtractConverter}, ConverterParameter=0.6}">
+                <Border x:Name="ShadowBorder" Margin="0.6" Background="#FFF3F3F3" Visibility="{Binding Visibility, ElementName=ViewPreviewBorder}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Effect" Value="{x:Null}"/>
@@ -440,7 +440,7 @@
                                 <RowDefinition Height="{Binding ElementName=CommonGrid, Path=ActualHeight}"/>
                             </Grid.RowDefinitions>
                             <!-- 背景图片 -->
-                            <Image x:Name="PreviewBackgroundImage" Source="{Binding BackgroundImagePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource PathToImageSourceConverter}}" Opacity="{Binding BackgroundImageOpacity, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=ViewPreviewBorder}" Height="{Binding ActualHeight, ElementName=ViewPreviewBorder}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="4"/>
+                            <Image x:Name="PreviewBackgroundImage" Stretch="Fill" Source="{Binding BackgroundImagePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource PathToImageSourceConverter}}" Opacity="{Binding BackgroundImageOpacity, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=ViewPreviewBorder}" Height="{Binding ActualHeight, ElementName=ViewPreviewBorder}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="4"/>
                             <!-- 标题栏 -->
                             <Grid Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.RowSpan="1">
                                 <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
