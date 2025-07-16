@@ -1096,5 +1096,16 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 pngw.End();
             }
         }
+
+        // 点击“已分享或保存的外观”按钮打开外观分享文件夹
+        private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\SharedAppearance"; // 外观分享文件夹路径
+            if (!Directory.Exists(folderPath)) // 如果文件夹不存在，则自动创建
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+            System.Diagnostics.Process.Start("explorer.exe", folderPath); // 使用资源管理器打开该文件夹
+        }
     }
 }
