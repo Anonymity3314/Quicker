@@ -1,8 +1,10 @@
-﻿using System.Windows.Media.Imaging;
+﻿using Quicker.UserControls.SettingWindow;
+using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Input;
 using System.Windows.Media;
+using Quicker.Managers;
 using System.Windows;
 using System.IO;
 
@@ -10,30 +12,41 @@ namespace Quicker.Windows.ToolWindows
 {
     public partial class ImageCropWindow : Window
     {
-        public CornerRadius BorderCornerRadius { get; set; } // 边框圆角
-        public double BorderHeight { get; set; } // 边框高度
-        public double BorderWidth { get; set; } // 边框宽度
+        // ================== 控件相关 ==================
+        public string CroppedImagePath { get; private set; } // 裁剪后图片的保存路径。
+        public event Action<object, string> CropCompleted; // 裁剪完成时触发的事件，第一个参数为事件源，第二个参数为裁剪后图片的路径。
 
-        private bool isDragging = false; // 是否正在拖动
-        private Point mouseOffset; // 鼠标在Border内的偏移
-        private bool isResizing = false; // 是否正在调整大小
-        private string resizeHandle; // 当前调整大小的手柄位置
-        private Point resizeStartPoint; // 开始调整大小时的鼠标位置
-        private double resizeStartWidth; // 开始调整大小时的宽度
-        private double resizeStartHeight; // 开始调整大小时的高度
-        private double resizeStartLeft; // 开始调整大小时的左边距
-        private double resizeStartTop; // 开始调整大小时的上边距
-        private double aspectRatio; // 宽高比
+        // ================== 图片与裁剪相关 ==================
+        private BitmapSource _originalBitmapSource; // 原始图片源。
+        private CornerRadius BorderCornerRadius;// 裁剪框圆角。
+        private double BorderHeight;// 裁剪框高度。
+        private double aspectRatio; // 裁剪框宽高比。
+        private double BorderWidth; // 裁剪框宽度。
 
-        private double imageScale = 1.0;
-        private const double ScaleStep = 0.1;
-        private const double MinScale = 0.1;
-        private const double MaxScale = 10.0;
+        // ================== 状态变量 ==================
+        private bool isDragging; // 是否正在拖动裁剪框。
+        private bool isResizing;// 是否正在调整裁剪框大小。
 
-        public string CroppedImagePath { get; private set; }
+        private string resizeHandle; // 当前正在调整的锚点名称。
+        private Point mouseOffset; // 鼠标拖动时的偏移量。
+        private Point resizeStartPoint; // 调整大小起始点。
+        private double resizeStartWidth; // 调整大小起始宽度。
+        private double resizeStartHeight; // 调整大小起始高度。
+        private double resizeStartLeft; // 调整大小起始左侧位置。
+        private double resizeStartTop; // 调整大小起始顶部位置。
 
-        public event Action<object, string> CropCompleted;
+        // ================== 颜色相关 ==================
+        private Button _currentColorButton; // 当前正在选择颜色的按钮。
 
+        // ================== 其它常量 ==================
+        private const double ScaleStep = 0.1; // 图片缩放步长。
+        private const double MinScale = 0.1; // 图片最小缩放比例。
+        private const double MaxScale = 10.0; // 图片最大缩放比例。
+
+        /// <summary>
+        /// 裁剪完成时调用的方法，触发 CropCompleted 事件并关闭窗口。
+        /// </summary>
+        /// <param name="path">裁剪后图片的保存路径</param>
         private void OnCropCompleted(string path)
         {
             CropCompleted?.Invoke(this, path);
@@ -51,19 +64,30 @@ namespace Quicker.Windows.ToolWindows
             InitializeComponent();
             this.aspectRatio = aspectRatio;
             BorderCornerRadius = cornerRadius;
-            // 设置初始大小，避免CropBorder在Loaded事件之前尺寸为0
-            BorderWidth = 200; // 初始宽度
-            BorderHeight = 200 / aspectRatio; // 根据比例计算初始高度
-            DataContext = this; // 绑定到自身
-            CropImage.Source = new BitmapImage(new Uri(filePath, UriKind.Absolute));
+            BorderWidth = 200;
+            BorderHeight = 200 / aspectRatio;
+            DataContext = this;
 
-            // 在Loaded事件中会根据ImageGrid实际大小重新调整
+            // 加载原始图片
+            _originalBitmapSource = new BitmapImage(new Uri(filePath, UriKind.Absolute));
+            CropImage.Source = _originalBitmapSource;
+
+            // 正确初始化Tag为SolidColorBrush
+            if (BackgroundColorButton.Tag is not SolidColorBrush)
+                BackgroundColorButton.Tag = new SolidColorBrush(Colors.Black);
+            if (BorderColorButton.Tag is not SolidColorBrush)
+                BorderColorButton.Tag = new SolidColorBrush(Colors.White);
+            if (HandleColorButton.Tag is not SolidColorBrush)
+                HandleColorButton.Tag = new SolidColorBrush(Colors.White);
+
+            // 同步到控件
+            ImageGrid.Background = BackgroundColorButton.Tag as SolidColorBrush;
+            CropBorder.BorderBrush = BorderColorButton.Tag as SolidColorBrush;
         }
 
         private void CropBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // 如果鼠标点击的是调整手柄，不处理拖动
-            if (e.OriginalSource is Rectangle)
+            if (e.OriginalSource is Rectangle) // 如果鼠标点击的是调整手柄，不处理拖动
                 return;
 
             isDragging = true;
@@ -74,6 +98,7 @@ namespace Quicker.Windows.ToolWindows
             HideResizeHandles();
         }
 
+        // 更新蒙版
         private void UpdateMask()
         {
             // 获取Grid在Canvas中的位置
@@ -117,8 +142,7 @@ namespace Quicker.Windows.ToolWindows
         // 移动鼠标时，更新CropBorder的位置
         private void CropBorder_MouseMove(object sender, MouseEventArgs e)
         {
-            // 如果正在调整大小，不处理拖动
-            if (isResizing)
+            if (isResizing) // 如果正在调整大小，不处理拖动
                 return;
 
             if (isDragging)
@@ -141,7 +165,7 @@ namespace Quicker.Windows.ToolWindows
                 Canvas.SetLeft(CropBorder, newLeft);
                 Canvas.SetTop(CropBorder, newTop);
 
-                UpdateMask();
+                UpdateMask(); // 更新蒙版
             }
         }
 
@@ -155,125 +179,135 @@ namespace Quicker.Windows.ToolWindows
             UpdateMask();
         }
 
-        /// <summary>
-        /// 调整大小手柄的鼠标按下事件
-        /// </summary>
+        // 调整大小手柄的鼠标按下事件
         private void ResizeHandle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            isResizing = true;
-            var handle = sender as FrameworkElement;
-            resizeHandle = handle.Tag.ToString();
-            
+            isResizing = true; // 开始调整大小
+            var handle = sender as FrameworkElement; // 获取调整手柄
+            resizeHandle = handle.Tag.ToString(); // 获取手柄位置
+
             // 记录开始调整时的状态
             resizeStartPoint = e.GetPosition((Canvas)CropBorder.Parent);
             resizeStartWidth = CropBorder.ActualWidth;
             resizeStartHeight = CropBorder.ActualHeight;
             resizeStartLeft = Canvas.GetLeft(CropBorder);
             resizeStartTop = Canvas.GetTop(CropBorder);
-            
-            handle.CaptureMouse();
-            e.Handled = true;
+
+            handle.CaptureMouse(); // 捕获鼠标
+            e.Handled = true; // 阻止事件传播到CropBorder
+        }
+
+        // 鼠标移动时，调整裁剪框大小和位置
+        private void ResizeHandle_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!isResizing) return; // 如果没有开始调整大小，不处理
+
+            var currentPoint = e.GetPosition((Canvas)CropBorder.Parent); // 当前鼠标位置
+            double deltaX = currentPoint.X - resizeStartPoint.X; // 鼠标水平方向移动距离
+            double deltaY = currentPoint.Y - resizeStartPoint.Y; // 鼠标垂直方向移动距离
+
+            double newWidth, newHeight, newLeft, newTop; // 新的宽高和位置
+            CalculateNewSizeAndPosition(deltaX, deltaY, out newWidth, out newHeight, out newLeft, out newTop); // 根据手柄类型和鼠标移动距离计算新的宽高和位置
+            FixSizeAndPositionWithinGrid(ref newWidth, ref newHeight, ref newLeft, ref newTop); // 边界检查和修正
+            ApplyCropBorderSizeAndPosition(newWidth, newHeight, newLeft, newTop); // 应用新的尺寸和位置
+            UpdateMask(); // 更新遮罩
         }
 
         /// <summary>
-        /// 调整大小手柄的鼠标移动事件
+        /// 根据手柄类型和鼠标移动距离，计算新的宽高和位置
         /// </summary>
-        private void ResizeHandle_MouseMove(object sender, MouseEventArgs e)
+        /// <param name="deltaX">水平方向移动距离</param>
+        /// <param name="deltaY">垂直方向移动距离</param>
+        /// <param name="newWidth">新的宽</param>
+        /// <param name="newHeight">新的高</param>
+        /// <param name="newLeft">新的左边距</param>
+        /// <param name="newTop">新的上边距</param>
+        private void CalculateNewSizeAndPosition(double deltaX, double deltaY, out double newWidth, out double newHeight, out double newLeft, out double newTop)
         {
-            if (!isResizing) return;
-
-            var currentPoint = e.GetPosition((Canvas)CropBorder.Parent);
-            double deltaX = currentPoint.X - resizeStartPoint.X;
-            double deltaY = currentPoint.Y - resizeStartPoint.Y;
-
-            // 获取Grid边界
-            double gridLeft = Canvas.GetLeft(ImageGrid);
-            double gridTop = Canvas.GetTop(ImageGrid);
-            double gridRight = gridLeft + ImageGrid.ActualWidth;
-            double gridBottom = gridTop + ImageGrid.ActualHeight;
-
-            double newWidth = resizeStartWidth;
-            double newHeight = resizeStartHeight;
-            double newLeft = resizeStartLeft;
-            double newTop = resizeStartTop;
-
-            // 根据不同的手柄位置计算新的尺寸和位置
+            newWidth = resizeStartWidth;
+            newHeight = resizeStartHeight;
+            newLeft = resizeStartLeft;
+            newTop = resizeStartTop;
             switch (resizeHandle)
             {
                 case "TopLeft":
-                    // 左上角：同时调整宽度、高度和位置
                     newWidth = Math.Max(50, resizeStartWidth - deltaX);
-                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newHeight = newWidth / aspectRatio;
                     newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
                     newTop = resizeStartTop + (resizeStartHeight - newHeight);
                     break;
                 case "TopRight":
-                    // 右上角：调整宽度、高度和上边距
                     newWidth = Math.Max(50, resizeStartWidth + deltaX);
-                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newHeight = newWidth / aspectRatio;
                     newTop = resizeStartTop + (resizeStartHeight - newHeight);
                     break;
                 case "BottomLeft":
-                    // 左下角：调整宽度、高度和左边距
                     newWidth = Math.Max(50, resizeStartWidth - deltaX);
-                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newHeight = newWidth / aspectRatio;
                     newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
                     break;
                 case "BottomRight":
-                    // 右下角：调整宽度和高度
                     newWidth = Math.Max(50, resizeStartWidth + deltaX);
-                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newHeight = newWidth / aspectRatio;
                     break;
                 case "Top":
-                    // 上边中点：调整高度和上边距
                     newHeight = Math.Max(50, resizeStartHeight - deltaY);
-                    newWidth = newHeight * aspectRatio; // 保持比例
+                    newWidth = newHeight * aspectRatio;
                     newTop = resizeStartTop + (resizeStartHeight - newHeight);
                     break;
                 case "Bottom":
-                    // 下边中点：调整高度
                     newHeight = Math.Max(50, resizeStartHeight + deltaY);
-                    newWidth = newHeight * aspectRatio; // 保持比例
+                    newWidth = newHeight * aspectRatio;
                     break;
                 case "Left":
-                    // 左边中点：调整宽度和左边距
                     newWidth = Math.Max(50, resizeStartWidth - deltaX);
-                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newHeight = newWidth / aspectRatio;
                     newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
                     break;
                 case "Right":
-                    // 右边中点：调整宽度
                     newWidth = Math.Max(50, resizeStartWidth + deltaX);
-                    newHeight = newWidth / aspectRatio; // 保持比例
+                    newHeight = newWidth / aspectRatio;
                     break;
             }
+        }
 
-            // 边界检查并重新计算保持比例的尺寸
-            if (newLeft < gridLeft)
+        /// <summary>
+        /// 检查并修正裁剪框不超出ImageGrid边界，并保持宽高比和最小尺寸
+        /// </summary>
+        /// <param name="newWidth">新的宽</param>
+        /// <param name="newHeight">新的高</param>
+        /// <param name="newLeft">新的左边距</param>
+        /// <param name="newTop">新的上边距</param>
+        private void FixSizeAndPositionWithinGrid(ref double newWidth, ref double newHeight, ref double newLeft, ref double newTop)
+        {
+            double gridLeft = Canvas.GetLeft(ImageGrid); // Grid在Canvas中的位置
+            double gridTop = Canvas.GetTop(ImageGrid); // Grid在Canvas中的位置
+            double gridRight = gridLeft + ImageGrid.ActualWidth; // Grid右边界
+            double gridBottom = gridTop + ImageGrid.ActualHeight; // Grid下边界
+            if (newLeft < gridLeft) // 左边界
             {
                 newLeft = gridLeft;
                 newWidth = resizeStartWidth - (gridLeft - resizeStartLeft);
                 newHeight = newWidth / aspectRatio;
             }
-            if (newTop < gridTop)
+            if (newTop < gridTop) // 上边界
             {
                 newTop = gridTop;
                 newHeight = resizeStartHeight - (gridTop - resizeStartTop);
                 newWidth = newHeight * aspectRatio;
             }
-            if (newLeft + newWidth > gridRight)
+            if (newLeft + newWidth > gridRight) // 右边界
             {
                 newWidth = gridRight - newLeft;
                 newHeight = newWidth / aspectRatio;
             }
-            if (newTop + newHeight > gridBottom)
+            if (newTop + newHeight > gridBottom) // 下边界
             {
                 newHeight = gridBottom - newTop;
                 newWidth = newHeight * aspectRatio;
             }
 
-            // 确保最小尺寸
-            if (newWidth < 50)
+            if (newWidth < 50) // 最小尺寸
             {
                 newWidth = 50;
                 newHeight = newWidth / aspectRatio;
@@ -283,23 +317,27 @@ namespace Quicker.Windows.ToolWindows
                 newHeight = 50;
                 newWidth = newHeight * aspectRatio;
             }
-
-            // 应用新的尺寸和位置
-            CropBorder.Width = newWidth;
-            CropBorder.Height = newHeight;
-            Canvas.SetLeft(CropBorder, newLeft);
-            Canvas.SetTop(CropBorder, newTop);
-
-            // 更新绑定属性
-            BorderWidth = newWidth;
-            BorderHeight = newHeight;
-
-            UpdateMask();
         }
 
         /// <summary>
-        /// 调整大小手柄的鼠标松开事件
+        /// 应用新的裁剪框尺寸和位置，并同步绑定属性
         /// </summary>
+        /// <param name="newWidth">新的宽</param>
+        /// <param name="newHeight">新的高</param>
+        /// <param name="newLeft">新的左边距</param>
+        /// <param name="newTop">新的上边距</param>
+        private void ApplyCropBorderSizeAndPosition(double newWidth, double newHeight, double newLeft, double newTop)
+        {
+            CropBorder.Width = newWidth; // 先设置宽高，再设置Left/Top，避免闪烁
+            CropBorder.Height = newHeight;
+            Canvas.SetLeft(CropBorder, newLeft); // 再设置Left/Top，避免闪烁
+            Canvas.SetTop(CropBorder, newTop);
+
+            BorderWidth = newWidth;
+            BorderHeight = newHeight;
+        }
+
+        // 调整大小手柄的鼠标松开事件
         private void ResizeHandle_MouseLeftButtonUp(object sender, MouseEventArgs e)
         {
             isResizing = false;
@@ -308,9 +346,7 @@ namespace Quicker.Windows.ToolWindows
             UpdateMask();
         }
 
-        /// <summary>
-        /// 隐藏所有调整手柄
-        /// </summary>
+        // 隐藏所有调整手柄
         private void HideResizeHandles()
         {
             ResizeHandleTopLeft.Fill = Brushes.Transparent;
@@ -323,46 +359,148 @@ namespace Quicker.Windows.ToolWindows
             ResizeHandleRight.Fill = Brushes.Transparent;
         }
 
-        /// <summary>
-        /// 显示所有调整手柄
-        /// </summary>
+        // 显示所有调整手柄
         private void ShowResizeHandles()
         {
-            ResizeHandleTopLeft.Fill = Brushes.Red;
-            ResizeHandleTopRight.Fill = Brushes.Red;
-            ResizeHandleBottomLeft.Fill = Brushes.Red;
-            ResizeHandleBottomRight.Fill = Brushes.Red;
-            ResizeHandleTop.Fill = Brushes.Red;
-            ResizeHandleBottom.Fill = Brushes.Red;
-            ResizeHandleLeft.Fill = Brushes.Red;
-            ResizeHandleRight.Fill = Brushes.Red;
+            ResizeHandleTopLeft.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleTopRight.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleBottomLeft.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleBottomRight.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleTop.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleBottom.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleLeft.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            ResizeHandleRight.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
         }
 
-        // 鼠标滚轮更改图片缩放
-        private void CropImage_MouseWheel(object sender, MouseWheelEventArgs e)
+        private TransformedBitmap _currentTransformedBitmap; // 当前变换后的图片
+
+        // 顺时针旋转90°
+        private void RotateRightButton_Click(object sender, RoutedEventArgs e)
         {
-            if (e.Delta > 0)
-                imageScale += ScaleStep;
-            else
-                imageScale -= ScaleStep;
-
-            imageScale = Math.Max(MinScale, Math.Min(MaxScale, imageScale));
-
-            CropImage.LayoutTransform = new ScaleTransform(imageScale, imageScale);
-
-            UpdateMask();
+            ApplyTransform(new RotateTransform(90, 0.5, 0.5), true);
         }
 
+        // 逆时针旋转90°
+        private void RotateLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTransform(new RotateTransform(-90, 0.5, 0.5), true);
+        }
 
+        // 垂直翻转
+        private void FlipVerticalButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTransform(new ScaleTransform(1, -1, 0.5, 0.5), false);
+        }
+
+        // 水平翻转
+        private void FlipHorizontalButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplyTransform(new ScaleTransform(-1, 1, 0.5, 0.5), false);
+        }
+
+        /// <summary>
+        /// 通用变换方法
+        /// </summary>
+        /// <param name="transform"> 变换对象 </param>
+        /// <param name="isRotate"> 是否旋转 </param>
+        private void ApplyTransform(Transform transform, bool isRotate)
+        {
+            // 防止空引用
+            BitmapSource source = CropImage.Source as BitmapSource ?? _originalBitmapSource;
+            if (source == null) return;
+
+            // 组合上一次的变换
+            var group = new TransformGroup(); // 组合变换
+            if (CropImage.LayoutTransform is TransformGroup oldGroup)
+            {
+                foreach (var t in oldGroup.Children)
+                    group.Children.Add(t);
+            }
+            else if (CropImage.LayoutTransform != null && !(CropImage.LayoutTransform is MatrixTransform mt && mt.Matrix.IsIdentity))
+            {
+                group.Children.Add(CropImage.LayoutTransform);
+            }
+
+            group.Children.Add(transform); // 旋转时，叠加旋转；翻转时，叠加翻转
+            CropImage.LayoutTransform = group; // 应用变换
+            if (isRotate) // 旋转90°后，宽高要互换
+            {
+                double temp = BorderWidth;
+                BorderWidth = BorderHeight;
+                BorderHeight = temp;
+            }
+
+            UpdateMask(); // 更新蒙版
+        }
+
+        // 点击按钮保存图片
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // 1. 计算裁剪区域在原图上的坐标
-            // 获取图片的 BitmapSource
-            var bitmapSource = CropImage.Source as BitmapSource;
+            BitmapSource bitmapSource = CropImage.Source as BitmapSource; // 图片源
+            string dir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages"; // 保存目录
+            string fileName = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds():x}.png"; // 保存文件名
+            string filePath = System.IO.Path.Combine(dir, fileName); // 保存路径
+            if (UseOriginalImageCheckBox.IsChecked == true) // 保存原图
+            {
+                if (!SaveOriginalImage(bitmapSource, dir, filePath)) // 保存失败
+                    return;
+                CroppedImagePath = filePath; // 保存路径
+                OnCropCompleted(CroppedImagePath); // 通知完成
+
+            }
+            else
+            {
+                if (!TryGetCropRect(bitmapSource, out var cropRect, out var scaleInfo) ||
+                    !SaveCroppedImage(bitmapSource, cropRect, dir, filePath)) // 计算裁剪区域或保存失败，返回
+                    return;
+                CroppedImagePath = filePath; // 保存路径
+                OnCropCompleted(CroppedImagePath); // 通知完成
+            }
+        }
+
+        /// <summary>
+        /// 保存原图到指定路径
+        /// </summary>
+        /// <param name="bitmapSource">原始图片源</param>
+        /// <param name="dir">保存目录</param>
+        /// <param name="filePath">保存路径</param>
+        /// <returns>保存成功返回 true，否则 false</returns>
+        private bool SaveOriginalImage(BitmapSource bitmapSource, string dir, string filePath)
+        {
             if (bitmapSource == null)
             {
-                MessageBox.Show("图片加载失败！");
-                return;
+                ShowToast("图片加载失败！", "Error");
+                return false;
+            }
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder(); // 保存为PNG格式
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 保存图片
+                encoder.Save(fileStream);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 获取裁剪区域在原图上的像素矩形
+        /// </summary>
+        /// <param name="bitmapSource">原始图片源</param>
+        /// <param name="cropRect">输出：裁剪区域</param>
+        /// <param name="scaleInfo">输出：缩放信息</param>
+        /// <returns>成功返回 true，否则 false</returns>
+        private bool TryGetCropRect(BitmapSource bitmapSource, out Int32Rect cropRect, out (double scale, double offsetX, double offsetY) scaleInfo)
+        {
+            cropRect = new Int32Rect();
+            scaleInfo = (0, 0, 0);
+
+            if (bitmapSource == null)
+            {
+                ShowToast("图片加载失败！", "Error");
+                return false;
             }
 
             // 获取Grid和Border的相对位置
@@ -377,8 +515,7 @@ namespace Quicker.Windows.ToolWindows
             double cropWidth = CropBorder.ActualWidth;
             double cropHeight = CropBorder.ActualHeight;
 
-            // 2. 计算显示区域和原图的缩放关系
-            // 由于Image的Stretch=Uniform，需考虑缩放和偏移
+            // 计算缩放关系
             double imgControlWidth = ImageGrid.ActualWidth;
             double imgControlHeight = ImageGrid.ActualHeight;
             double bmpWidth = bitmapSource.PixelWidth;
@@ -408,35 +545,124 @@ namespace Quicker.Windows.ToolWindows
 
             if (w <= 0 || h <= 0)
             {
-                MessageBox.Show("裁剪区域无效！");
-                return;
+                ShowToast("裁剪区域无效！", "Error");
+                return false;
             }
 
-            // 3. 裁剪
-            var cropped = new CroppedBitmap(bitmapSource, new Int32Rect((int)x, (int)y, (int)w, (int)h));
+            cropRect = new Int32Rect((int)x, (int)y, (int)w, (int)h);
+            scaleInfo = (scale, offsetX, offsetY);
+            return true;
+        }
 
-            // 4. 生成文件名
-            string dir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages";
+        /// <summary>
+        /// 保存裁剪后的图片到指定路径
+        /// </summary>
+        /// <param name="bitmapSource">原始图片源</param>
+        /// <param name="cropRect">裁剪区域</param>
+        /// <param name="dir">保存目录</param>
+        /// <param name="filePath">保存路径</param>
+        /// <returns>保存成功返回 true，否则 false</returns>
+        private bool SaveCroppedImage(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath)
+        {
+            var cropped = new CroppedBitmap(bitmapSource, cropRect);
+
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            string fileName = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds():x}.png";
-            string filePath = System.IO.Path.Combine(dir, fileName);
-
-            // 5. 保存为PNG
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 PngBitmapEncoder encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(cropped));
                 encoder.Save(fileStream);
             }
-            CroppedImagePath = filePath; // 保存路径
-            OnCropCompleted(CroppedImagePath); // 调用事件
+            return true;
         }
 
+        /// <summary>
+        /// 显示消息提示
+        /// </summary>
+        /// <param name="message">消息内容</param>
+        /// <param name="type">消息类型</param>
+        private void ShowToast(string message, string type)
+        {
+            using (var toast = new ToastManager())
+            {
+                toast.Show(message, type);
+            }
+        }
+
+        // 点击按钮关闭窗口
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            Close(); // 关闭窗口
+        }
+
+        // 点击按钮弹出颜色选择器
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn) // 防止空引用
+            {
+                _currentColorButton = btn; // 保存当前选中的按钮
+                var brush = btn.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Black); // 取出按钮的颜色
+                PopupColorPicker.SelectedColor = brush.Color; // 弹出颜色选择器
+                ColorPickerPopup.PlacementTarget = btn; // 设置弹出位置
+                ColorPickerPopup.IsOpen = true; // 打开颜色选择器
+            }
+        }
+
+        // 颜色选择器选择颜色后，应用到按钮上
+        private void PopupColorPicker_SelectedColorChanged(object sender, ColorChangedEventArgs e)
+        {
+            if (_currentColorButton == null) return; // 防止空引用
+            var newBrush = new SolidColorBrush(e.NewColor); // 取出选择的颜色
+            _currentColorButton.Tag = newBrush; // 保存到按钮的Tag属性
+
+            if (_currentColorButton == BackgroundColorButton)
+                ImageGrid.Background = newBrush;
+            else if (_currentColorButton == BorderColorButton)
+                CropBorder.BorderBrush = newBrush;
+        }
+
+        // 关闭窗口释放资源
+        private void ImageCropWindow_Closed(object sender, EventArgs e)
+        {
+            if (PopupColorPicker != null)
+                PopupColorPicker.SelectedColorChanged -= PopupColorPicker_SelectedColorChanged;
+
+            // 释放图片资源
+            if (CropImage.Source is BitmapImage bitmapImage)
+            {
+                CropImage.Source = null;
+                bitmapImage.StreamSource?.Dispose();
+            }
+            _originalBitmapSource = null;
+            _currentColorButton = null;
+            CropCompleted = null;
+        }
+
+        private void ChangeImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
+                Title = "选择图片"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    var newBitmap = new BitmapImage(new Uri(dialog.FileName, UriKind.Absolute)); // 加载新图片
+                    CropImage.Source = newBitmap; // 显示新图片
+                    _originalBitmapSource = newBitmap; // 保存原图
+                }
+                catch
+                {
+                    using (var toast = new ToastManager())
+                    {
+                        toast.Show("图片加载失败！", "Error");
+                    }
+                }
+            }
         }
     }
 }
