@@ -1,4 +1,5 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using Hardcodet.Wpf.TaskbarNotification;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Models.Settings;

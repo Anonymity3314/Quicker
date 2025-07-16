@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;

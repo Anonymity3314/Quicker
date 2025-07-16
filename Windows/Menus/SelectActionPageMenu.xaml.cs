@@ -1,5 +1,5 @@
-﻿using System.Windows.Media.Imaging;
-using Quicker.Windows.MainWindows;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using Quicker.Database;
 using Quicker.Managers;

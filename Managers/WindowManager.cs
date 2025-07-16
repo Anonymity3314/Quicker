@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Runtime.InteropServices;
 using Quicker.Windows.MainWindows;
 using System.Windows.Interop;
 using System.Diagnostics;

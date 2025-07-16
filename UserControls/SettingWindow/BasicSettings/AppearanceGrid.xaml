@@ -460,7 +460,7 @@
                                                 <ImageBrush ImageSource="/Resources/Images/MoreSelection.png"/>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
-                                        <Border x:Name="HasNewVersionTip" CornerRadius="4,4,4,4" Background="#11AD45" Margin="12,12,0,0"/>
+                                        <Border x:Name="HasNewVersionTip" CornerRadius="4" Background="#11AD45" Margin="12,12,0,0"/>
                                     </Grid>
                                 </Button>
                                 <Button Style="{StaticResource Task}" styles:ParentBackgroundHelper.ParentBackground="{Binding Background, ElementName=TitleBarGrid}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0">
@@ -525,7 +525,7 @@
                                 <Button x:Name="GlobalButton12" Style="{StaticResource PreviewButtonStyle}" Width="{Binding ElementName=ButtonSizeSlider, Path=Value}" Height="{Binding ElementName=ButtonSizeSlider, Path=Value}" Grid.Row="4" Grid.Column="6" MouseEnter="PreviewButton_MouseEnter" MouseLeave="PreviewButton_MouseLeave"/>
                             </Grid>
                             <!-- 功能栏 -->
-                            <Grid x:Name="FunctionBarGrid" VerticalAlignment="Center" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.Row="2" >
+                            <Grid x:Name="FunctionBarGrid" VerticalAlignment="Center" Height="25" Background="{Binding ElementName=ToolbarColorButton, Path=Background}" Grid.Row="2">
                                 <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding ElementName=ToolbarIconColorButton, Path=Background}" TextAlignment="Center" Margin="10,0"/>
                                 <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                                 <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>

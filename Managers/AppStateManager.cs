@@ -1,6 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Collections.Concurrent;
 using System.Windows.Media.Imaging;
-using Quicker.Windows.MainWindows;
 using System.Windows.Threading;
 using Quicker.Models.Settings;
 using Quicker.Database;

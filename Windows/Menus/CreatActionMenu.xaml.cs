@@ -1,4 +1,5 @@
-﻿using System.Windows.Media.Imaging;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Collections.Generic;
 using System.Windows.Controls;
