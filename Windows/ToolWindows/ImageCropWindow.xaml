@@ -14,6 +14,7 @@
     Height="520"
     Width="800"
 
+    KeyDown="ImageCropWindow_KeyDown"
     Loaded="ImageCropWindow_Loaded"
     Closed="ImageCropWindow_Closed"
 >
@@ -99,7 +100,7 @@
         <Button Content="水平翻转" Canvas.Left="655" Canvas.Top="137" Style="{StaticResource WhiteButton}" Width="108" VerticalAlignment="Top" Click="FlipHorizontalButton_Click"/>
         <Button x:Name="SaveButton" Click="SaveButton_Click" Canvas.Left="655" Canvas.Top="407" Width="108" VerticalAlignment="Top">
             <Button.Style>
-                <Style TargetType="Button" BasedOn="{StaticResource WhiteButton}">
+                <Style TargetType="Button" BasedOn="{StaticResource BlueButton}">
                     <Setter Property="Content" Value="裁剪并保存"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsChecked, ElementName=UseOriginalImageCheckBox}" Value="True">

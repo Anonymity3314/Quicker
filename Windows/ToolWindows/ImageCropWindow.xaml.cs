@@ -64,8 +64,8 @@ namespace Quicker.Windows.ToolWindows
             InitializeComponent();
             this.aspectRatio = aspectRatio;
             BorderCornerRadius = cornerRadius;
-            BorderWidth = 200;
-            BorderHeight = 200 / aspectRatio;
+            CropBorder.Width = 200;
+            CropBorder.Height = 200 / aspectRatio;
             DataContext = this;
 
             // 加载原始图片
@@ -73,16 +73,38 @@ namespace Quicker.Windows.ToolWindows
             CropImage.Source = _originalBitmapSource;
 
             // 正确初始化Tag为SolidColorBrush
-            if (BackgroundColorButton.Tag is not SolidColorBrush)
-                BackgroundColorButton.Tag = new SolidColorBrush(Colors.Black);
-            if (BorderColorButton.Tag is not SolidColorBrush)
-                BorderColorButton.Tag = new SolidColorBrush(Colors.White);
-            if (HandleColorButton.Tag is not SolidColorBrush)
-                HandleColorButton.Tag = new SolidColorBrush(Colors.White);
+            BackgroundColorButton.Tag = new SolidColorBrush(Colors.Black);
+            BorderColorButton.Tag = new SolidColorBrush(Colors.White);
+            HandleColorButton.Tag = new SolidColorBrush(Colors.White);
 
             // 同步到控件
             ImageGrid.Background = BackgroundColorButton.Tag as SolidColorBrush;
             CropBorder.BorderBrush = BorderColorButton.Tag as SolidColorBrush;
+        }
+
+        // 监听键盘方向键，微调裁剪框位置
+        private void ImageCropWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            double left = Canvas.GetLeft(CropBorder);
+            double top = Canvas.GetTop(CropBorder);
+            switch (e.Key)
+            {
+                case Key.Up:
+                    Canvas.SetTop(CropBorder, top - 1);
+                    break;
+                case Key.Down:
+                    Canvas.SetTop(CropBorder, top + 1);
+                    break;
+                case Key.Left:
+                    Canvas.SetLeft(CropBorder, left - 1);
+                    break;
+                case Key.Right:
+                    Canvas.SetLeft(CropBorder, left + 1);
+                    break;
+                default:
+                    return;
+            }
+            UpdateMask(); // 移动后刷新遮罩
         }
 
         private void CropBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
