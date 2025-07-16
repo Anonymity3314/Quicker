@@ -4,6 +4,7 @@ using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using System.Collections.Generic;
 using System.Windows.Threading;
+using Quicker.Models.Settings;
 using System.Windows.Controls;
 using System.ComponentModel;
 using Quicker.UserControls;
@@ -12,11 +13,14 @@ using System.Globalization;
 using System.Windows.Data;
 using Quicker.Database;
 using Quicker.Managers;
+using System.Text.Json;
 using System.Xml.Linq;
 using System.Windows;
 using Quicker.Models;
 using System.Linq;
 using System.IO;
+using Hjg.Pngcs;
+using Hjg.Pngcs.Chunks;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -431,8 +435,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
+                ShowToast($"图标加载失败：动作{buttonInformation.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
             }
         }
 
@@ -870,6 +873,232 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             settingManager.appearanceConditions.BackgroundImagePath = BackgroundImagePathTextBox.Text; // 保存路径到缓存
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
+        }
+
+        // 点击按钮分享外观
+        private void ShareSaveAppearanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. 获取当前外观设置对象
+            var appearance = settingManager.appearanceConditions;
+            // 2. 序列化为 JSON 字符串
+            string json = JsonSerializer.Serialize(appearance);
+            // 3. 获取作为分享载体的 PNG 图片路径（优先用用户自定义背景，否则用内置图片）
+            string inputPngPath = GetAppearanceCarrierImagePath();
+            inputPngPath = EnsureTrueColorPng(inputPngPath); // 保证是32位真彩色
+            // 4. 获取输出路径（自动创建保存文件夹，文件名带时间戳）
+            string outputPngPath = GetShareAppearanceOutputPath();
+            // 5. 写入 PNG 文件并嵌入 JSON 数据
+            WriteAppearanceToPng(inputPngPath, outputPngPath, json);
+            // 6. 显示保存成功的 Toast 提示
+            ShowToast("外观保存成功！", "Success");
+            // 7. 打开资源管理器并选中刚保存的 PNG 文件
+            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{outputPngPath}\"");
+        }
+
+        /// <summary>
+        /// 获取外观分享载体图片路径（优先用用户自定义背景，否则用内置图片）
+        /// </summary>
+        /// <returns>载体图片路径</returns>
+        private string GetAppearanceCarrierImagePath()
+        {
+            // 如果用户设置了背景图片且文件存在，则直接用该图片
+            if (!string.IsNullOrEmpty(BackgroundImagePathTextBox.Text) && File.Exists(BackgroundImagePathTextBox.Text))
+            {
+                return BackgroundImagePathTextBox.Text;
+            }
+            else // 否则用内置资源图片，先保存到临时文件
+            {
+                var resourceUri = new Uri("pack://application:,,,/Resources/Images/Quicker1.png"); // 内置图片资源路径
+                var streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流
+                string tempPath = Path.GetTempFileName() + ".png"; // 临时文件路径
+                using (var fileStream = File.Create(tempPath)) // 创建临时文件
+                {
+                    streamInfo.Stream.CopyTo(fileStream); // 复制资源流到临时文件
+                }
+                return tempPath;
+            }
+        }
+
+        /// <summary>
+        /// 获取分享 PNG 的输出路径（自动创建文件夹，文件名带时间戳）
+        /// </summary>
+        /// <returns>输出路径</returns>
+        private string GetShareAppearanceOutputPath()
+        {
+            string baseDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\SharedAppearance"; // 目标文件夹
+            if (!Directory.Exists(baseDir)) // 如果文件夹不存在则自动创建
+            {
+                Directory.CreateDirectory(baseDir);
+            }
+            string fileName = $"Quicker外观_{DateTime.Now:yyyyMMdd_HHmmss}.png"; // 文件名格式：Quicker外观_年月日_时分秒.png
+            return Path.Combine(baseDir, fileName);
+        }
+
+        /// <summary>
+        /// 将 JSON 数据写入 PNG 图片的 tEXt 块，实现外观参数嵌入
+        /// </summary>
+        /// <param name="inputPngPath">输入PNG路径（载体图片）</param>
+        /// <param name="outputPngPath">输出PNG路径（保存路径）</param>
+        /// <param name="json">要嵌入的 JSON 数据</param>
+        private void WriteAppearanceToPng(string inputPngPath, string outputPngPath, string json)
+        {
+            // 创建 PNG 读取器和写入器
+            var pngr = new Hjg.Pngcs.PngReader(File.OpenRead(inputPngPath));
+            var pngw = new Hjg.Pngcs.PngWriter(File.OpenWrite(outputPngPath), pngr.ImgInfo);
+            try
+            {
+                for (int row = 0; row < pngr.ImgInfo.Rows; row++) // 拷贝所有像素数据
+                {
+                    var line = pngr.ReadRowInt(row);
+                    pngw.WriteRow(line, row);
+                }
+                string base64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
+                pngw.GetMetadata().SetText("QuickerAppearance", base64, false, false);
+            }
+            finally // 释放资源
+            {
+                pngr.End();
+                pngw.End();
+            }
+        }
+
+        /// <summary>
+        /// 显示 Toast 提示
+        /// </summary>
+        /// <param name="message">提示内容</param>
+        /// <param name="type">提示类型 (Success, Error, Info)</param>
+        private void ShowToast(string message, string type)
+        {
+            using var toast = new ToastManager();
+            toast.Show(message, type);
+        }
+
+        /// <summary>
+        /// 确保输入的 PNG 图片为 32 位真彩色格式（BGRA32），如果不是则自动转换并返回新文件路径。
+        /// </summary>
+        /// <param name="inputPath">原始 PNG 图片路径（可以是索引色或其他格式）</param>
+        /// <returns>转换为 32 位真彩色的 PNG 文件路径（临时文件）</returns>
+        private string EnsureTrueColorPng(string inputPath)
+        {
+            // 用 WPF BitmapImage 读取
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri(inputPath, UriKind.Absolute);
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+
+            // 转换为 32 位 BGRA
+            var converted = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0);
+
+            // 保存为临时 PNG
+            string tempPath = Path.GetTempFileName() + ".png";
+            using (var fileStream = File.Create(tempPath))
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(converted));
+                encoder.Save(fileStream);
+            }
+            return tempPath;
+        }
+
+        // 导入外观设置按钮点击事件
+        private void ImportAppearanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 1. 选择图片
+                var dialog = new Microsoft.Win32.OpenFileDialog
+                {
+                    Filter = "PNG图片|*.png",
+                    Title = "选择外观分享图片"
+                };
+                if (dialog.ShowDialog() != true)
+                    return;
+                string selectedPngPath = dialog.FileName;
+
+                // 2. 提取 tEXt 数据
+                string json = null;
+                var pngr = new PngReader(File.OpenRead(selectedPngPath));
+                try
+                {
+                    var allChunks = pngr.GetChunksList().GetChunks();
+                    foreach (var chunk in allChunks)
+                    {
+                        if (chunk is PngChunkTextVar txtChunk)
+                        {
+                            var key = txtChunk.GetKey()?.Trim();
+                            if (key == "QuickerAppearance")
+                            {
+                                var val = txtChunk.GetVal();
+                                if (!string.IsNullOrEmpty(val))
+                                {
+                                    json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(val));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    pngr.End();
+                }
+                if (string.IsNullOrEmpty(json))
+                {
+                    ShowToast("未检测到外观数据！", "Error");
+                    return;
+                }
+                var appearance = JsonSerializer.Deserialize<Appearance>(json);
+
+                // 3. 处理背景图片
+                if (!string.IsNullOrEmpty(appearance.BackgroundImagePath))
+                {
+                    string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages";
+                    if (!Directory.Exists(bgDir))
+                        Directory.CreateDirectory(bgDir);
+                    string hash = DateTime.Now.Ticks.ToString("x");
+                    string newBgPath = Path.Combine(bgDir, $"bg_{hash}.png");
+                    RemoveTextChunkAndCopy(selectedPngPath, newBgPath);
+                    appearance.BackgroundImagePath = newBgPath;
+                }
+
+                // 4. 应用外观参数
+                settingManager.appearanceConditions = appearance;
+                SettingDatabase.UpdateAppearance(appearance);
+                // 刷新界面
+                ApplyButtonSettings();
+                ApplyColorSettings();
+                ApplyFontSettings();
+                ApplyBackgroundImageSettings();
+                ApplyBlurAndCornerSettings();
+                ApplyOptionSettings();
+
+                ShowToast("导入成功！", "Success");
+            }
+            catch
+            {
+                ShowToast("导入失败！", "Error");
+            }
+        }
+
+        private void RemoveTextChunkAndCopy(string srcPath, string destPath)
+        {
+            var pngr = new PngReader(File.OpenRead(srcPath));
+            var pngw = new PngWriter(File.OpenWrite(destPath), pngr.ImgInfo);
+            try
+            {
+                // 不复制 tEXt 块
+                for (int row = 0; row < pngr.ImgInfo.Rows; row++)
+                {
+                    var line = pngr.ReadRowInt(row);
+                    pngw.WriteRow(line, row);
+                }
+            }
+            finally
+            {
+                pngr.End();
+                pngw.End();
+            }
         }
     }
 
