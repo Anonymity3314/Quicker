@@ -1,5 +1,4 @@
 ﻿<UserControl
-    xmlns:conv="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
     xmlns:local="clr-namespace:Quicker.UserControls.SettingWindow.BasicSettings"
     x:Class="Quicker.UserControls.SettingWindow.BasicSettings.AppearanceGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,6 +8,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:styles="clr-namespace:Quicker.Resources.Styles"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:conv="clr-namespace:Quicker.Converters"
+    xmlns:helpers="clr-namespace:Quicker.Helpers"
     mc:Ignorable="d"
 
     d:DesignHeight="1300"
@@ -17,15 +18,15 @@
     Unloaded="AppearanceGrid_Unloaded"
 >
     <UserControl.Resources>
-        <local:PreviewBorderHeightConverter x:Key="PreviewBorderHeightConverter"/>
-        <local:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
+        <conv:PreviewBorderHeightConverter x:Key="PreviewBorderHeightConverter"/>
+        <conv:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <local:DoubleSubtractConverter x:Key="DoubleSubtractConverter"/>
-        <local:BlurEffectConverter x:Key="BlurEffectConverter"/>
-        <local:GridHeightConverter x:Key="GridHeightConverter"/>
-        <local:FontWeightConverter x:Key="FontWeightConverter"/>
-        <local:ThicknessConverter x:Key="ThicknessConverter"/>
-        <local:GridWidthConverter x:Key="GridWidthConverter"/>
+        <conv:DoubleSubtractConverter x:Key="DoubleSubtractConverter"/>
+        <conv:BlurEffectConverter x:Key="BlurEffectConverter"/>
+        <conv:GridHeightConverter x:Key="GridHeightConverter"/>
+        <conv:FontWeightConverter x:Key="FontWeightConverter"/>
+        <conv:ThicknessConverter x:Key="ThicknessConverter"/>
+        <conv:GridWidthConverter x:Key="GridWidthConverter"/>
         <!-- 按钮模板 -->
         <Style x:Key="PreviewButtonStyle" TargetType="Button">
             <Setter Property="FontWeight" Value="{Binding ElementName=FontWeightComboBox, Path=SelectedIndex, Converter={StaticResource FontWeightConverter}}"/>
@@ -420,7 +421,7 @@
                     </Border.Style>
                 </Border>
                 <!-- 设置面板预览 -->
-                <Border x:Name="ViewPreviewBorder" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" local:ClipHelper.ClipToBounds="True">
+                <Border x:Name="ViewPreviewBorder" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" helpers:ClipHelper.ClipToBounds="True">
                     <Border.Height>
                         <MultiBinding Converter="{StaticResource PreviewBorderHeightConverter}">
                             <Binding ElementName="ButtonSizeSlider" Path="Value"/>

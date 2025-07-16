@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Data.SQLite;
+﻿using Quicker.Helpers;
 using Quicker.Managers;
 using Quicker.Models;
+using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 
 namespace Quicker.Database
@@ -536,7 +537,7 @@ namespace Quicker.Database
                 size += 8; // LatestEditTime (DateTime)
                 size += 4; // UsedTimes (int)
             }
-            using var convertion = new DataConversionManager(); // 数据转换管理器
+            using var convertion = new DataSizeHelper(); // 数据转换管理器
             size = convertion.ConversionData(size); // 转换数据
             string sizeString = convertion.ConversionUnits(size); // 转换单位
             return $"{size} {sizeString}"; // 返回动作页大小

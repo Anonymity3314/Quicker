@@ -1,0 +1,25 @@
+﻿namespace Quicker.Converters
+{
+    /// <summary>
+    /// PreviewBorderHeightConverter：用于计算预览区高度，根据按钮高度、间隙、行数计算。
+    /// </summary>
+    public class PreviewBorderHeightConverter : System.Windows.Data.IMultiValueConverter
+    {
+        /// <summary>
+        /// 预览区高度转换器：根据按钮高度、间隙、行数计算预览区高度
+        /// </summary>
+        public object Convert(object[] values, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            // values[0]: 按钮高度, values[1]: 按钮间隙
+            if (values.Length >= 2 && double.TryParse(values[0]?.ToString(), out double btnHeight) && double.TryParse(values[1]?.ToString(), out double gap))
+            {
+                return 27 + 25 + btnHeight * 7 + gap * 5; // 预览区高度
+            }
+            return 0; // 错误值
+        }
+        /// <summary>
+        /// 不支持反向转换
+        /// </summary>
+        public object[] ConvertBack(object value, System.Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture) => throw new System.NotImplementedException();
+    }
+}

@@ -1,12 +1,13 @@
-﻿using Quicker.Windows.MainWindows;
-using System.Windows.Resources;
-using System.Windows.Controls;
-using Quicker.UserControls;
-using System.Windows.Input;
-using System.Diagnostics;
+﻿using Quicker.Helpers;
 using Quicker.Managers;
-using System.Windows;
+using Quicker.UserControls;
+using Quicker.Windows.MainWindows;
+using System.Diagnostics;
 using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Resources;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -200,7 +201,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     }
 
                     // 使用 DataConversionManager 转换数据大小和单位
-                    using var convertionManager = new DataConversionManager();
+                    using var convertionManager = new DataSizeHelper();
                     folderSize = convertionManager.ConversionData((int)folderSize); // 转换数据大小
                     folderSizeString = convertionManager.ConversionUnits((int)folderSize); // 转换单位
 

@@ -1,6 +1,6 @@
-﻿namespace Quicker.Managers
+﻿namespace Quicker.Helpers
 {
-    internal class DataConversionManager:IDisposable
+    internal class DataSizeHelper:IDisposable
     {
         private bool isDisposed = false; // 是否已释放资源
 
@@ -53,7 +53,7 @@
         }
 
         // 析构函数
-        ~DataConversionManager()
+        ~DataSizeHelper()
         {
             Dispose(false);
         }

@@ -1,15 +1,16 @@
-﻿using System.Windows.Controls.Primitives;
-using System.Windows.Media.Imaging;
+﻿using Quicker.Database;
+using Quicker.Helpers;
+using Quicker.Managers;
+using Quicker.Models;
 using Quicker.Windows.EditWindows;
-using Quicker.Windows.ToolWindows;
-using System.Windows.Controls;
 using Quicker.Windows.Menus;
+using Quicker.Windows.ToolWindows;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using Quicker.Managers;
-using Quicker.Database;
-using System.Windows;
-using Quicker.Models;
+using System.Windows.Media.Imaging;
 
 namespace Quicker.Windows.MainWindows
 {
@@ -743,7 +744,7 @@ namespace Quicker.Windows.MainWindows
             int actionPageIndex = int.Parse(bingdingButton.Name.Replace($"Edit{type}", "")); // 获取动作页 ID
             ActionPageData actionPageData = db3.GetActionPageData(type, actionPageIndex); // 获取动作页信息
             string actionPageSize = db3.GetActionPageSize(type, actionPageIndex); // 获取动作页大小
-            using var convertion = new DataConversionManager(); // 数据转换管理器
+            using var convertion = new DataSizeHelper(); // 数据转换管理器
             string actionPageInfo = $"ID：{actionPageData.DefaultActionPageName}\n" +
                                     $"最后修改：{actionPageData.LastEditTime}\n" +
                                     $"大小：{actionPageSize}"; // 创建消息窗口
