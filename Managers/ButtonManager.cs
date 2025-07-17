@@ -346,7 +346,7 @@ namespace Quicker.Managers
         /// <param name="button"> 目标按钮 </param>
         /// <param name="buttonInformation"> 按钮数据 </param>
         /// <param name="maxWidth"> 最大宽度 </param>
-        public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, int maxWidth, bool isMainWindow)
+        public void RefreshButtonDisplay(Button button, ButtonData buttonInformation, double maxWidth, bool isMainWindow = true)
         {
             if (buttonInformation == null || buttonInformation.Location == null)
             {
@@ -377,7 +377,8 @@ namespace Quicker.Managers
         /// <param name="buttonInformation"> 按钮数据 </param>
         /// <param name="maxWidth"> 最大宽度 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private Grid CreateButtonGrid(ButtonData buttonInformation, int maxWidth, bool isMainWindow)
+        /// <returns> 按钮网格 </returns>
+        private Grid CreateButtonGrid(ButtonData buttonInformation, double maxWidth, bool isMainWindow)
         {
             Grid grid = new(); // 创建网格
             if (!string.IsNullOrEmpty(buttonInformation.ImagePath)) // 如果图像路径不为空
@@ -387,7 +388,7 @@ namespace Quicker.Managers
 
             if (!string.IsNullOrEmpty(buttonInformation.Title)) // 如果标题不为空
             {
-                AddTitleToGrid(grid, buttonInformation, maxWidth); // 添加标题到网格
+                AddTitleToGrid(grid, buttonInformation, maxWidth, isMainWindow); // 添加标题到网格
             }
 
             return grid; // 返回网格
@@ -421,12 +422,26 @@ namespace Quicker.Managers
         /// <param name="grid"> 目标网格 </param>
         /// <param name="buttonInformation"> 按钮数据 </param>
         /// <param name="maxWidth"> 最大宽度 </param>
-        private void AddTitleToGrid(Grid grid, ButtonData buttonInformation, int maxWidth)
+        private void AddTitleToGrid(Grid grid, ButtonData buttonInformation, double maxWidth, bool isMainWindow)
         {
+            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            double buttonSize = appearance.ButtonSize; // 获取按钮大小
+            double borderWidth = appearance.BorderWidth; // 获取边框宽度
+            maxWidth = isMainWindow ? buttonSize - borderWidth * 2 : maxWidth; // 计算最大可用宽度
+
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
-            TextBlock textBlock = LoadActionTitle(buttonInformation, maxWidth); // 加载动作标题
-            grid.Children.Add(textBlock); // 添加标题到网格
-            Grid.SetRow(textBlock, 1); // 设置标题行
+            TextBlock textBlock = LoadActionTitle(buttonInformation, maxWidth, isMainWindow); // 创建标题TextBlock
+            textBlock.Visibility = appearance.HideActionNameAfterIcon ? Visibility.Collapsed : Visibility.Visible; // 根据设置控制可见性
+            if (appearance.AutoHideTitleBar)
+            {
+                ShrinkTextBlockFontToFit(textBlock, buttonSize, borderWidth); // 自动缩小字号以适应宽度
+            }
+            else
+            {
+                AutoEllipsisTextBlock(textBlock, (int)maxWidth); // 超出宽度时自动省略号
+            }
+            grid.Children.Add(textBlock); // 添加TextBlock到网格
+            Grid.SetRow(textBlock, 1); // 设置TextBlock所在行
         }
 
         /// <summary>
@@ -437,7 +452,8 @@ namespace Quicker.Managers
         /// <returns> 图像对象 </returns>
         private Image LoadActionIcon(ButtonData buttonInformation, bool isMainWindow)
         {
-            double buttonSize = isMainWindow ? 77.6 : 65;
+            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            double buttonSize = isMainWindow ? appearance.ButtonSize : 65;
             double imageSize = buttonSize / 2.0;
             Image image = new()
             {
@@ -448,6 +464,17 @@ namespace Quicker.Managers
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Source = new BitmapImage(new Uri(buttonInformation.ImagePath))
             };
+
+            image.Effect = appearance.ShowActionIconShadow == true
+            ? new System.Windows.Media.Effects.DropShadowEffect
+            {
+                Color = Colors.Black,
+                BlurRadius = 8,
+                ShadowDepth = 2,
+                Opacity = 0.5
+            }
+            : null; // 判断是否需要阴影
+
             return image;
         }
 
@@ -457,15 +484,19 @@ namespace Quicker.Managers
         /// <param name="buttonInformation"> 按钮数据 </param>
         /// <param name="maxWidth"> 最大宽度 </param>
         /// <returns> 文本块对象 </returns>
-        private TextBlock LoadActionTitle(ButtonData buttonInformation, int maxWidth)
+        private TextBlock LoadActionTitle(ButtonData buttonInformation, double maxWidth, bool isMainWindow)
         {
-            TextBlock textBlock = new()
+            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var textBlock = new TextBlock
             {
-                Text = buttonInformation.Title, // 设置文本
-                HorizontalAlignment = HorizontalAlignment.Center, // 水平居中
-            }; // 创建文本块对象
-            AutoEllipsisTextBlock(textBlock, maxWidth); // 动态调整字体大小
-            return textBlock; // 返回文本块对象
+                HorizontalAlignment = HorizontalAlignment.Stretch, // 水平拉伸填满
+                TextAlignment = TextAlignment.Center, // 文本居中
+                Text = buttonInformation.Title // 设置文本内容
+            }; // 创建TextBlock用于显示按钮标题
+
+            textBlock.FontSize = appearance.FontSize; // 滑块值
+
+            return textBlock; // 返回TextBlock对象，由AddTitleToGrid后续决定是否自动缩小字号
         }
 
         /// <summary>
@@ -578,6 +609,27 @@ namespace Quicker.Managers
                 if (newWidth <= maxWidth) break; // 如果新文本宽度小于等于最大宽度，退出循环
             }
             textBlock.Text = truncatedText + ellipsis; // 更新 TextBlock 的文本
+        }
+
+        /// <summary>
+        /// 缩小TextBlock字号直到文本宽度小于等于按钮大小 - 按钮边框 * 2
+        /// </summary>
+        /// <param name="textBlock"> 要调整的TextBlock </param>
+        /// <param name="buttonSize"> 按钮大小 </param>
+        /// <param name="borderWidth"> 按钮边框宽度 </param>
+        public void ShrinkTextBlockFontToFit(TextBlock textBlock, double buttonSize, double borderWidth)
+        {
+            if (textBlock == null || string.IsNullOrEmpty(textBlock.Text)) return; // 防止空引用或空文本
+            double maxWidth = buttonSize - borderWidth * 2; // 计算最大允许宽度
+            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            double fontSize = appearance.FontSize; // 获取初始字号
+            textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量当前文本块宽度
+            while (textBlock.DesiredSize.Width >= maxWidth)
+            {
+                fontSize -= 0.1; // 递减字号
+                textBlock.FontSize = fontSize; // 应用新字号
+                textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 重新测量宽度
+            }
         }
 
         /// <summary>

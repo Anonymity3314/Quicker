@@ -32,22 +32,13 @@
             <Setter Property="FontWeight" Value="{Binding ElementName=FontWeightComboBox, Path=SelectedIndex, Converter={StaticResource FontWeightConverter}}"/>
             <Setter Property="Background" Value="{Binding ElementName=BlankButtonColorButton, Path=Background}"/>
             <Setter Property="BorderBrush" Value="{Binding ElementName=BorderColorButton,Path=Background}"/>
+            <Setter Property="Foreground" Value="{Binding ElementName=TextColorButton, Path=Background}"/>
             <Setter Property="FontSize" Value="{Binding ElementName=FontSizeSlider, Path=Value}"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Content" Value="{x:Null}"/>
-            <Setter Property="AllowDrop" Value="True"/>
-            <Setter Property="Tag" Value="{x:Null}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Border
-                                x:Name="border"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value}">
+                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{Binding ElementName=BorderWidthSlider, Path=Value, Converter={StaticResource ThicknessConverter}}" Background="{TemplateBinding Background}" CornerRadius="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value}">
                                 <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
