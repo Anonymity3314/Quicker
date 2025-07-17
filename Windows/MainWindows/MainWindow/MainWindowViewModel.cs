@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Quicker.Database;
+using System.Windows;
 
 namespace Quicker.Windows.MainWindows.MainWindow
 {
@@ -27,7 +28,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
 
         // 字体相关字段
         private double _fontSize; // 字体大小
-        private int _fontWeight; // 字体粗细
+        private FontWeight _fontWeight; // 修改类型
 
         // 背景图片相关字段
         private string _backgroundImagePath; // 背景图片路径
@@ -164,7 +165,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <summary>
         /// 字体粗细
         /// </summary>
-        public int FontWeight
+        public FontWeight FontWeight
         {
             get => _fontWeight;
             set { _fontWeight = value; OnPropertyChanged(nameof(FontWeight)); }
@@ -273,7 +274,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 BlankButtonColor = appearance.BlankButtonColor;
                 BlankButtonMouseOverColor = appearance.BlankButtonMouseOverColor;
                 FontSize = appearance.FontSize;
-                FontWeight = appearance.FontWeight;
+                FontWeight = Quicker.Converters.FontWeightConverter.IndexToFontWeight(appearance.FontWeight); // 调用FontWeightConverter
                 ActionButtonColor = appearance.ActionButtonColor;
                 ActionButtonMouseOverColor = appearance.ActionButtonMouseOverColor;
                 ShowActionButtonMouseOver = appearance.ShowActionButtonMouseOver;

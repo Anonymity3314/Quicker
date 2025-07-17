@@ -15,7 +15,7 @@
                     cols = pCols;
                 return btnSize * cols + gap * (cols - 1);
             }
-            return 0;
+            return 0.0;
         }
         public object[] ConvertBack(object value, System.Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture) => throw new System.NotImplementedException();
     }

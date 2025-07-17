@@ -70,5 +70,28 @@
             }
             return 4; // Normal
         }
+
+        /// <summary>
+        /// 静态方法：根据索引获取FontWeight
+        /// </summary>
+        public static System.Windows.FontWeight IndexToFontWeight(int selectedIndex)
+        {
+            if (selectedIndex >= 0 && selectedIndex < FontWeightList.Length)
+                return FontWeightList[selectedIndex];
+            return System.Windows.FontWeights.Normal;
+        }
+
+        /// <summary>
+        /// 静态方法：根据FontWeight获取索引
+        /// </summary>
+        public static int FontWeightToIndex(System.Windows.FontWeight fontWeight)
+        {
+            for (int i = 0; i < FontWeightList.Length; i++)
+            {
+                if (FontWeightList[i] == fontWeight)
+                    return i;
+            }
+            return 4; // Normal
+        }
     }
 }
