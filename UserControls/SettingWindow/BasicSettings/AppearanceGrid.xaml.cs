@@ -340,12 +340,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private void LoadGlobalButtonsForPreview()
         {
             var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据
-            var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 获取UniformGrid中的所有Button
+            var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 获取Grid中的所有Button
             for (int i = 0; i < buttons.Count; i++)
             {
                 var btn = buttons[i];
-                int buttonIndex = 0 * 100 + (i / 4 + 1) * 10 + (i % 4 + 1); // 计算按钮索引（按原有规则）
-                string buttonName = $"Global{buttonIndex}";
+                string buttonName = btn.Name;
+                int buttonIndex = int.Parse(btn.Name.Replace("Global","")); // 获取按钮索引
 
                 // 查找对应的按钮数据
                 var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex);
