@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls.Primitives;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
@@ -513,6 +514,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
             button.PreviewMouseMove += Button_PreviewMouseMove; // 鼠标移动事件
             button.PreviewMouseLeftButtonUp += Button_PreviewMouseLeftButtonUp; // 鼠标左键释放事件
             button.PreviewMouseLeftButtonDown += Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
+            button.MouseEnter += Button_MouseEnter; // 鼠标移入事件
+            button.MouseLeave += Button_MouseLeave; // 鼠标移出事件
         }
 
         // 全局动作页可见性与切换按钮背景绑定
@@ -699,6 +702,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     button.PreviewMouseMove -= Button_PreviewMouseMove; // 鼠标移动事件
                     button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 鼠标左键释放事件
                     button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
+                    button.MouseEnter -= Button_MouseEnter; // 鼠标移入事件
+                    button.MouseLeave -= Button_MouseLeave; // 鼠标移出事件
 
                     // 清理按钮内容和资源
                     button.Content = null; // 清理按钮内容
@@ -819,6 +824,141 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 if (child is Grid g && g.Name.StartsWith(gridType))
                     g.Visibility = (g.Name == $"{gridType}{pageIndex}") ? Visibility.Visible : Visibility.Collapsed;
             }
+        }
+
+        /// <summary>
+        /// 鼠标移入按钮时的处理：
+        /// 1. 有Tag（有数据）的按钮执行放大动画（如允许）。
+        /// 2. 无Tag（空按钮）显示添加图片（如允许）。
+        /// </summary>
+        private void Button_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+                if (btn.Tag != null)
+                {
+                    // 有数据的按钮，执行放大动画
+                    AnimateButtonScale(btn, appearance);
+                }
+                else
+                {
+                    // 空按钮，显示添加图片
+                    var conventions = SettingDatabase.GetAllConventions().FirstOrDefault();
+                    ShowAddImageOnButton(btn, appearance, conventions);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 对有Tag的按钮执行放大动画（如果设置允许）。
+        /// </summary>
+        /// <param name="btn">目标按钮</param>
+        /// <param name="appearance">外观设置</param>
+        private void AnimateButtonScale(Button btn, dynamic appearance)
+        {
+            if (appearance == null || !appearance.ShowActionButtonMouseOver) return;
+            var border = FindVisualChild<Border>(btn);
+            if (border != null)
+            {
+                var scale = new ScaleTransform(1, 1);
+                border.RenderTransformOrigin = new Point(0.5, 0.5);
+                border.RenderTransform = scale;
+
+                var animX = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(100));
+                var animY = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(100));
+                scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX);
+                scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
+            }
+        }
+
+        /// <summary>
+        /// 对无Tag的按钮显示添加图片（如果设置允许）。
+        /// </summary>
+        /// <param name="btn">目标按钮</param>
+        /// <param name="appearance">外观设置（用于获取按钮尺寸）</param>
+        /// <param name="conventions">通用设置（用于判断是否显示图片）</param>
+        private void ShowAddImageOnButton(Button btn, dynamic appearance, dynamic conventions)
+        {
+            if (conventions == null || !conventions.ShowAddImage) return;
+            double btnSize = appearance?.ButtonSize ?? 48; // 默认48
+            double imageSize = btnSize / 2.0;
+            btn.Content = new Image
+            {
+                Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Add.png")),
+                Stretch = Stretch.Uniform,
+                Height = imageSize,
+                Width = imageSize
+            };
+        }
+
+        /// <summary>
+        /// 鼠标移出按钮时的处理：
+        /// 1. 有Tag（有数据）的按钮还原缩放动画。
+        /// 2. 无Tag（空按钮）移除添加图片。
+        /// </summary>
+        private void Button_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                if (btn.Tag != null)
+                {
+                    // 有数据的按钮，还原缩放动画
+                    RestoreButtonScale(btn);
+                }
+                else
+                {
+                    // 空按钮，移除图片
+                    RemoveAddImageOnButton(btn);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 还原有Tag按钮的缩放动画。
+        /// </summary>
+        /// <param name="btn">目标按钮</param>
+        private void RestoreButtonScale(Button btn)
+        {
+            var border = FindVisualChild<Border>(btn);
+            if (border != null)
+            {
+                var scale = border.RenderTransform as ScaleTransform;
+                if (scale != null)
+                {
+                    var animX = new DoubleAnimation(1, TimeSpan.FromMilliseconds(100));
+                    var animY = new DoubleAnimation(1, TimeSpan.FromMilliseconds(100));
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX);
+                    scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除无Tag按钮上的添加图片。
+        /// </summary>
+        /// <param name="btn">目标按钮</param>
+        private void RemoveAddImageOnButton(Button btn)
+        {
+            btn.Content = null;
+        }
+
+        // 辅助方法：查找Button模板里的Border
+        private T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is T t)
+                    return t;
+                else
+                {
+                    T childOfChild = FindVisualChild<T>(child);
+                    if (childOfChild != null)
+                        return childOfChild;
+                }
+            }
+            return null;
         }
     }
 }

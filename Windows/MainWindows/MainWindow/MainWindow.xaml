@@ -67,81 +67,12 @@
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{Binding BorderWidth, Converter={StaticResource ThicknessConverter}}" Background="{TemplateBinding Background}" CornerRadius="{Binding ButtonCornerRadius}">
-                                <Border.RenderTransformOrigin>0.5,0.5</Border.RenderTransformOrigin>
-                                <Border.RenderTransform>
-                                    <ScaleTransform>
-                                        <ScaleTransform.ScaleX>
-                                            <MultiBinding Converter="{StaticResource ButtonScaleConverter}">
-                                                <Binding Path="IsMouseOver" RelativeSource="{RelativeSource TemplatedParent}"/>
-                                                <Binding Path="DataContext.ShowActionButtonMouseOver" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                                <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}"/>
-                                            </MultiBinding>
-                                        </ScaleTransform.ScaleX>
-                                        <ScaleTransform.ScaleY>
-                                            <MultiBinding Converter="{StaticResource ButtonScaleConverter}">
-                                                <Binding Path="IsMouseOver" RelativeSource="{RelativeSource TemplatedParent}"/>
-                                                <Binding Path="DataContext.ShowActionButtonMouseOver" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                                <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}"/>
-                                            </MultiBinding>
-                                        </ScaleTransform.ScaleY>
-                                    </ScaleTransform>
-                                </Border.RenderTransform>
                                 <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
-                        <ControlTemplate.Triggers>
-                            <!-- 放大动画 -->
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
-                                    <Condition Binding="{Binding DataContext.ShowActionButtonMouseOver, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1.05" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1.05" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </MultiDataTrigger.EnterActions>
-                                <MultiDataTrigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </MultiDataTrigger.ExitActions>
-                            </MultiDataTrigger>
-                            <!-- 放大中心修正 -->
-                            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </DataTrigger.EnterActions>
-                            </DataTrigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}"/>
-                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
-                        <Condition Binding="{Binding DataContext.ShowAddImage, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Content">
-                        <Setter.Value>
-                            <Image Style="{StaticResource AddActionImage}"/>
-                        </Setter.Value>
-                    </Setter>
-                </MultiDataTrigger>
-            </Style.Triggers>
         </Style>
     </Window.Resources>
 
