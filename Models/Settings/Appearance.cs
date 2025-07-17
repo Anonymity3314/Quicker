@@ -36,8 +36,8 @@
         public double BackgroundImageOpacity { get; set; } // 背景图片不透明度
 
         // 模糊与圆角
-        public int Blur { get; set; }// 模糊模式
-        public int Win11CornerRadius { get; set; }// Win11圆角模式
+        public int Blur { get; set; } // 模糊模式
+        public int Win11CornerRadius { get; set; } // Win11圆角模式
 
         // 选项
         public bool AutoHideTitleBar { get; set; } // 自动缩小动作名称文字

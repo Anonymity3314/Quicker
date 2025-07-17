@@ -15,11 +15,6 @@ namespace Quicker.Managers
 {
     public class ButtonManager
     {
-        private readonly SolidColorBrush HasActionBrush =
-            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("White")); // 有动作的背景色
-        private readonly SolidColorBrush NoActionBrush =
-            new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F3F3F3")); // 无动作的背景色
-
         /// <summary>
         /// 查找所有指定类型的子元素
         /// </summary>
@@ -374,7 +369,6 @@ namespace Quicker.Managers
             button.Content = null; // 清空按钮内容
             button.ToolTip = null; // 清空提示文本
             button.Tag = null; // 清空标签
-            button.Background = NoActionBrush; // 设置背景色
         }
 
         /// <summary>

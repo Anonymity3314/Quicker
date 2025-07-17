@@ -51,38 +51,19 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 加载数据库和Button
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            InitializeActionPages(); // 初始化动作页
-            InitializeButtons(); // 初始化按钮
+            InitializePageGrids(); // 初始化所有页
             CheckUpdate(); // 检查更新
-            SetMainWindowState(); // 设置窗口状态
-            this.Activate(); // 激活窗口
+            SetMainWindowState();
+            this.Activate();
         }
 
         // 初始化动作页面
-        private void InitializeActionPages()
+        private void InitializePageGrids()
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                GenerateUniformGrid(0, "Global"); // 生成全局 UniformGrid
-                var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
-                GenerateUniformGrid(0, targetStyle); // 生成对应样式 UniformGrid
-                GenerateButtons(); // 生成按钮
-                SetCommonTextBlock(0); // 设置通用标签内容
-            }); // 在主线程中执行
-        }
-
-        // 初始化按钮
-        private void InitializeButtons()
-        {
-            // 加载BookButton图标
-            string iconPath = AppStateManager.Pinned ? AppStateManager.BookIconPath : AppStateManager.DisBookIconPath; // 获取图标路径
-            BitmapImage bookImage = new BitmapImage(new Uri(iconPath, UriKind.Relative)); // 创建图标对象
-            Book.Source = bookImage; // 设置Book按钮的图标
-
-            // 加载LockButton图标
-            string lockIconPath = AppStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
-            BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建图标对象
-            Lock.Source = lockImage; // 设置Lock按钮的图标
+            var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
+            GeneratePageGrid(GlobalGrid, "Global", 0, 3, 4);
+            GeneratePageGrid(CommonGrid, targetStyle, 0, 4, 4); GenerateButtons(); // 生成按钮
+            SetCommonTextBlock(0);
         }
 
         // 检查更新
@@ -211,14 +192,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 订住功能面板
         private void BookQuicker(object sender, EventArgs e)
         {
-            AppStateManager.Pinned = !AppStateManager.Pinned; // 更新数据库中的设置
-            BitmapImage bookimage = new(); // 创建图像对象
-            bookimage.BeginInit(); // 开始初始化
-            bookimage.UriSource = AppStateManager.Pinned
-                ? new Uri(AppStateManager.BookIconPath, UriKind.Relative) // 设置为订住样式
-                : new Uri(AppStateManager.DisBookIconPath, UriKind.Relative); // 设置为不订住样式
-            bookimage.EndInit(); // 结束初始化
-            Book.Source = bookimage; // 更新Book按钮图标
+            AppStateManager.Pinned = !AppStateManager.Pinned; // 反转 AppStateManager.Pinned
+            ((MainWindowViewModel)this.DataContext).IsPinned = AppStateManager.Pinned; // 反转 ViewModel 的 IsPinned
         }
 
         // 打开设置窗口
@@ -255,14 +230,14 @@ namespace Quicker.Windows.MainWindows.MainWindow
             Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData)
             {
-                button.RenderTransform = new ScaleTransform(1.05, 1.05); // 放大按钮
-                UniformGrid.SetZIndex(button, 1); // 调整按钮层级
+                //button.RenderTransform = new ScaleTransform(1.05, 1.05); // 放大按钮
+                //UniformGrid.SetZIndex(button, 1); // 调整按钮层级
             }
             else
             {
-                var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
-                if (Convention?.ShowAddImage == true) // 如果显示添加按钮
-                    button.Content = new Image { Style = FindResource("AddActionImage") as Style }; // 设置按钮内容
+                //var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
+                //if (Convention?.ShowAddImage == true) // 如果显示添加按钮
+                //    button.Content = new Image { Style = FindResource("AddActionImage") as Style }; // 设置按钮内容
             }
         }
         private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
@@ -314,8 +289,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
             Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData)
             {
-                UniformGrid.SetZIndex(button, 0); // 还原按钮层级
-                button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
+                //UniformGrid.SetZIndex(button, 0); // 还原按钮层级
+                //button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
             }
             else
             {
@@ -830,10 +805,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         private void LockCommonActionPage(object sender, RoutedEventArgs e)
         {
             AppStateManager.Locked = !AppStateManager.Locked; // 切换锁定状态
-            string lockIconPath = AppStateManager.Locked ? AppStateManager.LockIconPath : AppStateManager.UnLockIconPath; // 获取图标路径
-            BitmapImage lockImage = new BitmapImage(new Uri(lockIconPath, UriKind.Relative)); // 创建 BitmapImage 对象
-            Lock.Source = lockImage; // 设置图标
-            if (AppStateManager.Locked) AppStateManager.CommonState = CommonStyle; // 设置锁定状态
+            ((MainWindowViewModel)this.DataContext).IsLocked = AppStateManager.Locked; // 更新数据绑定
         }
 
         // 滚轮进行通用动作页翻页
@@ -923,8 +895,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
             CleanUpEventHandlers(); // 清理事件处理器
             CleanUpUniformGrid(MainGrid); // 清理全局网格
             CleanUpUniformGrid(CommonGrid); // 清理通用网格
-            Book.Source = null; // 订住按钮图片
-            Lock.Source = null; // 锁定按钮图片
+            //Pin.ImageSource = null; // 订住按钮图片
+            //Lock.ImageSource = null; // 锁定按钮图片
 
             CommonStyle = null; // 清理通用样式
             iconManager.Dispose(); // 释放图标管理器资源
@@ -986,6 +958,94 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 button.Click -= SwitchToCommonUniformGrid; // 切换到通用动作页
                 button.MouseEnter -= CommonActionPageChangeButton_MouseEnter; // 通用动作页鼠标移入事件
                 button.MouseLeave -= CommonActionPageChangeButton_MouseLeave; // 通用动作页鼠标移出事件
+            }
+        }
+
+        /// <summary>
+        /// 动态生成一页的Grid和按钮
+        /// </summary>
+        /// <param name="parent">父容器（如 CommonGrid/GlobalGrid）</param>
+        /// <param name="gridType">"Common" 或 "Global"</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        private Grid GeneratePageGrid(Panel parent, string gridType, int pageIndex, int rows, int cols)
+        {
+            // 1. 创建Grid
+            var grid = new Grid
+            {
+                Name = $"{gridType}{pageIndex}"
+            };
+
+            // 2. 定义行列（含间隔）
+            for (int i = 0; i < rows * 2 - 1; i++)
+            {
+                grid.RowDefinitions.Add(new RowDefinition
+                {
+                    Height = (i % 2 == 0) ? new GridLength(1, GridUnitType.Auto) : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
+                });
+            }
+            for (int j = 0; j < cols * 2 - 1; j++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = (j % 2 == 0) ? new GridLength(1, GridUnitType.Auto) : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
+                });
+            }
+
+            // 3. 生成按钮
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    int buttonIndex = pageIndex * 100 + (row + 1) * 10 + (col + 1);
+                    string buttonName = $"{gridType}{buttonIndex}";
+                    Style styleResource = FindResource("Button") as Style;
+
+                    Button button = new Button
+                    {
+                        Name = buttonName,
+                        Style = styleResource,
+                        Width = ((MainWindowViewModel)this.DataContext).ButtonSize,
+                        Height = ((MainWindowViewModel)this.DataContext).ButtonSize
+                    };
+
+                    // 设置行列（注意：有间隔，实际行列号*2）
+                    Grid.SetRow(button, row * 2);
+                    Grid.SetColumn(button, col * 2);
+
+                    // 绑定事件
+                    BindButtonEvents(button);
+
+                    // 绑定数据
+                    var buttonData = db2.GetButtonDataByID(buttonIndex, gridType);
+                    button.Tag = buttonData;
+                    buttonManager.RefreshButtonDisplay(button, buttonData, 60, true);
+
+                    grid.Children.Add(button);
+                }
+            }
+
+            // 4. 添加到父容器
+            parent.Children.Add(grid);
+
+            return grid;
+        }
+
+        /// <summary>
+        /// 显示指定页的Grid
+        /// </summary>
+        /// <param name="parent">父容器（如 CommonGrid/GlobalGrid）</param>
+        /// <param name="gridType">"Common" 或 "Global"</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        private void ShowPageGrid(Panel parent, string gridType, int pageIndex, int rows, int cols)
+        {
+            foreach (UIElement child in parent.Children)
+            {
+                if (child is Grid g && g.Name.StartsWith(gridType))
+                    g.Visibility = (g.Name == $"{gridType}{pageIndex}") ? Visibility.Visible : Visibility.Collapsed;
             }
         }
     }

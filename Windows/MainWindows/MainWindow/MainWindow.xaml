@@ -25,19 +25,27 @@
     Loaded="MainWindow_Loaded"
 >
     <Window.Resources>
+        <!-- 图片资源 -->
+        <ImageSource x:Key="PinToDesktopSource">pack://application:,,,/Resources/Images/PinToDesktop.png</ImageSource>
+        <ImageSource x:Key="UnpinFromDesktopSource">pack://application:,,,/Resources/Images/UnpinFromDesktop.png</ImageSource>
+        <ImageSource x:Key="LockIconSource">pack://application:,,,/Resources/Images/Locked.png</ImageSource>
+        <ImageSource x:Key="UnLockIconSource">pack://application:,,,/Resources/Images/UnLocked.png</ImageSource>
+        <!-- 转换器 -->
         <conv:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
         <conv:IntToCornerRadiusConverter x:Key="IntToCornerRadiusConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:ButtonBackgroundConverter x:Key="ButtonBackgroundConverter"/>
         <conv:DoubleSubtractConverter x:Key="DoubleSubtractConverter"/>
         <conv:BorderHeightConverter x:Key="BorderHeightConverter"/>
+        <conv:ButtonScaleConverter x:Key="ButtonScaleConverter"/>
         <conv:BlurEffectConverter x:Key="BlurEffectConverter"/>
         <conv:GridHeightConverter x:Key="GridHeightConverter"/>
         <conv:FontWeightConverter x:Key="FontWeightConverter"/>
         <conv:GridWidthConverter x:Key="GridWidthConverter"/>
         <conv:ThicknessConverter x:Key="ThicknessConverter"/>
-        <conv:ButtonBackgroundConverter x:Key="ButtonBackgroundConverter"/>
         <!-- 按钮模板 -->
         <Style x:Key="Button" TargetType="Button">
+            <Setter Property="Foreground" Value="{Binding DataContext.ButtonTextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
             <Setter Property="BorderBrush" Value="{Binding BorderColor}"/>
             <Setter Property="FontWeight" Value="{Binding FontWeight}"/>
             <Setter Property="FontSize" Value="{Binding FontSize}"/>
@@ -63,10 +71,26 @@
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{Binding BorderWidth, Converter={StaticResource ThicknessConverter}}" Background="{TemplateBinding Background}" CornerRadius="{Binding ButtonCornerRadius}">
+                                <Border.RenderTransformOrigin>0.5,0.5</Border.RenderTransformOrigin>
                                 <Border.RenderTransform>
-                                    <ScaleTransform x:Name="scale" CenterX="0.5" CenterY="0.5"/>
+                                    <ScaleTransform>
+                                        <ScaleTransform.ScaleX>
+                                            <MultiBinding Converter="{StaticResource ButtonScaleConverter}">
+                                                <Binding Path="IsMouseOver" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                                <Binding Path="DataContext.ShowActionButtonMouseOver" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                            </MultiBinding>
+                                        </ScaleTransform.ScaleX>
+                                        <ScaleTransform.ScaleY>
+                                            <MultiBinding Converter="{StaticResource ButtonScaleConverter}">
+                                                <Binding Path="IsMouseOver" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                                <Binding Path="DataContext.ShowActionButtonMouseOver" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                                <Binding Path="Tag" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                            </MultiBinding>
+                                        </ScaleTransform.ScaleY>
+                                    </ScaleTransform>
                                 </Border.RenderTransform>
-                                <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                                <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -74,7 +98,6 @@
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
-                                    <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}" />
                                     <Condition Binding="{Binding DataContext.ShowActionButtonMouseOver, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.EnterActions>
@@ -94,10 +117,40 @@
                                     </BeginStoryboard>
                                 </MultiDataTrigger.ExitActions>
                             </MultiDataTrigger>
+                            <!-- 放大中心修正 -->
+                            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleX" To="1" Duration="0:0:0.1"/>
+                                            <DoubleAnimation Storyboard.TargetName="border" Storyboard.TargetProperty="RenderTransform.ScaleY" To="1" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}"/>
+                        <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                        <Condition Binding="{Binding DataContext.ShowAddImage, RelativeSource={RelativeSource AncestorType=Window}}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Content">
+                        <Setter.Value>
+                            <Image Style="{StaticResource AddActionImage}"/>
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AddActionImage" TargetType="Image">
+            <Setter Property="Source" Value="pack://application:,,,/Resources/Images/Add.png"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
         </Style>
     </Window.Resources>
 
@@ -116,15 +169,75 @@
         </Grid.Width>
         <!-- 窗口阴影 -->
         <Border x:Name="ShadowBorder" Margin="0.6" Background="#FFF3F3F3" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}">
-            <Border.Effect>
-                <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Opacity" Value="1"/>
+                    <Style.Triggers>
+                        <!-- Blur == 0: 有阴影，Opacity=1 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="0">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="1"/>
+                        </DataTrigger>
+                        <!-- Blur == 1: 有阴影，Opacity=0.5 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="1">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                        <!-- Blur == 2: 无阴影，Opacity=1 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="2">
+                            <Setter Property="Effect" Value="{x:Null}"/>
+                            <Setter Property="Opacity" Value="1"/>
+                        </DataTrigger>
+                        <!-- Blur == 3: 无阴影，Opacity=0.5 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="3">
+                            <Setter Property="Effect" Value="{x:Null}"/>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
         </Border>
         <!-- 窗口模糊 -->
         <Border x:Name="BlurBorder" Background="Transparent" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}">
-            <Border.Effect>
-                <BlurEffect Radius="15" RenderingBias="Quality"/>
-            </Border.Effect>
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Effect" Value="{x:Null}"/>
+                    <Setter Property="Opacity" Value="1"/>
+                    <Style.Triggers>
+                        <!-- Blur == 1: 有模糊 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="1">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                        <!-- Blur == 3: 有模糊 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="3">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="15"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
         </Border>
         <!-- 窗口内容 -->
         <Border x:Name="ViewBorder" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}" Background="{Binding BackgroundColor}" helpers:ClipHelper.ClipToBounds="True">
@@ -139,13 +252,21 @@
                 <Image x:Name="BackgroundImage" Stretch="Fill" Source="{Binding BackgroundImagePath, Converter={StaticResource PathToImageSourceConverter}}" Opacity="{Binding BackgroundImageOpacity}" Width="{Binding ActualWidth, ElementName=ViewBorder}" Height="{Binding ActualHeight, ElementName=ViewBorder}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.RowSpan="4"/>
                 <!-- 标题栏 -->
                 <Grid x:Name="TitleBarGrid" Grid.RowSpan="1" Background="{Binding ToolbarColor}">
-                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#A1A1A1" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                    <Label Content="Quicker" Width="58" Height="24" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}" FontSize="13" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                     <Button styles:ParentBackgroundHelper.ParentBackground="{Binding Background, ElementName=TitleBarGrid}" Style="{StaticResource Task}" Click="OpenSettingWindow" ToolTip="打开设置窗口" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="58,0,0,0">
-                        <Image Source="/Resources/Images/SettingImage2.png" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Rectangle Width="16" Height="16" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="/Resources/Images/SettingImage2.png"/>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                     </Button>
                     <Button x:Name="ActionPageManager" styles:ParentBackgroundHelper.ParentBackground="{Binding Background, ElementName=TitleBarGrid}" Style="{StaticResource Task}" Click="OpenTitleMenu" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="82,0,0,0">
                         <Grid>
-                            <Image Source="/Resources/Images/MoreSelection.png" Width="16" Height="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Rectangle Width="16" Height="16" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="/Resources/Images/MoreSelection.png"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
                             <Border x:Name="HasNewVersionTip" CornerRadius="4" Background="#11AD45" Margin="12,12,0,0"/>
                         </Grid>
                     </Button>
@@ -191,10 +312,33 @@
                                 </StackPanel>
                             </ToolTip>
                         </Button.ToolTip>
-                        <Image x:Name="Book" Source="/Resources/Images/UnpinFromDesktop.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Rectangle Width="20" Height="20" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Rectangle.Style>
+                                <Style TargetType="Rectangle">
+                                    <Setter Property="OpacityMask">
+                                        <Setter.Value>
+                                            <ImageBrush ImageSource="{StaticResource UnpinFromDesktopSource}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.IsPinned, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                            <Setter Property="OpacityMask">
+                                                <Setter.Value>
+                                                    <ImageBrush ImageSource="{StaticResource PinToDesktopSource}"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
                     </Button>
                     <Button Style="{StaticResource Task}" styles:ParentBackgroundHelper.ParentBackground="{Binding Background, ElementName=TitleBarGrid}" Click="CloseMainWindow" ToolTip="关闭面板窗口" HorizontalAlignment="Right" Margin="0,0,1,0" Drop="CloseMainWindowButton_Drop">
-                        <Image x:Name="Close" Source="/Resources/Images/CloseWindow.png" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Rectangle Width="20" Height="20" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="/Resources/Images/CloseWindow.png"/>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
                     </Button>
                 </Grid>
                 <!-- 全局动作 -->
@@ -211,43 +355,10 @@
                             <Binding Path="ButtonGap"/>
                         </MultiBinding>
                     </Grid.Width>
-                    <Grid x:Name="Global0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="{Binding ButtonGap}"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="{Binding ButtonGap}"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <!-- 第一行 -->
-                        <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="0" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="0" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <!-- 第二行 -->
-                        <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="2" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="2" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <!-- 第三行 -->
-                        <Button Grid.Row="4" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="4" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="4" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="4" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                    </Grid>
                 </Grid>
                 <!-- 功能栏 -->
                 <Grid x:Name="FunctionBarGrid" VerticalAlignment="Center" Height="25" Grid.Row="2" Background="{Binding ToolbarColor}">
-                    <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#A1A1A1" TextAlignment="Center" MouseDown="CommonTextBlock_MouseDown" Margin="10,0" Cursor="Hand"/>
+                    <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}" TextAlignment="Center" MouseDown="CommonTextBlock_MouseDown" Margin="10,0" Cursor="Hand"/>
                     <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <Button x:Name="ActionPageSelecter" HorizontalAlignment="Right" Margin="0,0,34,0" styles:ParentBackgroundHelper.ParentBackground="{Binding Background, ElementName=FunctionBarGrid}" Style="{StaticResource Task}" Click="LockCommonActionPage" MouseRightButtonDown="OpenSelectActionPageMenu">
@@ -259,7 +370,26 @@
                                 </StackPanel>
                             </ToolTip>
                         </Button.ToolTip>
-                        <Image x:Name="Lock" Source="/Resources/Images/UnLocked.png" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Rectangle.Style>
+                                <Style TargetType="Rectangle">
+                                    <Setter Property="OpacityMask">
+                                        <Setter.Value>
+                                            <ImageBrush ImageSource="{StaticResource UnLockIconSource}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DataContext.IsLocked, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                                            <Setter Property="OpacityMask">
+                                                <Setter.Value>
+                                                    <ImageBrush ImageSource="{StaticResource LockIconSource}"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
                     </Button>
                 </Grid>
                 <!-- 通用动作 -->
@@ -276,50 +406,6 @@
                             <Binding Path="ButtonGap"/>
                         </MultiBinding>
                     </Grid.Width>
-                    <Grid x:Name="Common0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="{Binding ButtonGap}"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="{Binding ButtonGap}"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="{Binding ButtonGap}"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="{Binding ButtonGap}"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="{Binding ButtonGap}"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <!-- 第一行 -->
-                        <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="0" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="0" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <!-- 第二行 -->
-                        <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="2" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="2" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <!-- 第三行 -->
-                        <Button Grid.Row="4" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="4" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="4" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="4" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <!-- 第四行 -->
-                        <Button Grid.Row="6" Grid.Column="0" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="6" Grid.Column="2" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="6" Grid.Column="4" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                        <Button Grid.Row="6" Grid.Column="6" Style="{StaticResource Button}" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Click="DoAction" Drop="Button_Drop" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewDragOver="Button_PreviewDragOver" MouseRightButtonDown="OpenCreatActionMenu" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown"/>
-                    </Grid>
                 </Grid>
             </Grid>
         </Border>
