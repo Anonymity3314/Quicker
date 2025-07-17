@@ -31,69 +31,7 @@
         </Setter>
     </Style>
 
-    <!-- 标题栏的关闭主面板 Button -->
-    <Style x:Key="CloseMainWindowButton" TargetType="Button">
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Background" Value="#FFF3F3F3"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="AllowDrop" Value="True"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
-                        <Path StrokeThickness="2" Stroke="#A1A1A1" Margin="5" Stretch="Uniform" Data="M 0 0 L 10 10 M 10 0 L 0 10"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="#FFEAEAEA"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- 主Button-->
-    <!--<Style x:Key="Button" TargetType="Button">
-        <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
-        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="BorderBrush" Value="#FFD3D3D3"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="Background" Value="#FFFFFF"/>
-        <Setter Property="Content" Value="{x:Null}"/>
-        <Setter Property="AllowDrop" Value="True"/>
-        <Setter Property="Tag" Value="{x:Null}"/>
-        <Setter Property="Height" Value="77.6"/>
-        <Setter Property="Width" Value="77.6"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Grid>
-                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
-                        </Border>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#FFEAEAEA"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
-                <Setter Property="Background" Value="#F3F3F3"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>-->
-
-    <!-- 切换动作页面的 Button -->
+    <!-- 切换动作页面的按钮 -->
     <Style x:Key="ActionPageChangeButton" TargetType="Button">
         <Setter Property="Background" Value="#FFD3D3D3"/>
         <Setter Property="Margin" Value="2.5,0"/>
@@ -110,7 +48,7 @@
         </Setter>
     </Style>
 
-    
+
     <!-- AddWindow -->
     <!--“选择”Button -->
     <Style x:Key="Select" TargetType="Button">

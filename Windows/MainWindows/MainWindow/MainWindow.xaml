@@ -43,7 +43,7 @@
         <conv:FontWeightConverter x:Key="FontWeightConverter"/>
         <conv:GridWidthConverter x:Key="GridWidthConverter"/>
         <conv:ThicknessConverter x:Key="ThicknessConverter"/>
-        <!-- 按钮模板 -->
+        <!-- 动作按钮模板 -->
         <Style x:Key="Button" TargetType="Button">
             <Setter Property="Foreground" Value="{Binding DataContext.ButtonTextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
             <Setter Property="BorderBrush" Value="{Binding BorderColor}"/>
@@ -146,11 +146,6 @@
                     </Setter>
                 </MultiDataTrigger>
             </Style.Triggers>
-        </Style>
-        <Style x:Key="AddActionImage" TargetType="Image">
-            <Setter Property="Source" Value="pack://application:,,,/Resources/Images/Add.png"/>
-            <Setter Property="Width" Value="24"/>
-            <Setter Property="Height" Value="24"/>
         </Style>
     </Window.Resources>
 
@@ -342,7 +337,7 @@
                     </Button>
                 </Grid>
                 <!-- 全局动作 -->
-                <Grid x:Name="GlobalGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="1" MouseWheel="GolbalGrid_MouseWheel">
+                <Grid x:Name="GlobalGrid" VerticalAlignment="Top" HorizontalAlignment="Center" Grid.Row="1" MouseWheel="GlobalGrid_MouseWheel">
                     <Grid.Height>
                         <MultiBinding Converter="{StaticResource GridHeightConverter}" ConverterParameter="3">
                             <Binding Path="ButtonSize"/>

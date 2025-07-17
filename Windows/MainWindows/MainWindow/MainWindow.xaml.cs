@@ -16,7 +16,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
     public partial class MainWindow : Window
     {
         private readonly SolidColorBrush SelectedBrush =
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8D8D8D")); // 选中页面按钮颜色
+            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA1A1A1")); // 选中页面按钮颜色
         private readonly SolidColorBrush UnSelectedBrush =
             new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD3D3D3")); // 未选中页面按钮颜色
 
@@ -24,6 +24,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         public readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
+        int GloblePageIndex = 0, CommonPageIndex = 0; // 全局页面、通用页面索引
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string CommonStyle; // 样式
 
@@ -43,7 +44,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             CommonStyle = style; // 设置样式
             CommonGrid.Children.Clear(); // 清空通用网格
             SetCommonTextBlock(0); // 设置通用标签内容
-            GenerateUniformGrid(0, CommonStyle); // 生成对应样式 UniformGrid
+            GeneratePageGrid(CommonGrid, CommonStyle, 0, 4, 4); // 生成对应样式 UniformGrid
             GenerateButtons(); // 生成按钮
             LockCommonActionPage(null, null); // 锁住通用动作页面
         }
@@ -62,7 +63,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
             GeneratePageGrid(GlobalGrid, "Global", 0, 3, 4);
-            GeneratePageGrid(CommonGrid, targetStyle, 0, 4, 4); GenerateButtons(); // 生成按钮
+            GeneratePageGrid(CommonGrid, targetStyle, 0, 4, 4);
+            GenerateButtons(); // 生成按钮
             SetCommonTextBlock(0);
         }
 
@@ -75,6 +77,17 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 TitlePop.Height -= 25; // 减少高度
                 UpdateButton.Visibility = Visibility.Collapsed; // 隐藏更新按钮
             }
+        }
+
+        /// <summary>
+        /// 设置通用标签内容
+        /// </summary>
+        /// <param name="GridIndex"> 通用网格索引 </param>
+        private void SetCommonTextBlock(int GridIndex)
+        {
+            var actionPageData = db3.GetActionPageData(CommonStyle, GridIndex); // 从数据库中获取通用动作页面数据
+            CommonTextBlock.Text = actionPageData.ActionPageName; // 设置通用标签内容
+            CommonTextBlock.ToolTip = actionPageData.ActionPageName; // 设置通用标签提示
         }
 
         // 设置窗口状态
@@ -95,242 +108,141 @@ namespace Quicker.Windows.MainWindows.MainWindow
             CommonButtonPanel.Children.Clear(); // 清空通用动作页切换按钮
             var globalSceneData = db3.GetSceneData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
             var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
-            GeneratePageButtons("Global", globalSceneData.SceneCount, SwitchToGlobalUniformGrid, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel); // 生成全局页面切换按钮
-            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, SwitchToCommonUniformGrid, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel); // 生成通用页面切换按钮
+            GeneratePageButtons("Global", globalSceneData.SceneCount, GlobalPageChangeButton_Click, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel);
+            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, CommonPageChangeButton_Click, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel);
         }
 
         /// <summary>
         /// 生成页面切换按钮
         /// </summary>
-        /// <param name="prefix"> 按钮名称前缀 </param>
-        /// <param name="totalPages"> 总页面数 </param>
-        /// <param name="clickHandler"> 点击事件处理程序 </param>
-        /// <param name="mouseEnterHandler"> 鼠标进入事件处理程序 </param>
-        /// <param name="mouseLeaveHandler"> 鼠标离开事件处理程序 </param>
-        /// <param name="panel"> 按钮所属的面板</param>
         private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, MouseEventHandler mouseEnterHandler, MouseEventHandler mouseLeaveHandler, Panel panel)
         {
-            if (totalPages == 1) return; // 如果只有一个页面，不生成按钮
+            if (totalPages == 1) return;
             for (int i = 0; i < totalPages; i++)
             {
                 Button button = new Button
                 {
-                    Style = FindResource("ActionPageChangeButton") as Style, // 设置按钮样式
-                    Name = $"{prefix}{i}" // 设置按钮名称
-                }; // 创建按钮对象
-                if (i == 0) button.Background = SelectedBrush; // 设置当前按钮颜色
-
-                // 添加事件处理程序
-                button.Click += clickHandler; // 绑定点击事件
-                button.MouseEnter += mouseEnterHandler; // 绑定鼠标进入事件
-                button.MouseLeave += mouseLeaveHandler; // 绑定鼠标离开事件
-
-                panel.Children.Add(button); // 添加到面板
+                    Style = FindResource("ActionPageChangeButton") as Style,
+                    Name = $"{prefix}{i}"
+                };
+                if (i == 0) button.Background = SelectedBrush;
+                button.Click += clickHandler;
+                button.MouseEnter += mouseEnterHandler;
+                button.MouseLeave += mouseLeaveHandler;
+                panel.Children.Add(button);
             }
         }
 
-        // 切换到全局UniformGrid
-        private void SwitchToGlobalUniformGrid(object sender, RoutedEventArgs e)
+        // 全局页面切换按钮点击
+        private void GlobalPageChangeButton_Click(object sender, RoutedEventArgs e)
         {
-            SwitchToUniformGrid(sender, MainGrid, "Global"); // 切换到全局UniformGrid
+            SwitchToPageGrid(sender, GlobalGrid, "Global", 3, 4, GlobalButtonPanel);
         }
-
-        // 切换到通用UniformGrid
-        private void SwitchToCommonUniformGrid(object sender, RoutedEventArgs e)
+        // 通用页面切换按钮点击
+        private void CommonPageChangeButton_Click(object sender, RoutedEventArgs e)
         {
-            SwitchToUniformGrid(sender, CommonGrid, CommonStyle); // 切换到通用UniformGrid
+            SwitchToPageGrid(sender, CommonGrid, CommonStyle, 4, 4, CommonButtonPanel);
         }
 
         /// <summary>
-        /// 切换到指定的UniformGrid
+        /// 切换到指定的页面Grid
         /// </summary>
-        /// <param name="sender"> 触发事件的对象 </param>
-        /// <param name="targetGrid"> 目标Grid </param>
-        /// <param name="style"> 样式名称 </param>
-        private void SwitchToUniformGrid(object sender, Grid targetGrid, string style)
+        private void SwitchToPageGrid(object sender, Panel parent, string gridType, int rows, int cols, Panel buttonPanel)
         {
             if (sender is Button clickedButton)
             {
-                int uniformGridIndex = int.Parse(clickedButton.Name.Replace($"{style}", "")); // 获取UniformGrid索引
-                string targetUniformGridName = $"{style}{uniformGridIndex}"; // 生成目标UniformGrid名称
-                UniformGrid targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(targetGrid).FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
-
-                // 如果目标UniformGrid不存在，动态生成
-                if (targetUniformGrid == null)
-                {
-                    GenerateUniformGrid(uniformGridIndex, style); // 动态生成UniformGrid
-                    targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(targetGrid).FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
-                }
-                targetUniformGrid.Visibility = Visibility.Visible; // 设置目标UniformGrid可见
-                foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(targetGrid)) // 隐藏其他UniformGrid
-                {
-                    if (uniformGrid.Name.StartsWith($"{style}") && uniformGrid != targetUniformGrid)
-                        uniformGrid.Visibility = Visibility.Collapsed; // 隐藏其他UniformGrid
-                }
-
-                if(style != "Global") SetCommonTextBlock(uniformGridIndex); // 设置通用标签内容
+                int pageIndex = int.Parse(clickedButton.Name.Replace($"{gridType}", ""));
+                if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{pageIndex}"))
+                    GeneratePageGrid(parent, gridType, pageIndex, rows, cols);
+                ShowPageGrid(parent, gridType, pageIndex, rows, cols);
+                // 同步按钮背景
+                foreach (Button btn in buttonPanel.Children.OfType<Button>())
+                    btn.Background = btn.Name == $"{gridType}{pageIndex}" ? SelectedBrush : UnSelectedBrush;
+                if (gridType != "Global") SetCommonTextBlock(pageIndex);
+                if (gridType == "Global") GloblePageIndex = pageIndex; else CommonPageIndex = pageIndex;
             }
         }
 
         /// <summary>
-        /// 设置通用标签内容
+        /// 获取当前可见的页面Grid索引
         /// </summary>
-        /// <param name="uniformGridIndex"> UniformGrid索引 </param>
-        private void SetCommonTextBlock(int uniformGridIndex)
+        private int GetVisiblePageGridIndex(Panel parent, string gridType)
         {
-            var actionPageData = db3.GetActionPageData(CommonStyle, uniformGridIndex); // 从数据库中获取动作页面数据
-            CommonTextBlock.Text = actionPageData.ActionPageName; // 设置标签内容
-            CommonTextBlock.ToolTip = actionPageData.ActionPageName; // 设置标签提示
-        }
-
-        // 移动功能面板
-        private void MoveMainWindow(object sender, EventArgs e)
-        {
-            DragMove(); // 触发窗口拖动
-        }
-
-        // 订住功能面板
-        private void BookQuicker(object sender, EventArgs e)
-        {
-            AppStateManager.Pinned = !AppStateManager.Pinned; // 反转 AppStateManager.Pinned
-            ((MainWindowViewModel)this.DataContext).IsPinned = AppStateManager.Pinned; // 反转 ViewModel 的 IsPinned
-        }
-
-        // 打开设置窗口
-        private void OpenSettingWindow(object sender, RoutedEventArgs e)
-        {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
-        }
-
-        // 关闭功能面板
-        private void CloseMainWindow(object sender, EventArgs e)
-        {
-            Close(); // 关闭窗口
-        }
-
-        // 失去焦点时关闭功能面板
-        private void MainWindow_Deactivated(object sender, EventArgs e)
-        {
-            ActionInformationWindow actionInformationWindow = App.Current.Windows.OfType<ActionInformationWindow>().FirstOrDefault(); // 查找ActionInformationWindow
-            if (actionInformationWindow != null) // 如果存在ActionInformationWindow
-                this.Activate(); // 激活窗口
-            else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
+            foreach (Grid grid in parent.Children.OfType<Grid>())
             {
-                buttonManager.isClosing = true; // 设置关闭标志
-                this.Close(); // 关闭窗口
+                if (grid.Visibility == Visibility.Visible && grid.Name.StartsWith(gridType))
+                    return int.Parse(grid.Name.Replace(gridType, ""));
             }
-            else
-                this.Activate(); // 激活窗口
+            return 0;
         }
 
-        // 鼠标移入Button改变外观
-        private void Button_MouseEnter(object sender, MouseEventArgs e)
+        /// <summary>
+        /// 鼠标滚轮切换页面
+        /// </summary>
+        private void Grid_MouseWheel(object sender, MouseWheelEventArgs e, Panel parent, string gridType, int rows, int cols, Panel buttonPanel)
         {
-            Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData)
+            e.Handled = true;
+            int delta = e.Delta;
+            int currentIndex = GetVisiblePageGridIndex(parent, gridType);
+            int totalPages = db3.GetSceneData(gridType).FirstOrDefault()?.SceneCount ?? 1;
+            bool loop = Quicker.Database.SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
+            int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;
+            if (targetIndex < 0)
             {
-                //button.RenderTransform = new ScaleTransform(1.05, 1.05); // 放大按钮
-                //UniformGrid.SetZIndex(button, 1); // 调整按钮层级
+                if (loop)
+                    targetIndex = totalPages - 1;
+                else
+                    return;
             }
-            else
+            if (targetIndex >= totalPages)
             {
-                //var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
-                //if (Convention?.ShowAddImage == true) // 如果显示添加按钮
-                //    button.Content = new Image { Style = FindResource("AddActionImage") as Style }; // 设置按钮内容
+                if (loop)
+                    targetIndex = 0;
+                else
+                    return;
             }
+            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{targetIndex}"))
+                GeneratePageGrid(parent, gridType, targetIndex, rows, cols);
+            ShowPageGrid(parent, gridType, targetIndex, rows, cols);
+            foreach (Button btn in buttonPanel.Children.OfType<Button>())
+                btn.Background = btn.Name == $"{gridType}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
+            if (gridType != "Global") SetCommonTextBlock(targetIndex);
+            if (gridType == "Global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
         }
+
+        // 全局Grid滚轮事件
+        private void GlobalGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Grid_MouseWheel(sender, e, GlobalGrid, "Global", 3, 4, GlobalButtonPanel);
+        }
+        // 通用Grid滚轮事件
+        private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            Grid_MouseWheel(sender, e, CommonGrid, CommonStyle, 4, 4, CommonButtonPanel);
+        }
+
+        // 页面切换按钮鼠标进入/离开事件（可根据需要自定义变色逻辑）
         private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseEnter(sender, "Global", "#FFB9B9B9"); // 改变按钮颜色
-        }
-        private void CommonActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            PageChangeButton_MouseEnter(sender, CommonStyle, "#FFB9B9B9"); // 改变按钮颜色
-        }
-        /// <summary>
-        /// 鼠标移入Button改变外观
-        /// </summary>
-        /// <param name="sender"> 按钮 </param>
-        /// <param name="prefix"> 按钮名称前缀 </param>
-        /// <param name="color"> 按钮颜色 </param>
-        private void PageChangeButton_MouseEnter(object sender, string prefix, string color)
-        {
             if (sender is Button button)
-            {
-                int uniformGridIndex = int.Parse(button.Name.Replace($"{prefix}", "")); // 获取UniformGrid索引
-                string targetUniformGridName = $"{prefix}{uniformGridIndex}"; // 生成目标UniformGrid名称
-                UniformGrid targetUniformGrid = null; // 初始化目标UniformGrid
-
-                var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
-                foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(grid)) // 查找目标UniformGrid
-                {
-                    if (uniformGrid.Name == targetUniformGridName)
-                    {
-                        targetUniformGrid = uniformGrid; // 找到目标UniformGrid
-                        break;
-                    }
-                }
-
-                if (targetUniformGrid == null)
-                {
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
-                    return;
-                }
-
-                if (targetUniformGrid.Visibility != Visibility.Visible)
-                    button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 改变按钮背景颜色
-            }
-        }
-
-        // 鼠标移出Button还原外观
-        private void Button_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Button button = sender as Button; // 获取Button对象
-            if (button.Tag is ButtonData)
-            {
-                //UniformGrid.SetZIndex(button, 0); // 还原按钮层级
-                //button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
-            }
-            else
-            {
-                button.Content = null; // 清空按钮内容
-            }
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB9B9B9"));
         }
         private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseLeave(sender, "Global"); // 还原按钮颜色
+            int idx = GetVisiblePageGridIndex(GlobalGrid, "Global");
+            if (sender is Button button)
+                button.Background = button.Name == $"Global{idx}" ? SelectedBrush : UnSelectedBrush;
+        }
+        private void CommonActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Button button)
+                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB9B9B9"));
         }
         private void CommonActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            PageChangeButton_MouseLeave(sender, CommonStyle); // 还原按钮颜色
-        }
-        /// <summary>
-        /// 鼠标移出Button还原外观
-        /// </summary>
-        /// <param name="sender">按钮</param>
-        /// <param name="prefix">按钮名称前缀</param>
-        private void PageChangeButton_MouseLeave(object sender, string prefix)
-        {
+            int idx = GetVisiblePageGridIndex(CommonGrid, CommonStyle);
             if (sender is Button button)
-            {
-                int uniformGridIndex = int.Parse(button.Name.Replace($"{prefix}", "")); // 获取UniformGrid索引
-                string targetUniformGridName = $"{prefix}{uniformGridIndex}"; // 生成目标UniformGrid名称
-                UniformGrid targetUniformGrid = null; // 初始化目标UniformGrid
-
-                var grid = prefix == "Global" ? MainGrid : CommonGrid; // 根据前缀选择不同的Grid
-                foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(grid)) // 查找目标UniformGrid
-                {
-                    if (uniformGrid.Name != targetUniformGridName) continue; // 如果不是目标UniformGrid，跳过
-                    targetUniformGrid = uniformGrid; // 找到目标UniformGrid
-                    break;
-                }
-
-                if (targetUniformGrid == null) // 如果目标UniformGrid不存在
-                    button.Background = UnSelectedBrush; // 还原按钮背景颜色
-                else if (targetUniformGrid.Visibility != Visibility.Visible) // 如果目标UniformGrid不可见
-                    button.Background = UnSelectedBrush; // 还原按钮背景颜色
-            }
+                button.Background = button.Name == $"{CommonStyle}{idx}" ? SelectedBrush : UnSelectedBrush;
         }
 
         // 左键点击按钮时执行动作
@@ -386,7 +298,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     GlobalGrid.Children.Clear(); // 清空按钮所在容器
                 else
                     CommonGrid.Children.Clear(); // 清空按钮所在容器
-                GenerateUniformGrid(0, buttonType); // 重新生成第一页内容
+                GeneratePageGrid(buttonType == "Global" ? GlobalGrid : CommonGrid, buttonType, 0, 3, 4); // 重新生成第一页内容
             }
         }
 
@@ -447,13 +359,73 @@ namespace Quicker.Windows.MainWindows.MainWindow
             string type = data.Data1; // 获取动作页类型
             int index = int.Parse(data.Data2); // 获取动作页索引
             if (type != "Global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
-            int currentUniformGridIndex = GetVisibleUniformGridIndex(type); // 获取当前可见的UniformGrid编号
-            if (currentUniformGridIndex > index) // 如果当前UniformGrid编号大于目标UniformGrid编号
-                for (int i = currentUniformGridIndex; i > index; i--)
-                    SwitchToPreviousUniformGrid(i, type); // 向前切换UniformGrid
-            else // 如果当前UniformGrid编号小于目标UniformGrid编号
-                for (int i = currentUniformGridIndex; i < index; i++)
-                    SwitchToNextUniformGrid(i, type); // 向后切换UniformGrid
+            int currentGridIndex = type == "Global" ? GloblePageIndex : CommonPageIndex; // 获取当前可见的Grid编号
+            if (currentGridIndex > index) // 如果当前Grid编号大于目标Grid编号
+                for (int i = currentGridIndex; i > index; i--)
+                    SwitchToPreviousPageGrid(i, type); // 向前切换Grid
+            else // 如果当前Grid编号小于目标Grid编号
+                for (int i = currentGridIndex; i < index; i++)
+                    SwitchToNextPageGrid(i, type); // 向后切换Grid
+        }
+
+        /// <summary>
+        /// 切换到上一页Grid
+        /// </summary>
+        /// <param name="currentIndex">当前页索引</param>
+        /// <param name="type">页面类型</param>
+        private void SwitchToPreviousPageGrid(int currentIndex, string type)
+        {
+            int totalPages = db3.GetSceneData(type).FirstOrDefault()?.SceneCount ?? 1;
+            int targetIndex = currentIndex - 1;
+            bool loop = Quicker.Database.SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
+            if (targetIndex < 0)
+            {
+                if (loop)
+                    targetIndex = totalPages - 1;
+                else
+                    return;
+            }
+            Panel parent = type == "Global" ? GlobalGrid : CommonGrid;
+            Panel buttonPanel = type == "Global" ? GlobalButtonPanel : CommonButtonPanel;
+            int rows = type == "Global" ? 3 : 4;
+            int cols = 4;
+            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}"))
+                GeneratePageGrid(parent, type, targetIndex, rows, cols);
+            ShowPageGrid(parent, type, targetIndex, rows, cols);
+            foreach (Button btn in buttonPanel.Children.OfType<Button>())
+                btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
+            if (type != "Global") SetCommonTextBlock(targetIndex);
+            if (type == "Global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
+        }
+
+        /// <summary>
+        /// 切换到下一页Grid
+        /// </summary>
+        /// <param name="currentIndex">当前页索引</param>
+        /// <param name="type">页面类型</param>
+        private void SwitchToNextPageGrid(int currentIndex, string type)
+        {
+            int totalPages = db3.GetSceneData(type).FirstOrDefault()?.SceneCount ?? 1;
+            int targetIndex = currentIndex + 1;
+            bool loop = Quicker.Database.SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
+            if (targetIndex >= totalPages)
+            {
+                if (loop)
+                    targetIndex = 0;
+                else
+                    return;
+            }
+            Panel parent = type == "Global" ? GlobalGrid : CommonGrid;
+            Panel buttonPanel = type == "Global" ? GlobalButtonPanel : CommonButtonPanel;
+            int rows = type == "Global" ? 3 : 4;
+            int cols = 4;
+            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}"))
+                GeneratePageGrid(parent, type, targetIndex, rows, cols);
+            ShowPageGrid(parent, type, targetIndex, rows, cols);
+            foreach (Button btn in buttonPanel.Children.OfType<Button>())
+                btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
+            if (type != "Global") SetCommonTextBlock(targetIndex);
+            if (type == "Global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
         }
 
         // 右键按钮打开菜单
@@ -528,247 +500,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
             windowManager.OpenTargetWindow("ActionPageManageWindow"); // 打开动作管理窗口
         }
 
-        // 滚轮进行全局动作页翻页
-        private void GolbalGrid_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ChangeVisibleUniformGrid(e, "Global"); // 滚轮进行全局动作页翻页
-        }
-
-        /// <summary>
-        /// 获取当前可见的UniformGrid编号
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns> 当前可见的UniformGrid编号 </returns>
-        private int GetVisibleUniformGridIndex(string type)
-        {
-            var uniformGridCollection = type == "Global" // 根据是否是全局UniformGrid选择集合
-                ? buttonManager.FindVisualChildren<UniformGrid>(GlobalGrid) // 查找GlobalGrid下的UniformGrid集合
-                : buttonManager.FindVisualChildren<UniformGrid>(CommonGrid); // 查找CommonGrid下的UniformGrid集合
-            foreach (UniformGrid uniformGrid in uniformGridCollection) // 遍历UniformGrid集合
-            {
-                if (uniformGrid.Visibility == Visibility.Visible)
-                    return int.Parse(uniformGrid.Name.Replace(type, "")); // 如果匹配成功，返回UniformGrid编号
-            }
-            return 0; // 默认返回0
-        }
-
-        /// <summary>
-        /// 滑动滚轮更改当前可见 UniformGrid
-        /// </summary>
-        /// <param name="e">鼠标滚轮事件参数</param>
-        /// <param name="style">UniformGrid 类型</param>
-        private void ChangeVisibleUniformGrid(MouseWheelEventArgs e, string style)
-        {
-            e.Handled = true; // 标记事件已处理
-            int delta = e.Delta; // 获取鼠标滚轮的增量值
-            int currentUniformGridIndex = GetVisibleUniformGridIndex(style); // 获取当前可见的UniformGrid编号
-            if (delta > 0) SwitchToPreviousUniformGrid(currentUniformGridIndex, style); // 向上滚动，切换到上一页
-            else SwitchToNextUniformGrid(currentUniformGridIndex, style); // 向下滚动，切换到下一页
-        }
-
-        /// <summary>
-        /// 切换到上一页
-        /// </summary>
-        /// <param name="currentUniformGridIndex">当前可见的UniformGrid编号</param>
-        /// <param name="style">UniformGrid 类型</param>
-        private void SwitchToPreviousUniformGrid(int currentUniformGridIndex, string style)
-        {
-            SwitchUniformGrid(currentUniformGridIndex, style, false); // 向上滚动，切换到上一页
-        }
-
-        /// <summary>
-        /// 切换到下一页
-        /// </summary>
-        /// <param name="currentUniformGridIndex">当前可见的UniformGrid编号</param>
-        /// <param name="style">UniformGrid 类型</param>
-        private void SwitchToNextUniformGrid(int currentUniformGridIndex, string style)
-        {
-            SwitchUniformGrid(currentUniformGridIndex, style, true); // 向下滚动，切换到下一页
-        }
-
-        /// <summary>
-        /// 切换UniformGrid
-        /// </summary>
-        /// <param name="currentUniformGridIndex"> 当前可见的UniformGrid编号 </param>
-        /// <param name="style"> UniformGrid 类型 </param>
-        /// <param name="isNext"> 是否向下滚动 </param>
-        private void SwitchUniformGrid(int currentUniformGridIndex, string style, bool isNext)
-        {
-            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置数据
-            int targetUniformGridIndex = isNext ? currentUniformGridIndex + 1 : currentUniformGridIndex - 1; // 计算目标UniformGrid编号
-            var sceneData = db3.GetSceneData(style).FirstOrDefault(); // 从数据库中获取动作页数据
-            if (targetUniformGridIndex == sceneData.SceneCount || targetUniformGridIndex < 0) // 如果目标UniformGrid编号超出范围
-            {
-                if (Convention.LoopPageFlipping) // 如果循环翻页
-                    targetUniformGridIndex = isNext ? 0 : sceneData.SceneCount - 1; // 循环到第一页或最后一页
-                else return; // 如果不循环翻页，直接返回
-            }
-
-            string targetUniformGridName = $"{style}{targetUniformGridIndex}"; // 生成目标UniformGrid名称
-            UniformGrid targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
-                .FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
-
-            if (targetUniformGrid == null) // 如果目标UniformGrid不存在
-            {
-                GenerateUniformGrid(targetUniformGridIndex, style); // 动态生成UniformGrid
-                targetUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
-                    .FirstOrDefault(c => c.Name == targetUniformGridName); // 查找目标UniformGrid
-            }
-
-            targetUniformGrid.Visibility = Visibility.Visible; // 设置目标UniformGrid可见
-            string currentUniformGridName = $"{style}{currentUniformGridIndex}"; // 生成当前UniformGrid名称
-            UniformGrid currentUniformGrid = buttonManager.FindVisualChildren<UniformGrid>(style == "Global" ? GlobalGrid : CommonGrid)
-                .FirstOrDefault(c => c.Name == currentUniformGridName); // 查找当前UniformGrid
-            currentUniformGrid.Visibility = Visibility.Collapsed; // 隐藏当前UniformGrid
-
-            if (style != "Global") SetCommonTextBlock(targetUniformGridIndex); // 设置通用动作页标签
-        }
-
-        /// <summary>
-        /// 生成UniformGrid
-        /// </summary>
-        /// <param name="uniformGridIndex"> 要生成的页面索引 </param>
-        /// <param name="style"> UniformGrid 类型 </param>
-        public void GenerateUniformGrid(int uniformGridIndex, string style)
-        {
-            int rows = style == "Global" ? 3 : 4, cols = 4; // 行数和列数
-            UniformGrid newUniformGrid = new UniformGrid
-            {
-                Rows = rows, // 设置行数
-                Columns = cols, // 设置列数
-                Name = $"{style}{uniformGridIndex}", // 设置名称
-            }; // 创建UniformGrid对象
-
-            if (style == "Global")
-            {
-                GlobalGrid.Children.Add(newUniformGrid); // 添加到主Grid
-                newUniformGrid.IsVisibleChanged += GlobalUniformGrid_IsVisibleChanged; // 添加可见性变化事件
-            }
-            else
-            {
-                CommonGrid.Children.Add(newUniformGrid); // 添加到公共Grid
-                newUniformGrid.IsVisibleChanged += CommonUniformGrid_IsVisibleChanged; // 添加可见性变化事件
-            }
-
-            Panel ParentPanel = style == "Global" ? GlobalButtonPanel : CommonButtonPanel; // 根据样式选择父面板
-            foreach (var button in ParentPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
-            {
-                button.Background = button.Name.Contains($"{uniformGridIndex}") // 判断是否是当前按钮
-                    ? SelectedBrush
-                    : UnSelectedBrush; // 设置当前按钮颜色
-            }
-
-            for (int row = 0; row < rows; row++)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    int buttonIndex = uniformGridIndex * 100 + (row + 1) * 10 + (col + 1); // 按钮索引
-                    string buttonName = $"{style}{buttonIndex}"; // 按钮名称
-                    Style styleResource = FindResource("Button") as Style; // 按钮样式
-                    Button button = CreateButton(buttonName, styleResource, row, col); // 创建按钮
-                    newUniformGrid.Children.Add(button); // 添加按钮到UniformGrid
-                    var buttonData = db2.GetButtonDataByID(buttonIndex, style); // 从数据库中获取按钮数据
-                    buttonManager.RefreshButtonDisplay(button, buttonData, 60, true); // 更新按钮内容
-                }
-            }
-        }
-
-        /// <summary>
-        /// 创建按钮
-        /// </summary>
-        /// <param name="name">Button 的名称</param>
-        /// <param name="style">Button 的样式</param>
-        /// <param name="row">Button 的行</param>
-        /// <param name="col">Button的列</param>
-        /// <returns>生成的 Button</returns>
-        private Button CreateButton(string name, Style style, int row = 0, int col = 0)
-        {
-            Button button = new Button { Name = name, Style = style }; // 创建 Button 对象
-            double buttonSize = 77.6; // 按钮大小
-            double cornerRadius = 5; // 圆角半径
-
-            // 为特定位置的按钮添加裁剪
-            if (row == 3 && col == 0) // 左下角按钮
-            {
-                button.Clip = CreateBottomLeftCornerClip(buttonSize, cornerRadius);
-            }
-            else if (row == 3 && col == 3) // 右下角按钮
-            {
-                button.Clip = CreateBottomRightCornerClip(buttonSize, cornerRadius);
-            }
-
-            BindButtonEvents(button); // 绑定按钮事件
-            return button; // 返回创建的按钮
-        }
-
-        /// <summary>
-        /// 创建左下角圆角裁剪
-        /// </summary>
-        /// <param name="size"> 按钮大小 </param>
-        /// <param name="radius"> 圆角半径 </param>
-        /// <returns> 裁剪几何体 </returns>
-        private Geometry CreateBottomLeftCornerClip(double size, double radius)
-        {
-            var pathGeometry = new PathGeometry(); // 创建路径几何体
-            var pathFigure = new PathFigure
-            {
-                StartPoint = new Point(0, 0), // 设置起始点
-                IsClosed = true // 设置路径闭合
-            };
-
-            pathFigure.Segments.Add(new LineSegment(new Point(size, 0), true)); // 上边
-            pathFigure.Segments.Add(new LineSegment(new Point(size, size), true)); // 右边
-            pathFigure.Segments.Add(new LineSegment(new Point(radius, size), true)); // 下边（右下到左下圆角起点）
-
-            var arcSegment = new ArcSegment
-            {
-                Point = new Point(0, size - radius), // 圆弧终点
-                Size = new Size(radius, radius), // 圆弧大小
-                SweepDirection = SweepDirection.Clockwise, // 顺时针方向
-                IsLargeArc = false // 小圆弧
-            };
-            pathFigure.Segments.Add(arcSegment); // 左下角圆弧
-
-            pathFigure.Segments.Add(new LineSegment(new Point(0, 0), true)); // 左边
-            pathGeometry.Figures.Add(pathFigure); // 添加路径图形
-
-            return pathGeometry; // 返回路径几何体
-        }
-
-        /// <summary>
-        /// 创建右下角圆角裁剪
-        /// </summary>
-        /// <param name="size"> 按钮大小 </param>
-        /// <param name="radius"> 圆角半径 </param>
-        /// <returns> 裁剪几何体 </returns>
-        private Geometry CreateBottomRightCornerClip(double size, double radius)
-        {
-            var pathGeometry = new PathGeometry(); // 创建路径几何体
-            var pathFigure = new PathFigure
-            {
-                StartPoint = new Point(0, 0), // 设置起始点
-                IsClosed = true // 设置路径闭合
-            };
-
-            pathFigure.Segments.Add(new LineSegment(new Point(size, 0), true)); // 上边
-            pathFigure.Segments.Add(new LineSegment(new Point(size, size - radius), true)); // 右边（右上到右下圆角起点）
-
-            var arcSegment = new ArcSegment
-            {
-                Point = new Point(size - radius, size), // 圆弧终点
-                Size = new Size(radius, radius), // 圆弧大小
-                SweepDirection = SweepDirection.Clockwise, // 顺时针方向
-                IsLargeArc = false // 小圆弧
-            };
-            pathFigure.Segments.Add(arcSegment); // 右下角圆弧
-
-            pathFigure.Segments.Add(new LineSegment(new Point(0, size), true)); // 下边
-            pathFigure.Segments.Add(new LineSegment(new Point(0, 0), true)); // 左边
-            pathGeometry.Figures.Add(pathFigure); // 添加路径图形
-
-            return pathGeometry; // 返回路径几何体
-        }
-
         /// <summary>
         /// 绑定按钮事件
         /// </summary>
@@ -777,8 +508,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             button.Click += DoAction; // 左键点击事件
             button.Drop += Button_Drop; // 拖拽事件
-            button.MouseEnter += Button_MouseEnter; // 鼠标移入事件
-            button.MouseLeave += Button_MouseLeave; // 鼠标移出事件
             button.PreviewDragOver += Button_PreviewDragOver; // 添加拖拽事件
             button.MouseRightButtonDown += OpenCreatActionMenu; // 右键点击事件
             button.PreviewMouseMove += Button_PreviewMouseMove; // 鼠标移动事件
@@ -806,12 +535,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             AppStateManager.Locked = !AppStateManager.Locked; // 切换锁定状态
             ((MainWindowViewModel)this.DataContext).IsLocked = AppStateManager.Locked; // 更新数据绑定
-        }
-
-        // 滚轮进行通用动作页翻页
-        private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            ChangeVisibleUniformGrid(e, CommonStyle); // 调用切换 UniformGrid 方法
         }
 
         // 通用动作页可见性与切换按钮背景绑定
@@ -886,6 +609,57 @@ namespace Quicker.Windows.MainWindows.MainWindow
             buttonManager.DeleteActionByDrag(GetButtonType(sender), this); // 删除动作
         }
 
+        /// <summary>
+        /// 鼠标左键拖动窗口
+        /// </summary>
+        private void MoveMainWindow(object sender, EventArgs e)
+        {
+            DragMove(); // 触发窗口拖动
+        }
+
+        /// <summary>
+        /// 打开设置窗口
+        /// </summary>
+        private void OpenSettingWindow(object sender, RoutedEventArgs e)
+        {
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            windowManager.OpenTargetWindow("SettingWindow"); // 打开设置窗口
+        }
+
+        /// <summary>
+        /// 失去焦点时关闭功能面板
+        /// </summary>
+        private void MainWindow_Deactivated(object sender, EventArgs e)
+        {
+            ActionInformationWindow actionInformationWindow = App.Current.Windows.OfType<ActionInformationWindow>().FirstOrDefault(); // 查找ActionInformationWindow
+            if (actionInformationWindow != null) // 如果存在ActionInformationWindow
+                this.Activate(); // 激活窗口
+            else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
+            {
+                buttonManager.isClosing = true; // 设置关闭标志
+                this.Close(); // 关闭窗口
+            }
+            else
+                this.Activate(); // 激活窗口
+        }
+
+        /// <summary>
+        /// 订住功能面板
+        /// </summary>
+        private void BookQuicker(object sender, EventArgs e)
+        {
+            AppStateManager.Pinned = !AppStateManager.Pinned; // 反转 AppStateManager.Pinned
+            ((MainWindowViewModel)this.DataContext).IsPinned = AppStateManager.Pinned; // 反转 ViewModel 的 IsPinned
+        }
+
+        /// <summary>
+        /// 关闭功能面板
+        /// </summary>
+        private void CloseMainWindow(object sender, EventArgs e)
+        {
+            Close(); // 关闭窗口
+        }
+
         // 窗口关闭时强制垃圾回收
         protected override void OnClosed(EventArgs e)
         {
@@ -920,8 +694,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     // 移除所有事件处理器
                     button.Click -= DoAction; // 左键点击事件
                     button.Drop -= Button_Drop; // 拖拽事件
-                    button.MouseEnter -= Button_MouseEnter; // 鼠标移入事件
-                    button.MouseLeave -= Button_MouseLeave; // 鼠标移出事件
                     button.PreviewDragOver -= Button_PreviewDragOver; // 添加拖拽事件
                     button.MouseRightButtonDown -= OpenCreatActionMenu; // 右键点击事件
                     button.PreviewMouseMove -= Button_PreviewMouseMove; // 鼠标移动事件
@@ -948,14 +720,14 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 清理全局按钮面板事件
             {
-                button.Click -= SwitchToGlobalUniformGrid; // 切换到全局动作页
+                button.Click -= GlobalPageChangeButton_Click; // 全局页面切换按钮点击
                 button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter; // 全局动作页鼠标移入事件
                 button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave; // 全局动作页鼠标移出事件
             }
 
             foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 清理公共按钮面板事件
             {
-                button.Click -= SwitchToCommonUniformGrid; // 切换到通用动作页
+                button.Click -= CommonPageChangeButton_Click; // 通用页面切换按钮点击
                 button.MouseEnter -= CommonActionPageChangeButton_MouseEnter; // 通用动作页鼠标移入事件
                 button.MouseLeave -= CommonActionPageChangeButton_MouseLeave; // 通用动作页鼠标移出事件
             }
