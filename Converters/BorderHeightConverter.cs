@@ -1,9 +1,9 @@
 ﻿namespace Quicker.Converters
 {
     /// <summary>
-    /// PreviewBorderHeightConverter：用于计算预览区高度，根据按钮高度、间隙、行数计算。
+    /// BorderHeightConverter：用于计算预览区高度，根据按钮高度、间隙、行数计算。
     /// </summary>
-    public class PreviewBorderHeightConverter : System.Windows.Data.IMultiValueConverter
+    public class BorderHeightConverter : System.Windows.Data.IMultiValueConverter
     {
         /// <summary>
         /// 预览区高度转换器：根据按钮高度、间隙、行数计算预览区高度

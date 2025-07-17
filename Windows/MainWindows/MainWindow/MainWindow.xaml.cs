@@ -31,6 +31,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             CommonStyle = style; // 设置样式
             InitializeComponent(); // 初始化窗口组件
+            this.DataContext = new MainWindowViewModel();
         }
 
         /// <summary>
@@ -60,8 +61,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 初始化动作页面
         private void InitializeActionPages()
         {
-            GlobalGrid.Children.Remove(ViewGlobalUniformGrid); // 从主网格中移除
-            CommonGrid.Children.Remove(ViewCommonUniformGrid); // 从主网格中移除
             Application.Current.Dispatcher.Invoke(() =>
             {
                 GenerateUniformGrid(0, "Global"); // 生成全局 UniformGrid
@@ -232,7 +231,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 关闭功能面板
         private void CloseMainWindow(object sender, EventArgs e)
         {
-            MainWindow_Deactivated(null, null); // 点击关闭视为失去焦点
+            Close(); // 关闭窗口
         }
 
         // 失去焦点时关闭功能面板
@@ -256,7 +255,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
             Button button = sender as Button; // 获取Button对象
             if (button.Tag is ButtonData)
             {
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 改变按钮背景颜色
                 button.RenderTransform = new ScaleTransform(1.05, 1.05); // 放大按钮
                 UniformGrid.SetZIndex(button, 1); // 调整按钮层级
             }
@@ -265,7 +263,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
                 if (Convention?.ShowAddImage == true) // 如果显示添加按钮
                     button.Content = new Image { Style = FindResource("AddActionImage") as Style }; // 设置按钮内容
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变按钮背景颜色
             }
         }
         private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
@@ -319,12 +316,10 @@ namespace Quicker.Windows.MainWindows.MainWindow
             {
                 UniformGrid.SetZIndex(button, 0); // 还原按钮层级
                 button.RenderTransform = new ScaleTransform(1, 1); // 还原按钮大小
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
             }
             else
             {
                 button.Content = null; // 清空按钮内容
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 还原背景颜色
             }
         }
         private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)

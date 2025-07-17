@@ -18,10 +18,10 @@
     Unloaded="AppearanceGrid_Unloaded"
 >
     <UserControl.Resources>
-        <conv:PreviewBorderHeightConverter x:Key="PreviewBorderHeightConverter"/>
         <conv:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <conv:DoubleSubtractConverter x:Key="DoubleSubtractConverter"/>
+        <conv:BorderHeightConverter x:Key="BorderHeightConverter"/>
         <conv:BlurEffectConverter x:Key="BlurEffectConverter"/>
         <conv:GridHeightConverter x:Key="GridHeightConverter"/>
         <conv:FontWeightConverter x:Key="FontWeightConverter"/>
@@ -423,7 +423,7 @@
                 <!-- 设置面板预览 -->
                 <Border x:Name="ViewPreviewBorder" Background="{Binding ElementName=BackgroundColorButton, Path=Background}" CornerRadius="{Binding PreviewCornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}" helpers:ClipHelper.ClipToBounds="True">
                     <Border.Height>
-                        <MultiBinding Converter="{StaticResource PreviewBorderHeightConverter}">
+                        <MultiBinding Converter="{StaticResource BorderHeightConverter}">
                             <Binding ElementName="ButtonSizeSlider" Path="Value"/>
                             <Binding ElementName="ButtonGapSlider" Path="Value"/>
                         </MultiBinding>

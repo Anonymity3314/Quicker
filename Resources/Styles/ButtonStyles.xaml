@@ -1,11 +1,10 @@
 ﻿<ResourceDictionary 
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"        
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:styles="clr-namespace:Quicker.Resources.Styles"
     xmlns:local="clr-namespace:Quicker.Resources.Styles"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
 >
-    <!--<local:DarkerBrushConverter x:Key="DarkerBrushConverter"/>-->
-
     <!-- MainWindow -->
     <!-- 标题栏Button -->
     <Style x:Key="Task" TargetType="Button">
@@ -59,7 +58,7 @@
     </Style>
 
     <!-- 主Button-->
-    <Style x:Key="Button" TargetType="Button">
+    <!--<Style x:Key="Button" TargetType="Button">
         <Setter Property="BorderThickness" Value="0.2,0.2,0.2,0.2"/>
         <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -92,7 +91,7 @@
                 <Setter Property="Background" Value="#F3F3F3"/>
             </DataTrigger>
         </Style.Triggers>
-    </Style>
+    </Style>-->
 
     <!-- 切换动作页面的 Button -->
     <Style x:Key="ActionPageChangeButton" TargetType="Button">
