@@ -1,5 +1,8 @@
-﻿using System.Windows.Media.Effects;
+﻿using SixLabors.ImageSharp.Formats.Png.Chunks;
+using Color = System.Windows.Media.Color;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using Point = System.Windows.Point;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Threading;
 using Quicker.Models.Settings;
@@ -7,16 +10,15 @@ using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Globalization;
+using SixLabors.ImageSharp;
 using System.Windows.Data;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Text.Json;
-using Hjg.Pngcs.Chunks;
 using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
 using System.IO;
-using Hjg.Pngcs;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -718,30 +720,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         /// <summary>
-        /// 将 JSON 数据写入 PNG 图片的 tEXt 块，实现外观参数嵌入
+        /// 将 JSON 数据写入 PNG 图片的 tEXt 块，实现外观参数嵌入（ImageSharp 版本）
         /// </summary>
         /// <param name="inputPngPath">输入PNG路径（载体图片）</param>
         /// <param name="outputPngPath">输出PNG路径（保存路径）</param>
         /// <param name="json">要嵌入的 JSON 数据</param>
         private void WriteAppearanceToPng(string inputPngPath, string outputPngPath, string json)
         {
-            // 创建 PNG 读取器和写入器
-            var pngr = new Hjg.Pngcs.PngReader(File.OpenRead(inputPngPath));
-            var pngw = new Hjg.Pngcs.PngWriter(File.OpenWrite(outputPngPath), pngr.ImgInfo);
-            try
+            // 用 ImageSharp 读取图片，写入 tEXt 块
+            using (var image = SixLabors.ImageSharp.Image.Load(inputPngPath))
             {
-                for (int row = 0; row < pngr.ImgInfo.Rows; row++) // 拷贝所有像素数据
-                {
-                    var line = pngr.ReadRowInt(row);
-                    pngw.WriteRow(line, row);
-                }
+                var pngMeta = image.Metadata.GetPngMetadata();
                 string base64 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(json));
-                pngw.GetMetadata().SetText("QuickerAppearance", base64, false, false);
-            }
-            finally // 释放资源
-            {
-                pngr.End();
-                pngw.End();
+                // 先移除同名块，避免重复
+                var toRemove = pngMeta.TextData.Where(t => t.Keyword == "QuickerAppearance").ToList();
+                foreach (var item in toRemove)
+                {
+                    pngMeta.TextData.Remove(item);
+                }
+                pngMeta.TextData.Add(new PngTextData("QuickerAppearance", base64, null, null));
+                image.Save(outputPngPath);
             }
         }
 
@@ -784,78 +782,47 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             return tempPath;
         }
 
+        /// <summary>
+        /// 从 PNG 文件导入外观数据，返回 Appearance 对象，失败返回 null
+        /// </summary>
+        /// <param name="pngPath">PNG 文件路径</param>
+        /// <returns>Appearance 对象或 null</returns>
+        private Appearance ImportAppearanceFromPng(string pngPath)
+        {
+            string json = null;
+            using (var image = SixLabors.ImageSharp.Image.Load(pngPath))
+            {
+                var pngMeta = image.Metadata.GetPngMetadata();
+                var textData = pngMeta.TextData.FirstOrDefault(t => t.Keyword == "QuickerAppearance");
+                string text = textData.Equals(default(PngTextData)) ? null : textData.Value;
+                if (!string.IsNullOrEmpty(text))
+                {
+                    json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(text));
+                }
+            }
+            if (string.IsNullOrEmpty(json))
+                return null;
+            return JsonSerializer.Deserialize<Appearance>(json);
+        }
+
         // 导入外观设置按钮点击事件
         private void ImportAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // 1. 选择图片
-                var dialog = new Microsoft.Win32.OpenFileDialog
-                {
-                    Filter = "PNG图片|*.png",
-                    Title = "选择外观分享图片"
-                };
-                if (dialog.ShowDialog() != true)
+                string selectedPngPath = ShowSelectAppearancePngDialog(); // 选择图片
+                if (string.IsNullOrEmpty(selectedPngPath))
                     return;
-                string selectedPngPath = dialog.FileName;
 
-                // 2. 提取 tEXt 数据
-                string json = null;
-                var pngr = new PngReader(File.OpenRead(selectedPngPath));
-                try
-                {
-                    var allChunks = pngr.GetChunksList().GetChunks();
-                    foreach (var chunk in allChunks)
-                    {
-                        if (chunk is PngChunkTextVar txtChunk)
-                        {
-                            var key = txtChunk.GetKey()?.Trim();
-                            if (key == "QuickerAppearance")
-                            {
-                                var val = txtChunk.GetVal();
-                                if (!string.IsNullOrEmpty(val))
-                                {
-                                    json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(val));
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    pngr.End();
-                }
-                if (string.IsNullOrEmpty(json))
+                var appearance = ImportAppearanceFromPng(selectedPngPath); // 导入外观数据
+                if (appearance == null)
                 {
                     ShowToast("未检测到外观数据！", "Error");
                     return;
                 }
-                var appearance = JsonSerializer.Deserialize<Appearance>(json);
 
-                // 3. 处理背景图片
-                if (!string.IsNullOrEmpty(appearance.BackgroundImagePath))
-                {
-                    string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages";
-                    if (!Directory.Exists(bgDir))
-                        Directory.CreateDirectory(bgDir);
-                    string hash = DateTime.Now.Ticks.ToString("x");
-                    string newBgPath = Path.Combine(bgDir, $"bg_{hash}.png");
-                    RemoveTextChunkAndCopy(selectedPngPath, newBgPath);
-                    appearance.BackgroundImagePath = newBgPath;
-                }
-
-                // 4. 应用外观参数
-                SettingDatabase.UpdateAppearance(appearance);
-                settingManager.appearanceConditions = appearance;
-                // 刷新界面
-                ApplyButtonSettings();
-                ApplyColorSettings();
-                ApplyFontSettings();
-                ApplyBackgroundImageSettings();
-                ApplyBlurAndCornerSettings();
-                ApplyOptionSettings();
-
+                HandleImportedAppearanceBackgroundImage(appearance, selectedPngPath); // 处理背景图片
+                ApplyImportedAppearance(appearance); // 应用外观参数并刷新界面
                 ShowToast("导入成功！", "Success");
             }
             catch
@@ -864,23 +831,73 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        /// <summary>
+        /// 弹出文件选择对话框，返回用户选择的PNG文件路径，取消则返回null
+        /// </summary>
+        /// <returns>PNG文件路径</returns>
+        private string ShowSelectAppearancePngDialog()
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "PNG图片|*.png",
+                Title = "选择外观分享图片"
+            };
+            return dialog.ShowDialog() == true ? dialog.FileName : null;
+        }
+
+        /// <summary>
+        /// 处理导入Appearance对象的背景图片，将其去除文本块后复制到本地并更新路径
+        /// </summary>
+        /// <param name="appearance">要处理的Appearance对象</param>
+        /// <param name="srcPngPath">源PNG文件路径（载体图片）</param>
+        private void HandleImportedAppearanceBackgroundImage(Appearance appearance, string srcPngPath)
+        {
+            if (!string.IsNullOrEmpty(appearance.BackgroundImagePath))
+            {
+                string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages"; // 背景图片文件夹路径
+                if (!Directory.Exists(bgDir)) // 如果文件夹不存在则自动创建
+                    Directory.CreateDirectory(bgDir);
+                string hash = DateTime.Now.Ticks.ToString("x"); // 随机哈希值作为文件名
+                string newBgPath = Path.Combine(bgDir, $"bg_{hash}.png"); // 新背景图片路径
+                RemoveTextChunkAndCopy(srcPngPath, newBgPath); // 去除文本块并复制图片
+                appearance.BackgroundImagePath = newBgPath; // 更新路径
+            }
+        }
+
+        /// <summary>
+        /// 应用导入的Appearance对象到设置，并刷新界面和预览
+        /// </summary>
+        /// <param name="appearance">要应用的Appearance对象</param>
+        private void ApplyImportedAppearance(Appearance appearance)
+        {
+            SettingDatabase.UpdateAppearance(appearance);
+            settingManager.appearanceConditions = appearance;
+            ApplyButtonSettings();
+            ApplyColorSettings();
+            ApplyFontSettings();
+            ApplyBackgroundImageSettings();
+            ApplyBlurAndCornerSettings();
+            ApplyOptionSettings();
+            LoadGlobalButtonsForPreview();
+            // 保证导入后预览区可见
+            EnablePreviewCheckBox.IsChecked = true;
+            settingManager.appearanceConditions.EnablePreview = true;
+            EnablePreviewCheckBox_Click(null, null);
+        }
+
+        /// <summary>
+        /// 去除 PNG 图片的 tEXt/iTXt/zTXt 元数据并复制到指定路径
+        /// 用于处理导入Appearance对象的背景图片，将其去除文本块后复制到本地
+        /// </summary>
+        /// <param name="srcPath"> 源 PNG 文件路径 </param>
+        /// <param name="destPath"> 目标 PNG 文件路径 </param>
         private void RemoveTextChunkAndCopy(string srcPath, string destPath)
         {
-            var pngr = new PngReader(File.OpenRead(srcPath));
-            var pngw = new PngWriter(File.OpenWrite(destPath), pngr.ImgInfo);
-            try
+            using (var image = SixLabors.ImageSharp.Image.Load(srcPath)) // 用 ImageSharp 读取图片像素并去除所有 tEXt/iTXt/zTXt 元数据
             {
-                // 不复制 tEXt 块
-                for (int row = 0; row < pngr.ImgInfo.Rows; row++)
-                {
-                    var line = pngr.ReadRowInt(row);
-                    pngw.WriteRow(line, row);
-                }
-            }
-            finally
-            {
-                pngr.End();
-                pngw.End();
+                var pngMeta = image.Metadata.GetPngMetadata();
+                pngMeta.TextData.Clear(); // 移除所有文本块
+                image.Save(destPath);
             }
         }
 
