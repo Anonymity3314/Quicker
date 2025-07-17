@@ -30,6 +30,7 @@
 - **强大的动作管理**：支持创建、编辑和组织各种动作，提高工作效率。
 - **灵活的扩展机制**：通过扩展模块增强应用功能，满足不同用户的需求。
 - **按钮管理**：自定义和管理界面按钮。
+- **外观导入/导出**：基于 ImageSharp 实现，支持将外观参数嵌入 PNG 图片并从图片中恢复。
 
 ---
 
@@ -71,6 +72,7 @@
 | SharpHook                  | 提供键盘和鼠标钩子功能               |
 | Svg                        | 提供加载、解析和渲染 SVG 图像的功能   |
 | System.Data.SQLite         | 提供 SQLite 数据库支持              |
+| SixLabors.ImageSharp       | 实现 PNG 图片的元数据读写与外观导入导出 |
 
 打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
 
@@ -153,95 +155,97 @@ Quicker/
 ├─App.xaml.cs                                         # 应用入口点的代码后台
 ├─AssemblyInfo.cs                                     # 项目的属性和版本信息
 ├─Converters/                                         # WPF XAML 绑定用的值转换器
-│   ├─BlurEffectConverter.cs
-│   ├─DoubleSubtractConverter.cs
-│   ├─FontWeightConverter.cs
-│   ├─GridHeightConverter.cs
-│   ├─GridWidthConverter.cs
-│   ├─PathToImageSourceConverter.cs
-│   ├─PreviewBorderHeightConverter.cs
-│   └─ThicknessConverter.cs
+│   ├─FontWeightConverter.cs                           # 字体粗细与枚举转换器
+│   ├─ButtonScaleConverter.cs                          # 按钮缩放比例转换器
+│   ├─ButtonBackgroundConverter.cs                     # 按钮背景色转换器
+│   ├─GridWidthConverter.cs                            # 网格宽度计算转换器
+│   ├─GridHeightConverter.cs                           # 网格高度计算转换器
+│   ├─BorderHeightConverter.cs                         # 边框高度转换器
+│   ├─IntToCornerRadiusConverter.cs                    # int转圆角半径转换器
+│   ├─DoubleSubtractConverter.cs                       # double减法转换器
+│   ├─BlurEffectConverter.cs                           # 模糊效果转换器
+│   ├─PathToImageSourceConverter.cs                    # 路径转图片源转换器
+│   └─ThicknessConverter.cs                            # 边距厚度转换器
 ├─Database/                                           # 数据库文件夹
-│   ├─ActionPageDatabase.cs                           # 动作页数据库
-│   ├─ButtonDatabase.cs                               # 按钮数据库
-│   └─SettingDatabase.cs                              # 设置数据库
+│   ├─ActionPageDatabase.cs                            # 动作页数据库
+│   ├─ButtonDatabase.cs                                # 按钮数据库
+│   └─SettingDatabase.cs                               # 设置数据库
 ├─Extend/                                             # 扩展文件夹
-│   ├─IExtensionModule.cs                             # 实现扩展的接口
-│   └─ModuleLoader.cs                                 # 扩展模块加载器
+│   ├─IExtensionModule.cs                              # 实现扩展的接口
+│   └─ModuleLoader.cs                                  # 扩展模块加载器
 ├─Helpers/                                            # 通用辅助类/附加属性
-│   ├─ClipHelper.cs                                   # UI裁剪附加属性
-│   └─DataSizeHelper.cs                               # 数据大小换算工具类
+│   ├─ClipHelper.cs                                    # UI裁剪附加属性
+│   └─DataSizeHelper.cs                                # 数据大小换算工具类
 ├─InfoData/                                           # 信息数据文件夹
-│   ├─Extensions.json                                 # 扩展信息
-│   ├─UpdateHistory.txt                               # 更新历史
-│   └─VersionInfo.json                                # 版本信息
+│   ├─Extensions.json                                  # 扩展信息
+│   ├─UpdateHistory.txt                                # 更新历史
+│   └─VersionInfo.json                                 # 版本信息
 ├─LICENSE                                             # 开源协议文件
 ├─Managers/                                           # 管理器文件夹
-│   ├─ActionManager.cs                                # 动作管理器
-│   ├─AppManager.cs                                   # 应用管理器
-│   ├─AppStateManager.cs                              # 应用状态管理器
-│   ├─AppUpdateManager.cs                             # 应用更新管理器
-│   ├─ButtonManager.cs                                # 按钮管理器
-│   ├─DatabaseUpdateManager.cs                        # 数据库更新管理器
-│   ├─IconManager.cs                                  # 图标管理器
-│   ├─SettingManager.cs                               # 设置管理器
-│   ├─SingleInstanceManager .cs                       # 互斥锁管理器
-│   ├─ToastManager.cs                                 # 消息管理器
-│   └─WindowManager.cs                                # 窗口管理器
+│   ├─ActionManager.cs                                 # 动作管理器
+│   ├─AppManager.cs                                    # 应用管理器
+│   ├─AppStateManager.cs                               # 应用状态管理器
+│   ├─AppUpdateManager.cs                              # 应用更新管理器
+│   ├─ButtonManager.cs                                 # 按钮管理器
+│   ├─DatabaseUpdateManager.cs                         # 数据库更新管理器
+│   ├─IconManager.cs                                   # 图标管理器
+│   ├─SettingManager.cs                                # 设置管理器
+│   ├─SingleInstanceManager .cs                        # 互斥锁管理器
+│   ├─ToastManager.cs                                  # 消息管理器
+│   └─WindowManager.cs                                 # 窗口管理器
 ├─Models/                                             # 数据模型
-│   ├─ActionPageData.cs                               # 动作页数据模型
-│   ├─ButtonData.cs                                   # 按钮数据模型
-│   ├─SceneData.cs                                    # 场景数据模型
-│   └─Settings/                                       # 设置相关数据模型
-│       ├─Appearance.cs                               # 外观设置数据模型
-│       ├─Blacklist.cs                                # 黑名单设置数据模型
-│       ├─Convention.cs                               # 常规设置数据模型
-│       └─OpenMainWindow.cs                           # 打开主窗口条件数据模型
-├─obj/                                                # 编译中间文件夹
+│   ├─ActionPageData.cs                                # 动作页数据模型
+│   ├─ButtonData.cs                                    # 按钮数据模型
+│   ├─SceneData.cs                                     # 场景数据模型
+│   └─Settings/                                        # 设置相关数据模型
+│       ├─Appearance.cs                                 # 外观设置数据模型
+│       ├─Blacklist.cs                                  # 黑名单设置数据模型
+│       ├─Convention.cs                                 # 常规设置数据模型
+│       └─OpenMainWindow.cs                             # 打开主窗口条件数据模型
 ├─Properties/                                         # 项目属性文件夹
-│   ├─Settings.Designer.cs                            # 自动生成的设置代码
-│   ├─Settings.settings                               # 应用程序设置
-│   └─PublishProfiles/                                # 发布配置文件夹
+│   ├─Settings.Designer.cs                             # 自动生成的设置代码
+│   ├─Settings.settings                                # 应用程序设置
+│   └─PublishProfiles/                                 # 发布配置文件夹
 ├─Quicker.csproj                                      # 项目的核心配置文件
 ├─Quicker.csproj.user                                 # 项目用户配置文件
 ├─Quicker.ico                                         # 应用图标
 ├─Quicker.sln                                         # 项目解决方案文件
 ├─README.md                                           # 项目说明文档
 ├─Resources/                                          # 资源文件夹
-│   ├─Images/                                         # 图像资源文件夹
-│   │   ├─AboutQuicker.png                            # 关于Quicker的图片
-│   │   ├─ActionInformation.png                       # 动作信息的图片
-│   │   ├─ActionPagesManager.jpg                      # 动作场景的图片
-│   │   ├─Add.png                                     # 主面板添加动作的图片
-│   │   ├─BasicSettingsButton.png                     # 基础设置按钮的图片
-│   │   ├─BlackList.png                               # 黑名单设置按钮的图片
-│   │   ├─ClearButton.png                             # 下载窗口中清理按钮的图片
-│   │   ├─CloseDownloadWindow.png                     # 关闭下载窗口的按钮图片
-│   │   ├─CloseQuicker.png                            # 退出Quicker的图片
-│   │   ├─CloseWindow.png                             # 关闭主面板的图片
-│   │   ├─CopyAction.png                              # 复制动作按钮的图片
-│   │   ├─DeleteImage.png                             # 删除动作按钮图像的图片
-│   │   ├─DesktopSceneImage.png                       # 桌面场景的图片
-│   │   ├─EditButton.png                              # 编辑动作的图片
-│   │   ├─Locked.png                                  # 锁住通用动作页的图片
-│   │   ├─MessageImage.jpg                            # 消息弹窗的图片
-│   │   ├─MoreSelection.png                           # 主面板更多选择的图片
-│   │   ├─OpenFile.png                                # 打开文件所在文件夹的图片
-│   │   ├─OpenFileImage.png                           # 添加窗口中打开文件动作的图片
-│   │   ├─OpenMainWindow1.png                         # 菜单中打开主面板的图片
-│   │   ├─OpenMainWindow2.png                         # 设置窗口中弹出面板按钮的图片
-│   │   ├─OpenWebsiteImage.png                        # 添加窗口中打开网站动作的图片
-│   │   ├─Pause.png                                   # 暂停Quicker的图片
-│   │   ├─PinToDesktop.png                            # 订住主面板的图片
-│   │   ├─Quicker1.png                                # Quicker运行中的图片
-│   │   ├─Quicker2.png                                # Quicker暂停时的图片
-│   │   ├─RestartQuicker.png                          # 重启Quicker的图片
-│   │   ├─SelectLocalImage.png                        # 从本地文件选择动作按钮图像的图片
-│   │   ├─SettingImage1.png                           # 菜单中打开设置窗口的按钮图片
-│   │   ├─SettingImage2.png                           # 主面板打开设置面板的图片
-│   │   ├─SettingWindow.png                           # 设置面板的图片
-│   │   ├─UnLocked.png                                # 不锁住通用动作页的图片
-│   │   └─UnpinFromDesktop.png                        # 不订住Quicker的图片
+│   ├─Images/                                          # 图像资源文件夹
+│   │   ├─AboutQuicker.png                              # 关于Quicker的图片
+│   │   ├─ActionInformation.png                         # 动作信息的图片
+│   │   ├─ActionPagesManager.jpg                        # 动作场景的图片
+│   │   ├─Add.png                                       # 主面板添加动作的图片
+│   │   ├─BasicSettingsButton.png                       # 基础设置按钮的图片
+│   │   ├─BlackList.png                                 # 黑名单设置按钮的图片
+│   │   ├─ClearButton.png                               # 下载窗口中清理按钮的图片
+│   │   ├─CloseDownloadWindow.png                       # 关闭下载窗口的按钮图片
+│   │   ├─CloseQuicker.png                              # 退出Quicker的图片
+│   │   ├─CloseWindow.png                               # 关闭主面板的图片
+│   │   ├─CopyAction.png                                # 复制动作按钮的图片
+│   │   ├─DeleteImage.png                               # 删除动作按钮图像的图片
+│   │   ├─DesktopSceneImage.png                         # 桌面场景的图片
+│   │   ├─EditButton.png                                # 编辑动作的图片
+│   │   ├─Locked.png                                    # 锁住通用动作页的图片
+│   │   ├─MessageImage.jpg                              # 消息弹窗的图片
+│   │   ├─MoreSelection.png                             # 主面板更多选择的图片
+│   │   ├─OpenFile.png                                  # 打开文件所在文件夹的图片
+│   │   ├─OpenFileImage.png                             # 添加窗口中打开文件动作的图片
+│   │   ├─OpenMainWindow1.png                           # 菜单中打开主面板的图片
+│   │   ├─OpenMainWindow2.png                           # 设置窗口中弹出面板按钮的图片
+│   │   ├─OpenWebsiteImage.png                          # 添加窗口中打开网站动作的图片
+│   │   ├─Pause.png                                     # 暂停Quicker的图片
+│   │   ├─PinToDesktop.png                              # 订住主面板的图片
+│   │   ├─Quicker1.png                                  # Quicker运行中的图片
+│   │   ├─Quicker2.png                                  # Quicker暂停时的图片
+│   │   ├─RestartQuicker.png                            # 重启Quicker的图片
+│   │   ├─SelectLocalImage.png                          # 从本地文件选择动作按钮图像的图片
+│   │   ├─SettingImage1.png                             # 菜单中打开设置窗口的按钮图片
+│   │   ├─SettingImage2.png                             # 主面板打开设置面板的图片
+│   │   ├─SettingWindow.png                             # 设置面板的图片
+│   │   ├─UnLocked.png                                  # 不锁住通用动作页的图片
+│   │   └─UnpinFromDesktop.png                          # 不订住Quicker的图片
 │   └─Styles/                                         # 样式资源文件夹
 │       ├─BorderStyles.xaml                            # 边框样式
 │       ├─ButtonStyles.xaml                            # 按钮样式
@@ -259,78 +263,78 @@ Quicker/
 │       ├─TextBoxStyles.xaml                           # 文本框样式
 │       └─TooltipStyle.xaml                            # 提示框样式
 ├─UserControls/                                       # 自定义控件文件夹
-│   ├─AddWindow/                                      # 添加窗口的自定义控件
-│   │   ├─LoadExtension.xaml
-│   │   ├─LoadExtension.xaml.cs
-│   │   ├─OpenFile.xaml
-│   │   ├─OpenFile.xaml.cs
-│   │   ├─OpenWebsite.xaml
-│   │   └─OpenWebsite.xaml.cs
-│   └─SettingWindow/                                  # 设置窗口的自定义控件
-│       ├─Auxiliary_Functions/                        # 辅助功能控件文件夹
-│       ├─BasicSettings/                              # 基础设置控件文件夹
-│       │   ├─AboutQuickerGrid.xaml
-│       │   ├─AboutQuickerGrid.xaml.cs
-│       │   ├─AppearanceGrid.xaml
-│       │   ├─AppearanceGrid.xaml.cs
-│       │   ├─BlacklistGrid.xaml
-│       │   ├─BlacklistGrid.xaml.cs
-│       │   ├─ConventionGrid.xaml
-│       │   ├─ConventionGrid.xaml.cs
-│       │   ├─FunctionShortcutKeysGrid.xaml
-│       │   ├─FunctionShortcutKeysGrid.xaml.cs
-│       │   ├─OpenMainWindowGrid.xaml
-│       │   └─OpenMainWindowGrid.xaml.cs
-│       ├─ColorPicker.xaml
-│       ├─ColorPicker.xaml.cs
-│       └─Tools/                                      # 工具控件文件夹
+│   ├─AddWindow/                                       # 添加窗口的自定义控件
+│   │   ├─LoadExtension.xaml                            # 加载扩展界面
+│   │   │   └─LoadExtension.xaml.cs
+│   │   ├─OpenFile.xaml                                 # 打开文件界面
+│   │   │   └─OpenFile.xaml.cs
+│   │   └─OpenWebsite.xaml                              # 打开网站界面
+│   │       └─OpenWebsite.xaml.cs
+│   └─SettingWindow/                                   # 设置窗口的自定义控件
+│       ├─Auxiliary_Functions/                          # 辅助功能控件文件夹
+│       ├─BasicSettings/                                # 基础设置控件文件夹
+│       │   ├─AboutQuickerGrid.xaml                      # 关于界面
+│       │   │   └─AboutQuickerGrid.xaml.cs
+│       │   ├─AppearanceGrid.xaml                        # 外观设置界面
+│       │   │   └─AppearanceGrid.xaml.cs
+│       │   ├─BlacklistGrid.xaml                         # 黑名单设置界面
+│       │   │   └─BlacklistGrid.xaml.cs
+│       │   ├─ConventionGrid.xaml                        # 常规设置界面
+│       │   │   └─ConventionGrid.xaml.cs
+│       │   ├─FunctionShortcutKeysGrid.xaml              # 快捷键设置界面
+│       │   │   └─FunctionShortcutKeysGrid.xaml.cs
+│       │   └─OpenMainWindowGrid.xaml                    # 打开主窗口设置界面
+│       │       └─OpenMainWindowGrid.xaml.cs
+│       ├─ColorPicker.xaml                              # 颜色选择器
+│       │   └─ColorPicker.xaml.cs
+│       └─Tools/                                        # 工具控件文件夹
 ├─Windows/                                            # 界面文件夹
-│   ├─EditWindows/                                    # 编辑窗口文件夹
-│   │   ├─EditActionPageInfoWindow.xaml
-│   │   ├─EditActionPageInfoWindow.xaml.cs
-│   │   ├─EditSceneWindow.xaml
-│   │   └─EditSceneWindow.xaml.cs
-│   ├─MainWindows/                                    # 主窗口文件夹
-│   │   ├─ActionPageManageWindow.xaml
-│   │   ├─ActionPageManageWindow.xaml.cs
-│   │   ├─AddWindow.xaml
-│   │   ├─AddWindow.xaml.cs
-│   │   ├─FindAppsWindow.xaml
-│   │   ├─FindAppsWindow.xaml.cs
-│   │   ├─MainWindow/                                 # 主功能面板MVVM文件夹
-│   │   │   ├─MainWindow.xaml
-│   │   │   ├─MainWindow.xaml.cs
-│   │   │   └─MainWindowViewModel.cs
-│   │   ├─SelectImageWindow.xaml
-│   │   ├─SelectImageWindow.xaml.cs
-│   │   ├─SettingWindow.xaml
-│   │   ├─SettingWindow.xaml.cs
-│   │   ├─UpdateWindow.xaml
-│   │   └─UpdateWindow.xaml.cs
-│   ├─Menus/                                          # 菜单文件夹
-│   │   ├─CreatActionMenu.xaml
-│   │   ├─CreatActionMenu.xaml.cs
-│   │   ├─CustomMenu.xaml
-│   │   ├─CustomMenu.xaml.cs
-│   │   ├─OperationMenu.xaml
-│   │   ├─OperationMenu.xaml.cs
-│   │   ├─SelectActionPageMenu.xaml
-│   │   └─SelectActionPageMenu.xaml.cs
-│   └─ToolWindows/                                    # 工具窗口文件夹
-│       ├─ActionInformationWindow.xaml
-│       ├─ActionInformationWindow.xaml.cs
-│       ├─DownloadWindow.xaml
-│       ├─DownloadWindow.xaml.cs
-│       ├─ImageCropWindow.xaml
-│       ├─ImageCropWindow.xaml.cs
-│       ├─LoadingWindow.xaml
-│       ├─LoadingWindow.xaml.cs
-│       ├─MessageWindow.xaml
-│       ├─MessageWindow.xaml.cs
-│       ├─SelectWindowWindow.xaml
-│       ├─SelectWindowWindow.xaml.cs
-│       ├─ToastWindow.xaml
-│       └─ToastWindow.xaml.cs
+│   ├─EditWindows/                                     # 编辑窗口文件夹
+│   │   ├─EditActionPageInfoWindow.xaml                #  编辑动作页信息窗口
+│   │   │   └─EditActionPageInfoWindow.xaml.cs
+│   │   └─EditSceneWindow.xaml                         #  编辑场景窗口
+│   │       └─EditSceneWindow.xaml.cs
+│   ├─MainWindows/                                     # 主窗口文件夹
+│   │   ├─ActionPageManageWindow.xaml                  #  动作页管理窗口
+│   │   │   └─ActionPageManageWindow.xaml.cs
+│   │   ├─AddWindow.xaml                               #  添加动作窗口
+│   │   │   └─AddWindow.xaml.cs
+│   │   ├─FindAppsWindow.xaml                          #  查找应用窗口
+│   │   │   └─FindAppsWindow.xaml.cs
+│   │   ├─MainWindow/                                  #  主功能面板MVVM文件夹
+│   │   │   ├─MainWindow.xaml                          #   主面板
+│   │   │   │   └─MainWindow.xaml.cs
+│   │   │   └─MainWindowViewModel.cs                   #   主面板ViewModel
+│   │   ├─SelectImageWindow.xaml                       #  选择图片窗口
+│   │   │   └─SelectImageWindow.xaml.cs
+│   │   ├─SettingWindow.xaml                           #  设置窗口
+│   │   │   └─SettingWindow.xaml.cs
+│   │   └─UpdateWindow.xaml                            #  更新窗口
+│   │       └─UpdateWindow.xaml.cs
+│   ├─Menus/                                           # 菜单文件夹
+│   │   ├─CreatActionMenu.xaml                         #  创建动作菜单
+│   │   │   └─CreatActionMenu.xaml.cs
+│   │   ├─CustomMenu.xaml                              #  自定义菜单
+│   │   │   └─CustomMenu.xaml.cs
+│   │   ├─OperationMenu.xaml                           #  操作菜单
+│   │   │   └─OperationMenu.xaml.cs
+│   │   └─SelectActionPageMenu.xaml                    #  选择动作页菜单
+│   │       └─SelectActionPageMenu.xaml.cs
+│   └─ToolWindows/                                     # 工具窗口文件夹
+│       ├─ActionInformationWindow.xaml                 #  动作信息窗口
+│       │   └─ActionInformationWindow.xaml.cs
+│       ├─DownloadWindow.xaml                          #  下载窗口
+│       │   └─DownloadWindow.xaml.cs
+│       ├─ImageCropWindow.xaml                         #  图片裁剪窗口
+│       │   └─ImageCropWindow.xaml.cs
+│       ├─LoadingWindow.xaml                           #  加载窗口
+│       │   └─LoadingWindow.xaml.cs
+│       ├─MessageWindow.xaml                           #  消息窗口
+│       │   └─MessageWindow.xaml.cs
+│       ├─SelectWindowWindow.xaml                      #  选择窗口
+│       │   └─SelectWindowWindow.xaml.cs
+│       └─ToastWindow.xaml                             #  Toast提示窗口
+│           └─ToastWindow.xaml.cs
 ```
 
 ---
