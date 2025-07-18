@@ -7,13 +7,13 @@
     xmlns:conv="clr-namespace:Quicker.Converters"
 >
     <!-- 颜色转换器 -->
+    <conv:SmartHoverColorConverter x:Key="SmartHoverColorConverter" DarkerFactor="0.8" LighterFactor="1.2"/>
     <conv:LighterColorConverter x:Key="LighterColorConverter" Factor="1.2"/>
-    <conv:DarkerColorConverter x:Key="DarkerColorConverter" Factor="0.9"/>
 
     <!-- MainWindow -->    
     <!-- 切换动作页面的按钮 -->
     <Style x:Key="ActionPageChangeButton" TargetType="Button">
-        <Setter Property="Background" Value="{Binding ToolbarColor, Converter={StaticResource DarkerColorConverter}}"/>
+        <Setter Property="Background" Value="{Binding ToolbarColor, Converter={StaticResource SmartHoverColorConverter}}"/>
         <Setter Property="Margin" Value="2.5,0"/>
         <Setter Property="Height" Value="6"/>
         <Setter Property="Width" Value="6"/>

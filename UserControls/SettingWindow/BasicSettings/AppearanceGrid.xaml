@@ -19,10 +19,8 @@
     Unloaded="AppearanceGrid_Unloaded"
 >
     <UserControl.Resources>
-        <conv:DarkerColorConverter x:Key="DarkerColorConverter" Factor="0.8"/>
+        <conv:SmartHoverColorConverter x:Key="SmartHoverColorConverter" DarkerFactor="0.8" LighterFactor="1.2"/>
         <conv:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <conv:DoubleSubtractConverter x:Key="DoubleSubtractConverter"/>
         <conv:BorderHeightConverter x:Key="BorderHeightConverter"/>
         <conv:BlurEffectConverter x:Key="BlurEffectConverter"/>
         <conv:GridHeightConverter x:Key="GridHeightConverter"/>
@@ -70,7 +68,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{Binding ElementName=ToolbarColorButton, Path=Background, Converter={StaticResource DarkerColorConverter}}"/>
+                                <Setter TargetName="border" Property="Background" Value="{Binding ElementName=ToolbarColorButton, Path=Background, Converter={StaticResource SmartHoverColorConverter}}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

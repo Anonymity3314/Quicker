@@ -33,13 +33,11 @@
         <ImageSource x:Key="LockIconSource">pack://application:,,,/Resources/Images/Locked.png</ImageSource>
         <ImageSource x:Key="UnLockIconSource">pack://application:,,,/Resources/Images/UnLocked.png</ImageSource>
         <!-- 转换器 -->
-        <conv:LighterColorConverter x:Key="LighterColorConverter" Factor="1.2"/>
-        <conv:DarkerColorConverter x:Key="DarkerColorConverter" Factor="0.8"/>
+        <conv:SmartHoverColorConverter x:Key="SmartHoverColorConverter" DarkerFactor="0.8" LighterFactor="1.2"/>
         <conv:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
         <conv:IntToCornerRadiusConverter x:Key="IntToCornerRadiusConverter"/>
         <conv:ButtonBackgroundConverter x:Key="ButtonBackgroundConverter"/>
         <conv:BorderHeightConverter x:Key="BorderHeightConverter"/>
-        <conv:ButtonScaleConverter x:Key="ButtonScaleConverter"/>
         <conv:BlurEffectConverter x:Key="BlurEffectConverter"/>
         <conv:GridHeightConverter x:Key="GridHeightConverter"/>
         <conv:FontWeightConverter x:Key="FontWeightConverter"/>
@@ -93,7 +91,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{Binding DataContext.ToolbarColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource DarkerColorConverter}}"/>
+                                <Setter TargetName="border" Property="Background" Value="{Binding DataContext.ToolbarColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource SmartHoverColorConverter}}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
