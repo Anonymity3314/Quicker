@@ -10,32 +10,7 @@
     <conv:LighterColorConverter x:Key="LighterColorConverter" Factor="1.2"/>
     <conv:DarkerColorConverter x:Key="DarkerColorConverter" Factor="0.9"/>
 
-    <!-- MainWindow -->
-    <!-- 标题栏Button -->
-    <Style x:Key="Task" TargetType="Button">
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="Background" Value="{x:Null}"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{Binding DataContext.ToolbarColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource DarkerColorConverter}}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
+    <!-- MainWindow -->    
     <!-- 切换动作页面的按钮 -->
     <Style x:Key="ActionPageChangeButton" TargetType="Button">
         <Setter Property="Background" Value="{Binding ToolbarColor, Converter={StaticResource DarkerColorConverter}}"/>

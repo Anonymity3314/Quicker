@@ -11,9 +11,9 @@ namespace Quicker.Converters
     public class DarkerColorConverter : IValueConverter
     {
         /// <summary>
-        /// 加深系数，取值范围 0~1，越小越深。默认 0.9。
+        /// 加深系数，取值范围 0~1，越小越深。默认 0.8。
         /// </summary>
-        public double Factor { get; set; } = 0.9;
+        public double Factor { get; set; } = 0.8;
 
         /// <summary>
         /// 将颜色字符串转换为加深后的 SolidColorBrush。
@@ -25,6 +25,14 @@ namespace Quicker.Converters
         /// <returns>加深后的 SolidColorBrush</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is SolidColorBrush brush)
+            {
+                var color = brush.Color;
+                byte r = (byte)(color.R * Factor);
+                byte g = (byte)(color.G * Factor);
+                byte b = (byte)(color.B * Factor);
+                return new SolidColorBrush(Color.FromArgb(color.A, r, g, b));
+            }
             if (value is string colorStr)
             {
                 try
@@ -33,11 +41,11 @@ namespace Quicker.Converters
                     byte r = (byte)(color.R * Factor);
                     byte g = (byte)(color.G * Factor);
                     byte b = (byte)(color.B * Factor);
-                    return new SolidColorBrush(Color.FromArgb(color.A, r, g, b)); // 返回加深后的颜色
+                    return new SolidColorBrush(Color.FromArgb(color.A, r, g, b));
                 }
                 catch
                 {
-                    return new SolidColorBrush(Colors.Transparent); // 解析失败返回透明色
+                    return new SolidColorBrush(Colors.Transparent);
                 }
             }
             return new SolidColorBrush(Colors.Transparent);
