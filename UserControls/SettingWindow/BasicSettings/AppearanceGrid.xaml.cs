@@ -540,13 +540,29 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 应用全局字体方法
         private void ApplyGlobalFontFamily()
         {
-            // 获取当前选择的字体名
+            // 获取当前 appearanceConditions 的 Font1/Font2 索引
+            int font1Index = settingManager.appearanceConditions.Font1;
+            int font2Index = settingManager.appearanceConditions.Font2;
+
+            // ComboBox 的 ItemsSource 是字体名列表，最后一项是“(系统默认)”
+            var fontFamilies = FontSizeComboBox1.ItemsSource as IList<string>;
+            if (fontFamilies == null || fontFamilies.Count == 0)
+            {
+                return; // 字体列表未初始化，直接返回
+            }
+            int defaultIndex = fontFamilies.Count - 1;
+
+            // 设置 ComboBox 选中项（防止越界）
+            FontSizeComboBox1.SelectedIndex = (font1Index == -1 || font1Index < 0 || font1Index >= fontFamilies.Count) ? defaultIndex : font1Index;
+            FontSizeComboBox2.SelectedIndex = (font2Index == -1 || font2Index < 0 || font2Index >= fontFamilies.Count) ? defaultIndex : font2Index;
+
+            // 获取字体名
             string font1 = FontSizeComboBox1.SelectedItem as string;
             string font2 = FontSizeComboBox2.SelectedItem as string;
 
-            // 判断是否为“系统默认”
-            bool isDefault1 = font1 == "(系统默认)";
-            bool isDefault2 = font2 == "(系统默认)";
+            // 防止 null
+            bool isDefault1 = string.IsNullOrEmpty(font1) || font1 == "(系统默认)";
+            bool isDefault2 = string.IsNullOrEmpty(font2) || font2 == "(系统默认)";
             FontFamily fontFamily;
             if (!isDefault1 && !isDefault2)
             {
@@ -908,5 +924,287 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             System.Diagnostics.Process.Start("explorer.exe", folderPath); // 使用资源管理器打开该文件夹
         }
+
+        // 预置样式按钮点击事件
+        private void PresetStyleItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string styleKey)
+            {
+                ApplyPresetStyle(styleKey);
+                PresetStylePopup.IsOpen = false; // 关闭弹窗
+            }
+        }
+
+        /// <summary>
+        /// 应用预置样式
+        /// </summary>
+        /// <param name="styleKey"> 预置样式键 </param>
+        private void ApplyPresetStyle(string styleKey)
+        {
+            Appearance preset = null;
+            switch (styleKey)
+            {
+                case "Original":
+                    preset = PresetOriginal;
+                    break;
+                case "Simple":
+                    preset = PresetSimple;
+                    break;
+                case "Translucent":
+                    preset = PresetTranslucent;
+                    break;
+                case "Dark":
+                    preset = PresetDark;
+                    break;
+                case "DarkTranslucent":
+                    preset = PresetDarkTranslucent;
+                    break;
+            }
+
+            if (preset != null)
+            {
+                // 复制所有属性到当前 appearanceConditions
+                var current = settingManager.appearanceConditions;
+                foreach (var prop in typeof(Appearance).GetProperties())
+                {
+                    prop.SetValue(current, prop.GetValue(preset));
+                }
+                // 刷新界面
+                ApplyButtonSettings();
+                ApplyColorSettings();
+                ApplyFontSettings();
+                ApplyBackgroundImageSettings();
+                ApplyBlurAndCornerSettings();
+                ApplyOptionSettings();
+                LoadGlobalButtonsForPreview();
+                SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 保存到数据库
+            }
+        }
+
+        // 预置样式静态数据
+        // 原始风格
+        private static readonly Appearance PresetOriginal = new Appearance
+        {
+            // 尺寸
+            ButtonSize = 79,
+            ButtonGap = 1,
+            BorderWidth = 0,
+            ButtonCornerRadius = 0,
+
+            // 颜色
+            BackgroundColor = "#99B0B0B0",
+            BorderColor = "#00FFFFFF",
+            ToolbarColor = "#18999999",
+            ToolbarIconColor = "#FF666666",
+            ActionButtonColor = "#FFFFFFFF",
+            ActionButtonMouseOverColor = "#FFB2F2FF",
+            BlankButtonColor = "#32C8C8C8",
+            BlankButtonMouseOverColor = "#05000000",
+            ButtonTextColor = "#FF000000",
+            ActionIconColor = "#FF696969",
+            TriggerKeyTextColor = "#D0FF8C00",
+            OtherIconColor = "#FF666666",
+
+            // 字体
+            Font1 = -1,
+            Font2 = -1,
+            FontSize = 12,
+            FontWeight = 4,
+
+            // 背景图片
+            BackgroundImagePath = "",
+            BackgroundImageOpacity = 1.0,
+
+            // 模糊与圆角
+            Blur = 1,
+            Win11CornerRadius = 0,
+
+            // 选项
+            AutoHideTitleBar = true,
+            ShowActionButtonMouseOver = true,
+            HideActionNameAfterIcon = false,
+            ShowActionIconShadow = false,
+            EnablePreview = true
+        };
+
+        // 小白风格
+        private static readonly Appearance PresetSimple = new Appearance
+        {
+            // 尺寸
+            ButtonSize = 72,
+            ButtonGap = 0.2,
+            BorderWidth = 0,
+            ButtonCornerRadius = 0,
+
+            // 颜色
+            BackgroundColor = "#C5CCCCCC",
+            BorderColor = "#00FFFFFF",
+            ToolbarColor = "#2B999999",
+            ToolbarIconColor = "#FF666666",
+            ActionButtonColor = "#FFFFFFFF",
+            ActionButtonMouseOverColor = "#59B2F2FF",
+            BlankButtonColor = "#32C8C8C8",
+            BlankButtonMouseOverColor = "#05000000",
+            ButtonTextColor = "#FF000000",
+            ActionIconColor = "#FF696969",
+            TriggerKeyTextColor = "#D0FF8C00",
+            OtherIconColor = "#FF666666",
+
+            // 字体
+            Font1 = -1,
+            Font2 = -1,
+            FontSize = 12,
+            FontWeight = 4,
+
+            // 背景图片
+            BackgroundImagePath = "",
+            BackgroundImageOpacity = 1.0,
+
+            // 模糊与圆角
+            Blur = 1,
+            Win11CornerRadius = 0,
+
+            // 选项
+            AutoHideTitleBar = true,
+            ShowActionButtonMouseOver = true,
+            HideActionNameAfterIcon = false,
+            ShowActionIconShadow = false,
+            EnablePreview = true
+        };
+
+        // 半透风格
+        private static readonly Appearance PresetTranslucent = new Appearance
+        {
+            // 尺寸
+            ButtonSize = 72,
+            ButtonGap = 0,
+            BorderWidth = 0,
+            ButtonCornerRadius = 0,
+
+            // 颜色
+            BackgroundColor = "#60FFFFFF",
+            BorderColor = "#00FFFFFF",
+            ToolbarColor = "#1F999999",
+            ToolbarIconColor = "#FF666666",
+            ActionButtonColor = "#9DFFFFFF",
+            ActionButtonMouseOverColor = "#59B2F2FF",
+            BlankButtonColor = "#32C8C8C8",
+            BlankButtonMouseOverColor = "#05000000",
+            ButtonTextColor = "#FF000000",
+            ActionIconColor = "#FF696969",
+            TriggerKeyTextColor = "#D0FF8C00",
+            OtherIconColor = "#FF666666",
+
+            // 字体
+            Font1 = -1,
+            Font2 = -1,
+            FontSize = 12,
+            FontWeight = 4,
+
+            // 背景图片
+            BackgroundImagePath = "",
+            BackgroundImageOpacity = 1.0,
+
+            // 模糊与圆角
+            Blur = 1,
+            Win11CornerRadius = 0,
+
+            // 选项
+            AutoHideTitleBar = true,
+            ShowActionButtonMouseOver = true,
+            HideActionNameAfterIcon = false,
+            ShowActionIconShadow = false,
+            EnablePreview = true
+        };
+
+        // 深色风格
+        private static readonly Appearance PresetDark = new Appearance
+        {
+            // 尺寸
+            ButtonSize = 72,
+            ButtonGap = 0.5,
+            BorderWidth = 0,
+            ButtonCornerRadius = 0,
+
+            // 颜色
+            BackgroundColor = "#C5737373",
+            BorderColor = "#00FFFFFF",
+            ToolbarColor = "#00999999",
+            ToolbarIconColor = "#FF000000",
+            ActionButtonColor = "#31000000",
+            ActionButtonMouseOverColor = "#59D7D7D7",
+            BlankButtonColor = "#38000000",
+            BlankButtonMouseOverColor = "#05000000",
+            ButtonTextColor = "#FFFFFFFF",
+            ActionIconColor = "#FFF0F0F0",
+            TriggerKeyTextColor = "#D0FF8C00",
+            OtherIconColor = "#FF666666",
+
+            // 字体
+            Font1 = -1,
+            Font2 = -1,
+            FontSize = 12,
+            FontWeight = 4,
+
+            // 背景图片
+            BackgroundImagePath = "",
+            BackgroundImageOpacity = 1.0,
+
+            // 模糊与圆角
+            Blur = 1,
+            Win11CornerRadius = 0,
+
+            // 选项
+            AutoHideTitleBar = true,
+            ShowActionButtonMouseOver = true,
+            HideActionNameAfterIcon = false,
+            ShowActionIconShadow = false,
+            EnablePreview = true
+        };
+
+        // 深色半透风格
+        private static readonly Appearance PresetDarkTranslucent = new Appearance
+        {
+            // 尺寸
+            ButtonSize = 72,
+            ButtonGap = 0,
+            BorderWidth = 0,
+            ButtonCornerRadius = 0,
+
+            // 颜色
+            BackgroundColor = "#355E5E5E",
+            BorderColor = "#00FFFFFF",
+            ToolbarColor = "#29999999",
+            ToolbarIconColor = "#AA000000",
+            ActionButtonColor = "#31000000",
+            ActionButtonMouseOverColor = "#59D7D7D7",
+            BlankButtonColor = "#38000000",
+            BlankButtonMouseOverColor = "#05000000",
+            ButtonTextColor = "#FFFFFFFF",
+            ActionIconColor = "#FFF0F0F0",
+            TriggerKeyTextColor = "#D0FF8C00",
+            OtherIconColor = "#FF666666",
+
+            // 字体
+            Font1 = -1,
+            Font2 = -1,
+            FontSize = 12,
+            FontWeight = 4,
+
+            // 背景图片
+            BackgroundImagePath = "",
+            BackgroundImageOpacity = 1.0,
+
+            // 模糊与圆角
+            Blur = 0,
+            Win11CornerRadius = 0,
+
+            // 选项
+            AutoHideTitleBar = true,
+            ShowActionButtonMouseOver = true,
+            HideActionNameAfterIcon = false,
+            ShowActionIconShadow = false,
+            EnablePreview = true
+        };
     }
 }

@@ -189,9 +189,9 @@
         <Border x:Name="ViewBorder" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}" Background="{Binding BackgroundColor}" helpers:ClipHelper.ClipToBounds="True">
             <Grid x:Name="MainGrid">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="27"/>
+                    <RowDefinition Height="31"/>
                     <RowDefinition Height="{Binding ElementName=GlobalGrid, Path=ActualHeight}"/>
-                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="25.5"/>
                     <RowDefinition Height="{Binding ElementName=CommonGrid, Path=ActualHeight}"/>
                 </Grid.RowDefinitions>
                 <!-- 背景图片 -->
