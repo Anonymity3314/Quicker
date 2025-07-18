@@ -1,6 +1,6 @@
 ﻿using Quicker.Windows.ToolWindows;
+using Quicker.Database.Core;
 using System.Data.SQLite;
-using Quicker.Database;
 using Quicker.Windows;
 using Quicker.Models;
 using System.IO;
@@ -43,8 +43,11 @@ namespace Quicker.Managers
             {
                 switch (dbVersion)
                 {
-                    case "2.2.0":
+                    case "2.3.0":
                         return; // 数据库版本相同，无需更新
+                    case "2.2.0":
+                        UpdateFrom2_2_0To2_3_0(); // 数据库版本从2.2.0升级到2.3.0
+                        return;
                     case "2.1.3":
                         UpdateFrom2_1_3To2_2_0(); // 数据库版本从2.1.3升级到2.2.0
                         break;
@@ -98,6 +101,8 @@ namespace Quicker.Managers
         /// <summary>
         /// 检查数据库文件是否存在
         /// </summary>
+        /// <param name="dbFileName"> 数据库文件名 </param>
+        /// <returns> 是否存在数据库文件 </returns>
         private bool DatabaseExists(string dbFileName)
         {
             string dbFilePath = Path.Combine(DatabaseFolder, dbFileName); // 设置数据库文件路径
@@ -121,6 +126,13 @@ namespace Quicker.Managers
         /// </summary>
         /// <returns> 是否存在动作页面数据库 </returns>
         private bool ExistActionPageDatabase() => DatabaseExists("ActionPage.db");
+
+        // 数据库版本从2.2.0升级到2.3.0
+        private void UpdateFrom2_2_0To2_3_0()
+        {
+            SetCurrentVersion("2.3.0"); // 设置数据库版本为2.3.0
+            SettingDatabase.InitializeAppearance(); // 升级设置数据库
+        }
 
         // 数据库版本从2.1.3升级到2.2.0
         private void UpdateFrom2_1_3To2_2_0()
@@ -449,6 +461,8 @@ namespace Quicker.Managers
         /// <summary>
         /// 迁移文件到指定位置
         /// </summary>
+        /// <param name="fileName">文件名</param>
+        /// <param name="destinationPath">目标路径</param>
         public void MigrateFile(string fileName, string destinationPath)
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory; // 应用程序目录
@@ -477,6 +491,7 @@ namespace Quicker.Managers
         /// <summary>
         /// 重命名表格中的列名
         /// </summary>
+        /// <param name="tableName">表名</param>
         public void RenameColumn(string tableName)
         {
             using var connection = _db2.OpenConnection(); // 打开数据库连接

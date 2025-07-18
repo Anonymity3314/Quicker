@@ -1,16 +1,16 @@
-﻿using Quicker.Database;
-using Quicker.Helpers;
-using Quicker.Managers;
-using Quicker.Models;
+﻿using System.Windows.Controls.Primitives;
+using System.Windows.Media.Imaging;
 using Quicker.Windows.EditWindows;
-using Quicker.Windows.Menus;
 using Quicker.Windows.ToolWindows;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
+using Quicker.Database.Core;
+using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Quicker.Managers;
+using Quicker.Helpers;
+using Quicker.Models;
+using System.Windows;
 
 namespace Quicker.Windows.MainWindows
 {

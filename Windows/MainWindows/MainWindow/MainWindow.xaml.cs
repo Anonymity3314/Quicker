@@ -4,10 +4,10 @@ using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Managers;
-using Quicker.Database;
 using System.Windows;
 using Quicker.Models;
 using System.IO;
@@ -189,7 +189,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             int delta = e.Delta;
             int currentIndex = GetVisiblePageGridIndex(parent, gridType);
             int totalPages = db3.GetSceneData(gridType).FirstOrDefault()?.SceneCount ?? 1;
-            bool loop = Quicker.Database.SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
+            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
             int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;
             if (targetIndex < 0)
             {
@@ -357,7 +357,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             int totalPages = db3.GetSceneData(type).FirstOrDefault()?.SceneCount ?? 1;
             int targetIndex = currentIndex - 1;
-            bool loop = Quicker.Database.SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
+            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
             if (targetIndex < 0)
             {
                 if (loop)
@@ -387,7 +387,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             int totalPages = db3.GetSceneData(type).FirstOrDefault()?.SceneCount ?? 1;
             int targetIndex = currentIndex + 1;
-            bool loop = Quicker.Database.SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
+            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
             if (targetIndex >= totalPages)
             {
                 if (loop)
@@ -613,8 +613,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// </summary>
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            ActionInformationWindow actionInformationWindow = App.Current.Windows.OfType<ActionInformationWindow>().FirstOrDefault(); // 查找ActionInformationWindow
-            if (actionInformationWindow != null) // 如果存在ActionInformationWindow
+            ActionInfoWindow actionInfoWindow = App.Current.Windows.OfType<ActionInfoWindow>().FirstOrDefault(); // 查找ActionInfoWindow
+            if (actionInfoWindow != null) // 如果存在ActionInfoWindow
                 this.Activate(); // 激活窗口
             else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
             {

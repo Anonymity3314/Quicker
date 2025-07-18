@@ -1,9 +1,9 @@
 ﻿using Quicker.Windows.MainWindows;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using Quicker.Managers;
-using Quicker.Database;
 using System.Windows;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings

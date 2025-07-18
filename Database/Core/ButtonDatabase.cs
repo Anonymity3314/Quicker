@@ -5,7 +5,7 @@ using System.Text.Json;
 using Quicker.Models;
 using System.IO;
 
-namespace Quicker.Database
+namespace Quicker.Database.Core
 {
     public class ButtonDatabase
     {

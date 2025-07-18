@@ -4,11 +4,11 @@ using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Models.Settings;
 using Quicker.Windows.Menus;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
-using Quicker.Database;
 using System.Windows;
 using SharpHook;
 
@@ -50,7 +50,7 @@ namespace Quicker
         // 检查并升级数据库
         private void CheckAndUpdateDatabase()
         {
-            using var databaseUpdater = new DatabaseUpdateManager(); // 数据库更新管理器
+            using var databaseUpdater = new Managers.DatabaseUpdateManager(); // 数据库更新管理器
             databaseUpdater.CheckAndUpgradeDatabase(); // 检查并升级数据库
         }
 
@@ -98,7 +98,7 @@ namespace Quicker
         private void RestoreGlobalFontFamilyFromDatabase()
         {
             // 读取 Appearance 设置
-            var appearance = Quicker.Database.SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
             if (appearance == null)
             {
                 using var toast = new ToastManager();

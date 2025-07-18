@@ -1,8 +1,8 @@
 ﻿using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Diagnostics;
-using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;

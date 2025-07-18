@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 
 // SQLite数据库操作类
-namespace Quicker.Database
+namespace Quicker.Database.Core
 {
     public static class SettingDatabase
     {
@@ -84,7 +84,7 @@ namespace Quicker.Database
         // 数据库连接
         private const string db1 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
         private readonly static ButtonDatabase db2 = new(); // 按钮数据库
-        public const string currentVersion = "2.2.0"; // 当前版本号
+        public const string currentVersion = "2.3.0"; // 当前版本号
 
         static SettingDatabase()
         {
@@ -201,7 +201,7 @@ namespace Quicker.Database
         }
 
         // 初始化 Appearance 表
-        private static void InitializeAppearance()
+        public static void InitializeAppearance()
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var createAppearanceCommand = new SQLiteCommand(SQLStatements.CreateAppearanceTable, connection); // 创建 SQLiteCommand 对象

@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Quicker.Models.Settings;
-using Quicker.Database;
+using Quicker.Database.Core;
 using Quicker.Managers;
 using System.Windows;
 

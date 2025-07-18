@@ -1,11 +1,10 @@
-﻿using Quicker.Helpers;
-using Quicker.Managers;
-using Quicker.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
+using Quicker.Helpers;
+using Quicker.Models;
 using System.IO;
 
-namespace Quicker.Database
+namespace Quicker.Database.Core
 {
     public class ActionPageDatabase
     {

@@ -1,9 +1,9 @@
 ﻿using Quicker.Models.Settings;
 using System.Windows.Controls;
 using System.Threading.Tasks;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Diagnostics;
-using Quicker.Database;
 using System.Windows;
 
 namespace Quicker.Managers

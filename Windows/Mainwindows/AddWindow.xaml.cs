@@ -2,10 +2,10 @@
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
-using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using Quicker.Models;

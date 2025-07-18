@@ -4,9 +4,9 @@ using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Input;
-using Quicker.Database;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
@@ -222,9 +222,9 @@ namespace Quicker.Windows.Menus
         // 查看动作信息
         private void CheckImformation_Click(object sender, RoutedEventArgs e)
         {
-            ActionInformationWindow actionInformationWindow = new(ButtonID, TableName); // 创建动作信息窗口
+            ActionInfoWindow actionInfoWindow = new(ButtonID, TableName); // 创建动作信息窗口
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找主窗口
-            actionInformationWindow.ShowDialog(); // 显示动作信息窗口
+            actionInfoWindow.ShowDialog(); // 显示动作信息窗口
             this.Close(); // 关闭操作菜单窗口
         }
 

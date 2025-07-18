@@ -154,22 +154,30 @@ Quicker/
 ├─App.xaml                                            # 应用入口点
 ├─App.xaml.cs                                         # 应用入口点的代码后台
 ├─AssemblyInfo.cs                                     # 项目的属性和版本信息
-├─Converters/                                         # WPF XAML 绑定用的值转换器
+├─Converters/                                         # XAML 绑定用的值转换器
+│   ├─LighterColorConverter.cs                         # 亮色系转换器
+│   ├─SmartHoverColorConverter.cs                      # 智能悬停色转换器
 │   ├─FontWeightConverter.cs                           # 字体粗细与枚举转换器
-│   ├─ButtonScaleConverter.cs                          # 按钮缩放比例转换器
 │   ├─ButtonBackgroundConverter.cs                     # 按钮背景色转换器
 │   ├─GridWidthConverter.cs                            # 网格宽度计算转换器
 │   ├─GridHeightConverter.cs                           # 网格高度计算转换器
 │   ├─BorderHeightConverter.cs                         # 边框高度转换器
 │   ├─IntToCornerRadiusConverter.cs                    # int转圆角半径转换器
-│   ├─DoubleSubtractConverter.cs                       # double减法转换器
 │   ├─BlurEffectConverter.cs                           # 模糊效果转换器
 │   ├─PathToImageSourceConverter.cs                    # 路径转图片源转换器
 │   └─ThicknessConverter.cs                            # 边距厚度转换器
-├─Database/                                           # 数据库文件夹
-│   ├─ActionPageDatabase.cs                            # 动作页数据库
-│   ├─ButtonDatabase.cs                                # 按钮数据库
-│   └─SettingDatabase.cs                               # 设置数据库
+├─Database/                                           # 数据库相关
+│   ├─Core/                                            # 数据库核心操作
+│   │   ├─SettingDatabase.cs						    # 设置数据库
+│   │   ├─ButtonDatabase.cs							    # 按钮数据库
+│   │   └─ActionPageDatabase.cs						    # 动作页数据库
+│   └─Upgrade/                                         # 数据库升级相关
+│       ├─IDatabaseUpgradeStep.cs                       # 升级步骤接口
+│       ├─DatabaseUpdateManager.cs                      # 升级调度主类
+│       └─Steps/                                        # 各版本升级实现类（每个版本一个类，便于维护和扩展）
+│           ├─Upgrade_2_3_0.cs
+│           ├─Upgrade_2_2_0.cs
+│           └─...（每个版本一个类）
 ├─Extend/                                             # 扩展文件夹
 │   ├─IExtensionModule.cs                              # 实现扩展的接口
 │   └─ModuleLoader.cs                                  # 扩展模块加载器
@@ -290,50 +298,50 @@ Quicker/
 │       └─Tools/                                        # 工具控件文件夹
 ├─Windows/                                            # 界面文件夹
 │   ├─EditWindows/                                     # 编辑窗口文件夹
-│   │   ├─EditActionPageInfoWindow.xaml                #  编辑动作页信息窗口
+│   │   ├─EditActionPageInfoWindow.xaml                 # 编辑动作页信息窗口
 │   │   │   └─EditActionPageInfoWindow.xaml.cs
-│   │   └─EditSceneWindow.xaml                         #  编辑场景窗口
+│   │   └─EditSceneWindow.xaml                          # 编辑场景窗口
 │   │       └─EditSceneWindow.xaml.cs
-│   ├─MainWindows/                                     # 主窗口文件夹
-│   │   ├─ActionPageManageWindow.xaml                  #  动作页管理窗口
+│   ├─MainWindows/                                      # 主窗口文件夹
+│   │   ├─ActionPageManageWindow.xaml                    # 动作页管理窗口
 │   │   │   └─ActionPageManageWindow.xaml.cs
-│   │   ├─AddWindow.xaml                               #  添加动作窗口
+│   │   ├─AddWindow.xaml                                 # 添加动作窗口
 │   │   │   └─AddWindow.xaml.cs
-│   │   ├─FindAppsWindow.xaml                          #  查找应用窗口
+│   │   ├─FindAppsWindow.xaml                            # 查找应用窗口
 │   │   │   └─FindAppsWindow.xaml.cs
-│   │   ├─MainWindow/                                  #  主功能面板MVVM文件夹
-│   │   │   ├─MainWindow.xaml                          #   主面板
+│   │   ├─MainWindow/                                    # 主功能面板MVVM文件夹
+│   │   │   ├─MainWindow.xaml                             # 主面板
 │   │   │   │   └─MainWindow.xaml.cs
-│   │   │   └─MainWindowViewModel.cs                   #   主面板ViewModel
-│   │   ├─SelectImageWindow.xaml                       #  选择图片窗口
+│   │   │   └─MainWindowViewModel.cs                      # 主面板ViewModel
+│   │   ├─SelectImageWindow.xaml                         # 选择图片窗口
 │   │   │   └─SelectImageWindow.xaml.cs
-│   │   ├─SettingWindow.xaml                           #  设置窗口
+│   │   ├─SettingWindow.xaml                             #  设置窗口
 │   │   │   └─SettingWindow.xaml.cs
-│   │   └─UpdateWindow.xaml                            #  更新窗口
+│   │   └─UpdateWindow.xaml                              #  更新窗口
 │   │       └─UpdateWindow.xaml.cs
 │   ├─Menus/                                           # 菜单文件夹
-│   │   ├─CreatActionMenu.xaml                         #  创建动作菜单
+│   │   ├─CreatActionMenu.xaml                          # 创建动作菜单
 │   │   │   └─CreatActionMenu.xaml.cs
-│   │   ├─CustomMenu.xaml                              #  自定义菜单
+│   │   ├─CustomMenu.xaml                               # 自定义菜单
 │   │   │   └─CustomMenu.xaml.cs
-│   │   ├─OperationMenu.xaml                           #  操作菜单
+│   │   ├─OperationMenu.xaml                            # 操作菜单
 │   │   │   └─OperationMenu.xaml.cs
-│   │   └─SelectActionPageMenu.xaml                    #  选择动作页菜单
+│   │   └─SelectActionPageMenu.xaml                     # 选择动作页菜单
 │   │       └─SelectActionPageMenu.xaml.cs
 │   └─ToolWindows/                                     # 工具窗口文件夹
-│       ├─ActionInformationWindow.xaml                 #  动作信息窗口
-│       │   └─ActionInformationWindow.xaml.cs
-│       ├─DownloadWindow.xaml                          #  下载窗口
+│       ├─ActionInfoWindow.xaml							# 动作信息窗口
+│       │   └─ActionInfoWindow.xaml.cs
+│       ├─DownloadWindow.xaml                           # 下载窗口
 │       │   └─DownloadWindow.xaml.cs
-│       ├─ImageCropWindow.xaml                         #  图片裁剪窗口
+│       ├─ImageCropWindow.xaml                          # 图片裁剪窗口
 │       │   └─ImageCropWindow.xaml.cs
-│       ├─LoadingWindow.xaml                           #  加载窗口
+│       ├─LoadingWindow.xaml                            # 加载窗口
 │       │   └─LoadingWindow.xaml.cs
-│       ├─MessageWindow.xaml                           #  消息窗口
+│       ├─MessageWindow.xaml                            # 消息窗口
 │       │   └─MessageWindow.xaml.cs
-│       ├─SelectWindowWindow.xaml                      #  选择窗口
+│       ├─SelectWindowWindow.xaml                       # 选择窗口
 │       │   └─SelectWindowWindow.xaml.cs
-│       └─ToastWindow.xaml                             #  Toast提示窗口
+│       └─ToastWindow.xaml                              # Toast提示窗口
 │           └─ToastWindow.xaml.cs
 ```
 

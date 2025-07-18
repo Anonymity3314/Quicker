@@ -1,5 +1,5 @@
 ﻿using Quicker.Windows.MainWindows;
-using Quicker.Database;
+using Quicker.Database.Core;
 using System.Windows;
 using Quicker.Models;
 

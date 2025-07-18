@@ -2,10 +2,10 @@
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
 using System.Windows.Input;
-using Quicker.Database;
 using Quicker.Windows;
 using System.Windows;
 using Quicker.Models;

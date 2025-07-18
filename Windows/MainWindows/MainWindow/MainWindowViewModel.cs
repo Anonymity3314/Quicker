@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
+using Quicker.Database.Core;
 using System.Windows.Media;
-using Quicker.Database;
 using System.Windows;
 
 namespace Quicker.Windows.MainWindows.MainWindow

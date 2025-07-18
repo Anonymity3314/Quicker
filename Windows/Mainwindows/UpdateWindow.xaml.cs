@@ -1,10 +1,10 @@
 ﻿using Quicker.Windows.ToolWindows;
 using static AppUpdateManager;
 using Quicker.Windows.Menus;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Forms;
 using Quicker.Managers;
-using Quicker.Database;
 using System.Windows;
 using System.IO;
 

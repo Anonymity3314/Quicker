@@ -1,19 +1,19 @@
 ﻿using System.Windows.Media.Imaging;
 using System.Windows.Controls;
-using Quicker.Database;
+using Quicker.Database.Core;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
 
 namespace Quicker.Windows.ToolWindows
 {
-    public partial class ActionInformationWindow : Window
+    public partial class ActionInfoWindow : Window
     {
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public int ButtonID { get; private set; } // 当前按钮ID
         public string TableName { get; private set; } // 表名
 
-        public ActionInformationWindow(int buttonID, string tableName)
+        public ActionInfoWindow(int buttonID, string tableName)
         {
             InitializeComponent();
             ButtonID = buttonID; // 设置当前按钮ID
