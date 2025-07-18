@@ -16,10 +16,10 @@ namespace Quicker.Windows.MainWindows.MainWindow
 {
     public partial class MainWindow : Window
     {
-        private readonly SolidColorBrush SelectedBrush =
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA1A1A1")); // 选中页面按钮颜色
-        private readonly SolidColorBrush UnSelectedBrush =
-            new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD3D3D3")); // 未选中页面按钮颜色
+        private SolidColorBrush SelectedBrush =>
+            (this.DataContext as MainWindowViewModel)?.SelectedBrush ?? new SolidColorBrush(Colors.Transparent);
+        private SolidColorBrush UnSelectedBrush =>
+            (this.DataContext as MainWindowViewModel)?.UnSelectedBrush ?? new SolidColorBrush(Colors.Transparent);
 
         private readonly CancellationTokenSource cancellationTokenSource = new(); // 取消后台任务的令牌源
         public readonly ButtonManager buttonManager = new(); // 按钮管理器
@@ -105,18 +105,23 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 生成页面切换 Button
         private void GenerateButtons()
         {
+            // 切换通用动作页时清空
             GlobalButtonPanel.Children.Clear(); // 清空全局动作页切换按钮
             CommonButtonPanel.Children.Clear(); // 清空通用动作页切换按钮
             var globalSceneData = db3.GetSceneData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
             var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
-            GeneratePageButtons("Global", globalSceneData.SceneCount, GlobalPageChangeButton_Click, GlobalActionPageChangeButton_MouseEnter, GlobalActionPageChangeButton_MouseLeave, GlobalButtonPanel);
-            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, CommonPageChangeButton_Click, CommonActionPageChangeButton_MouseEnter, CommonActionPageChangeButton_MouseLeave, CommonButtonPanel);
+            GeneratePageButtons("Global", globalSceneData.SceneCount, GlobalPageChangeButton_Click, GlobalButtonPanel);
+            GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, CommonPageChangeButton_Click, CommonButtonPanel);
         }
 
         /// <summary>
         /// 生成页面切换按钮
         /// </summary>
-        private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, MouseEventHandler mouseEnterHandler, MouseEventHandler mouseLeaveHandler, Panel panel)
+        /// <param name="prefix"> 前缀 </param>
+        /// <param name="totalPages"> 总页数 </param>
+        /// <param name="clickHandler"> 点击事件 </param>
+        /// <param name="panel"> 按钮容器 </param>
+        private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, Panel panel)
         {
             if (totalPages == 1) return;
             for (int i = 0; i < totalPages; i++)
@@ -128,8 +133,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 };
                 if (i == 0) button.Background = SelectedBrush;
                 button.Click += clickHandler;
-                button.MouseEnter += mouseEnterHandler;
-                button.MouseLeave += mouseLeaveHandler;
                 panel.Children.Add(button);
             }
         }
@@ -220,30 +223,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
         private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             Grid_MouseWheel(sender, e, CommonGrid, CommonStyle, 4, 4, CommonButtonPanel);
-        }
-
-        // 页面切换按钮鼠标进入/离开事件（可根据需要自定义变色逻辑）
-        private void GlobalActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (sender is Button button)
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB9B9B9"));
-        }
-        private void GlobalActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            int idx = GetVisiblePageGridIndex(GlobalGrid, "Global");
-            if (sender is Button button)
-                button.Background = button.Name == $"Global{idx}" ? SelectedBrush : UnSelectedBrush;
-        }
-        private void CommonActionPageChangeButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (sender is Button button)
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFB9B9B9"));
-        }
-        private void CommonActionPageChangeButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            int idx = GetVisiblePageGridIndex(CommonGrid, CommonStyle);
-            if (sender is Button button)
-                button.Background = button.Name == $"{CommonStyle}{idx}" ? SelectedBrush : UnSelectedBrush;
         }
 
         // 左键点击按钮时执行动作
@@ -726,15 +705,11 @@ namespace Quicker.Windows.MainWindows.MainWindow
             foreach (Button button in GlobalButtonPanel.Children.OfType<Button>()) // 清理全局按钮面板事件
             {
                 button.Click -= GlobalPageChangeButton_Click; // 全局页面切换按钮点击
-                button.MouseEnter -= GlobalActionPageChangeButton_MouseEnter; // 全局动作页鼠标移入事件
-                button.MouseLeave -= GlobalActionPageChangeButton_MouseLeave; // 全局动作页鼠标移出事件
             }
 
             foreach (Button button in CommonButtonPanel.Children.OfType<Button>()) // 清理公共按钮面板事件
             {
                 button.Click -= CommonPageChangeButton_Click; // 通用页面切换按钮点击
-                button.MouseEnter -= CommonActionPageChangeButton_MouseEnter; // 通用动作页鼠标移入事件
-                button.MouseLeave -= CommonActionPageChangeButton_MouseLeave; // 通用动作页鼠标移出事件
             }
         }
 
@@ -748,29 +723,33 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="cols">列数</param>
         private Grid GeneratePageGrid(Panel parent, string gridType, int pageIndex, int rows, int cols)
         {
-            // 1. 创建Grid
+            // 创建Grid
             var grid = new Grid
             {
                 Name = $"{gridType}{pageIndex}"
             };
 
-            // 2. 定义行列（含间隔）
+            // 定义行列（含间隔）
             for (int i = 0; i < rows * 2 - 1; i++)
             {
                 grid.RowDefinitions.Add(new RowDefinition
                 {
-                    Height = (i % 2 == 0) ? new GridLength(1, GridUnitType.Auto) : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
+                    Height = (i % 2 == 0)
+                    ? new GridLength(1, GridUnitType.Auto)
+                    : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
                 });
             }
             for (int j = 0; j < cols * 2 - 1; j++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
-                    Width = (j % 2 == 0) ? new GridLength(1, GridUnitType.Auto) : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
+                    Width = (j % 2 == 0)
+                    ? new GridLength(1, GridUnitType.Auto)
+                    : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
                 });
             }
 
-            // 3. 生成按钮
+            // 生成按钮
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
@@ -803,9 +782,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 }
             }
 
-            // 4. 添加到父容器
+            // 添加到父容器
             parent.Children.Add(grid);
-
             return grid;
         }
 
@@ -836,14 +814,12 @@ namespace Quicker.Windows.MainWindows.MainWindow
             if (sender is Button btn)
             {
                 var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
-                if (btn.Tag != null)
+                if (btn.Tag != null) // 有数据的按钮，执行放大动画
                 {
-                    // 有数据的按钮，执行放大动画
                     AnimateButtonScale(btn, appearance);
                 }
-                else
+                else // 空按钮，显示添加图片
                 {
-                    // 空按钮，显示添加图片
                     var conventions = SettingDatabase.GetAllConventions().FirstOrDefault();
                     ShowAddImageOnButton(btn, appearance, conventions);
                 }
@@ -881,7 +857,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         private void ShowAddImageOnButton(Button btn, dynamic appearance, dynamic conventions)
         {
             if (conventions == null || !conventions.ShowAddImage) return;
-            double btnSize = appearance?.ButtonSize ?? 48; // 默认48
+            double btnSize = appearance.ButtonSize;
             double imageSize = btnSize / 2.0;
             btn.Content = new Image
             {
@@ -901,15 +877,13 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             if (sender is Button btn)
             {
-                if (btn.Tag != null)
+                if (btn.Tag != null) // 有数据的按钮，还原缩放动画
                 {
-                    // 有数据的按钮，还原缩放动画
                     RestoreButtonScale(btn);
                 }
-                else
+                else // 空按钮，移除图片
                 {
-                    // 空按钮，移除图片
-                    RemoveAddImageOnButton(btn);
+                    btn.Content = null;
                 }
             }
         }
@@ -932,15 +906,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
                 }
             }
-        }
-
-        /// <summary>
-        /// 移除无Tag按钮上的添加图片。
-        /// </summary>
-        /// <param name="btn">目标按钮</param>
-        private void RemoveAddImageOnButton(Button btn)
-        {
-            btn.Content = null;
         }
 
         // 辅助方法：查找Button模板里的Border

@@ -8,16 +8,14 @@ using System.Windows.Threading;
 using Quicker.Models.Settings;
 using System.Windows.Controls;
 using System.ComponentModel;
+using System.Windows.Input;
 using System.Windows.Media;
-using System.Globalization;
 using SixLabors.ImageSharp;
-using System.Windows.Data;
 using Quicker.Database;
 using Quicker.Managers;
 using System.Text.Json;
 using Quicker.Helpers;
 using System.Windows;
-using Quicker.Models;
 using System.IO;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
@@ -374,8 +372,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 : ActionButtonMouseOverColorButton.Background; // 绑定颜色选择
 
             // 判断是否需要放大按钮
-            if (ShowActionButtonMouseOverCheckBox != null &&
-                ShowActionButtonMouseOverCheckBox.IsChecked == true &&
+            if (ShowActionButtonMouseOverCheckBox.IsChecked == true &&
                 btn.Tag != null)
             {
                 btn.RenderTransformOrigin = new Point(0.5, 0.5); // 设置缩放中心为按钮中心
@@ -392,7 +389,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 : ActionButtonColorButton.Background; // 绑定颜色选择
 
             // 判断是否需要还原按钮大小
-            if (ShowActionButtonMouseOverCheckBox != null && ShowActionButtonMouseOverCheckBox.IsChecked == true)
+            if (ShowActionButtonMouseOverCheckBox.IsChecked == true)
             {
                 btn.RenderTransform = null; // 还原为默认大小
             }

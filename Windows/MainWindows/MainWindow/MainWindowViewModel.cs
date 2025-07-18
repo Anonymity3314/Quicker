@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows.Media;
 using Quicker.Database;
 using System.Windows;
 
@@ -213,7 +214,40 @@ namespace Quicker.Windows.MainWindows.MainWindow
         public string ToolbarIconColor
         {
             get => _toolbarIconColor;
-            set { _toolbarIconColor = value; OnPropertyChanged(nameof(ToolbarIconColor)); }
+            set { _toolbarIconColor = value; OnPropertyChanged(nameof(ToolbarIconColor)); OnPropertyChanged(nameof(SelectedBrush)); OnPropertyChanged(nameof(UnSelectedBrush)); }
+        }
+
+        /// <summary>
+        /// 选中页面按钮颜色（动态绑定 ToolbarIconColor）
+        /// </summary>
+        public SolidColorBrush SelectedBrush =>
+            string.IsNullOrEmpty(ToolbarIconColor)
+                ? new SolidColorBrush(Colors.Transparent)
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString(ToolbarIconColor));
+
+        /// <summary>
+        /// 未选中页面按钮颜色（动态绑定 ToolbarIconColor 的浅色）
+        /// </summary>
+        public SolidColorBrush UnSelectedBrush
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ToolbarColor))
+                    return new SolidColorBrush(Colors.Transparent);
+                try
+                {
+                    var color = (Color)ColorConverter.ConvertFromString(ToolbarColor);
+                    double factor = 0.8;
+                    byte r = (byte)(color.R * factor);
+                    byte g = (byte)(color.G * factor);
+                    byte b = (byte)(color.B * factor);
+                    return new SolidColorBrush(Color.FromArgb(color.A, r, g, b));
+                }
+                catch
+                {
+                    return new SolidColorBrush(Colors.Transparent);
+                }
+            }
         }
 
         /// <summary>

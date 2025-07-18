@@ -4,7 +4,12 @@
     xmlns:styles="clr-namespace:Quicker.Resources.Styles"
     xmlns:local="clr-namespace:Quicker.Resources.Styles"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:conv="clr-namespace:Quicker.Converters"
 >
+    <!-- 颜色转换器 -->
+    <conv:LighterColorConverter x:Key="LighterColorConverter" Factor="1.2"/>
+    <conv:DarkerColorConverter x:Key="DarkerColorConverter" Factor="0.9"/>
+
     <!-- MainWindow -->
     <!-- 标题栏Button -->
     <Style x:Key="Task" TargetType="Button">
@@ -23,7 +28,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{Binding (styles:ParentBackgroundHelper.ParentBackground), RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter TargetName="border" Property="Background" Value="{Binding DataContext.ToolbarColor, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource DarkerColorConverter}}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -33,7 +38,7 @@
 
     <!-- 切换动作页面的按钮 -->
     <Style x:Key="ActionPageChangeButton" TargetType="Button">
-        <Setter Property="Background" Value="#FFD3D3D3"/>
+        <Setter Property="Background" Value="{Binding ToolbarColor, Converter={StaticResource DarkerColorConverter}}"/>
         <Setter Property="Margin" Value="2.5,0"/>
         <Setter Property="Height" Value="6"/>
         <Setter Property="Width" Value="6"/>
@@ -43,6 +48,11 @@
                     <Border x:Name="border" Background="{TemplateBinding Background}" BorderThickness="0" CornerRadius="3">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{Binding ToolbarIconColor, Converter={StaticResource LighterColorConverter}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
