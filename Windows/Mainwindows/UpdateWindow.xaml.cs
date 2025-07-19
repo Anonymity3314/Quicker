@@ -51,9 +51,25 @@ namespace Quicker.Windows.MainWindows
             Close(); // 关闭窗口
         }
 
-        // 下载不内置.NET框架的版本
+        // 下载按钮点击事件 - 显示下载选项Popup
         private void DownloadButton_Click(object sender, RoutedEventArgs e)
         {
+            // 检查是否有可用的下载地址
+            bool hasNormalDownload = !string.IsNullOrWhiteSpace(_downloadUrl);
+            bool hasNetDownload = !string.IsNullOrWhiteSpace(_downloadUrlWithNet);
+
+            // 更新按钮状态
+            NormalDownloadButton.IsEnabled = hasNormalDownload;
+            NetDownloadButton.IsEnabled = hasNetDownload;
+
+            // 显示Popup
+            DownloadPopup.IsOpen = true;
+        }
+
+        // 普通版本下载按钮点击事件
+        private void NormalDownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadPopup.IsOpen = false; // 关闭Popup
             if (string.IsNullOrWhiteSpace(_downloadUrl))
             {
                 using var toast = new ToastManager(); // 创建Toast提示
@@ -68,9 +84,10 @@ namespace Quicker.Windows.MainWindows
             downloadWindow.Show(); // 显示下载窗口
         }
 
-        // 下载内置.NET框架的版本
-        private void DownloadWithFrameButton_Click(object sender, RoutedEventArgs e)
+        // 内置.NET框架版本下载按钮点击事件
+        private void NetDownloadButton_Click(object sender, RoutedEventArgs e)
         {
+            DownloadPopup.IsOpen = false; // 关闭Popup
             if (string.IsNullOrWhiteSpace(_downloadUrlWithNet))
             {
                 using var toast = new ToastManager(); // 创建Toast提示
@@ -83,6 +100,12 @@ namespace Quicker.Windows.MainWindows
 
             var downloadWindow = DownloadWindow.Create(_downloadUrlWithNet, destinationPath); // 创建下载窗口
             downloadWindow.Show(); // 显示下载窗口
+        }
+
+        // 取消下载按钮点击事件
+        private void CancelDownloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadPopup.IsOpen = false; // 关闭Popup
         }
 
         // 前往下载地址查看详细信息
@@ -154,7 +177,6 @@ namespace Quicker.Windows.MainWindows
             LatestVersionTextBlock1.Text = SettingDatabase.currentVersion; // 显示当前版本号
             LatestVersionTextBlock1.FontWeight = FontWeights.Normal; // 设置字体粗细
             DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
-            DownloadWithFrameButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
             TitleTextBlock.Text = "暂无新版本。"; // 更新标题文本
             LineRectangle.Width = 350; // 调整分界线宽度
             
@@ -174,22 +196,12 @@ namespace Quicker.Windows.MainWindows
             _downloadUrlWithNet = updateInfo.DownloadUrlWithNet; // 保存下载地址
             string newVersion = updateInfo.Version; // 获取最新版本号
             
-            // 计算更新内容的行数并调整UI
-            int changelogLineCount = updateInfo.Changelog.Count(c => c == '~');
-            
             // 更新UI显示
             LatestVersionTextBlock1.Text = newVersion; // 显示最新版本号
-            LatestVersionTextBlock2.Text = newVersion; // 显示最新版本号
             VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
-            UpdateDateTextBlock.Text = updateInfo.ReleaseDate; // 显示更新日期
-            UpdateInfoTextBlock.Text = updateInfo.Changelog; // 显示更新内容
             
             // 检查下载地址可用性并更新按钮状态
             UpdateDownloadButtonsState();
-            
-            // 调整UI元素高度
-            UpdateInfoGrid.Height += changelogLineCount * 18; // 设置更新内容的高度
-            UpdateInfoBorder.Height += changelogLineCount * 18; // 设置更新内容的高度
         }
 
         /// <summary>
@@ -197,22 +209,13 @@ namespace Quicker.Windows.MainWindows
         /// </summary>
         private void UpdateDownloadButtonsState()
         {
-            // 检查普通版本下载地址
+            // 检查是否有可用的下载地址
             bool hasNormalDownload = !string.IsNullOrWhiteSpace(_downloadUrl);
-            DownloadButton.IsEnabled = hasNormalDownload;
-            DownloadButton.ToolTip = hasNormalDownload ? "下载普通版本" : "暂无该版本下载方式";
-
-            // 检查内置.NET运行时版本下载地址
             bool hasNetDownload = !string.IsNullOrWhiteSpace(_downloadUrlWithNet);
-            DownloadWithFrameButton.IsEnabled = hasNetDownload;
-            DownloadWithFrameButton.ToolTip = hasNetDownload ? "下载内置.NET运行时版本" : "暂无该版本下载方式";
+            bool hasAnyDownload = hasNormalDownload || hasNetDownload; // 是否有任何下载地址
 
-            // 如果两个下载地址都不可用，显示提示
-            if (!hasNormalDownload && !hasNetDownload)
-            {
-                using var toast = new ToastManager(); // 创建Toast提示
-                toast.Show("该版本暂无下载方式，请稍后再试！", "Common"); // 显示Toast提示
-            }
+            // 更新主下载按钮状态
+            DownloadButton.IsEnabled = hasAnyDownload;
         }
 
         /// <summary>
@@ -220,28 +223,39 @@ namespace Quicker.Windows.MainWindows
         /// </summary>
         private void LoadVersionHistory()
         {
-            var versionHistory = _updateManager.GetVersionHistory(5); // 获取最近5个版本
-            if (versionHistory.Count > 0)
+            var allVersions = _updateManager.GetVersionHistory(); // 获取所有版本
+            if (allVersions.Count > 0)
             {
-                // 这里可以添加版本历史记录的显示逻辑
-                // 比如在UI中添加一个版本历史列表
-                DisplayVersionHistory(versionHistory);
-            }
-        }
+                // 获取当前版本和最新版本
+                var currentVersion = new Version(SettingDatabase.currentVersion);
+                var latestVersion = allVersions.FirstOrDefault(v => v.IsLatest);
+                if (latestVersion != null)
+                {
+                    // 筛选当前版本到最新版本之间的版本（不包含当前版本，只显示更新的版本）
+                    var relevantVersions = allVersions.Where(v => 
+                    {
+                        if (Version.TryParse(v.Version, out Version version))
+                        {
+                            return version > currentVersion; // 只显示比当前版本更新的版本
+                        }
+                        return false;
+                    }).OrderByDescending(v => v.Version).ToList();
 
-        /// <summary>
-        /// 显示版本历史记录
-        /// </summary>
-        /// <param name="versions">版本列表</param>
-        private void DisplayVersionHistory(List<UpdateInfo> versions)
-        {
-            // 这里可以实现版本历史记录的UI显示
-            // 可以根据需要添加版本历史列表控件
-            // 暂时只记录到控制台
-            System.Diagnostics.Debug.WriteLine($"版本历史记录：");
-            foreach (var version in versions)
-            {
-                System.Diagnostics.Debug.WriteLine($"版本：{version.Version}，发布日期：{version.ReleaseDate}");
+                    // 为每个版本添加LatestVersionText属性
+                    var versionHistoryWithText = relevantVersions.Select(v => new
+                    {
+                        v.Version,
+                        v.DownloadUrl,
+                        v.DownloadUrlWithNet,
+                        v.Changelog,
+                        v.ReleaseDate,
+                        v.IsLatest,
+                        LatestVersionText = v.IsLatest ? "最新版本" : ""
+                    }).ToList();
+
+                    // 设置版本历史列表的数据源
+                    VersionHistoryItemsControl.ItemsSource = versionHistoryWithText;
+                }
             }
         }
 
@@ -272,10 +286,10 @@ namespace Quicker.Windows.MainWindows
             // 清理UI元素引用
             VersionTextBlock.Text = null;
             LatestVersionTextBlock1.Text = null;
-            LatestVersionTextBlock2.Text = null;
             VersionChangeTextBlock.Text = null;
-            UpdateDateTextBlock.Text = null;
-            UpdateInfoTextBlock.Text = null;
+            
+            // 清理版本历史列表
+            VersionHistoryItemsControl.ItemsSource = null;
 
             // 清理数据绑定
             Content = null;

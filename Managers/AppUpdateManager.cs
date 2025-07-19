@@ -1,10 +1,9 @@
 ﻿using Quicker.Database.Core;
 using Quicker.Managers;
-using Quicker.Helpers;
 using System.Text.Json;
+using Quicker.Helpers;
 using System.Net;
 using System.IO;
-using Quicker;
 
 public class AppUpdateManager : IDisposable
 {

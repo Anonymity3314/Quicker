@@ -218,11 +218,11 @@
                     </Button>
                     <Popup x:Name="TitlePop" PopupAnimation="Fade" Width="180" Height="95" PlacementTarget="{Binding ElementName=ActionPageManager}" AllowsTransparency="True" StaysOpen="False">
                         <Grid>
-                            <Rectangle Fill="White" Margin="3,5">
-                                <Rectangle.Effect>
+                            <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                                <Border.Effect>
                                     <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="8" RenderingBias="Quality" ShadowDepth="1"/>
-                                </Rectangle.Effect>
-                            </Rectangle>
+                                </Border.Effect>
+                            </Border>
                             <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
                                 <StackPanel Background="{x:Null}">
                                     <Button Style="{StaticResource MenuButton}" ToolTip="为应用程序创建场景设置，管理动作页" Margin="0,3,0,0" Click="OpenActionPageManageWindow">

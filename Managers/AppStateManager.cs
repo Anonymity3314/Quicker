@@ -7,7 +7,7 @@ using Quicker.Database.Core;
 using Quicker.Managers;
 using System.Windows;
 
-namespace Quicker
+namespace Quicker.Managers
 {
     public static class AppStateManager
     {
