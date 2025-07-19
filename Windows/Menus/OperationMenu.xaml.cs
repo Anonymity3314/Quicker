@@ -67,13 +67,8 @@ namespace Quicker.Windows.Menus
             // 获取按钮的绝对位置
             Point otherFunctionPoint = OtherFunction.TransformToAncestor(this).Transform(new Point(0, 0));
             Point exportActionPoint = ExportAction.TransformToAncestor(this).Transform(new Point(0, 0));
-            Point copyActionInfoPoint = CopyActionInfo.TransformToAncestor(this).Transform(new Point(0, 0));
-            Point checkImformationPoint = CheckImformation.TransformToAncestor(this).Transform(new Point(0, 0));
-            
-            // 设置 FirstChildGrid 的边距，使其与 OtherFunction 按钮对齐
-            FirstChildGrid.Margin = new Thickness(0, otherFunctionPoint.Y - exportActionPoint.Y - 2, 0, 0);
-            // 设置 SecondChildGrid 的边距，使其与 CopyActionInfo 按钮对齐
-            SecondChildGrid.Margin = new Thickness(130, copyActionInfoPoint.Y - checkImformationPoint.Y + 65, 0, 0);
+            double deltaY = otherFunctionPoint.Y - exportActionPoint.Y;
+            ChiildGrid.Margin = new Thickness(219, 147 + deltaY, 0, 0); // 设置子菜单位置
         }
 
         // 初始化菜单
