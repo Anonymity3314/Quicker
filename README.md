@@ -168,22 +168,22 @@ Quicker/
 │   └─ThicknessConverter.cs                            # 边距厚度转换器
 ├─Database/                                           # 数据库相关
 │   ├─Core/                                            # 数据库核心操作
-│   │   ├─SettingDatabase.cs						    # 设置数据库
-│   │   ├─ButtonDatabase.cs							    # 按钮数据库
-│   │   └─ActionPageDatabase.cs						    # 动作页数据库
+│   │   ├─SettingDatabase.cs						    # 设置数据库，管理应用配置和设置信息
+│   │   ├─ButtonDatabase.cs							    # 按钮数据库，管理动作按钮的数据存储
+│   │   └─ActionPageDatabase.cs						    # 动作页数据库，管理动作页和场景数据
 │   └─Upgrade/                                         # 数据库升级相关
-│       ├─IDatabaseUpgradeStep.cs                       # 升级步骤接口
-│       ├─DatabaseUpdateManager.cs                      # 升级调度主类
-│       └─Steps/                                        # 各版本升级实现类（每个版本一个类，便于维护和扩展）
-│           ├─Upgrade_2_3_0.cs
-│           ├─Upgrade_2_2_0.cs
-│           └─...（每个版本一个类）
+│       ├─IDatabaseUpgradeStep.cs                       # 升级步骤接口，定义数据库升级的标准接口
+│       ├─DatabaseUpdateManager.cs                      # 升级调度主类，负责数据库版本检查和升级流程管理
+│       └─Versions/                                     # 各版本升级实现类（每个版本一个类，便于维护和扩展）
+│           ├─Upgrade_2_2_0.cs                          # 2.1.3到2.2.0版本升级实现
+│           └─Upgrade_2_3_0.cs                          # 2.2.0到2.3.0版本升级实现
 ├─Extend/                                             # 扩展文件夹
 │   ├─IExtensionModule.cs                              # 实现扩展的接口
 │   └─ModuleLoader.cs                                  # 扩展模块加载器
 ├─Helpers/                                            # 通用辅助类/附加属性
-│   ├─ClipHelper.cs                                    # UI裁剪附加属性
-│   └─DataSizeHelper.cs                                # 数据大小换算工具类
+│   ├─ClipHelper.cs                                    # UI裁剪附加属性，用于为按钮和边框设置自定义裁剪（圆角）
+│   ├─DataSizeHelper.cs                                # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换
+│   └─VersionHelper.cs                                 # 版本号比较工具类，用于版本号比较和检查更新
 ├─InfoData/                                           # 信息数据文件夹
 │   ├─Extensions.json                                  # 扩展信息
 │   ├─UpdateHistory.txt                                # 更新历史
@@ -214,6 +214,8 @@ Quicker/
 │   ├─Settings.Designer.cs                             # 自动生成的设置代码
 │   ├─Settings.settings                                # 应用程序设置
 │   └─PublishProfiles/                                 # 发布配置文件夹
+│       ├─FolderProfile.pubxml                          # 文件夹发布配置文件
+│       └─FolderProfile.pubxml.user                     # 文件夹发布配置用户文件
 ├─Quicker.csproj                                      # 项目的核心配置文件
 ├─Quicker.csproj.user                                 # 项目用户配置文件
 ├─Quicker.ico                                         # 应用图标
