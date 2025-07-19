@@ -2,6 +2,7 @@
 using Hardcodet.Wpf.TaskbarNotification;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
+using Quicker.Database.Upgrade;
 using Quicker.Models.Settings;
 using Quicker.Windows.Menus;
 using Quicker.Database.Core;
@@ -50,7 +51,7 @@ namespace Quicker
         // 检查并升级数据库
         private void CheckAndUpdateDatabase()
         {
-            using var databaseUpdater = new Managers.DatabaseUpdateManager(); // 数据库更新管理器
+            using var databaseUpdater = new DatabaseUpdateManager(); // 数据库更新管理器
             databaseUpdater.CheckAndUpgradeDatabase(); // 检查并升级数据库
         }
 

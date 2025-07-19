@@ -1,14 +1,90 @@
-﻿using Quicker.Database.Upgrade;
+﻿using Quicker.Database.Upgrade.Versions;
+using Quicker.Windows.ToolWindows;
+using Quicker.Database.Upgrade;
 using Quicker.Database.Core;
+using System.Data.SQLite;
+using System.Reflection;
+using Quicker.Managers;
 
 namespace Quicker.Database.Upgrade
 {
-    internal class DatabaseUpdateManager :IDisposable
+    public class DatabaseUpdateManager :IDisposable
     {
-        private readonly string _newBasePath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 新图片文件夹路径
-        private const string DatabaseFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 数据库文件夹路径
-        private readonly ButtonDatabase _db2 = new(); // 按钮数据库对象
+        public string NewBasePath => @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 新图片文件夹路径
+        public const string DatabaseFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 数据库文件夹路径
+        private List<IDatabaseUpgradeStep> _upgradeSteps; // 升级步骤列表
+        public readonly ButtonDatabase _db2 = new(); // 按钮数据库对象
         private bool _disposed = false; // 标记是否已释放资源
+
+        public DatabaseUpdateManager()
+        {
+            _upgradeSteps = new List<IDatabaseUpgradeStep>
+            {
+                new Upgrade_2_1_0(),
+                new Upgrade_2_1_1(),
+                new Upgrade_2_1_2(),
+                new Upgrade_2_1_3(),
+                new Upgrade_2_2_0(),
+                new Upgrade_2_3_0()
+            }; // 升级步骤列表
+        }
+
+        // 检查并升级数据库
+        public void CheckAndUpgradeDatabase()
+        {
+            string currentVersion = GetCurrentVersion(); // 获取当前数据库版本号
+            if (currentVersion == SettingDatabase.currentVersion) return; // 如果版本相同，无需更新
+            LoadingWindow loadingWindow = new(); // 创建加载窗口
+            loadingWindow.Show(); // 显示加载窗口
+            try
+            {
+                while (true)
+                {
+                    var step = _upgradeSteps.FirstOrDefault(s => s.FromVersion == currentVersion);
+                    if (step == null) break;
+                    using (var conn = SettingDatabase.OpenConnection())
+                    {
+                        step.Upgrade(conn, this);
+                    }
+                    SetCurrentVersion(step.ToVersion);
+                    currentVersion = step.ToVersion;
+                }
+            }
+            catch
+            {
+                using var toast = new ToastManager(); // 创建 Toast 管理器
+                toast.Show("数据库更新失败，请删除数据库文件后重试。", "Error"); // 显示 Toast 通知
+            }
+            finally
+            {
+                loadingWindow.Close(); // 关闭加载窗口
+            }
+        }
+
+        /// <summary>
+        /// 获取当前数据库版本号
+        /// </summary>
+        /// <returns> 当前版本号 </returns>
+        private string GetCurrentVersion()
+        {
+            using var connection = SettingDatabase.OpenConnection(); // 打开数据库连接
+            string selectVersionQuery = "SELECT Version FROM Convention ORDER BY ID DESC LIMIT 1;"; // 查询版本号
+            using var command = new SQLiteCommand(selectVersionQuery, connection); // 创建 SQLiteCommand 对象
+            using var reader = command.ExecuteReader(); // 执行查询命令
+            return reader.Read() ? reader.GetString(0) : null; // 如果有数据，返回版本号；如果没有数据，则返回null
+        }
+
+        /// <summary>
+        /// 设置数据库版本号
+        /// </summary>
+        /// <param name="version"> 版本号 </param>
+        public void SetCurrentVersion(string version)
+        {
+            using var connection = SettingDatabase.OpenConnection(); // 打开数据库连接
+            string updateVersionQuery = @$"UPDATE Convention SET Version = '{version}';"; // 设置默认值
+            using var updateVersionCommand = new SQLiteCommand(updateVersionQuery, connection); // 创建 SQLiteCommand 对象
+            updateVersionCommand.ExecuteNonQuery(); // 执行更新命令
+        }
 
         // 释放资源
         public void Dispose()
@@ -30,23 +106,6 @@ namespace Quicker.Database.Upgrade
         ~DatabaseUpdateManager()
         {
             Dispose(false); // 释放非托管资源
-        }
-
-        // 2.2.0 版本之前的按钮数据
-        public class ButtonDataBefore2_2_0
-        {
-            public string ButtonID { get; set; }
-            public string Title { get; set; }
-            public string Location { get; set; }
-            public string ImagePath { get; set; }
-            public string Data1 { get; set; }
-            public string Data2 { get; set; }
-            public string Data3 { get; set; }
-            public string Description { get; set; }
-            public DateTime CreateTime { get; set; }
-            public DateTime LatestEditTime { get; set; }
-            public string ActionType { get; set; }
-            public int UsedTimes { get; set; }
         }
     }
 }

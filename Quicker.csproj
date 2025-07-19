@@ -248,7 +248,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Database\Upgrade\Versions\" />
     <Folder Include="UserControls\SettingWindow\Auxiliary_Functions\" />
     <Folder Include="UserControls\SettingWindow\Tools\" />
   </ItemGroup>
