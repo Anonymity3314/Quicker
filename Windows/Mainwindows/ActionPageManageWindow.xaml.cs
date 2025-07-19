@@ -33,11 +33,30 @@ namespace Quicker.Windows.MainWindows
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string type; // 场景类型
 
+        private SolidColorBrush actionButtonBrush; // 动作按钮背景色
+        private SolidColorBrush actionButtonMouseOverBrush; // 动作按钮鼠标移入背景色
+        private SolidColorBrush blankButtonBrush; // 空白按钮背景色
+        private SolidColorBrush blankButtonMouseOverBrush; // 空白按钮鼠标移入背景色
+
         public ActionPageManageWindow(string type = "Common")
         {
+            InitAppearanceBrushes(); // 加载 Appearance 颜色
             InitializeComponent(); // 初始化窗口
             GenerateSceneButtons(); // 加载按钮前缀
             TypeChanged(type); // 默认加载通用场景
+        }
+
+        // 加载 Appearance 颜色
+        private void InitAppearanceBrushes()
+        {
+            var appearance = Quicker.Database.Core.SettingDatabase.GetAllAppearanceSettings()?.FirstOrDefault();
+            if (appearance != null)
+            {
+                actionButtonBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonColor));
+                actionButtonMouseOverBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonMouseOverColor));
+                blankButtonBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.BlankButtonColor));
+                blankButtonMouseOverBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.BlankButtonMouseOverColor));
+            }
         }
 
         /// <summary>
@@ -47,14 +66,11 @@ namespace Quicker.Windows.MainWindows
         private void TypeChanged(string targetType)
         {
             if (type == targetType) return; // 如果目标类型与当前类型相同，直接返回
-            //LoadingWindow loadingWindow = new(); // 创建加载窗口
-            //loadingWindow.Show(); // 显示加载窗口
             type = targetType; // 设置类型
             LoadCanvas(type); // 加载动作页画布
             LoadSettings(); // 加载设置
             SetButtonBackground(); // 设置场景按钮背景色
             SetSceneTitle(); // 设置场景标题
-            //loadingWindow?.Close(); // 关闭加载窗口
         }
 
         // 加载设置
@@ -309,6 +325,7 @@ namespace Quicker.Windows.MainWindows
             int cols = 4; // 列数
             UniformGrid uniformGrid = new()
             {
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")),
                 Margin = new Thickness(0, 20, 0, 0),
                 Columns = cols,
                 Rows = rows,
@@ -330,10 +347,9 @@ namespace Quicker.Windows.MainWindows
                     var data = db2.GetButtonDataByID(int.Parse(buttonName.Replace(style, "")), type); // 获取按钮数据
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
 
-                    if (button.Tag is ButtonData) // 如果按钮有数据
-                        button.Background = isDarkModle
-                            ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
-                            : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                    button.Background = isDarkModle
+                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
+                        : (button.Tag is ButtonData ? actionButtonBrush : blankButtonBrush); // 设置按钮背景颜色
                 }
             }
             return dynamicCanvas; // 返回画布
@@ -443,13 +459,13 @@ namespace Quicker.Windows.MainWindows
             {
                 button.Background = isDarkModle
                     ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("LightGray"))
-                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BEE6FD")); // 设置按钮背景颜色
+                    : actionButtonMouseOverBrush; // 设置按钮背景颜色
 
                 if (showUsedTimes) // 如果显示使用次数
                     buttonManager.LoadActionUsedTimes(button, data); // 刷新按钮显示
             }
             else
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置按钮背景颜色
+                button.Background = blankButtonMouseOverBrush; // 设置按钮背景颜色
         }
 
         // 鼠标移出按钮还原背景色
@@ -462,10 +478,10 @@ namespace Quicker.Windows.MainWindows
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
                 button.Background = isDarkModle
                     ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
-                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                    : actionButtonBrush; // 设置按钮背景颜色
             }
             else
-                button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置按钮背景颜色
+                button.Background = blankButtonBrush; // 设置按钮背景颜色
         }
 
         /// <summary>
@@ -718,7 +734,7 @@ namespace Quicker.Windows.MainWindows
                     {
                         button.Background = isDarkModle
                             ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
-                            : new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 设置按钮背景颜色
+                            : actionButtonBrush; // 设置按钮背景颜色
                     }
                 }
             }
@@ -958,6 +974,11 @@ namespace Quicker.Windows.MainWindows
         // 关闭窗口时释放资源
         protected override void OnClosed(EventArgs e)
         {
+            // 释放Appearance颜色资源
+            actionButtonBrush = null;
+            actionButtonMouseOverBrush = null;
+            blankButtonBrush = null;
+            blankButtonMouseOverBrush = null;
             type = null; // 清理场景类型
             isDarkModle = false; // 清理是否为暗黑模式
             showUsedTimes = false; // 清理是否显示使用次数

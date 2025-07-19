@@ -117,7 +117,8 @@ namespace Quicker.Windows.Menus
         // 根据上一个窗口调整界面
         private void AdjustUIForPreviousWindow()
         {
-            if (FatherWindow is MainWindow) // 如果是主窗口
+            if (FatherWindow is MainWindow ||
+                FatherWindow is ActionPageManageWindow)  // 如果是主窗口
             {
                 MainStackPanel.Children.Remove(CloseFloatButton); // 移除关闭浮动按钮
                 MainStackPanel.Children.Remove(Rectangle1); // 移除分割线

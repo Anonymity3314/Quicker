@@ -1,4 +1,5 @@
-﻿namespace Quicker.Models.Settings{
+﻿namespace Quicker.Models.Settings
+{
     /// <summary>
     /// 外观设置模型
     /// </summary>
