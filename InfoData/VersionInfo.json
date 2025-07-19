@@ -1,7 +1,69 @@
 {
-  "NewVersion": "2.2.0",
-  "DownloadUrl": "https://github.com/user-attachments/files/20789775/Quicker.2.2.0.zip",
-  "DownloadUrlWithNet": "https://github.com/user-attachments/files/20789775/Quicker.2.2.0.zip",
-  "Changelog": "~.新增了粘贴地址时自动去除引号的功能\n~.新增了打开动作页类型的动作\n~.新增了动作使用次数统计\n~.新增了动作页编辑功能\n~.新增了检查更新功能\n~.修复了某些BUG",
-  "ReleaseDate": "2025-06-18"
+  "LatestVersion": "2.3.0",
+  "Versions": [
+    {
+      "Version": "2.3.0",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.新增了功能面板外观自定义\n~.可以添加扩展加载了\n~.修复了某些BUG",
+      "ReleaseDate": "2025-01-20",
+      "IsLatest": true
+    },
+    {
+      "Version": "2.2.0",
+      "DownloadUrl": "https://github.com/user-attachments/files/20789775/Quicker.2.2.0.zip",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.新增了粘贴地址时自动去除引号的功能\n~.新增了打开动作页类型的动作\n~.新增了动作使用次数统计\n~.新增了动作页编辑功能\n~.新增了检查更新功能\n~.修复了某些BUG",
+      "ReleaseDate": "2025-06-18",
+      "IsLatest": false
+    },
+    {
+      "Version": "2.1.2",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.新增了拖拽网址到按钮上添加网址打开方式\n~.新增了支持多文件打开方式\n~.修复了若干BUG",
+      "ReleaseDate": "2025-05-08",
+      "IsLatest": false
+    },
+    {
+      "Version": "2.1.1",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.为操作菜单添加了阴影并调整了生成位置\n~.优化了添加动作窗口的UI布局\n~.新增了打开网站的功能\n~.给操作菜单添加了圆角\n~.修复了一些BUG\n~.添加了反馈途径",
+      "ReleaseDate": "2025-05-02",
+      "IsLatest": false
+    },
+    {
+      "Version": "2.1.0",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.进一步完善了资源释放\n~.新增了黑名单功能\n~.优化了部分性能",
+      "ReleaseDate": "2025-04-30",
+      "IsLatest": false
+    },
+    {
+      "Version": "2.0.1",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.优化了设置窗口的性能及部分UI显示",
+      "ReleaseDate": "2025-04-21",
+      "IsLatest": false
+    },
+    {
+      "Version": "2.0.0",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.新增了拖拽按钮移位的功能\n~.新增了查找本地应用的功能\n~.新增了动作页切换功能\n~.新增了弹出面板的方式\n~.新增了面板的阴影效果\n~.更新了一些控件的UI\n~.新增了动作页\n~.修复了设置界面的全屏显示问题\n~.修复了面板打开失败的BUG",
+      "ReleaseDate": "2025-04-16",
+      "IsLatest": false
+    },
+    {
+      "Version": "1.0.0",
+      "DownloadUrl": "",
+      "DownloadUrlWithNet": "",
+      "Changelog": "~.Hello World!",
+      "ReleaseDate": "2025-02-03",
+      "IsLatest": false
+    }
+  ]
 }

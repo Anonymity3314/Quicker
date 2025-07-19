@@ -676,20 +676,20 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击按钮分享外观
         private void ShareSaveAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
-            // 1. 获取当前外观设置对象
+            // 获取当前外观设置对象
             var appearance = settingManager.appearanceConditions;
-            // 2. 序列化为 JSON 字符串
+            // 序列化为 JSON 字符串
             string json = JsonSerializer.Serialize(appearance);
-            // 3. 获取作为分享载体的 PNG 图片路径（优先用用户自定义背景，否则用内置图片）
+            // 获取作为分享载体的 PNG 图片路径（优先用用户自定义背景，否则用内置图片）
             string inputPngPath = GetAppearanceCarrierImagePath();
             inputPngPath = EnsureTrueColorPng(inputPngPath); // 保证是32位真彩色
-            // 4. 获取输出路径（自动创建保存文件夹，文件名带时间戳）
+            // 获取输出路径（自动创建保存文件夹，文件名带时间戳）
             string outputPngPath = GetShareAppearanceOutputPath();
-            // 5. 写入 PNG 文件并嵌入 JSON 数据
+            // 写入 PNG 文件并嵌入 JSON 数据
             WriteAppearanceToPng(inputPngPath, outputPngPath, json);
-            // 6. 显示保存成功的 Toast 提示
+            // 显示保存成功的 Toast 提示
             ShowToast("外观保存成功！", "Success");
-            // 7. 打开资源管理器并选中刚保存的 PNG 文件
+            // 打开资源管理器并选中刚保存的 PNG 文件
             System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{outputPngPath}\"");
         }
 
@@ -941,44 +941,115 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <param name="styleKey"> 预置样式键 </param>
         private void ApplyPresetStyle(string styleKey)
         {
-            Appearance preset = null;
-            switch (styleKey)
-            {
-                case "Original":
-                    preset = PresetOriginal;
-                    break;
-                case "Simple":
-                    preset = PresetSimple;
-                    break;
-                case "Translucent":
-                    preset = PresetTranslucent;
-                    break;
-                case "Dark":
-                    preset = PresetDark;
-                    break;
-                case "DarkTranslucent":
-                    preset = PresetDarkTranslucent;
-                    break;
-            }
+            // 获取预置样式对象
+            Appearance preset = GetPresetStyle(styleKey);
+            if (preset == null) return;
 
-            if (preset != null)
+            // 保存当前用户选项设置
+            var currentOptions = SaveCurrentUserOptions();
+
+            // 应用预置样式到当前设置
+            ApplyPresetToCurrentSettings(preset);
+
+            // 恢复用户选项设置
+            RestoreUserOptions(currentOptions);
+
+            // 刷新界面显示
+            RefreshInterfaceDisplay();
+
+            // 保存到数据库
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
+        }
+
+        /// <summary>
+        /// 根据样式键获取对应的预置样式对象
+        /// </summary>
+        /// <param name="styleKey">样式键</param>
+        /// <returns>预置样式对象，如果未找到则返回null</returns>
+        private Appearance GetPresetStyle(string styleKey)
+        {
+            return styleKey switch
             {
-                // 复制所有属性到当前 appearanceConditions
-                var current = settingManager.appearanceConditions;
-                foreach (var prop in typeof(Appearance).GetProperties())
+                "Original" => PresetOriginal,
+                "Simple" => PresetSimple,
+                "Translucent" => PresetTranslucent,
+                "Dark" => PresetDark,
+                "DarkTranslucent" => PresetDarkTranslucent,
+                _ => null
+            };
+        }
+
+        /// <summary>
+        /// 保存当前用户的选项设置，这些设置不会被预置样式覆盖
+        /// </summary>
+        /// <returns>包含用户选项设置的对象</returns>
+        private UserOptions SaveCurrentUserOptions()
+        {
+            return new UserOptions
+            {
+                AutoHideTitleBar = settingManager.appearanceConditions.AutoHideTitleBar,
+                ShowActionButtonMouseOver = settingManager.appearanceConditions.ShowActionButtonMouseOver,
+                HideActionNameAfterIcon = settingManager.appearanceConditions.HideActionNameAfterIcon,
+                ShowActionIconShadow = settingManager.appearanceConditions.ShowActionIconShadow
+            };
+        }
+
+        /// <summary>
+        /// 将预置样式应用到当前设置对象
+        /// </summary>
+        /// <param name="preset">预置样式对象</param>
+        private void ApplyPresetToCurrentSettings(Appearance preset)
+        {
+            var current = settingManager.appearanceConditions;
+            
+            // 复制预置样式的所有属性到当前设置
+            foreach (var prop in typeof(Appearance).GetProperties())
+            {
+                if (prop.CanWrite)
                 {
                     prop.SetValue(current, prop.GetValue(preset));
                 }
-                // 刷新界面
-                ApplyButtonSettings();
-                ApplyColorSettings();
-                ApplyFontSettings();
-                ApplyBackgroundImageSettings();
-                ApplyBlurAndCornerSettings();
-                ApplyOptionSettings();
-                LoadGlobalButtonsForPreview();
-                SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 保存到数据库
             }
+        }
+
+        /// <summary>
+        /// 恢复用户之前保存的选项设置
+        /// </summary>
+        /// <param name="options">用户选项设置对象</param>
+        private void RestoreUserOptions(UserOptions options)
+        {
+            settingManager.appearanceConditions.AutoHideTitleBar = options.AutoHideTitleBar;
+            settingManager.appearanceConditions.ShowActionButtonMouseOver = options.ShowActionButtonMouseOver;
+            settingManager.appearanceConditions.HideActionNameAfterIcon = options.HideActionNameAfterIcon;
+            settingManager.appearanceConditions.ShowActionIconShadow = options.ShowActionIconShadow;
+            
+            // 确保预览功能开启
+            settingManager.appearanceConditions.EnablePreview = true;
+        }
+
+        /// <summary>
+        /// 刷新界面显示，应用新的设置到UI控件
+        /// </summary>
+        private void RefreshInterfaceDisplay()
+        {
+            ApplyButtonSettings();
+            ApplyColorSettings();
+            ApplyFontSettings();
+            ApplyBackgroundImageSettings();
+            ApplyBlurAndCornerSettings();
+            ApplyOptionSettings();
+            LoadGlobalButtonsForPreview();
+        }
+
+        /// <summary>
+        /// 用户选项设置的数据结构，用于保存和恢复用户特定的选项
+        /// </summary>
+        private class UserOptions
+        {
+            public bool AutoHideTitleBar { get; set; }
+            public bool ShowActionButtonMouseOver { get; set; }
+            public bool HideActionNameAfterIcon { get; set; }
+            public bool ShowActionIconShadow { get; set; }
         }
 
         // 预置样式静态数据
@@ -1063,13 +1134,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             // 模糊与圆角
             Blur = 1,
             Win11CornerRadius = 0,
-
-            // 选项
-            AutoHideTitleBar = true,
-            ShowActionButtonMouseOver = true,
-            HideActionNameAfterIcon = false,
-            ShowActionIconShadow = false,
-            EnablePreview = true
         };
 
         // 半透风格
@@ -1108,13 +1172,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             // 模糊与圆角
             Blur = 1,
             Win11CornerRadius = 0,
-
-            // 选项
-            AutoHideTitleBar = true,
-            ShowActionButtonMouseOver = true,
-            HideActionNameAfterIcon = false,
-            ShowActionIconShadow = false,
-            EnablePreview = true
         };
 
         // 深色风格
@@ -1153,13 +1210,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             // 模糊与圆角
             Blur = 1,
             Win11CornerRadius = 0,
-
-            // 选项
-            AutoHideTitleBar = true,
-            ShowActionButtonMouseOver = true,
-            HideActionNameAfterIcon = false,
-            ShowActionIconShadow = false,
-            EnablePreview = true
         };
 
         // 深色半透风格
@@ -1198,13 +1248,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             // 模糊与圆角
             Blur = 0,
             Win11CornerRadius = 0,
-
-            // 选项
-            AutoHideTitleBar = true,
-            ShowActionButtonMouseOver = true,
-            HideActionNameAfterIcon = false,
-            ShowActionIconShadow = false,
-            EnablePreview = true
         };
     }
 }

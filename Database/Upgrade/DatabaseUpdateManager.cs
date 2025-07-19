@@ -5,6 +5,7 @@ using Quicker.Database.Core;
 using System.Data.SQLite;
 using System.Reflection;
 using Quicker.Managers;
+using Quicker.Helpers;
 
 namespace Quicker.Database.Upgrade
 {
@@ -20,10 +21,6 @@ namespace Quicker.Database.Upgrade
         {
             _upgradeSteps = new List<IDatabaseUpgradeStep>
             {
-                new Upgrade_2_1_0(),
-                new Upgrade_2_1_1(),
-                new Upgrade_2_1_2(),
-                new Upgrade_2_1_3(),
                 new Upgrade_2_2_0(),
                 new Upgrade_2_3_0()
             }; // 升级步骤列表
@@ -33,7 +30,7 @@ namespace Quicker.Database.Upgrade
         public void CheckAndUpgradeDatabase()
         {
             string currentVersion = GetCurrentVersion(); // 获取当前数据库版本号
-            if (currentVersion == SettingDatabase.currentVersion) return; // 如果版本相同，无需更新
+            if (VersionHelper.CompareVersions(currentVersion, SettingDatabase.currentVersion) == 0) return; // 使用VersionHelper进行版本比较
             LoadingWindow loadingWindow = new(); // 创建加载窗口
             loadingWindow.Show(); // 显示加载窗口
             try
@@ -100,12 +97,6 @@ namespace Quicker.Database.Upgrade
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed) _disposed = true; // 防止重复释放
-        }
-
-        // 析构函数
-        ~DatabaseUpdateManager()
-        {
-            Dispose(false); // 释放非托管资源
         }
     }
 }
