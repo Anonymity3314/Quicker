@@ -24,6 +24,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
+        private readonly List<string> _tempFiles = new(); // 临时文件列表，用于清理
         private DispatcherTimer _settingsChangeTimer; // 设置变化检测计时器
         private readonly ButtonDatabase db2 = new(); // 添加按钮数据库
         private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
@@ -88,9 +89,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             settingManager = settingWindow._settingManager; // 初始化设置管理器
             weakSettingWindow = new(settingWindow); // 保存设置窗口
             this.DataContext = this; // 设置自身为DataContext，便于属性绑定
-            InitializeAsync(); // 异步初始化
-            InitializeSettingsChangeTimer(); // 初始化设置变化检测计时器
-            InitializeFontComboBoxes(); // 初始化字体下拉框
+            
+            // 延迟初始化，避免阻塞UI线程
+            Dispatcher.BeginInvoke(new Action(async () =>
+            {
+                await InitializeAsync(); // 异步初始化
+                InitializeSettingsChangeTimer(); // 初始化设置变化检测计时器
+                await InitializeFontComboBoxes(); // 异步初始化字体下拉框
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
 
         // 初始化设置变化检测计时器
@@ -113,7 +119,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         // 异步初始化方法
-        private async void InitializeAsync()
+        private async Task InitializeAsync()
         {
             await LoadSettingsAsync(); // 异步加载设置
         }
@@ -121,19 +127,30 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 异步加载设置
         private async Task LoadSettingsAsync()
         {
-            settingManager.LoadAppearanceAsync(); // 初始化缓存数据
-            Application.Current.Dispatcher.Invoke(() =>
+            await settingManager.LoadAppearanceAsync(); // 初始化缓存数据
+            
+            // 分批更新UI，减少闪烁
+            await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                ApplyButtonSettings(); // 应用按钮相关设置
-                ApplyColorSettings(); // 应用颜色相关设置
-                ApplyFontSettings(); // 应用字体相关设置
-                ApplyBackgroundImageSettings(); // 应用背景图片设置
-                ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
-                ApplyOptionSettings(); // 应用选项设置
-
-                // 初始化重置按钮为隐藏状态
-                ResetAppearanceButton.Visibility = Visibility.Collapsed;
-            }); // 异步加载设置
+                // 第一批：基础设置
+                ApplyButtonSettings();
+                ApplyColorSettings();
+                ApplyFontSettings();
+            });
+            
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                // 第二批：背景和模糊设置
+                ApplyBackgroundImageSettings();
+                ApplyBlurAndCornerSettings();
+            });
+            
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                // 第三批：选项设置（包含预览）
+                ApplyOptionSettings();
+                ResetAppearanceButton.Visibility = Visibility.Collapsed; // 初始化重置按钮为隐藏状态
+            });
         }
 
         // 按钮相关设置
@@ -197,7 +214,15 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ShowActionIconShadowCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionIconShadow; // 设置显示动作图标阴影
 
             EnablePreviewCheckBox.IsChecked = settingManager.appearanceConditions.EnablePreview; // 设置显示设置应用效果
-            EnablePreviewCheckBox_Click(null, null); // 切换预览可见性
+            
+            // 延迟加载预览区域，避免立即触发
+            if (settingManager.appearanceConditions.EnablePreview)
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    EnablePreviewCheckBox_Click(null, null); // 切换预览可见性
+                }), System.Windows.Threading.DispatcherPriority.Background);
+            }
         }
 
         // 同步滚动条数据
@@ -322,12 +347,37 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 _settingsChangeTimer = null;
             }
 
+            // 清理UI元素
             GlobalGrid.Children.Clear(); // 清空按钮
+            // 清理颜色画刷资源
+            if (_currentBrush != null)
+            {
+                _currentBrush = null;
+            }
 
+            if (_buttonTextColorBrush != null)
+            {
+                _buttonTextColorBrush = null;
+            }
             settingManager = null; // 释放设置管理器
             weakSettingWindow = null; // 释放弱引用设置窗口
-            _currentBrush = null; // 释放当前选中的颜色画刷
             _currentColorButton = null; // 释放当前颜色按钮引用
+            PropertyChanged = null; // 清理事件绑定
+            foreach (string tempFile in _tempFiles) // 清理临时文件
+            {
+                try
+                {
+                    if (File.Exists(tempFile))
+                    {
+                        File.Delete(tempFile);
+                    }
+                }
+                catch
+                {
+                    // 忽略删除失败的情况
+                }
+            }
+            _tempFiles.Clear();
         }
 
         // 点击按钮打开预设菜单
@@ -337,9 +387,11 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         // 为预览加载全局按钮
-        private void LoadGlobalButtonsForPreview()
+        private async void LoadGlobalButtonsForPreview()
         {
-            var globalButtons = db2.GetPagesOfButtons("Global", 0); // 获取全局按钮数据
+            // 异步加载按钮数据，避免阻塞UI
+            var globalButtons = await Task.Run(() => db2.GetPagesOfButtons("Global", 0)); // 获取全局按钮数据
+            
             var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 获取Grid中的所有Button
             for (int i = 0; i < buttons.Count; i++)
             {
@@ -513,28 +565,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 
                 // 恢复预览设置为当前值（不重置预览设置）
                 settingManager.appearanceConditions.EnablePreview = currentPreviewSetting;
-
-                // 重新应用设置到界面
-                ApplyButtonSettings(); // 应用按钮相关设置
-                ApplyColorSettings(); // 应用颜色相关设置
-                ApplyFontSettings(); // 应用字体相关设置
-                ApplyBackgroundImageSettings(); // 应用背景图片设置
-                ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
-                ApplyOptionSettings(); // 应用选项设置
-
-                // 刷新预览区
+                RefreshInterfaceDisplay(); // 刷新界面
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新数据库
-                LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
             }
         }
 
         // 初始化字体下拉框
-        private void InitializeFontComboBoxes()
+        private async Task InitializeFontComboBoxes()
         {
-            var fontFamilies = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
-            fontFamilies.Add("(系统默认)"); // 在最后插入一个空项
-            FontSizeComboBox1.ItemsSource = fontFamilies;
-            FontSizeComboBox2.ItemsSource = fontFamilies;
+            // 异步加载字体列表，避免阻塞UI
+            await Task.Run(() =>
+            {
+                var fontFamilies = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
+                fontFamilies.Add("(系统默认)"); // 在最后插入一个空项
+                
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    FontSizeComboBox1.ItemsSource = fontFamilies;
+                    FontSizeComboBox2.ItemsSource = fontFamilies;
+                });
+            });
         }
 
         // 应用全局字体方法
@@ -709,6 +759,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 var resourceUri = new Uri("pack://application:,,,/Resources/Images/Quicker1.png"); // 内置图片资源路径
                 var streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流
                 string tempPath = Path.GetTempFileName() + ".png"; // 临时文件路径
+                _tempFiles.Add(tempPath); // 添加到临时文件跟踪列表
                 using (var fileStream = File.Create(tempPath)) // 创建临时文件
                 {
                     streamInfo.Stream.CopyTo(fileStream); // 复制资源流到临时文件
@@ -774,25 +825,37 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <returns>转换为 32 位真彩色的 PNG 文件路径（临时文件）</returns>
         private string EnsureTrueColorPng(string inputPath)
         {
-            // 用 WPF BitmapImage 读取
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(inputPath, UriKind.Absolute);
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-
-            // 转换为 32 位 BGRA
-            var converted = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0);
-
-            // 保存为临时 PNG
-            string tempPath = Path.GetTempFileName() + ".png";
-            using (var fileStream = File.Create(tempPath))
+            BitmapImage bitmap = null;
+            FormatConvertedBitmap converted = null;
+            try
             {
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(converted));
-                encoder.Save(fileStream);
+                // 用 WPF BitmapImage 读取
+                bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(inputPath, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+
+                // 转换为 32 位 BGRA
+                converted = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0);
+
+                // 保存为临时 PNG
+                string tempPath = Path.GetTempFileName() + ".png";
+                _tempFiles.Add(tempPath); // 添加到临时文件跟踪列表
+                using (var fileStream = File.Create(tempPath))
+                {
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(converted));
+                    encoder.Save(fileStream);
+                }
+                return tempPath;
             }
-            return tempPath;
+            finally
+            {
+                // 确保资源被释放
+                converted?.Freeze();
+                bitmap?.Freeze();
+            }
         }
 
         /// <summary>
@@ -883,15 +946,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <param name="appearance">要应用的Appearance对象</param>
         private void ApplyImportedAppearance(Appearance appearance)
         {
-            SettingDatabase.UpdateAppearance(appearance);
-            settingManager.appearanceConditions = appearance;
-            ApplyButtonSettings();
-            ApplyColorSettings();
-            ApplyFontSettings();
-            ApplyBackgroundImageSettings();
-            ApplyBlurAndCornerSettings();
-            ApplyOptionSettings();
-            LoadGlobalButtonsForPreview();
+            SettingDatabase.UpdateAppearance(appearance); // 更新数据库
+            settingManager.appearanceConditions = appearance; // 应用到缓存
+            RefreshInterfaceDisplay(); // 刷新界面显示
             // 保证导入后预览区可见
             EnablePreviewCheckBox.IsChecked = true;
             settingManager.appearanceConditions.EnablePreview = true;
@@ -945,20 +1002,11 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Appearance preset = GetPresetStyle(styleKey);
             if (preset == null) return;
 
-            // 保存当前用户选项设置
-            var currentOptions = SaveCurrentUserOptions();
-
-            // 应用预置样式到当前设置
-            ApplyPresetToCurrentSettings(preset);
-
-            // 恢复用户选项设置
-            RestoreUserOptions(currentOptions);
-
-            // 刷新界面显示
-            RefreshInterfaceDisplay();
-
-            // 保存到数据库
-            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions);
+            var currentOptions = SaveCurrentUserOptions(); // 保存当前用户选项设置
+            ApplyPresetToCurrentSettings(preset); // 应用预置样式到当前设置
+            RestoreUserOptions(currentOptions); // 恢复用户选项设置
+            RefreshInterfaceDisplay(); // 刷新界面显示
+            SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 保存到数据库
         }
 
         /// <summary>
@@ -1032,13 +1080,13 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// </summary>
         private void RefreshInterfaceDisplay()
         {
-            ApplyButtonSettings();
-            ApplyColorSettings();
-            ApplyFontSettings();
-            ApplyBackgroundImageSettings();
-            ApplyBlurAndCornerSettings();
-            ApplyOptionSettings();
-            LoadGlobalButtonsForPreview();
+            ApplyButtonSettings(); // 应用按钮设置
+            ApplyColorSettings(); // 应用颜色设置
+            ApplyFontSettings(); // 应用字体设置
+            ApplyBackgroundImageSettings(); // 应用背景图片设置
+            ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
+            ApplyOptionSettings(); // 应用选项设置
+            LoadGlobalButtonsForPreview(); // 加载全局按钮列表并显示预览区
         }
 
         /// <summary>

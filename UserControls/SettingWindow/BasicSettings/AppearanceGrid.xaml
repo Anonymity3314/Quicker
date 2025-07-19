@@ -100,11 +100,11 @@
                         <Label Content="尺寸" Margin="10,50,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 尺寸-按钮大小 -->
                         <Label Content="按钮大小：" Margin="10,90,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="77.6" ValueChanged="Slider_ValueChanged"/>
+                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="261,92,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-按钮间隙 -->
                         <Label Content="按钮间隙：" Margin="10,125,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" Value="0.2" VerticalAlignment="Top" Minimum="0" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
+                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" VerticalAlignment="Top" Minimum="0" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
                         <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,126,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 尺寸-边框宽度 -->
                         <Label Content="边框宽度：" Margin="10,160,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -119,7 +119,7 @@
                         <Label Content="颜色" Margin="10,240,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                         <!-- 颜色-背景 -->
                         <Label Content="背景：" Margin="10,276,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" Background="#F3F3F3" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BackgroundColorButton" Path="Background"/>
@@ -128,7 +128,7 @@
                         </Button>
                         <!-- 颜色-边框 -->
                         <Label Content="边框：" Margin="10,303,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BorderColorButton" Style="{StaticResource WhiteButton}" Background="#FFD3D3D3" HorizontalAlignment="Left" Margin="167,306,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BorderColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,306,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BorderColorButton" Path="Background"/>
@@ -137,7 +137,7 @@
                         </Button>
                         <!-- 颜色-工具栏 -->
                         <Label Content="工具栏：" Margin="10,330,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ToolbarColorButton" Style="{StaticResource WhiteButton}" Background="#00F3F3F3" HorizontalAlignment="Left" Margin="167,333,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ToolbarColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,333,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="ToolbarColorButton" Path="Background"/>
@@ -146,7 +146,7 @@
                         </Button>
                         <!-- 颜色-工具栏图标 -->
                         <Label Content="工具栏图标：" Margin="10,357,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Button x:Name="ToolbarIconColorButton" Style="{StaticResource WhiteButton}" Background="#FFA1A1A1" HorizontalAlignment="Left" Margin="167,360,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="ToolbarIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,360,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="ToolbarIconColorButton" Path="Background"/>
@@ -173,7 +173,7 @@
                         </Button>
                         <!-- 颜色-空白按钮 -->
                         <Label Content="空白按钮：" Margin="10,435,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" Background="#FFF3F3F3" HorizontalAlignment="Left" Margin="167,438,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,438,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BlankButtonColorButton" Path="Background"/>
@@ -182,7 +182,7 @@
                         </Button>
                         <!-- 颜色-空白按钮鼠标悬浮 -->
                         <Label Content="空白按钮鼠标悬浮：" Margin="10,461,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" Background="#FFEAEAEA" HorizontalAlignment="Left" Margin="167,464,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                        <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,464,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
                                     <Binding ElementName="BlankButtonMouseOverColorButton" Path="Background"/>
@@ -191,10 +191,10 @@
                         </Button>
                         <!-- 颜色-按钮文字 -->
                         <Label Content="按钮文字：" Margin="10,487,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="TextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,490,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click" Background="{Binding ButtonTextColorBrush}">
+                        <Button x:Name="TextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,490,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
                             <Rectangle Width="100" Height="16">
                                 <Rectangle.Fill>
-                                    <Binding Path="ButtonTextColorBrush"/>
+                                    <Binding ElementName="TextColorButton" Path="Background"/>
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
