@@ -48,7 +48,7 @@
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="编辑"/>
                         </Grid>
                     </Button>
-                    <Rectangle Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
+                    <Rectangle x:Name="Rectangle2" Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
                     <Button x:Name="SuspendAction" Style="{StaticResource MenuButton}" ToolTip="悬浮动作" Click="SuspendAction_Click">
                         <Grid Width="194">
                             <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>

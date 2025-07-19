@@ -30,7 +30,6 @@ namespace Quicker.Windows.Menus
         #region 属性和字段
         public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
-        public bool IsMainWindow { get; private set; } // 是否为主窗口
         public Window FatherWindow { get; private set; } // 父窗口
 
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
@@ -46,14 +45,13 @@ namespace Quicker.Windows.Menus
         /// </summary>
         /// <param name="buttonID">按钮ID</param>
         /// <param name="tableName">表名</param>
-        public OperationMenu(int buttonID, string tableName, Window window = null, bool isMainWindow = true)
+        public OperationMenu(int buttonID, string tableName, Window window = null)
         {
             InitializeComponent(); // 初始化窗口
             FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             SecondChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             ButtonID = buttonID; // 设置当前按钮
             TableName = tableName; // 设置表名
-            IsMainWindow = isMainWindow; // 设置是否为主窗口
             FatherWindow = window; // 设置父窗口
             InitializeMenu(); // 初始化菜单
         }
@@ -101,7 +99,8 @@ namespace Quicker.Windows.Menus
         {
             if (buttonData.ActionType == "OpenWebsite")
             {
-                RemoveOpenLocationButton();
+                MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
+                MainGrid.Height -= 25; // 设置网格高度
             }
         }
 
@@ -110,34 +109,26 @@ namespace Quicker.Windows.Menus
         {
             if (!Clipboard.ContainsImage()) // 剪贴板不包含图像
             {
-                RemovePasteIconButton();
+                MainStackPanel.Children.Remove(PasteIcon); // 移除粘贴图标按钮
+                MainGrid.Height -= 25; // 设置网格高度
             }
         }
 
         // 根据上一个窗口调整界面
         private void AdjustUIForPreviousWindow()
         {
-            if (IsMainWindow) // 如果是主窗口
+            if (FatherWindow is MainWindow) // 如果是主窗口
             {
                 MainStackPanel.Children.Remove(CloseFloatButton); // 移除关闭浮动按钮
                 MainStackPanel.Children.Remove(Rectangle1); // 移除分割线
                 EditeInformation.Margin = new Thickness(0, 5, 0, 0); // 调整编辑信息按钮位置
-                MainGrid.Height -= 32; // 设置网格高度
             }
-        }
-
-        // 移除打开位置按钮
-        private void RemoveOpenLocationButton()
-        {
-            MainStackPanel.Children.Remove(OpenLocation); // 移除打开文件或文件夹按钮
-            MainGrid.Height -= 25; // 设置网格高度
-        }
-
-        // 移除粘贴图标按钮
-        private void RemovePasteIconButton()
-        {
-            MainStackPanel.Children.Remove(PasteIcon); // 移除粘贴图标按钮
-            MainGrid.Height -= 25; // 设置网格高度
+            else
+            {
+                MainStackPanel.Children.Remove(SuspendAction); // 移除悬浮动按钮
+                MainStackPanel.Children.Remove(Rectangle2); // 移除分割线
+            }
+            MainGrid.Height -= 32; // 设置网格高度
         }
 
         #endregion

@@ -517,7 +517,7 @@ namespace Quicker.Windows.MainWindows
         private void ShowCreatActionMenu(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag == null)
-                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this, type); // 打开创建动作菜单
+                buttonManager.OpenMenu(sender, "CreatActionMenu", this, type); // 打开创建动作菜单
         }
 
         // 显示编辑窗口
@@ -620,10 +620,7 @@ namespace Quicker.Windows.MainWindows
         {
             e.Handled = true; // 阻止默认右键菜单
             Button button = sender as Button; // 获取按钮
-            if (button.Tag is ButtonData data && button != null)
-                buttonManager.OpenMenu(sender, false, "OperationMenu", this, type); // 打开操作菜单
-            else
-                buttonManager.OpenMenu(sender, false, "CreatActionMenu", this, type); // 打开创建动作菜单
+            buttonManager.OpenMenu(sender, button.Tag is ButtonData data ? "OperationMenu" : "CreatActionMenu", this, type); // 打开操作菜单
         }
 
         /// <summary>

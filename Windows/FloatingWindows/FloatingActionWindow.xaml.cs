@@ -152,7 +152,7 @@ namespace Quicker.Windows.FloatingWindows
         /// </summary>
         private void Button_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OperationMenu menu = new OperationMenu(ButtonID, TableName, this, false); // 创建操作菜单
+            OperationMenu menu = new OperationMenu(ButtonID, TableName, this); // 创建操作菜单
             menu.Show(); // 显示菜单
         }
 

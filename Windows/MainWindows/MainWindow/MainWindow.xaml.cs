@@ -294,7 +294,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
             if (Convention.ShowAddImage) // 如果显示添加按钮
-                buttonManager.OpenMenu(sender, true, "CreatActionMenu", this, buttonType); // 点击打开菜单
+                buttonManager.OpenMenu(sender, "CreatActionMenu", this, buttonType); // 点击打开菜单
         }
 
         /// <summary>
@@ -379,7 +379,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         public void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
-            buttonManager.OpenMenu(sender, true, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this, GetButtonType(sender)); // 打开操作菜单
+            buttonManager.OpenMenu(sender, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this, GetButtonType(sender)); // 打开操作菜单
         }
 
         // 添加关闭标志防止报错
@@ -511,7 +511,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 右键锁定 Button 切换菜单
         private void OpenSelectActionPageMenu(object sender, MouseButtonEventArgs e)
         {
-            buttonManager.OpenMenu(sender, true, "SelectActionPageMenu", this, GetButtonType(sender)); // 打开菜单
+            buttonManager.OpenMenu(sender, "SelectActionPageMenu", this, GetButtonType(sender)); // 打开菜单
         }
 
         /// <summary>
@@ -580,16 +580,12 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// </summary>
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
-            ActionInfoWindow actionInfoWindow = App.Current.Windows.OfType<ActionInfoWindow>().FirstOrDefault(); // 查找ActionInfoWindow
-            if (actionInfoWindow != null) // 如果存在ActionInfoWindow
-                this.Activate(); // 激活窗口
-            else if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
+            this.Activate(); // 激活窗口
+            if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
             }
-            else
-                this.Activate(); // 激活窗口
         }
 
         /// <summary>

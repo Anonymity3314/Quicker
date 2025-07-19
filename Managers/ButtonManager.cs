@@ -639,18 +639,19 @@ namespace Quicker.Managers
         /// <param name="isMainWindow"> 是否为主窗口 </param>
         /// <param name="targetMenu"> 要打开的菜单名称 </param>
         /// <param name="sourceWindow"> 触发菜单的窗口 </param>
-        public void OpenMenu(object sender, bool isMainWindow, string targetMenu, Window sourceWindow, string tableName)
+        public void OpenMenu(object sender, string targetMenu, Window sourceWindow, string tableName)
         {
             Window menu = null; // 菜单窗口
             Button button = sender as Button; // 获取触发菜单的按钮
             Point mousePosition = Mouse.GetPosition(sourceWindow); // 获取鼠标位置
+            bool isMainWindow = sourceWindow is MainWindow; // 是否为主窗口
             if (isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
             switch (targetMenu)
             {
                 case "OperationMenu":
                     OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
                     operationMenu?.Close(); // 关闭操作菜单
-                    operationMenu = new(int.Parse(button.Name.Replace(tableName, "")), tableName); // 设置菜单位置
+                    operationMenu = new(int.Parse(button.Name.Replace(tableName, "")), tableName, sourceWindow); // 设置菜单位置
                     if (isMainWindow)
                     {
                         operationMenu.ClosingOrHiding += () =>
