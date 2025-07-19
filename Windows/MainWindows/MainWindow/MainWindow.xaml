@@ -18,6 +18,8 @@
     ResizeMode="NoResize"
     WindowStyle="None"
     Topmost="True"
+    Height="850"
+    Width="450"
 
     MouseLeftButtonDown="MoveMainWindow"
     Deactivated="MainWindow_Deactivated"
@@ -100,7 +102,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
         <Grid.Height>
             <MultiBinding Converter="{StaticResource BorderHeightConverter}">
                 <Binding Path="ButtonSize"/>
@@ -307,6 +309,13 @@
                     <TextBlock x:Name="CommonTextBlock" Text="默认" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}" TextAlignment="Center" MouseDown="CommonTextBlock_MouseDown" Margin="10,0" Cursor="Hand"/>
                     <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    <Button IsEnabled="False" x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click">
+                        <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush/>
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
                     <Button x:Name="ActionPageSelecter" HorizontalAlignment="Right" Margin="0,0,34,0" Style="{StaticResource Task}" Click="LockCommonActionPage" MouseRightButtonDown="OpenSelectActionPageMenu">
                         <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
                             <Rectangle.Style>

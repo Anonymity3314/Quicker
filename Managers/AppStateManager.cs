@@ -48,7 +48,8 @@ namespace Quicker.Managers
 
         // 窗口状态
         public static bool Locked { get; set; } = false; // 锁定状态
-        public static bool Pinned { get; set; } = false; // 订住状态
+        public static bool MainWindowPinned { get; set; } = false; // 订住状态
+        public static bool SearchWindowPinned { get; set; } = false; // 搜索窗口订住状态
         public static bool Pause { get; set; } = false; // 暂停状态
 
         // 时间记录

@@ -55,8 +55,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             InitializePageGrids(); // 初始化所有页
             CheckUpdate(); // 检查更新
-            SetMainWindowState();
-            this.Activate();
+            SetMainWindowState(); // 设置窗口状态
+            this.Activate(); // 激活窗口
         }
 
         // 初始化动作页面
@@ -232,7 +232,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             string buttonType = GetButtonType(sender); // 获取按钮类型
             if (button.Tag is ButtonData data)
             {
-                if (!AppStateManager.Pinned && data.ActionType != "OpenActionPage") 
+                if (!AppStateManager.MainWindowPinned && data.ActionType != "OpenActionPage") 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
 
                 if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
@@ -581,7 +581,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
             this.Activate(); // 激活窗口
-            if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.Pinned)
+            if (!AppStateManager.Pause && !buttonManager.isClosing && !AppStateManager.MainWindowPinned)
             {
                 buttonManager.isClosing = true; // 设置关闭标志
                 this.Close(); // 关闭窗口
@@ -593,8 +593,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// </summary>
         private void BookQuicker(object sender, EventArgs e)
         {
-            AppStateManager.Pinned = !AppStateManager.Pinned; // 反转 AppStateManager.Pinned
-            ((MainWindowViewModel)this.DataContext).IsPinned = AppStateManager.Pinned; // 反转 ViewModel 的 IsPinned
+            AppStateManager.MainWindowPinned = !AppStateManager.MainWindowPinned; // 反转 AppStateManager.Pinned
+            ((MainWindowViewModel)this.DataContext).IsPinned = AppStateManager.MainWindowPinned; // 反转 ViewModel 的 IsPinned
         }
 
         /// <summary>
@@ -869,6 +869,13 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
                 }
             }
+        }
+
+        // 点击按钮打开搜索窗口
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchWindow searchWindow = new(); // 创建搜索窗口
+            searchWindow.Show(); // 显示窗口
         }
 
         // 辅助方法：查找Button模板里的Border

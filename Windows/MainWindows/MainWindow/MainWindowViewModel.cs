@@ -319,7 +319,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             }
             var convention = SettingDatabase.GetAllConventions()?.FirstOrDefault();
             ShowAddImage = convention?.ShowAddImage ?? false;
-            IsPinned = AppStateManager.Pinned;
+            IsPinned = AppStateManager.MainWindowPinned;
             IsLocked = AppStateManager.Locked;
         }
 
