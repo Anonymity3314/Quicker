@@ -237,7 +237,10 @@ namespace Quicker.Windows.MainWindows.MainWindow
 
                 if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
 
-                DoAction(data); // 执行动作
+                using (var actionManager = new ActionManager())
+                {
+                    actionManager.DoAction(data);
+                }
                 db2.IncreaseActionUsedTimes(data.ButtonID, buttonType); // 增加动作使用次数
 
                 HandleAutoReturn(buttonType); // 处理自动返回
@@ -292,42 +295,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
             if (Convention.ShowAddImage) // 如果显示添加按钮
                 buttonManager.OpenMenu(sender, true, "CreatActionMenu", this, buttonType); // 点击打开菜单
-        }
-
-        /// <summary>
-        /// 执行按钮动作
-        /// </summary>
-        /// <param name="data"> 按钮数据 </param>
-        private void DoAction(ButtonData data)
-        {
-            using var actionManager = new ActionManager(); // 创建 ActionManager 的实例
-            switch (data.ActionType)
-            {
-                case "OpenFile":
-                    actionManager.OpenFile(data); // 打开文件
-                    break; // 打开文件、文件夹
-                case "OpenWebsite":
-                    actionManager.OpenWebsite(data); // 打开网站
-                    break; // 打开网站
-                case "OpenFiles":
-                    actionManager.OpenFiles(data); // 打开多个文件
-                    break; // 打开多个文件
-                case "OpenUwpApp":
-                    actionManager.OpenUwpApp(data); // 打开UWP应用
-                    break; // 打开UWP应用
-                case "OpenActionPage":
-                    OpenActionPage(data); // 打开动作页
-                    break; // 打开动作页
-                case "LoadExtension":
-                    actionManager.LoadExtension(data); // 加载扩展
-                    break; // 加载扩展
-                default:
-                    {
-                        using var toast = new ToastManager(); // 创建 ToastManager 的实例
-                        toast.Show("未知动作", "Error"); // 显示 Toast 提示
-                    }
-                    return; // 未知动作
-            }
         }
 
         /// <summary>

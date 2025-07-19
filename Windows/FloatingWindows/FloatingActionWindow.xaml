@@ -1,0 +1,42 @@
+﻿<Window
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    x:Class="Quicker.Windows.FloatingWindows.FloatingActionWindow"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Quicker.Windows.FloatingWindows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="clr-namespace:Quicker.Helpers"
+    mc:Ignorable="d"
+
+    AllowsTransparency="True"
+    Background="{x:Null}"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+    Height="150"
+    Width="150"
+
+    Unloaded="FloatingActionWindow_Unloaded"
+    Loaded="FloatingActionWindow_Loaded"
+>
+    <Grid Margin="8" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Border Width="{Binding ElementName=Border, Path=ActualWidth}" Height="{Binding ElementName=Border, Path=ActualHeight}" CornerRadius="5" Background="#F3F3F3">
+            <Border.Effect>
+                <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
+            </Border.Effect>
+        </Border>
+        <Border x:Name="Border" CornerRadius="5" helpers:ClipHelper.ClipToBounds="True">
+            <Grid Background="#F3F3F3">
+                <Button x:Name="Button" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Click="Button_Click" MouseRightButtonDown="Button_MouseRightButtonDown">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="#F3F3F3" BorderThickness="1" CornerRadius="5">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

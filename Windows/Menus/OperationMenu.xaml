@@ -15,21 +15,28 @@
     Topmost="True"
     Height="451"
     Width="784"
-    
+
     Deactivated="OperationMenu_Deactivated"
     Loaded="OperationMenu_Loaded"
 >
     <Grid>
-        <Grid x:Name="MainGrid" Height="192" Width="204" Margin="15,13,565,246">
+        <Grid x:Name="MainGrid" Height="255" Width="204" Margin="15,13,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <!-- 窗口阴影 -->
-            <Rectangle Fill="White" Margin="5,7">
-                <Rectangle.Effect>
+            <Border Background="White" Margin="5">
+                <Border.Effect>
                     <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-                </Rectangle.Effect>
-            </Rectangle>
+                </Border.Effect>
+            </Border>
             <Border CornerRadius="5" Background="White">
                 <StackPanel x:Name="MainStackPanel">
-                    <Button x:Name="EditeInformation" Style="{StaticResource MenuButton}" Margin="0,5,0,3" Click="EditeInformation_Click">
+                    <Button x:Name="CloseFloatButton" Style="{StaticResource MenuButton}" ToolTip="关闭悬浮窗" Margin="0,5,0,0" Click="CloseFloatButton_Click">
+                        <Grid Width="194">
+                            <Image Source="/Resources/Images/DeleteImage.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="关闭"/>
+                        </Grid>
+                    </Button>
+                    <Rectangle x:Name="Rectangle1" Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
+                    <Button x:Name="EditeInformation" Style="{StaticResource MenuButton}" Click="EditeInformation_Click">
                         <Button.ToolTip>
                             <StackPanel>
                                 <TextBlock Text="编辑动作定义"/>
@@ -41,8 +48,15 @@
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="编辑"/>
                         </Grid>
                     </Button>
-                    <Rectangle Height="1" Fill="#FFF0F0F0" Width="204"/>
-                    <Button x:Name="CopyAction" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="CopyAction_Click">
+                    <Rectangle Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
+                    <Button x:Name="SuspendAction" Style="{StaticResource MenuButton}" ToolTip="悬浮动作" Click="SuspendAction_Click">
+                        <Grid Width="194">
+                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮"/>
+                        </Grid>
+                    </Button>
+                    <Rectangle Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
+                    <Button x:Name="CopyAction" Style="{StaticResource MenuButton}" Click="CopyAction_Click">
                         <Button.ToolTip>
                             <StackPanel>
                                 <TextBlock Text="复制动作"/>
@@ -122,11 +136,11 @@
             </Grid>
             <Grid x:Name="SecondChildGrid" Margin="130,57,0,0" MouseLeave="SecondChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <!-- 窗口阴影 -->
-                <Rectangle Fill="White" Margin="5,7">
-                    <Rectangle.Effect>
+                <Border Background="White" Margin="5">
+                    <Border.Effect>
                         <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-                    </Rectangle.Effect>
-                </Rectangle>
+                    </Border.Effect>
+                </Border>
                 <Border CornerRadius="3" Background="White">
                     <StackPanel>
                         <Button x:Name="CopyActionID" Style="{StaticResource MenuButton}" ToolTip="复制动作的ID文字" Margin="0,3,0,0" Click="CopyActionID_Click">

@@ -353,6 +353,34 @@ namespace Quicker.Managers
             }
         }
 
+        /// <summary>
+        /// 执行动作
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        public void DoAction(ButtonData data)
+        {
+            if (data.ActionType == "OpenFile")
+            {
+                OpenFile(data);
+            }
+            else if (data.ActionType == "OpenWebsite")
+            {
+                OpenWebsite(data);
+            }
+            else if (data.ActionType == "OpenFiles")
+            {
+                OpenFiles(data);
+            }
+            else if (data.ActionType == "OpenUwpApp")
+            {
+                OpenUwpApp(data);
+            }
+            else if (data.ActionType == "LoadExtension")
+            {
+                LoadExtension(data);
+            }
+        }
+
         // 实现IDisposable接口
         public void Dispose()
         {
