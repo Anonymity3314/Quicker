@@ -5,6 +5,7 @@
     x:Class="Quicker.Windows.MainWindows.ActionPageManageWindow"
     xmlns:local="clr-namespace:Quicker.Windows.MainWindows"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:Quicker.Converters"
     mc:Ignorable="d"
 
     WindowStartupLocation="CenterScreen"
@@ -12,8 +13,13 @@
     Height="850"
     Width="1200"
 >
+    <Window.Resources>
+        <conv:SearchHintVisibilityConverter x:Key="SearchHintVisibilityConverter"/>
+    </Window.Resources>
+
     <Grid>
-        <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Foreground="#FFABADB3" Width="221" Height="28" TextChanged="SearchTextBox_TextChanged"/>
+        <Label Content="筛选..." Foreground="#FFABADB3" Visibility="{Binding ElementName=SearchTextBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" Margin="12,11,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="SearchTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="9,10,0,0" TextWrapping="Wrap" Width="221" Height="28" TextChanged="SearchTextBox_TextChanged"/>
         <Border Margin="9,44,0,39" CornerRadius="4" HorizontalAlignment="Left" Width="221" BorderBrush="#FFB4B4B4" BorderThickness="1">
             <StackPanel x:Name="ActionPagesButtonPanel"/>
         </Border>

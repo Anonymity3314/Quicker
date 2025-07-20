@@ -166,7 +166,8 @@ Quicker/
 │   ├─IntToCornerRadiusConverter.cs                   # int转圆角半径转换器
 │   ├─BlurEffectConverter.cs                          # 模糊效果转换器
 │   ├─PathToImageSourceConverter.cs                   # 路径转图片源转换器
-│   └─ThicknessConverter.cs                           # 边距厚度转换器
+│   ├─ThicknessConverter.cs                           # 边距厚度转换器
+│   └─SearchHintVisibilityConverter.cs                # 搜索框提示可见性转换器，根据TextBox文本内容控制提示Label的显示/隐藏
 ├─Database/                                           # 数据库相关
 │   ├─Core/                                            # 数据库核心操作
 │   │   ├─SettingDatabase.cs                            # 设置数据库，管理应用配置和设置信息

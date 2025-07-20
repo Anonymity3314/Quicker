@@ -4,6 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="Quicker.Windows.MainWindows.SettingWindow"
+    xmlns:conv="clr-namespace:Quicker.Converters"
     mc:Ignorable="d"
 
     Icon="/Resources/Images/SettingWindow.png"
@@ -15,6 +16,10 @@
     
     Loaded="SettingWindow_Loaded"
 >
+    <Window.Resources>
+        <conv:SearchHintVisibilityConverter x:Key="SearchHintVisibilityConverter"/>
+    </Window.Resources>
+
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="49"/>
@@ -36,6 +41,7 @@
         <!-- 侧边栏2 -->
         <Grid x:Name="MenuGrid" Background="#FFF0F0F0" HorizontalAlignment="Center" Grid.Column="1" Width="192">
             <Grid Height="60" HorizontalAlignment="Left" VerticalAlignment="Top" Width="192">
+                <Label Content="筛选..." Foreground="#FFABADB3" Visibility="{Binding ElementName=SearchBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" Margin="22,0,0,0" VerticalAlignment="Center"/>
                 <TextBox x:Name="SearchBox" Margin="22,0" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Style="{StaticResource RoundedTextBox}" TextChanged="SearchBox_TextChanged"/>
             </Grid>
             <!-- 基础设置 -->

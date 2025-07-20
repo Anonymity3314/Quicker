@@ -5,6 +5,7 @@
     xmlns:local="clr-namespace:Quicker.UserControls.AddWindow"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="Quicker.UserControls.AddWindow.OpenFile"
+    xmlns:conv="clr-namespace:Quicker.Converters"
     mc:Ignorable="d" 
     
     Background="White"
@@ -14,9 +15,14 @@
     Unloaded="OpenFile_Unloaded"
     Loaded="OpenFile_Loaded"
 >
+    <UserControl.Resources>
+        <conv:SearchHintVisibilityConverter x:Key="SearchHintVisibilityConverter"/>
+    </UserControl.Resources>
+
     <Grid>
         <Label Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" GotFocus="LocationTextBox_GotFocus" LostFocus="LocationTextBox_LostFocus" Text="可以用英文分号隔开不同路径来添加多个文件" FontSize="11" Foreground="#FF8C8C8C" SizeChanged="LocationTextBox_SizeChanged"/>
+        <Label IsHitTestVisible="False" Content="可以用英文分号隔开不同路径来添加多个文件" Foreground="#FF8C8C8C" Visibility="{Binding ElementName=LocationTextBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,16,0,0" FontSize="11" Panel.ZIndex="1"/>
+        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" SizeChanged="LocationTextBox_SizeChanged"/>
         <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu"/>
         <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="112" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
             <Grid>

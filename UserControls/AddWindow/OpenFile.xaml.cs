@@ -18,7 +18,6 @@ namespace Quicker.UserControls.AddWindow
     {
         #region 字段
 
-        private const string DefaultLocationText = "可以用英文分号隔开不同路径来添加多个文件";
         private Quicker.Windows.MainWindows.AddWindow _addWindow; // AddWindow 的引用
         private readonly ButtonManager _buttonManager = new(); // 按钮管理器
         private readonly IconManager _iconManager = new(); // 图标管理器接口
@@ -179,39 +178,7 @@ namespace Quicker.UserControls.AddWindow
         // 如果地址栏不为空，则启用保存按钮
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            bool isEmpty = LocationTextBox.Text == DefaultLocationText || string.IsNullOrWhiteSpace(LocationTextBox.Text);
-            if (isEmpty)
-            {
-                LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C")); // 字体颜色
-                LocationTextBox.FontSize = 11; // 字体大小
-                _addWindow.SaveButton.IsEnabled = false; // 禁用保存按钮
-            }
-            else
-            {
-                LocationTextBox.Foreground = new SolidColorBrush(Colors.Black); // 字体颜色
-                LocationTextBox.FontSize = 12; // 字体大小
-                _addWindow.SaveButton.IsEnabled = true; // 启用保存按钮
-            }
-        }
-
-        // 获得焦点时隐藏提示
-        private void LocationTextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (LocationTextBox.Text == DefaultLocationText)
-                LocationTextBox.Text = "";
-            LocationTextBox.Foreground = new SolidColorBrush(Colors.Black); // 字体颜色
-            LocationTextBox.FontSize = 12; // 字体大小
-        }
-
-        // 失去焦点时显示提示
-        private void LocationTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(LocationTextBox.Text))
-            {
-                LocationTextBox.Text = DefaultLocationText;
-                LocationTextBox.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF8C8C8C"));
-                LocationTextBox.FontSize = 11;
-            }
+            _addWindow.SaveButton.IsEnabled = !string.IsNullOrWhiteSpace(LocationTextBox.Text);
         }
 
         // 移除控件清理资源
@@ -394,16 +361,16 @@ namespace Quicker.UserControls.AddWindow
                 findAppsWindow.ApplicationSelected -= OnApplicationSelected;
                 findAppsWindow = null;
             }
-            
+
             _buttonManager.Dispose();
             _iconManager.Dispose();
-            
+
             // 重置UI控件状态
             LocationTextBox.Text = "";
             WindowStateComboBox.SelectedIndex = -1;
             RunByMessager.IsChecked = false;
             TryToOpenExitingWindow.IsChecked = false;
-            
+
             // 清空引用
             _addWindow = null;
             _buttonDb = null;
