@@ -706,9 +706,7 @@ namespace Quicker
                     mainWindow.WindowStartupLocation = WindowStartupLocation.Manual; // 系统默认
                     break; // 系统默认
                 case 1:
-                    mainWindow.WindowStartupLocation = WindowStartupLocation.Manual; // 鼠标位置
-                    mainWindow.Left = System.Windows.Forms.Cursor.Position.X; // 鼠标位置
-                    mainWindow.Top = System.Windows.Forms.Cursor.Position.Y; // 鼠标位置
+                    mainWindow.PositionWindowAtMouse(); // 窗口打开位置跟随鼠标
                     break; // 窗口打开位置跟随鼠标
                 case 2:
                     mainWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen; // 屏幕中心

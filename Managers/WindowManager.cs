@@ -313,9 +313,13 @@ namespace Quicker.Managers
         {
             GetCursorPos(out POINT cursorPos); // 获取鼠标位置
 
-            // 计算窗口中心的位置
-            int left = cursorPos.X - (int)(window.ActualWidth / 2); // 窗口左边界
-            int top = cursorPos.Y - (int)(window.ActualHeight / 2); // 窗口上边界
+            // 计算窗口中心定位到鼠标位置所需的偏移量
+            int offsetX = (int)(window.ActualWidth / 2); // 窗口宽度的一半
+            int offsetY = (int)(window.ActualHeight / 2); // 窗口高度的一半
+
+            // 窗口左边界 = 鼠标X坐标 - 窗口宽度的一半（使窗口中心对齐鼠标）
+            int left = cursorPos.X - offsetX; // 窗口左边界
+            int top = cursorPos.Y - offsetY; // 窗口上边界
 
             SetWindowPosition(window, left, top); // 设置窗口位置
         }

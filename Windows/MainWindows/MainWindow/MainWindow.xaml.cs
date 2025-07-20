@@ -1,4 +1,8 @@
-﻿using System.Windows.Controls.Primitives;
+﻿using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using DragEventArgs = System.Windows.DragEventArgs;
+using Button = System.Windows.Controls.Button;
+using Panel = System.Windows.Controls.Panel;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
@@ -7,6 +11,7 @@ using Quicker.Windows.Menus;
 using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Input;
+using System.Windows.Forms;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
@@ -96,10 +101,23 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.SetWindowTopmost(this);// 设置窗口置顶
-            if (AppStateManager.OpenByMouse)
-            {
-                windowManager.SetWindowCenterAtMouse(this); // 设置窗口居中
-            }
+        }
+
+        /// <summary>
+        /// 将窗口定位到鼠标位置，使CenterPointGrid位于鼠标处
+        /// </summary>
+        public void PositionWindowAtMouse()
+        {
+            var mousePos = System.Windows.Forms.Cursor.Position; // 获取鼠标位置
+            var centerPointScreen = CenterPointGrid.PointToScreen(new Point(0, 0)); // 获取CenterPointGrid在屏幕上的绝对位置
+
+            // 计算窗口需要移动的偏移量
+            double offsetX = mousePos.X - centerPointScreen.X;
+            double offsetY = mousePos.Y - centerPointScreen.Y;
+
+            // 调整窗口位置
+            this.Left += offsetX;
+            this.Top += offsetY;
         }
 
         // 生成页面切换 Button
@@ -612,8 +630,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
             CleanUpEventHandlers(); // 清理事件处理器
             CleanUpUniformGrid(MainGrid); // 清理全局网格
             CleanUpUniformGrid(CommonGrid); // 清理通用网格
-            //Pin.ImageSource = null; // 订住按钮图片
-            //Lock.ImageSource = null; // 锁定按钮图片
 
             CommonStyle = null; // 清理通用样式
             iconManager.Dispose(); // 释放图标管理器资源
