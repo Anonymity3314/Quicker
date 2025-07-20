@@ -2,6 +2,7 @@
 using System.Windows.Media.Imaging;
 using Quicker.Windows.EditWindows;
 using Quicker.Windows.ToolWindows;
+using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using Quicker.Windows.Menus;
@@ -11,6 +12,7 @@ using Quicker.Managers;
 using Quicker.Helpers;
 using Quicker.Models;
 using System.Windows;
+using System.IO;
 
 namespace Quicker.Windows.MainWindows
 {
@@ -187,7 +189,7 @@ namespace Quicker.Windows.MainWindows
         }
 
         /// <summary>
-        /// 创建场景按钮内容
+        /// 创建场景按钮内容（主方法，组装图片、名称、标签）
         /// </summary>
         /// <param name="sceneData"> 场景数据 </param>
         /// <param name="filter"> 过滤关键字 </param>
@@ -195,14 +197,64 @@ namespace Quicker.Windows.MainWindows
         private Grid CreateButtonContent(SceneData sceneData, string filter = null)
         {
             Grid buttonContent = new() { Style = FindResource("SceneButtonContentGrid") as Style }; // 创建网格
-            Image image = new()
-            {
-                Source = new BitmapImage(new Uri(sceneData.SceneIconPath, UriKind.Relative)), // 设置按钮图片
-                Style = FindResource("SceneButtonImage") as Style // 应用样式
-            }; // 创建图片
-            buttonContent.Children.Add(image); // 添加到网格
+            buttonContent.Children.Add(CreateSceneImage(sceneData)); // 添加图片
+            buttonContent.Children.Add(CreateSceneNameTextBlock(sceneData, filter)); // 添加场景名称
+            buttonContent.Children.Add(CreateSceneTagTextBlock(sceneData, filter)); // 添加场景标签
+            return buttonContent; // 返回按钮内容
+        }
 
-            // 场景名称高亮
+        /// <summary>
+        /// 创建场景图片控件
+        /// </summary>
+        /// <param name="sceneData"> 场景数据 </param>
+        /// <returns> Image控件 </returns>
+        private Image CreateSceneImage(SceneData sceneData)
+        {
+            Image image = new();
+            if (!string.IsNullOrEmpty(sceneData.SceneIconPath))
+            {
+                try
+                {
+                    if (sceneData.SceneIconPath.StartsWith("/Resources/Images/"))
+                    {
+                        // 资源图片，使用 Pack URI
+                        string packUri = $"pack://application:,,,{sceneData.SceneIconPath}";
+                        image.Source = new BitmapImage(new Uri(packUri, UriKind.Absolute));
+                    }
+                    else if (Path.IsPathRooted(sceneData.SceneIconPath))
+                    {
+                        // 本地绝对路径
+                        image.Source = new BitmapImage(new Uri(sceneData.SceneIconPath, UriKind.Absolute));
+                    }
+                    else
+                    {
+                        // 其它情况，尝试相对路径
+                        image.Source = new BitmapImage(new Uri(sceneData.SceneIconPath, UriKind.RelativeOrAbsolute));
+                    }
+                }
+                catch
+                {
+                    // 加载失败，使用默认图片
+                    image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker1.png", UriKind.Absolute));
+                }
+            }
+            else
+            {
+                // 为空时用默认图片
+                image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker1.png", UriKind.Absolute));
+            }
+            image.Style = FindResource("SceneButtonImage") as Style; // 应用样式
+            return image;
+        }
+
+        /// <summary>
+        /// 创建场景名称TextBlock控件
+        /// </summary>
+        /// <param name="sceneData"> 场景数据 </param>
+        /// <param name="filter"> 过滤关键字 </param>
+        /// <returns> TextBlock控件 </returns>
+        private TextBlock CreateSceneNameTextBlock(SceneData sceneData, string filter = null)
+        {
             TextBlock sceneName = new()
             {
                 Style = FindResource("SceneNameTextBlock") as Style,
@@ -212,9 +264,17 @@ namespace Quicker.Windows.MainWindows
                 Text = db3.GetSceneTitle(sceneData),
                 Keyword = filter ?? ""
             });
-            buttonContent.Children.Add(sceneName); // 添加到网格
+            return sceneName;
+        }
 
-            // 场景标签高亮
+        /// <summary>
+        /// 创建场景标签TextBlock控件
+        /// </summary>
+        /// <param name="sceneData"> 场景数据 </param>
+        /// <param name="filter"> 过滤关键字 </param>
+        /// <returns> TextBlock控件 </returns>
+        private TextBlock CreateSceneTagTextBlock(SceneData sceneData, string filter = null)
+        {
             TextBlock sceneTag = new()
             {
                 Style = FindResource("SceneTagTextBlock") as Style,
@@ -224,8 +284,7 @@ namespace Quicker.Windows.MainWindows
                 Text = sceneData.SceneTag ?? "",
                 Keyword = filter ?? ""
             });
-            buttonContent.Children.Add(sceneTag); // 添加到网格
-            return buttonContent; // 返回按钮内容
+            return sceneTag;
         }
 
         /// <summary>
@@ -586,7 +645,7 @@ namespace Quicker.Windows.MainWindows
             e.Handled = true; // 阻止默认双击事件
             if (sender is Button button && button.Tag != null)
             {
-                AddWindow addWindow = new AddWindow(int.Parse(button.Name.Replace(type, "")), type, 0); // 创建编辑窗口
+                AddActionWindow addWindow = new AddActionWindow(int.Parse(button.Name.Replace(type, "")), type, 0); // 创建编辑窗口
                 addWindow.Show(); // 显示编辑窗口
                 addWindow.Activate(); // 激活编辑窗口
             }
@@ -880,8 +939,19 @@ namespace Quicker.Windows.MainWindows
         // 点击按钮添加场景
         private void AddSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("功能开发中。", "Common"); // 弹出消息提醒
+            AddSceneWindow addSceneWindow = new();
+            addSceneWindow.SceneAddCompleted += (isSaved, newSceneName) =>
+            {
+                if (isSaved)
+                {
+                    GenerateSceneButtons();
+                    if (!string.IsNullOrEmpty(newSceneName))
+                        TypeChanged(newSceneName);
+                    else
+                        TypeChanged(type);
+                }
+            };
+            addSceneWindow.ShowDialog();
         }
 
         // 点击按钮编辑场景
@@ -894,7 +964,6 @@ namespace Quicker.Windows.MainWindows
             }
             else
             {
-                string canvasIndex = GetBingdingButton().Name.Replace("Edit" + type, ""); // 获取画布索引
                 EditSceneWindow editSceneWindow = new(type); // 创建编辑场景窗口
                 editSceneWindow.Show(); // 显示编辑场景窗口
             }
@@ -910,7 +979,9 @@ namespace Quicker.Windows.MainWindows
             }
             else
             {
-
+                db3.DeleteSceneTable(type); // 删除场景数据表
+                GenerateSceneButtons(); // 刷新场景按钮
+                TypeChanged("Global"); // 切换类型为全局场景
             }
         }
 

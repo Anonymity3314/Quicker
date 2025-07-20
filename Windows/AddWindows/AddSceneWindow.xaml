@@ -1,0 +1,39 @@
+﻿<Window
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Quicker.Windows.AddWindows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="Quicker.Windows.AddWindows.AddSceneWindow"
+    mc:Ignorable="d"
+
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="NoResize"
+    Title="添加场景"
+    Height="307"
+    Width="434"
+>
+    <Grid>
+        <Label Content="应用程序" HorizontalAlignment="Left" Margin="50,12,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="AppComboBox" HorizontalAlignment="Left" Margin="113,15,0,0" VerticalAlignment="Top" Height="27" Width="200">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Image Source="{Binding Icon}" Style="{StaticResource MenuButtonImage}"/>
+                        <TextBlock Text="{Binding ProcessName}" Margin="25,0" VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="318,15,0,0" VerticalAlignment="Top" Width="27" Height="27"/>
+
+        <Label Content="场景标识" HorizontalAlignment="Left" Margin="50,46,0,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="113,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
+        <Label Content="场景名称" HorizontalAlignment="Left" Margin="50,80,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="113,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="133"/>
+        <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,206,0,0" Stroke="LightGray" VerticalAlignment="Top" Width="394"/>
+        <Button x:Name="SaveButton" Content="保存(S)" Style="{StaticResource BlueButton}" HorizontalAlignment="Left" Margin="275,218,0,0" VerticalAlignment="Top" IsEnabled="False" Width="62" Height="26" Click="SaveButton_Click"/>
+        <Button x:Name="CancelButton" Content="取消(C)" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="349,218,0,0" VerticalAlignment="Top" Width="62" Height="26" Click="CancelButton_Click"/>
+    </Grid>
+</Window>

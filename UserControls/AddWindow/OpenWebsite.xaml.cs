@@ -18,7 +18,7 @@ namespace Quicker.UserControls.AddWindow
     {
         #region 字段
 
-        private Quicker.Windows.MainWindows.AddWindow _addWindow; // AddWindow 的引用
+        private Quicker.Windows.AddWindows.AddActionWindow _addWindow; // AddWindow 的引用
         private readonly ButtonManager _buttonManager = new(); // 按钮管理器接口
         private readonly IconManager _iconManager = new(); // 图标管理器接口
         private ButtonDatabase _buttonDb = new(); // 按钮数据库
@@ -29,7 +29,7 @@ namespace Quicker.UserControls.AddWindow
 
         #region 构造函数
 
-        public OpenWebsite(Quicker.Windows.MainWindows.AddWindow addWindow)
+        public OpenWebsite(Quicker.Windows.AddWindows.AddActionWindow addWindow)
         {
             _addWindow = addWindow; // 保存 AddWindow 的引用
             InitializeComponent();

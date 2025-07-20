@@ -1,6 +1,7 @@
 ﻿using Quicker.UserControls.AddWindow;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
+using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Input;
@@ -12,9 +13,9 @@ using Quicker.Models;
 using System.Media;
 using System.IO;
 
-namespace Quicker.Windows.MainWindows
+namespace Quicker.Windows.AddWindows
 {
-    public partial class AddWindow : Window
+    public partial class AddActionWindow : Window
     {
         private const string OPEN_FILE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenFileImage.png";
         private const string OPEN_WEBSITE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenWebSiteImage.png";
@@ -49,7 +50,7 @@ namespace Quicker.Windows.MainWindows
         /// <param name="currentbutton"> 当前按钮 </param>
         /// <param name="tableName"> 表名 </param>
         /// <param name="choice"> 选择添加动作类型 </param>
-        public AddWindow(int currentbutton, string tableName, int choice)
+        public AddActionWindow(int currentbutton, string tableName, int choice)
         {
             ButtonID = currentbutton; // 当前按钮
             TableName = tableName; // 表名

@@ -2,6 +2,7 @@
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Collections.Generic;
+using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
@@ -251,7 +252,7 @@ namespace Quicker.Windows.Menus
         {
             haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(ButtonID, TableName, 1); // 传递当前按钮和类型
+            AddActionWindow addWindow = new(ButtonID, TableName, 1); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -261,7 +262,7 @@ namespace Quicker.Windows.Menus
         {
             haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(ButtonID, TableName, 2); // 传递当前按钮和类型
+            AddActionWindow addWindow = new(ButtonID, TableName, 2); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -271,7 +272,7 @@ namespace Quicker.Windows.Menus
         {
             haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(ButtonID, TableName, 3); // 传递当前按钮和类型
+            AddActionWindow addWindow = new(ButtonID, TableName, 3); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -281,7 +282,7 @@ namespace Quicker.Windows.Menus
         {
             haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(ButtonID, TableName, 4); // 传递当前按钮和类型
+            AddActionWindow addWindow = new(ButtonID, TableName, 4); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }
@@ -358,7 +359,7 @@ namespace Quicker.Windows.Menus
         {
             haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new(ButtonID, TableName, 5); // 传递当前按钮和类型
+            AddActionWindow addWindow = new(ButtonID, TableName, 5); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
             buttonManager.CloseMainWindow(this); // 关闭主窗口
         }

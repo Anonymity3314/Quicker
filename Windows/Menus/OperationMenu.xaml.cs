@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
+using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
@@ -253,7 +254,7 @@ namespace Quicker.Windows.Menus
         private void EditeInformation_Click(object sender, RoutedEventArgs e)
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
-            AddWindow addWindow = new AddWindow(ButtonID, TableName, 0); // 创建添加动作窗口
+            AddActionWindow addWindow = new(ButtonID, TableName, 0); // 创建添加动作窗口
             addWindow.Show(); // 显示添加动作窗口
             buttonManager.CloseMainWindow(this); // 关闭操作菜单窗口
         }

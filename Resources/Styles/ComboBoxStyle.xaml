@@ -51,7 +51,7 @@
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Grid>
-                                        <Border x:Name="border" Background="#FAFAFA" BorderBrush="#FFABADB3" BorderThickness="1" CornerRadius="4" Padding="5,0">
+                                        <Border x:Name="border" Background="#FAFAFA" BorderBrush="#FFABADB3" BorderThickness="1" CornerRadius="3" Padding="5,0">
                                             <ContentControl x:Name="contentPresenter" HorizontalAlignment="Left" VerticalAlignment="Center" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}, Converter={StaticResource ContentCloneConverter}}" />
                                         </Border>
                                         <Path x:Name="arrow" Data="M0,0 L4,4 L8,0" Stroke="#FFABADB3" Width="10" Height="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>

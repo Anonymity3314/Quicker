@@ -147,6 +147,9 @@ Quicker 支持通过创建扩展模块来增强应用功能。你可以通过以
 
 ## 项目文件结构
 
+<details>
+<summary>详细结构</summary>
+
 ```
 Quicker/
 ├─.gitattributes                                      # Git属性配置
@@ -302,12 +305,17 @@ Quicker/
 │       │   └─ColorPicker.xaml.cs
 │       └─Tools/                                        # 工具控件文件夹
 ├─Windows/                                            # 界面文件夹
+│   ├─AddWindows/                                     # 添加相关窗口（如添加场景、添加动作等）
+│   │   ├─AddSceneWindow.xaml                         # 添加场景窗口
+│   │   │   └─AddSceneWindow.xaml.cs
+│   │   └─AddWindow.xaml                              # 添加动作窗口
+│   │       └─AddWindow.xaml.cs
 │   ├─FloatingWindows/                                # 悬浮窗口相关
 │   │   ├─Windows/                                    # 悬浮窗口实现文件夹
 │   │   │   ├─FloatingActionPageWindow.xaml           # 悬浮动作页窗口
-│   │   │   ├─FloatingActionPageWindow.xaml.cs        # 悬浮动作页窗口后台
-│   │   │   ├─FloatingActionWindow.xaml               # 悬浮动作窗口
-│   │   │   └─FloatingActionWindow.xaml.cs            # 悬浮动作窗口后台
+│   │   │   │   └─FloatingActionPageWindow.xaml.cs
+│   │   │   └─FloatingActionWindow.xaml               # 悬浮动作窗口
+│   │   │       └─FloatingActionWindow.xaml.cs
 │   │   └─ViewModels/                                 # 悬浮窗口ViewModel文件夹
 │   │       ├─FloatingActionPageWindow.cs             # 悬浮动作页窗口ViewModel
 │   │       └─FloatingActionWindow.cs                 # 悬浮动作窗口ViewModel
@@ -319,8 +327,6 @@ Quicker/
 │   ├─MainWindows/                                      # 主窗口文件夹
 │   │   ├─ActionPageManageWindow.xaml                    # 动作页管理窗口
 │   │   │   └─ActionPageManageWindow.xaml.cs
-│   │   ├─AddWindow.xaml                                 # 添加动作窗口
-│   │   │   └─AddWindow.xaml.cs
 │   │   ├─FindAppsWindow.xaml                            # 查找应用窗口
 │   │   │   └─FindAppsWindow.xaml.cs
 │   │   ├─MainWindow/                                    # 主功能面板MVVM文件夹
@@ -360,6 +366,8 @@ Quicker/
 │       └─ToastWindow.xaml                              # Toast提示窗口
 │           └─ToastWindow.xaml.cs
 ```
+
+</details>
 
 ---
 

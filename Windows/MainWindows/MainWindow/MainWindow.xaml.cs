@@ -6,6 +6,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
+using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using Quicker.Database.Core;
@@ -277,7 +278,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             if (Keyboard.IsKeyDown(Key.LeftShift))
             {
-                AddWindow addWindow = new(int.Parse(button.Name.Replace($"{buttonType}", "")), buttonType, 0); // 创建添加窗口
+                AddActionWindow addWindow = new(int.Parse(button.Name.Replace($"{buttonType}", "")), buttonType, 0); // 创建添加窗口
                 addWindow.Show(); // 显示添加窗口
                 return true; // 处理Shift键动作
             }

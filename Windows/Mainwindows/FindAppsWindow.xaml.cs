@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Quicker.UserControls.AddWindow;
 using Quicker.Windows.ToolWindows;
+using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -177,7 +178,7 @@ namespace Quicker.Windows.MainWindows
         // 在文件管理器中定位应用
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
-            AddWindow addWindow = Application.Current.Windows.OfType<AddWindow>().FirstOrDefault(); // 获取AddWindow实例
+            AddActionWindow addWindow = Application.Current.Windows.OfType<AddActionWindow>().FirstOrDefault(); // 获取AddWindow实例
             OpenFile openFile = addWindow.ActionInfoGrid.Children[0] as OpenFile;
             openFile.ChooseProcess(null, null); // 调用选择进程的方法
         }

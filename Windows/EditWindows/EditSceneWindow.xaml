@@ -17,13 +17,15 @@
         <TextBlock x:Name="LocationTextBlock" HorizontalAlignment="Left" Margin="223,145,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
         <Label Content="路径：" HorizontalAlignment="Left" Margin="146,145,0,0" VerticalAlignment="Top"/>
         <Button x:Name="UpdateLocationButton" Style="{StaticResource WhiteButton}" Content="更新路径..." HorizontalAlignment="Left" Margin="222,165,0,0" VerticalAlignment="Top" Width="80"/>
-        <Label Content="场景名称：" HorizontalAlignment="Left" Margin="122,192,0,0" VerticalAlignment="Top"/>
+        <Label Content="场景名称：" HorizontalAlignment="Left" Margin="122,200,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="222,200,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Label Content="关联其它程序：" HorizontalAlignment="Left" Margin="98,222,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="OtherProgressTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="223,226,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="SelectProgressButton" Style="{StaticResource WhiteButton}" Content="选择窗口" HorizontalAlignment="Left" Margin="400,225,0,0" VerticalAlignment="Top" Width="61" IsEnabled="False"/>
-        <Label Content="其他和当前程序使用相同配置的程序。多个exe文件请使用半角分号分隔。" HorizontalAlignment="Left" Margin="222,248,0,0" VerticalAlignment="Top"/>
-        <Label Content="仅当未对这些软件单独创建设置时有效。" HorizontalAlignment="Left" Margin="223,273,0,0" VerticalAlignment="Top"/>
+        <Grid Visibility="Collapsed" HorizontalAlignment="Left" Height="66" VerticalAlignment="Top" Width="526" Margin="122,225,0,0">
+            <Label Content="关联其它程序：" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBox x:Name="OtherProgressTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="125,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+            <Button x:Name="SelectProgressButton" Style="{StaticResource WhiteButton}" Content="选择窗口" HorizontalAlignment="Left" Margin="302,3,0,0" VerticalAlignment="Top" Width="61" IsEnabled="False"/>
+            <Label Content="其他和当前程序使用相同配置的程序。多个exe文件请使用半角分号分隔。" HorizontalAlignment="Left" Margin="124,26,0,0" VerticalAlignment="Top"/>
+            <Label Content="仅当未对这些软件单独创建设置时有效。" HorizontalAlignment="Left" Margin="125,40,0,0" VerticalAlignment="Top"/>
+        </Grid>
         <Button x:Name="SaveButton" Style="{StaticResource BlueButton}" Content="保存(S)" HorizontalAlignment="Left" Margin="223,317,0,0" VerticalAlignment="Top" Width="79" Click="SaveButton_Click"/>
         <Button x:Name="CancelButton" Style="{StaticResource WhiteButton}" Content="取消" Margin="0,317,0,0" VerticalAlignment="Top" Width="71" Click="CancelButton_Click"/>
     </Grid>
