@@ -1,4 +1,6 @@
 ﻿<Window
+    d:DataContext="{d:DesignInstance Type=viewmodels:FloatingActionWindowViewModel}"
+    xmlns:viewmodels="clr-namespace:Quicker.Windows.FloatingWindows.ViewModels"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Class="Quicker.Windows.FloatingWindows.Windows.FloatingActionWindow"
     xmlns:local="clr-namespace:Quicker.Windows.FloatingWindows.Windows"
@@ -6,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:helpers="clr-namespace:Quicker.Helpers"
+    xmlns:conv="clr-namespace:Quicker.Converters"
     mc:Ignorable="d"
 
     AllowsTransparency="True"
@@ -19,18 +22,91 @@
     Unloaded="FloatingActionWindow_Unloaded"
     Loaded="FloatingActionWindow_Loaded"
 >
+    <Window.Resources>
+        <!-- 转换器 -->
+        <conv:IntToCornerRadiusConverter x:Key="IntToCornerRadiusConverter"/>
+    </Window.Resources>
+
     <Grid Margin="8" HorizontalAlignment="Left" VerticalAlignment="Top">
-        <Border Width="{Binding ElementName=Border, Path=ActualWidth}" Height="{Binding ElementName=Border, Path=ActualHeight}" CornerRadius="5" Background="#F3F3F3">
-            <Border.Effect>
-                <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
-            </Border.Effect>
+        <!-- 窗口阴影 -->
+        <Border Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}" Background="#F3F3F3">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Opacity" Value="1"/>
+                    <Style.Triggers>
+                        <!-- Blur == 0: 有阴影，Opacity=1 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="0">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="1"/>
+                        </DataTrigger>
+                        <!-- Blur == 1: 有阴影，Opacity=0.5 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="1">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                        <!-- Blur == 2: 无阴影，Opacity=1 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="2">
+                            <Setter Property="Effect" Value="{x:Null}"/>
+                            <Setter Property="Opacity" Value="1"/>
+                        </DataTrigger>
+                        <!-- Blur == 3: 无阴影，Opacity=0.5 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="3">
+                            <Setter Property="Effect" Value="{x:Null}"/>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
         </Border>
-        <Border x:Name="Border" CornerRadius="5" helpers:ClipHelper.ClipToBounds="True">
-            <Grid Background="#F3F3F3">
-                <Button x:Name="Button" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Click="Button_Click" MouseRightButtonDown="Button_MouseRightButtonDown">
+        <!-- 窗口模糊 -->
+        <Border x:Name="BlurBorder" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" Background="Transparent" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Effect" Value="{x:Null}"/>
+                    <Setter Property="Opacity" Value="1"/>
+                    <Style.Triggers>
+                        <!-- Blur == 1: 有模糊 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="1">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="5"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                        <!-- Blur == 3: 有模糊 -->
+                        <DataTrigger Binding="{Binding Blur}" Value="3">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="5"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+        <!-- 窗口内容 -->
+        <Border x:Name="Border" Width="{Binding ButtonSize}" Height="{Binding ButtonSize}" CornerRadius="{Binding Win11CornerRadius, Converter={StaticResource IntToCornerRadiusConverter}}" Background="{Binding BackgroundColor}" helpers:ClipHelper.ClipToBounds="True">
+            <Grid Background="{Binding BackgroundColor}">
+                <Button x:Name="Button" MouseEnter="Button_MouseEnter" MouseLeave="Button_MouseLeave" PreviewMouseLeftButtonDown="Button_PreviewMouseLeftButtonDown" PreviewMouseMove="Button_PreviewMouseMove" PreviewMouseLeftButtonUp="Button_PreviewMouseLeftButtonUp" Click="Button_Click" MouseRightButtonDown="Button_MouseRightButtonDown" Tag="{Binding ButtonData}">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="#F3F3F3" BorderThickness="1" CornerRadius="5">
+                            <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="#F3F3F3" BorderThickness="1" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                         </ControlTemplate>

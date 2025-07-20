@@ -128,16 +128,24 @@ namespace Quicker.Windows.FloatingWindows.Windows
         private void ActionButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Button button = (Button)sender;
-            if (button.Tag is ButtonData buttonData)
+            OperationMenu menu = new OperationMenu(button.Tag is ButtonData buttonData ? buttonData.ButtonID : 0, TableName, this);
+            menu.Show();
+        }
+
+        // 关闭窗口时释放资源
+        private void FloatingActionPageWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // 清理所有按钮的Tag
+            var buttons = ActionButtonGrid.Children.OfType<Button>().ToArray();
+            foreach (var button in buttons)
             {
-                OperationMenu menu1 = new OperationMenu(buttonData.ButtonID, TableName, this);
-                menu1.Show();
+                button.Tag = null;
+                button.Content = null;
             }
-            else
-            {
-                OperationMenu menu2 = new OperationMenu(0, TableName, this);
-                menu2.Show();
-            }
+
+            buttonManager?.Dispose(); // 释放管理器
+            viewModel?.Dispose(); // 清理ViewModel
+            this.DataContext = null; // 清理数据上下文
         }
     }
 }

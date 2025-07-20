@@ -19,6 +19,7 @@
     Height="450"
     Width="450"
 
+    Unloaded="FloatingActionPageWindow_Unloaded"
     Loaded="FloatingActionPageWindow_Loaded"
 >
     <Window.Resources>

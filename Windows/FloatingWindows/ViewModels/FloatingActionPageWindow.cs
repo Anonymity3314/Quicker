@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace Quicker.Windows.FloatingWindows.ViewModels
 {
-    public class FloatingActionPageWindowViewModel : INotifyPropertyChanged
+    public class FloatingActionPageWindowViewModel : INotifyPropertyChanged, IDisposable
     {
         public int ActionPageIndex { get; set; } // 当前按钮所在的页面索引
         public string TableName { get; set; } // 表名
@@ -40,6 +40,7 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         // 按钮数据集合
         private readonly ObservableCollection<ButtonData> _buttonDataCollection = new();
         private readonly ButtonDatabase _buttonDatabase = new();
+        private bool _disposed = false;
 
         public ObservableCollection<ButtonData> ButtonDataCollection
         {
@@ -403,6 +404,27 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    _buttonDataCollection.Clear();
+                    // ButtonDatabase没有实现IDisposable，不需要手动释放
+                }
+                // 释放非托管资源
+            }
+            _disposed = true;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Quicker.Database.Core;
+﻿using Quicker.Windows.FloatingWindows.ViewModels;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -10,11 +10,8 @@ namespace Quicker.Windows.FloatingWindows.Windows
 {
     public partial class FloatingActionWindow : Window
     {
-        public int ButtonID { get; private set; } // 当前按钮
-        public string TableName { get; private set; } // 表名
-
+        private readonly FloatingActionWindowViewModel viewModel; // ViewModel
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private SolidColorBrush _normalBrush; // 按钮初始背景色
         private SolidColorBrush _hoverBrush; // 按钮悬停背景色
         private bool _isDragging = false; // 是否正在拖动
@@ -28,16 +25,17 @@ namespace Quicker.Windows.FloatingWindows.Windows
         public FloatingActionWindow(int buttonID, string tableName)
         {
             InitializeComponent();
-            ButtonID = buttonID; // 设置当前按钮
-            TableName = tableName; // 设置表名
+            
+            // 创建并设置ViewModel
+            viewModel = new FloatingActionWindowViewModel(buttonID, tableName);
+            this.DataContext = viewModel;
         }
 
         // 加载窗体
         private void FloatingActionWindow_Loaded(object sender, RoutedEventArgs e)
         {
             SetWindowPositionAndTopmost(); // 设置窗口位置和置顶
-            SetWindowSizeAndBackground(); // 设置窗口大小和背景色
-            InitButtonAppearance(); // 初始化按钮外观
+            SetButtonAppearance(); // 设置按钮外观
             LoadButtonData(); // 加载按钮数据并刷新显示
         }
 
@@ -52,22 +50,12 @@ namespace Quicker.Windows.FloatingWindows.Windows
         }
 
         /// <summary>
-        /// 设置窗口大小和背景色
+        /// 设置按钮外观
         /// </summary>
-        private void SetWindowSizeAndBackground()
+        private void SetButtonAppearance()
         {
-            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault(); // 获取外观设置
-            Border.Height = appearance.ButtonSize; // 设置高度
-            Border.Width = appearance.ButtonSize; // 设置宽度
-            _normalBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonColor)); // 设置按钮初始背景色
-            _hoverBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonMouseOverColor)); // 设置按钮悬停背景色
-        }
-
-        /// <summary>
-        /// 初始化按钮外观
-        /// </summary>
-        private void InitButtonAppearance()
-        {
+            _normalBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(viewModel.ActionButtonColor)); // 设置按钮初始背景色
+            _hoverBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(viewModel.ActionButtonMouseOverColor)); // 设置按钮悬停背景色
             Button.Background = _normalBrush; // 设置按钮初始背景色
         }
 
@@ -76,9 +64,10 @@ namespace Quicker.Windows.FloatingWindows.Windows
         /// </summary>
         private void LoadButtonData()
         {
-            var buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
-            Button.Tag = buttonData; // 绑定数据到按钮
-            buttonManager.RefreshButtonDisplay(Button, buttonData, 60, true); // 刷新按钮显示
+            if (viewModel.ButtonData != null)
+            {
+                buttonManager.RefreshButtonDisplay(Button, viewModel.ButtonData, (int)viewModel.ButtonSize, true); // 刷新按钮显示
+            }
         }
 
         /// <summary>
@@ -120,14 +109,13 @@ namespace Quicker.Windows.FloatingWindows.Windows
         /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!_isDragging)
+            if (!_isDragging && viewModel.ButtonData != null)
             {
-                var buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
                 using (var actionManager = new ActionManager())
                 {
-                    actionManager.DoAction(buttonData, TableName); // 执行动作
-                } // 执行动作
-                db2.IncreaseActionUsedTimes(ButtonID, TableName); // 增加动作使用次数
+                    actionManager.DoAction(viewModel.ButtonData, viewModel.TableName); // 执行动作
+                }
+                viewModel.IncreaseActionUsedTimes(); // 增加动作使用次数
             }
         }
 
@@ -152,7 +140,7 @@ namespace Quicker.Windows.FloatingWindows.Windows
         /// </summary>
         private void Button_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            OperationMenu menu = new OperationMenu(ButtonID, TableName, this); // 创建操作菜单
+            OperationMenu menu = new OperationMenu(viewModel.ButtonID, viewModel.TableName, this); // 创建操作菜单
             menu.Show(); // 显示菜单
         }
 
@@ -165,6 +153,10 @@ namespace Quicker.Windows.FloatingWindows.Windows
             Button.Tag = null;
             _normalBrush = null;
             _hoverBrush = null;
+
+            buttonManager?.Dispose(); // 释放管理器
+            viewModel?.Dispose(); // 清理ViewModel
+            this.DataContext = null; // 清理数据上下文
         }
     }
 }
