@@ -155,22 +155,23 @@ Quicker/
 ├─App.xaml.cs                                         # 应用入口点的代码后台
 ├─AssemblyInfo.cs                                     # 项目的属性和版本信息
 ├─Converters/                                         # XAML 绑定用的值转换器
-│   ├─LighterColorConverter.cs                         # 亮色系转换器
-│   ├─SmartHoverColorConverter.cs                      # 智能悬停色转换器
-│   ├─FontWeightConverter.cs                           # 字体粗细与枚举转换器
-│   ├─ButtonBackgroundConverter.cs                     # 按钮背景色转换器
-│   ├─GridWidthConverter.cs                            # 网格宽度计算转换器
-│   ├─GridHeightConverter.cs                           # 网格高度计算转换器
-│   ├─BorderHeightConverter.cs                         # 边框高度转换器
-│   ├─IntToCornerRadiusConverter.cs                    # int转圆角半径转换器
-│   ├─BlurEffectConverter.cs                           # 模糊效果转换器
-│   ├─PathToImageSourceConverter.cs                    # 路径转图片源转换器
-│   └─ThicknessConverter.cs                            # 边距厚度转换器
+│   ├─HighlightTextConverter.cs                       # 高亮文本转换器
+│   ├─GridWidthConverter.cs                           # 网格宽度计算转换器
+│   ├─GridHeightConverter.cs                          # 网格高度计算转换器
+│   ├─BorderHeightConverter.cs                        # 边框高度转换器
+│   ├─LighterColorConverter.cs                        # 亮色系转换器
+│   ├─SmartHoverColorConverter.cs                     # 智能悬停色转换器
+│   ├─FontWeightConverter.cs                          # 字体粗细与枚举转换器
+│   ├─ButtonBackgroundConverter.cs                    # 按钮背景色转换器
+│   ├─IntToCornerRadiusConverter.cs                   # int转圆角半径转换器
+│   ├─BlurEffectConverter.cs                          # 模糊效果转换器
+│   ├─PathToImageSourceConverter.cs                   # 路径转图片源转换器
+│   └─ThicknessConverter.cs                           # 边距厚度转换器
 ├─Database/                                           # 数据库相关
 │   ├─Core/                                            # 数据库核心操作
-│   │   ├─SettingDatabase.cs						    # 设置数据库，管理应用配置和设置信息
-│   │   ├─ButtonDatabase.cs							    # 按钮数据库，管理动作按钮的数据存储
-│   │   └─ActionPageDatabase.cs						    # 动作页数据库，管理动作页和场景数据
+│   │   ├─SettingDatabase.cs                            # 设置数据库，管理应用配置和设置信息
+│   │   ├─ButtonDatabase.cs                             # 按钮数据库，管理动作按钮的数据存储
+│   │   └─ActionPageDatabase.cs                         # 动作页数据库，管理动作页和场景数据
 │   └─Upgrade/                                         # 数据库升级相关
 │       ├─IDatabaseUpgradeStep.cs                       # 升级步骤接口，定义数据库升级的标准接口
 │       ├─DatabaseUpdateManager.cs                      # 升级调度主类，负责数据库版本检查和升级流程管理
@@ -181,9 +182,10 @@ Quicker/
 │   ├─IExtensionModule.cs                              # 实现扩展的接口
 │   └─ModuleLoader.cs                                  # 扩展模块加载器
 ├─Helpers/                                            # 通用辅助类/附加属性
-│   ├─ClipHelper.cs                                    # UI裁剪附加属性，用于为按钮和边框设置自定义裁剪（圆角）
-│   ├─DataSizeHelper.cs                                # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换
-│   └─VersionHelper.cs                                 # 版本号比较工具类，用于版本号比较和检查更新
+│   ├─TextBlockHelper.cs                              # 文本块辅助类
+│   ├─VersionHelper.cs                                # 版本号比较工具类，用于版本号比较和检查更新
+│   ├─DataSizeHelper.cs                               # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换
+│   └─ClipHelper.cs                                   # UI裁剪附加属性，用于为按钮和边框设置自定义裁剪（圆角）
 ├─InfoData/                                           # 信息数据文件夹
 │   ├─Extensions.json                                  # 扩展信息
 │   ├─UpdateHistory.txt                                # 更新历史
@@ -299,6 +301,15 @@ Quicker/
 │       │   └─ColorPicker.xaml.cs
 │       └─Tools/                                        # 工具控件文件夹
 ├─Windows/                                            # 界面文件夹
+│   ├─FloatingWindows/                                # 悬浮窗口相关
+│   │   ├─Windows/                                    # 悬浮窗口实现文件夹
+│   │   │   ├─FloatingActionPageWindow.xaml           # 悬浮动作页窗口
+│   │   │   ├─FloatingActionPageWindow.xaml.cs        # 悬浮动作页窗口后台
+│   │   │   ├─FloatingActionWindow.xaml               # 悬浮动作窗口
+│   │   │   └─FloatingActionWindow.xaml.cs            # 悬浮动作窗口后台
+│   │   └─ViewModels/                                 # 悬浮窗口ViewModel文件夹
+│   │       ├─FloatingActionPageWindow.cs             # 悬浮动作页窗口ViewModel
+│   │       └─FloatingActionWindow.cs                 # 悬浮动作窗口ViewModel
 │   ├─EditWindows/                                     # 编辑窗口文件夹
 │   │   ├─EditActionPageInfoWindow.xaml                 # 编辑动作页信息窗口
 │   │   │   └─EditActionPageInfoWindow.xaml.cs
@@ -315,6 +326,8 @@ Quicker/
 │   │   │   ├─MainWindow.xaml                             # 主面板
 │   │   │   │   └─MainWindow.xaml.cs
 │   │   │   └─MainWindowViewModel.cs                      # 主面板ViewModel
+│   │   ├─SearchWindow.xaml                              # 搜索窗口
+│   │   │   └─SearchWindow.xaml.cs
 │   │   ├─SelectImageWindow.xaml                         # 选择图片窗口
 │   │   │   └─SelectImageWindow.xaml.cs
 │   │   ├─SettingWindow.xaml                             #  设置窗口
@@ -331,7 +344,7 @@ Quicker/
 │   │   └─SelectActionPageMenu.xaml                     # 选择动作页菜单
 │   │       └─SelectActionPageMenu.xaml.cs
 │   └─ToolWindows/                                     # 工具窗口文件夹
-│       ├─ActionInfoWindow.xaml							# 动作信息窗口
+│       ├─ActionInfoWindow.xaml                         # 动作信息窗口
 │       │   └─ActionInfoWindow.xaml.cs
 │       ├─DownloadWindow.xaml                           # 下载窗口
 │       │   └─DownloadWindow.xaml.cs
