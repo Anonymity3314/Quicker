@@ -4,7 +4,9 @@ using Windows.Management.Deployment;
 using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
+using System.ComponentModel;
 using System.Windows.Media;
+using Quicker.Helpers;
 using System.Xml.Linq;
 using Microsoft.Win32;
 using System.Windows;
@@ -601,12 +603,30 @@ namespace Quicker.Managers
     }
 
     // 定义应用信息类
-    public class AppInfo
+    public class AppInfo : INotifyPropertyChanged
     {
         public string Name { get; set; } // 应用名称
         public string Location { get; set; } // 应用路径
         public ImageSource Icon { get; set; } // 应用图标
         public string Tag { get; set; } // 自定义数据
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText != value)
+                {
+                    _searchText = value;
+                    OnPropertyChanged(nameof(Name));
+                    OnPropertyChanged(nameof(Tag));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         // 获取应用名称的首字母，用于分组
         public string FirstLetter
@@ -623,5 +643,8 @@ namespace Quicker.Managers
                     return "#";
             }
         }
+
+        public HighlightTextData NameAndSearchText => new HighlightTextData { Text = Name, Keyword = SearchText };
+        public HighlightTextData TagAndSearchText => new HighlightTextData { Text = Tag, Keyword = SearchText };
     }
 }

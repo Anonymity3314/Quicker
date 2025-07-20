@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:Quicker.Windows.MainWindows"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     mc:Ignorable="d"
-    
+
     WindowStartupLocation="CenterScreen"
     Title="场景与动作管理"
     Height="850"

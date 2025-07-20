@@ -5,6 +5,8 @@
     xmlns:local="clr-namespace:Quicker.Windows.MainWindows"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Class="Quicker.Windows.MainWindows.FindAppsWindow"
+    xmlns:conv="clr-namespace:Quicker.Converters"
+    xmlns:helpers="clr-namespace:Quicker.Helpers"
     mc:Ignorable="d"
 
     WindowStartupLocation="CenterOwner"
@@ -20,6 +22,7 @@
         <Style x:Key="LeftAlignedHeader" TargetType="GridViewColumnHeader">
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
         </Style>
+        <conv:HighlightTextConverter x:Key="HighlightTextConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -61,7 +64,8 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal"  ToolTip="右键项目复制所在文件夹地址">
                                         <Image Width="16" Height="16" Source="{Binding Icon, IsAsync=True}"/>
-                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        <!-- 应用名称 -->
+                                        <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" helpers:TextBlockHelper.Highlight="{Binding NameAndSearchText}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -69,7 +73,7 @@
                         <GridViewColumn Width="350" HeaderContainerStyle="{StaticResource LeftAlignedHeader}" Header="地址">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Tag, IsAsync=True}" ToolTip="右键项目复制所在文件夹地址"/>
+                                    <TextBlock ToolTip="右键项目复制所在文件夹地址" helpers:TextBlockHelper.Highlight="{Binding TagAndSearchText}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

@@ -151,23 +151,29 @@ namespace Quicker.Windows.MainWindows
             SearchApps(); // 调用搜索方法
         }
 
-        // 输入应用名查找应用
+        /// <summary>
+        /// 根据搜索框输入内容，过滤应用列表，并同步高亮关键字。
+        /// </summary>
         private void SearchApps()
         {
-            string searchText = SearchTextBox.Text.Trim().ToLower(); // 获取搜索文本
-            Application.Current.Dispatcher.Invoke(() => // 在UI线程中执行
+            string searchText = SearchTextBox.Text.Trim(); // 获取搜索框输入的文本，并去除首尾空格
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                _applicationView.Filter = item => // 过滤器
+                // 遍历所有应用，将当前搜索关键字同步到每个AppInfo（用于高亮显示）
+                foreach (var app in _allApplications)
                 {
-                    if (string.IsNullOrEmpty(searchText)) // 如果搜索文本为空，返回所有应用
-                    {
-                        return true;
-                    }
-
-                    AppInfo app = item as AppInfo; // 获取应用信息
-                    return app != null && app.Name.ToLower().Contains(searchText); // 检查应用名称是否包含搜索文本
+                    app.SearchText = searchText;
+                }
+                // 设置集合视图的过滤器，只显示名称中包含搜索关键字的应用
+                _applicationView.Filter = item =>
+                {
+                    if (string.IsNullOrEmpty(searchText))
+                        return true; // 搜索内容为空时显示全部
+                    AppInfo app = item as AppInfo;
+                    // 仅当应用名称包含关键字时显示
+                    return app != null && app.Name.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0;
                 };
-            });
+            }); // 在UI线程中执行过滤和高亮同步
         }
 
         // 刷新ListView
