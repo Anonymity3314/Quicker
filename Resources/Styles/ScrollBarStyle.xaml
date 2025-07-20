@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 >
     <!-- 自定义 Thumb 样式，用于滚动条的滑块 -->
     <Style x:Key="ScrollThumb" TargetType="{x:Type Thumb}">

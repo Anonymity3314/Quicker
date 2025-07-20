@@ -110,46 +110,77 @@ namespace Quicker.Windows.MainWindows
                 : System.Windows.Media.Brushes.Transparent; // 设置背景色
         }
 
-        // 生成场景按钮
-        private void GenerateSceneButtons()
+        // 生成场景按钮（主流程）
+        private void GenerateSceneButtons(string filter = null)
         {
+            ActionPagesButtonPanel.Children.Clear(); // 先清空
             var sceneData = db3.GetAllSceneData(); // 获取所有场景数据
-            var defaultScenes = new List<string> { "Global", "Common", "Taskbar", "Desktop" }; // 默认场景顺序
-            var otherScenes = new List<SceneData>(); // 其他场景
-            foreach (var data in sceneData) // 遍历场景数据
+            var filteredScenes = FilterScenes(sceneData, filter); // 过滤场景
+            var orderedScenes = OrderScenes(filteredScenes); // 排序场景
+            foreach (var data in orderedScenes)
             {
-                if (defaultScenes.Contains(data.SceneName)) // 如果是默认场景，按照指定顺序插入到列表中
+                CreateSceneButton(data, filter); // 创建场景按钮
+            }
+        }
+
+        /// <summary>
+        /// 根据过滤条件筛选场景数据，只保留名称或标签包含关键字的场景。
+        /// </summary>
+        /// <param name="sceneData">所有场景数据</param>
+        /// <param name="filter">过滤关键字</param>
+        /// <returns>筛选后的场景数据列表</returns>
+        private List<SceneData> FilterScenes(IEnumerable<SceneData> sceneData, string filter)
+        {
+            if (string.IsNullOrEmpty(filter))
+                return sceneData.ToList(); // 无过滤条件直接返回所有场景数据
+            string lowerFilter = filter.ToLower(); // 转换为小写字母
+            return sceneData.Where(data =>
+            {
+                string sceneTitle = db3.GetSceneTitle(data);
+                string sceneTag = data.SceneTag ?? ""; // 标签可能为空
+                return sceneTitle.ToLower().Contains(lowerFilter) || sceneTag.ToLower().Contains(lowerFilter);
+            }).ToList(); // 筛选
+        }
+
+        /// <summary>
+        /// 对场景数据进行排序，默认场景优先，其他场景按原顺序排列。
+        /// </summary>
+        /// <param name="scenes">待排序的场景数据</param>
+        /// <returns>排序后的场景数据列表</returns>
+        private List<SceneData> OrderScenes(List<SceneData> scenes)
+        {
+            var defaultScenes = new List<string> { "Global", "Common", "Taskbar", "Desktop" };
+            var ordered = new List<SceneData>(new SceneData[defaultScenes.Count]); // 默认场景
+            var others = new List<SceneData>(); // 其他场景
+            foreach (var data in scenes)
+            {
+                int index = defaultScenes.IndexOf(data.SceneName);
+                if (index >= 0)
                 {
-                    int index = defaultScenes.IndexOf(data.SceneName); // 获取索引
-                    if (index < 0) index = defaultScenes.Count; // 如果索引不存在，则设置为默认列表末尾
-                    while (otherScenes.Count <= index) // 填充空项
-                    {
-                        otherScenes.Add(null); // 添加空项
-                    }
-                    otherScenes[index] = data; // 插入数据
+                    ordered[index] = data;
                 }
                 else
-                    otherScenes.Add(data); // 否则添加到其他场景列表中
+                {
+                    others.Add(data);
+                }
             }
-            otherScenes = otherScenes.Where(s => s != null).ToList(); // 过滤空项
-            foreach (var data in otherScenes) // 添加默认场景和其他场景
-            {
-                CreateSceneButton(data); // 创建场景按钮
-            }
+            // 合并默认场景和其他场景，去除空项
+            return ordered.Where(s => s != null).Concat(others).ToList();
         }
 
         /// <summary>
         /// 创建场景按钮
         /// </summary>
         /// <param name="sceneData"> 场景数据 </param>
-        private void CreateSceneButton(SceneData sceneData)
+        /// <param name="filter"> 过滤关键字 </param>
+        private void CreateSceneButton(SceneData sceneData, string filter = null)
         {
             var button = new Button()
             {
                 Style = FindResource("SceneButton") as Style, // 应用样式
                 Name = sceneData.SceneName // 按钮名称
             };
-            Grid buttonContent = CreateButtonContent(sceneData); // 使用模块化方法创建按钮内容
+            Grid buttonContent = CreateButtonContent(sceneData, filter); // 使用模块化方法创建按钮内容
             button.Content = buttonContent; // 设置按钮内容
             SetupButtonEvents(button); // 使用模块化方法设置按钮事件
             ActionPagesButtonPanel.Children.Add(button); // 将按钮添加到StackPanel
@@ -159,8 +190,9 @@ namespace Quicker.Windows.MainWindows
         /// 创建场景按钮内容
         /// </summary>
         /// <param name="sceneData"> 场景数据 </param>
+        /// <param name="filter"> 过滤关键字 </param>
         /// <returns> 按钮内容 </returns>
-        private Grid CreateButtonContent(SceneData sceneData)
+        private Grid CreateButtonContent(SceneData sceneData, string filter = null)
         {
             Grid buttonContent = new() { Style = FindResource("SceneButtonContentGrid") as Style }; // 创建网格
             Image image = new()
@@ -169,17 +201,29 @@ namespace Quicker.Windows.MainWindows
                 Style = FindResource("SceneButtonImage") as Style // 应用样式
             }; // 创建图片
             buttonContent.Children.Add(image); // 添加到网格
+
+            // 场景名称高亮
             TextBlock sceneName = new()
             {
-                Style = FindResource("SceneNameTextBlock") as Style, // 应用样式
-                Text = db3.GetSceneTitle(sceneData) // 文本内容
-            }; // 创建 TextBlock
+                Style = FindResource("SceneNameTextBlock") as Style,
+            };
+            TextBlockHelper.SetHighlight(sceneName, new HighlightTextData
+            {
+                Text = db3.GetSceneTitle(sceneData),
+                Keyword = filter ?? ""
+            });
             buttonContent.Children.Add(sceneName); // 添加到网格
+
+            // 场景标签高亮
             TextBlock sceneTag = new()
             {
-                Style = FindResource("SceneTagTextBlock") as Style, // 应用样式
-                Text = sceneData.SceneTag, // 文本内容
-            }; // 创建 TextBlock
+                Style = FindResource("SceneTagTextBlock") as Style,
+            };
+            TextBlockHelper.SetHighlight(sceneTag, new HighlightTextData
+            {
+                Text = sceneData.SceneTag ?? "",
+                Keyword = filter ?? ""
+            });
             buttonContent.Children.Add(sceneTag); // 添加到网格
             return buttonContent; // 返回按钮内容
         }
@@ -715,9 +759,8 @@ namespace Quicker.Windows.MainWindows
         // 查找场景按钮
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = SearchTextBox.Text.ToLower(); // 获取用户输入的文本并转换为小写
-            if (string.IsNullOrEmpty(searchText))
-                GenerateSceneButtons(); // 如果文本为空，则加载默认按钮前缀
+            string searchText = SearchTextBox.Text.ToLower().Trim(); // 获取搜索文本
+            GenerateSceneButtons(string.IsNullOrEmpty(searchText) ? null : searchText); // 生成场景按钮
         }
 
         // 双击标签切换动作按钮背景色
