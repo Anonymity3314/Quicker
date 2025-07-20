@@ -76,23 +76,15 @@ namespace Quicker.Windows.MainWindows
                 // 使用AppManager加载应用
                 AppManager appManager = new();
                 appManager.ClearCache(); // 清空缓存
-                
-                // 加载所有应用并排序
-                var apps = await appManager.LoadAllApplicationsAsync();
-                
-                // 将排序后的应用添加到集合中
-                foreach (var app in apps)
+                var apps = await appManager.LoadAllApplicationsAsync(); // 加载所有应用并排序
+                foreach (var app in apps) // 将排序后的应用添加到集合中
                 {
                     _allApplications.Add(app);
                 }
-                
                 // 刷新视图
                 _applicationView.Refresh();
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"加载应用程序时出错: {ex.Message}");
-            }
+            catch { }
             finally
             {
                 InitializeScrollBar(); // 初始化滚动条

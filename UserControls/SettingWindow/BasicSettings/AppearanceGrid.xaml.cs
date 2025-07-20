@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Media;
 using SixLabors.ImageSharp;
+using System.Diagnostics;
 using Quicker.Managers;
 using System.Text.Json;
 using Quicker.Helpers;
@@ -637,55 +638,95 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击“选择...”按钮
         private void BackgroundImagePathButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.OpenFileDialog()
+            BackgroundImagePathPopup.IsOpen = true; // 打开背景图片选择弹出窗口
+        }
+
+        // 选择图片
+        private void SelectBackgroundImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            BackgroundImagePathPopup.IsOpen = false; // 关闭弹窗
+            var dialog = CreateImageOpenFileDialog(); // 创建图片选择对话框
+            var result = dialog.ShowDialog(); // 显示文件选择对话框
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                double aspectRatio = ViewPreviewBorder.ActualWidth / ViewPreviewBorder.ActualHeight; // 计算宽高比
+                var imageCropWindow = new ImageCropWindow(dialog.FileName, aspectRatio, ViewPreviewBorder.CornerRadius); // 创建图片裁剪窗口
+                RegisterImageCropWindowEvents(imageCropWindow); // 注册图片裁剪窗口的事件
+                BackgroundImagePathButton.IsEnabled = false; // 禁用选择按钮
+                imageCropWindow.Show(); // 显示图片裁剪窗口
+            }
+        }
+
+        /// <summary>
+        /// 创建图片选择对话框
+        /// </summary>
+        /// <returns>图片选择对话框</returns>
+        private System.Windows.Forms.OpenFileDialog CreateImageOpenFileDialog()
+        {
+            return new System.Windows.Forms.OpenFileDialog()
             {
                 Filter = "图片文件|*.jpg;*.png;*.bmp",
                 Title = "选择背景图片"
             };
-            var result = dialog.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                double aspectRatio = ViewPreviewBorder.ActualWidth / ViewPreviewBorder.ActualHeight; // 计算宽高比
-                var imageCropWindow = new ImageCropWindow(dialog.FileName, aspectRatio, ViewPreviewBorder.CornerRadius);
-                // 定义事件处理方法，便于后续解绑，防止内存泄漏
-                Action<object, string> cropCompletedHandler = null; // 裁剪完成事件处理器
-                EventHandler closedHandler = null; // 窗口关闭事件处理器
-
-                // 裁剪完成事件：设置图片路径，启用按钮，并解绑事件
-                cropCompletedHandler = (s, croppedPath) =>
-                {
-                    if (!string.IsNullOrEmpty(croppedPath))
-                    {
-                        BackgroundImagePathTextBox.Text = croppedPath; // 设置新图片路径
-                    }
-                    BackgroundImagePathButton.IsEnabled = true; // 启用选择按钮
-                    // 解绑事件，防止内存泄漏
-                    imageCropWindow.CropCompleted -= cropCompletedHandler;
-                    imageCropWindow.Closed -= closedHandler;
-                };
-
-                // 窗口关闭事件：无论是否裁剪，均启用按钮并解绑事件
-                closedHandler = (s, args) =>
-                {
-                    BackgroundImagePathButton.IsEnabled = true; // 启用选择按钮
-                    // 解绑事件，防止内存泄漏
-                    imageCropWindow.CropCompleted -= cropCompletedHandler;
-                    imageCropWindow.Closed -= closedHandler;
-                };
-
-                // 绑定事件，确保窗口关闭或裁剪完成后都能正确处理
-                imageCropWindow.CropCompleted += cropCompletedHandler;
-                imageCropWindow.Closed += closedHandler;
-                BackgroundImagePathButton.IsEnabled = false;
-                imageCropWindow.Show();
-            }
         }
 
-        // 设置背景
-        private void UpdateBackgroundImage()
+        /// <summary>
+        /// 注册图片裁剪窗口的事件，处理裁剪完成和窗口关闭
+        /// </summary>
+        /// <param name="imageCropWindow">图片裁剪窗口</param>
+        private void RegisterImageCropWindowEvents(ImageCropWindow imageCropWindow)
         {
-            var path = BackgroundImagePathTextBox.Text;
-            var opacity = BackgroundImageOpacitySlider.Value;
+            Action<object, string> cropCompletedHandler = null; // 裁剪完成事件处理器
+            EventHandler closedHandler = null; // 窗口关闭事件处理器
+
+            // 裁剪完成事件：设置图片路径，启用按钮，并解绑事件
+            cropCompletedHandler = (s, croppedPath) =>
+            {
+                OnImageCropCompleted(croppedPath);
+                UnregisterImageCropWindowEvents(imageCropWindow, cropCompletedHandler, closedHandler);
+            };
+
+            // 窗口关闭事件：无论是否裁剪，均启用按钮并解绑事件
+            closedHandler = (s, args) =>
+            {
+                BackgroundImagePathButton.IsEnabled = true; // 启用选择按钮
+                UnregisterImageCropWindowEvents(imageCropWindow, cropCompletedHandler, closedHandler);
+            };
+
+            imageCropWindow.CropCompleted += cropCompletedHandler;
+            imageCropWindow.Closed += closedHandler; 
+        }
+
+        /// <summary>
+        /// 处理图片裁剪完成后的逻辑
+        /// </summary>
+        /// <param name="croppedPath">裁剪后的图片路径</param>
+        private void OnImageCropCompleted(string croppedPath)
+        {
+            if (!string.IsNullOrEmpty(croppedPath))
+            {
+                BackgroundImagePathTextBox.Text = croppedPath; // 设置新图片路径
+            }
+            BackgroundImagePathButton.IsEnabled = true; // 启用选择按钮
+        }
+
+        /// <summary>
+        /// 解绑图片裁剪窗口的事件，防止内存泄漏
+        /// </summary>
+        /// <param name="imageCropWindow">图片裁剪窗口</param>
+        /// <param name="cropCompletedHandler">裁剪完成事件处理器</param>
+        /// <param name="closedHandler">窗口关闭事件处理器</param>
+        private void UnregisterImageCropWindowEvents(ImageCropWindow imageCropWindow, Action<object, string> cropCompletedHandler, EventHandler closedHandler)
+        {
+            imageCropWindow.CropCompleted -= cropCompletedHandler;
+            imageCropWindow.Closed -= closedHandler;
+        }
+
+        // 点击“插入剪贴板”按钮
+        private void InsertClipboardTextButton_Click(object sender, RoutedEventArgs e)
+        {
+            string imagePath = Clipboard.GetText().Trim().Replace("\"", ""); // 去除所有引号
+            BackgroundImagePathTextBox.Text = imagePath;
         }
 
         private string _backgroundImagePath; // 背景图片路径
@@ -702,20 +743,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
-        private double _backgroundImageOpacity = 1.0; // 背景图片不透明度
-        public double BackgroundImageOpacity
-        {
-            get => _backgroundImageOpacity;
-            set
-            {
-                if (_backgroundImageOpacity != value)
-                {
-                    _backgroundImageOpacity = value;
-                    OnPropertyChanged(nameof(BackgroundImageOpacity));
-                }
-            }
-        }
-
         // 文本框失去焦点时，保存背景图片路径
         private void BackgroundImagePathTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -726,21 +753,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击按钮分享外观
         private void ShareSaveAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
-            // 获取当前外观设置对象
-            var appearance = settingManager.appearanceConditions;
-            // 序列化为 JSON 字符串
-            string json = JsonSerializer.Serialize(appearance);
-            // 获取作为分享载体的 PNG 图片路径（优先用用户自定义背景，否则用内置图片）
-            string inputPngPath = GetAppearanceCarrierImagePath();
+            var appearance = settingManager.appearanceConditions; // 获取当前外观设置对象
+            string json = JsonSerializer.Serialize(appearance); // 序列化为 JSON 字符串
+            string inputPngPath = GetAppearanceCarrierImagePath(); // 获取作为分享载体的 PNG 图片路径（优先用用户自定义背景，否则用内置图片）
             inputPngPath = EnsureTrueColorPng(inputPngPath); // 保证是32位真彩色
-            // 获取输出路径（自动创建保存文件夹，文件名带时间戳）
-            string outputPngPath = GetShareAppearanceOutputPath();
-            // 写入 PNG 文件并嵌入 JSON 数据
-            WriteAppearanceToPng(inputPngPath, outputPngPath, json);
-            // 显示保存成功的 Toast 提示
-            ShowToast("外观保存成功！", "Success");
-            // 打开资源管理器并选中刚保存的 PNG 文件
-            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{outputPngPath}\"");
+            string outputPngPath = GetShareAppearanceOutputPath(); // 获取输出路径（自动创建保存文件夹，文件名带时间戳）
+            WriteAppearanceToPng(inputPngPath, outputPngPath, json); // 写入 PNG 文件并嵌入 JSON 数据
+            ShowToast("外观保存成功！", "Success"); // 显示保存成功的 Toast 提示
+            Process.Start("explorer.exe", $"/select,\"{outputPngPath}\""); // 打开资源管理器并选中刚保存的 PNG 文件
         }
 
         /// <summary>
