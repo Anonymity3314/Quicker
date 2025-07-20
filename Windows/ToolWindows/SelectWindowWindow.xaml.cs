@@ -12,13 +12,13 @@ namespace Quicker.Windows.ToolWindows
     public partial class SelectWindowWindow
     {
         // 定义窗口选择事件委托和事件
-        public delegate void WindowSelectedEventHandler(object sender, WindowSelectedEventArgs e);
-        public event WindowSelectedEventHandler WindowSelected;
+        public delegate void WindowSelectedEventHandler(object sender, WindowSelectedEventArgs e); // 窗口选择事件委托
+        public event WindowSelectedEventHandler WindowSelected; // 窗口选择事件
 
-        private readonly WindowManager windowManager = new();
-        private readonly IconManager iconManager = new();
-        private bool isSelecting = false;
-        private Window ownerWindow;
+        private readonly WindowManager windowManager = new(); // 窗口管理器
+        private readonly IconManager iconManager = new(); // 图标管理器
+        private bool isSelecting = false; // 是否正在选择
+        private Window ownerWindow; // 所有者窗口
 
         public class WindowSelectedEventArgs : EventArgs
         {
@@ -34,11 +34,14 @@ namespace Quicker.Windows.ToolWindows
             MouseHook.MouseDown += MouseHook_MouseDown;
         }
 
+        /// <summary>
+        /// 开始窗口选择
+        /// </summary>
+        /// <param name="owner"> 所有者窗口 </param>
         public void StartSelecting(Window owner)
         {
-            ownerWindow = owner;
-            isSelecting = true;
-
+            ownerWindow = owner; // 保存所有者窗口
+            isSelecting = true; // 开始选择
             // 最小化所有者窗口
             if (ownerWindow != null)
             {
@@ -46,94 +49,148 @@ namespace Quicker.Windows.ToolWindows
             }
         }
 
+        /// <summary>
+        /// 鼠标按下事件处理
+        /// </summary>
         private async void MouseHook_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (!isSelecting) return;
-            // 只处理鼠标左键点击事件
-            if (e.LeftButton == MouseButtonState.Released)
+            if (!isSelecting) return; // 未开始选择
+            if (e.LeftButton == MouseButtonState.Released) // 鼠标左键释放
             {
-                isSelecting = false;
+                isSelecting = false; // 停止选择
 
-                // 获取鼠标位置
-                GetCursorPos(out POINT point);
+                var point = GetMousePosition(); // 获取鼠标位置
+                nint windowHandle = GetWindowHandleFromPoint(point);
+                if (IsOwnerWindow(windowHandle)) return;
 
-                // 获取鼠标位置下的窗口句柄
-                nint windowHandle = WindowFromPoint(point.X, point.Y);
+                string windowTitle = GetWindowTitle(windowHandle); // 获取窗口标题
+                string processPath = GetProcessPath(windowHandle); // 获取进程路径
+                BitmapSource processIcon = GetProcessIcon(processPath); // 获取进程图标
 
-                // 如果是所有者窗口，则忽略
-                if (ownerWindow != null && windowHandle == new System.Windows.Interop.WindowInteropHelper(ownerWindow).Handle)
-                    return;
+                await RestoreOwnerWindowAsync();
 
-                // 获取窗口标题
-                string windowTitle = GetWindowTitle(windowHandle);
-
-                // 获取进程路径
-                string processPath = GetProcessPath(windowHandle);
-
-                // 获取进程图标
-                BitmapSource processIcon = null;
-                if (!string.IsNullOrEmpty(processPath))
-                {
-                    try
-                    {
-                        processIcon = iconManager.GetIcon(processPath) as BitmapSource;
-                    }
-                    catch
-                    {
-                        // 图标加载失败，忽略
-                    }
-                }
-
-                // 延时10毫秒后恢复所有者窗口
-                await Task.Delay(10);
-                if (ownerWindow != null)
-                {
-                    ownerWindow.WindowState = WindowState.Normal;
-                    ownerWindow.Activate();
-                }
-
-                // 触发窗口选择事件
-                if (!string.IsNullOrEmpty(processPath))
-                {
-                    WindowSelected?.Invoke(this, new WindowSelectedEventArgs
-                    {
-                        WindowHandle = windowHandle,
-                        WindowTitle = windowTitle,
-                        ProcessPath = processPath,
-                        ProcessIcon = processIcon
-                    });
-                }
-
-                // 取消注册鼠标事件
-                MouseHook.MouseDown -= MouseHook_MouseDown;
+                TriggerWindowSelectedEvent(windowHandle, windowTitle, processPath, processIcon); // 触发窗口选择事件
+                MouseHook.MouseDown -= MouseHook_MouseDown; // 取消注册鼠标事件
             }
         }
 
-        private string GetWindowTitle(nint hWnd)
+        /// <summary>
+        /// 获取当前鼠标位置
+        /// </summary>
+        /// <returns> 鼠标位置 </returns>
+        private POINT GetMousePosition()
         {
-            StringBuilder title = new StringBuilder(256);
-            GetWindowText(hWnd, title, title.Capacity);
-            return title.ToString();
+            GetCursorPos(out POINT point); // 获取鼠标位置
+            return point; // 返回鼠标位置
         }
 
+        /// <summary>
+        /// 根据坐标点获取窗口句柄
+        /// </summary>
+        /// <param name="point"> 坐标点 </param>
+        /// <returns> 窗口句柄 </returns>
+        private nint GetWindowHandleFromPoint(POINT point)
+        {
+            return WindowFromPoint(point.X, point.Y); // 获取窗口句柄
+        }
+
+        /// <summary>
+        /// 判断指定窗口句柄是否为所有者窗口
+        /// </summary>
+        /// <param name="windowHandle"> 窗口句柄 </param>
+        /// <returns> 是否为所有者窗口 </returns>
+        private bool IsOwnerWindow(nint windowHandle)
+        {
+            return ownerWindow != null && windowHandle == new System.Windows.Interop.WindowInteropHelper(ownerWindow).Handle;
+        }
+
+        /// <summary>
+        /// 获取指定进程路径的图标
+        /// </summary>
+        /// <param name="processPath"> 进程路径 </param>
+        /// <returns> 图标 </returns>
+        private BitmapSource GetProcessIcon(string processPath)
+        {
+            if (!string.IsNullOrEmpty(processPath))
+            {
+                try
+                {
+                    return iconManager.GetIcon(processPath) as BitmapSource; // 获取图标
+                }
+                catch { }
+            }
+            return null; // 图标获取失败
+        }
+
+        /// <summary>
+        /// 恢复所有者窗口到正常状态并激活
+        /// </summary>
+        /// <returns> 异步任务 </returns>
+        private async Task RestoreOwnerWindowAsync()
+        {
+            await Task.Delay(10); // 等待10毫秒，确保所有者窗口完全最小化
+            if (ownerWindow != null)
+            {
+                ownerWindow.WindowState = WindowState.Normal; // 恢复所有者窗口
+                ownerWindow.Activate(); // 所有者窗口激活
+            }
+        }
+
+        /// <summary>
+        /// 触发窗口选择事件
+        /// </summary>
+        /// <param name="windowHandle"> 窗口句柄 </param>
+        /// <param name="windowTitle"> 窗口标题 </param>
+        /// <param name="processPath"> 进程路径 </param>
+        /// <param name="processIcon"> 进程图标 </param>
+        private void TriggerWindowSelectedEvent(nint windowHandle, string windowTitle, string processPath, BitmapSource processIcon)
+        {
+            if (!string.IsNullOrEmpty(processPath))
+            {
+                WindowSelected?.Invoke(this, new WindowSelectedEventArgs
+                {
+                    WindowHandle = windowHandle,
+                    WindowTitle = windowTitle,
+                    ProcessPath = processPath,
+                    ProcessIcon = processIcon
+                }); // 触发窗口选择事件
+            }
+        }
+
+        /// <summary>
+        /// 获取窗口标题
+        /// </summary>
+        /// <param name="hWnd"> 窗口句柄 </param>
+        /// <returns> 窗口标题 </returns>
+        private string GetWindowTitle(nint hWnd)
+        {
+            StringBuilder title = new StringBuilder(256); // 窗口标题缓冲区
+            GetWindowText(hWnd, title, title.Capacity); // 获取窗口标题
+            return title.ToString(); // 返回窗口标题
+        }
+
+        /// <summary>
+        /// 获取指定窗口句柄的进程路径
+        /// </summary>
+        /// <param name="hWnd"> 窗口句柄 </param>
+        /// <returns> 进程路径 </returns>
         private string GetProcessPath(nint hWnd)
         {
             try
             {
-                GetWindowThreadProcessId(hWnd, out uint processId);
-                Process process = Process.GetProcessById((int)processId);
-                return process.MainModule?.FileName ?? string.Empty;
+                GetWindowThreadProcessId(hWnd, out uint processId); // 获取进程ID
+                Process process = Process.GetProcessById((int)processId); // 获取进程对象
+                return process.MainModule?.FileName ?? string.Empty; // 返回进程路径
             }
             catch
             {
-                return string.Empty;
+                return string.Empty; // 进程获取失败
             }
         }
 
         public void Close()
         {
-            // 取消注册鼠标事件
-            MouseHook.MouseDown -= MouseHook_MouseDown;
+            MouseHook.MouseDown -= MouseHook_MouseDown; // 取消注册鼠标事件
 
             // 释放资源
             windowManager.Dispose();

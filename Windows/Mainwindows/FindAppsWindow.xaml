@@ -30,7 +30,7 @@
         <Button Style="{StaticResource WhiteButton}" Content="搜索" Margin="168,17,0,0" Click="SearchButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="48" Height="27"/>
         <Button Style="{StaticResource WhiteButton}" Content="刷新" Margin="242,17,0,0" Click="RefreshButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="50" Height="27"/>
         <Button Style="{StaticResource WhiteButton}" Content="浏览..." Margin="305,17,0,0" Click="BrowseButton_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="55" Height="27"/>
-        <Button x:Name="SelectWindowButton" Style="{StaticResource WhiteButton}" Margin="382.5,17,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="86" Height="27" Click="SelectWindowButton_Click" IsEnabled="False">
+        <Button x:Name="SelectWindowButton" Style="{StaticResource WhiteButton}" Margin="382.5,17,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="86" Height="27" Click="SelectWindowButton_Click">
             <Grid Width="76">
                 <TextBlock Text="选择窗口" Margin="23,0,0,0"/>
                 <Image Source="/Resources/Images/Quicker1.png" Margin="5,0,56,0" Width="15" Height="15"/>
