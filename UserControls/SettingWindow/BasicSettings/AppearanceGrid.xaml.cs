@@ -391,7 +391,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             // 异步加载按钮数据，避免阻塞UI
             var globalButtons = await Task.Run(() => db2.GetPagesOfButtons("Global", 0)); // 获取全局按钮数据
-            
             var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 获取Grid中的所有Button
             for (int i = 0; i < buttons.Count; i++)
             {

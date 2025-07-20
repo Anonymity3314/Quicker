@@ -49,7 +49,7 @@
                         </Grid>
                     </Button>
                     <Rectangle x:Name="Rectangle2" Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
-                    <Button x:Name="SuspendAction" Style="{StaticResource MenuButton}" ToolTip="悬浮动作" Click="SuspendAction_Click">
+                    <Button x:Name="SuspendAction" Style="{StaticResource MenuButton}" ToolTip="悬浮动作" MouseEnter="SuspendAction_MouseEnter" MouseLeave="SuspendAction_MouseLeave">
                         <Grid Width="194">
                             <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮"/>
@@ -102,14 +102,52 @@
                 </StackPanel>
             </Border>
         </Grid>
-        <Grid x:Name="ChiildGrid" Margin="219,147,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Grid x:Name="FirstChildGrid" Margin="0,0,0,0" MouseLeave="FirstChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
+        <Grid x:Name="ChiildGrid1" Margin="219,79,0,0">
+            <Grid x:Name="ChildGrid" Margin="0" HorizontalAlignment="Left" VerticalAlignment="Top" MouseLeave="ChildGrid_MouseLeave">
                 <!-- 窗口阴影 -->
-                <Rectangle Fill="White" Margin="5,7">
-                    <Rectangle.Effect>
+                <Border CornerRadius="3" Background="White" Margin="5">
+                    <Border.Effect>
                         <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-                    </Rectangle.Effect>
-                </Rectangle>
+                    </Border.Effect>
+                </Border>
+                <Border CornerRadius="3" Background="White">
+                    <StackPanel>
+                        <Button x:Name="FloatActionButton" Style="{StaticResource MenuButton}" Click="FloatActionButton_Click" Margin="0,3,0,0">
+                            <Button.ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="将动作悬浮在桌面方便随身点击"/>
+                                    <!--<TextBlock Text="【面板窗口快速触发方式】右键拖拽 或Alt+左键拖拽悬浮。"/>-->
+                                </StackPanel>
+                            </Button.ToolTip>
+                            <Grid Width="194">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮此动作"/>
+                            </Grid>
+                        </Button>
+                        <Button x:Name="FloatActionPageButton" Margin="0,0,0,3" Style="{StaticResource MenuButton}" Click="FloatActionPageButton_Click">
+                            <Button.ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="悬浮动作所在动作页"/>
+                                    <!--<TextBlock Text="【面板窗口快速触发方式】Ctrl+右键点击动作页。"/>-->
+                                </StackPanel>
+                            </Button.ToolTip>
+                            <Grid Width="194">
+                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮动作页"/>
+                            </Grid>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+        <Grid x:Name="ChiildGrid2" Margin="219,211,0,0">
+            <Grid x:Name="FirstChildGrid" Margin="0" MouseLeave="FirstChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <!-- 窗口阴影 -->
+                <Border CornerRadius="3" Background="White" Margin="5">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Border.Effect>
+                </Border>
                 <Border CornerRadius="3" Background="White">
                     <StackPanel>
                         <Button x:Name="ExportAction" Style="{StaticResource MenuButton}" ToolTip="导出动作定义到文件" Margin="0,3" Click="ExportAction_Click">
@@ -118,7 +156,7 @@
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="导出动作"/>
                             </Grid>
                         </Button>
-                        <Rectangle Height="1" Fill="#FFF0F0F0" Width="130"/>
+                        <Rectangle Height="1" Fill="#F0F0F0" Width="130"/>
                         <Button x:Name="CheckImformation" Style="{StaticResource MenuButton}" ToolTip="查看动作信息" Margin="0,3,0,0" Click="CheckImformation_Click">
                             <Grid Width="130">
                                 <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
@@ -136,7 +174,7 @@
             </Grid>
             <Grid x:Name="SecondChildGrid" Margin="130,57,0,0" MouseLeave="SecondChildGrid_MouseLeave" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <!-- 窗口阴影 -->
-                <Border Background="White" Margin="5">
+                <Border CornerRadius="3" Background="White" Margin="5">
                     <Border.Effect>
                         <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
                     </Border.Effect>

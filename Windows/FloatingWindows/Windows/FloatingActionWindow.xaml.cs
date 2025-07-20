@@ -6,7 +6,7 @@ using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
 
-namespace Quicker.Windows.FloatingWindows
+namespace Quicker.Windows.FloatingWindows.Windows
 {
     public partial class FloatingActionWindow : Window
     {
@@ -125,7 +125,7 @@ namespace Quicker.Windows.FloatingWindows
                 var buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
                 using (var actionManager = new ActionManager())
                 {
-                    actionManager.DoAction(buttonData); // 执行动作
+                    actionManager.DoAction(buttonData, TableName); // 执行动作
                 } // 执行动作
                 db2.IncreaseActionUsedTimes(ButtonID, TableName); // 增加动作使用次数
             }

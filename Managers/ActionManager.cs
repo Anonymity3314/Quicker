@@ -1,12 +1,13 @@
 ﻿using System.Runtime.InteropServices;
-using System.Diagnostics;
+using Quicker.Database.Core;
 using IWshRuntimeLibrary;
+using System.Diagnostics;
 using Quicker.Database;
-using Microsoft.Win32;
 using Quicker.Windows;
+using Microsoft.Win32;
 using Quicker.Extend;
-using System.Windows;
 using Quicker.Models;
+using System.Windows;
 using System.IO;
 
 namespace Quicker.Managers
@@ -357,28 +358,29 @@ namespace Quicker.Managers
         /// 执行动作
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        public void DoAction(ButtonData data)
+        public void DoAction(ButtonData data,string tableName)
         {
-            if (data.ActionType == "OpenFile")
+            switch (data.ActionType)
             {
-                OpenFile(data);
+                case "OpenFile":
+                    OpenFile(data);
+                    break;
+                case "OpenWebsite":
+                    OpenWebsite(data);
+                    break;
+                case "OpenFiles":
+                    OpenFiles(data);
+                    break;
+                case "OpenUwpApp":
+                    OpenUwpApp(data);
+                    break;
+                case "LoadExtension":
+                    LoadExtension(data);
+                    break;
             }
-            else if (data.ActionType == "OpenWebsite")
-            {
-                OpenWebsite(data);
-            }
-            else if (data.ActionType == "OpenFiles")
-            {
-                OpenFiles(data);
-            }
-            else if (data.ActionType == "OpenUwpApp")
-            {
-                OpenUwpApp(data);
-            }
-            else if (data.ActionType == "LoadExtension")
-            {
-                LoadExtension(data);
-            }
+            // 增加动作使用次数
+            var buttonDatabase = new ButtonDatabase();
+            buttonDatabase.IncreaseActionUsedTimes(data.ButtonID, tableName);
         }
 
         // 实现IDisposable接口

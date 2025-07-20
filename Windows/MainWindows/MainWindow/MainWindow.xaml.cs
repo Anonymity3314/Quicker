@@ -239,10 +239,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
 
                 using (var actionManager = new ActionManager())
                 {
-                    actionManager.DoAction(data);
+                    actionManager.DoAction(data, buttonType);
                 }
-                db2.IncreaseActionUsedTimes(data.ButtonID, buttonType); // 增加动作使用次数
-
                 HandleAutoReturn(buttonType); // 处理自动返回
             }
             else

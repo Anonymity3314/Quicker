@@ -1,5 +1,5 @@
-﻿using Quicker.Windows.MainWindows.MainWindow;
-using Quicker.Windows.FloatingWindows;
+﻿using Quicker.Windows.FloatingWindows.Windows;
+using Quicker.Windows.MainWindows.MainWindow;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
@@ -48,6 +48,7 @@ namespace Quicker.Windows.Menus
         public OperationMenu(int buttonID, string tableName, Window window = null)
         {
             InitializeComponent(); // 初始化窗口
+            ChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             SecondChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             ButtonID = buttonID; // 设置当前按钮
@@ -62,16 +63,32 @@ namespace Quicker.Windows.Menus
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
 
+            try
+            {
+                SetChidGridsMargin(); // 设置子菜单位置
+            }
+            catch { }
+        }
+
+        // 设置子菜单位置
+        private void SetChidGridsMargin()
+        {
+            Point suspendAction = SuspendAction.TransformToAncestor(this).Transform(new Point(0, 0));
+            Point floatActionButton = FloatActionButton.TransformToAncestor(this).Transform(new Point(0, 0));
+            double deltaY1 = suspendAction.Y - floatActionButton.Y;
+            ChiildGrid1.Margin = new Thickness(219, 79 + deltaY1, 0, 0); // 设置子菜单位置
+
             // 获取按钮的绝对位置
             Point otherFunctionPoint = OtherFunction.TransformToAncestor(this).Transform(new Point(0, 0));
             Point exportActionPoint = ExportAction.TransformToAncestor(this).Transform(new Point(0, 0));
-            double deltaY = otherFunctionPoint.Y - exportActionPoint.Y;
-            ChiildGrid.Margin = new Thickness(219, 147 + deltaY, 0, 0); // 设置子菜单位置
+            double deltaY2 = otherFunctionPoint.Y - exportActionPoint.Y;
+            ChiildGrid2.Margin = new Thickness(219, 211 + deltaY2, 0, 0); // 设置子菜单位置
         }
 
         // 初始化菜单
         private void InitializeMenu()
         {
+            AdjustUIForPreviousWindow(); // 根据上一个窗口调整界面
             ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             if (buttonData == null) // 按钮数据不存在
             {
@@ -80,7 +97,6 @@ namespace Quicker.Windows.Menus
             }
             AdjustUIForButtonType(buttonData); // 根据按钮类型调整界面
             AdjustUIForClipboard(); // 根据剪贴板内容调整界面
-            AdjustUIForPreviousWindow(); // 根据上一个窗口调整界面
         }
 
         // 更新主窗口按钮
@@ -117,19 +133,117 @@ namespace Quicker.Windows.Menus
         // 根据上一个窗口调整界面
         private void AdjustUIForPreviousWindow()
         {
-            if (FatherWindow is MainWindow ||
-                FatherWindow is ActionPageManageWindow)  // 如果是主窗口
+            if (FatherWindow is MainWindow || FatherWindow is ActionPageManageWindow)
             {
-                MainStackPanel.Children.Remove(CloseFloatButton); // 移除关闭浮动按钮
-                MainStackPanel.Children.Remove(Rectangle1); // 移除分割线
-                EditeInformation.Margin = new Thickness(0, 5, 0, 0); // 调整编辑信息按钮位置
+                AdjustUIForMainWindow();
+            }
+            else if (FatherWindow is FloatingActionPageWindow)
+            {
+                AdjustUIForFloatingActionPageWindow();
             }
             else
             {
-                MainStackPanel.Children.Remove(SuspendAction); // 移除悬浮动按钮
-                MainStackPanel.Children.Remove(Rectangle2); // 移除分割线
+                AdjustUIForOtherWindows();
             }
+        }
+
+        /// <summary>
+        /// 为主窗口调整界面
+        /// </summary>
+        private void AdjustUIForMainWindow()
+        {
+            MainStackPanel.Children.Remove(CloseFloatButton); // 移除关闭浮动按钮
+            MainStackPanel.Children.Remove(Rectangle1); // 移除分割线
+            EditeInformation.Margin = new Thickness(0, 5, 0, 0); // 调整编辑信息按钮位置
             MainGrid.Height -= 32; // 设置网格高度
+        }
+
+        /// <summary>
+        /// 为浮动动作页面窗口调整界面
+        /// </summary>
+        private void AdjustUIForFloatingActionPageWindow()
+        {
+            if (ButtonID == 0)
+            {
+                AdjustUIForFloatingActionPageWindowWithButtonIDZero();
+            }
+            else
+            {
+                AdjustUIForFloatingActionPageWindowWithNonZeroButtonID();
+            }
+        }
+
+        /// <summary>
+        /// 为浮动动作页面窗口（ButtonID为0）调整界面
+        /// </summary>
+        private void AdjustUIForFloatingActionPageWindowWithButtonIDZero()
+        {
+            // 移除除了CloseFloatButton之外的所有元素
+            var elementsToRemove = GetElementsToRemoveExceptCloseFloatButton();
+            RemoveElementsFromMainStackPanel(elementsToRemove);
+
+            // 调整CloseFloatButton的位置和MainGrid的高度
+            CloseFloatButton.Margin = new Thickness(0, 5, 0, 5);
+            MainGrid.Height = 35;
+        }
+
+        /// <summary>
+        /// 为浮动动作页面窗口（ButtonID不为0）调整界面
+        /// </summary>
+        private void AdjustUIForFloatingActionPageWindowWithNonZeroButtonID()
+        {
+            MainStackPanel.Children.Remove(CloseFloatButton); // 移除关闭浮动按钮
+            MainStackPanel.Children.Remove(Rectangle1); // 移除分割线
+            EditeInformation.Margin = new Thickness(0, 5, 0, 0); // 调整编辑信息按钮位置
+            MainGrid.Height -= 32; // 设置网格高度
+        }
+
+        /// <summary>
+        /// 为其他窗口调整界面
+        /// </summary>
+        private void AdjustUIForOtherWindows()
+        {
+            MainStackPanel.Children.Remove(SuspendAction); // 移除悬浮动按钮
+            MainStackPanel.Children.Remove(Rectangle2); // 移除分割线
+            MainGrid.Height -= 32; // 设置网格高度
+        }
+
+        /// <summary>
+        /// 获取除了CloseFloatButton之外需要移除的元素
+        /// </summary>
+        /// <returns>需要移除的元素列表</returns>
+        private List<UIElement> GetElementsToRemoveExceptCloseFloatButton()
+        {
+            var elementsToRemove = new List<UIElement>();
+            foreach (object element in MainStackPanel.Children)
+            {
+                if (element is Button button)
+                {
+                    // 如果是Button，判断是否为CloseFloatButton
+                    if (button != CloseFloatButton)
+                    {
+                        elementsToRemove.Add(button);
+                    }
+                }
+                else if (element is UIElement uiElement)
+                {
+                    // 如果不是Button但是UIElement，直接添加到移除列表
+                    elementsToRemove.Add(uiElement);
+                }
+            }
+            return elementsToRemove;
+        }
+
+        /// <summary>
+        /// 从MainStackPanel中移除指定的元素
+        /// </summary>
+        /// <param name="elementsToRemove">需要移除的元素列表</param>
+        private void RemoveElementsFromMainStackPanel(List<UIElement> elementsToRemove)
+        {
+            foreach (var element in elementsToRemove)
+            {
+                MainStackPanel.Children.Remove(element);
+            }
         }
 
         #endregion
@@ -170,19 +284,6 @@ namespace Quicker.Windows.Menus
             this.Close(); // 关闭窗口
         }
 
-        // 悬浮动作
-        private void SuspendAction_Click(object sender, RoutedEventArgs e)
-        {
-            this.Visibility = Visibility.Hidden; // 隐藏窗口
-            ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
-            if (buttonData != null) // 按钮数据不为空
-            {
-                FloatingActionWindow floatingActionWindow = new(ButtonID, TableName); // 创建悬浮动作窗口
-                floatingActionWindow.Show(); // 显示悬浮动作窗口
-            }
-            this.Close(); // 关闭窗口
-        }
-
         // 更新UI（删除动作后）
         private void UpdateUIAfterActionDelete()
         {
@@ -214,6 +315,27 @@ namespace Quicker.Windows.Menus
         private void CloseFloatButton_Click(object sender, RoutedEventArgs e)
         {
             FatherWindow.Close(); // 关闭父窗口
+            this.Close(); // 关闭窗口
+        }
+
+        private void FloatActionButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
+            ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
+            if (buttonData != null) // 按钮数据不为空
+            {
+                FloatingActionWindow floatingActionWindow = new(ButtonID, TableName); // 创建悬浮动作窗口
+                floatingActionWindow.Show(); // 显示悬浮动作窗口
+            }
+            this.Close(); // 关闭窗口
+        }
+
+        private void FloatActionPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden; // 隐藏窗口
+            int actionPageIndex = ButtonID / 100; // 获取动作页面索引
+            FloatingActionPageWindow floatingActionPageWindow = new(actionPageIndex, TableName); // 创建悬浮动作窗口
+            floatingActionPageWindow.Show(); // 显示悬浮动作窗口
             this.Close(); // 关闭窗口
         }
 
@@ -437,6 +559,7 @@ namespace Quicker.Windows.Menus
         #endregion
 
         #region UI交互
+
         // 失去焦点时关闭操作菜单
         private void OperationMenu_Deactivated(object sender, EventArgs e)
         {
@@ -448,6 +571,31 @@ namespace Quicker.Windows.Menus
                 this.Visibility = Visibility.Hidden; // 隐藏窗口
                 using var windowManager = new WindowManager(); // 创建窗口管理器
                 windowManager.CloseMenuAsync(this); // 延时关闭窗口
+            }
+        }
+
+        // 鼠标移入显示子菜单
+        private void SuspendAction_MouseEnter(object sender, MouseEventArgs e)
+        {
+            SuspendAction.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 改变背景颜色
+            ChildGrid.Visibility = Visibility.Visible; // 显示子菜单
+        }
+
+        // 鼠标移出关闭子菜单
+        private void SuspendAction_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (ChildGrid.IsMouseOver) return;
+            SuspendAction.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White"));
+            ChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+        }
+
+        // 鼠标移出关闭子菜单
+        private void ChildGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!MainGrid.IsMouseOver && !ChildGrid.IsMouseOver && !OtherFunction.IsMouseOver)
+            {
+                SuspendAction.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("White")); // 还原背景颜色
+                ChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             }
         }
 
@@ -499,6 +647,7 @@ namespace Quicker.Windows.Menus
                 FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             }
         }
+
         #endregion
 
         #region 辅助方法

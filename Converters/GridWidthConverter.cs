@@ -1,7 +1,7 @@
 ﻿namespace Quicker.Converters
 {
     /// <summary>
-    /// GridWidthConverter：用于计算Grid的高度，根据按钮大小、间隙、行数计算。
+    /// GridWidthConverter：用于计算Grid的宽度，根据按钮大小、间隙、列数计算。
     /// </summary>
     public class GridWidthConverter : System.Windows.Data.IMultiValueConverter
     {
