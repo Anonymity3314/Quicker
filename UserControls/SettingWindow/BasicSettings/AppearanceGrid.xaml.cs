@@ -1,5 +1,6 @@
 ﻿using SixLabors.ImageSharp.Formats.Png.Chunks;
 using Color = System.Windows.Media.Color;
+using Image = SixLabors.ImageSharp.Image;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using Point = System.Windows.Point;
@@ -129,11 +130,17 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private async Task LoadSettingsAsync()
         {
             await settingManager.LoadAppearanceAsync(); // 初始化缓存数据
-            
             // 分批更新UI，减少闪烁
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                // 第一批：基础设置
+                // 第一批：选项设置（包含预览）
+                ApplyOptionSettings();
+                ResetAppearanceButton.Visibility = Visibility.Collapsed; // 初始化重置按钮为隐藏状态
+            });
+
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                // 第二批：基础设置
                 ApplyButtonSettings();
                 ApplyColorSettings();
                 ApplyFontSettings();
@@ -141,16 +148,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             
             await Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                // 第二批：背景和模糊设置
+                // 第三批：背景和模糊设置
                 ApplyBackgroundImageSettings();
                 ApplyBlurAndCornerSettings();
-            });
-            
-            await Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                // 第三批：选项设置（包含预览）
-                ApplyOptionSettings();
-                ResetAppearanceButton.Visibility = Visibility.Collapsed; // 初始化重置按钮为隐藏状态
             });
         }
 
@@ -215,13 +215,16 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ShowActionIconShadowCheckBox.IsChecked = settingManager.appearanceConditions.ShowActionIconShadow; // 设置显示动作图标阴影
 
             EnablePreviewCheckBox.IsChecked = settingManager.appearanceConditions.EnablePreview; // 设置显示设置应用效果
-            
-            // 延迟加载预览区域，避免立即触发
+
+            // 直接设置预览区域可见性，避免调用EnablePreviewCheckBox_Click导致的逻辑问题
+            ViewPreviewBorder.Visibility = settingManager.appearanceConditions.EnablePreview ? Visibility.Visible : Visibility.Collapsed;
+
+            // 如果开启预览，延迟加载预览区域
             if (settingManager.appearanceConditions.EnablePreview)
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    EnablePreviewCheckBox_Click(null, null); // 切换预览可见性
+                    LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
                 }), System.Windows.Threading.DispatcherPriority.Background);
             }
         }
@@ -649,7 +652,25 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             var result = dialog.ShowDialog(); // 显示文件选择对话框
             if (result == System.Windows.Forms.DialogResult.OK)
             {
-                double aspectRatio = ViewPreviewBorder.ActualWidth / ViewPreviewBorder.ActualHeight; // 计算宽高比
+                double aspectRatio;
+                if(settingManager.appearanceConditions.EnablePreview) // 根据预览器可见性使用不同方法，保证性能
+                {
+                    aspectRatio = ViewPreviewBorder.ActualWidth / ViewPreviewBorder.ActualHeight; // 计算宽高比
+                }
+                else
+                {
+                    // 使用转换器逻辑计算宽高比，避免依赖ViewPreviewBorder的ActualWidth/ActualHeight
+                    double btnSize = ButtonSizeSlider.Value;
+                    double gap = ButtonGapSlider.Value;
+
+                    // 计算宽度：btnSize * 4 + gap * 3 (4列，3个间隙)
+                    double width = btnSize * 4 + gap * 3;
+
+                    // 计算高度：31 + 25.5 + btnSize * 7 + gap * 5 (标题栏31 + 功能栏25.5 + 按钮区域 + 间隙)
+                    double height = 31 + 25.5 + btnSize * 7 + gap * 5;
+
+                    aspectRatio = width / height; // 计算宽高比
+                }
                 var imageCropWindow = new ImageCropWindow(dialog.FileName, aspectRatio, ViewPreviewBorder.CornerRadius); // 创建图片裁剪窗口
                 RegisterImageCropWindowEvents(imageCropWindow); // 注册图片裁剪窗口的事件
                 BackgroundImagePathButton.IsEnabled = false; // 禁用选择按钮
@@ -886,7 +907,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private Appearance ImportAppearanceFromPng(string pngPath)
         {
             string json = null;
-            using (var image = SixLabors.ImageSharp.Image.Load(pngPath))
+            using (var image = Image.Load(pngPath))
             {
                 var pngMeta = image.Metadata.GetPngMetadata();
                 var textData = pngMeta.TextData.FirstOrDefault(t => t.Keyword == "QuickerAppearance");
@@ -983,7 +1004,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <param name="destPath"> 目标 PNG 文件路径 </param>
         private void RemoveTextChunkAndCopy(string srcPath, string destPath)
         {
-            using (var image = SixLabors.ImageSharp.Image.Load(srcPath)) // 用 ImageSharp 读取图片像素并去除所有 tEXt/iTXt/zTXt 元数据
+            using (var image = Image.Load(srcPath)) // 用 ImageSharp 读取图片像素并去除所有 tEXt/iTXt/zTXt 元数据
             {
                 var pngMeta = image.Metadata.GetPngMetadata();
                 pngMeta.TextData.Clear(); // 移除所有文本块
@@ -999,7 +1020,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 Directory.CreateDirectory(folderPath);
             }
-            System.Diagnostics.Process.Start("explorer.exe", folderPath); // 使用资源管理器打开该文件夹
+            Process.Start("explorer.exe", folderPath); // 使用资源管理器打开该文件夹
         }
 
         // 预置样式按钮点击事件
@@ -1069,9 +1090,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private void ApplyPresetToCurrentSettings(Appearance preset)
         {
             var current = settingManager.appearanceConditions;
-            
-            // 复制预置样式的所有属性到当前设置
-            foreach (var prop in typeof(Appearance).GetProperties())
+            foreach (var prop in typeof(Appearance).GetProperties()) // 复制预置样式的所有属性到当前设置
             {
                 if (prop.CanWrite)
                 {
@@ -1090,7 +1109,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             settingManager.appearanceConditions.ShowActionButtonMouseOver = options.ShowActionButtonMouseOver;
             settingManager.appearanceConditions.HideActionNameAfterIcon = options.HideActionNameAfterIcon;
             settingManager.appearanceConditions.ShowActionIconShadow = options.ShowActionIconShadow;
-            
+
             // 确保预览功能开启
             settingManager.appearanceConditions.EnablePreview = true;
         }
@@ -1106,7 +1125,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ApplyBackgroundImageSettings(); // 应用背景图片设置
             ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
             ApplyOptionSettings(); // 应用选项设置
-            LoadGlobalButtonsForPreview(); // 加载全局按钮列表并显示预览区
+            
+            // 只在预览功能开启时才加载预览按钮
+            if (settingManager.appearanceConditions.EnablePreview)
+            {
+                LoadGlobalButtonsForPreview(); // 加载全局按钮列表并显示预览区
+            }
         }
 
         /// <summary>
