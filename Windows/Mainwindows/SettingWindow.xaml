@@ -34,10 +34,13 @@
             </Button>
         </StackPanel>
         <!-- 侧边栏2 -->
-        <Grid x:Name="MenuGrid" HorizontalAlignment="Center" Grid.Column="1" Width="192">
+        <Grid x:Name="MenuGrid" Background="#FFF0F0F0" HorizontalAlignment="Center" Grid.Column="1" Width="192">
+            <Grid Height="60" HorizontalAlignment="Left" VerticalAlignment="Top" Width="192">
+                <TextBox x:Name="SearchBox" Margin="22,0" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Style="{StaticResource RoundedTextBox}" TextChanged="SearchBox_TextChanged"/>
+            </Grid>
             <!-- 基础设置 -->
-            <StackPanel x:Name="BasicSettingsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Visible">
-                <Button x:Name="Convention" ToolTip="自动启动、鼠标挂钩、版本等" Style="{StaticResource Button2}" Background="#FFFAFAFA" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
+            <StackPanel x:Name="BasicSettingsStackPanel" Width="192" Visibility="Visible" Margin="0,60,0,0">
+                <Button x:Name="Convention" ToolTip="自动启动、鼠标挂钩、版本等" Style="{StaticResource Button2}" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/SettingImage2.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="常规" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
@@ -75,9 +78,9 @@
                 </Button>
             </StackPanel>
             <!-- 辅助功能 -->
-            <StackPanel x:Name="Auxiliary_FunctionsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
+            <StackPanel x:Name="Auxiliary_FunctionsStackPanel" Width="192" Margin="0,40,0,0" Visibility="Hidden"/>
             <!-- 工具 -->
-            <StackPanel x:Name="ToolsStackPanel" Background="#FFF0F0F0" Width="195" Visibility="Hidden"/>
+            <StackPanel x:Name="ToolsStackPanel" Width="192" Margin="0,40,0,0" Visibility="Hidden"/>
         </Grid>
         <!-- 设置菜单 -->
         <Grid x:Name="ResultGrid" Margin="4,0,0,0" Grid.Column="2">

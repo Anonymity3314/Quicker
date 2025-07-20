@@ -541,6 +541,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // "开启预览"复选框点击事件
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
+            if(settingManager == null) return; // 防止空引用
             settingManager.appearanceConditions.EnablePreview = EnablePreviewCheckBox.IsChecked == true; // 同步复选框状态到缓存
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
             ViewPreviewBorder.Visibility = (Visibility)(EnablePreviewCheckBox.IsChecked == true ? 0 : 2); // 切换预览区可见性

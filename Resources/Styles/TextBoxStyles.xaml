@@ -12,7 +12,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border x:Name="border" CornerRadius="3,0,0,3" BorderThickness="1" BorderBrush="#FFD5D5D5">
+                    <Border x:Name="border" CornerRadius="3,0,0,3" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#FFD5D5D5">
                         <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Margin="2,0" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled"/>
                     </Border>
 

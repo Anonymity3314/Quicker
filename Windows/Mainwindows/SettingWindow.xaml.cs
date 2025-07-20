@@ -573,5 +573,73 @@ namespace Quicker.Windows.MainWindows
         }
 
         #endregion
+
+        #region 搜索与高亮
+
+        /// <summary>
+        /// 根据关键字筛选并高亮BasicSettingsStackPanel中的按钮
+        /// </summary>
+        /// <param name="keyword">查找关键字</param>
+        private void FilterAndHighlightBasicSettingsButtons(string keyword)
+        {
+            foreach (var child in BasicSettingsStackPanel.Children)
+            {
+                if (child is Button btn)
+                {
+                    // 查找按钮内的TextBlock
+                    var textBlock = FindTextBlockInButton(btn);
+                    if (textBlock != null)
+                    {
+                        string text = textBlock.Text ?? "";
+                        if (string.IsNullOrEmpty(keyword) || text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            btn.Visibility = Visibility.Visible;
+                            // 设置高亮
+                            Quicker.Helpers.TextBlockHelper.SetHighlight(textBlock, new Quicker.Helpers.HighlightTextData
+                            {
+                                Text = text,
+                                Keyword = keyword
+                            });
+                        }
+                        else
+                        {
+                            btn.Visibility = Visibility.Collapsed;
+                            // 清除高亮
+                            Quicker.Helpers.TextBlockHelper.SetHighlight(textBlock, new Quicker.Helpers.HighlightTextData
+                            {
+                                Text = text,
+                                Keyword = ""
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 查找按钮内的TextBlock
+        /// </summary>
+        /// <param name="btn">按钮</param>
+        /// <returns>TextBlock</returns>
+        private TextBlock FindTextBlockInButton(Button btn)
+        {
+            if (btn.Content is Grid grid)
+            {
+                foreach (var child in grid.Children)
+                {
+                    if (child is TextBlock tb)
+                        return tb;
+                }
+            }
+            return null;
+        }
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string keyword = SearchBox.Text.Trim();
+            FilterAndHighlightBasicSettingsButtons(keyword);
+        }
+
+        #endregion
     }
 }
