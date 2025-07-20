@@ -1,17 +1,26 @@
+using System.Runtime.InteropServices.WindowsRuntime;
+using WinRTSize = Windows.Foundation.Size;
+using WinRTRect = Windows.Foundation.Rect;
 using System.Runtime.InteropServices;
+using WpfSize = System.Windows.Size;
+using WpfRect = System.Windows.Rect;
 using System.Collections.Concurrent;
 using Windows.Management.Deployment;
 using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
+using Windows.ApplicationModel;
+using Windows.Storage.Streams;
 using System.Windows.Interop;
 using System.ComponentModel;
 using System.Windows.Media;
+using Windows.Foundation;
 using Quicker.Helpers;
 using System.Xml.Linq;
 using Microsoft.Win32;
 using System.Windows;
 using System.Text;
 using System.IO;
+using Windows.ApplicationModel.Core;
 
 namespace Quicker.Managers
 {
@@ -51,68 +60,79 @@ namespace Quicker.Managers
             _fileHashCache.Clear();
         }
 
-        // 加载所有应用
+        /// <summary>
+        /// 加载所有应用（注册表、UWP等）
+        /// </summary>
+        /// <returns> 应用列表 </returns>
         public async Task<List<AppInfo>> LoadAllApplicationsAsync()
         {
-            var allApps = new ConcurrentBag<AppInfo>();
-
-            // 使用任务列表来跟踪所有加载任务
-            var tasks = new List<Task>();
-
-            // 从注册表加载应用
-            tasks.Add(LoadFromRegistryAsync(allApps));
-
-            // 从常见路径加载应用
-            //tasks.Add(LoadFromCommonPathsAsync(allApps));
-
-            // 从UWP应用商店加载应用
-            //tasks.Add(LoadUWPAppsAsync(allApps));
-
-            // 等待所有加载任务完成
+            var allApps = new ConcurrentBag<AppInfo>(); // 应用列表
+            var tasks = new List<Task>
+            {
+                LoadFromRegistryAsync(allApps),
+                LoadUWPAppsAsync(allApps)
+            };
             await Task.WhenAll(tasks);
-
-            // 按应用名称排序并返回
             return allApps.OrderBy(app => app.Name, StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
-        // 从注册表加载应用路径
+        /// <summary>
+        /// 加载注册表中的应用
+        /// </summary>
+        /// <param name="appsList"> 应用列表 </param>
         private async Task LoadFromRegistryAsync(ConcurrentBag<AppInfo> appsList)
         {
             try
             {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths"))
+                foreach (var subKeyName in GetRegistryAppSubKeys())
                 {
-                    if (key != null)
+                    await TryAddRegistryAppAsync(subKeyName, appsList);
+                }
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// 获取注册表中所有应用子键名
+        /// </summary>
+        private IEnumerable<string> GetRegistryAppSubKeys()
+        {
+            using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths"))
+            {
+                return key?.GetSubKeyNames() ?? Array.Empty<string>();
+            }
+        }
+
+        /// <summary>
+        /// 尝试将注册表中的应用添加到列表
+        /// </summary>
+        private async Task TryAddRegistryAppAsync(string subKeyName, ConcurrentBag<AppInfo> appsList)
+        {
+            try
+            {
+                using (RegistryKey subKey = Registry.LocalMachine.OpenSubKey($@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{subKeyName}"))
+                {
+                    string path = (string)subKey?.GetValue("");
+                    if (!string.IsNullOrEmpty(path) && File.Exists(path))
                     {
-                        string[] subKeyNames = key.GetSubKeyNames(); // 获取所有子键名称
-                        foreach (string subKeyName in subKeyNames)
-                        {
-                            try
-                            {
-                                using (RegistryKey subKey = key.OpenSubKey(subKeyName))
-                                {
-                                    if (subKey != null)
-                                    {
-                                        string path = (string)subKey.GetValue(""); // 获取默认值
-                                        if (!string.IsNullOrEmpty(path))
-                                        {
-                                            // 检查目标文件是否存在
-                                            if (File.Exists(path))
-                                            {
-                                                string appName = Path.GetFileNameWithoutExtension(path); // 获取文件名（去掉扩展名）
-                                                var icon = await GetIconAsync(path);
-                                                appsList.Add(new AppInfo { Name = appName, Location = path, Icon = icon, Tag = path }); // 添加到应用列表
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            catch { } // 忽略单个注册表项的错误
-                        }
+                        string appName = Path.GetFileNameWithoutExtension(path);
+                        var icon = await GetIconAsync(path);
+                        AddAppInfo(appsList, appName, path, icon, path);
                     }
                 }
             }
-            catch { } // 忽略注册表加载的总体错误
+            catch { }
+        }
+
+        /// <summary>
+        /// 添加应用信息到列表
+        /// </summary>
+        private void AddAppInfo(ConcurrentBag<AppInfo> appsList, string name, string location, ImageSource icon, string tag)
+        {
+            if (!IsAppAlreadyAdded(name, location, appsList))
+            {
+                appsList.Add(new AppInfo { Name = name, Location = location, Icon = icon, Tag = tag });
+            }
         }
 
         // 从常见路径加载 .exe 或 .lnk 文件
@@ -197,47 +217,113 @@ namespace Quicker.Managers
                 app.Location.Equals(location, StringComparison.OrdinalIgnoreCase));
         }
 
-        // 加载应用商店应用
+        /// <summary>
+        /// 加载UWP应用
+        /// </summary>
         private async Task LoadUWPAppsAsync(ConcurrentBag<AppInfo> appsList)
         {
             try
             {
-                PackageManager packageManager = new(); // 创建包管理器实例
-                var packages = packageManager.FindPackagesForUser(""); // 获取所有包信息
-                foreach (var package in packages)
+                var packages = GetUwpPackages();
+                var tasks = packages.Select(package => ProcessUwpPackageAsync(package, appsList));
+                await Task.WhenAll(tasks);
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// 获取所有UWP包
+        /// </summary>
+        private List<Package> GetUwpPackages()
+        {
+            PackageManager packageManager = new();
+            return packageManager.FindPackagesForUser("").ToList();
+        }
+
+        /// <summary>
+        /// 处理单个UWP包
+        /// </summary>
+        private async Task ProcessUwpPackageAsync(Package package, ConcurrentBag<AppInfo> appsList)
+        {
+            if (!IsValidUwpPackage(package)) return;
+            var appEntries = await package.GetAppListEntriesAsync();
+            foreach (var appEntry in appEntries)
+            {
+                await AddUwpAppEntryAsync(appEntry, package, appsList);
+            }
+        }
+
+        /// <summary>
+        /// 判断UWP包是否有效
+        /// </summary>
+        private bool IsValidUwpPackage(Package package)
+        {
+            return !(package.IsFramework || package.IsResourcePackage || package.IsBundle ||
+                     string.IsNullOrWhiteSpace(package.DisplayName) ||
+                     package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase) ||
+                     package.IsDevelopmentMode ||
+                     package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
+                     package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// 添加UWP应用条目到列表
+        /// </summary>
+        private async Task AddUwpAppEntryAsync(AppListEntry appEntry, Package package, ConcurrentBag<AppInfo> appsList)
+        {
+            string appUserModelId = appEntry.AppUserModelId;
+            string displayName = appEntry.DisplayInfo.DisplayName;
+            ImageSource icon = await GetUwpAppIconAsync(appEntry, package.Id.FamilyName);
+            AddAppInfo(appsList, displayName, appUserModelId, icon, "[Windows 商店应用]");
+        }
+
+        /// <summary>
+        /// 获取UWP应用图标（优先大图标）
+        /// </summary>
+        private async Task<ImageSource> GetUwpAppIconAsync(AppListEntry appEntry, string packageFamilyName)
+        {
+            try
+            {
+                var streamRef = appEntry.DisplayInfo.GetLogo(new WinRTSize(400, 400));
+                using (var randomAccessStream = await streamRef.OpenReadAsync())
                 {
-                    try
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = randomAccessStream.AsStream();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                    if (bitmap.PixelWidth < 256)
                     {
-                        if (package.IsFramework || package.IsResourcePackage || package.IsBundle ||
-                            string.IsNullOrWhiteSpace(package.DisplayName) ||
-                            package.DisplayName.Equals(package.Id.Name, StringComparison.OrdinalIgnoreCase) ||
-                            package.IsDevelopmentMode ||
-                            package.Id.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
-                            package.Id.Name.StartsWith("Windows.", StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue; // 跳过框架包、资源包、系统组件、没有显示名称或显示名称是包ID、开发模式安装的应用、Microsoft系统应用
-                        }
-
-                        var displayName = package.DisplayName; // 获取显示名称
-                        var packageFamilyName = package.Id.FamilyName; // 获取包ID
-
-                        // 构建shell:AppsFolder协议使用的应用标识符
-                        var appFolderID = packageFamilyName + "_" + packageFamilyName.Split('_')[0];
-
-                        ImageSource icon = await Task.Run(() => ExtractUWPAppIcon(packageFamilyName)); // 获取应用图标
-
-                        appsList.Add(new AppInfo
-                        {
-                            Name = displayName,
-                            Location = appFolderID, // 使用shell:AppsFolder兼容的ID
-                            Icon = icon,
-                            Tag = "[Windows 商店应用]" // 保存包ID
-                        }); // 添加到应用列表
+                        var icon2 = ExtractUWPAppIcon(packageFamilyName);
+                        return icon2 ?? bitmap;
                     }
-                    catch { } // 忽略单个包的错误
+                    return bitmap;
                 }
             }
-            catch { } // 忽略异常
+            catch
+            {
+                return ExtractUWPAppIcon(packageFamilyName);
+            }
+        }
+
+        /// <summary>
+        /// 将 BitmapSource 放大到指定尺寸
+        /// </summary>
+        private BitmapSource ResizeBitmap(BitmapSource source, int width, int height)
+        {
+            if (source == null) return null;
+            var group = new DrawingGroup();
+            group.Children.Add(new ImageDrawing(source, new WpfRect(0, 0, width, height)));
+            var drawingVisual = new DrawingVisual();
+            using (var drawingContext = drawingVisual.RenderOpen())
+            {
+                drawingContext.DrawDrawing(group);
+            }
+            var resizedImage = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+            resizedImage.Render(drawingVisual);
+            resizedImage.Freeze();
+            return resizedImage;
         }
 
         // 异步加载图标
@@ -415,12 +501,10 @@ namespace Quicker.Managers
         {
             try
             {
-                // 获取 UWP 应用的安装目录路径
                 string installPath = GetUWPAppInstallPath(packageFamilyName);
                 if (string.IsNullOrEmpty(installPath))
                     return null;
 
-                // 从 AppxManifest.xml 文件中提取图标路径
                 string manifestPath = Path.Combine(installPath, "AppxManifest.xml");
                 if (!File.Exists(manifestPath))
                     return null;
@@ -431,21 +515,35 @@ namespace Quicker.Managers
                 if (visualElements == null)
                     return null;
 
-                string iconPath = visualElements.Attribute("Square150x150Logo")?.Value
-                               ?? visualElements.Attribute("Square44x44Logo")?.Value
-                               ?? visualElements.Attribute("Logo")?.Value; // 优先使用 150x150 图标，其次使用 44x44 图标，最后使用 Logo 图标
+                // 优先级列表
+                string[] iconAttrs = { "Square310x310Logo", "Square256x256Logo", "Square150x150Logo", "Square44x44Logo", "Logo" };
+                foreach (var attr in iconAttrs)
+                {
+                    string iconPath = visualElements.Attribute(attr)?.Value;
+                    if (string.IsNullOrEmpty(iconPath))
+                        continue;
 
-                if (string.IsNullOrEmpty(iconPath))
-                    return null; // 图标路径为空
+                    iconPath = iconPath.Replace('/', '\\');
+                    string directory = Path.GetDirectoryName(Path.Combine(installPath, iconPath));
+                    string fileName = Path.GetFileNameWithoutExtension(iconPath);
+                    string extension = Path.GetExtension(iconPath);
 
-                // 构建完整的图标文件路径
-                iconPath = iconPath.Replace('/', '\\'); // 统一使用反斜杠作为路径分隔符
-                string fullIconPath = Path.Combine(installPath, iconPath); // 构建完整的图标文件路径
-                return LoadIconFromPath(fullIconPath);// 加载图标
+                    // 优先查找 scale-400, scale-200, scale-100
+                    string[] scales = { ".scale-400", ".scale-200", ".scale-100", "" };
+                    foreach (var scale in scales)
+                    {
+                        string scaledPath = Path.Combine(directory, fileName + scale + extension);
+                        if (File.Exists(scaledPath))
+                        {
+                            return LoadIconFromPath(scaledPath);
+                        }
+                    }
+                }
+                return null;
             }
             catch
             {
-                return null; // 忽略图标加载错误
+                return null;
             }
         }
 
