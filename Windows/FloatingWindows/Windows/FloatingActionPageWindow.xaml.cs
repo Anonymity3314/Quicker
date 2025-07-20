@@ -17,7 +17,6 @@ namespace Quicker.Windows.FloatingWindows.Windows
         private readonly ActionPageDatabase db3 = new(); // 动作页面数据库
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly FloatingActionPageWindowViewModel viewModel; // ViewModel
-        private bool pinToDesktop = false; // 是否置顶
 
         public FloatingActionPageWindow(int actionPageIndex, string tableName)
         {
@@ -35,14 +34,13 @@ namespace Quicker.Windows.FloatingWindows.Windows
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
             windowManager.SetWindowTopmost(this); // 设置窗口置顶
-            
+
             // 设置标题
             var actionPageData = db3.GetActionPageData(TableName, 0); // 从数据库中获取通用动作页面数据
             TitleTextBlock.Text = actionPageData.ActionPageName; // 设置通用标签内容
             TitleTextBlock.ToolTip = actionPageData.ActionPageName; // 设置通用标签提示
-            
-            // 加载按钮数据
-            LoadButtonData();
+
+            LoadButtonData(); // 加载按钮数据
         }
 
         /// <summary>
@@ -146,6 +144,22 @@ namespace Quicker.Windows.FloatingWindows.Windows
             buttonManager?.Dispose(); // 释放管理器
             viewModel?.Dispose(); // 清理ViewModel
             this.DataContext = null; // 清理数据上下文
+        }
+
+        private void Border_MouseEnter(object sender, MouseEventArgs e)
+        {
+            ViewBorder.Visibility = Visibility.Visible;
+            Border.Visibility = Visibility.Collapsed;
+        }
+
+        private void ViewBorder_MouseLeave(object sender, MouseEventArgs e)
+        {
+            // 只有在未固定状态下才隐藏
+            if (!viewModel.IsPinned)
+            {
+                ViewBorder.Visibility = Visibility.Collapsed;
+                Border.Visibility = Visibility.Visible;
+            }
         }
     }
 }

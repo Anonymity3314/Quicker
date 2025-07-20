@@ -100,7 +100,7 @@
             <Binding Path="GridHeight"/>
         </Grid.Height>
         <!-- 窗口阴影 -->
-        <Border x:Name="ShadowBorder" Margin="0.6" Background="#F3F3F3" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}">
+        <Border x:Name="ShadowBorder" Visibility="{Binding ElementName=ViewBorder, Path=Visibility}" Margin="0.6" Background="#F3F3F3" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Effect">
@@ -143,7 +143,7 @@
             </Border.Style>
         </Border>
         <!-- 窗口模糊 -->
-        <Border x:Name="BlurBorder" Background="Transparent" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}">
+        <Border x:Name="BlurBorder" Visibility="{Binding ElementName=ViewBorder, Path=Visibility}" Background="Transparent" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="Effect" Value="{x:Null}"/>
@@ -172,7 +172,16 @@
             </Border.Style>
         </Border>
         <!-- 窗口内容 -->
-        <Border x:Name="ViewBorder" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}" Background="{Binding DataContext.BackgroundColor, RelativeSource={RelativeSource AncestorType=Window}}" helpers:ClipHelper.ClipToBounds="True">
+        <Border x:Name="ViewBorder" CornerRadius="{Binding DataContext.Win11CornerRadius, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource IntToCornerRadiusConverter}}" Background="{Binding DataContext.BackgroundColor, RelativeSource={RelativeSource AncestorType=Window}}" helpers:ClipHelper.ClipToBounds="True" MouseLeave="ViewBorder_MouseLeave">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding DataContext.IsPinned, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="31"/>
@@ -280,6 +289,9 @@
                     <Button Grid.Row="6" Grid.Column="6" x:Name="Button44" Style="{StaticResource ActionButton}" Click="ActionButton_Click" MouseRightButtonDown="ActionButton_MouseRightButtonDown"/>
                 </Grid>
             </Grid>
+        </Border>
+        <Border x:Name="Border" Width="40" Height="40" CornerRadius="20" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.5" Background="Black" MouseEnter="Border_MouseEnter" Visibility="Collapsed">
+            <TextBlock Text="{Binding ElementName=TitleTextBlock, Path=Text}" FontSize="16" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         </Border>
     </Grid>
 </Window>
