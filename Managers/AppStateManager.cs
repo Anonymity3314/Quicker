@@ -15,7 +15,7 @@ namespace Quicker.Managers
         private static readonly object _cacheLock = new(); // 缓存锁
         
         public static BitmapImage _trayIcon1 = new(new Uri("pack://application:,,,/Resources/Images/Quicker1.png")); // 托盘图标1
-        public static BitmapImage _trayIcon2 = new(new Uri("pack://application:,,,/Resources/Images/Quicker2.png")); // 托盘图标2
+        public static BitmapImage _trayIcon2 = new(new Uri("pack://application:,,,/Resources/Images/Quicker_Disabled.ico")); // 托盘图标2
 
         private static List<BlacklistApplication> _blacklistApplications; // 黑名单应用
         private static OpenMainWindow _openMainWindowConditions; // 打开主窗口条件

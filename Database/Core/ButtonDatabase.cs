@@ -76,7 +76,7 @@ namespace Quicker.Database.Core
         public ButtonData GetButtonDataByID(int buttonID, string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($"SELECT * FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"SELECT * FROM [{tableName}] WHERE ButtonID = @ButtonID", connection); // 创建命令对象
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询语句
             if (reader.Read())
@@ -95,7 +95,7 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            string query = $@"INSERT OR REPLACE INTO {tableName}
+            string query = $@"INSERT OR REPLACE INTO [{tableName}]
             (ButtonID, Title, Location, ImagePath, Data1, Data2, Data3, Description, CreateTime, LatestEditTime, ActionType, UsedTimes)
             VALUES 
             (@ButtonID, @Title, @Location, @ImagePath, @Data1, @Data2, @Data3, @Description, @CreateTime, @LatestEditTime, @ActionType, @UsedTimes)"; // 创建SQL语句
@@ -128,7 +128,7 @@ namespace Quicker.Database.Core
         {
             var buttonDataList = new List<ButtonData>(); // 初始化ButtonData列表
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($"SELECT * FROM {tableName}", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"SELECT * FROM [{tableName}]", connection); // 创建命令对象
             using var reader = command.ExecuteReader(); // 执行查询语句
             while (reader.Read())
             {
@@ -144,7 +144,7 @@ namespace Quicker.Database.Core
         public void DeleteButtonTable(string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS {tableName}", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS [{tableName}]", connection); // 创建命令对象
             command.ExecuteNonQuery(); // 执行删除表格语句
         }
 
@@ -165,7 +165,7 @@ namespace Quicker.Database.Core
             if (currentButtonIDs.Count > 0) // 批量删除当前页的按钮
             {
                 string ids = string.Join(",", currentButtonIDs); // 当前页所有ButtonID
-                using var delCmd = new SQLiteCommand($"DELETE FROM {tableName} WHERE ButtonID IN ({ids})", connection, transaction); // 创建删除命令
+                using var delCmd = new SQLiteCommand($"DELETE FROM [{tableName}] WHERE ButtonID IN ({ids})", connection, transaction); // 创建删除命令
                 delCmd.ExecuteNonQuery(); // 执行删除语句
             }
 
@@ -206,7 +206,7 @@ namespace Quicker.Database.Core
         { 
             if (connection == null) connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开始事务
-            using var command = new SQLiteCommand($@"DELETE FROM {tableName} WHERE ButtonID = @ButtonID", connection); // 创建命令
+            using var command = new SQLiteCommand($@"DELETE FROM [{tableName}] WHERE ButtonID = @ButtonID", connection); // 创建命令
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行命令
             transaction.Commit(); // 提交事务
@@ -283,7 +283,7 @@ namespace Quicker.Database.Core
         /// <param name="newButtonID"> 目标 ButtonID </param>
         private void UpdateButtonID(SQLiteConnection connection, string tableName, int oldButtonID, int newButtonID)
         {
-            using var command = new SQLiteCommand($@"UPDATE {tableName} SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
+            using var command = new SQLiteCommand($@"UPDATE [{tableName}] SET ButtonID = @NewButtonID WHERE ButtonID = @OldButtonID", connection);
             command.Parameters.AddWithValue("@NewButtonID", newButtonID); // 绑定参数
             command.Parameters.AddWithValue("@OldButtonID", oldButtonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行更新语句
@@ -328,7 +328,7 @@ namespace Quicker.Database.Core
         public void IncreaseActionUsedTimes(int buttonID, string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($@"UPDATE {tableName} SET UsedTimes = UsedTimes + 1 WHERE ButtonID = @ButtonID", connection);
+            using var command = new SQLiteCommand($@"UPDATE [{tableName}] SET UsedTimes = UsedTimes + 1 WHERE ButtonID = @ButtonID", connection);
             command.Parameters.AddWithValue("@ButtonID", buttonID); // 绑定参数
             command.ExecuteNonQuery(); // 执行更新语句
         }

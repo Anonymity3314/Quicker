@@ -36,6 +36,7 @@ using Quicker.Managers;
 using System.Windows;
 using SharpHook.Data;
 using SharpHook;
+using System.IO;
 
 namespace Quicker
 {
@@ -709,24 +710,6 @@ namespace Quicker
         {
             this.Dispatcher.Invoke(() =>
             {
-                //MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
-                //if (mainWindow == null)
-                //{
-                //    string windowType = DetermineWindowType(); // 确定窗口类型
-                //    mainWindow = new MainWindow(windowType); // 创建新的功能面板
-
-                //    var settings = SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
-                //    SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                //    mainWindow.Show(); // 显示功能面板
-                //    mainWindow.Activate(); // 激活功能面板
-                //    AppStateManager.Left = (float)mainWindow.Left; // 记录功能面板位置
-                //    AppStateManager.Top = (float)mainWindow.Top; // 记录功能面板位置
-                //}
-                //else
-                //{
-                //    if (!AppStateManager.MainWindowPinned) mainWindow.Close(); // 关闭功能面板
-                //}
-
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
                 bool hasVisibleWindow = mainWindowList.Any(window => window.Visibility == Visibility.Visible); // 是否有可见窗口
@@ -749,6 +732,38 @@ namespace Quicker
         /// <returns> 窗口类型 </returns>
         private string DetermineWindowType()
         {
+            try
+            {
+                using var windowManager = new WindowManager();
+                IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow();
+                if (foregroundWindow != IntPtr.Zero)
+                {
+                    uint processId = windowManager.GetWindowProcessId(foregroundWindow);
+                    using var process = Process.GetProcessById((int)processId);
+                    string processFilePath = process.MainModule.FileName;
+                    string processFileName = Path.GetFileName(processFilePath).ToLower();
+
+                    // 检查是否存在以 文件名+"Scene" 命名的表
+                    var db = new ActionPageDatabase();
+                    if (db.SceneTableExists(processFileName))
+                    {
+                        // 获取场景数据
+                        var sceneList = db.GetSceneData(processFileName);
+                        if (sceneList != null && sceneList.Count > 0)
+                        {
+                            var scene = sceneList[0];
+                            // 路径相同则返回文件名（带后缀）
+                            if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                if(scene.SceneCount > 0)
+                                    return processFileName;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { /* 忽略异常并继续执行下面的逻辑 */ }
+
             if (AppStateManager.Locked)
                 return AppStateManager.CommonState; // 窗口类型为锁定状态
             else if (IsMouseOnTaskbar())

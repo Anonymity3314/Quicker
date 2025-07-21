@@ -64,6 +64,7 @@
     <None Remove="Resources\Images\DesktopSceneImage.png" />
     <None Remove="Resources\Images\EditButton.png" />
     <None Remove="Resources\Images\EditButton.png" />
+    <None Remove="Resources\Images\GlobalSceneImage.png" />
     <None Remove="Resources\Images\Locked.png" />
     <None Remove="Resources\Images\MessageImage.jpg" />
     <None Remove="Resources\Images\MoreSelection.png" />
@@ -72,6 +73,7 @@
     <None Remove="Resources\Images\OpenMainWindow.png" />
     <None Remove="Resources\Images\OpenMainWindow1.png" />
     <None Remove="Resources\Images\OpenMainWindow2.png" />
+    <None Remove="Resources\Images\PasteAction.png" />
     <None Remove="Resources\Images\Pause.png" />
     <None Remove="Resources\Images\Pause.png" />
     <None Remove="Resources\Images\Quicker2.png" />
@@ -86,6 +88,8 @@
     <None Remove="Resources\Images\SettingImage2.png" />
     <None Remove="Resources\Images\SettingWindow.png" />
     <None Remove="Resources\Images\SettingWindow.png" />
+    <None Remove="Resources\Images\StartApp.png" />
+    <None Remove="Resources\Images\Target.png" />
     <None Remove="Resources\Images\UnLocked.png" />
     <None Remove="UpdateHistory.txt" />
     <None Remove="Windows\MainWindow.xaml.cs~RF56f46fe.TMP" />
@@ -114,6 +118,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\CopyAction.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\GlobalSceneImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\MessageImage.jpg">
@@ -152,6 +159,9 @@
     <Resource Include="Resources\Images\BasicSettingsButton.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Images\PasteAction.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Images\PinToDesktop.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -171,6 +181,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\DesktopSceneImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Quicker_Disabled.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\StartApp.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\Target.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\UnpinFromDesktop.png">

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Threading.Tasks;
+using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Managers;
@@ -98,34 +99,36 @@ namespace Quicker.Windows.AddWindows
         /// <returns>进程信息列表</returns>
         private List<(string FileName, string ProcessName)> GetFilteredProcessList()
         {
-            var processList = new List<(string FileName, string ProcessName)>(); // 创建列表
-            var uniqueProcessNames = new HashSet<string>(); // 创建集合
+            var processList = new List<(string FileName, string ProcessName)>();
+            var db = new ActionPageDatabase();
+            var allScenes = db.GetAllSceneData(); // 获取所有场景数据
             try
             {
-                // 只获取有窗口的进程
-                var processes = Process.GetProcesses()
-                    .Where(p => HasWindow(p))
-                    .Take(20); // 限制最大进程数
-
+                var processes = Process.GetProcesses().Where(p => HasWindow(p)).Take(20); // 获取进程列表，最多20个
                 foreach (var process in processes)
                 {
                     try
                     {
-                        string processFileName = process.MainModule.FileName; // 获取进程文件名
-                        string fullProcessName = Path.GetFileName(processFileName); // 获取进程名
+                        string processFileName = process.MainModule.FileName; // 进程文件名
+                        string fullProcessName = Path.GetFileName(processFileName)?.ToLower(); // 进程名（带后缀，小写）
 
+                        // 检查是否与数据库中已有场景重复
+                        bool isDuplicate = allScenes.Any(scene =>
+                            scene.SceneTag?.ToLower() == fullProcessName &&
+                            scene.SceneProcess?.Equals(processFileName, StringComparison.OrdinalIgnoreCase) == true);
+
+                        if (isDuplicate) continue; // 跳过重复的进程
                         processList.Add((processFileName, fullProcessName)); // 添加到列表
-                        if (processList.Count >= 8) break; // 如果超过8个，跳出循环
                     }
-                    catch { } // 忽略异常
+                    catch { }
                     finally
                     {
-                        process?.Dispose(); // 释放进程
+                        process?.Dispose(); // 释放资源
                     }
                 }
             }
             catch { } // 忽略异常
-            return processList;
+            return processList; // 返回进程列表
         }
 
         /// <summary>
@@ -144,7 +147,6 @@ namespace Quicker.Windows.AddWindows
 
             // 用Grid代替StackPanel，结构与ComboBox模板一致
             Grid grid = new Grid();
-
             Image iconImage = new()
             {
                 Style = FindResource("MenuButtonImage") as Style,
@@ -154,9 +156,9 @@ namespace Quicker.Windows.AddWindows
 
             TextBlock textBlock = new()
             {
-                Text = appNames,
+                VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(25, 0, 0, 0),
-                VerticalAlignment = VerticalAlignment.Center
+                Text = appNames
             };
             grid.Children.Add(textBlock);
 
@@ -180,7 +182,7 @@ namespace Quicker.Windows.AddWindows
                 }
                 var db = new Quicker.Database.Core.ActionPageDatabase();
                 db.CreateAndInitTable(currentSceneData.SceneTag, currentSceneData.SceneIconPath, currentSceneData.SceneTag);
-                db.UpdateSceneTable(currentSceneData.SceneTag, currentSceneData);
+                //db.UpdateSceneTable(currentSceneData.SceneTag, currentSceneData);
             }
             SceneAddCompleted?.Invoke(true, currentSceneData?.SceneTag);
             this.Close(); // 关闭窗口

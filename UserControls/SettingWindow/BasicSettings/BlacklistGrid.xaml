@@ -46,14 +46,19 @@
                             </BeginStoryboard>
                         </EventTrigger>
                     </Grid.Triggers>
-                    
+
                     <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
                         <StackPanel x:Name="BlacklistStackPanel" Margin="0,0,0,2"/>
                     </ScrollViewer>
                     <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Hidden"/>
                 </Grid>
             </Border>
-            <Button x:Name="BlacklistDragButton" Content="拖动到要禁用Quicker的窗口上" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click" IsEnabled="False"/>
+            <Button x:Name="BlacklistDragButton" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click" IsEnabled="False">
+                <Grid Width="204">
+                    <TextBlock Text="拖动到要禁用Quicker的窗口上" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="12" Margin="30,0,0,0"/>
+                    <Image Source="/Resources/Images/Target.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0" Height="18" Width="18"/>
+                </Grid>
+            </Button>
             <Button x:Name="BlacklistAddButton" Content="添加..." Style="{StaticResource WhiteButton}" ToolTip="增加特殊的应用" HorizontalAlignment="Left" Margin="228,230,0,0" VerticalAlignment="Top" Width="57" Height="27" Click="BlacklistAddButton_Click"/>
             <Popup x:Name="AddBlacklistAppsPop" PopupAnimation="Fade" PlacementTarget="{Binding ElementName=BlacklistAddButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Margin="198,412,197,411">
                 <Grid>

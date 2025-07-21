@@ -54,7 +54,7 @@ namespace Quicker.Database.Core
         {
             public static readonly Dictionary<string, (string Process, string ActionPageName, string IconPath, string Tag)> Configs = new()
             {
-                ["_global"] = ("Default", "默认全局动作页", "/Resources/Images/Quicker1.png", "_global"),
+                ["_global"] = ("Default", "默认全局动作页", "/Resources/Images/GlobalSceneImage.png", "_global"),
                 ["common"] = ("Default", "默认", "/Resources/Images/Quicker1.png", "common"),
                 ["desktop"] = ("Windows桌面", "桌面 #", "/Resources/Images/DesktopSceneImage.png", "desktop"),
                 ["taskbar"] = ("Windows任务栏", "任务栏 #", "/Resources/Images/Quicker1.png", "taskbar")
@@ -85,18 +85,19 @@ namespace Quicker.Database.Core
             int actionPageCount = db2.TableExists(tableName) ? db2.GetTotalAntionPageIndex(tableName) : 0;
             var sceneData = new SceneData
             {
-                SceneName = tableName,
+                SceneName = Path.GetFileNameWithoutExtension(tableName), // 不带后缀的文件名
                 SceneIconPath = sceneIconPath,
                 SceneCount = actionPageCount,
-                SceneTag = sceneTag,
+                SceneTag = Path.GetFileNameWithoutExtension(tableName), // 不带后缀的文件名
+                ActualTag = tableName, // 带后缀的文件名
                 AutoReturnToFirstPage = false,
                 SceneProcess = sceneProcess
             }; // 创建并初始化场景数据
-            UpdateSceneTable(sceneTag, sceneData); // 更新场景数据表
+            UpdateSceneTable(sceneData); // 更新场景数据表
 
             for (int i = 0; i < actionPageCount; i++) // 创建并初始化动作页
             {
-                CreateActionPageTable(tableName);
+                CreateActionPageTable(sceneData.ActualTag);
 
                 string currentActionPageName = tableName switch
                 {
@@ -104,21 +105,21 @@ namespace Quicker.Database.Core
                     _ => $"{actionPageName}{i}"
                 };
 
-                UpdateActionPageTable(tableName, $"{tableName}{i}", currentActionPageName);
+                UpdateActionPageTable(sceneData.ActualTag, $"{sceneData.ActualTag}{i}", currentActionPageName);
             }
         }
 
         /// <summary>
         /// 更新应用管理表
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
-        private void AddToApplication_MasterTable(string tableName)
+        /// <param name="actualTag"> 实际标签（带后缀的文件名） </param>
+        private void AddToApplication_MasterTable(string actualTag)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             string insertQuery = "INSERT OR REPLACE INTO Application_Master (TableName) VALUES (@TableName);"; // 插入场景数据表名的SQL语句
             using var insertCommand = new SQLiteCommand(insertQuery, connection, transaction); // 创建SQLiteCommand对象
-            insertCommand.Parameters.AddWithValue("@TableName", tableName + "Scene"); // 场景数据表名
+            insertCommand.Parameters.AddWithValue("@TableName", actualTag + "Scene"); // 场景数据表名
             insertCommand.ExecuteNonQuery(); // 执行插入表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -136,7 +137,8 @@ namespace Quicker.Database.Core
                 SceneName TEXT,
                 SceneIconPath TEXT,
                 SceneCount INTEGER,
-                SceneTag TEXT PRIMARY KEY,
+                SceneTag TEXT,
+                ActualTag TEXT PRIMARY KEY,
                 AutoReturnToFirstPage BOOL,
                 SceneProcess TEXT
             );"; // 创建场景数据表的SQL语句
@@ -148,21 +150,21 @@ namespace Quicker.Database.Core
         /// <summary>
         /// 更新场景数据表
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
         /// <param name="sceneData"> 场景数据对象 </param>
-        public void UpdateSceneTable(string tableName, SceneData sceneData)
+        public void UpdateSceneTable(SceneData sceneData)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"INSERT OR REPLACE INTO [{tableName + "Scene"}]
-            (SceneName, SceneIconPath, SceneCount, SceneTag, AutoReturnToFirstPage, SceneProcess)
+            string query = $@"INSERT OR REPLACE INTO [{sceneData.ActualTag + "Scene"}]
+            (SceneName, SceneIconPath, SceneCount, SceneTag, ActualTag, AutoReturnToFirstPage, SceneProcess)
             VALUES
-            (@SceneName, @SceneIconPath, @SceneCount, @SceneTag, @AutoReturnToFirstPage, @SceneProcess)"; // 更新场景数据表的SQL语句
+            (@SceneName, @SceneIconPath, @SceneCount, @SceneTag, @ActualTag, @AutoReturnToFirstPage, @SceneProcess)"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@SceneName", sceneData.SceneName); // 场景类型
             command.Parameters.AddWithValue("@SceneIconPath", sceneData.SceneIconPath); // 场景图标路径
             command.Parameters.AddWithValue("@SceneCount", sceneData.SceneCount); // 场景数量
             command.Parameters.AddWithValue("@SceneTag", sceneData.SceneTag); // 场景标签
+            command.Parameters.AddWithValue("@ActualTag", sceneData.ActualTag); // 实际标签
             command.Parameters.AddWithValue("@AutoReturnToFirstPage", sceneData.AutoReturnToFirstPage); // 是否自动返回到第一个页面
             command.Parameters.AddWithValue("@SceneProcess", sceneData.SceneProcess); // 动作页所属应用程序名称
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
@@ -172,16 +174,16 @@ namespace Quicker.Database.Core
         /// <summary>
         /// 设置是否自动返回第一页
         /// </summary>
-        /// <param name="tableName"> 场景表名称 </param>
+        /// <param name="actualTag"> 实际标签（带后缀的文件名） </param>
         /// <param name="autoReturnToFirstPage"> 是否自动返回到第一个页面 </param>
-        public void SetAutoReturnToFirstPage(string tableName, bool autoReturnToFirstPage)
+        public void SetAutoReturnToFirstPage(string actualTag, bool autoReturnToFirstPage)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"UPDATE [{tableName + "Scene"}] SET AutoReturnToFirstPage = @AutoReturnToFirstPage WHERE SceneTag = @SceneTag"; // 更新场景数据表的SQL语句
+            string query = $@"UPDATE [{actualTag + "Scene"}] SET AutoReturnToFirstPage = @AutoReturnToFirstPage WHERE ActualTag = @ActualTag"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@AutoReturnToFirstPage", autoReturnToFirstPage); // 设置参数
-            command.Parameters.AddWithValue("@SceneTag", tableName); // 设置场景类型
+            command.Parameters.AddWithValue("@ActualTag", actualTag); // 设置实际标签
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -191,13 +193,13 @@ namespace Quicker.Database.Core
         /// </summary>
         /// <param name="tableName"> 场景表名称 </param>
         /// <returns> 是否自动返回到第一个页面 </returns>
-        public bool GetAutoReturnToFirstPage(string tableName)
+        public bool GetAutoReturnToFirstPage(string actualTag)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"SELECT AutoReturnToFirstPage FROM [{tableName + "Scene"}] WHERE SceneTag = @SceneTag"; // 获取场景数据表的SQL语句
+            string query = $@"SELECT AutoReturnToFirstPage FROM [{actualTag + "Scene"}] WHERE ActualTag = @ActualTag"; // 获取场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@SceneTag", tableName); // 添加参数
+            command.Parameters.AddWithValue("@ActualTag", actualTag); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询SQL语句
             bool autoReturnToFirstPage = false; // 自动返回到第一个页面
             while (reader.Read())
@@ -210,16 +212,16 @@ namespace Quicker.Database.Core
         /// <summary>
         /// 更新场景数量
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
+        /// <param name="actualTag"> 实际标签（带后缀的文件名） </param>
         /// <param name="sceneCount"> 场景数量 </param>
-        public void UpdateSceneCount(string tableName, int sceneCount)
+        public void UpdateSceneCount(string actualTag, int sceneCount)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"UPDATE [{tableName + "Scene"}] SET SceneCount = @SceneCount WHERE SceneTag = @SceneTag"; // 更新场景数据表的SQL语句
+            string query = $@"UPDATE [{actualTag + "Scene"}] SET SceneCount = @SceneCount WHERE ActualTag = @ActualTag"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@SceneCount", sceneCount); // 设置参数
-            command.Parameters.AddWithValue("@SceneTag", tableName); // 设置场景类型
+            command.Parameters.AddWithValue("@ActualTag", actualTag); // 设置实际标签
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -268,18 +270,33 @@ namespace Quicker.Database.Core
         /// <summary>
         /// 删除场景数据表
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
-        public void DeleteSceneTable(string tableName)
+        /// <param name="actualTag"> 实际标签（带后缀的文件名） </param>
+        public void DeleteSceneTable(string actualTag)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             string query = $@"DELETE FROM Application_Master WHERE TableName = @TableName"; // 删除场景数据表的SQL语句
             using var command1 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
-            command1.Parameters.AddWithValue("@TableName", tableName + "Scene"); // 设置参数
+            command1.Parameters.AddWithValue("@TableName", actualTag + "Scene"); // 设置参数
             command1.ExecuteNonQuery(); // 执行删除表的SQL语句
-            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS [{tableName + "Scene"}]", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS [{actualTag + "Scene"}]", connection); // 创建命令对象
             command.ExecuteNonQuery(); // 执行删除表格语句
             transaction.Commit(); // 提交事务
+        }
+
+        /// <summary>
+        /// 检查场景表是否存在
+        /// </summary>
+        /// <param name="tableName">场景名称(不带Scene后缀)</param>
+        /// <returns>是否存在</returns>
+        public bool SceneTableExists(string tableName)
+        {
+            using var connection = OpenConnection();
+            string query = "SELECT name FROM sqlite_master WHERE type='table' AND name=@TableName;";
+            using var command = new SQLiteCommand(query, connection);
+            command.Parameters.AddWithValue("@TableName", tableName + "Scene");
+            using var reader = command.ExecuteReader();
+            return reader.HasRows;
         }
 
         /// <summary>
@@ -343,15 +360,15 @@ namespace Quicker.Database.Core
         /// <summary>
         /// 获取场景数据表
         /// </summary>
-        /// <param name="tableName"> 场景数据表名称 </param>
+        /// <param name="actualTag"> 实际标签（带后缀的文件名） </param>
         /// <returns> 场景数据表 </returns>
-        public List<SceneData> GetSceneData(string tableName)
+        public List<SceneData> GetSceneData(string actualTag)
         {
             var conditions = new List<SceneData>(); // 场景数据表
             using var connection = OpenConnection(); // 打开数据库连接
-            string selectQuery = $"SELECT * FROM [{tableName + "Scene"}] WHERE SceneTag = @SceneTag;"; // 获取场景数据表的SQL语句
+            string selectQuery = $"SELECT * FROM [{actualTag + "Scene"}] WHERE ActualTag = @ActualTag;"; // 获取场景数据表的SQL语句
             using var command = new SQLiteCommand(selectQuery, connection); // 创建SQLiteCommand对象
-            command.Parameters.AddWithValue("@SceneTag", tableName); // 添加参数
+            command.Parameters.AddWithValue("@ActualTag", actualTag); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询SQL语句
             while (reader.Read())
             {
@@ -361,8 +378,9 @@ namespace Quicker.Database.Core
                     SceneIconPath = reader.GetString(1), // 场景图标路径
                     SceneCount = reader.GetInt32(2), // 场景数量
                     SceneTag = reader.GetString(3), // 场景标签
-                    AutoReturnToFirstPage = reader.GetBoolean(4), // 是否自动返回第一个页面
-                    SceneProcess = reader.GetString(5), // 动作页所属应用程序名称
+                    ActualTag = reader.GetString(4), // 实际标签
+                    AutoReturnToFirstPage = reader.GetBoolean(5), // 是否自动返回第一个页面
+                    SceneProcess = reader.GetString(6), // 动作页所属应用程序名称
                 }); // 添加场景数据
             }
             return conditions; // 返回场景数据表
@@ -398,8 +416,9 @@ namespace Quicker.Database.Core
                         SceneIconPath = tableReader.GetString(1), // 场景图标路径
                         SceneCount = tableReader.GetInt32(2), // 场景数量
                         SceneTag = tableReader.GetString(3), // 场景标签
-                        AutoReturnToFirstPage = tableReader.GetBoolean(4), // 是否自动返回第一个页面
-                        SceneProcess = tableReader.GetString(5), // 动作页所属应用程序名称
+                        ActualTag = tableReader.GetString(4), // 实际标签
+                        AutoReturnToFirstPage = tableReader.GetBoolean(5), // 是否自动返回第一个页面
+                        SceneProcess = tableReader.GetString(6), // 动作页所属应用程序名称
                     }); // 添加场景数据
                 }
             }

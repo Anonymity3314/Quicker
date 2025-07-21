@@ -30,14 +30,14 @@
             <StackPanel>
                 <Button x:Name="PasteActionButton" Click="PasteActionButton_Click" Style="{StaticResource MenuButton}" Margin="0,3,0,3">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/PasteAction.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock x:Name="PasteActionTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Rectangle x:Name="Line1" Height="1" Fill="#FFF0F0F0"/>
                 <Button x:Name="StartAppButton" Click="StartApp" Style="{StaticResource MenuButton}" Margin="0,3,0,0">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/StartApp.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="启动软件"/>
                     </Grid>
                 </Button>

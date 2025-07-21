@@ -301,7 +301,7 @@ namespace Quicker.Windows.MainWindows
         private void ChangeSceneButtonBackground(object sender, DragEventArgs e)
         {
             Button button = sender as Button; // 转换为按钮
-            if (button.Tag != null && button.Tag.ToString() == type)
+            if (button.Name == type)
                 button.AllowDrop = false; // 不允许拖拽
             else
                 button.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E9E9E9")); // 设置按钮背景色
@@ -317,7 +317,7 @@ namespace Quicker.Windows.MainWindows
         private void ResetSceneButtonBackground(object sender, DragEventArgs e)
         {
             Button button = sender as Button; // 转换为按钮
-            if (button.Tag == null || button.Tag.ToString() != type)
+            if (button.Name != type)
             {
                 button.Background = System.Windows.Media.Brushes.Transparent; // 还原背景色
                 var targetSceneData = db3.GetSceneData(button.Tag?.ToString()).FirstOrDefault(); // 添加场景数量检查，只有未达到上限时才允许拖拽
@@ -460,7 +460,7 @@ namespace Quicker.Windows.MainWindows
             {
                 Style = FindResource("ActionPageCanvas") as Style,
                 Height = style == "_global" ? 215 : 280, // 画布高度
-                Name = canvasName, // 画布名称
+                Tag = canvasName, // 画布名称
             }; // 创建画布
             return dynamicCanvas; // 返回画布
         }
@@ -488,7 +488,7 @@ namespace Quicker.Windows.MainWindows
             Button pageButton = new Button
             {
                 Style = FindResource("ActionChangePageButton") as Style,
-                Name = $"{style}{canvasIndex}", // 按钮名称
+                Tag = $"{style}{canvasIndex}", // 按钮名称
             }; // 创建按钮
             pageButton.PreviewMouseMove += ChangePageButton_PreviewMouseMove; // 鼠标移动事件
             pageButton.PreviewMouseLeftButtonUp += buttonManager.Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
@@ -507,7 +507,7 @@ namespace Quicker.Windows.MainWindows
             Button editPageButton = new Button
             {
                 Style = FindResource("ActionPageEditButton") as Style,
-                Name = $"Edit{style}{canvasIndex}", // 按钮名称
+                Tag = $"Edit{style}{canvasIndex}", // 按钮名称
             }; // 创建按钮
             editPageButton.Click += OpenEditPopup; // 点击事件
             editPageButton.MouseDoubleClick += EditActionPageInfoButton_Click; // 双击事件
@@ -652,7 +652,10 @@ namespace Quicker.Windows.MainWindows
             else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
-                db3.CreateAndInitTable(type, "", ""); // 创建场景数据表
+                var sceneData = db3.GetSceneData(type).FirstOrDefault(); // 获取场景数据
+                db3.CreateActionPageTable(type); // 创建动作页数据表
+                db3.UpdateActionPageTable(type, $"{type}{0}", sceneData.SceneName); // 更新动作页数据表
+                db3.UpdateSceneCount(type, 1); // 更新场景数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
                 if(type != "_global")
                 {
@@ -919,8 +922,6 @@ namespace Quicker.Windows.MainWindows
             {
                 db2.DeleteButtonTable(type); // 如果没有画布，则删除按钮数据表
                 db3.DeleteActionPageTable(type); // 删除动作页数据表
-                if (!new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(type)) // 如果不是默认场景
-                    db3.DeleteSceneTable(type); // 删除场景数据表
             }
             LoadCanvas(type); // 刷新界面
         }
