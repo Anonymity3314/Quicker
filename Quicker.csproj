@@ -275,7 +275,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Windows\Anonymity\SettingWindow.xaml">
+    <Page Update="Windows\MainWindows\SettingWindow.xaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Page>
   </ItemGroup>
