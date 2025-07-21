@@ -23,7 +23,7 @@ namespace Quicker.Windows.EditWindows
         // 加载动作页信息
         private void EditActionPageInfoWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var sceneData = db3.GetSceneData(actionPageType).FirstOrDefault(); // 获取场景信息
+            var sceneData = db3.GetSceneData(actionPageType); // 获取场景信息
             ActionPageProcess.Text = sceneData.SceneProcess; // 设置动作页所属进程名称
             ActionPageName.Text = actionPage.ActionPageName; // 设置动作页名称
         }

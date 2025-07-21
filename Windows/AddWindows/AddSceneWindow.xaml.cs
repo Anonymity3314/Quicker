@@ -171,7 +171,7 @@ namespace Quicker.Windows.AddWindows
                         currentSceneData.SceneIconPath = iconPath; // 更新图标路径
                     }
                 }
-                var db = new Quicker.Database.Core.ActionPageDatabase(); // 数据库连接
+                var db = new ActionPageDatabase(); // 数据库连接
                 db.CreateAndInitTable(currentSceneData.SceneTag, currentSceneData.SceneIconPath, currentSceneData.SceneTag); // 初始化数据表
                 db.UpdateSceneTable(currentSceneData); // 更新场景数据
             }

@@ -760,12 +760,11 @@ namespace Quicker
                 string processFilePath = process.MainModule.FileName; // 获取进程文件路径
                 string processFileName = Path.GetFileName(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
                 var db = new ActionPageDatabase(); // 检查是否存在以 文件名+"Scene" 命名的表
-                if (db.SceneTableExists(processFileName))
+                if (db.SceneExists(processFileName))
                 {
-                    var sceneList = db.GetSceneData(processFileName); // 获取场景数据
-                    if (sceneList != null && sceneList.Count > 0)
+                    var scene = db.GetSceneData(processFileName); // 获取场景数据
+                    if (scene != null)
                     {
-                        var scene = sceneList[0];
                         // 路径相同则返回文件名（带后缀）
                         if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase))
                         {

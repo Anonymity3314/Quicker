@@ -127,8 +127,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
             // 切换通用动作页时清空
             GlobalButtonPanel.Children.Clear(); // 清空全局动作页切换按钮
             CommonButtonPanel.Children.Clear(); // 清空通用动作页切换按钮
-            var globalSceneData = db3.GetSceneData("_global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
-            var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
+            var globalSceneData = db3.GetSceneData("_global"); // 从数据库中获取全局动作页面数据
+            var commonSceneData = db3.GetSceneData(CommonStyle); // 从数据库中获取通用动作页面数据
             GeneratePageButtons("_global", globalSceneData.SceneCount, GlobalPageChangeButton_Click, GlobalButtonPanel);
             GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, CommonPageChangeButton_Click, CommonButtonPanel);
         }
@@ -207,7 +207,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             e.Handled = true;
             int delta = e.Delta;
             int currentIndex = GetVisiblePageGridIndex(parent, gridType);
-            int totalPages = db3.GetSceneData(gridType).FirstOrDefault()?.SceneCount ?? 1;
+            int totalPages = db3.GetSceneData(gridType)?.SceneCount ?? 1;
             bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
             int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;
             if (targetIndex < 0)
@@ -339,7 +339,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="type">页面类型</param>
         private void SwitchToPreviousPageGrid(int currentIndex, string type)
         {
-            int totalPages = db3.GetSceneData(type).FirstOrDefault()?.SceneCount ?? 1;
+            int totalPages = db3.GetSceneData(type)?.SceneCount ?? 1;
             int targetIndex = currentIndex - 1;
             bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
             if (targetIndex < 0)
@@ -369,7 +369,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="type">页面类型</param>
         private void SwitchToNextPageGrid(int currentIndex, string type)
         {
-            int totalPages = db3.GetSceneData(type).FirstOrDefault()?.SceneCount ?? 1;
+            int totalPages = db3.GetSceneData(type)?.SceneCount ?? 1;
             int targetIndex = currentIndex + 1;
             bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
             if (targetIndex >= totalPages)
