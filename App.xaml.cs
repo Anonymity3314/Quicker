@@ -1,4 +1,5 @@
-﻿using Quicker.Windows.MainWindows.MainWindow;
+﻿using MouseButton = SharpHook.Data.MouseButton;
+using Quicker.Windows.MainWindows.MainWindow;
 using Hardcodet.Wpf.TaskbarNotification;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
 using System.Windows;
+using SharpHook.Data;
 using SharpHook;
 
 namespace Quicker
@@ -108,7 +110,7 @@ namespace Quicker
             }
 
             // 获取系统字体列表
-            var fontFamilies = System.Windows.Media.Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
+            var fontFamilies = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
             fontFamilies.Add("(系统默认)"); // 保持和界面一致
 
             // 判断索引是否为最后一项（即“系统默认”）
@@ -242,8 +244,10 @@ namespace Quicker
         {
             if (!CanProcessHook()) return; // 如果不能处理钩子，返回
             // 优先处理Ctrl+鼠标的情况
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             if (GetCtrlKeyState() &&
-                (e.Data.Button == SharpHook.Data.MouseButton.Button2 || e.Data.Button == SharpHook.Data.MouseButton.Button3))
+                ((e.Data.Button == MouseButton.Button2 && openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick) ||
+                (e.Data.Button == MouseButton.Button3 && openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick)))  
             {
                 CloseOrShowMainWindow();
                 return;
@@ -251,7 +255,6 @@ namespace Quicker
 
             // 其他情况
             if (AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间已记录，返回
-            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             
             ProcessMouseButtonPress(e.Data.Button, openMainWindowConditions); // 处理鼠标按下事件
         }
@@ -409,20 +412,20 @@ namespace Quicker
         /// </summary>
         /// <param name="button"> 鼠标按钮 </param>
         /// <param name="conditions"> 设置 </param>
-        private void ProcessMouseButtonPress(SharpHook.Data.MouseButton button, OpenMainWindow conditions)
+        private void ProcessMouseButtonPress(MouseButton button, OpenMainWindow conditions)
         {
             switch (button)
             {
-                case SharpHook.Data.MouseButton.Button2:
+                case MouseButton.Button2:
                     ProcessRightMouseButtonPress(conditions);
                     break; // 右键按下
-                case SharpHook.Data.MouseButton.Button3:
+                case MouseButton.Button3:
                     ProcessMiddleMouseButtonPress(conditions);
                     break; // 中键按下
-                case SharpHook.Data.MouseButton.Button4:
+                case MouseButton.Button4:
                     ProcessX1MouseButtonPress(conditions);
                     break; // X1鼠标按下
-                case SharpHook.Data.MouseButton.Button5:
+                case MouseButton.Button5:
                     ProcessX2MouseButtonPress(conditions);
                     break; // X2鼠标按下
             }
@@ -492,15 +495,15 @@ namespace Quicker
         /// <param name="conditions"> 设置 </param>
         /// <param name="conventions"> 设置 </param>
         /// <param name="pressDuration"> 按键按下时间 </param>
-        private void ProcessMouseButtonRelease(SharpHook.Data.MouseButton button, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        private void ProcessMouseButtonRelease(MouseButton button, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
         {
             switch (button)
             {
-                case SharpHook.Data.MouseButton.Button3:
+                case MouseButton.Button3:
                     ProcessMiddleMouseButtonRelease(conditions, conventions, pressDuration);
                     break; // 中键松开
-                case SharpHook.Data.MouseButton.Button4:
-                case SharpHook.Data.MouseButton.Button5:
+                case MouseButton.Button4:
+                case MouseButton.Button5:
                     ProcessXMouseButtonRelease(conditions, conventions, pressDuration);
                     break; // X鼠标松开
             }
@@ -542,10 +545,10 @@ namespace Quicker
         /// </summary>
         /// <param name="keyCode"> 按键代码 </param>
         /// <param name="conditions"> 设置 </param>
-        private void ProcessControlKeyPress(SharpHook.Data.KeyCode keyCode, OpenMainWindow conditions)
+        private void ProcessControlKeyPress(KeyCode keyCode, OpenMainWindow conditions)
         {
-            if ((keyCode == SharpHook.Data.KeyCode.VcLeftControl ||
-                 keyCode == SharpHook.Data.KeyCode.VcRightControl) &&
+            if ((keyCode == KeyCode.VcLeftControl ||
+                 keyCode == KeyCode.VcRightControl) &&
                 (conditions.OpenMainWindowByCtrl_MiddleMouseClick ||
                  conditions.OpenMainWindowByCtrl_RightMouseClick ||
                  conditions.OpenMainWindowByCtrl))
@@ -561,10 +564,10 @@ namespace Quicker
         /// <param name="conditions"> 设置 </param>
         /// <param name="conventions"> 设置 </param>
         /// <param name="pressDuration"> 按键按下时间 </param>
-        private void ProcessControlKeyRelease(SharpHook.Data.KeyCode keyCode, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        private void ProcessControlKeyRelease(KeyCode keyCode, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
         {
-            if ((keyCode == SharpHook.Data.KeyCode.VcLeftControl ||
-                 keyCode == SharpHook.Data.KeyCode.VcRightControl) &&
+            if ((keyCode == KeyCode.VcLeftControl ||
+                 keyCode == KeyCode.VcRightControl) &&
                 conditions.OpenMainWindowByCtrl &&
                 pressDuration.TotalMilliseconds <= conventions.LongPressThreshold)
             {
