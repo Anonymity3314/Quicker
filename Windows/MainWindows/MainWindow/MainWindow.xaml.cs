@@ -51,7 +51,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             CommonStyle = style; // 设置样式
             CommonGrid.Children.Clear(); // 清空通用网格
             SetCommonTextBlock(0); // 设置通用标签内容
-            GeneratePageGrid(CommonGrid, CommonStyle, 0, 4, 4); // 生成对应样式 UniformGrid
+            GeneratePageGrid(CommonGrid, CommonStyle, 0, 4, 4); // 生成对应样式 Grid
             GenerateButtons(); // 生成按钮
             LockCommonActionPage(null, null); // 锁住通用动作页面
         }
@@ -481,41 +481,11 @@ namespace Quicker.Windows.MainWindows.MainWindow
             button.MouseLeave += Button_MouseLeave; // 鼠标移出事件
         }
 
-        // 全局动作页可见性与切换按钮背景绑定
-        private void GlobalUniformGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender is UniformGrid uniformGrid && uniformGrid.IsVisible)
-            {
-                int uniformGridIndex = int.Parse(uniformGrid.Name.Replace("Global", "")); // 获取UniformGrid索引
-                foreach (var button in GlobalButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
-                {
-                    button.Background = button.Name.Contains($"{uniformGridIndex}") // 判断是否是当前按钮
-                        ? SelectedBrush
-                        : UnSelectedBrush; // 设置当前按钮颜色
-                } // 设置所有按钮的颜色
-            }
-        }
-
         // 锁定通用动作页
         private void LockCommonActionPage(object sender, RoutedEventArgs e)
         {
             AppStateManager.Locked = !AppStateManager.Locked; // 切换锁定状态
             ((MainWindowViewModel)this.DataContext).IsLocked = AppStateManager.Locked; // 更新数据绑定
-        }
-
-        // 通用动作页可见性与切换按钮背景绑定
-        private void CommonUniformGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender is UniformGrid uniformGrid && uniformGrid.IsVisible)
-            {
-                int uniformGridIndex = int.Parse(uniformGrid.Name.Replace($"{CommonStyle}", "")); // 获取UniformGrid索引
-                foreach (var button in CommonButtonPanel.Children.OfType<Button>()) // 遍历所有按钮，重置颜色
-                {
-                    button.Background = button.Name.Contains($"{uniformGridIndex}") // 判断是否是当前按钮
-                        ? SelectedBrush
-                        : UnSelectedBrush; // 设置当前按钮颜色
-                } // 设置所有按钮的颜色
-            }
         }
 
         // 点击标签打开动作页管理窗口
@@ -629,8 +599,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
             cancellationTokenSource.Cancel(); // 取消所有后台任务
             cancellationTokenSource.Dispose();
             CleanUpEventHandlers(); // 清理事件处理器
-            CleanUpUniformGrid(MainGrid); // 清理全局网格
-            CleanUpUniformGrid(CommonGrid); // 清理通用网格
+            CleanUpGrid(GlobalGrid); // 清理全局网格
+            CleanUpGrid(CommonGrid); // 清理通用网格
 
             CommonStyle = null; // 清理通用样式
             iconManager.Dispose(); // 释放图标管理器资源
@@ -642,14 +612,14 @@ namespace Quicker.Windows.MainWindows.MainWindow
         }
 
         /// <summary>
-        /// 清理指定Grid中的所有UniformGrid及其子元素
+        /// 清理指定Grid中的所有Grid及其子元素
         /// </summary>
         /// <param name="grid">要清理的Grid</param>
-        private void CleanUpUniformGrid(Grid grid)
+        private void CleanUpGrid(Grid grid)
         {
-            foreach (UniformGrid uniformGrid in buttonManager.FindVisualChildren<UniformGrid>(grid))
+            foreach (Grid Grid in buttonManager.FindVisualChildren<Grid>(grid))
             {
-                foreach (Button button in buttonManager.FindVisualChildren<Button>(uniformGrid))
+                foreach (Button button in buttonManager.FindVisualChildren<Button>(Grid))
                 {
                     // 移除所有事件处理器
                     button.Click -= DoAction; // 左键点击事件
@@ -667,12 +637,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     button.Tag = null; // 清理按钮标签
                     button.Background = null; // 清理按钮背景
                 }
-
-                // 移除UniformGrid事件
-                uniformGrid.IsVisibleChanged -= GlobalUniformGrid_IsVisibleChanged; // 全局动作页可见性变化事件
-                uniformGrid.IsVisibleChanged -= CommonUniformGrid_IsVisibleChanged; // 通用动作页可见性变化事件
-
-                uniformGrid.Children.Clear(); // 清空UniformGrid
+                Grid.Children.Clear(); // 清空Grid
             }
             grid.Children.Clear(); // 清空Grid
         }
@@ -701,68 +666,114 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="cols">列数</param>
         private Grid GeneratePageGrid(Panel parent, string gridType, int pageIndex, int rows, int cols)
         {
-            // 创建Grid
-            var grid = new Grid
-            {
-                Name = $"{gridType}{pageIndex}"
-            };
+            var grid = new Grid { Name = $"{gridType}{pageIndex}" }; // 创建Grid
+            AddGridRows(grid, rows, ((MainWindowViewModel)this.DataContext).ButtonGap); // 添加行定义
+            AddGridColumns(grid, cols, ((MainWindowViewModel)this.DataContext).ButtonGap); // 添加列定义
+            // 添加按钮到Grid
+            AddButtonsToGrid(grid, pageIndex, rows, cols, gridType, FindResource("Button") as Style, ((MainWindowViewModel)this.DataContext).ButtonSize);
+            parent.Children.Add(grid); // 添加到父容器
+            return grid;
+        }
 
-            // 定义行列（含间隔）
+        /// <summary>
+        /// 为Grid添加行定义（含间隔）
+        /// </summary>
+        /// <param name="grid">目标Grid</param>
+        /// <param name="rows">行数</param>
+        /// <param name="gap">行间距</param>
+        private void AddGridRows(Grid grid, int rows, double gap)
+        {
             for (int i = 0; i < rows * 2 - 1; i++)
             {
                 grid.RowDefinitions.Add(new RowDefinition
                 {
                     Height = (i % 2 == 0)
-                    ? new GridLength(1, GridUnitType.Auto)
-                    : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
+                        ? new GridLength(1, GridUnitType.Auto)
+                        : new GridLength(gap)
                 });
             }
+        }
+
+        /// <summary>
+        /// 为Grid添加列定义（含间隔）
+        /// </summary>
+        /// <param name="grid">目标Grid</param>
+        /// <param name="cols">列数</param>
+        /// <param name="gap">列间距</param>
+        private void AddGridColumns(Grid grid, int cols, double gap)
+        {
             for (int j = 0; j < cols * 2 - 1; j++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
                     Width = (j % 2 == 0)
-                    ? new GridLength(1, GridUnitType.Auto)
-                    : new GridLength(((MainWindowViewModel)this.DataContext).ButtonGap)
+                        ? new GridLength(1, GridUnitType.Auto)
+                        : new GridLength(gap)
                 });
             }
+        }
 
-            // 生成按钮
+        /// <summary>
+        /// 向Grid中批量添加按钮
+        /// </summary>
+        /// <param name="grid">目标Grid</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        /// <param name="gridType">Grid类型</param>
+        /// <param name="style">按钮样式</param>
+        /// <param name="size">按钮尺寸</param>
+        private void AddButtonsToGrid(Grid grid, int pageIndex, int rows, int cols, string gridType, Style style, double size)
+        {
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
                 {
                     int buttonIndex = pageIndex * 100 + (row + 1) * 10 + (col + 1);
                     string buttonName = $"{gridType}{buttonIndex}";
-                    Style styleResource = FindResource("Button") as Style;
-
-                    Button button = new Button
-                    {
-                        Name = buttonName,
-                        Style = styleResource,
-                        Width = ((MainWindowViewModel)this.DataContext).ButtonSize,
-                        Height = ((MainWindowViewModel)this.DataContext).ButtonSize
-                    };
-
+                    Button button = CreateButton(buttonName, style, size);
                     // 设置行列（注意：有间隔，实际行列号*2）
                     Grid.SetRow(button, row * 2);
                     Grid.SetColumn(button, col * 2);
-
-                    // 绑定事件
-                    BindButtonEvents(button);
-
-                    // 绑定数据
-                    var buttonData = db2.GetButtonDataByID(buttonIndex, gridType);
-                    button.Tag = buttonData;
-                    buttonManager.RefreshButtonDisplay(button, buttonData, 60, true);
-
+                    // 绑定数据和事件
+                    BindButtonDataAndEvents(button, buttonIndex, gridType);
                     grid.Children.Add(button);
                 }
             }
+        }
 
-            // 添加到父容器
-            parent.Children.Add(grid);
-            return grid;
+        /// <summary>
+        /// 创建一个按钮并设置基本属性
+        /// </summary>
+        /// <param name="name">按钮名称</param>
+        /// <param name="style">按钮样式</param>
+        /// <param name="size">按钮尺寸</param>
+        /// <returns>新建的Button对象</returns>
+        private Button CreateButton(string name, Style style, double size)
+        {
+            return new Button
+            {
+                Name = name,
+                Style = style,
+                Width = size,
+                Height = size
+            };
+        }
+
+        /// <summary>
+        /// 绑定按钮的数据和事件，并刷新显示
+        /// </summary>
+        /// <param name="button">目标按钮</param>
+        /// <param name="buttonIndex">按钮索引</param>
+        /// <param name="gridType">Grid类型</param>
+        private void BindButtonDataAndEvents(Button button, int buttonIndex, string gridType)
+        {
+            // 绑定事件
+            BindButtonEvents(button);
+            // 绑定数据
+            var buttonData = db2.GetButtonDataByID(buttonIndex, gridType);
+            button.Tag = buttonData;
+            buttonManager.RefreshButtonDisplay(button, buttonData, 60, true);
         }
 
         /// <summary>
