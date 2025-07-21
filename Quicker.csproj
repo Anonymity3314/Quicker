@@ -58,6 +58,7 @@
     <None Remove="Resources\Images\CloseQuicker.png" />
     <None Remove="Resources\Images\CloseWindow.png" />
     <None Remove="Resources\Images\CloseWindow.png" />
+    <None Remove="Resources\Images\CommonSceneImage.png" />
     <None Remove="Resources\Images\CopyAction.png" />
     <None Remove="Resources\Images\DeleteImage.png" />
     <None Remove="Resources\Images\DeleteImage.png" />
@@ -90,6 +91,7 @@
     <None Remove="Resources\Images\SettingWindow.png" />
     <None Remove="Resources\Images\StartApp.png" />
     <None Remove="Resources\Images\Target.png" />
+    <None Remove="Resources\Images\TaskbarSceneImage.png" />
     <None Remove="Resources\Images\UnLocked.png" />
     <None Remove="UpdateHistory.txt" />
     <None Remove="Windows\MainWindow.xaml.cs~RF56f46fe.TMP" />
@@ -115,6 +117,9 @@
 
   <ItemGroup>
     <Resource Include="Resources\Images\BlackList.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\CommonSceneImage.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\CopyAction.png">
@@ -192,6 +197,9 @@
     <Resource Include="Resources\Images\Target.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Images\TaskbarSceneImage.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Images\UnpinFromDesktop.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -218,9 +226,6 @@
     </Resource>
     <Resource Include="Resources\Images\Quicker1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Images\Quicker2.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\RestartQuicker.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

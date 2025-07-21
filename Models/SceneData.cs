@@ -14,3 +14,7 @@
         public string SceneProcess { get; set; } // 场景所属程序名称
     }
 }
+/*
+ * SceneTag 可用于Name属性
+ * ActualTag 用于数据查询
+ */

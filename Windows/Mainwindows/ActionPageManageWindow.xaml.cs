@@ -651,18 +651,34 @@ namespace Quicker.Windows.MainWindows
             }
             else if (canvasCount == 0)
             {
-                db2.CreateButtonTable(type); // 创建按钮数据表
-                var sceneData = db3.GetSceneData(type).FirstOrDefault(); // 获取场景数据
-                db3.CreateActionPageTable(type); // 创建动作页数据表
-                db3.UpdateActionPageTable(type, $"{type}{0}", sceneData.SceneName); // 更新动作页数据表
-                db3.UpdateSceneCount(type, 1); // 更新场景数据表
-                MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
-                if(type != "_global")
+                if (new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(type))
                 {
-                    MainBorder.Height = 289; // 设置主边框高度
-                    ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
-                    AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加场景按钮边距
-                    AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 341, 0, 0); // 设置自动返回到第一页复选框边距
+                    db2.CreateButtonTable(type); // 创建按钮数据表
+                    var sceneData = db3.GetSceneData(type).FirstOrDefault(); // 获取场景数据
+                    db3.CreateActionPageTable(type); // 创建动作页数据表
+                    db3.UpdateActionPageTable(type, $"{type}{0}", sceneData.SceneName); // 更新动作页数据表
+                    db3.UpdateSceneCount(type, 1); // 更新场景数据表
+                    MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
+                    if (type != "_global")
+                    {
+                        MainBorder.Height = 289; // 设置主边框高度
+                        ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                        AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加场景按钮边距
+                        AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 341, 0, 0); // 设置自动返回到第一页复选框边距
+                    }
+                }
+                else
+                {
+                    db2.CreateButtonTable(type); // 创建按钮数据表
+                    db3.CreateAndInitTable(type, "", ""); // 创建场景数据表
+                    MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
+                    if (type != "Global")
+                    {
+                        MainBorder.Height = 289; // 设置主边框高度
+                        ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
+                        AddActionPageButton.Margin = new Thickness(239, 337, 0, 0); // 设置添加场景按钮边距
+                        AutoReturnToFirstPageCheckBox.Margin = new Thickness(535, 341, 0, 0); // 设置自动返回到第一页复选框边距
+                    }
                 }
             }
             else

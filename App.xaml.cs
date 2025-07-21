@@ -732,46 +732,50 @@ namespace Quicker
         /// <returns> 窗口类型 </returns>
         private string DetermineWindowType()
         {
-            try
-            {
-                using var windowManager = new WindowManager();
-                IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow();
-                if (foregroundWindow != IntPtr.Zero)
-                {
-                    uint processId = windowManager.GetWindowProcessId(foregroundWindow);
-                    using var process = Process.GetProcessById((int)processId);
-                    string processFilePath = process.MainModule.FileName;
-                    string processFileName = Path.GetFileName(processFilePath).ToLower();
-
-                    // 检查是否存在以 文件名+"Scene" 命名的表
-                    var db = new ActionPageDatabase();
-                    if (db.SceneTableExists(processFileName))
-                    {
-                        // 获取场景数据
-                        var sceneList = db.GetSceneData(processFileName);
-                        if (sceneList != null && sceneList.Count > 0)
-                        {
-                            var scene = sceneList[0];
-                            // 路径相同则返回文件名（带后缀）
-                            if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase))
-                            {
-                                if(scene.SceneCount > 0)
-                                    return processFileName;
-                            }
-                        }
-                    }
-                }
-            }
-            catch { /* 忽略异常并继续执行下面的逻辑 */ }
-
+            string processSceneType = GetProcessSceneType();
             if (AppStateManager.Locked)
                 return AppStateManager.CommonState; // 窗口类型为锁定状态
+            else if (!string.IsNullOrEmpty(processSceneType))
+                return processSceneType;
             else if (IsMouseOnTaskbar())
                 return "taskbar"; // 鼠标在任务栏上
             else if (IsMouseOnDesktop())
                 return "desktop"; // 鼠标在桌面上
             else
                 return "common"; // 鼠标在其他窗口上
+        }
+
+        /// <summary>
+        /// 获取进程对应的场景类型
+        /// </summary>
+        /// <returns>如果找到对应的场景类型则返回，否则返回空字符串</returns>
+        private string GetProcessSceneType()
+        {
+            using var windowManager = new WindowManager(); // 创建窗口管理器
+            IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
+            if (foregroundWindow != IntPtr.Zero) // 如果前台窗口不为空
+            {
+                uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
+                using var process = Process.GetProcessById((int)processId); // 获取进程
+                string processFilePath = process.MainModule.FileName; // 获取进程文件路径
+                string processFileName = Path.GetFileName(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
+                var db = new ActionPageDatabase(); // 检查是否存在以 文件名+"Scene" 命名的表
+                if (db.SceneTableExists(processFileName))
+                {
+                    var sceneList = db.GetSceneData(processFileName); // 获取场景数据
+                    if (sceneList != null && sceneList.Count > 0)
+                    {
+                        var scene = sceneList[0];
+                        // 路径相同则返回文件名（带后缀）
+                        if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (scene.SceneCount > 0)
+                                return processFileName;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
         }
 
         /// <summary>
