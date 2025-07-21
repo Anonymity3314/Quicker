@@ -16,6 +16,43 @@ namespace Quicker.Database.Upgrade.Versions
         public void Upgrade(SQLiteConnection connection, DatabaseUpdateManager manager)
         {
             SettingDatabase.InitializeAppearance(); // 新增数据库表
+            RenameDefaultTables(connection, manager); // 重命名默认表
+        }
+
+        /// <summary>
+        /// 重命名表名
+        /// </summary>
+        /// <param name="connection"> 数据库连接 </param>
+        /// <param name="manager"> 数据库更新管理器 </param>
+        public void RenameDefaultTables(SQLiteConnection connection, DatabaseUpdateManager manager)
+        {
+            var renameMap = new Dictionary<string, string>
+            {
+                { "Global", "_global" },
+                { "Common", "common" },
+                { "Desktop", "desktop" },
+                { "Taskbar", "taskbar" }
+            }; // 重命名映射表
+            foreach (var kv in renameMap)
+            {
+                if (manager._db2.TableExists(kv.Key) && !manager._db2.TableExists(kv.Value)) // 旧表存在且新表不存在
+                {
+                    RenameTable(connection, kv.Key, kv.Value); // 重命名表
+                }
+            }
+        }
+
+        /// <summary>
+        /// 重命名表
+        /// </summary>
+        /// <param name="connection"> 数据库连接 </param>
+        /// <param name="oldName"> 旧表名 </param>
+        /// <param name="newName"> 新表名 </param>
+        public void RenameTable(SQLiteConnection connection, string oldName, string newName)
+        {
+            string sql = $"ALTER TABLE [{oldName}] RENAME TO [{newName}]"; // 重命名表
+            using var command = new SQLiteCommand(sql, connection); // 创建命令
+            command.ExecuteNonQuery(); // 执行命令
         }
     }
 }

@@ -735,7 +735,7 @@ namespace Quicker.Managers
         public void DeleteActionByDrag(MainWindow mainWindow, string commonStyle)
         {
             if (SourceButton == null) return; // 如果按钮不存在，直接返回
-            string tableName = SourceTableName.StartsWith("Global") ? "Global" : commonStyle; // 获取表名
+            string tableName = SourceTableName.StartsWith("_global") ? "_global" : commonStyle; // 获取表名
             int buttonID = int.Parse(SourceButton.Name.Replace($"{tableName}", "")); // 获取按钮ID
             db2.DeleteAction(buttonID, tableName); // 删除动作
             mainWindow.UpdateButtonContent(buttonID, tableName); // 更新按钮内容

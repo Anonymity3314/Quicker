@@ -15,7 +15,7 @@
 >
     <Grid>
         <Label Content="应用程序" HorizontalAlignment="Left" Margin="50,12,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="AppComboBox" HorizontalAlignment="Left" Margin="113,15,0,0" VerticalAlignment="Top" Height="27" Width="200">
+        <ComboBox x:Name="AppComboBox" HorizontalAlignment="Left" Margin="113,11,0,0" VerticalAlignment="Top" Height="27" Width="200">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -25,10 +25,10 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="318,15,0,0" VerticalAlignment="Top" Width="27" Height="27"/>
+        <Button Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="318,11,0,0" VerticalAlignment="Top" Width="27" Height="27"/>
 
         <Label Content="场景标识" HorizontalAlignment="Left" Margin="50,46,0,0" VerticalAlignment="Top"/>
-        <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="113,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="113,51,0,0" Foreground="#FF326CF3" TextWrapping="Wrap" VerticalAlignment="Top"/>
 
         <Label Content="场景名称" HorizontalAlignment="Left" Margin="50,80,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="113,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="133"/>

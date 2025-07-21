@@ -20,8 +20,8 @@ namespace Quicker.Database.Core
             if (!File.Exists(dbFilePath))
             {
                 SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
-                CreateButtonTable("Global"); // 创建全局表格
-                CreateButtonTable("Common"); // 创建通用表格
+                CreateButtonTable("_global"); // 创建全局表格
+                CreateButtonTable("common"); // 创建通用表格
             }
         }
 

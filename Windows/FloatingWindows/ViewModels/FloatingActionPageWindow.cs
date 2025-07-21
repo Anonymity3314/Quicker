@@ -385,7 +385,7 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         private void CalculateGridHeight()
         {
             const double titleHeight = 31; // 标题栏高度
-            if (TableName == "Global")
+            if (TableName == "_global")
             {
                 // Global模式：3行按钮，通过调整高度隐藏第4行
                 ButtonRows = 3;

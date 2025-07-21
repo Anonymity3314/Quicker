@@ -174,15 +174,15 @@ namespace Quicker.Windows.AddWindows
                     string iconPath = iconManager.SaveIconToFile(item.Icon);
                     if (!string.IsNullOrEmpty(iconPath))
                     {
+                        currentSceneData.SceneName = SceneNameTextBox.Text;
                         currentSceneData.SceneIconPath = iconPath;
                     }
                 }
                 var db = new Quicker.Database.Core.ActionPageDatabase();
-                db.CreateAndInitTable(currentSceneData.SceneName, currentSceneData.SceneIconPath, currentSceneData.SceneTag);
-                // 如果需要，后续再UpdateSceneTable补充其它字段
-                db.UpdateSceneTable(currentSceneData.SceneName, currentSceneData);
+                db.CreateAndInitTable(currentSceneData.SceneTag, currentSceneData.SceneIconPath, currentSceneData.SceneTag);
+                db.UpdateSceneTable(currentSceneData.SceneTag, currentSceneData);
             }
-            SceneAddCompleted?.Invoke(true, currentSceneData?.SceneName);
+            SceneAddCompleted?.Invoke(true, currentSceneData?.SceneTag);
             this.Close(); // 关闭窗口
         }
 

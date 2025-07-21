@@ -27,7 +27,7 @@ namespace Quicker.Windows.Menus
             var sceneData = db3.GetAllSceneData(); // 获取所有场景数据
             foreach (var data in sceneData) // 遍历所有场景
             {
-                if (data.SceneCount == 0 || data.SceneName == "Global") continue; // 跳过没有动作页的场景和全局场景
+                if (data.SceneCount == 0 || data.SceneTag == "_global") continue; // 跳过没有动作页的场景和全局场景
                 IncreaseMenuSize(); // 增加菜单大小
                 Button button = GenerateButton(data); // 生成切换动作页按钮
                 Grid grid = new() { Width = MainGrid.Width }; // 创建按钮容器

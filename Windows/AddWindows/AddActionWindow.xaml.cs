@@ -76,16 +76,16 @@ namespace Quicker.Windows.AddWindows
             {
                 switch (TableName)
                 {
-                    case "Global":
+                    case "_global":
                         pageName = "默认全局动作"; // 页面名称
                         break; // 默认全局动作
-                    case "TaskBar":
+                    case "taskbar":
                         pageName = "默认任务栏动作"; // 页面名称
                         break; // 默认任务栏动作
-                    case "Desktop":
+                    case "desktop":
                         pageName = "默认桌面动作"; // 页面名称
                         break; // 默认桌面动作
-                    case "Common":
+                    case "common":
                         pageName = "默认"; // 页面名称
                         break; // 默认动作
                 }

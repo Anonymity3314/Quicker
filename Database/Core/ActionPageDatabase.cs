@@ -30,10 +30,10 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             CreateMasterTable(connection); // 创建Application_Master表
-            CreateAndInitTable("Global", "", ""); // 创建数据表并初始化
-            CreateAndInitTable("Common", "", ""); // 创建数据表并初始化
-            CreateAndInitTable("Taskbar", "", ""); // 创建数据表并初始化
-            CreateAndInitTable("Desktop", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("_global", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("common", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("taskbar", "", ""); // 创建数据表并初始化
+            CreateAndInitTable("desktop", "", ""); // 创建数据表并初始化
         }
 
         // 创建Application_Master表
@@ -54,10 +54,10 @@ namespace Quicker.Database.Core
         {
             public static readonly Dictionary<string, (string Process, string ActionPageName, string IconPath, string Tag)> Configs = new()
             {
-                ["Global"] = ("Default", "默认全局动作页", "/Resources/Images/Quicker1.png", "_global"),
-                ["Common"] = ("Default", "默认", "/Resources/Images/Quicker1.png", "common"),
-                ["Desktop"] = ("Windows桌面", "桌面 #", "/Resources/Images/DesktopSceneImage.png", "desktop"),
-                ["Taskbar"] = ("Windows任务栏", "任务栏 #", "/Resources/Images/Quicker1.png", "taskbar")
+                ["_global"] = ("Default", "默认全局动作页", "/Resources/Images/Quicker1.png", "_global"),
+                ["common"] = ("Default", "默认", "/Resources/Images/Quicker1.png", "common"),
+                ["desktop"] = ("Windows桌面", "桌面 #", "/Resources/Images/DesktopSceneImage.png", "desktop"),
+                ["taskbar"] = ("Windows任务栏", "任务栏 #", "/Resources/Images/Quicker1.png", "taskbar")
             };
         }
 
@@ -92,7 +92,7 @@ namespace Quicker.Database.Core
                 AutoReturnToFirstPage = false,
                 SceneProcess = sceneProcess
             }; // 创建并初始化场景数据
-            UpdateSceneTable(tableName, sceneData); // 更新场景数据表
+            UpdateSceneTable(sceneTag, sceneData); // 更新场景数据表
 
             for (int i = 0; i < actionPageCount; i++) // 创建并初始化动作页
             {
@@ -100,7 +100,7 @@ namespace Quicker.Database.Core
 
                 string currentActionPageName = tableName switch
                 {
-                    "Global" or "Common" => actionPageName,
+                    "_global" or "common" => actionPageName,
                     _ => $"{actionPageName}{i}"
                 };
 
@@ -133,10 +133,10 @@ namespace Quicker.Database.Core
             using var transaction = connection.BeginTransaction(); // 开启事务
             string createTableQuery = $@"CREATE TABLE IF NOT EXISTS [{tableName + "Scene"}]
             (
-                SceneName TEXT PRIMARY KEY,
+                SceneName TEXT,
                 SceneIconPath TEXT,
                 SceneCount INTEGER,
-                SceneTag TEXT,
+                SceneTag TEXT PRIMARY KEY,
                 AutoReturnToFirstPage BOOL,
                 SceneProcess TEXT
             );"; // 创建场景数据表的SQL语句
@@ -154,7 +154,7 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"INSERT OR REPLACE INTO {tableName + "Scene"}
+            string query = $@"INSERT OR REPLACE INTO [{tableName + "Scene"}]
             (SceneName, SceneIconPath, SceneCount, SceneTag, AutoReturnToFirstPage, SceneProcess)
             VALUES
             (@SceneName, @SceneIconPath, @SceneCount, @SceneTag, @AutoReturnToFirstPage, @SceneProcess)"; // 更新场景数据表的SQL语句
@@ -178,9 +178,10 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"UPDATE {tableName + "Scene"} SET AutoReturnToFirstPage = @AutoReturnToFirstPage"; // 更新场景数据表的SQL语句
+            string query = $@"UPDATE [{tableName + "Scene"}] SET AutoReturnToFirstPage = @AutoReturnToFirstPage WHERE SceneTag = @SceneTag"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@AutoReturnToFirstPage", autoReturnToFirstPage); // 设置参数
+            command.Parameters.AddWithValue("@SceneTag", tableName); // 设置场景类型
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -194,8 +195,9 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"SELECT AutoReturnToFirstPage FROM {tableName + "Scene"}"; // 获取场景数据表的SQL语句
+            string query = $@"SELECT AutoReturnToFirstPage FROM [{tableName + "Scene"}] WHERE SceneTag = @SceneTag"; // 获取场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
+            command.Parameters.AddWithValue("@SceneTag", tableName); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询SQL语句
             bool autoReturnToFirstPage = false; // 自动返回到第一个页面
             while (reader.Read())
@@ -214,9 +216,10 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"UPDATE {tableName + "Scene"} SET SceneCount = @SceneCount"; // 更新场景数据表的SQL语句
+            string query = $@"UPDATE [{tableName + "Scene"}] SET SceneCount = @SceneCount WHERE SceneTag = @SceneTag"; // 更新场景数据表的SQL语句
             using var command = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@SceneCount", sceneCount); // 设置参数
+            command.Parameters.AddWithValue("@SceneTag", tableName); // 设置场景类型
             command.ExecuteNonQuery(); // 执行更新表的SQL语句
             transaction.Commit(); // 提交事务
         }
@@ -250,7 +253,7 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"INSERT OR REPLACE INTO {tableName + "ActionPage"}
+            string query = $@"INSERT OR REPLACE INTO [{tableName + "ActionPage"}]
             (DefaultActionPageName, ActionPageName, LastEditTime)
             VALUES
             (@DefaultActionPageName, @ActionPageName, @LastEditTime)"; // 更新场景数据表的SQL语句
@@ -274,7 +277,7 @@ namespace Quicker.Database.Core
             using var command1 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command1.Parameters.AddWithValue("@TableName", tableName + "Scene"); // 设置参数
             command1.ExecuteNonQuery(); // 执行删除表的SQL语句
-            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS {tableName + "Scene"}", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS [{tableName + "Scene"}]", connection); // 创建命令对象
             command.ExecuteNonQuery(); // 执行删除表格语句
             transaction.Commit(); // 提交事务
         }
@@ -288,12 +291,12 @@ namespace Quicker.Database.Core
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
-            string query = $@"DELETE FROM {tableName + "ActionPage"} WHERE DefaultActionPageName = @DefaultActionPageName"; // 删除动作页数据表的SQL语句
+            string query = $@"DELETE FROM [{tableName + "ActionPage"}] WHERE DefaultActionPageName = @DefaultActionPageName"; // 删除动作页数据表的SQL语句
             using var command1 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command1.Parameters.AddWithValue("@DefaultActionPageName", tableName + actionPageIndex.ToString()); // 添加参数
             command1.ExecuteNonQuery(); // 执行删除表的SQL语句
 
-            string selectQuery = $@"SELECT DefaultActionPageName FROM {tableName + "ActionPage"} 
+            string selectQuery = $@"SELECT DefaultActionPageName FROM [{tableName + "ActionPage"}] 
                     ORDER BY CAST(SUBSTR(DefaultActionPageName, LENGTH(@TableName) + 1) AS INTEGER)"; // 获取所有剩余动作页的 SQL语句
             using var selectCommand = new SQLiteCommand(selectQuery, connection, transaction); // 创建SQLiteCommand对象
             selectCommand.Parameters.AddWithValue("@TableName", tableName); // 设置参数
@@ -310,7 +313,7 @@ namespace Quicker.Database.Core
                 string newDefaultActionPageName = $"{tableName}{i}"; // 设置新名称
                 if (oldDefaultActionPageName != newDefaultActionPageName)
                 {
-                    string updateQuery = $@"UPDATE {tableName + "ActionPage"}
+                    string updateQuery = $@"UPDATE [{tableName + "ActionPage"}]
                             SET DefaultActionPageName = @NewDefaultActionPageName
                             WHERE DefaultActionPageName = @OldDefaultActionPageName"; // 更新动作页数据表的SQL语句
                     using var updateCommand = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
@@ -319,7 +322,7 @@ namespace Quicker.Database.Core
                     updateCommand.ExecuteNonQuery(); // 执行更新表的SQL语句
                 }
             }
-            query = $@"UPDATE {tableName + "Scene"} SET SceneCount = SceneCount - 1 WHERE SceneName = @SceneName"; // 更新场景数据表的SQL语句
+            query = $@"UPDATE [{tableName + "Scene"}] SET SceneCount = SceneCount - 1 WHERE SceneName = @SceneName"; // 更新场景数据表的SQL语句
             using var command2 = new SQLiteCommand(query, connection, transaction); // 创建SQLiteCommand对象
             command2.Parameters.AddWithValue("@SceneName", tableName); // 设置场景类型
             command2.ExecuteNonQuery(); // 执行更新表的SQL语句
@@ -333,7 +336,7 @@ namespace Quicker.Database.Core
         public void DeleteActionPageTable(string tableName)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS {tableName + "ActionPage"}", connection); // 创建命令对象
+            using var command = new SQLiteCommand($"DROP TABLE IF EXISTS [{tableName + "ActionPage"}]", connection); // 创建命令对象
             command.ExecuteNonQuery(); // 执行删除表格语句
         }
 
@@ -346,8 +349,9 @@ namespace Quicker.Database.Core
         {
             var conditions = new List<SceneData>(); // 场景数据表
             using var connection = OpenConnection(); // 打开数据库连接
-            string selectQuery = $"SELECT * FROM {tableName + "Scene"};"; // 获取场景数据表的SQL语句
+            string selectQuery = $"SELECT * FROM [{tableName + "Scene"}] WHERE SceneTag = @SceneTag;"; // 获取场景数据表的SQL语句
             using var command = new SQLiteCommand(selectQuery, connection); // 创建SQLiteCommand对象
+            command.Parameters.AddWithValue("@SceneTag", tableName); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询SQL语句
             while (reader.Read())
             {
@@ -411,7 +415,7 @@ namespace Quicker.Database.Core
         public ActionPageData GetActionPageData(string tableName, int actionPageIndex)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            string selectQuery = $"SELECT * FROM {tableName + "ActionPage"} WHERE DefaultActionPageName = @DefaultActionPageName"; // 获取动作页数据表的SQL语句
+            string selectQuery = $"SELECT * FROM [{tableName + "ActionPage"}] WHERE DefaultActionPageName = @DefaultActionPageName"; // 获取动作页数据表的SQL语句
             using var command = new SQLiteCommand(selectQuery, connection); // 创建SQLiteCommand对象
             command.Parameters.AddWithValue("@DefaultActionPageName", tableName + actionPageIndex.ToString()); // 添加参数
             using var reader = command.ExecuteReader(); // 执行查询SQL语句
@@ -442,7 +446,7 @@ namespace Quicker.Database.Core
             string tempName = $"{tableName}_temp_swap"; // 生成临时名称
 
             // 更新第一个动作页为临时名称
-            string updateQuery = $@"UPDATE {tableName + "ActionPage"}
+            string updateQuery = $@"UPDATE [{tableName + "ActionPage"}]
                                 SET DefaultActionPageName = @TempName
                                 WHERE DefaultActionPageName = @ActionPage1Name"; // 更新第一个动作页的SQL语句
             using var updateCommand1 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
@@ -451,7 +455,7 @@ namespace Quicker.Database.Core
             updateCommand1.ExecuteNonQuery(); // 执行更新表的SQL语句
 
             // 更新第二个动作页为第一个动作页的原始名称
-            updateQuery = $@"UPDATE {tableName + "ActionPage"}
+            updateQuery = $@"UPDATE [{tableName + "ActionPage"}]
                         SET DefaultActionPageName = @ActionPage1Name
                         WHERE DefaultActionPageName = @ActionPage2Name"; // 更新第二个动作页的SQL语句
             using var updateCommand2 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
@@ -460,7 +464,7 @@ namespace Quicker.Database.Core
             updateCommand2.ExecuteNonQuery(); // 执行更新表的SQL语句
 
             // 更新第一个动作页为第二个动作页的原始名称
-            updateQuery = $@"UPDATE {tableName + "ActionPage"}
+            updateQuery = $@"UPDATE [{tableName + "ActionPage"}]
                         SET DefaultActionPageName = @ActionPage2Name
                         WHERE DefaultActionPageName = @TempName"; // 更新第一个动作页的SQL语句
             using var updateCommand3 = new SQLiteCommand(updateQuery, connection, transaction); // 创建SQLiteCommand对象
@@ -479,13 +483,13 @@ namespace Quicker.Database.Core
         {
             switch (sceneData.SceneName)
             {
-                case "Global":
+                case "_global":
                     return "全局"; // 全局场景
-                case "Common":
+                case "common":
                     return "通用"; // 通用场景
-                case "Taskbar":
+                case "taskbar":
                     return "任务栏"; // 任务栏场景
-                case "Desktop":
+                case "desktop":
                     return "桌面"; // 桌面场景
                 default:
                     return sceneData.SceneName; // 其他场景
@@ -500,7 +504,7 @@ namespace Quicker.Database.Core
         public void UpdateActionPageLastEditTime(string tableName, int actionPageIndex)
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            string query = $@"UPDATE {tableName + "ActionPage"}
+            string query = $@"UPDATE [{tableName + "ActionPage"}]
             SET LastEditTime = @LastEditTime
             WHERE DefaultActionPageName = @DefaultActionPageName"; // 更新动作页最后编辑时间的SQL语句
             using var command = new SQLiteCommand(query, connection); // 创建SQLiteCommand对象

@@ -68,8 +68,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 初始化动作页面
         private void InitializePageGrids()
         {
-            var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "Common"); // 设置样式
-            GeneratePageGrid(GlobalGrid, "Global", 0, 3, 4);
+            var targetStyle = db2.TableExists(CommonStyle) ? CommonStyle : (CommonStyle = "common"); // 设置样式
+            GeneratePageGrid(GlobalGrid, "_global", 0, 3, 4);
             GeneratePageGrid(CommonGrid, targetStyle, 0, 4, 4);
             GenerateButtons(); // 生成按钮
             SetCommonTextBlock(0);
@@ -127,9 +127,9 @@ namespace Quicker.Windows.MainWindows.MainWindow
             // 切换通用动作页时清空
             GlobalButtonPanel.Children.Clear(); // 清空全局动作页切换按钮
             CommonButtonPanel.Children.Clear(); // 清空通用动作页切换按钮
-            var globalSceneData = db3.GetSceneData("Global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
+            var globalSceneData = db3.GetSceneData("_global").FirstOrDefault(); // 从数据库中获取全局动作页面数据
             var commonSceneData = db3.GetSceneData(CommonStyle).FirstOrDefault(); // 从数据库中获取通用动作页面数据
-            GeneratePageButtons("Global", globalSceneData.SceneCount, GlobalPageChangeButton_Click, GlobalButtonPanel);
+            GeneratePageButtons("_global", globalSceneData.SceneCount, GlobalPageChangeButton_Click, GlobalButtonPanel);
             GeneratePageButtons(CommonStyle, commonSceneData.SceneCount, CommonPageChangeButton_Click, CommonButtonPanel);
         }
 
@@ -159,7 +159,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 全局页面切换按钮点击
         private void GlobalPageChangeButton_Click(object sender, RoutedEventArgs e)
         {
-            SwitchToPageGrid(sender, GlobalGrid, "Global", 3, 4, GlobalButtonPanel);
+            SwitchToPageGrid(sender, GlobalGrid, "_global", 3, 4, GlobalButtonPanel);
         }
         // 通用页面切换按钮点击
         private void CommonPageChangeButton_Click(object sender, RoutedEventArgs e)
@@ -181,8 +181,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 // 同步按钮背景
                 foreach (Button btn in buttonPanel.Children.OfType<Button>())
                     btn.Background = btn.Name == $"{gridType}{pageIndex}" ? SelectedBrush : UnSelectedBrush;
-                if (gridType != "Global") SetCommonTextBlock(pageIndex);
-                if (gridType == "Global") GloblePageIndex = pageIndex; else CommonPageIndex = pageIndex;
+                if (gridType != "_global") SetCommonTextBlock(pageIndex);
+                if (gridType == "_global") GloblePageIndex = pageIndex; else CommonPageIndex = pageIndex;
             }
         }
 
@@ -229,14 +229,14 @@ namespace Quicker.Windows.MainWindows.MainWindow
             ShowPageGrid(parent, gridType, targetIndex, rows, cols);
             foreach (Button btn in buttonPanel.Children.OfType<Button>())
                 btn.Background = btn.Name == $"{gridType}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (gridType != "Global") SetCommonTextBlock(targetIndex);
-            if (gridType == "Global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
+            if (gridType != "_global") SetCommonTextBlock(targetIndex);
+            if (gridType == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
         }
 
         // 全局Grid滚轮事件
         private void GlobalGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            Grid_MouseWheel(sender, e, GlobalGrid, "Global", 3, 4, GlobalButtonPanel);
+            Grid_MouseWheel(sender, e, GlobalGrid, "_global", 3, 4, GlobalButtonPanel);
         }
         // 通用Grid滚轮事件
         private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -294,11 +294,11 @@ namespace Quicker.Windows.MainWindows.MainWindow
             bool autoReturn = db3.GetAutoReturnToFirstPage(buttonType); // 获取是否自动返回第一页
             if(autoReturn) // 如果自动返回第一页，清空按钮所在容器
             {
-                if (buttonType == "Global")
+                if (buttonType == "_global")
                     GlobalGrid.Children.Clear(); // 清空按钮所在容器
                 else
                     CommonGrid.Children.Clear(); // 清空按钮所在容器
-                GeneratePageGrid(buttonType == "Global" ? GlobalGrid : CommonGrid, buttonType, 0, 3, 4); // 重新生成第一页内容
+                GeneratePageGrid(buttonType == "_global" ? GlobalGrid : CommonGrid, buttonType, 0, 3, 4); // 重新生成第一页内容
             }
         }
 
@@ -322,8 +322,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             string type = data.Data1; // 获取动作页类型
             int index = int.Parse(data.Data2); // 获取动作页索引
-            if (type != "Global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
-            int currentGridIndex = type == "Global" ? GloblePageIndex : CommonPageIndex; // 获取当前可见的Grid编号
+            if (type != "_global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
+            int currentGridIndex = type == "_global" ? GloblePageIndex : CommonPageIndex; // 获取当前可见的Grid编号
             if (currentGridIndex > index) // 如果当前Grid编号大于目标Grid编号
                 for (int i = currentGridIndex; i > index; i--)
                     SwitchToPreviousPageGrid(i, type); // 向前切换Grid
@@ -349,17 +349,17 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 else
                     return;
             }
-            Panel parent = type == "Global" ? GlobalGrid : CommonGrid;
-            Panel buttonPanel = type == "Global" ? GlobalButtonPanel : CommonButtonPanel;
-            int rows = type == "Global" ? 3 : 4;
+            Panel parent = type == "_global" ? GlobalGrid : CommonGrid;
+            Panel buttonPanel = type == "_global" ? GlobalButtonPanel : CommonButtonPanel;
+            int rows = type == "_global" ? 3 : 4;
             int cols = 4;
             if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}"))
                 GeneratePageGrid(parent, type, targetIndex, rows, cols);
             ShowPageGrid(parent, type, targetIndex, rows, cols);
             foreach (Button btn in buttonPanel.Children.OfType<Button>())
                 btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (type != "Global") SetCommonTextBlock(targetIndex);
-            if (type == "Global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
+            if (type != "_global") SetCommonTextBlock(targetIndex);
+            if (type == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
         }
 
         /// <summary>
@@ -379,17 +379,17 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 else
                     return;
             }
-            Panel parent = type == "Global" ? GlobalGrid : CommonGrid;
-            Panel buttonPanel = type == "Global" ? GlobalButtonPanel : CommonButtonPanel;
-            int rows = type == "Global" ? 3 : 4;
+            Panel parent = type == "_global" ? GlobalGrid : CommonGrid;
+            Panel buttonPanel = type == "_global" ? GlobalButtonPanel : CommonButtonPanel;
+            int rows = type == "_global" ? 3 : 4;
             int cols = 4;
             if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}"))
                 GeneratePageGrid(parent, type, targetIndex, rows, cols);
             ShowPageGrid(parent, type, targetIndex, rows, cols);
             foreach (Button btn in buttonPanel.Children.OfType<Button>())
                 btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (type != "Global") SetCommonTextBlock(targetIndex);
-            if (type == "Global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
+            if (type != "_global") SetCommonTextBlock(targetIndex);
+            if (type == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
         }
 
         // 右键按钮打开菜单
@@ -509,7 +509,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         private string GetButtonType(object sender)
         {
             Button button = sender as Button; // 获取按钮
-            return button.Name.StartsWith("Global") ? "Global" : CommonStyle; // 获取按钮类型
+            return button.Name.StartsWith("_global") ? "_global" : CommonStyle; // 获取按钮类型
         }
 
         // 点击按钮更新Quicker
@@ -526,7 +526,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="tableName"> 数据库表名 </param>
         public void UpdateButtonContent(int buttonID, string tableName)
         {
-            Grid fatherGrid = tableName == "Global" ? GlobalGrid : CommonGrid; // 根据表名选择父网格
+            Grid fatherGrid = tableName == "_global" ? GlobalGrid : CommonGrid; // 根据表名选择父网格
             int pageIndex = buttonID / 100; // 计算按钮索引
             string buttonName = $"{tableName}{buttonID}"; // 生成按钮名称
             var button = fatherGrid.Children.OfType<Grid>()
@@ -660,7 +660,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// 动态生成一页的Grid和按钮
         /// </summary>
         /// <param name="parent">父容器（如 CommonGrid/GlobalGrid）</param>
-        /// <param name="gridType">"Common" 或 "Global"</param>
+        /// <param name="gridType">"common" 或 "_global"</param>
         /// <param name="pageIndex">页码</param>
         /// <param name="rows">行数</param>
         /// <param name="cols">列数</param>
@@ -780,7 +780,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// 显示指定页的Grid
         /// </summary>
         /// <param name="parent">父容器（如 CommonGrid/GlobalGrid）</param>
-        /// <param name="gridType">"Common" 或 "Global"</param>
+        /// <param name="gridType">"common" 或 "_global"</param>
         /// <param name="pageIndex">页码</param>
         /// <param name="rows">行数</param>
         /// <param name="cols">列数</param>

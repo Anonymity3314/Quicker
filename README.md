@@ -180,7 +180,6 @@ Quicker/
 │       ├─IDatabaseUpgradeStep.cs                       # 升级步骤接口，定义数据库升级的标准接口
 │       ├─DatabaseUpdateManager.cs                      # 升级调度主类，负责数据库版本检查和升级流程管理
 │       └─Versions/                                     # 各版本升级实现类（每个版本一个类，便于维护和扩展）
-│           ├─Upgrade_2_2_0.cs                          # 2.1.3到2.2.0版本升级实现
 │           └─Upgrade_2_3_0.cs                          # 2.2.0到2.3.0版本升级实现
 ├─Extend/                                             # 扩展文件夹
 │   ├─IExtensionModule.cs                              # 实现扩展的接口

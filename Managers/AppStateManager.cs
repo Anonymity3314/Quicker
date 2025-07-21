@@ -70,7 +70,7 @@ namespace Quicker.Managers
 
         // 其他状态
         public static bool EnableMemoryOptimization { get; set; } = false; // 启用内存优化
-        public static string CommonState { get; set; } = "Common"; // 普通状态
+        public static string CommonState { get; set; } = "common"; // 普通状态
         public static bool HasNewVersion { get; set; } = false; // 是否有新版本
         public static float Left { get; set; } = 0; // 左
         public static float Top { get; set; } = 0; // 上

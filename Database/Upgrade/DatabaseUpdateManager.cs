@@ -21,7 +21,6 @@ namespace Quicker.Database.Upgrade
         {
             _upgradeSteps = new List<IDatabaseUpgradeStep>
             {
-                new Upgrade_2_2_0(),
                 new Upgrade_2_3_0()
             }; // 升级步骤列表
         }

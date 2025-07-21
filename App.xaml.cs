@@ -752,11 +752,11 @@ namespace Quicker
             if (AppStateManager.Locked)
                 return AppStateManager.CommonState; // 窗口类型为锁定状态
             else if (IsMouseOnTaskbar())
-                return "Taskbar"; // 鼠标在任务栏上
+                return "taskbar"; // 鼠标在任务栏上
             else if (IsMouseOnDesktop())
-                return "Desktop"; // 鼠标在桌面上
+                return "desktop"; // 鼠标在桌面上
             else
-                return "Common"; // 鼠标在其他窗口上
+                return "common"; // 鼠标在其他窗口上
         }
 
         /// <summary>

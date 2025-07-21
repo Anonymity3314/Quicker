@@ -7,18 +7,20 @@
     x:Class="Quicker.Windows.EditWindows.EditSceneWindow"
     mc:Ignorable="d"
 
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="NoResize"
     Title="编辑场景信息"
-    Height="450"
-    Width="800"
+    Height="297"
+    Width="680"
 >
     <Grid>
-        <Label Content="场景标识：" HorizontalAlignment="Left" Margin="122,115,0,0" VerticalAlignment="Top"/>
-        <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="223,120,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
-        <TextBlock x:Name="LocationTextBlock" HorizontalAlignment="Left" Margin="223,145,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
-        <Label Content="路径：" HorizontalAlignment="Left" Margin="146,145,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="UpdateLocationButton" Style="{StaticResource WhiteButton}" Content="更新路径..." HorizontalAlignment="Left" Margin="222,165,0,0" VerticalAlignment="Top" Width="80"/>
-        <Label Content="场景名称：" HorizontalAlignment="Left" Margin="122,200,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="222,200,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label Content="场景标识：" HorizontalAlignment="Left" Margin="122,37,0,0" VerticalAlignment="Top"/>
+        <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="221,48,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <TextBlock x:Name="LocationTextBlock" HorizontalAlignment="Left" Margin="221,73,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <Label Content="路径：" HorizontalAlignment="Left" Margin="146,68,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="UpdateLocationButton" Style="{StaticResource WhiteButton}" Content="更新路径..." HorizontalAlignment="Left" Margin="220,93,0,0" VerticalAlignment="Top" Width="80"/>
+        <Label Content="场景名称：" HorizontalAlignment="Left" Margin="120,0,0,0" VerticalAlignment="Center"/>
+        <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="220,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Width="120"/>
         <Grid Visibility="Collapsed" HorizontalAlignment="Left" Height="66" VerticalAlignment="Top" Width="526" Margin="122,225,0,0">
             <Label Content="关联其它程序：" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <TextBox x:Name="OtherProgressTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="125,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
@@ -26,7 +28,7 @@
             <Label Content="其他和当前程序使用相同配置的程序。多个exe文件请使用半角分号分隔。" HorizontalAlignment="Left" Margin="124,26,0,0" VerticalAlignment="Top"/>
             <Label Content="仅当未对这些软件单独创建设置时有效。" HorizontalAlignment="Left" Margin="125,40,0,0" VerticalAlignment="Top"/>
         </Grid>
-        <Button x:Name="SaveButton" Style="{StaticResource BlueButton}" Content="保存(S)" HorizontalAlignment="Left" Margin="223,317,0,0" VerticalAlignment="Top" Width="79" Click="SaveButton_Click"/>
-        <Button x:Name="CancelButton" Style="{StaticResource WhiteButton}" Content="取消" Margin="0,317,0,0" VerticalAlignment="Top" Width="71" Click="CancelButton_Click"/>
+        <Button x:Name="SaveButton" Style="{StaticResource BlueButton}" Content="保存(S)" HorizontalAlignment="Left" Margin="223,230,0,0" VerticalAlignment="Top" Width="79" Click="SaveButton_Click"/>
+        <Button x:Name="CancelButton" Style="{StaticResource WhiteButton}" Content="取消" Margin="325,230,0,0" VerticalAlignment="Top" Width="71" Click="CancelButton_Click" HorizontalAlignment="Left"/>
     </Grid>
 </Window>
