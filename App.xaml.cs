@@ -308,12 +308,35 @@ namespace Quicker
         private void Hook_KeyReleased(object sender, KeyboardHookEventArgs e)
         {
             if (!AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键时间未记录，返回
-
             var conventions = AppStateManager.Conventions; // 获取设置
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = GetKeyPressDuration(); // 获取按键按下时间
-            
-            ProcessControlKeyRelease(e.Data.KeyCode, openMainWindowConditions, conventions, pressDuration); // 处理按键松开事件
+
+            if (!IsOtherKeyDown())// 如果没有除Ctrl以外的其他按键被按下，处理按键松开事件
+                ProcessControlKeyRelease(e.Data.KeyCode, openMainWindowConditions, conventions, pressDuration); // 处理按键松开事件
+        }
+
+        /// <summary>
+        /// 判断是否有除Ctrl以外的其他任意按键被按下
+        /// </summary>
+        /// <returns>有则返回true，否则返回false</returns>
+        private bool IsOtherKeyDown()
+        {
+            bool otherKeyDown = false;
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (Key key in Enum.GetValues(typeof(Key)))
+                {
+                    if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.None)
+                        continue;
+                    if (Keyboard.IsKeyDown(key))
+                    {
+                        otherKeyDown = true;
+                        break;
+                    }
+                }
+            });
+            return otherKeyDown;
         }
 
         /// <summary>
@@ -686,6 +709,24 @@ namespace Quicker
         {
             this.Dispatcher.Invoke(() =>
             {
+                //MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 尝试查找现有的功能面板
+                //if (mainWindow == null)
+                //{
+                //    string windowType = DetermineWindowType(); // 确定窗口类型
+                //    mainWindow = new MainWindow(windowType); // 创建新的功能面板
+
+                //    var settings = SettingDatabase.GetAllOpenMainWindowConditions().FirstOrDefault(); // 获取设置
+                //    SetMainWindowPosition(mainWindow, settings.WindowStartupLocation); // 设置窗口位置
+                //    mainWindow.Show(); // 显示功能面板
+                //    mainWindow.Activate(); // 激活功能面板
+                //    AppStateManager.Left = (float)mainWindow.Left; // 记录功能面板位置
+                //    AppStateManager.Top = (float)mainWindow.Top; // 记录功能面板位置
+                //}
+                //else
+                //{
+                //    if (!AppStateManager.MainWindowPinned) mainWindow.Close(); // 关闭功能面板
+                //}
+
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
                 bool hasVisibleWindow = mainWindowList.Any(window => window.Visibility == Visibility.Visible); // 是否有可见窗口
