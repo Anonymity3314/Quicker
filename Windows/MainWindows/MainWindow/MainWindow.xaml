@@ -281,7 +281,7 @@
                             </Rectangle.Style>
                         </Rectangle>
                     </Button>
-                    <Button Style="{StaticResource Task}" Click="CloseMainWindow" ToolTip="关闭面板窗口" HorizontalAlignment="Right" Margin="0,0,3,0" Drop="CloseMainWindowButton_Drop">
+                    <Button Style="{StaticResource Task}" Click="CloseMainWindow" ToolTip="关闭面板窗口" HorizontalAlignment="Right" Margin="0,0,3,0" AllowDrop="True" Drop="CloseMainWindowButton_Drop">
                         <Rectangle Width="20" Height="20" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
                             <Rectangle.OpacityMask>
                                 <ImageBrush ImageSource="/Resources/Images/CloseWindow.png"/>

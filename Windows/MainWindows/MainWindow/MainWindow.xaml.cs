@@ -529,7 +529,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             Grid fatherGrid = tableName == "Global" ? GlobalGrid : CommonGrid; // 根据表名选择父网格
             int pageIndex = buttonID / 100; // 计算按钮索引
             string buttonName = $"{tableName}{buttonID}"; // 生成按钮名称
-            var button = fatherGrid.Children.OfType<UniformGrid>()
+            var button = fatherGrid.Children.OfType<Grid>()
                 .Where(ug => ug.Name == $"{tableName}{pageIndex}")
                 .SelectMany(ug => ug.Children.OfType<Button>())
                 .FirstOrDefault(b => b.Name == buttonName); // 查找按钮
@@ -542,7 +542,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 拖拽动作按钮到上面删除动作
         private void CloseMainWindowButton_Drop(object sender, DragEventArgs e)
         {
-            buttonManager.DeleteActionByDrag(GetButtonType(sender), this); // 删除动作
+            buttonManager.DeleteActionByDrag(this, CommonStyle); // 删除动作
         }
 
         /// <summary>
