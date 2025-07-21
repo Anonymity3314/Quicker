@@ -15,7 +15,7 @@
 >
     <Grid>
         <Label Content="应用程序" HorizontalAlignment="Left" Margin="50,12,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="AppComboBox" HorizontalAlignment="Left" Margin="113,11,0,0" VerticalAlignment="Top" Height="27" Width="200">
+        <ComboBox x:Name="AppComboBox" HorizontalAlignment="Left" Margin="113,11,0,0" VerticalAlignment="Top" Height="27" Width="200" SelectionChanged="AppComboBox_SelectionChanged">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

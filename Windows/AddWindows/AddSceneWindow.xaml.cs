@@ -13,6 +13,7 @@ namespace Quicker.Windows.AddWindows
 {
     public partial class AddSceneWindow : Window
     {
+        public event Action<bool, string?>? SceneAddCompleted; // 参数1: 是否保存, 参数2: 新场景名
         private IconManager iconManager = new(); // 图标管理器
         private SceneData currentSceneData; // 当前场景数据
 
@@ -20,40 +21,31 @@ namespace Quicker.Windows.AddWindows
         {
             InitializeComponent();
             LoadProcessesAsync();
-            AppComboBox.SelectionChanged += AppComboBox_SelectionChanged;
         }
 
-        public event Action<bool, string?>? SceneAddCompleted; // 参数1: 是否保存, 参数2: 新场景名
-
+        // 选择进程后，显示进程名和图标
         private void AppComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (AppComboBox.SelectedItem is ProcessItem item)
+            ProcessItem item = AppComboBox.SelectedItem as ProcessItem; // 获取选择的进程
+            string fileNameWithExt = Path.GetFileName(item.FileName)?.ToLower(); // 文件名（带后缀，小写）
+            SceneTagTextBlock.Text = fileNameWithExt; // 显示文件名
+            string processNameNoExt = Path.GetFileNameWithoutExtension(item.ProcessName); // ProcessName 去除后缀
+            SceneNameTextBox.Text = processNameNoExt; // 显示进程名
+            currentSceneData = new SceneData
             {
-                // 文件名（带后缀，小写）
-                string fileNameWithExt = Path.GetFileName(item.FileName)?.ToLower();
-                SceneTagTextBlock.Text = fileNameWithExt;
-                // ProcessName 去除后缀
-                string processNameNoExt = Path.GetFileNameWithoutExtension(item.ProcessName);
-                SceneNameTextBox.Text = processNameNoExt;
-                // 构造场景数据模型
-                currentSceneData = new SceneData
-                {
-                    SceneName = processNameNoExt,
-                    SceneIconPath = item.FileName, // 这里可根据实际需求保存图标路径或文件路径
-                    SceneCount = 0,
-                    SceneTag = fileNameWithExt,
-                    AutoReturnToFirstPage = false,
-                    SceneProcess = item.FileName
-                };
-
-                SaveButton.IsEnabled = true; // 启用保存按钮
-            }
-            else
-            {
-                SaveButton.IsEnabled = false;
-            }
+                SceneName = processNameNoExt,
+                SceneIconPath = item.FileName,
+                SceneCount = 0,
+                SceneTag = processNameNoExt,
+                AutoReturnToFirstPage = false,
+                SceneProcess = item.FileName
+            }; // 构造场景数据模型
+            SaveButton.IsEnabled = true; // 启用保存按钮
         }
 
+        /// <summary>
+        /// 异步加载进程列表
+        /// </summary>
         public async void LoadProcessesAsync()
         {
             // 1. 后台线程只收集文件名和进程名
@@ -163,31 +155,31 @@ namespace Quicker.Windows.AddWindows
             grid.Children.Add(textBlock);
 
             button.Content = grid;
-            // 你可以把button加到需要的容器里
         }
 
+        // 保存场景数据
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentSceneData != null)
+            if (currentSceneData != null) // 场景数据不为空
             {
-                // 保存到数据库前，保存图标到本地文件
-                if (AppComboBox.SelectedItem is ProcessItem item && item.Icon != null)
+                if (AppComboBox.SelectedItem is ProcessItem item && item.Icon != null) // 保存到数据库前，保存图标到本地文件
                 {
-                    string iconPath = iconManager.SaveIconToFile(item.Icon);
-                    if (!string.IsNullOrEmpty(iconPath))
+                    string iconPath = iconManager.SaveIconToFile(item.Icon); // 保存图标到本地文件
+                    if (!string.IsNullOrEmpty(iconPath)) // 图标保存成功
                     {
-                        currentSceneData.SceneName = SceneNameTextBox.Text;
-                        currentSceneData.SceneIconPath = iconPath;
+                        currentSceneData.SceneName = SceneNameTextBox.Text; // 更新场景名
+                        currentSceneData.SceneIconPath = iconPath; // 更新图标路径
                     }
                 }
-                var db = new Quicker.Database.Core.ActionPageDatabase();
-                db.CreateAndInitTable(currentSceneData.SceneTag, currentSceneData.SceneIconPath, currentSceneData.SceneTag);
-                //db.UpdateSceneTable(currentSceneData.SceneTag, currentSceneData);
+                var db = new Quicker.Database.Core.ActionPageDatabase(); // 数据库连接
+                db.CreateAndInitTable(currentSceneData.SceneTag, currentSceneData.SceneIconPath, currentSceneData.SceneTag); // 初始化数据表
+                db.UpdateSceneTable(currentSceneData); // 更新场景数据
             }
-            SceneAddCompleted?.Invoke(true, currentSceneData?.SceneTag);
+            SceneAddCompleted?.Invoke(true, currentSceneData?.SceneTag); // 通知父窗口保存完成
             this.Close(); // 关闭窗口
         }
 
+        // 取消场景添加
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             SceneAddCompleted?.Invoke(false, null);
@@ -195,10 +187,13 @@ namespace Quicker.Windows.AddWindows
         }
     }
 
+    /// <summary>
+    /// 进程信息
+    /// </summary>
     public class ProcessItem
     {
-        public string FileName { get; set; }
-        public string ProcessName { get; set; }
-        public ImageSource Icon { get; set; }
+        public string FileName { get; set; } // 进程文件名
+        public string ProcessName { get; set; } // 进程名（带后缀）
+        public ImageSource Icon { get; set; } // 图标
     }
 }
