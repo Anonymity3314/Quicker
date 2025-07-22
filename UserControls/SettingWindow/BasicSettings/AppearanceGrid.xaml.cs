@@ -765,7 +765,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         // 文本框失去焦点时，保存背景图片路径
-        private void BackgroundImagePathTextBox_LostFocus(object sender, RoutedEventArgs e)
+        private void BackgroundImagePathTextBox_TextChanged(object sender, RoutedEventArgs e)
         {
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
             settingManager.appearanceConditions.BackgroundImagePath = BackgroundImagePathTextBox.Text; // 保存路径到缓存
