@@ -7,7 +7,7 @@
     x:Class="Quicker.Windows.ToolWindows.MessageWindow"
     mc:Ignorable="d"
     
-    Icon="/Resources/Images/Quicker1.png"
+    Icon="/Resources/Images/Quicker_Enabled.png"
     WindowStartupLocation="CenterScreen"
     Background="Transparent"
     AllowsTransparency="True"
@@ -25,7 +25,7 @@
         <Border CornerRadius="8" Background="#FFFFFF" BorderThickness="1" BorderBrush="DarkGray">
             <Grid Background="Transparent">
                 <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Height="28">
-                    <Image Source="/Resources/Images/Quicker1.png" Height="16" Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+                    <Image Source="/Resources/Images/Quicker_Enabled.png" Height="16" Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0"/>
                     <TextBlock x:Name="TitileTextBlock" Margin="34,0,230,0" VerticalAlignment="Center"/>
                     <Button Style="{StaticResource CloseMessageButton}" Click="Button_Click"/>
                 </Grid>

@@ -235,7 +235,7 @@
                                     </Button>
                                     <Button x:Name="UpdateButton" Style="{StaticResource MenuButton}" Click="UpdateQuicker">
                                         <Grid Width="176">
-                                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                            <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                                             <TextBlock Text="升级Quicker" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                                         </Grid>
                                     </Button>

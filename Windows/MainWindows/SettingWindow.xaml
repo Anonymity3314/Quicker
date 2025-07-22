@@ -32,10 +32,10 @@
                 <Image Source="/Resources/Images/BasicSettingsButton.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
             </Button>
             <Button x:Name="Auxiliary_Functions" Style="{StaticResource Button1}" ToolTip="辅助功能" Background="#FFE0E0E0" Click="Auxiliary_Functions_Click" MouseLeave="Auxiliary_Functions_MouseLeave">
-                <!--<Image Source="/Resources/Images/Quicker1.png"/>-->
+                <!--<Image Source="/Resources/Images/Quicker_Enabled.png"/>-->
             </Button>
             <Button x:Name="Tools" Style="{StaticResource Button1}" ToolTip="工具" Background="#FFE0E0E0" Click="Tools_Click" MouseLeave="Tools_MouseLeave">
-                <!--<Image Source="/Resources/Images/Quicker1.png"/>-->
+                <!--<Image Source="/Resources/Images/Quicker_Enabled.png"/>-->
             </Button>
         </StackPanel>
         <!-- 侧边栏2 -->
@@ -60,7 +60,7 @@
                 </Button>
                 <Button x:Name="FunctionShortcutKeys" ToolTip="Quicker功能快捷键" Style="{StaticResource Button2}" Click="FunctionShortcutKeys_Click" MouseLeave="FunctionShortcutKeys_MouseLeave">
                     <Grid Width="195">
-                        <Image Source="/Resources/Images/Quicker1.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="功能快捷键" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
@@ -72,7 +72,7 @@
                 </Button>
                 <Button x:Name="Appearance" ToolTip="颜色、字体等样式设置" Style="{StaticResource Button2}" Click="Appearance_Click" MouseLeave="Appearance_MouseLeave">
                     <Grid Width="195">
-                        <Image Source="/Resources/Images/Quicker1.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="外观" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>

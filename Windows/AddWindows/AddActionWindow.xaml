@@ -34,7 +34,7 @@
             </ComboBoxItem>
             <ComboBoxItem>
                 <Grid>
-                    <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                    <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                     <TextBlock Text="加载扩展" Margin="25,0" VerticalAlignment="Center"/>
                 </Grid>
             </ComboBoxItem>

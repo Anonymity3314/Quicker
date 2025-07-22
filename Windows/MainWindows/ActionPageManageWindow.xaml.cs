@@ -235,12 +235,12 @@ namespace Quicker.Windows.MainWindows
                 }
                 catch // 加载失败，使用默认图片
                 {
-                    image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker1.png", UriKind.Absolute));
+                    image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png", UriKind.Absolute));
                 }
             }
             else // 为空时用默认图片
             {
-                image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker1.png", UriKind.Absolute));
+                image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png", UriKind.Absolute));
             }
             image.Style = FindResource("SceneButtonImage") as Style; // 应用样式
             return image;
@@ -278,9 +278,13 @@ namespace Quicker.Windows.MainWindows
             {
                 Style = FindResource("SceneTagTextBlock") as Style,
             };
+            string tagText = sceneData.SceneTag; // 先拼接标签文本，如果不是默认场景，则加上.exe后缀（用于区分默认场景和应用场景）
+            if (!new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(sceneData.SceneTag))
+                tagText += ".exe"; // 普通应用场景标签加.exe后缀，便于用户识别
+            // 必须在拼接好后再传递给高亮方法，否则高亮方法可能会覆盖Text属性，导致后缀丢失
             TextBlockHelper.SetHighlight(sceneTag, new HighlightTextData
             {
-                Text = sceneData.SceneTag ?? "",
+                Text = tagText,
                 Keyword = filter ?? ""
             });
             return sceneTag;
@@ -349,6 +353,8 @@ namespace Quicker.Windows.MainWindows
                 Style = FindResource("SceneDescriptionTextBlock") as Style, // 应用样式
                 Text = sceneInfo.SceneTag // 场景标签
             }; // 创建场景描述
+            if (!new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(sceneInfo.SceneTag))
+                sceneDescription.Text += ".exe"; // 标签可能为空
             SceneTitleStackPanel.Children.Add(sceneDescription); // 添加到标题StackPanel
         }
 
@@ -656,9 +662,10 @@ namespace Quicker.Windows.MainWindows
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
                 db3.CreateActionPageTable(type); // 创建动作页数据表
+                db3.UpdateSceneCount(type, 1); // 更新场景数据表
                 db3.UpdateActionPageTable(type, $"{type}{0}", GetActionPageInfo().ActionPageName); // 更新动作页数据表
                 MainListView.Items.Add(GenerateCanvas(canvasCount, type)); // 如果画布索引为0，则生成画布
-                if (type != "Global")
+                if (type != "_global")
                 {
                     MainBorder.Height = 289; // 设置主边框高度
                     ScrollBar.Margin = new Thickness(239, 315, 10, 0); // 设置滚动条边距
@@ -872,6 +879,7 @@ namespace Quicker.Windows.MainWindows
         private void EditActionPageInfoButton_Click(object sender, RoutedEventArgs e)
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
+            if (bingdingButton == null) return; // 如果绑定按钮为 null，则返回
             switch (type)
             {
                 case "_global":

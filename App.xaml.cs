@@ -758,7 +758,7 @@ namespace Quicker
                 uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
                 using var process = Process.GetProcessById((int)processId); // 获取进程
                 string processFilePath = process.MainModule.FileName; // 获取进程文件路径
-                string processFileName = Path.GetFileName(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
+                string processFileName = Path.GetFileNameWithoutExtension(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
                 var db = new ActionPageDatabase(); // 检查是否存在以 文件名+"Scene" 命名的表
                 if (db.SceneExists(processFileName))
                 {

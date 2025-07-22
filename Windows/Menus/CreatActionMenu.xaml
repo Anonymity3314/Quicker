@@ -41,40 +41,40 @@
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="启动软件"/>
                     </Grid>
                 </Button>
-                <Button Click="OpenDocument" Style="{StaticResource MenuButton}">
+                <Button Click="OpenFile" Style="{StaticResource MenuButton}">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/OpenFile.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开文件"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenFolder" Style="{StaticResource MenuButton}">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/OpenFolder.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开文件夹"/>
                     </Grid>
                 </Button>
                 <Button Click="OpenWebsite" Style="{StaticResource MenuButton}" Margin="0,0,0,3">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开网址"/>
                     </Grid>
                 </Button>
                 <Rectangle Height="1" Fill="#FFF0F0F0"/>
                 <Button Click="LoadExtension" Style="{StaticResource MenuButton}" Margin="0,3,0,0">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="加载扩展"/>
                     </Grid>
                 </Button>
                 <Button x:Name="CreatOpenFileActionButton" Click="CreatOpenFileAction" Style="{StaticResource MenuButton}">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock x:Name="CreatOpenFileActionTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <Button Click="ImportActionData" ToolTip="从本地文件中导入动作" Style="{StaticResource MenuButton}" Margin="0,0,0,3">
                     <Grid Width="168" Style="{StaticResource MenuButtonContentGrid}">
-                        <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                         <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="导入动作"/>
                     </Grid>
                 </Button>

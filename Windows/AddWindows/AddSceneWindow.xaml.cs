@@ -48,7 +48,6 @@ namespace Quicker.Windows.AddWindows
         /// </summary>
         public async void LoadProcessesAsync()
         {
-            // 1. 后台线程只收集文件名和进程名
             var processList = await Task.Run(() =>
             {
                 var items = new List<(string FileName, string ProcessName)>();
@@ -103,10 +102,11 @@ namespace Quicker.Windows.AddWindows
                     {
                         string processFileName = process.MainModule.FileName; // 进程文件名
                         string fullProcessName = Path.GetFileName(processFileName)?.ToLower(); // 进程名（带后缀，小写）
+                        string processName = Path.GetFileNameWithoutExtension(process.ProcessName); // 进程名（去除后缀）
 
                         // 检查是否与数据库中已有场景重复
                         bool isDuplicate = allScenes.Any(scene =>
-                            scene.SceneTag?.ToLower() == fullProcessName &&
+                            scene.SceneTag?.ToLower() == processName &&
                             scene.SceneProcess?.Equals(processFileName, StringComparison.OrdinalIgnoreCase) == true);
 
                         if (isDuplicate) continue; // 跳过重复的进程

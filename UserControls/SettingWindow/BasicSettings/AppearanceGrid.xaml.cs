@@ -797,7 +797,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             else // 否则用内置资源图片，先保存到临时文件
             {
-                var resourceUri = new Uri("pack://application:,,,/Resources/Images/Quicker1.png"); // 内置图片资源路径
+                var resourceUri = new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png"); // 内置图片资源路径
                 var streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流
                 string tempPath = Path.GetTempFileName() + ".png"; // 临时文件路径
                 _tempFiles.Add(tempPath); // 添加到临时文件跟踪列表

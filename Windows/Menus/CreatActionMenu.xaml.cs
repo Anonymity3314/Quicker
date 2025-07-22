@@ -258,7 +258,7 @@ namespace Quicker.Windows.Menus
         }
 
         // 打开文件
-        private void OpenDocument(object sender, RoutedEventArgs e)
+        private void OpenFile(object sender, RoutedEventArgs e)
         {
             haveAction = true; // 有动作
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口

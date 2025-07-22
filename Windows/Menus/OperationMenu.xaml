@@ -51,7 +51,7 @@
                     <Rectangle x:Name="Rectangle2" Height="1" Fill="#FFF0F0F0" Width="204" Margin="0,3"/>
                     <Button x:Name="SuspendAction" Style="{StaticResource MenuButton}" ToolTip="悬浮动作" MouseEnter="SuspendAction_MouseEnter" MouseLeave="SuspendAction_MouseLeave">
                         <Grid Width="194">
-                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮"/>
                         </Grid>
                     </Button>
@@ -71,7 +71,7 @@
                     </Button>
                     <Button x:Name="CutAction" ToolTip="复制并删除动作" Style="{StaticResource MenuButton}" Click="CutAction_Click">
                         <Grid Width="199">
-                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="剪切"/>
                         </Grid>
                     </Button>
@@ -83,7 +83,7 @@
                     </Button>
                     <Button x:Name="PasteIcon" ToolTip="设置动作图标为剪贴板图片" Style="{StaticResource MenuButton}" Click="PasteIcon_Click">
                         <Grid Width="199">
-                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                            <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="粘贴图标"/>
                         </Grid>
                     </Button>
@@ -95,7 +95,7 @@
                     </Button>
                     <Button x:Name="OpenLocation" ToolTip="在资源管理器中找到对应文件或文件夹" Style="{StaticResource MenuButton}" Margin="0,0,0,5" Click="OpenLocation_Click">
                         <Grid Width="194">
-                            <Image Source="/Resources/Images/OpenFile.png" Style="{StaticResource MenuButtonImage}"/>
+                            <Image Source="/Resources/Images/OpenFolder.png" Style="{StaticResource MenuButtonImage}"/>
                             <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="打开所在位置"/>
                         </Grid>
                     </Button>
@@ -120,7 +120,7 @@
                                 </StackPanel>
                             </Button.ToolTip>
                             <Grid Width="194">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮此动作"/>
                             </Grid>
                         </Button>
@@ -132,7 +132,7 @@
                                 </StackPanel>
                             </Button.ToolTip>
                             <Grid Width="194">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="悬浮动作页"/>
                             </Grid>
                         </Button>
@@ -152,20 +152,20 @@
                     <StackPanel>
                         <Button x:Name="ExportAction" Style="{StaticResource MenuButton}" ToolTip="导出动作定义到文件" Margin="0,3" Click="ExportAction_Click">
                             <Grid Width="130">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="导出动作"/>
                             </Grid>
                         </Button>
                         <Rectangle Height="1" Fill="#F0F0F0" Width="130"/>
                         <Button x:Name="CheckImformation" Style="{StaticResource MenuButton}" ToolTip="查看动作信息" Margin="0,3,0,0" Click="CheckImformation_Click">
                             <Grid Width="130">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="查看信息"/>
                             </Grid>
                         </Button>
                         <Button x:Name="CopyActionInfo" Style="{StaticResource MenuButton}" Margin="0,0,0,3" MouseEnter="CopyActionInfo_MouseEnter" MouseLeave="CopyActionInfo_MouseLeave">
                             <Grid Width="130">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,0,0"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,0,0"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="复制"/>
                             </Grid>
                         </Button>
@@ -183,13 +183,13 @@
                     <StackPanel>
                         <Button x:Name="CopyActionID" Style="{StaticResource MenuButton}" ToolTip="复制动作的ID文字" Margin="0,3,0,0" Click="CopyActionID_Click">
                             <Grid Width="130">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="动作ID"/>
                             </Grid>
                         </Button>
                         <Button x:Name="CopyActionName" Style="{StaticResource MenuButton}" ToolTip="复制动作的名称文字" Margin="0,0,0,3" Click="CopyActionName_Click">
                             <Grid Width="130">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource MenuButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}"/>
                                 <TextBlock Style="{StaticResource MenuButtonTextBlock}" Text="动作名称"/>
                             </Grid>
                         </Button>

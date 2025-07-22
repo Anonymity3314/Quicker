@@ -10,7 +10,7 @@
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>False</UseWindowsForms>
-    <PackageIcon>Quicker1.png</PackageIcon>
+    <PackageIcon>Quicker_Enabled.png</PackageIcon>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
@@ -71,6 +71,7 @@
     <None Remove="Resources\Images\MoreSelection.png" />
     <None Remove="Resources\Images\OpenFile.png" />
     <None Remove="Resources\Images\OpenFile.png" />
+    <None Remove="Resources\Images\OpenFolder.png" />
     <None Remove="Resources\Images\OpenMainWindow.png" />
     <None Remove="Resources\Images\OpenMainWindow1.png" />
     <None Remove="Resources\Images\OpenMainWindow2.png" />
@@ -138,6 +139,9 @@
 
   <ItemGroup>
     <Resource Include="Resources\Images\1372BCD4FF819A292E9B6CD87E818C9D965C848D.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\OpenFolder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\OpenWebsiteImage.png">
@@ -224,7 +228,7 @@
     <Resource Include="Resources\Images\Pause.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\Images\Quicker1.png">
+    <Resource Include="Resources\Images\Quicker_Enabled.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\RestartQuicker.png">
@@ -268,7 +272,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Update="Resources\Images\Quicker1.png">
+    <None Update="Resources\Images\Quicker_Enabled.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

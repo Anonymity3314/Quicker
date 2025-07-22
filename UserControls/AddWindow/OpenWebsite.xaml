@@ -28,7 +28,7 @@
                 <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
                     <Button Style="{StaticResource MenuButton}" Click="CopyLocation">
                         <Grid Width="174" Height="20">
-                            <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                            <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                             <TextBlock Text="插入剪切贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                         </Grid>
                     </Button>

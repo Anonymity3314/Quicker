@@ -434,7 +434,7 @@ namespace Quicker.Managers
             textBlock.Visibility = appearance.HideActionNameAfterIcon ? Visibility.Collapsed : Visibility.Visible; // 根据设置控制可见性
             if (appearance.AutoHideTitleBar)
             {
-                ShrinkTextBlockFontToFit(textBlock, buttonSize, borderWidth); // 自动缩小字号以适应宽度
+                ShrinkTextBlockFontToFit(textBlock, maxWidth); // 自动缩小字号以适应宽度
             }
             else
             {
@@ -617,10 +617,9 @@ namespace Quicker.Managers
         /// <param name="textBlock"> 要调整的TextBlock </param>
         /// <param name="buttonSize"> 按钮大小 </param>
         /// <param name="borderWidth"> 按钮边框宽度 </param>
-        public void ShrinkTextBlockFontToFit(TextBlock textBlock, double buttonSize, double borderWidth)
+        public void ShrinkTextBlockFontToFit(TextBlock textBlock, double maxWidth)
         {
             if (textBlock == null || string.IsNullOrEmpty(textBlock.Text)) return; // 防止空引用或空文本
-            double maxWidth = buttonSize - borderWidth * 2; // 计算最大允许宽度
             var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
             double fontSize = appearance.FontSize; // 获取初始字号
             textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量当前文本块宽度

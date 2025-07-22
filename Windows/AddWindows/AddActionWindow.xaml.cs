@@ -19,7 +19,7 @@ namespace Quicker.Windows.AddWindows
     {
         private const string OPEN_FILE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenFileImage.png";
         private const string OPEN_WEBSITE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenWebSiteImage.png";
-        private const string DEFAULT_IMAGE_PATH = "pack://application:,,,/Resources/Images/Quicker1.png";
+        private const string DEFAULT_IMAGE_PATH = "pack://application:,,,/Resources/Images/Quicker_Enabled.png";
 
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly IconManager iconManager = new(); // 图标管理器

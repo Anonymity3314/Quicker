@@ -21,7 +21,7 @@
 
     <Grid>
         <Label Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <Label IsHitTestVisible="False" Content="可以用英文分号隔开不同路径来添加多个文件" Foreground="#FF8C8C8C" Visibility="{Binding ElementName=LocationTextBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,16,0,0" FontSize="11" Panel.ZIndex="1"/>
+        <Label IsHitTestVisible="False" Content="可以用英文分号隔开不同路径来添加多个文件" Foreground="DarkGray" Visibility="{Binding ElementName=LocationTextBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,16,0,0" FontSize="11" Panel.ZIndex="1"/>
         <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" SizeChanged="LocationTextBox_SizeChanged"/>
         <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu"/>
         <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="112" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
@@ -35,25 +35,25 @@
                     <StackPanel Background="{x:Null}" Margin="0,3">
                         <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="已安装的软件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="文件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="文件夹..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                         <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation">
                             <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker1.png" Style="{StaticResource SelectButtonImage}"/>
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
@@ -68,7 +68,7 @@
                 <ComboBoxItem Content="最大化(Maximized)" VerticalAlignment="Center"/>
             </ComboBox>
             <Label Content="窗口风格" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="58"/>
-            <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="62,26,0,0" VerticalAlignment="Top" Foreground="#FF8C8C8C" Width="284"/>
+            <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="62,26,0,0" VerticalAlignment="Top" Foreground="DarkGray" Width="284"/>
             <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="68,51,0,0" VerticalAlignment="Top"/>
             <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="68,71,0,0" VerticalAlignment="Top"/>
             <Label Content="选项" HorizontalAlignment="Left" Margin="20,46,0,0" VerticalAlignment="Top"/>
