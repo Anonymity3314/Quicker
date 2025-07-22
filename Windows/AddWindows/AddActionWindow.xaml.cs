@@ -3,8 +3,10 @@ using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
+using Quicker.Models.Settings;
 using Quicker.Database.Core;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Windows;
@@ -26,6 +28,7 @@ namespace Quicker.Windows.AddWindows
         private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
+        private Appearance _appearance; // 外观设置
         private bool isLoading = true; // 是否正在加载
         public string iconPath; // 图标路径
 
@@ -55,7 +58,9 @@ namespace Quicker.Windows.AddWindows
             ButtonID = currentbutton; // 当前按钮
             TableName = tableName; // 表名
             Choice = choice; // 选择添加动作类型
+            _appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault(); // 获取外观设置
             InitializeComponent(); // 初始化窗口组件
+            SetButtonViewBackground(); // 设置初始背景色
             ExecuteChoiceAction(); // 执行对应命令
         }
 
@@ -159,7 +164,7 @@ namespace Quicker.Windows.AddWindows
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
-            string localIconsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LocalIcons"); // 动态生成路径
+            string localIconsPath = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\LocalIcons"; // 动态生成路径
             if (!Directory.Exists(localIconsPath)) Directory.CreateDirectory(localIconsPath); // 如果文件夹不存在，创建它
             Process.Start(new ProcessStartInfo
             {
@@ -287,20 +292,6 @@ namespace Quicker.Windows.AddWindows
             selectImageWindow.ShowDialog(); // 显示为模式对话框
         }
 
-        // 选择窗口
-        private void SelectWindow(object sender, RoutedEventArgs e)
-        {
-            // 检查当前是否为OpenFile控件
-            if (ActionInfoGrid.Children.Count == 0 || !(ActionInfoGrid.Children[0] is OpenFile))
-            {
-                ChoiceComboBox.SelectedIndex = 0; // 切换到OpenFile控件
-            }
-            
-            selectWindowWindow = new(); // 创建 SelectWindowWindow 实例
-            selectWindowWindow.WindowSelected += OnWindowSelected; // 订阅 WindowSelected 事件
-            selectWindowWindow.StartSelecting(this); // 开始选择窗口
-        }
-        
         // 处理选中的窗口
         private void OnWindowSelected(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
         {
@@ -342,7 +333,11 @@ namespace Quicker.Windows.AddWindows
             this.Activate();
         }
 
-        // 处理选择的图片
+        /// <summary>
+        /// 处理选择的图片
+        /// </summary>
+        /// <param name="sender"> 发送者 </param>
+        /// <param name="selectedImagePath"> 选择的图片路径 </param>
         private void OnImageConfirmed(object sender, string selectedImagePath)
         {           
             if (!string.IsNullOrEmpty(selectedImagePath))
@@ -441,6 +436,24 @@ namespace Quicker.Windows.AddWindows
                 _ => DEFAULT_IMAGE_PATH
             }; // 根据选择的选项设置默认图标路径
             SetImageSource(imagePath); // 设置图标
+        }
+
+        // 设置ButtonView的背景色
+        private void SetButtonViewBackground()
+        {
+            ButtonView.Background = (Brush)new BrushConverter().ConvertFromString(_appearance.ActionButtonColor);
+        }
+
+        // 鼠标移入时变色
+        private void ButtonView_MouseEnter(object sender, MouseEventArgs e)
+        {
+            ButtonView.Background = (Brush)new BrushConverter().ConvertFromString(_appearance.ActionButtonMouseOverColor);
+        }
+
+        // 鼠标移出时还原
+        private void ButtonView_MouseLeave(object sender, MouseEventArgs e)
+        {
+            SetButtonViewBackground();
         }
 
         // 关闭窗口前，释放资源
