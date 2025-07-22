@@ -30,27 +30,27 @@
             <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
             <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
             <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
-            <TextBlock x:Name="UpdateHistory" Text="更新历史" HorizontalAlignment="Left" Margin="109,70,0,0" VerticalAlignment="Top" Foreground="#FF326CF3" FontSize="16" Cursor="Hand" MouseLeftButtonDown="OpenUpdateHistory">
+            <TextBlock x:Name="UpdateHistory" Style="{StaticResource HoverTextBlock}" Text="更新历史" Margin="109,70,0,0" FontSize="16" MouseLeftButtonDown="OpenUpdateHistory">
                 <TextBlock.ToolTip>
                     <ToolTip Content="点击查看" FontSize="12" Foreground="Black"/>
                 </TextBlock.ToolTip>
             </TextBlock>
             <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
-            <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" Foreground="Black" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,80,0,0" VerticalAlignment="Top" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
-            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
-            <TextBlock x:Name="icons8_com" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
-            <Label HorizontalAlignment="Left" Margin="0,186,0,0" VerticalAlignment="Top" Content="支持" Foreground="Black" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="FeedBack" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,221,0,0" VerticalAlignment="Top" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
-            <TextBlock x:Name="icon11_community_github_io" ToolTip="点击前往" HorizontalAlignment="Left" Margin="10,149,0,0" VerticalAlignment="Top" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" Foreground="#FF326CF3" FontSize="14" Cursor="Hand" Grid.Column="1"/>
+            <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" FontSize="16" Grid.Column="1"/>
+            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,80,0,0" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
+            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,126,0,0" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
+            <TextBlock x:Name="icons8_com" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,103,0,0" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
+            <Label HorizontalAlignment="Left" Margin="0,186,0,0" VerticalAlignment="Top" Content="支持" FontSize="16" Grid.Column="1"/>
+            <TextBlock x:Name="FeedBack" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,221,0,0" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
+            <TextBlock x:Name="icon11_community_github_io" Style="{StaticResource HoverTextBlock}" ToolTip="点击前往" Margin="10,149,0,0" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
             <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="447" Margin="0,0,0,55">
                 <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,30,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="RootFolderPath" HorizontalAlignment="Left" Margin="23,60,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="RootFolderPath_MouseDown"/>
+                <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,60,0,0" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" MouseDown="RootFolderPath_MouseDown"/>
                 <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,80,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="DatabaseFolderPath" HorizontalAlignment="Left" Margin="23,108,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="DatabaseFolderPath_MouseDown"/>
+                <TextBlock x:Name="DatabaseFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,108,0,0" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database" MouseDown="DatabaseFolderPath_MouseDown"/>
                 <Label Content="图标文件夹：" HorizontalAlignment="Left" Margin="18,128,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="LocalIconsFolderPath" HorizontalAlignment="Left" Margin="23,156,0,0" TextWrapping="Wrap" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons" VerticalAlignment="Top" Foreground="#FF326CF3" Cursor="Hand" MouseDown="LocalIconsFolderPath_MouseDown"/>
+                <TextBlock x:Name="LocalIconsFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,156,0,0" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons" MouseDown="LocalIconsFolderPath_MouseDown"/>
 
                 <Label Content="备份数据" HorizontalAlignment="Left" Margin="0,191,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" Margin="14,226,0,0" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>
@@ -58,7 +58,7 @@
 
                 <Label Content="临时文件" HorizontalAlignment="Left" Margin="0,278,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
                 <Label Content="大小：" HorizontalAlignment="Left" Margin="18,313,0,0" VerticalAlignment="Top"/>
-                <TextBlock x:Name="TempSize" HorizontalAlignment="Left" Margin="58,318,0,0" TextWrapping="Wrap" Text="计算中..." VerticalAlignment="Top"/>
+                <TextBlock x:Name="TempSize" HorizontalAlignment="Left" Margin="58,318,0,0" Text="计算中..." VerticalAlignment="Top"/>
                 <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="23,343,0,0" VerticalAlignment="Top" Width="61" Click="CleanTempDataButton_Click" IsEnabled="False"/>
             </Grid>
         </Grid>

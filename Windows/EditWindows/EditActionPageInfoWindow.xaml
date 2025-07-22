@@ -6,13 +6,13 @@
     xmlns:local="clr-namespace:Quicker.Windows.EditWindows"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     mc:Ignorable="d"
-    
+
     WindowStartupLocation="CenterScreen"
     ResizeMode="NoResize"
     Title="编辑动作页信息"
     Height="190"
     Width="395"
-    
+
     Loaded="EditActionPageInfoWindow_Loaded"
 >
     <Grid>

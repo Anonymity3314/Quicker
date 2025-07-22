@@ -12,6 +12,8 @@
     Title="添加场景"
     Height="307"
     Width="434"
+    
+    KeyDown="AddSceneWindow_KeyDown"
 >
     <Grid>
         <Label Content="应用程序" HorizontalAlignment="Left" Margin="50,12,0,0" VerticalAlignment="Top"/>

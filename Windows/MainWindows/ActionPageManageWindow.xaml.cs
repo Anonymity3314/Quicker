@@ -948,13 +948,10 @@ namespace Quicker.Windows.MainWindows
         private void AddSceneButton_Click(object sender, RoutedEventArgs e)
         {
             AddSceneWindow addSceneWindow = new(); // 创建添加场景窗口
-            addSceneWindow.SceneAddCompleted += (isSaved, newSceneTag) =>
+            addSceneWindow.SceneAddCompleted += AddSceneWindow_SceneAddCompleted; // 绑定场景添加完成事件
+            addSceneWindow.Closed += (s, args) =>
             {
-                if (isSaved)
-                {
-                    GenerateSceneButtons(); // 刷新场景按钮
-                    TypeChanged(string.IsNullOrEmpty(newSceneTag) ? newSceneTag : type); // 切换场景
-                }
+                addSceneWindow.SceneAddCompleted -= AddSceneWindow_SceneAddCompleted; // 解绑场景添加完成事件
             };
             addSceneWindow.ShowDialog(); // 显示添加场景窗口
         }
@@ -970,7 +967,9 @@ namespace Quicker.Windows.MainWindows
             else
             {
                 EditSceneWindow editSceneWindow = new(type); // 创建编辑场景窗口
-                editSceneWindow.Show(); // 显示编辑场景窗口
+                editSceneWindow.ShowDialog(); // 显示编辑场景窗口
+                GenerateSceneButtons(); // 刷新场景按钮
+                SetButtonBackground(); // 设置按钮背景
             }
         }
 
@@ -1209,6 +1208,21 @@ namespace Quicker.Windows.MainWindows
                     button.Style = null; // 清理按钮样式
                 }
                 ActionPagesButtonPanel.Children.Remove(child); // 移除场景按钮面板子元素
+            }
+        }
+
+        /// <summary>
+        /// 添加场景窗口完成后回调方法。
+        /// 处理场景添加完成后的刷新和切换逻辑。
+        /// </summary>
+        /// <param name="isSaved">是否保存成功</param>
+        /// <param name="newSceneTag">新添加场景的标签</param>
+        private void AddSceneWindow_SceneAddCompleted(bool isSaved, string newSceneTag)
+        {
+            if (isSaved)
+            {
+                GenerateSceneButtons(); // 刷新场景按钮
+                TypeChanged(string.IsNullOrEmpty(newSceneTag) ? newSceneTag : type); // 切换场景
             }
         }
     }

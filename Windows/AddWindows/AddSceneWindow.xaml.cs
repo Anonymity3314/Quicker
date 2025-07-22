@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Threading.Tasks;
 using Quicker.Database.Core;
 using System.Windows.Media;
+using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
 using System.Windows;
@@ -188,6 +189,19 @@ namespace Quicker.Windows.AddWindows
         {
             SceneAddCompleted?.Invoke(false, null);
             this.Close(); // 关闭窗口
+        }
+
+        // 按下S或C键保存或取消
+        private void AddSceneWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.S) // 按下S
+            {
+                SaveButton_Click(sender, e); // 保存按钮
+            }
+            else if (e.Key == Key.C) // 按下C
+            {
+                CancelButton_Click(sender, e); // 取消按钮
+            }
         }
     }
 
