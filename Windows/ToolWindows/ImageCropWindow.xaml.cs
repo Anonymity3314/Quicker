@@ -1,7 +1,11 @@
-﻿using Quicker.UserControls.SettingWindow;
+﻿using Rectangle = System.Windows.Shapes.Rectangle;
+using Quicker.UserControls.SettingWindow;
+using Point = System.Windows.Point;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Path = System.IO.Path;
 using System.Windows.Shapes;
+using SixLabors.ImageSharp;
 using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Managers;
@@ -460,51 +464,134 @@ namespace Quicker.Windows.ToolWindows
         {
             BitmapSource bitmapSource = CropImage.Source as BitmapSource; // 图片源
             string dir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages"; // 保存目录
-            string fileName = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds():x}.png"; // 保存文件名
-            string filePath = System.IO.Path.Combine(dir, fileName); // 保存路径
+            string originalFilePath = _originalBitmapSource is BitmapImage bmpImg && bmpImg.UriSource != null ? bmpImg.UriSource.LocalPath : null;
+            string fileName = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds():x}.png"; // 默认保存文件名
+            string filePath = System.IO.Path.Combine(dir, fileName); // 默认保存路径
             if (UseOriginalImageCheckBox.IsChecked == true) // 保存原图
             {
-                if (!SaveOriginalImage(bitmapSource, dir, filePath)) // 保存失败
+                string savedPath = SaveOriginalImageWithFallback(bitmapSource, dir, filePath, originalFilePath);
+                if (string.IsNullOrEmpty(savedPath)) // 保存失败
                     return;
-                CroppedImagePath = filePath; // 保存路径
+                CroppedImagePath = savedPath; // 实际保存路径
                 OnCropCompleted(CroppedImagePath); // 通知完成
-
             }
             else
             {
-                if (!TryGetCropRect(bitmapSource, out var cropRect, out var scaleInfo) ||
-                    !SaveCroppedImage(bitmapSource, cropRect, dir, filePath)) // 计算裁剪区域或保存失败，返回
+                if (!TryGetCropRect(bitmapSource, out var cropRect, out var scaleInfo)) // 计算裁剪区域失败
                     return;
-                CroppedImagePath = filePath; // 保存路径
+                string savedPath = SaveCroppedImageWithFallback(bitmapSource, cropRect, dir, filePath, originalFilePath);
+                if (string.IsNullOrEmpty(savedPath)) // 保存失败
+                    return;
+                CroppedImagePath = savedPath; // 实际保存路径
                 OnCropCompleted(CroppedImagePath); // 通知完成
             }
         }
 
         /// <summary>
-        /// 保存原图到指定路径
+        /// 优先保存为PNG，失败则用原格式保存原图，返回实际保存路径，失败返回null
         /// </summary>
-        /// <param name="bitmapSource">原始图片源</param>
-        /// <param name="dir">保存目录</param>
-        /// <param name="filePath">保存路径</param>
-        /// <returns>保存成功返回 true，否则 false</returns>
-        private bool SaveOriginalImage(BitmapSource bitmapSource, string dir, string filePath)
+        /// <param name="bitmapSource"> 图片源 </param>
+        /// <param name="dir"> 保存目录 </param>
+        /// <param name="filePath"> 保存路径 </param>
+        /// <param name="originalFilePath"> 原图路径 </param>
+        /// <returns>实际保存路径，失败返回 null </returns>
+        private string SaveOriginalImageWithFallback(BitmapSource bitmapSource, string dir, string filePath, string originalFilePath)
         {
             if (bitmapSource == null)
             {
                 ShowToast("图片加载失败！", "Error");
-                return false;
+                return null;
             }
+            if (!Directory.Exists(dir)) // 创建保存目录
+                Directory.CreateDirectory(dir);
+            try // 优先尝试用PNG编码器保存图片
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    PngBitmapEncoder encoder = new(); // 编码器
+                    encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 添加图片
+                    encoder.Save(fileStream); // 保存图片
+                }
+                return filePath; // 保存成功，返回PNG路径
+            }
+            catch // PNG保存失败，尝试用原格式保存
+            {
+                try // 检查原图路径有效且文件存在
+                {
+                    if (!string.IsNullOrEmpty(originalFilePath) && File.Exists(originalFilePath)) // 原图路径有效且文件存在
+                    {
+                        string ext = Path.GetExtension(originalFilePath).ToLower(); // 获取原图扩展名
+                        string fallbackPath = Path.ChangeExtension(filePath, ext); // 生成原格式的目标路径
+                        File.Copy(originalFilePath, fallbackPath, true); // 直接复制原图文件
+                        ShowToast("PNG保存失败，已按原格式保存。", "Error");
+                        return fallbackPath; // 返回原格式路径
+                    }
+                }
+                catch { /* 原格式保存也失败，进入下方错误提示 */ }
+                ShowToast("图片保存失败！", "Error"); // 所有方式都失败
+                return null;
+            }
+        }
 
+        /// <summary>
+        /// 优先保存为PNG，失败则用原格式保存裁剪图，返回实际保存路径，失败返回null
+        /// </summary>
+        private string SaveCroppedImageWithFallback(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath, string originalFilePath)
+        {
+            var cropped = new CroppedBitmap(bitmapSource, cropRect);
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                PngBitmapEncoder encoder = new PngBitmapEncoder(); // 保存为PNG格式
-                encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 保存图片
-                encoder.Save(fileStream);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(cropped));
+                    encoder.Save(fileStream);
+                }
+                return filePath;
             }
-            return true;
+            catch
+            {
+                // PNG保存失败，尝试用原格式保存
+                try
+                {
+                    if (!string.IsNullOrEmpty(originalFilePath) && File.Exists(originalFilePath))
+                    {
+                        string ext = Path.GetExtension(originalFilePath).ToLower();
+                        string fallbackPath = Path.ChangeExtension(filePath, ext);
+                        using (var ms = new MemoryStream())
+                        {
+                            // 先用WPF保存为BMP到内存流
+                            BmpBitmapEncoder bmpEncoder = new BmpBitmapEncoder();
+                            bmpEncoder.Frames.Add(BitmapFrame.Create(cropped));
+                            bmpEncoder.Save(ms);
+                            ms.Seek(0, SeekOrigin.Begin);
+                            // 用ImageSharp加载BMP流
+                            using (var image = SixLabors.ImageSharp.Image.Load(ms))
+                            {
+                                if (ext == ".jpg" || ext == ".jpeg")
+                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
+                                else if (ext == ".bmp")
+                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Bmp.BmpEncoder());
+                                else if (ext == ".gif")
+                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Gif.GifEncoder());
+                                else if (ext == ".webp")
+                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Webp.WebpEncoder());
+                                else if (ext == ".tiff")
+                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Tiff.TiffEncoder());
+                                else
+                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Png.PngEncoder()); // 兜底
+                            }
+                        }
+                        ShowToast($"PNG保存失败，已按原格式{ext}保存。", "Info");
+                        return fallbackPath;
+                    }
+                }
+                catch { }
+                ShowToast("图片保存失败，已跳过。", "Error");
+                return null;
+            }
         }
 
         /// <summary>

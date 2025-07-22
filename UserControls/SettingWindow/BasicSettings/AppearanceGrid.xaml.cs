@@ -746,8 +746,11 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击“插入剪贴板”按钮
         private void InsertClipboardTextButton_Click(object sender, RoutedEventArgs e)
         {
+            BackgroundImagePathPopup.IsOpen = false; // 关闭弹窗
             string imagePath = Clipboard.GetText().Trim().Replace("\"", ""); // 去除所有引号
             BackgroundImagePathTextBox.Text = imagePath;
+            EnablePreviewCheckBox.IsChecked = true; // 开启预览
+            EnablePreviewCheckBox_Click(null, null);
         }
 
         private string _backgroundImagePath; // 背景图片路径
@@ -764,7 +767,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
-        // 文本框失去焦点时，保存背景图片路径
+        // 文本框文本变化时，保存背景图片路径
         private void BackgroundImagePathTextBox_TextChanged(object sender, RoutedEventArgs e)
         {
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
@@ -777,11 +780,44 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             var appearance = settingManager.appearanceConditions; // 获取当前外观设置对象
             string json = JsonSerializer.Serialize(appearance); // 序列化为 JSON 字符串
             string inputPngPath = GetAppearanceCarrierImagePath(); // 获取作为分享载体的 PNG 图片路径（优先用用户自定义背景，否则用内置图片）
+            if (Path.GetExtension(inputPngPath).ToLower() != ".png") // 如果不是PNG图片，自动转换为PNG
+            {
+                string tempPngPath = Path.GetTempFileName() + ".png";
+                ConvertImageToPng(inputPngPath, tempPngPath);
+                _tempFiles.Add(tempPngPath); // 添加到临时文件跟踪列表
+                inputPngPath = tempPngPath;
+            }
             inputPngPath = EnsureTrueColorPng(inputPngPath); // 保证是32位真彩色
             string outputPngPath = GetShareAppearanceOutputPath(); // 获取输出路径（自动创建保存文件夹，文件名带时间戳）
             WriteAppearanceToPng(inputPngPath, outputPngPath, json); // 写入 PNG 文件并嵌入 JSON 数据
             ShowToast("外观保存成功！", "Success"); // 显示保存成功的 Toast 提示
             Process.Start("explorer.exe", $"/select,\"{outputPngPath}\""); // 打开资源管理器并选中刚保存的 PNG 文件
+        }
+
+        /// <summary>
+        /// 将任意图片文件转换为 PNG 格式并保存到指定路径
+        /// </summary>
+        /// <param name="inputPath">原始图片路径（支持jpg、bmp、gif等）</param>
+        /// <param name="outputPath">输出PNG图片路径</param>
+        private void ConvertImageToPng(string inputPath, string outputPath)
+        {
+            try
+            {
+                using (var image = SixLabors.ImageSharp.Image.Load(inputPath))
+                {
+                    image.Save(outputPath, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+                }
+            }
+            catch
+            {
+                ShowToast("图片格式不受支持或文件损坏，已自动使用默认图片导出外观。", "Error");
+                string defaultPath = GetAppearanceCarrierImagePath(); // 获取默认图片路径
+                // 防止死循环：如果inputPath已经是默认图片，则不再递归
+                if (!string.Equals(inputPath, defaultPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    ConvertImageToPng(defaultPath, outputPath);
+                }
+            }
         }
 
         /// <summary>
@@ -992,7 +1028,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             RefreshInterfaceDisplay(); // 刷新界面显示
             // 保证导入后预览区可见
             EnablePreviewCheckBox.IsChecked = true;
-            settingManager.appearanceConditions.EnablePreview = true;
             EnablePreviewCheckBox_Click(null, null);
         }
 
