@@ -777,41 +777,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             if (!IsLoaded) return; // 避免控件未初始化时访问
             if (PreviewBackgroundImage == null) return; // 避免空引用
-            if (string.IsNullOrEmpty(path) || !File.Exists(path)) // 如果路径为空或文件不存在
-            {
-                PreviewBackgroundImage.Source = null; // 设置为空
-                ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 设置为空
-                return; // 直接返回
-            }
-            string ext = Path.GetExtension(path).ToLower(); // 获取文件扩展名
-            try
-            {
-                if (ext == ".gif") // 如果是GIF动图
-                {
-                    var bitmap = new BitmapImage(); // 创建BitmapImage对象
-                    bitmap.BeginInit(); // 开始初始化
-                    bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置URI源
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
-                    bitmap.EndInit(); // 结束初始化
-                    ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, bitmap); // 设置为GIF动图
-                }
-                else if (ext == ".svg") // 如果是SVG
-                {
-                    var iconManager = new Quicker.Managers.IconManager();
-                    ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 清除动画
-                    PreviewBackgroundImage.Source = iconManager.LoadSvgToBitmapImage(path); // 加载SVG
-                }
-                else
-                {
-                    ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 设置为空
-                    PreviewBackgroundImage.Source = new BitmapImage(new Uri(path, UriKind.Absolute)); // 设置为BitmapImage
-                }
-            }
-            catch
-            {
-                PreviewBackgroundImage.Source = null; // 设置为空
-                ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 设置为空
-            }
+            var iconManager = new Quicker.Managers.IconManager();
+            iconManager.SetImageWithGifSupport(PreviewBackgroundImage, path);
         }
 
         // 文本框文本变化时，保存背景图片路径

@@ -73,6 +73,7 @@
 | Svg                        | 提供加载、解析和渲染 SVG 图像的功能   |
 | System.Data.SQLite         | 提供 SQLite 数据库支持              |
 | SixLabors.ImageSharp       | 实现 PNG 图片的元数据读写与外观导入导出 |
+| WpfAnimatedGif             | GIF 动画播放支持，支持 Image 控件直接显示动图 |
 
 打开项目解决方案文件（Quicker.sln），使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
 

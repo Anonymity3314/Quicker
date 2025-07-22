@@ -51,37 +51,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="path"> 图片路径 </param>
         private void SetBackgroundImage(string path)
         {
-            if (string.IsNullOrEmpty(path) || !File.Exists(path)) // 如果路径为空或不存在
-            {
-                BackgroundImage.Source = null; // 设置背景图片为空
-                ImageBehavior.SetAnimatedSource(BackgroundImage, null); // 设置动画源为空
-                return; // 返回
-            }
-            string ext = Path.GetExtension(path).ToLower(); // 获取文件扩展名
-            try
-            {
-                if (ext == ".gif") // 如果扩展名是gif
-                {
-                    var bitmap = new BitmapImage(); // 创建BitmapImage对象
-                    bitmap.BeginInit(); // 开始初始化
-                    bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置Uri源
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
-                    bitmap.EndInit(); // 结束初始化
-                    ImageBehavior.SetAnimatedSource(BackgroundImage, bitmap); // 设置动画源
-                }
-                else // 如果扩展名不是gif
-                {
-                    ImageBehavior.SetAnimatedSource(BackgroundImage, null); // 先清除动画
-                    BackgroundImage.Source = new BitmapImage(new Uri(path, UriKind.Absolute)); // 设置背景图片
-                }
-            }
-            catch
-            {
-                BackgroundImage.Source = null; // 设置背景图片为空
-                ImageBehavior.SetAnimatedSource(BackgroundImage, null); // 设置动画源为空
-                using var toast = new ToastManager(); // 创建ToastManager对象
-                toast.Show("背景图片设置失败！", "Error"); // 显示Toast
-            }
+            iconManager.SetImageWithGifSupport(BackgroundImage, path);
         }
 
         /// <summary>

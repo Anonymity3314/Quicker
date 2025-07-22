@@ -66,8 +66,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("获取图标失败。", "Error"); // 弹出消息提醒
+                ShowToast("获取图标失败。", "Error"); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
             return null; // 如果获取失败，返回 null
@@ -89,8 +88,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("检查缓存图标失败。", "Error"); // 弹出消息提醒
+                ShowToast("检查缓存图标失败。", "Error"); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -125,8 +123,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("保存图标失败。", "Error"); // 弹出消息提醒
+                ShowToast("保存图标失败。", "Error"); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -158,8 +155,7 @@ namespace Quicker.Managers
 
                     if (IsImageEmpty(bitmapImage))
                     {
-                        using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show("获取网站图标失败。", "Error"); // 弹出消息提醒
+                        ShowToast("获取网站图标失败。", "Error"); // 显示Toast
                         return null; // 如果获取的网站图标为空图片，返回 null
                     }
                     return bitmapImage; // 返回网站图标
@@ -167,8 +163,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("获取网站图标失败。", "Error"); // 弹出消息提醒
+                ShowToast("获取网站图标失败。", "Error"); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
             finally
@@ -240,8 +235,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("处理图标失败。", "Error"); // 弹出消息提醒
+                ShowToast("处理图标失败。", "Error"); // 显示Toast
                 throw;
             }
         }
@@ -312,15 +306,52 @@ namespace Quicker.Managers
         {
             try
             {
-                string svgContent = File.ReadAllText(filePath); // 读取 SVG 文件内容
-                SvgDocument svgDocument = SvgDocument.FromSvg<SvgDocument>(svgContent); // 使用 SvgDocument 解析 SVG 内容
-                // 计算 SVG 图像的尺寸
-                double width = svgDocument.Width.Value; // 宽度
-                double height = svgDocument.Height.Value; // 高度
-                DrawingVisual visual = new DrawingVisual(); // 创建一个用于渲染的 Visual
-                using (DrawingContext context = visual.RenderOpen())
+                string svgContent = ReadSvgFileContent(filePath);
+                var svgDocument = ParseSvgDocument(svgContent);
+                var bitmapSource = RenderSvgToBitmapSource(svgDocument);
+                var bitmapImage = ConvertBitmapSourceToBitmapImage(bitmapSource);
+                return bitmapImage;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"加载 SVG 文件时出错: {filePath}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 读取SVG文件内容
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>SVG内容</returns>
+        private string ReadSvgFileContent(string filePath)
+        {
+            return File.ReadAllText(filePath);
+        }
+
+        /// <summary>
+        /// 解析SVG内容为SvgDocument
+        /// </summary>
+        /// <param name="svgContent">SVG内容</param>
+        /// <returns>SvgDocument</returns>
+        private Svg.SvgDocument ParseSvgDocument(string svgContent)
+        {
+            return Svg.SvgDocument.FromSvg<Svg.SvgDocument>(svgContent);
+        }
+
+        /// <summary>
+        /// 渲染SvgDocument为BitmapSource
+        /// </summary>
+        /// <param name="svgDocument">SVG文档</param>
+        /// <returns>BitmapSource</returns>
+        private BitmapSource RenderSvgToBitmapSource(Svg.SvgDocument svgDocument)
+        {
+            double width = svgDocument.Width.Value;
+            double height = svgDocument.Height.Value;
+            DrawingVisual visual = new DrawingVisual();
+            using (DrawingContext context = visual.RenderOpen())
+            {
+                using (var bitmap = svgDocument.Draw())
                 {
-                    Bitmap bitmap = svgDocument.Draw(); // 将 SVG 图像绘制到 Visual 上下文中
                     BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
                         bitmap.GetHbitmap(),
                         IntPtr.Zero,
@@ -332,33 +363,35 @@ namespace Quicker.Managers
                         new System.Windows.Rect(new System.Windows.Point(0, 0), new System.Windows.Size(width, height))
                     );
                 }
-                // 创建 RenderTargetBitmap 并渲染 Visual
-                RenderTargetBitmap rtb = new RenderTargetBitmap(
-                    (int)width,
-                    (int)height,
-                    96, // DPI X
-                    96, // DPI Y
-                    PixelFormats.Pbgra32
-                );
-                rtb.Render(visual); // 渲染 Visual
-                rtb.Freeze(); // 冻结 RenderTargetBitmap
+            }
+            RenderTargetBitmap rtb = new RenderTargetBitmap(
+                (int)width,
+                (int)height,
+                96, // DPI X
+                96, // DPI Y
+                PixelFormats.Pbgra32
+            );
+            rtb.Render(visual);
+            rtb.Freeze();
+            return rtb;
+        }
 
-                BitmapImage bitmapImage = new BitmapImage(); // 创建 BitmapImage 对象
-                using (var memoryStream = new MemoryStream()) // 创建内存流
-                {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
-                    encoder.Frames.Add(BitmapFrame.Create(rtb)); // 将 RenderTargetBitmap 转换为 BitmapFrame
-                    encoder.Save(memoryStream); // 保存图像到内存流
-                    bitmapImage.BeginInit(); // 开始初始化 BitmapImage
-                    bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray()); // 设置内存流为 BitmapImage 的源
-                    bitmapImage.EndInit(); // 结束初始化 BitmapImage
-                }
-                return bitmapImage; // 返回 BitmapImage
-            }
-            catch (Exception ex)
+        /// <summary>
+        /// 将BitmapSource转换为BitmapImage
+        /// </summary>
+        private BitmapImage ConvertBitmapSourceToBitmapImage(BitmapSource bitmapSource)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            using (var memoryStream = new MemoryStream())
             {
-                throw new InvalidOperationException($"加载 SVG 文件时出错: {filePath}", ex);
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+                encoder.Save(memoryStream);
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray());
+                bitmapImage.EndInit();
             }
+            return bitmapImage;
         }
 
         /// <summary>
@@ -443,6 +476,107 @@ namespace Quicker.Managers
                 File.Copy(filePath, targetPath, true); // 复制文件
             }
             return targetPath; // 返回目标路径
+        }
+
+        /// <summary>
+        /// 加载背景图片（支持 GIF 动图、SVG 和普通图片），自动处理 WpfAnimatedGif 兼容性。
+        /// </summary>
+        /// <param name="imageControl">目标 Image 控件</param>
+        /// <param name="path">图片路径</param>
+        public void SetImageWithGifSupport(System.Windows.Controls.Image imageControl, string path)
+        {
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+                ClearImage(imageControl); // 清空图片
+                return;
+            }
+            string ext = Path.GetExtension(path).ToLower(); // 获取文件扩展名
+            try
+            {
+                if (ext == ".gif")
+                {
+                    SetGifImage(imageControl, path); // 设置GIF动图
+                }
+                else if (ext == ".svg")
+                {
+                    SetSvgImage(imageControl, path); // 设置SVG图片
+                }
+                else
+                {
+                    SetNormalImage(imageControl, path); // 设置普通图片
+                }
+            }
+            catch
+            {
+                ClearImage(imageControl); // 清空图片
+                ShowToast("背景图片设置失败！", "Error"); // 显示Toast
+            }
+        }
+
+        /// <summary>
+        /// 设置 GIF 动图到 Image 控件
+        /// </summary>
+        /// <param name="imageControl">目标 Image 控件</param>
+        /// <param name="path">图片路径</param>
+        private void SetGifImage(System.Windows.Controls.Image imageControl, string path)
+        {
+            var bitmap = new BitmapImage(); // 创建BitmapImage对象
+            bitmap.BeginInit(); // 开始初始化BitmapImage
+            bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置图片路径
+            bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
+            bitmap.EndInit(); // 结束初始化BitmapImage
+            bitmap.Freeze(); // 冻结BitmapImage
+            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, bitmap); // 设置动画源
+        }
+
+        /// <summary>
+        /// 设置 SVG 图片到 Image 控件
+        /// </summary>
+        /// <param name="imageControl">目标 Image 控件</param>
+        /// <param name="path">图片路径</param>
+        private void SetSvgImage(System.Windows.Controls.Image imageControl, string path)
+        {
+            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
+            var svgBitmap = LoadSvgToBitmapImage(path); // 加载SVG图片
+            imageControl.Source = svgBitmap; // 设置图片源
+        }
+
+        /// <summary>
+        /// 设置普通图片到 Image 控件
+        /// </summary>
+        /// <param name="imageControl">目标 Image 控件</param>
+        /// <param name="path">图片路径</param>
+        private void SetNormalImage(System.Windows.Controls.Image imageControl, string path)
+        {
+            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
+            var bitmap = new BitmapImage(); // 创建BitmapImage对象
+            bitmap.BeginInit(); // 开始初始化BitmapImage
+            bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置图片路径
+            bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
+            bitmap.EndInit(); // 结束初始化BitmapImage
+            bitmap.Freeze(); // 冻结BitmapImage
+            imageControl.Source = bitmap; // 设置图片源
+        }
+
+        /// <summary>
+        /// 清空图片显示
+        /// </summary>
+        /// <param name="imageControl">目标 Image 控件</param>
+        private void ClearImage(System.Windows.Controls.Image imageControl)
+        {
+            imageControl.Source = null; // 设置图片为空
+            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
+        }
+
+        /// <summary>
+        /// 显示Toast
+        /// </summary>
+        /// <param name="message">消息</param>
+        /// <param name="title">标题</param>
+        private void ShowToast(string message, string title = "Error")
+        {
+            using var toast = new ToastManager(); // 创建ToastManager对象
+            toast.Show(message, title); // 显示Toast
         }
     }
 }
