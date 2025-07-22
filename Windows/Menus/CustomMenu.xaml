@@ -22,11 +22,11 @@
 >
     <Grid Width="200" Height="159">
         <!-- 窗口阴影 -->
-        <Rectangle Fill="White" Margin="5,7">
-            <Rectangle.Effect>
-                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
-            </Rectangle.Effect>
-        </Rectangle>
+        <Border Background="White" CornerRadius="5">
+            <Border.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="5" RenderingBias="Quality" ShadowDepth="1"/>
+            </Border.Effect>
+        </Border>
         <Border BorderBrush="White" BorderThickness="0" CornerRadius="5" Padding="1" Background="White">
             <StackPanel Margin="-1,-1,-1,-1">
                 <Button Click="ShowMainWindow" ToolTip="弹出面板窗口" Style="{StaticResource MenuButton}" Margin="0,5,0,0">

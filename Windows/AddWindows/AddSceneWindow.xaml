@@ -31,7 +31,7 @@
         <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="113,51,0,0" Foreground="#FF326CF3" TextWrapping="Wrap" VerticalAlignment="Top"/>
 
         <Label Content="场景名称" HorizontalAlignment="Left" Margin="50,80,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="113,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="133"/>
+        <TextBox x:Name="SceneNameTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="113,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200"/>
         <Rectangle HorizontalAlignment="Center" Height="1" Margin="0,206,0,0" Stroke="LightGray" VerticalAlignment="Top" Width="394"/>
         <Button x:Name="SaveButton" Content="保存(S)" Style="{StaticResource BlueButton}" HorizontalAlignment="Left" Margin="275,218,0,0" VerticalAlignment="Top" IsEnabled="False" Width="62" Height="26" Click="SaveButton_Click"/>
         <Button x:Name="CancelButton" Content="取消(C)" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="349,218,0,0" VerticalAlignment="Top" Width="62" Height="26" Click="CancelButton_Click"/>

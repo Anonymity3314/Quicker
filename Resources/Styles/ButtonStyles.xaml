@@ -193,6 +193,7 @@
     <Style x:Key="ActionButton" TargetType="Button">
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="AllowDrop" Value="True"/>
         <Setter Property="FontSize" Value="9"/>
         <Setter Property="Height" Value="65"/>
         <Setter Property="Width" Value="65"/>

@@ -110,6 +110,10 @@ namespace Quicker.Windows.AddWindows
                             scene.SceneProcess?.Equals(processFileName, StringComparison.OrdinalIgnoreCase) == true);
 
                         if (isDuplicate) continue; // 跳过重复的进程
+
+                        if (processList.Any(p => p.FileName.Equals(processFileName, StringComparison.OrdinalIgnoreCase)))
+                            continue; // 已经添加过该应用，跳过
+
                         processList.Add((processFileName, fullProcessName)); // 添加到列表
                     }
                     catch { }

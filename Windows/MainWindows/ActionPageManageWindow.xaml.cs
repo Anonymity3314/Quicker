@@ -296,12 +296,23 @@ namespace Quicker.Windows.MainWindows
         /// <param name="button"> 按钮 </param>
         private void SetupButtonEvents(Button button)
         {
-            button.Click += new RoutedEventHandler(ChanceSceneButton_Click); // 设置按钮点击事件
+            button.MouseDoubleClick += EditSceneButton_Click; // 双击编辑场景信息
             button.DragEnter += ChangeSceneButtonBackground; // 设置拖拽事件
             button.DragLeave += ResetSceneButtonBackground; // 还原背景色
+            button.MouseRightButtonDown += OpenContextMenu; // 右键菜单
             button.MouseEnter += HightLightBlacklistItem; // 鼠标移入高亮显示
+            button.Click += ChanceSceneButton_Click; // 设置按钮点击事件
             button.MouseLeave += FadeBlacklistItem; // 鼠标移出恢复原状
             button.Drop += ChangeActionPageScene; // 设置拖拽事件
+        }
+
+        // 右键打开菜单
+        private void OpenContextMenu(object sender, MouseButtonEventArgs e)
+        {
+            Button button = sender as Button; // 转换为按钮
+            if(new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(button.Name)) return; // 禁止编辑默认场景
+            EditSceneMenu editSceneMenu = new(button.Name); // 创建菜单
+            editSceneMenu.Show(); // 显示菜单
         }
 
         // 设置场景按钮背景色
@@ -591,16 +602,15 @@ namespace Quicker.Windows.MainWindows
         /// <param name="button"> 按钮 </param>
         private void BindButtonEvents(Button button)
         {
-            button.AllowDrop = true; // 允许拖放
-            button.Drop += Button_Drop; // 拖放事件
-            button.Click += ShowCreatActionMenu; // 点击事件
-            button.MouseEnter += Button_MouseEnter; // 鼠标进入事件
-            button.MouseLeave += Button_MouseLeave; // 鼠标离开事件
-            button.MouseDoubleClick += ShowEditWindow; // 双击事件
-            button.PreviewMouseRightButtonDown += OpenMenu; // 右键点击事件
-            button.PreviewMouseMove += Button_PreviewMouseMove; // 鼠标移动事件
             button.PreviewMouseLeftButtonDown += Button_PreviewMouseLeftButtonDown; // 鼠标左键按下事件
             button.PreviewMouseLeftButtonUp += Button_PreviewMouseLeftButtonUp; // 鼠标左键抬起事件
+            button.PreviewMouseMove += Button_PreviewMouseMove; // 鼠标移动事件
+            button.PreviewMouseRightButtonDown += OpenMenu; // 右键点击事件
+            button.MouseDoubleClick += ShowEditWindow; // 双击事件
+            button.MouseLeave += Button_MouseLeave; // 鼠标离开事件
+            button.MouseEnter += Button_MouseEnter; // 鼠标进入事件
+            button.Click += ShowCreatActionMenu; // 点击事件
+            button.Drop += Button_Drop; // 拖放事件
         }
 
         // 拖放事件
@@ -937,19 +947,16 @@ namespace Quicker.Windows.MainWindows
         // 点击按钮添加场景
         private void AddSceneButton_Click(object sender, RoutedEventArgs e)
         {
-            AddSceneWindow addSceneWindow = new();
+            AddSceneWindow addSceneWindow = new(); // 创建添加场景窗口
             addSceneWindow.SceneAddCompleted += (isSaved, newSceneTag) =>
             {
                 if (isSaved)
                 {
-                    GenerateSceneButtons();
-                    if (!string.IsNullOrEmpty(newSceneTag))
-                        TypeChanged(newSceneTag);
-                    else
-                        TypeChanged(type);
+                    GenerateSceneButtons(); // 刷新场景按钮
+                    TypeChanged(string.IsNullOrEmpty(newSceneTag) ? newSceneTag : type); // 切换场景
                 }
             };
-            addSceneWindow.ShowDialog();
+            addSceneWindow.ShowDialog(); // 显示添加场景窗口
         }
 
         // 点击按钮编辑场景
@@ -1097,6 +1104,7 @@ namespace Quicker.Windows.MainWindows
             CleanupMainListView(); // 清理主列表视图
             CleanupActionPagesButtonPanel(); // 清理场景按钮面板
             buttonManager?.Dispose(); // 清理按钮管理器
+            SceneImage.Source = null; // 清理场景图片
 
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             GC.Collect(); // 强制垃圾回收
@@ -1159,15 +1167,15 @@ namespace Quicker.Windows.MainWindows
         private void CleanupButton(Button button)
         {
             // 解绑所有事件
-            button.Drop -= Button_Drop; // 解绑按钮拖拽事件
-            button.Click -= ShowCreatActionMenu; // 解绑按钮点击事件
+            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 解绑按钮鼠标左键按下事件
+            button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 解绑按钮鼠标左键释放事件
+            button.PreviewMouseMove -= Button_PreviewMouseMove; // 解绑按钮鼠标移动事件
+            button.PreviewMouseRightButtonDown -= OpenMenu; // 解绑按钮鼠标右键点击事件
+            button.MouseDoubleClick -= ShowEditWindow; // 解绑按钮鼠标双击事件
             button.MouseEnter -= Button_MouseEnter; // 解绑按钮鼠标进入事件
             button.MouseLeave -= Button_MouseLeave; // 解绑按钮鼠标离开事件
-            button.MouseDoubleClick -= ShowEditWindow; // 解绑按钮鼠标双击事件
-            button.PreviewMouseRightButtonDown -= OpenMenu; // 解绑按钮鼠标右键点击事件
-            button.PreviewMouseMove -= Button_PreviewMouseMove; // 解绑按钮鼠标移动事件
-            button.PreviewMouseLeftButtonUp -= Button_PreviewMouseLeftButtonUp; // 解绑按钮鼠标左键释放事件
-            button.PreviewMouseLeftButtonDown -= Button_PreviewMouseLeftButtonDown; // 解绑按钮鼠标左键按下事件
+            button.Click -= ShowCreatActionMenu; // 解绑按钮点击事件
+            button.Drop -= Button_Drop; // 解绑按钮拖拽事件
 
             // 清理按钮资源
             button.Content = null; // 清理按钮内容
@@ -1184,10 +1192,15 @@ namespace Quicker.Windows.MainWindows
                 UIElement child = ActionPagesButtonPanel.Children[0];
                 if (child is Button button)
                 {
-                    // 解绑事件
-                    button.Click -= ChanceSceneButton_Click; // 解绑按钮点击事件
-                    button.MouseEnter -= HightLightBlacklistItem; // 解绑按钮鼠标进入事件
-                    button.MouseLeave -= FadeBlacklistItem; // 解绑按钮鼠标离开事件
+                    // 解绑所有事件
+                    button.MouseDoubleClick -= EditSceneButton_Click;
+                    button.DragEnter -= ChangeSceneButtonBackground;
+                    button.DragLeave -= ResetSceneButtonBackground;
+                    button.MouseRightButtonDown -= OpenContextMenu;
+                    button.MouseEnter -= HightLightBlacklistItem;
+                    button.MouseLeave -= FadeBlacklistItem;
+                    button.Click -= ChanceSceneButton_Click;
+                    button.Drop -= ChangeActionPageScene;
 
                     // 清理按钮资源
                     button.Content = null; // 清理按钮内容

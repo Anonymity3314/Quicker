@@ -53,7 +53,10 @@ namespace Quicker.Windows.MainWindows.MainWindow
             SetCommonTextBlock(0); // 设置通用标签内容
             GeneratePageGrid(CommonGrid, CommonStyle, 0, 4, 4); // 生成对应样式 Grid
             GenerateButtons(); // 生成按钮
-            LockCommonActionPage(null, null); // 锁住通用动作页面
+
+            // 固定锁定状态为 true
+            AppStateManager.Locked = true;
+            ((MainWindowViewModel)this.DataContext).IsLocked = true;
         }
 
         // 加载数据库和Button

@@ -1,0 +1,38 @@
+﻿<Window
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Quicker.Windows.Menus"
+    x:Class="Quicker.Windows.Menus.EditSceneMenu"
+    mc:Ignorable="d"
+
+    AllowsTransparency="True"
+    ShowInTaskbar="False"
+    Background="{x:Null}"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+    Height="40"
+    Width="130"
+    
+    Deactivated="EditSceneMenu_Deactivated"
+    Loaded="EditSceneMenu_Loaded"
+>
+    <Grid Background="Transparent" Height="30" Width="120">
+        <Border Background="White" CornerRadius="3">
+            <Border.Effect>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
+            </Border.Effect>
+        </Border>
+        <Border CornerRadius="3" Padding="0,3" Height="30" Width="120">
+            <StackPanel>
+                <Button Style="{StaticResource MenuButton}" Click="Button_Click">
+                    <Grid Width="120">
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource MenuButtonImage}" Margin="10,0,0,0"/>
+                        <TextBlock Text="编辑" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

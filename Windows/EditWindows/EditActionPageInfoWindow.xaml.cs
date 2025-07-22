@@ -9,8 +9,8 @@ namespace Quicker.Windows.EditWindows
     {
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
         private readonly ActionPageData actionPage; // 动作页信息
-        private readonly string actionPageType; // 动作页类型
         private readonly string actionPageIndex; // 动作页索引
+        private readonly string actionPageType; // 动作页类型
 
         public EditActionPageInfoWindow(string actionPageType, string actionPageIndex)
         {
@@ -24,7 +24,7 @@ namespace Quicker.Windows.EditWindows
         private void EditActionPageInfoWindow_Loaded(object sender, RoutedEventArgs e)
         {
             var sceneData = db3.GetSceneData(actionPageType); // 获取场景信息
-            ActionPageProcess.Text = sceneData.SceneProcess; // 设置动作页所属进程名称
+            ActionPageProcess.Text = sceneData.SceneTag + ".exe"; // 设置动作页所属进程名称
             ActionPageName.Text = actionPage.ActionPageName; // 设置动作页名称
         }
 

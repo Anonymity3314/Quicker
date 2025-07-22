@@ -59,7 +59,8 @@ namespace Quicker.Windows.Menus
             {
                 Style = FindResource("MenuButton") as Style, // 加载按钮样式
                 ToolTip = data.SceneTag, // 设置按钮提示
-                Name = data.SceneName // 设置按钮名称
+                Name = data.SceneTag, // 设置按钮名称
+                Tag = data.SceneName // 设置按钮标签
             }; // 生成切换动作页按钮
             return button; // 返回按钮
         }
