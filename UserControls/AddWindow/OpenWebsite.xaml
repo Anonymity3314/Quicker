@@ -20,12 +20,12 @@
         <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="···" HorizontalAlignment="Left" Margin="392,15,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu" FontSize="16" FontWeight="Bold" Foreground="#FFA9A6A6"/>
         <Popup x:Name="OpenWebsitePopup" PopupAnimation="Fade" Width="180" Height="35" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
             <Grid>
-                <Rectangle Fill="White" Margin="3,5">
-                    <Rectangle.Effect>
-                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
-                    </Rectangle.Effect>
-                </Rectangle>
-                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                <Border Background="White" CornerRadius="3" Margin="3">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Border.Effect>
+                </Border>
+                <Border Background="White" CornerRadius="3" Margin="3">
                     <Button Style="{StaticResource MenuButton}" Click="CopyLocation">
                         <Grid Width="174" Height="20">
                             <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>

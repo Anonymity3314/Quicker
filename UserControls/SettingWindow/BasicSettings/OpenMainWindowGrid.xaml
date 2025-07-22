@@ -25,7 +25,7 @@
                 <ColumnDefinition Width="133*"/>
             </Grid.ColumnDefinitions>
             <Label Content="鼠标方式" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="74"/>
-            <StackPanel Margin="10,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="142" Width="110">
+            <StackPanel Margin="10,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="151" Width="110">
                 <CheckBox x:Name="OpenMainWindowByMiddleMouseClickCheckBox" Content="按下中键" ToolTip="按下鼠标中键" FontSize="14" Click="CheckBox_Click"/>
                 <CheckBox x:Name="OpenMainWindowByX1MouseClickCheckBox" Content="按下X1键" ToolTip="需鼠标支持，通常为侧键" FontSize="14" Click="CheckBox_Click"/>
                 <CheckBox x:Name="OpenMainWindowByX2MouseClickCheckBox" Content="按下X2键" ToolTip="需鼠标支持，通常为侧键" FontSize="14" Click="CheckBox_Click"/>

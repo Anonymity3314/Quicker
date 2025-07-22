@@ -16,7 +16,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private double totalUsageTime; // 总使用时长
         private DispatcherTimer timer; // 定时器
 
-
         public ConventionGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent();

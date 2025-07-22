@@ -26,12 +26,12 @@
         <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu"/>
         <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="112" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
             <Grid>
-                <Rectangle Fill="White" Margin="5">
-                    <Rectangle.Effect>
-                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="10" RenderingBias="Quality" ShadowDepth="1"/>
-                    </Rectangle.Effect>
-                </Rectangle>
-                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                <Border Background="White" CornerRadius="3" Margin="3">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
+                    </Border.Effect>
+                </Border>
+                <Border Background="White" CornerRadius="3" Margin="3">
                     <StackPanel Background="{x:Null}" Margin="0,3">
                         <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications">
                             <Grid Width="174" Height="20">
