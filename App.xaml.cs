@@ -712,11 +712,10 @@ namespace Quicker
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
-                bool hasVisibleWindow = mainWindowList.Any(window => window.Visibility == Visibility.Visible); // 是否有可见窗口
-                if (hasVisibleWindow && (AppStateManager.Pause || AppStateManager.MainWindowPinned))
+                if (mainWindowList.Any(window => window.Visibility == Visibility.Visible)) // 是否有可见窗口
                 {
-                    AppStateManager.PreLoadMainWindow.Close(); // 有可见窗口且处于暂停或固定状态，关闭预加载窗口
-                    if (AppStateManager.Pause && !AppStateManager.MainWindowPinned) // 如果是暂停状态，关闭所有主窗口
+                    AppStateManager.PreLoadMainWindow.Close(); // 有可见窗口且处于固定状态，关闭预加载窗口
+                    if (!AppStateManager.MainWindowPinned) // 如果是暂停状态，关闭所有主窗口
                         foreach (var window in mainWindowList)
                             window.Close(); // 关闭其他窗口
                 }
