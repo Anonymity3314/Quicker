@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Quicker.Windows;
 using System.Windows;
 using Quicker.Models;
+using WpfAnimatedGif;
 using System.IO;
 
 namespace Quicker.Managers
@@ -395,7 +396,7 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 添加图像到网格
+        /// 添加图像到网格，支持GIF动图
         /// </summary>
         /// <param name="grid"> 目标网格 </param>
         /// <param name="buttonInformation"> 按钮数据 </param>
@@ -406,6 +407,15 @@ namespace Quicker.Managers
             {
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // 添加行定义
                 Image image = LoadActionIcon(buttonInformation, isMainWindow); // 加载动作图标
+
+                // 检查是否为GIF图片，若是则用WpfAnimatedGif设置动画源
+                string ext = System.IO.Path.GetExtension(buttonInformation.ImagePath ?? "").ToLower();
+                if (ext == ".gif" && !string.IsNullOrEmpty(buttonInformation.ImagePath))
+                {
+                    var bitmap = new System.Windows.Media.Imaging.BitmapImage(new System.Uri(buttonInformation.ImagePath));
+                    WpfAnimatedGif.ImageBehavior.SetAnimatedSource(image, bitmap);
+                }
+
                 grid.Children.Add(image); // 添加图像到网格
                 Grid.SetRow(image, 0); // 设置图像行
             }

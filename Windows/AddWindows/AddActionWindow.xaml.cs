@@ -1,4 +1,5 @@
 ﻿using Quicker.UserControls.AddWindow;
+using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using Quicker.Windows.MainWindows;
@@ -12,6 +13,7 @@ using Quicker.Managers;
 using Quicker.Windows;
 using System.Windows;
 using Quicker.Models;
+using WpfAnimatedGif;
 using System.Media;
 using System.IO;
 
@@ -297,9 +299,8 @@ namespace Quicker.Windows.AddWindows
         {
             if (!string.IsNullOrEmpty(e.ProcessPath))
             {
-                try
+                try // 更新控件数据
                 {
-                    // 更新控件数据
                     TitleTextBox.Text = Path.GetFileNameWithoutExtension(e.ProcessPath); // 设置标题为进程名
                     // 更新OpenFile控件中的路径
                     if (ActionInfoGrid.Children.Count > 0 && ActionInfoGrid.Children[0] is OpenFile openFile)
@@ -342,7 +343,7 @@ namespace Quicker.Windows.AddWindows
         {           
             if (!string.IsNullOrEmpty(selectedImagePath))
             {
-                SetImageSource(selectedImagePath);
+                SetButtonImage(selectedImagePath); // 设置图片源
             }
         }
 
@@ -407,21 +408,32 @@ namespace Quicker.Windows.AddWindows
         }
 
         /// <summary>
-        /// 设置图片源
+        /// 根据图片路径设置 ButtonImage，支持 SVG、GIF 动图等格式
         /// </summary>
-        /// <param name="imagePath"> 图片路径 </param>
-        private void SetImageSource(string imagePath)
+        /// <param name="imagePath">图片路径</param>
+        public void SetButtonImage(string imagePath)
         {
             try
             {
-                ButtonImage.Source = new BitmapImage(new Uri(imagePath)); // 设置图片源
                 ButtonImage.Visibility = Visibility.Visible; // 显示图标
+                string ext = Path.GetExtension(imagePath).ToLower(); // 获取文件扩展名
+                if (ext == ".svg") // 如果扩展名是SVG
+                {
+                    var iconManager = new IconManager(); // 创建 IconManager 实例
+                    ButtonImage.Source = iconManager.LoadSvgToBitmapImage(imagePath); // 加载SVG图片
+                }
+                else // 如果扩展名不是SVG
+                {
+                    var bitmap = new BitmapImage(new Uri(imagePath)); // 创建 BitmapImage 实例
+                    WpfAnimatedGif.ImageBehavior.SetAnimatedSource(ButtonImage, bitmap); // 设置动画源
+                }
+                this.iconPath = imagePath; // 同步iconPath为当前图片路径
             }
             catch
             {
-                using var toast = new ToastManager(); // 创建 ToastManager 实例
-                toast.Show("加载图片失败!", "Error"); // 显示提示消息
                 ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
+                using var toast = new ToastManager(); // 创建 ToastManager 实例
+                toast.Show("加载图片失败!", "Error"); // 显示错误提示
             }
         }
 
@@ -435,7 +447,7 @@ namespace Quicker.Windows.AddWindows
                 1 => OPEN_WEBSITE_IMAGE_PATH,
                 _ => DEFAULT_IMAGE_PATH
             }; // 根据选择的选项设置默认图标路径
-            SetImageSource(imagePath); // 设置图标
+            SetButtonImage(imagePath); // 设置图标
         }
 
         // 设置ButtonView的背景色
@@ -478,6 +490,25 @@ namespace Quicker.Windows.AddWindows
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
+        }
+
+        /// <summary>
+        /// 保存图标到本地
+        /// </summary>
+        /// <returns>保存路径</returns>
+        public string SaveIconToLocal()
+        {
+            // 优先用本地文件路径
+            if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath) && !iconPath.StartsWith("pack://"))
+            {
+                return iconManager.SaveImageToLocalIcons(iconPath);
+            }
+            // 其它情况（如pack://、内存图片等），保存ButtonImage.Source
+            if (ButtonImage.Source != null)
+            {
+                return iconManager.SaveIconToFile(ButtonImage.Source);
+            }
+            return "";
         }
     }
 }

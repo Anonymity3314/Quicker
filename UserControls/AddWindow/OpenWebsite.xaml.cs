@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
+using WpfAnimatedGif;
 using System.Net;
 using System.IO;
 
@@ -21,8 +22,8 @@ namespace Quicker.UserControls.AddWindow
         private Quicker.Windows.AddWindows.AddActionWindow _addWindow; // AddWindow 的引用
         private readonly ButtonManager _buttonManager = new(); // 按钮管理器接口
         private readonly IconManager _iconManager = new(); // 图标管理器接口
-        private ButtonDatabase _buttonDb = new(); // 按钮数据库
         private const string DefaultUrlPrefix = "https://"; // 默认URL前缀
+        private ButtonDatabase _buttonDb = new(); // 按钮数据库
         private bool isLoading = true; // 是否正在加载
 
         #endregion
@@ -119,40 +120,68 @@ namespace Quicker.UserControls.AddWindow
             ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
             if (buttonData.ActionType != "OpenWebsite") return; // 如果不是打开网站动作，则不执行操作
 
-            // 设置按钮标题
+            SetButtonTitle(buttonData); // 设置按钮标题
+            SetAddressAndBrowser(buttonData); // 设置地址和浏览器
+            SetButtonImage(buttonData); // 设置图标
+            SetOtherOptions(buttonData); // 设置其他选项
+        }
+
+        /// <summary>
+        /// 设置按钮标题
+        /// </summary>
+        /// <param name="buttonData">按钮数据</param>
+        private void SetButtonTitle(ButtonData buttonData)
+        {
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
-                _addWindow.ButtonTitle.Visibility = Visibility.Visible;
-                _addWindow.ButtonTitle.Text = buttonData.Title;
+                _addWindow.ButtonTitle.Visibility = Visibility.Visible; // 设置标题可见
+                _addWindow.ButtonTitle.Text = buttonData.Title; // 设置标题文本
             }
-            
-            _addWindow.TitleTextBox.Text = buttonData.Title;
+            _addWindow.TitleTextBox.Text = buttonData.Title; // 设置标题文本
+        }
 
-            // 设置地址和浏览器
-            LocationTextBox.Text = buttonData.Location;
+        /// <summary>
+        /// 设置地址和浏览器
+        /// </summary>
+        /// <param name="buttonData">按钮数据</param>
+        private void SetAddressAndBrowser(ButtonData buttonData)
+        {
+            LocationTextBox.Text = buttonData.Location; // 设置地址栏文本
             if (buttonData.Data1 == "8") // 如果是自定义浏览器
             {
-                BrowserLocation.Text = buttonData.Data2;
+                BrowserLocation.Text = buttonData.Data2; // 设置浏览器地址
             }
+        }
 
-            // 设置图标
+        /// <summary>
+        /// 设置图标
+        /// </summary>
+        /// <param name="buttonData">按钮数据</param>
+        private void SetButtonImage(ButtonData buttonData)
+        {
             if (!string.IsNullOrEmpty(buttonData.ImagePath))
             {
                 try
                 {
-                    _addWindow.ButtonImage.Visibility = Visibility.Visible;
-                    _addWindow.ButtonImage.Source = new BitmapImage(new Uri(buttonData.ImagePath));
+                    _addWindow.SetButtonImage(buttonData.ImagePath); // 设置图标
+                    _addWindow.iconPath = buttonData.ImagePath; // 同步iconPath
                 }
                 catch
                 {
                     _addWindow.ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
                 }
             }
-            
-            // 设置其他选项
-            BrowserComboBox.SelectedIndex = int.Parse(buttonData.Data1);
-            _addWindow.DescriptionTextBox.Text = buttonData.Description;
-            _addWindow.UpdateTooltip();
+        }
+
+        /// <summary>
+        /// 设置其他选项（浏览器下拉框、描述、提示等）
+        /// </summary>
+        /// <param name="buttonData">按钮数据</param>
+        private void SetOtherOptions(ButtonData buttonData)
+        {
+            BrowserComboBox.SelectedIndex = int.Parse(buttonData.Data1); // 设置浏览器下拉框
+            _addWindow.DescriptionTextBox.Text = buttonData.Description; // 设置描述
+            _addWindow.UpdateTooltip(); // 更新提示
         }
 
         // 获取网站图标
@@ -175,9 +204,8 @@ namespace Quicker.UserControls.AddWindow
         // 保存动作
         public void Save()
         {
-            // 保存图标
             _addWindow.iconPath = _addWindow.ButtonImage.Visibility == Visibility.Visible
-                ? _iconManager.SaveIconToFile(_addWindow.ButtonImage.Source)
+                ? _addWindow.SaveIconToLocal()
                 : "";
 
             // 获取旧数据并保留创建时间

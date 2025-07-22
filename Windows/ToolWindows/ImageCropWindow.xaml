@@ -93,6 +93,7 @@
             </Grid>
         </Border>
         <!-- 按钮 -->
+        <TextBlock x:Name="GifTipTextBlock" Foreground="Red" Text="GIF裁剪后只保留第一帧，无法保留动图效果" Canvas.Left="654" Canvas.Top="333" HorizontalAlignment="Center" VerticalAlignment="Top" Width="109" TextWrapping="Wrap" Visibility="Collapsed"/>
         <CheckBox x:Name="UseOriginalImageCheckBox" Content="直接使用原图" Canvas.Left="663" Canvas.Top="386" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <Button Content="顺时针旋转90°" Canvas.Left="655" Canvas.Top="97" Style="{StaticResource WhiteButton}" Width="108" VerticalAlignment="Top" Click="RotateRightButton_Click"/>
         <Button Content="逆时针旋转90°" Canvas.Left="655" Canvas.Top="68" Style="{StaticResource WhiteButton}" Width="108" Click="RotateLeftButton_Click" VerticalAlignment="Top"/>

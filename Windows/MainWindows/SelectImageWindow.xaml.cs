@@ -108,7 +108,7 @@ namespace Quicker.Windows.MainWindows
                 return; // 返回
             }
 
-            string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif" }; // 支持的图片格式
+            string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif", ".svg" }; // 支持的图片格式
             allImageFiles = Directory.GetFiles(targetFolderPath)
                 .Where(file => supportedExtensions.Contains(Path.GetExtension(file).ToLower()))
                 .ToArray();
@@ -179,12 +179,15 @@ namespace Quicker.Windows.MainWindows
             var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
                 Filter =
-                "所有支持的文件 (*.png;*.ico;*.svg;*.exe;*.jpg)|*.png;*.ico;*.svg;*.exe;*.jpg|" +
+                "所有支持的文件 (*.png;*.ico;*.svg;*.exe;*.jpg;*.jpeg;*.bmp;*.gif)|*.png;*.ico;*.svg;*.exe;*.jpg;*.jpeg;*.bmp;*.gif|" +
                 "PNG 图片 (*.png)|*.png|" +
                 "Icon 文件 (*.ico)|*.ico|" +
                 "Exe 文件 (*.exe)|*.exe|" +
                 "Svg 图标 (*.svg)|*.svg|" +
-                "Jpg 文件 (*.jpg)|*.jpg",
+                "Jpg 文件 (*.jpg)|*.jpg|" +
+                "Jpeg 文件 (*.jpeg)|*.jpeg|" +
+                "Bmp 文件 (*.bmp)|*.bmp|" +
+                "Gif 文件 (*.gif)|*.gif",
                 Multiselect = false, // 不允许多选
                 Title = "选择图片文件"
             }; // 创建文件选择对话框

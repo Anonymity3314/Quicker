@@ -5,6 +5,7 @@ using Quicker.Managers;
 using Microsoft.Win32;
 using System.Windows;
 using Quicker.Models;
+using WpfAnimatedGif;
 using System.IO;
 
 namespace Quicker.UserControls.AddWindow
@@ -102,15 +103,8 @@ namespace Quicker.UserControls.AddWindow
         private void UpdateIconFromButtonData(ButtonData buttonData)
         {
             if (string.IsNullOrEmpty(buttonData.ImagePath)) return; // 如果图标路径为空，则返回
-            try
-            {
-                _addWindow.ButtonImage.Visibility = Visibility.Visible; // 设置图标可见
-                _addWindow.ButtonImage.Source = new BitmapImage(new Uri(buttonData.ImagePath)); // 设置图标源
-            }
-            catch
-            {
-                _addWindow.ButtonImage.Visibility = Visibility.Collapsed; // 设置图标不可见
-            }
+            _addWindow.SetButtonImage(buttonData.ImagePath); // 设置图标
+            _addWindow.iconPath = buttonData.ImagePath; // 同步iconPath
         }
 
         #endregion
@@ -255,7 +249,7 @@ namespace Quicker.UserControls.AddWindow
         public void Save()
         {
             _addWindow.iconPath = _addWindow.ButtonImage.Visibility == Visibility.Visible
-                ? _iconManager.SaveIconToFile(_addWindow.ButtonImage.Source)
+                ? _addWindow.SaveIconToLocal()
                 : ""; // 保存图标
 
             // 获取旧数据并保留创建时间

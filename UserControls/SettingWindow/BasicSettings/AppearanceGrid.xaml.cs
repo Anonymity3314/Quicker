@@ -686,7 +686,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             return new System.Windows.Forms.OpenFileDialog()
             {
-                Filter = "图片文件|*.jpg;*.png;*.bmp",
+                Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.svg;*.ico",
                 Title = "选择背景图片"
             };
         }

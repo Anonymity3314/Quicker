@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
+using System.Windows.Media.Animation;
 using System.Security.Cryptography;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
@@ -8,6 +10,7 @@ using Quicker.Windows.Menus;
 using System.Windows.Media;
 using Quicker.Database;
 using System.Windows;
+using WpfAnimatedGif;
 using System.Drawing;
 using System.Net;
 using System.IO;
@@ -79,8 +82,9 @@ namespace Quicker.Managers
         {
             try
             {
-                string iconFileName = GetIconFileName(filePath); // 获取图标文件名
-                string iconPath = Path.Combine(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons", iconFileName); // 拼接图标文件路径
+                string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
+                string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
+                string iconPath = Path.Combine(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons", $"{hash}{ext}"); // 拼接图标文件路径
                 return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
             }
             catch
@@ -91,83 +95,38 @@ namespace Quicker.Managers
             }
         }
 
-
         /// <summary>
-        /// 获取图标文件名
+        /// 保存ImageSource为本地图标目录的PNG图片，文件名为内容哈希，避免重复
         /// </summary>
-        /// <param name="filePath"> 文件路径 </param>
-        /// <returns> 图标文件名 </returns>
-        public string GetIconFileName(string filePath)
-        {
-            try
-            {
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(filePath); // 计算文件路径的哈希值
-                byte[] hash = SHA256.HashData(bytes); // 计算哈希值
-                return $"{BitConverter.ToString(hash).Replace("-", "").ToLower()}.png"; // 拼接图标文件名
-            }
-            catch
-            {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("获取图标文件名失败。", "Error"); // 弹出消息提醒
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 保存图标到文件
-        /// </summary>
-        /// <param name="imageSource"></param>
-        /// <returns> 图标文件路径 </returns>
+        /// <param name="imageSource">图片源</param>
+        /// <returns>保存路径</returns>
         public string SaveIconToFile(ImageSource imageSource)
         {
             try
             {
-                byte[] imageHash = GetImageHash(imageSource); // 计算图像的哈希值
-                if (imageHash == null) return null; // 如果计算哈希值失败，返回 null
-
-                string iconFileName = BitConverter.ToString(imageHash).Replace("-", "").ToLower() + ".png"; // 拼接图标文件名
-                string iconPath = Path.Combine(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons", iconFileName); // 拼接图标文件路径
-
-                if (File.Exists(iconPath)) return iconPath; // 如果文件已存在，返回路径
-                Directory.CreateDirectory(Path.GetDirectoryName(iconPath)); // 创建图标目录
-                using (FileStream iconStream = new FileStream(iconPath, FileMode.Create)) // 创建文件流
+                BitmapSource bitmapSource = imageSource as BitmapSource; // 将 ImageSource 转换为 BitmapSource
+                if (bitmapSource == null) return null; // 如果转换失败，返回 null
+                using (MemoryStream stream = new MemoryStream()) // 创建内存流
                 {
-                    BitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
-                    encoder.Frames.Add(BitmapFrame.Create((BitmapSource)imageSource)); // 将 ImageSource 转换为 BitmapFrame
-                    encoder.Save(iconStream); // 保存 BitmapFrame 到文件流
+                    PngBitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
+                    encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 添加到编码器
+                    encoder.Save(stream); // 保存 BitmapSource 到内存流
+                    byte[] pngBytes = stream.ToArray(); // 将内存流转换为字节数组
+                    // 用内容哈希命名
+                    string hash = BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(pngBytes)).Replace("-", "").ToLower();
+                    string saveDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons"; // 保存路径
+                    string targetPath = Path.Combine(saveDir, $"{hash}.png"); // 生成目标路径
+                    if (!File.Exists(targetPath)) // 如果目标路径不存在
+                    {
+                        File.WriteAllBytes(targetPath, pngBytes); // 写入文件
+                    }
+                    return targetPath; // 返回目标路径
                 }
-
-                return iconPath; // 返回图标文件路径
             }
             catch
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
                 toast.Show("保存图标失败。", "Error"); // 弹出消息提醒
-                return null; // 如果出现异常，返回 null
-            }
-        }
-
-        /// <summary>
-        /// 计算图像的哈希值
-        /// </summary>
-        /// <param name="imageSource"> 图像源 </param>
-        /// <returns> 图像的哈希值 </returns>
-        public byte[] GetImageHash(ImageSource imageSource)
-        {
-            try
-            {
-                BitmapSource bitmapSource = imageSource as BitmapSource; // 转换为 BitmapSource
-                if (bitmapSource == null) return null; // 如果不是 BitmapSource，返回 null
-                using (MemoryStream stream = new MemoryStream()) // 创建内存流
-                {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
-                    encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 转换为 BitmapFrame
-                    encoder.Save(stream); // 保存 BitmapFrame 到内存流
-                    return SHA256.HashData(stream.ToArray()); // 计算哈希值并返回
-                }
-            }
-            catch
-            {
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -251,11 +210,11 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 处理图片路径，返回 BitmapImage 对象
+        /// 处理图片路径，返回 BitmapImage 或 BitmapFrame[]（动图）
         /// </summary>
         /// <param name="filePath">文件路径</param>
-        /// <returns>处理后的 BitmapImage 对象</returns>
-        public BitmapImage ProcessIcon(string filePath)
+        /// <returns>处理后的 BitmapImage 或 BitmapFrame[]</returns>
+        public object ProcessIcon(string filePath)
         {
             try
             {
@@ -266,8 +225,11 @@ namespace Quicker.Managers
                     case ".jpg":
                     case ".jpeg":
                     case ".bmp":
-                    case ".ico":
                         return LoadBitmapImage(filePath); // 加载普通图片文件
+                    case ".ico":
+                        return LoadBitmapImage(filePath); // ICO 也用BitmapImage加载，支持多尺寸
+                    case ".gif":
+                        return LoadGifImage(filePath); // 加载GIF，支持动图
                     case ".svg":
                         return LoadSvgToBitmapImage(filePath); // 加载 SVG 文件
                     case ".exe":
@@ -285,7 +247,7 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 加载普通图片文件（如 PNG、JPG）
+        /// 加载普通图片文件（如 PNG、JPG、JPEG、BMP、ICO）
         /// </summary>
         /// <param name="filePath">文件路径</param>
         /// <returns>加载的 BitmapImage</returns>
@@ -301,11 +263,47 @@ namespace Quicker.Managers
                     bi.StreamSource = stream;
                     bi.EndInit();
                 }
+                bi.Freeze();
                 return bi;
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"加载图片时出错: {filePath}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 加载 GIF 文件，支持动图，返回第一帧（BitmapImage）或所有帧（BitmapFrame[]）
+        /// </summary>
+        /// <param name="filePath">GIF 文件路径</param>
+        /// <returns>BitmapImage（静态）或 BitmapFrame[]（动图）</returns>
+        private object LoadGifImage(string filePath)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    GifBitmapDecoder decoder = new GifBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    if (decoder.Frames.Count == 1) // 静态GIF，直接返回BitmapImage
+                    {
+                        BitmapImage bi = new BitmapImage();
+                        stream.Seek(0, SeekOrigin.Begin);
+                        bi.BeginInit();
+                        bi.CacheOption = BitmapCacheOption.OnLoad;
+                        bi.StreamSource = stream;
+                        bi.EndInit();
+                        bi.Freeze();
+                        return bi;
+                    }
+                    else // 动图，返回所有帧
+                    {
+                        return decoder.Frames.ToArray();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"加载GIF图片时出错: {filePath}", ex);
             }
         }
 
@@ -418,6 +416,37 @@ namespace Quicker.Managers
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
+        }
+
+        /// <summary>
+        /// 获取文件内容哈希值
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>文件内容哈希值</returns>
+        public static string GetFileContentHash(string filePath)
+        {
+            using var stream = File.OpenRead(filePath); // 打开文件流
+            using var sha256 = System.Security.Cryptography.SHA256.Create(); // 创建SHA256哈希算法
+            var hash = sha256.ComputeHash(stream); // 计算哈希值
+            return BitConverter.ToString(hash).Replace("-", "").ToLower(); // 返回哈希值
+        }
+
+        /// <summary>
+        /// 保存图片文件到本地图标目录，文件名为内容哈希，避免重复
+        /// </summary>
+        /// <param name="filePath">图片文件路径</param>
+        /// <returns>保存路径</returns>
+        public string SaveImageToLocalIcons(string filePath)
+        {
+            string saveDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons"; // 保存路径
+            string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
+            string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
+            string targetPath = Path.Combine(saveDir, $"{hash}{ext}"); // 生成目标路径
+            if (!File.Exists(targetPath)) // 如果目标路径不存在
+            {
+                File.Copy(filePath, targetPath, true); // 复制文件
+            }
+            return targetPath; // 返回目标路径
         }
     }
 }

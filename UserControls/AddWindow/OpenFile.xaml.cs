@@ -7,6 +7,7 @@ using System.Windows.Media;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
+using WpfAnimatedGif;
 using System.IO;
 
 namespace Quicker.UserControls.AddWindow
@@ -229,48 +230,102 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
-            
-            // 检查动作类型是否为打开文件相关
-            switch (buttonData.ActionType)
-            {
-                case "OpenFile":
-                case "OpenFiles":
-                case "OpenUwpApp":
-                    break; // 加载打开文件动作信息
-                default:
-                    return; // 其他动作类型不加载
-            }
+            if (!IsOpenFileAction(buttonData.ActionType))
+                return;
+            SetButtonTitleAndLocation(buttonData); // 设置标题和地址
+            SetButtonImageSafe(buttonData.ImagePath); // 设置图标
+            SetOtherOptions(buttonData); // 设置其他选项
+        }
 
-            // 设置UI控件
+        /// <summary>
+        /// 判断是否为打开文件相关的动作类型
+        /// </summary>
+        private bool IsOpenFileAction(string actionType)
+        {
+            return actionType == "OpenFile" || actionType == "OpenFiles" || actionType == "OpenUwpApp";
+        }
+
+        /// <summary>
+        /// 设置标题和地址栏
+        /// </summary>
+        private void SetButtonTitleAndLocation(ButtonData buttonData)
+        {
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
             {
-                _addWindow.ButtonTitle.Visibility = Visibility.Visible;
-                _addWindow.ButtonTitle.Text = buttonData.Title;
+                _addWindow.ButtonTitle.Visibility = Visibility.Visible; // 显示按钮标题
+                _addWindow.ButtonTitle.Text = buttonData.Title; // 设置按钮标题
             }
-            
-            _addWindow.TitleTextBox.Text = buttonData.Title;
-            LocationTextBox.Text = buttonData.Location;
-            
-            // 设置图标
-            if (!string.IsNullOrEmpty(buttonData.ImagePath))
+            _addWindow.TitleTextBox.Text = buttonData.Title; // 设置标题
+            LocationTextBox.Text = buttonData.Location; // 设置地址
+        }
+
+        /// <summary>
+        /// 安全设置图标（带异常处理）
+        /// </summary>
+        private void SetButtonImageSafe(string imagePath)
+        {
+            if (!string.IsNullOrEmpty(imagePath))
             {
                 try
                 {
-                    _addWindow.ButtonImage.Visibility = Visibility.Visible;
-                    _addWindow.ButtonImage.Source = new BitmapImage(new Uri(buttonData.ImagePath));
+                    _addWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
+                    SetButtonImageFromPath(imagePath); // 调用主方法
                 }
                 catch
                 {
                     _addWindow.ButtonImage.Visibility = Visibility.Collapsed; // 如果加载失败，隐藏图标
                 }
             }
-            
-            // 设置其他选项
-            RunByMessager.IsChecked = buttonData.Data1 == "True";
-            TryToOpenExitingWindow.IsChecked = buttonData.Data2 == "True";
-            WindowStateComboBox.SelectedIndex = int.Parse(buttonData.Data3);
-            _addWindow.DescriptionTextBox.Text = buttonData.Description;
+        }
+
+        /// <summary>
+        /// 设置其他选项（如复选框、下拉框、描述等）
+        /// </summary>
+        private void SetOtherOptions(ButtonData buttonData)
+        {
+            RunByMessager.IsChecked = buttonData.Data1 == "True"; // 设置运行方式
+            TryToOpenExitingWindow.IsChecked = buttonData.Data2 == "True"; // 设置是否尝试打开已存在的窗口
+            WindowStateComboBox.SelectedIndex = int.Parse(buttonData.Data3); // 设置窗口状态
+            _addWindow.DescriptionTextBox.Text = buttonData.Description; // 设置描述
             _addWindow.UpdateTooltip(); // 更新提示文本
+        }
+
+        /// <summary>
+        /// 根据图片路径设置ButtonImage，自动识别SVG和普通图片
+        /// </summary>
+        /// <param name="imagePath">图片路径</param>
+        private void SetButtonImageFromPath(string imagePath)
+        {
+            string ext = Path.GetExtension(imagePath).ToLower(); // 获取文件扩展名
+            if (ext == ".svg") // 如果扩展名是SVG
+            {
+                SetSvgButtonImage(imagePath); // 设置SVG图片
+            }
+            else // 其它格式
+            {
+                SetBitmapButtonImage(imagePath); // 设置普通图片
+            }
+            _addWindow.iconPath = imagePath; // 同步iconPath
+        }
+
+        /// <summary>
+        /// 设置SVG图片到ButtonImage
+        /// </summary>
+        /// <param name="imagePath">SVG图片路径</param>
+        private void SetSvgButtonImage(string imagePath)
+        {
+            var iconManager = new IconManager(); // 创建 IconManager 实例
+            _addWindow.ButtonImage.Source = iconManager.LoadSvgToBitmapImage(imagePath); // 加载SVG图片
+        }
+
+        /// <summary>
+        /// 设置普通图片（含GIF动图）到ButtonImage
+        /// </summary>
+        /// <param name="imagePath">图片路径</param>
+        private void SetBitmapButtonImage(string imagePath)
+        {
+            var bitmap = new BitmapImage(new Uri(imagePath)); // 创建 BitmapImage 实例
+            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(_addWindow.ButtonImage, bitmap); // 支持GIF动图
         }
 
         // 保存动作
@@ -282,7 +337,7 @@ namespace Quicker.UserControls.AddWindow
             
             // 保存图标
             _addWindow.iconPath = _addWindow.ButtonImage.Visibility == Visibility.Visible
-                ? _iconManager.SaveIconToFile(_addWindow.ButtonImage.Source)
+                ? _addWindow.SaveIconToLocal()
                 : "";
 
             // 确定动作类型
@@ -315,33 +370,37 @@ namespace Quicker.UserControls.AddWindow
 
         #region 辅助方法
 
-        // 设置图标
+        /// <summary>
+        /// 根据路径设置图标
+        /// </summary>
+        /// <param name="path">路径</param>
         private void SetIconFromPath(string path)
         {
-            string cachedIconPath = _iconManager.CheckCachedIcon(path);
-            
+            string cachedIconPath = _iconManager.CheckCachedIcon(path); // 检查缓存图标
             if (!string.IsNullOrEmpty(cachedIconPath))
             {
-                _addWindow.ButtonImage.Source = new BitmapImage(new Uri(cachedIconPath));
-                _addWindow.ButtonImage.Visibility = Visibility.Visible;
+                _addWindow.SetButtonImage(cachedIconPath); // 设置图标
             }
             else
             {
-                ImageSource iconSource = _iconManager.GetIcon(path);
+                ImageSource iconSource = _iconManager.GetIcon(path); // 获取图标
                 if (iconSource != null)
                 {
-                    _addWindow.ButtonImage.Source = iconSource;
-                    _addWindow.ButtonImage.Visibility = Visibility.Visible;
+                    _addWindow.ButtonImage.Source = iconSource; // 设置图标
+                    _addWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
                 }
                 else
                 {
-                    using var toast = new ToastManager();
-                    toast.Show("图标提取失败!", "Error");
+                    using var toast = new ToastManager(); // 创建 ToastManager 实例
+                    toast.Show("图标提取失败!", "Error"); // 显示错误提示
                 }
             }
         }
 
-        // 确定动作类型
+        /// <summary>
+        /// 确定动作类型
+        /// </summary>
+        /// <returns>动作类型</returns>
         private string DetermineActionType()
         {
             if (LocationTextBox.Text.Contains(";"))
@@ -349,8 +408,8 @@ namespace Quicker.UserControls.AddWindow
                 return "OpenFiles"; // 如果地址栏包含分号，则设置为打开多个文件动作
             }
             string pattern = @"^[A-Za-z]:\\(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]*$";
-            bool isValidPath = Regex.IsMatch(LocationTextBox.Text, pattern);
-            return isValidPath ? "OpenFile" : "OpenUwpApp";
+            bool isValidPath = Regex.IsMatch(LocationTextBox.Text, pattern); // 检查路径是否有效
+            return isValidPath ? "OpenFile" : "OpenUwpApp"; // 返回动作类型
         }
 
         // 清理资源
@@ -362,8 +421,8 @@ namespace Quicker.UserControls.AddWindow
                 findAppsWindow = null;
             }
 
-            _buttonManager.Dispose();
-            _iconManager.Dispose();
+            _buttonManager.Dispose(); // 释放按钮管理器
+            _iconManager.Dispose(); // 释放图标管理器
 
             // 重置UI控件状态
             LocationTextBox.Text = "";

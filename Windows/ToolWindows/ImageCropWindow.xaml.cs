@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Managers;
 using System.Windows;
+using WpfAnimatedGif;
 using System.IO;
 
 namespace Quicker.Windows.ToolWindows
@@ -72,18 +73,52 @@ namespace Quicker.Windows.ToolWindows
             CropBorder.Height = 200 / aspectRatio;
             DataContext = this;
 
-            // 加载原始图片
-            _originalBitmapSource = new BitmapImage(new Uri(filePath, UriKind.Absolute));
-            CropImage.Source = _originalBitmapSource;
+            LoadAndDisplayImage(filePath); // 加载图片并设置到控件
+            InitColorButtonsAndControls(); // 初始化颜色按钮和控件
+        }
 
-            // 正确初始化Tag为SolidColorBrush
+        /// <summary>
+        /// 加载图片并显示到CropImage控件，同时处理GIF动图和提示
+        /// </summary>
+        /// <param name="filePath">图片路径</param>
+        private void LoadAndDisplayImage(string filePath)
+        {
+            var iconManager = new IconManager(); // 创建IconManager实例
+            var result = iconManager.ProcessIcon(filePath); // 处理图片
+            string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
+            if (result is BitmapImage bitmapImage) // 静态图片或静态GIF
+            {
+                ImageBehavior.SetAnimatedSource(CropImage, bitmapImage); // 显示静态图片或静态GIF
+                _originalBitmapSource = bitmapImage; // 保存原图
+            }
+            else if (result is BitmapFrame[] frames && frames.Length > 1) // 动图GIF，直接用WpfAnimatedGif显示
+            {
+                var gifImage = new BitmapImage(new Uri(filePath, UriKind.Absolute)); // 创建BitmapImage实例
+                ImageBehavior.SetAnimatedSource(CropImage, gifImage); // 显示动图GIF
+                _originalBitmapSource = gifImage; // 保存原图
+            }
+            SetGifTipVisibility(ext); // 根据扩展名设置GIF提示的可见性
+        }
+
+        /// <summary>
+        /// 初始化颜色相关按钮和控件的Tag、背景、边框色
+        /// </summary>
+        private void InitColorButtonsAndControls()
+        {
             BackgroundColorButton.Tag = new SolidColorBrush(Colors.Black);
             BorderColorButton.Tag = new SolidColorBrush(Colors.White);
             HandleColorButton.Tag = new SolidColorBrush(Colors.White);
-
-            // 同步到控件
             ImageGrid.Background = BackgroundColorButton.Tag as SolidColorBrush;
             CropBorder.BorderBrush = BorderColorButton.Tag as SolidColorBrush;
+        }
+
+        /// <summary>
+        /// 根据扩展名设置GIF提示的可见性
+        /// </summary>
+        /// <param name="ext">文件扩展名（小写）</param>
+        private void SetGifTipVisibility(string ext)
+        {
+            GifTipTextBlock.Visibility = ext == ".gif" ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // 监听键盘方向键，微调裁剪框位置
@@ -257,42 +292,42 @@ namespace Quicker.Windows.ToolWindows
             switch (resizeHandle)
             {
                 case "TopLeft":
-                    newWidth = Math.Max(50, resizeStartWidth - deltaX);
-                    newHeight = newWidth / aspectRatio;
-                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
-                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
+                    newWidth = Math.Max(50, resizeStartWidth - deltaX); // 最小宽度50
+                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth); // 根据水平移动距离计算新的左边距
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight); // 根据垂直移动距离计算新的上边距
                     break;
                 case "TopRight":
-                    newWidth = Math.Max(50, resizeStartWidth + deltaX);
-                    newHeight = newWidth / aspectRatio;
-                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
+                    newWidth = Math.Max(50, resizeStartWidth + deltaX); // 最小宽度50
+                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight); // 根据垂直移动距离计算新的上边距
                     break;
                 case "BottomLeft":
-                    newWidth = Math.Max(50, resizeStartWidth - deltaX);
-                    newHeight = newWidth / aspectRatio;
-                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
+                    newWidth = Math.Max(50, resizeStartWidth - deltaX); // 最小宽度50
+                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth); // 根据水平移动距离计算新的左边距
                     break;
                 case "BottomRight":
-                    newWidth = Math.Max(50, resizeStartWidth + deltaX);
-                    newHeight = newWidth / aspectRatio;
+                    newWidth = Math.Max(50, resizeStartWidth + deltaX); // 最小宽度50
+                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
                     break;
                 case "Top":
-                    newHeight = Math.Max(50, resizeStartHeight - deltaY);
-                    newWidth = newHeight * aspectRatio;
-                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
+                    newHeight = Math.Max(50, resizeStartHeight - deltaY); // 最小高度50
+                    newWidth = newHeight * aspectRatio; // 根据宽高比计算宽度
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight); // 根据垂直移动距离计算新的上边距
                     break;
                 case "Bottom":
-                    newHeight = Math.Max(50, resizeStartHeight + deltaY);
-                    newWidth = newHeight * aspectRatio;
+                    newHeight = Math.Max(50, resizeStartHeight + deltaY); // 最小高度50
+                    newWidth = newHeight * aspectRatio; // 根据宽高比计算宽度
                     break;
                 case "Left":
-                    newWidth = Math.Max(50, resizeStartWidth - deltaX);
-                    newHeight = newWidth / aspectRatio;
-                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
+                    newWidth = Math.Max(50, resizeStartWidth - deltaX); // 最小宽度50
+                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth); // 根据水平移动距离计算新的左边距
                     break;
                 case "Right":
-                    newWidth = Math.Max(50, resizeStartWidth + deltaX);
-                    newHeight = newWidth / aspectRatio;
+                    newWidth = Math.Max(50, resizeStartWidth + deltaX); // 最小宽度50
+                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
                     break;
             }
         }
@@ -747,26 +782,47 @@ namespace Quicker.Windows.ToolWindows
             _originalBitmapSource = null;
             _currentColorButton = null;
             CropCompleted = null;
+
+            // 强制垃圾回收
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
+        /// <summary>
+        /// 点击"更改图片"按钮后弹出文件选择对话框，支持选择普通图片和SVG图片，并加载到裁剪窗口。
+        /// </summary>
         private void ChangeImageButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
+                Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.svg;*.ico",
                 Title = "选择图片"
-            };
-            if (dialog.ShowDialog() == true)
+            }; // 创建文件选择对话框，过滤支持的图片格式，包括SVG
+            if (dialog.ShowDialog() == true) // 如果用户选择了文件并点击"打开"
             {
-                try
+                try // 获取文件扩展名，判断是否为SVG
                 {
-                    var newBitmap = new BitmapImage(new Uri(dialog.FileName, UriKind.Absolute)); // 加载新图片
-                    CropImage.Source = newBitmap; // 显示新图片
-                    _originalBitmapSource = newBitmap; // 保存原图
+                    string ext = Path.GetExtension(dialog.FileName).ToLower();
+                    var iconManager = new IconManager();
+                    var result = iconManager.ProcessIcon(dialog.FileName);
+                    if (result is BitmapImage bitmapImage)
+                    {
+                        ImageBehavior.SetAnimatedSource(CropImage, bitmapImage);
+                        _originalBitmapSource = bitmapImage;
+                    }
+                    else if (result is BitmapFrame[] frames && frames.Length > 1)
+                    {
+                        var gifImage = new BitmapImage(new Uri(dialog.FileName, UriKind.Absolute));
+                        ImageBehavior.SetAnimatedSource(CropImage, gifImage);
+                        _originalBitmapSource = gifImage;
+                    }
+                    // 判断是否为GIF，显示或隐藏提示
+                    GifTipTextBlock.Visibility = ext == ".gif" ? Visibility.Visible : Visibility.Collapsed;
                 }
                 catch
                 {
-                    using (var toast = new ToastManager())
+                    using (var toast = new ToastManager()) // 加载失败时弹出提示
                     {
                         toast.Show("图片加载失败！", "Error");
                     }
