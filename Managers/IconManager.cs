@@ -256,13 +256,10 @@ namespace Quicker.Managers
             BitmapImage bi = new BitmapImage();
             try
             {
-                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                {
-                    bi.BeginInit();
-                    bi.CacheOption = BitmapCacheOption.OnLoad;
-                    bi.StreamSource = stream;
-                    bi.EndInit();
-                }
+                bi.BeginInit();
+                bi.CacheOption = BitmapCacheOption.OnLoad;
+                bi.UriSource = new Uri(filePath, UriKind.Absolute); // 用UriSource
+                bi.EndInit();
                 bi.Freeze();
                 return bi;
             }
@@ -287,10 +284,9 @@ namespace Quicker.Managers
                     if (decoder.Frames.Count == 1) // 静态GIF，直接返回BitmapImage
                     {
                         BitmapImage bi = new BitmapImage();
-                        stream.Seek(0, SeekOrigin.Begin);
                         bi.BeginInit();
                         bi.CacheOption = BitmapCacheOption.OnLoad;
-                        bi.StreamSource = stream;
+                        bi.UriSource = new Uri(filePath, UriKind.Absolute); // 用UriSource
                         bi.EndInit();
                         bi.Freeze();
                         return bi;

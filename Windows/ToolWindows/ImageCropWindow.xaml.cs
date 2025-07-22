@@ -23,7 +23,6 @@ namespace Quicker.Windows.ToolWindows
 
         // ================== 图片与裁剪相关 ==================
         private BitmapSource _originalBitmapSource; // 原始图片源。
-        private CornerRadius BorderCornerRadius;// 裁剪框圆角。
         private double BorderHeight;// 裁剪框高度。
         private double aspectRatio; // 裁剪框宽高比。
         private double BorderWidth; // 裁剪框宽度。
@@ -68,7 +67,7 @@ namespace Quicker.Windows.ToolWindows
         {
             InitializeComponent();
             this.aspectRatio = aspectRatio;
-            BorderCornerRadius = cornerRadius;
+            CropBorder.CornerRadius = cornerRadius;
             CropBorder.Width = 200;
             CropBorder.Height = 200 / aspectRatio;
             DataContext = this;
