@@ -238,27 +238,34 @@ Quicker/
 │   │   ├─CloseDownloadWindow.png                       # 关闭下载窗口的按钮图片
 │   │   ├─CloseQuicker.png                              # 退出Quicker的图片
 │   │   ├─CloseWindow.png                               # 关闭主面板的图片
+│   │   ├─CommonSceneImage.png                          # 通用场景图片
 │   │   ├─CopyAction.png                                # 复制动作按钮的图片
 │   │   ├─DeleteImage.png                               # 删除动作按钮图像的图片
 │   │   ├─DesktopSceneImage.png                         # 桌面场景的图片
 │   │   ├─EditButton.png                                # 编辑动作的图片
+│   │   ├─GlobalSceneImage.png                          # 全局场景图片
 │   │   ├─Locked.png                                    # 锁住通用动作页的图片
 │   │   ├─MessageImage.jpg                              # 消息弹窗的图片
 │   │   ├─MoreSelection.png                             # 主面板更多选择的图片
 │   │   ├─OpenFile.png                                  # 打开文件所在文件夹的图片
 │   │   ├─OpenFileImage.png                             # 添加窗口中打开文件动作的图片
+│   │   ├─OpenFolder.png                                # 打开文件夹的图片
 │   │   ├─OpenMainWindow1.png                           # 菜单中打开主面板的图片
 │   │   ├─OpenMainWindow2.png                           # 设置窗口中弹出面板按钮的图片
 │   │   ├─OpenWebsiteImage.png                          # 添加窗口中打开网站动作的图片
+│   │   ├─PasteAction.png                               # 粘贴动作按钮图片
 │   │   ├─Pause.png                                     # 暂停Quicker的图片
 │   │   ├─PinToDesktop.png                              # 订住主面板的图片
-│   │   ├─Quicker_Enabled.png                                  # Quicker运行中的图片
-│   │   ├─Quicker2.png                                  # Quicker暂停时的图片
+│   │   ├─Quicker_Enabled.png                           # Quicker运行中的图片
+│   │   ├─Quicker_Disabled.png                          # Quicker暂停时的图片
 │   │   ├─RestartQuicker.png                            # 重启Quicker的图片
 │   │   ├─SelectLocalImage.png                          # 从本地文件选择动作按钮图像的图片
 │   │   ├─SettingImage1.png                             # 菜单中打开设置窗口的按钮图片
 │   │   ├─SettingImage2.png                             # 主面板打开设置面板的图片
 │   │   ├─SettingWindow.png                             # 设置面板的图片
+│   │   ├─StartApp.png                                  # 启动应用图标
+│   │   ├─TaskbarSceneImage.png                         # 任务栏场景图片
+│   │   ├─Target.png                                    # 目标图标
 │   │   ├─UnLocked.png                                  # 不锁住通用动作页的图片
 │   │   └─UnpinFromDesktop.png                          # 不订住Quicker的图片
 │   └─Styles/                                         # 样式资源文件夹
@@ -341,14 +348,17 @@ Quicker/
 │   │   └─UpdateWindow.xaml                              #  更新窗口
 │   │       └─UpdateWindow.xaml.cs
 │   ├─Menus/                                           # 菜单文件夹
-│   │   ├─CreatActionMenu.xaml                          # 创建动作菜单
+│   │   ├─CreatActionMenu.xaml                          # 创建动作菜单界面
 │   │   │   └─CreatActionMenu.xaml.cs
-│   │   ├─CustomMenu.xaml                               # 自定义菜单
+│   │   ├─CustomMenu.xaml                               # 自定义菜单界面
 │   │   │   └─CustomMenu.xaml.cs
-│   │   ├─OperationMenu.xaml                            # 操作菜单
+│   │   ├─EditSceneMenu.xaml                            # 编辑场景菜单界面
+│   │   │   └─EditSceneMenu.xaml.cs
+│   │   ├─OperationMenu.xaml                            # 操作菜单界面
 │   │   │   └─OperationMenu.xaml.cs
-│   │   └─SelectActionPageMenu.xaml                     # 选择动作页菜单
-│   │       └─SelectActionPageMenu.xaml.cs
+│   │   ├─SelectActionPageMenu.xaml                     # 选择动作页菜单界面
+│   │   │   └─SelectActionPageMenu.xaml.cs
+│   │   └─SelectActionPageMenu.xaml.cs                  # 选择动作页菜单逻辑
 │   └─ToolWindows/                                     # 工具窗口文件夹
 │       ├─ActionInfoWindow.xaml                         # 动作信息窗口
 │       │   └─ActionInfoWindow.xaml.cs
