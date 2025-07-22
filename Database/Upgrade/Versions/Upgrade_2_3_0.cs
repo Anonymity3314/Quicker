@@ -16,7 +16,26 @@ namespace Quicker.Database.Upgrade.Versions
         public void Upgrade(SQLiteConnection connection, DatabaseUpdateManager manager)
         {
             SettingDatabase.InitializeAppearance(); // 新增数据库表
+            AddTrayIconColumnsIfNotExist(connection); // 新增托盘图标字段
             RenameDefaultTables(connection, manager); // 重命名默认表
+        }
+
+        /// <summary>
+        /// 为 Convention 表添加托盘图标字段（如果不存在）
+        /// </summary>
+        /// <param name="connection"> 数据库连接 </param>
+        private void AddTrayIconColumnsIfNotExist(SQLiteConnection connection)
+        {
+            // 直接插入 TrayIconPathRunning 字段
+            using (var cmd = new SQLiteCommand("ALTER TABLE Convention ADD COLUMN TrayIconPathRunning TEXT DEFAULT 'pack://application:,,,/Resources/Images/Quicker_Enabled.png'", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            // 直接插入 TrayIconPathPaused 字段
+            using (var cmd = new SQLiteCommand("ALTER TABLE Convention ADD COLUMN TrayIconPathPaused TEXT DEFAULT 'pack://application:,,,/Resources/Images/Quicker_Disabled.ico'", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
         }
 
         /// <summary>

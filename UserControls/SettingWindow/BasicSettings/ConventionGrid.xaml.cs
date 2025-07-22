@@ -3,18 +3,62 @@ using System.Windows.Threading;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
+using System.Windows.Input;
 using Quicker.Managers;
 using System.Windows;
+using System.ComponentModel;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
-    public partial class ConventionGrid : UserControl
+    public partial class ConventionGrid : UserControl, INotifyPropertyChanged
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
         private double totalUsageTime; // 总使用时长
         private DispatcherTimer timer; // 定时器
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public ImageSource RunningTrayIconImage
+        {
+            get
+            {
+                var path = settingManager?.conventions?.TrayIconPathRunning; // 获取运行时托盘图标路径
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    try
+                    {
+                        if (path.StartsWith("pack://"))
+                            return new System.Windows.Media.Imaging.BitmapImage(new Uri(path, UriKind.Absolute));
+                        if (System.IO.File.Exists(path))
+                            return new System.Windows.Media.Imaging.BitmapImage(new Uri(path, UriKind.Absolute));
+                    }
+                    catch { }
+                }
+                return new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png"));
+            }
+        }
+        public ImageSource PausedTrayIconImage
+        {
+            get
+            {
+                var path = settingManager?.conventions?.TrayIconPathPaused; // 获取暂停时托盘图标路径
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    try
+                    {
+                        if (path.StartsWith("pack://"))
+                            return new System.Windows.Media.Imaging.BitmapImage(new Uri(path, UriKind.Absolute));
+                        if (System.IO.File.Exists(path))
+                            return new System.Windows.Media.Imaging.BitmapImage(new Uri(path, UriKind.Absolute));
+                    }
+                    catch { }
+                }
+                return new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Disabled.ico"));
+            }
+        }
 
         public ConventionGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
@@ -155,6 +199,76 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     break;
                 default:
                     return;
+            }
+        }
+
+        private void TrayIconButton_Click(object sender, RoutedEventArgs e)
+        {
+            TrayIconPopup.IsOpen = true; // 显示托盘图标菜单
+        }
+
+        // 选择托盘图标文件（仅支持ICO和PNG）
+        private string SelectTrayIconFilePath(string title)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = title,
+                Filter = "图标文件 (*.ico;*.png)|*.ico;*.png"
+            }; // 设置文件过滤器
+            return dialog.ShowDialog() == true ? dialog.FileName : null; // 显示文件选择对话框
+        }
+
+        /// <summary>
+        /// 选择图片后保存到本地图标目录并返回保存路径
+        /// </summary>
+        /// <param name="file">用户选择的图片文件路径</param>
+        /// <returns>保存到本地后的路径，失败返回null</returns>
+        private string SaveCustomTrayIcon(string file)
+        {
+            if (string.IsNullOrEmpty(file)) return null;
+            var iconManager = new IconManager();
+            return iconManager.SaveImageToLocalIcons(file);
+        }
+
+        // 编辑运行时托盘图标
+        private void EditRunningTrayIconButton_Click(object sender, RoutedEventArgs e)
+        {
+            var file = SelectTrayIconFilePath("选择运行时托盘图标");
+            var savedPath = SaveCustomTrayIcon(file); // 保存到本地
+            if (!string.IsNullOrEmpty(savedPath))
+            {
+                settingManager.conventions.TrayIconPathRunning = savedPath; // 设置运行时托盘图标路径
+                OnPropertyChanged(nameof(RunningTrayIconImage)); // 更新运行时托盘图标
+            }
+        }
+
+        // 编辑暂停时托盘图标
+        private void EditPausedTrayIconButton_Click(object sender, RoutedEventArgs e)
+        {
+            var file = SelectTrayIconFilePath("选择暂停时托盘图标");
+            var savedPath = SaveCustomTrayIcon(file); // 保存到本地
+            if (!string.IsNullOrEmpty(savedPath))
+            {
+                settingManager.conventions.TrayIconPathPaused = savedPath; // 设置暂停时托盘图标路径
+                OnPropertyChanged(nameof(PausedTrayIconImage)); // 更新暂停时托盘图标
+            }
+        }
+
+        // 右键恢复默认托盘图标
+        private void RestoreDefaultTrayIconButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                if (btn.Name == "EditRunningTrayIconButton") // 恢复运行时图标为默认
+                {
+                    settingManager.conventions.TrayIconPathRunning = "pack://application:,,,/Resources/Images/Quicker_Enabled.png"; // 设置运行时托盘图标路径为默认
+                    OnPropertyChanged(nameof(RunningTrayIconImage)); // 更新运行时托盘图标
+                }
+                else if (btn.Name == "EditPausedTrayIconButton") // 恢复暂停时图标为默认
+                {
+                    settingManager.conventions.TrayIconPathPaused = "pack://application:,,,/Resources/Images/Quicker_Disabled.ico"; // 设置暂停时托盘图标路径为默认
+                    OnPropertyChanged(nameof(PausedTrayIconImage)); // 更新暂停时托盘图标
+                }
             }
         }
 

@@ -96,6 +96,9 @@ namespace Quicker.Windows.MainWindows
 
             var result = await SaveSettingsAsync(); // 保存设置并获取结果
             ShowSaveResultMessage(result); // 显示保存结果信息
+
+            // 保存设置后刷新托盘图标
+            RefreshTrayIconForBothStates();
         }
 
         /// <summary>
@@ -125,7 +128,10 @@ namespace Quicker.Windows.MainWindows
                         _settingManager.conventions.MouseMovePixels,
                         _settingManager.conventions.LoopPageFlipping,
                         _settingManager.conventions.RememberLastPage,
-                        _settingManager.conventions.EnableMemoryOptimization); // 更新常规设置
+                        _settingManager.conventions.EnableMemoryOptimization,
+                        _settingManager.conventions.TrayIconPathRunning,
+                        _settingManager.conventions.TrayIconPathPaused
+                    ); // 更新常规设置
                 if (_settingManager.openMainWindowConditions != null)
                     SettingDatabase.ApplyOpenMainWindowSettings(
                         _settingManager.openMainWindowConditions.OpenMainWindowByMiddleMouseClick,
@@ -142,7 +148,8 @@ namespace Quicker.Windows.MainWindows
                 if (_settingManager.blacklistSettings != null)
                     SettingDatabase.ApplyBlacklistSettings(
                         _settingManager.blacklistSettings.IsFullScreenDisabled,
-                        _settingManager.blacklistSettings.IsBlacklistEnabledForExtendedHotkey); // 更新黑名单设置
+                        _settingManager.blacklistSettings.IsBlacklistEnabledForExtendedHotkey
+                    ); // 更新黑名单设置
 
                 bool settingsLoadSuccess = true; // 设置加载成功标志
                 try
@@ -208,6 +215,18 @@ namespace Quicker.Windows.MainWindows
                 return true; // 返回设置成功
             }
             catch { return false; } // 出现异常，返回失败
+        }
+
+        /// <summary>
+        /// 刷新两种状态下的托盘图标（运行/暂停）
+        /// </summary>
+        public void RefreshTrayIconForBothStates()
+        {
+            var conventions = _settingManager.conventions;
+            Quicker.Managers.AppStateManager.NotifyTrayIconChanged(
+                conventions.TrayIconPathRunning,
+                conventions.TrayIconPathPaused
+            );
         }
 
         #endregion

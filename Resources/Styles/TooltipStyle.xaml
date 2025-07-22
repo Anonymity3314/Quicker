@@ -14,13 +14,13 @@
                 <ControlTemplate TargetType="{x:Type ToolTip}">
                     <Grid>
                         <!-- 阴影效果 -->
-                        <Rectangle Fill="White" Margin="11,11,5,7">
-                            <Rectangle.Effect>
-                                <DropShadowEffect Color="LightGray" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
-                            </Rectangle.Effect>
-                        </Rectangle>
+                        <Border CornerRadius="3" Background="White" Margin="3">
+                            <Border.Effect>
+                                <DropShadowEffect Color="LightGray" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Border.Effect>
+                        </Border>
                         <!-- 内容区域 -->
-                        <Border Background="White" BorderBrush="#C5CFD8" BorderThickness="1" CornerRadius="3" Margin="5">
+                        <Border Background="White" BorderBrush="#C5CFD8" BorderThickness="1" CornerRadius="3" Margin="3">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6"/>
                         </Border>
                     </Grid>

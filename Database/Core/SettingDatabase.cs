@@ -21,6 +21,8 @@ namespace Quicker.Database.Core
          * RememberLastPage: 是否记住设置窗口中最后打开的页面，默认为false（不记住）。
          * LastPage: 最后打开的页面ID，默认为11。
          * EnableMemoryOptimization: 是否启用内存优化，默认为true（开启）。
+         * TrayIconPathRunning: 运行时托盘图标路径，默认为"pack://application:,,,/Resources/Images/Quicker_Enabled.png"。
+         * TrayIconPathPaused: 暂停时托盘图标路径，默认为"pack://application:,,,/Resources/Images/Quicker_Disabled.ico"。
          */
         /* [OpenMainWindow] 弹出面板
          * OpenMainWindowByMiddleMouseClick: 按中键点击打开设置窗口，默认为false（关闭）。
@@ -114,7 +116,7 @@ namespace Quicker.Database.Core
         private static void InsertDefaultConventionData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (currentVersion, false, true, true, 0.0, false, 300, 50, true, false, 111, true); // 使用参数元组封装默认值
+            var defaults = (currentVersion, false, true, true, 0.0, false, 300, 50, true, false, 111, true, "pack://application:,,,/Resources/Images/Quicker_Enabled.png", "pack://application:,,,/Resources/Images/Quicker_Disabled.ico"); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@Version"] = defaults.Item1,
@@ -128,7 +130,9 @@ namespace Quicker.Database.Core
                 ["@LoopPageFlipping"] = defaults.Item9,
                 ["@RememberLastPage"] = defaults.Item10,
                 ["@LastPage"] = defaults.Item11,
-                ["@EnableMemoryOptimization"] = defaults.Item12
+                ["@EnableMemoryOptimization"] = defaults.Item12,
+                ["@TrayIconPathRunning"] = defaults.Item13,
+                ["@TrayIconPathPaused"] = defaults.Item14
             }; // 使用字典批量绑定参数
             using var command = new SQLiteCommand(SQLStatements.InsertConvention, connection); // 创建 SQLiteCommand 对象
             foreach (var param in parameters)
@@ -264,7 +268,9 @@ namespace Quicker.Database.Core
         /// <param name="loopPageFlipping"> 是否循环翻页 </param>
         /// <param name="rememberLastPage"> 是否记住设置窗口中最后打开的页面 </param>
         /// <param name="enableMemoryOptimization"> 是否启用内存优化 </param>
-        public static void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization)
+        /// <param name="trayIconPathRunning"> 运行时托盘图标路径 </param>
+        /// <param name="trayIconPathPaused"> 暂停时托盘图标路径 </param>
+        public static void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization, string trayIconPathRunning, string trayIconPathPaused)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
@@ -278,6 +284,8 @@ namespace Quicker.Database.Core
             command.Parameters.AddWithValue("@LoopPageFlipping", loopPageFlipping); // 是否循环翻页
             command.Parameters.AddWithValue("@RememberLastPage", rememberLastPage); // 是否记住设置窗口中最后打开的页面
             command.Parameters.AddWithValue("@EnableMemoryOptimization", enableMemoryOptimization); // 是否启用内存优化
+            command.Parameters.AddWithValue("@TrayIconPathRunning", trayIconPathRunning); // 运行时托盘图标路径
+            command.Parameters.AddWithValue("@TrayIconPathPaused", trayIconPathPaused); // 暂停时托盘图标路径
             command.ExecuteNonQuery(); // 执行更新命令
             transaction.Commit(); // 提交事务
         }
@@ -417,7 +425,9 @@ namespace Quicker.Database.Core
                     LoopPageFlipping = reader.GetBoolean(9), // 是否循环翻页
                     RememberLastPage = reader.GetBoolean(10), // 是否记住设置窗口中最后打开的页面
                     LastPage = reader.GetInt32(11), // 设置窗口中最后打开的页面
-                    EnableMemoryOptimization = reader.GetBoolean(12) // 是否启用内存优化
+                    EnableMemoryOptimization = reader.GetBoolean(12), // 是否启用内存优化
+                    TrayIconPathRunning = reader.GetString(13), // 运行时托盘图标路径
+                    TrayIconPathPaused = reader.GetString(14) // 暂停时托盘图标路径
                 }); // 将读取到的数据添加到列表中
             }
             transaction.Commit(); // 提交事务
@@ -630,7 +640,9 @@ namespace Quicker.Database.Core
                 LoopPageFlipping BOOLEAN,
                 RememberLastPage BOOLEAN,
                 LastPage INTEGER,
-                EnableMemoryOptimization BOOLEAN
+                EnableMemoryOptimization BOOLEAN,
+                TrayIconPathRunning TEXT,
+                TrayIconPathPaused TEXT
             );";
             public const string InsertConvention = @"
             INSERT INTO Convention
@@ -640,7 +652,8 @@ namespace Quicker.Database.Core
                 TotalUsageTime,     HideTooltip,
                 LongPressThreshold, MouseMovePixels,
                 LoopPageFlipping,   RememberLastPage,
-                LastPage,           EnableMemoryOptimization
+                LastPage,           EnableMemoryOptimization,
+                TrayIconPathRunning, TrayIconPathPaused
             )
             VALUES
             (
@@ -649,7 +662,8 @@ namespace Quicker.Database.Core
                 @TotalUsageTime,    @HideTooltip,
                 @LongPressThreshold,@MouseMovePixels,
                 @LoopPageFlipping,  @RememberLastPage,
-                @LastPage,          @EnableMemoryOptimization
+                @LastPage,          @EnableMemoryOptimization,
+                @TrayIconPathRunning, @TrayIconPathPaused
             );";
             public const string UpdateConvention = @"
             UPDATE Convention SET
@@ -661,7 +675,9 @@ namespace Quicker.Database.Core
                 MouseMovePixels = @MouseMovePixels,
                 LoopPageFlipping = @LoopPageFlipping,
                 RememberLastPage = @RememberLastPage,
-                EnableMemoryOptimization = @EnableMemoryOptimization
+                EnableMemoryOptimization = @EnableMemoryOptimization,
+                TrayIconPathRunning = @TrayIconPathRunning,
+                TrayIconPathPaused = @TrayIconPathPaused
             WHERE ID = 1;";
             public const string GetAllConventions = "SELECT * FROM Convention;";
             // 打开主窗口设置表

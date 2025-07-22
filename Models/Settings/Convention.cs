@@ -18,5 +18,7 @@
         public bool RememberLastPage { get; set; } // 是否记住设置窗口中最后打开的页面
         public int LastPage { get; set; } // 设置窗口中最后打开的页面
         public bool EnableMemoryOptimization { get; set; } // 是否启用内存优化
+        public string TrayIconPathRunning { get; set; } // 运行时托盘图标路径
+        public string TrayIconPathPaused { get; set; } // 暂停时托盘图标路径
     }
 }

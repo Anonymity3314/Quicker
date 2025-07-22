@@ -6,6 +6,7 @@ using Quicker.Models.Settings;
 using Quicker.Database.Core;
 using Quicker.Managers;
 using System.Windows;
+using System.IO;
 
 namespace Quicker.Managers
 {
@@ -14,8 +15,30 @@ namespace Quicker.Managers
         private static readonly ConcurrentDictionary<string, object> _cache = new(); // 缓存
         private static readonly object _cacheLock = new(); // 缓存锁
         
-        public static BitmapImage _trayIcon1 = new(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png")); // 托盘图标1
-        public static BitmapImage _trayIcon2 = new(new Uri("pack://application:,,,/Resources/Images/Quicker_Disabled.ico")); // 托盘图标2
+        // 支持外部传入路径的托盘图标获取
+        public static BitmapImage GetTrayIcon(string runningPath = null, string pausedPath = null, bool? pause = null)
+        {
+            string path;
+            bool isPaused = pause ?? Pause;
+            if (isPaused)
+                path = !string.IsNullOrWhiteSpace(pausedPath) ? pausedPath : (Conventions?.TrayIconPathPaused ?? "");
+            else
+                path = !string.IsNullOrWhiteSpace(runningPath) ? runningPath : (Conventions?.TrayIconPathRunning ?? "");
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                try
+                {
+                    if (path.StartsWith("pack://")) // 支持pack://资源
+                        return new BitmapImage(new Uri(path, UriKind.Absolute));
+                    if (File.Exists(path)) // 支持本地文件
+                        return new BitmapImage(new Uri(path, UriKind.Absolute));
+                }
+                catch { }
+            }
+            return null;
+        }
+
+        public static BitmapImage TrayIcon => GetTrayIcon(); // 当前托盘图标
 
         private static List<BlacklistApplication> _blacklistApplications; // 黑名单应用
         private static OpenMainWindow _openMainWindowConditions; // 打开主窗口条件
@@ -74,6 +97,15 @@ namespace Quicker.Managers
         public static bool HasNewVersion { get; set; } = false; // 是否有新版本
         public static float Left { get; set; } = 0; // 左
         public static float Top { get; set; } = 0; // 上
+
+        // 托盘图标改变事件
+        public static event Action<string, string> TrayIconChanged;
+
+        // 通知托盘图标改变
+        public static void NotifyTrayIconChanged(string runningPath = null, string pausedPath = null)
+        {
+            TrayIconChanged?.Invoke(runningPath, pausedPath);
+        }
 
         static AppStateManager()
         {

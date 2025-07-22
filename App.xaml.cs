@@ -45,6 +45,9 @@ namespace Quicker
     {
         private TaskPoolGlobalHook? hook; // 全局钩子
         private TaskbarIcon? taskbarIcon; // 托盘图标
+        private string _previewRunningPath;
+        private string _previewPausedPath;
+        private Action<string, string> _trayIconChangedHandler;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -94,7 +97,7 @@ namespace Quicker
         // 初始化托盘图标
         private void InitializeTaskbar()
         {
-            var icon = AppStateManager._trayIcon1; // 设置托盘图标
+            var icon = AppStateManager.TrayIcon; // 设置托盘图标
             Current.Resources["AppIcon"] = icon; // 设置应用图标
             taskbarIcon = new TaskbarIcon // 创建托盘图标
             {
@@ -105,6 +108,14 @@ namespace Quicker
             taskbarIcon.TrayLeftMouseDown += ShowMainWindow; // 左键单击弹出功能面板
             taskbarIcon.TrayRightMouseDown += ShowCustomMenu; // 右键单击弹出菜单栏
             taskbarIcon.TrayMouseDoubleClick += PauseQuicker; // 双击暂停Quicker
+
+            _trayIconChangedHandler = (running, paused) =>
+            {
+                _previewRunningPath = running;
+                _previewPausedPath = paused;
+                taskbarIcon.IconSource = AppStateManager.GetTrayIcon(_previewRunningPath, _previewPausedPath, AppStateManager.Pause);
+            };
+            AppStateManager.TrayIconChanged += _trayIconChangedHandler;
         }
 
         // 弹出消息提醒
@@ -893,11 +904,8 @@ namespace Quicker
             var text = AppStateManager.Pause ? "暂停" : "恢复"; // 消息提醒
             CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
             customMenu.PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
-            taskbarIcon.IconSource = AppStateManager.Pause
-                ? AppStateManager._trayIcon1
-                : AppStateManager._trayIcon2; // 切换托盘图标
-
             AppStateManager.Pause = !AppStateManager.Pause; // 切换暂停状态
+            taskbarIcon.IconSource = AppStateManager.TrayIcon; // 切换托盘图标
             toast.Show(toastMessage, AppStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
         }
 
@@ -921,6 +929,8 @@ namespace Quicker
             taskbarIcon.TrayLeftMouseDown -= ShowMainWindow; // 移除左键单击弹出功能面板事件
             taskbarIcon.TrayRightMouseDown -= ShowCustomMenu; // 移除右键单击弹出菜单栏事件
             taskbarIcon.TrayMouseDoubleClick -= PauseQuicker; // 移除双击暂停Quicker事件
+            if (_trayIconChangedHandler != null)
+                AppStateManager.TrayIconChanged -= _trayIconChangedHandler; // 解绑托盘图标事件
             taskbarIcon?.Dispose(); // 释放托盘图标
             taskbarIcon = null; // 清空托盘图标
         }
