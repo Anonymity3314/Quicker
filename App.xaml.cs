@@ -27,6 +27,7 @@ using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Database.Upgrade;
 using Quicker.Models.Settings;
+using System.Windows.Controls;
 using Quicker.Windows.Menus;
 using Quicker.Database.Core;
 using System.Windows.Media;
@@ -136,7 +137,7 @@ namespace Quicker
             var fontFamilies = Fonts.SystemFontFamilies.Select(f => f.Source).OrderBy(f => f).ToList();
             fontFamilies.Add("(系统默认)"); // 保持和界面一致
 
-            // 判断索引是否为最后一项（即“系统默认”）
+            // 判断索引是否为最后一项（即"系统默认"）
             string font1 = (appearance.Font1 >= 0 && appearance.Font1 < fontFamilies.Count - 1) ? fontFamilies[appearance.Font1] : null;
             string font2 = (appearance.Font2 >= 0 && appearance.Font2 < fontFamilies.Count - 1) ? fontFamilies[appearance.Font2] : null;
             FontFamily fontFamily; // 设置全局字体
@@ -278,7 +279,6 @@ namespace Quicker
 
             // 其他情况
             if (AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间已记录，返回
-            
             ProcessMouseButtonPress(e.Data.Button, openMainWindowConditions); // 处理鼠标按下事件
         }
 
@@ -291,7 +291,6 @@ namespace Quicker
             var conventions = AppStateManager.Conventions; // 获取设置
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             TimeSpan pressDuration = GetMousePressDuration(); // 获取鼠标按下时间
-
             ProcessMouseButtonRelease(e.Data.Button, openMainWindowConditions, conventions, pressDuration); // 处理鼠标松开事件
         }
 
@@ -326,18 +325,18 @@ namespace Quicker
             bool otherKeyDown = false;
             this.Dispatcher.Invoke(() =>
             {
-                foreach (Key key in Enum.GetValues(typeof(Key)))
+                foreach (Key key in Enum.GetValues(typeof(Key))) // 遍历所有按键
                 {
-                    if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.None)
+                    if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.None) // 跳过Ctrl键和None键
                         continue;
-                    if (Keyboard.IsKeyDown(key))
+                    if (Keyboard.IsKeyDown(key)) // 如果按键被按下
                     {
-                        otherKeyDown = true;
-                        break;
+                        otherKeyDown = true; // 设置其他按键被按下
+                        break; // 找到后退出循环
                     }
                 }
             });
-            return otherKeyDown;
+            return otherKeyDown; // 返回其他按键是否被按下
         }
 
         /// <summary>
@@ -374,8 +373,8 @@ namespace Quicker
                                 if (buttonPoint.X >= 0 && buttonPoint.X <= testButton.ActualWidth &&
                                     buttonPoint.Y >= 0 && buttonPoint.Y <= testButton.ActualHeight) // 检查鼠标是否在按钮范围内
                                 {
-                                    isMouseOnTestButton = true;
-                                    break;
+                                    isMouseOnTestButton = true; // 设置鼠标在测试按钮上
+                                    break; // 找到后退出循环
                                 }
                             }
                         }
@@ -383,7 +382,7 @@ namespace Quicker
                 });
             }
             catch { }
-            return isMouseOnTestButton;
+            return isMouseOnTestButton; // 返回鼠标是否在测试按钮上
         }
 
         /// <summary>
@@ -392,23 +391,23 @@ namespace Quicker
         /// <param name="parent">父元素</param>
         /// <param name="buttonName">按钮名称</param>
         /// <returns>找到的按钮</returns>
-        private System.Windows.Controls.Button? FindButtonByName(System.Windows.DependencyObject parent, string buttonName)
+        private Button? FindButtonByName(DependencyObject parent, string buttonName)
         {
-            for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++) // 遍历父元素的子元素
             {
-                var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
-                if (child is System.Windows.Controls.Button button && button.Name == buttonName)
+                var child = VisualTreeHelper.GetChild(parent, i); // 获取子元素
+                if (child is Button button && button.Name == buttonName) // 如果子元素是按钮且名称匹配
                 {
-                    return button;
+                    return button; // 返回按钮
                 }
 
-                var result = FindButtonByName(child, buttonName);
+                var result = FindButtonByName(child, buttonName); // 递归查找子元素中的按钮
                 if (result != null)
                 {
-                    return result;
+                    return result; // 返回找到的按钮
                 }
             }
-            return null;
+            return null; // 没有找到，返回null
         }
 
         /// <summary>
@@ -422,7 +421,7 @@ namespace Quicker
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+                    isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 获取 Ctrl 键状态
                 }); // 获取 Ctrl 键状态
             }
             catch { }
@@ -435,9 +434,21 @@ namespace Quicker
         /// <returns> 鼠标按下时间 </returns>
         private TimeSpan GetMousePressDuration()
         {
-            var duration = DateTime.Now - AppStateManager.MousePressStartTime.Value; // 获取鼠标按下时间
+            var duration = DateTime.Now - AppStateManager.MousePressStartTime.Value; // 计算鼠标按下时间
             AppStateManager.MousePressStartTime = null; // 重置鼠标按下时间
-            AppStateManager.KeyPressStartTime = null; // 重置键盘按下时间
+            bool ctrlDown = false; // 是否按下Ctrl键
+            try
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    ctrlDown = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 获取Ctrl键状态
+                });
+            }
+            catch { }
+            if (!ctrlDown)
+            {
+                AppStateManager.KeyPressStartTime = null; // 重置按键按下时间
+            }
             return duration; // 返回鼠标按下时间
         }
 
@@ -447,10 +458,23 @@ namespace Quicker
         /// <returns> 按键按下时间 </returns>
         private TimeSpan GetKeyPressDuration()
         {
-            var duration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 获取按键按下时间
-            AppStateManager.MousePressStartTime = null; // 重置鼠标按下时间
-            AppStateManager.KeyPressStartTime = null; // 重置按键时间
+            var duration = DateTime.Now - AppStateManager.KeyPressStartTime.Value; // 计算按键按下时间
+            AppStateManager.KeyPressStartTime = null; // 重置按键按下时间
+            // 只有没有鼠标按下时才清空
+            if (!IsAnyMouseButtonDown())
+            {
+                AppStateManager.MousePressStartTime = null; // 重置鼠标按下时间
+            }
             return duration; // 返回按键按下时间
+        }
+
+        /// <summary>
+        /// 判断是否有鼠标按下
+        /// </summary>
+        /// <returns> 是否有鼠标按下 </returns>
+        private bool IsAnyMouseButtonDown()
+        {
+            return System.Windows.Forms.Control.MouseButtons != System.Windows.Forms.MouseButtons.None; // 返回鼠标按下状态
         }
 
         /// <summary>
