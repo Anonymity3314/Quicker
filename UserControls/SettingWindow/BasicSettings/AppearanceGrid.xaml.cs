@@ -18,6 +18,7 @@ using Quicker.Managers;
 using System.Text.Json;
 using Quicker.Helpers;
 using System.Windows;
+using WpfAnimatedGif;
 using System.IO;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
@@ -598,7 +599,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             int font1Index = settingManager.appearanceConditions.Font1;
             int font2Index = settingManager.appearanceConditions.Font2;
 
-            // ComboBox 的 ItemsSource 是字体名列表，最后一项是“(系统默认)”
+            // ComboBox 的 ItemsSource 是字体名列表，最后一项是"(系统默认)"
             var fontFamilies = FontSizeComboBox1.ItemsSource as IList<string>;
             if (fontFamilies == null || fontFamilies.Count == 0)
             {
@@ -638,7 +639,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Application.Current.Resources["GlobalFontFamily"] = fontFamily;
         }
 
-        // 点击“选择...”按钮
+        // 点击"选择..."按钮
         private void BackgroundImagePathButton_Click(object sender, RoutedEventArgs e)
         {
             BackgroundImagePathPopup.IsOpen = true; // 打开背景图片选择弹出窗口
@@ -743,7 +744,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             imageCropWindow.Closed -= closedHandler;
         }
 
-        // 点击“插入剪贴板”按钮
+        // 点击"插入剪贴板"按钮
         private void InsertClipboardTextButton_Click(object sender, RoutedEventArgs e)
         {
             BackgroundImagePathPopup.IsOpen = false; // 关闭弹窗
@@ -763,7 +764,53 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 {
                     _backgroundImagePath = value;
                     OnPropertyChanged(nameof(BackgroundImagePath));
+                    SetPreviewBackgroundImage(_backgroundImagePath); // 动态设置预览背景图片，支持GIF动图
                 }
+            }
+        }
+
+        /// <summary>
+        /// 设置预览区背景图片，支持GIF动图
+        /// </summary>
+        /// <param name="path">图片路径</param>
+        private void SetPreviewBackgroundImage(string path)
+        {
+            if (!IsLoaded) return; // 避免控件未初始化时访问
+            if (PreviewBackgroundImage == null) return; // 避免空引用
+            if (string.IsNullOrEmpty(path) || !File.Exists(path)) // 如果路径为空或文件不存在
+            {
+                PreviewBackgroundImage.Source = null; // 设置为空
+                ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 设置为空
+                return; // 直接返回
+            }
+            string ext = Path.GetExtension(path).ToLower(); // 获取文件扩展名
+            try
+            {
+                if (ext == ".gif") // 如果是GIF动图
+                {
+                    var bitmap = new BitmapImage(); // 创建BitmapImage对象
+                    bitmap.BeginInit(); // 开始初始化
+                    bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置URI源
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
+                    bitmap.EndInit(); // 结束初始化
+                    ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, bitmap); // 设置为GIF动图
+                }
+                else if (ext == ".svg") // 如果是SVG
+                {
+                    var iconManager = new Quicker.Managers.IconManager();
+                    ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 清除动画
+                    PreviewBackgroundImage.Source = iconManager.LoadSvgToBitmapImage(path); // 加载SVG
+                }
+                else
+                {
+                    ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 设置为空
+                    PreviewBackgroundImage.Source = new BitmapImage(new Uri(path, UriKind.Absolute)); // 设置为BitmapImage
+                }
+            }
+            catch
+            {
+                PreviewBackgroundImage.Source = null; // 设置为空
+                ImageBehavior.SetAnimatedSource(PreviewBackgroundImage, null); // 设置为空
             }
         }
 
@@ -1047,7 +1094,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
-        // 点击“已分享或保存的外观”按钮打开外观分享文件夹
+        // 点击"已分享或保存的外观"按钮打开外观分享文件夹
         private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
             string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\SharedAppearance"; // 外观分享文件夹路径
