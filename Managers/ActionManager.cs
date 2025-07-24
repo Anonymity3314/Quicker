@@ -1,14 +1,15 @@
-﻿using System.Runtime.InteropServices;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Runtime.InteropServices;
 using Quicker.Database.Core;
 using IWshRuntimeLibrary;
 using System.Diagnostics;
 using Quicker.Database;
-using Quicker.Windows;
 using Microsoft.Win32;
 using Quicker.Extend;
 using Quicker.Models;
 using System.Windows;
 using System.IO;
+using System.Linq; // 记得加上
 
 namespace Quicker.Managers
 {
@@ -377,10 +378,28 @@ namespace Quicker.Managers
                 case "LoadExtension":
                     LoadExtension(data);
                     break;
+                case "OpenActionPage":
+                    OpenActionPage(data);
+                    break;
             }
             // 增加动作使用次数
             var buttonDatabase = new ButtonDatabase();
             buttonDatabase.IncreaseActionUsedTimes(data.ButtonID, tableName);
+        }
+
+        /// <summary>
+        /// 打开动作页面
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        private void OpenActionPage(ButtonData data)
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口
+            if (mainWindow == null)
+            {
+                mainWindow = new(data.Data1);
+                mainWindow.Show();
+            }
+            mainWindow.OpenActionPage(data);
         }
 
         // 实现IDisposable接口

@@ -330,24 +330,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
         }
 
         /// <summary>
-        /// 切换动作页
-        /// </summary>
-        /// <param name="data"> 按钮数据 </param>
-        public void OpenActionPage(ButtonData data)
-        {
-            string type = data.Data1; // 获取动作页类型
-            int index = int.Parse(data.Data2); // 获取动作页索引
-            if (type != "_global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
-            int currentGridIndex = type == "_global" ? GloblePageIndex : CommonPageIndex; // 获取当前可见的Grid编号
-            if (currentGridIndex > index) // 如果当前Grid编号大于目标Grid编号
-                for (int i = currentGridIndex; i > index; i--)
-                    SwitchToPreviousPageGrid(i, type); // 向前切换Grid
-            else // 如果当前Grid编号小于目标Grid编号
-                for (int i = currentGridIndex; i < index; i++)
-                    SwitchToNextPageGrid(i, type); // 向后切换Grid
-        }
-
-        /// <summary>
         /// 切换到上一页Grid
         /// </summary>
         /// <param name="currentIndex">当前页索引</param>
@@ -605,6 +587,24 @@ namespace Quicker.Windows.MainWindows.MainWindow
         private void CloseMainWindow(object sender, EventArgs e)
         {
             Close(); // 关闭窗口
+        }
+
+        /// <summary>
+        /// 切换动作页（根据按钮数据，切换到指定类型和索引的动作页）
+        /// </summary>
+        /// <param name="data"> 按钮数据，Data1为类型，Data2为页索引 </param>
+        public void OpenActionPage(ButtonData data)
+        {
+            string type = data.Data1; // 获取动作页类型
+            int index = int.Parse(data.Data2); // 获取动作页索引
+            if (type != "_global") OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
+            int currentGridIndex = type == "_global" ? GloblePageIndex : CommonPageIndex; // 获取当前可见的Grid编号
+            if (currentGridIndex > index) // 如果当前Grid编号大于目标Grid编号
+                for (int i = currentGridIndex; i > index; i--)
+                    SwitchToPreviousPageGrid(i, type); // 向前切换Grid
+            else if (currentGridIndex < index) // 如果当前Grid编号小于目标Grid编号
+                for (int i = currentGridIndex; i < index; i++)
+                    SwitchToNextPageGrid(i, type); // 向后切换Grid
         }
 
         // 窗口关闭时强制垃圾回收
