@@ -1,13 +1,15 @@
-﻿using Quicker.Helpers;
-using Quicker.Managers;
-using Quicker.UserControls;
-using Quicker.Windows.MainWindows;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using Quicker.Windows.MainWindows;
 using System.Windows.Resources;
+using System.Windows.Controls;
+using Quicker.UserControls;
+using System.Windows.Input;
+using System.Diagnostics;
+using Quicker.Managers;
+using System.Text.Json;
+using Quicker.Helpers;
+using System.Windows;
+using System.Text;
+using System.IO;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -34,19 +36,33 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             settingManager.ButtonStyle3_Click(AboutQuickerButton, MainGrid); // 保存Button类型3边框设置
         }
 
-        // 打开更新历史文件
+        // 打开更新历史文件（从资源型JSON反序列化）
         private void OpenUpdateHistory(object sender, MouseButtonEventArgs e)
         {
-            string resourceName = "InfoData/UpdateHistory.txt"; // 确保资源名称正确
-            Uri resourceUri = new Uri(resourceName, UriKind.Relative); // 构造资源URI
-            StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 获取资源流信息
-            using (StreamReader reader = new StreamReader(streamInfo.Stream)) // 读取资源流
+            string resourceName = "VersionInfo.json"; // 资源文件名
+            Uri resourceUri = new(resourceName, UriKind.Relative); // 资源URI
+            StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 通过资源URI获取资源流
+            using (StreamReader reader = new(streamInfo.Stream)) // 读取资源流内容
             {
-                string content = reader.ReadToEnd(); // 读取资源内容
+                string json = reader.ReadToEnd(); // 读取JSON字符串
+                var versionInfo = JsonSerializer.Deserialize<VersionInfoRoot>(json); // 反序列化为对象
+                StringBuilder sb = new();
+                foreach (var v in versionInfo.Versions) // 遍历所有版本信息，拼接为文本
+                {
+                    sb.AppendLine($"{v.Version}\t{v.ReleaseDate}"); // 版本号和发布日期
+                    var changelogs = v.Changelog.Split('\n'); // 按行分割变更日志
+                    foreach (var log in changelogs)
+                    {
+                        sb.AppendLine(log.Trim('~', '.', '\r')); // 去除前缀符号后写入
+                    }
+                    sb.AppendLine(); // 每个版本之间空一行
+                }
+
+                // 写入临时文件并用记事本打开
                 string tempPath = Path.GetTempPath(); // 获取临时文件夹路径
                 string tempFilePath = Path.Combine(tempPath, "更新历史.txt"); // 构造临时文件路径
-                File.WriteAllText(tempFilePath, content); // 写入临时文件
-                System.Diagnostics.Process.Start("notepad.exe", tempFilePath); // 使用系统默认文本编辑器打开临时文件
+                File.WriteAllText(tempFilePath, sb.ToString()); // 写入临时文件
+                System.Diagnostics.Process.Start("notepad.exe", tempFilePath); // 用记事本打开临时文件
             }
         }
 
@@ -243,5 +259,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             VersionLabel.Content = string.Empty; // 清理文本内容
             TempSize.Text = null; // 清理文本内容
         }
+    }
+
+    /// <summary>
+    /// 版本信息根对象，对应VersionInfo.json的结构
+    /// </summary>
+    public class VersionInfoRoot
+    {
+        public string LatestVersion { get; set; }// 最新版本号
+        public List<VersionItem> Versions { get; set; }// 所有版本的详细信息列表
+    }
+    /// <summary>
+    /// 单个版本的信息
+    /// </summary>
+    public class VersionItem
+    {
+        public string Version { get; set; }// 版本号
+        public string DownloadUrl { get; set; }// 下载地址
+        public string DownloadUrlWithNet { get; set; }// 备用下载地址
+        public string Changelog { get; set; }// 变更日志（多行字符串）
+        public string ReleaseDate { get; set; }// 发布日期
+        public bool IsLatest { get; set; }// 是否为最新版本
     }
 }

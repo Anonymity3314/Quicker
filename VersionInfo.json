@@ -5,8 +5,8 @@
       "Version": "2.3.0",
       "DownloadUrl": "",
       "DownloadUrlWithNet": "",
-      "Changelog": "~.新增了功能面板外观自定义\n~.可以添加扩展加载了\n~.修复了某些BUG",
-      "ReleaseDate": "2025-01-20",
+      "Changelog": "~.新增了功能面板外观自定义\n~.新增了动作悬浮功能\n~.新增了扩展加载功能\n~.修复了某些BUG",
+      "ReleaseDate": "",
       "IsLatest": true
     },
     {
@@ -53,7 +53,7 @@
       "Version": "2.0.0",
       "DownloadUrl": "",
       "DownloadUrlWithNet": "",
-      "Changelog": "~.新增了拖拽按钮移位的功能\n~.新增了查找本地应用的功能\n~.新增了动作页切换功能\n~.新增了弹出面板的方式\n~.新增了面板的阴影效果\n~.更新了一些控件的UI\n~.新增了动作页\n~.修复了设置界面的全屏显示问题\n~.修复了面板打开失败的BUG",
+      "Changelog": "~.修复了设置界面的全屏显示问题\n~.修复了面板打开失败的BUG\n~.新增了拖拽按钮移位的功能\n~.新增了查找本地应用的功能\n~.新增了动作页切换功能\n~.新增了弹出面板的方式\n~.新增了面板的阴影效果\n~.更新了一些控件的UI\n~.新增了动作页",
       "ReleaseDate": "2025-04-16",
       "IsLatest": false
     },

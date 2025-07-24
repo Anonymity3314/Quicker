@@ -186,15 +186,12 @@ Quicker/
 │   ├─IExtensionModule.cs                              # 实现扩展的接口
 │   └─ModuleLoader.cs                                  # 扩展模块加载器
 ├─Helpers/                                            # 通用辅助类/附加属性
-│   ├─TextBlockHelper.cs                              # 文本块辅助类
-│   ├─VersionHelper.cs                                # 版本号比较工具类，用于版本号比较和检查更新
-│   ├─DataSizeHelper.cs                               # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换
-│   ├─ClipHelper.cs                                   # UI裁剪附加属性，用于为按钮和边框设置自定义裁剪（圆角）
-│   └─ShortcutHelper.cs                               # 快捷键辅助类，提供快捷键字符串生成、友好显示、比对等功能
-├─InfoData/                                           # 信息数据文件夹
-│   ├─Extensions.json                                  # 扩展信息
-│   ├─UpdateHistory.txt                                # 更新历史
-│   └─VersionInfo.json                                 # 版本信息
+│   ├─TextBlockHelper.cs                               # 文本块辅助类
+│   ├─VersionHelper.cs                                 # 版本号比较工具类，用于版本号比较和检查更新
+│   ├─DataSizeHelper.cs                                # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换
+│   ├─ClipHelper.cs                                    # UI裁剪附加属性，用于为按钮和边框设置自定义裁剪（圆角）
+│   └─ShortcutHelper.cs                                # 快捷键辅助类，提供快捷键字符串生成、友好显示、比对等功能
+├─VersionInfo.json                                    # 版本信息
 ├─LICENSE                                             # 开源协议文件
 ├─Managers/                                           # 管理器文件夹
 │   ├─ActionManager.cs                                 # 动作管理器
