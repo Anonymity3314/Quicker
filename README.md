@@ -309,6 +309,8 @@ Quicker/
 │       ├─ColorPicker.xaml                              # 颜色选择器
 │       │   └─ColorPicker.xaml.cs
 │       └─Tools/                                        # 工具控件文件夹
+|           └─ExtensionManagementGrid.xaml               # 扩展管理界面
+|               └─ExtensionManagementGrid.xaml.cs
 ├─Windows/                                            # 界面文件夹
 │   ├─AddWindows/                                     # 添加相关窗口（如添加场景、添加动作等）
 │   │   ├─AddSceneWindow.xaml                         # 添加场景窗口

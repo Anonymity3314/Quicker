@@ -287,7 +287,6 @@
 
   <ItemGroup>
     <Folder Include="UserControls\SettingWindow\Auxiliary_Functions\" />
-    <Folder Include="UserControls\SettingWindow\Tools\" />
   </ItemGroup>
 
   <ItemGroup>

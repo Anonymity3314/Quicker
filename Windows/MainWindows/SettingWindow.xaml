@@ -13,7 +13,7 @@
     MinWidth="863"
     Width="1211"
     Height="870"
-    
+
     Loaded="SettingWindow_Loaded"
 >
     <Window.Resources>
@@ -31,11 +31,11 @@
             <Button x:Name="BasicSettings" Style="{StaticResource Button1}" ToolTip="基础设置" Background="#FFF4F4F4" Click="BasicSettings_Click" MouseLeave="BasicSettings_MouseLeave">
                 <Image Source="/Resources/Images/BasicSettingsButton.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
             </Button>
-            <Button x:Name="Auxiliary_Functions" Style="{StaticResource Button1}" ToolTip="辅助功能" Background="#FFE0E0E0" Click="Auxiliary_Functions_Click" MouseLeave="Auxiliary_Functions_MouseLeave">
-                <!--<Image Source="/Resources/Images/Quicker_Enabled.png"/>-->
+            <Button Visibility="Collapsed" x:Name="Auxiliary_Functions" Style="{StaticResource Button1}" ToolTip="辅助功能" Background="#FFE0E0E0" Click="Auxiliary_Functions_Click" MouseLeave="Auxiliary_Functions_MouseLeave">
+                <!--<Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>-->
             </Button>
             <Button x:Name="Tools" Style="{StaticResource Button1}" ToolTip="工具" Background="#FFE0E0E0" Click="Tools_Click" MouseLeave="Tools_MouseLeave">
-                <!--<Image Source="/Resources/Images/Quicker_Enabled.png"/>-->
+                <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Center" VerticalAlignment="Center" Width="30" Height="30"/>
             </Button>
         </StackPanel>
         <!-- 侧边栏2 -->
@@ -58,7 +58,7 @@
                         <TextBlock Text="弹出面板" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
-                <Button x:Name="FunctionShortcutKeys" ToolTip="Quicker功能快捷键" Style="{StaticResource Button2}" Click="FunctionShortcutKeys_Click" MouseLeave="FunctionShortcutKeys_MouseLeave">
+                <Button Visibility="Collapsed" x:Name="FunctionShortcutKeys" ToolTip="Quicker功能快捷键" Style="{StaticResource Button2}" Click="FunctionShortcutKeys_Click" MouseLeave="FunctionShortcutKeys_MouseLeave">
                     <Grid Width="195">
                         <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="功能快捷键" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
@@ -84,9 +84,16 @@
                 </Button>
             </StackPanel>
             <!-- 辅助功能 -->
-            <StackPanel x:Name="Auxiliary_FunctionsStackPanel" Width="192" Margin="0,40,0,0" Visibility="Hidden"/>
+            <StackPanel x:Name="Auxiliary_FunctionsStackPanel" Width="192" Margin="0,60,0,0" Visibility="Hidden"/>
             <!-- 工具 -->
-            <StackPanel x:Name="ToolsStackPanel" Width="192" Margin="0,40,0,0" Visibility="Hidden"/>
+            <StackPanel x:Name="ToolsStackPanel" Width="192" Margin="0,60,0,0" Visibility="Hidden">
+                <Button x:Name="ManageExtensions" ToolTip="进行扩展管理" Style="{StaticResource Button2}" Click="ManageExtensions_Click" MouseLeave="ManageExtensions_MouseLeave">
+                    <Grid Width="195">
+                        <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
+                        <TextBlock Text="管理扩展" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
+                    </Grid>
+                </Button>
+            </StackPanel>
         </Grid>
         <!-- 设置菜单 -->
         <Grid x:Name="ResultGrid" Margin="4,0,0,0" Grid.Column="2">

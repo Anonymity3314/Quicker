@@ -1,4 +1,5 @@
 ﻿using Quicker.UserControls.SettingWindow.BasicSettings;
+using Quicker.UserControls.SettingWindow.Tools;
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.ComponentModel;
@@ -241,29 +242,22 @@ namespace Quicker.Windows.MainWindows
         /// <param name="page"> 界面数据 </param>
         private void SetLastPage(int page)
         {
-            LoadPage1(page / 100); // 计算第几组按钮
-            LoadPage2(page % 100 / 10); // 计算第几个按钮
-        }
-
-        /// <summary>
-        /// 加载第一组按钮
-        /// </summary>
-        /// <param name="num1"> 第几组按钮 </param>
-        private void LoadPage1(int num1)
-        {
-            switch (num1)
+            switch (page / 100)
             {
                 case 1:
                     BasicSettings_Click(null, null); // 点击基础设置按钮
+                    LoadBasicSettingPages(page % 100 / 10); // 计算第几个按钮
                     break;
                 case 2:
                     Auxiliary_Functions_Click(null, null); // 点击辅助功能按钮
                     break;
                 case 3:
                     Tools_Click(null, null); // 点击工具按钮
+                    LoadToolPages(page % 100 / 10); // 计算第几个按钮
                     break;
                 default:
                     BasicSettings_Click(null, null); // 点击基础设置按钮
+                    LoadBasicSettingPages(1); // 显示第一个按钮
                     break;
             }
         }
@@ -272,7 +266,7 @@ namespace Quicker.Windows.MainWindows
         /// 加载第二组按钮
         /// </summary>
         /// <param name="num2"> 第几组按钮 </param>
-        private void LoadPage2(int num2)
+        private void LoadBasicSettingPages(int num2)
         {
             switch (num2)
             {
@@ -297,6 +291,23 @@ namespace Quicker.Windows.MainWindows
                 default:
                     Convention_Click(null, null);
                     break; // 点击常规设置按钮
+            }
+        }
+
+        /// <summary>
+        /// 加载第二组按钮
+        /// </summary>
+        /// <param name="num2"> 第几组按钮 </param>
+        private void LoadToolPages(int num2)
+        {
+            switch (num2)
+            {
+                case 1:
+                    ManageExtensions_Click(null, null);
+                    break; // 点击扩展管理按钮
+                default:
+                    ManageExtensions_Click(null, null);
+                    break; // 点击扩展管理按钮
             }
         }
 
@@ -371,6 +382,10 @@ namespace Quicker.Windows.MainWindows
                     return 162; // 隐私声明页面
                 }
                 return 161; // 关于Quicker页面
+            }
+            else if (element is ExtensionManagementGrid)
+            {
+                return 311; // 扩展管理页面
             }
             return 0;
         }
@@ -457,11 +472,11 @@ namespace Quicker.Windows.MainWindows
         /// <param name="stackPanel">StackPanel</param>
         /// <param name="resultGrid">ResultGrid</param>
         /// <param name="settingButtonsGridVisibility">SettingButtonsGrid 的可见性</param>
-        private void OpenCustomGrid(Button button, StackPanel stackPanel, UserControl grid, Grid resultGrid, Visibility settingButtonsGridVisibility)
+        private void OpenCustomGrid(Button button, UserControl grid, Grid resultGrid, Visibility settingButtonsGridVisibility = Visibility.Visible)
         {
             if (grid is FrameworkElement fe) // 如果grid是FrameworkElement类型
                 fe.Name = grid.GetType().Name; // 设置grid的名称
-            _settingManager.ButtonStyle2_Click(button, stackPanel, grid, resultGrid); // 设置Button类型2样式
+            _settingManager.ButtonStyle2_Click(button, grid, resultGrid, MenuGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = settingButtonsGridVisibility; // 设置SettingButtonsGrid的可见性
         }
 
@@ -469,7 +484,7 @@ namespace Quicker.Windows.MainWindows
 
         #endregion
 
-        #region 基础设置按钮事件
+        #region 基础设置
 
         // 基础设置
         private void BasicSettings_Click(object sender, RoutedEventArgs e)
@@ -486,7 +501,7 @@ namespace Quicker.Windows.MainWindows
         // 基础设置-常规
         private void Convention_Click(object sender, RoutedEventArgs e)
         {
-            OpenCustomGrid(Convention, BasicSettingsStackPanel, new ConventionGrid(this), ResultGrid, Visibility.Visible);
+            OpenCustomGrid(Convention, new ConventionGrid(this), ResultGrid);
         }
         // 鼠标移出Button恢复Background
         private void Convention_MouseLeave(object sender, MouseEventArgs e)
@@ -499,7 +514,7 @@ namespace Quicker.Windows.MainWindows
         private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
         {
             var OpenMainWindowGrid = new OpenMainWindowGrid(this) { Name = "OpenMainWindowGrid" }; // 创建弹出面板设置Grid
-            _settingManager.ButtonStyle2_Click(OpenMainWindow, BasicSettingsStackPanel, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
+            OpenCustomGrid(OpenMainWindow, OpenMainWindowGrid, ResultGrid); // 设置Button类型2样式
             SettingButtonsGrid.Visibility = Visibility.Visible; // 设置SettingButtonsGrid可见性
         }
         // 鼠标移出Button恢复Background
@@ -512,7 +527,7 @@ namespace Quicker.Windows.MainWindows
         // 基础设置-功能快捷键
         private void FunctionShortcutKeys_Click(object sender, RoutedEventArgs e)
         {
-            OpenCustomGrid(FunctionShortcutKeys, BasicSettingsStackPanel, new FunctionShortcutKeysGrid(this), ResultGrid, Visibility.Visible);
+            OpenCustomGrid(FunctionShortcutKeys, new FunctionShortcutKeysGrid(this), ResultGrid);
         }
         // 鼠标移出Button恢复Background
         private void FunctionShortcutKeys_MouseLeave(object sender, MouseEventArgs e)
@@ -524,7 +539,7 @@ namespace Quicker.Windows.MainWindows
         // 基础设置-黑名单
         private void Blacklist_Click(object sender, RoutedEventArgs e)
         {
-            OpenCustomGrid(Blacklist, BasicSettingsStackPanel, new BlacklistGrid(this), ResultGrid, Visibility.Visible);
+            OpenCustomGrid(Blacklist, new BlacklistGrid(this), ResultGrid);
         }
         // 鼠标移出Button恢复Background
         private void Blacklist_MouseLeave(object sender, MouseEventArgs e)
@@ -536,7 +551,7 @@ namespace Quicker.Windows.MainWindows
         // 基础设置-外观
         private void Appearance_Click(object sender, RoutedEventArgs e)
         {
-            OpenCustomGrid(Appearance, BasicSettingsStackPanel, new AppearanceGrid(this), ResultGrid, Visibility.Visible);
+            OpenCustomGrid(Appearance,  new AppearanceGrid(this), ResultGrid);
         }
         // 鼠标移出Button恢复Background
         private void Appearance_MouseLeave(object sender, MouseEventArgs e)
@@ -548,7 +563,7 @@ namespace Quicker.Windows.MainWindows
         // 基础设置-关于Quicker
         private void AboutQuicker_Click(object sender, RoutedEventArgs e)
         {
-            OpenCustomGrid(AboutQuicker, BasicSettingsStackPanel, new AboutQuickerGrid(this), ResultGrid, Visibility.Collapsed);
+            OpenCustomGrid(AboutQuicker, new AboutQuickerGrid(this), ResultGrid, Visibility.Collapsed);
             // 下面的特殊逻辑可以保留
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             if (Convention.RememberLastPage && Convention.LastPage % 10 == 2) 
@@ -566,7 +581,7 @@ namespace Quicker.Windows.MainWindows
 
         #endregion
 
-        #region 辅助功能和工具按钮事件
+        #region 辅助功能
 
         // 辅助功能
         private void Auxiliary_Functions_Click(object sender, RoutedEventArgs e)
@@ -579,7 +594,9 @@ namespace Quicker.Windows.MainWindows
             _settingManager.ButtonStyle1_MouseLeave(sender, Auxiliary_FunctionsStackPanel); // 鼠标移出Button恢复Background
         }
 
+        #endregion
 
+        #region 工具
         // 工具
         private void Tools_Click(object sender, RoutedEventArgs e)
         {
@@ -589,6 +606,18 @@ namespace Quicker.Windows.MainWindows
         private void Tools_MouseLeave(object sender, MouseEventArgs e)
         {
             _settingManager.ButtonStyle1_MouseLeave(sender, ToolsStackPanel); // 鼠标移出Button恢复Background
+        }
+
+        // 工具-管理扩展
+        private void ManageExtensions_Click(object sender, RoutedEventArgs e)
+        {
+            OpenCustomGrid(ManageExtensions, new ExtensionManagementGrid(), ResultGrid, Visibility.Visible);
+        }
+        // 鼠标移出Button恢复Background
+        private void ManageExtensions_MouseLeave(object sender, MouseEventArgs e)
+        {
+            var ExtensionManagementGrid = new ExtensionManagementGrid() { Name = "ExtensionManagementGrid" }; // 创建常规设置Grid  
+            _settingManager.ButtonStyle2_MouseLeave(sender, ExtensionManagementGrid, ResultGrid); // 鼠标移出Button恢复Background
         }
 
         #endregion
