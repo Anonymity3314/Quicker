@@ -13,6 +13,7 @@ namespace Quicker.Windows.MainWindows
     {
         public ObservableCollection<ImageItem> ImageItems { get; set; } = new(); // 图片项集合
         public string SelectedImagePath { get; private set; } = string.Empty; // 选中的图片路径
+        private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\"; // 文件夹路径
         public event EventHandler<string> ImageConfirmed; // 图片确认事件
         private ScrollViewer listViewScrollViewer; // 图片列表的 ScrollViewer
         private int loadedImageCount = 0; // 已加载的图片数量
@@ -100,16 +101,15 @@ namespace Quicker.Windows.MainWindows
         // 从文件夹加载图片
         private void LoadImagesFromFolder()
         {
-            string targetFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
-            if (!Directory.Exists(targetFolderPath))
+            if (!Directory.Exists(folderPath))
             {
-                Directory.CreateDirectory(targetFolderPath); // 创建文件夹
-                DirectoryInfo dirInfo = new DirectoryInfo(Path.GetDirectoryName(targetFolderPath)); // 获取文件夹信息
+                Directory.CreateDirectory(folderPath); // 创建文件夹
+                DirectoryInfo dirInfo = new DirectoryInfo(Path.GetDirectoryName(folderPath)); // 获取文件夹信息
                 return; // 返回
             }
 
             string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif", ".svg" }; // 支持的图片格式
-            allImageFiles = Directory.GetFiles(targetFolderPath)
+            allImageFiles = Directory.GetFiles(folderPath)
                 .Where(file => supportedExtensions.Contains(Path.GetExtension(file).ToLower()))
                 .ToArray();
 
@@ -256,7 +256,6 @@ namespace Quicker.Windows.MainWindows
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
-            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 文件夹路径
             if (!Directory.Exists(folderPath))  Directory.CreateDirectory(folderPath); // 创建文件夹
             Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true }); // 打开文件夹
         }

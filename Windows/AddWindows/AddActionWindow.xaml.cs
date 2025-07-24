@@ -166,7 +166,7 @@ namespace Quicker.Windows.AddWindows
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
-            string localIconsPath = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\LocalIcons"; // 动态生成路径
+            string localIconsPath = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Images\\LocalIcons"; // 动态生成路径
             if (!Directory.Exists(localIconsPath)) Directory.CreateDirectory(localIconsPath); // 如果文件夹不存在，创建它
             Process.Start(new ProcessStartInfo
             {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using System.Threading.Tasks;
 using Quicker.Database.Core;
@@ -9,14 +10,17 @@ using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
 using System.IO;
+using System;
 
 namespace Quicker.Windows.AddWindows
 {
     public partial class AddSceneWindow : Window
     {
         public event Action<bool, string?>? SceneAddCompleted; // 参数1: 是否保存, 参数2: 新场景名
+        private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
         private IconManager iconManager = new(); // 图标管理器
         private SceneData currentSceneData; // 当前场景数据
+        public AppInfo SelectedApp { get; set; } // 选中的应用
 
         public AddSceneWindow()
         {
@@ -203,6 +207,107 @@ namespace Quicker.Windows.AddWindows
                 CancelButton_Click(sender, e); // 取消按钮
             }
         }
+
+        // 选择窗口
+        private void SelectWindow_Click(object sender, RoutedEventArgs e)
+        {
+            selectWindowWindow = new(); // 创建 SelectWindowWindow 实例
+            selectWindowWindow.WindowSelected += OnWindowSelected; // 订阅 WindowSelected 事件
+            selectWindowWindow.StartSelecting(this); // 开始选择窗口
+        }
+
+        /// <summary>
+        /// 处理窗口选择事件，分发到各个子方法
+        /// </summary>
+        private void OnWindowSelected(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.ProcessPath))
+            {
+                try
+                {
+                    var processItem = CreateProcessItem(e);
+                    var existItem = AddOrGetProcessItem(processItem);
+                    SelectProcessItem(existItem);
+                    UpdateCurrentSceneData(e);
+                    UpdateUI(); // 更新UI
+                }
+                catch { }
+                finally
+                {
+                    selectWindowWindow?.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 根据窗口选择事件参数创建一个新的 ProcessItem。
+        /// </summary>
+        /// <param name="e">窗口选择事件参数，包含进程路径和图标等信息</param>
+        /// <returns>新建的 ProcessItem 对象</returns>
+        private ProcessItem CreateProcessItem(SelectWindowWindow.WindowSelectedEventArgs e)
+        {
+            return new ProcessItem
+            {
+                FileName = e.ProcessPath,
+                ProcessName = Path.GetFileName(e.ProcessPath),
+                Icon = e.ProcessIcon
+            };
+        }
+
+        /// <summary>
+        /// 将 ProcessItem 添加到 ComboBox 的 ItemsSource（如果不存在），并返回集合中的引用。
+        /// </summary>
+        /// <param name="processItem">要添加的 ProcessItem</param>
+        /// <returns>ItemsSource 集合中对应的 ProcessItem 引用</returns>
+        private ProcessItem AddOrGetProcessItem(ProcessItem processItem)
+        {
+            var items = AppComboBox.ItemsSource as List<ProcessItem> ?? new List<ProcessItem>();
+            var existItem = items.FirstOrDefault(x => x.FileName == processItem.FileName);
+            if (existItem == null)
+            {
+                items.Add(processItem);
+                AppComboBox.ItemsSource = null; // 触发刷新
+                AppComboBox.ItemsSource = items;
+                existItem = processItem;
+            }
+            return existItem;
+        }
+
+        /// <summary>
+        /// 选中 ComboBox 中指定的 ProcessItem。
+        /// </summary>
+        /// <param name="item">要选中的 ProcessItem</param>
+        private void SelectProcessItem(ProcessItem item)
+        {
+            AppComboBox.SelectedItem = item;
+        }
+
+        /// <summary>
+        /// 根据窗口选择事件参数，更新当前场景数据 currentSceneData。
+        /// </summary>
+        /// <param name="e">窗口选择事件参数</param>
+        private void UpdateCurrentSceneData(SelectWindowWindow.WindowSelectedEventArgs e)
+        {
+            currentSceneData = new SceneData
+            {
+                SceneName = Path.GetFileNameWithoutExtension(e.ProcessPath),
+                SceneIconPath = e.ProcessPath, // 后续保存时再处理
+                SceneCount = 0,
+                SceneTag = Path.GetFileNameWithoutExtension(e.ProcessPath).ToLower(),
+                AutoReturnToFirstPage = false,
+                SceneProcess = e.ProcessPath
+            };
+        }
+
+        /// <summary>
+        /// 同步界面控件内容，将 currentSceneData 的信息显示到界面上。
+        /// </summary>
+        private void UpdateUI()
+        {
+            SceneNameTextBox.Text = currentSceneData.SceneName;
+            SceneTagTextBlock.Text = currentSceneData.SceneTag + ".exe";
+        }
+
     }
 
     /// <summary>

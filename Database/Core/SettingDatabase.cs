@@ -61,9 +61,6 @@ namespace Quicker.Database.Core
          * BlankButtonColor: 空白按钮颜色，默认为#FFF3F3F3。
          * BlankButtonMouseOverColor: 空白按钮鼠标悬停颜色，默认为#FFEAEAEA。
          * ButtonTextColor: 按钮文字颜色，默认为#FF000000。
-         * ActionIconColor: 动作图标颜色，默认为#FF696969。
-         * TriggerKeyTextColor: 触发键文字颜色，默认为#D0FF8C00。
-         * OtherIconColor: 其他位置图标颜色，默认为#FF666666。
          *
          * Font1: 字体1，默认为-1。
          * Font2: 字体2，默认为-1。
@@ -545,22 +542,19 @@ namespace Quicker.Database.Core
                     BlankButtonColor = reader.GetString(11), // 空白按钮颜色
                     BlankButtonMouseOverColor = reader.GetString(12), // 空白按钮悬浮颜色
                     ButtonTextColor = reader.GetString(13), // 按钮文字颜色
-                    ActionIconColor = reader.GetString(14), // 动作图标颜色
-                    TriggerKeyTextColor = reader.GetString(15), // 触发键文字颜色
-                    OtherIconColor = reader.GetString(16), // 其他图标颜色
-                    Font1 = reader.GetInt32(17), // 字体1
-                    Font2 = reader.GetInt32(18), // 字体2
-                    FontSize = reader.GetDouble(19), // 字体大小
-                    FontWeight = reader.GetInt32(20), // 字体粗细
-                    BackgroundImagePath = reader.GetString(21), // 背景图片路径
-                    BackgroundImageOpacity = reader.GetDouble(22), // 背景图片不透明度
-                    Blur = reader.GetInt32(23), // 模糊模式
-                    Win11CornerRadius = reader.GetInt32(24), // Win11圆角模式
-                    AutoHideTitleBar = reader.GetBoolean(25), // 自动隐藏标题栏
-                    ShowActionButtonMouseOver = reader.GetBoolean(26), // 动作按钮悬浮放大
-                    HideActionNameAfterIcon = reader.GetBoolean(27), // 设置动作图标后隐藏名称
-                    ShowActionIconShadow = reader.GetBoolean(28), // 动作图标显示阴影
-                    EnablePreview = reader.GetBoolean(29) // 启用预览
+                    Font1 = reader.GetInt32(14), // 字体1
+                    Font2 = reader.GetInt32(15), // 字体2
+                    FontSize = reader.GetDouble(16), // 字体大小
+                    FontWeight = reader.GetInt32(17), // 字体粗细
+                    BackgroundImagePath = reader.GetString(18), // 背景图片路径
+                    BackgroundImageOpacity = reader.GetDouble(19), // 背景图片不透明度
+                    Blur = reader.GetInt32(20), // 模糊模式
+                    Win11CornerRadius = reader.GetInt32(21), // Win11圆角模式
+                    AutoHideTitleBar = reader.GetBoolean(22), // 自动隐藏标题栏
+                    ShowActionButtonMouseOver = reader.GetBoolean(23), // 动作按钮悬浮放大
+                    HideActionNameAfterIcon = reader.GetBoolean(24), // 设置动作图标后隐藏名称
+                    ShowActionIconShadow = reader.GetBoolean(25), // 动作图标显示阴影
+                    EnablePreview = reader.GetBoolean(26) // 启用预览
                 });
             }
             transaction.Commit(); // 提交事务
@@ -589,9 +583,6 @@ namespace Quicker.Database.Core
             command.Parameters.AddWithValue("@BlankButtonColor", appearance.BlankButtonColor); // 空白按钮颜色
             command.Parameters.AddWithValue("@BlankButtonMouseOverColor", appearance.BlankButtonMouseOverColor); // 空白按钮悬浮颜色
             command.Parameters.AddWithValue("@ButtonTextColor", appearance.ButtonTextColor); // 按钮文字颜色
-            command.Parameters.AddWithValue("@ActionIconColor", appearance.ActionIconColor); // 动作图标颜色
-            command.Parameters.AddWithValue("@TriggerKeyTextColor", appearance.TriggerKeyTextColor); // 触发键文字颜色
-            command.Parameters.AddWithValue("@OtherIconColor", appearance.OtherIconColor); // 其他图标颜色
             command.Parameters.AddWithValue("@Font1", appearance.Font1); // 字体1
             command.Parameters.AddWithValue("@Font2", appearance.Font2); // 字体2
             command.Parameters.AddWithValue("@FontSize", appearance.FontSize); // 字体大小
@@ -817,9 +808,6 @@ namespace Quicker.Database.Core
                 BlankButtonColor TEXT,
                 BlankButtonMouseOverColor TEXT,
                 ButtonTextColor TEXT,
-                ActionIconColor TEXT,
-                TriggerKeyTextColor TEXT,
-                OtherIconColor TEXT,
                 Font1 INTEGER,
                 Font2 INTEGER,
                 FontSize REAL,
@@ -850,9 +838,6 @@ namespace Quicker.Database.Core
                 BlankButtonColor,
                 BlankButtonMouseOverColor,
                 ButtonTextColor,
-                ActionIconColor,
-                TriggerKeyTextColor,
-                OtherIconColor,
                 Font1,
                 Font2,
                 FontSize,
@@ -882,9 +867,6 @@ namespace Quicker.Database.Core
                 @BlankButtonColor,
                 @BlankButtonMouseOverColor,
                 @ButtonTextColor,
-                @ActionIconColor,
-                @TriggerKeyTextColor,
-                @OtherIconColor,
                 @Font1,
                 @Font2,
                 @FontSize,
@@ -915,9 +897,6 @@ namespace Quicker.Database.Core
                 BlankButtonColor = @BlankButtonColor,
                 BlankButtonMouseOverColor = @BlankButtonMouseOverColor,
                 ButtonTextColor = @ButtonTextColor,
-                ActionIconColor = @ActionIconColor,
-                TriggerKeyTextColor = @TriggerKeyTextColor,
-                OtherIconColor = @OtherIconColor,
                 Font1 = @Font1,
                 Font2 = @Font2,
                 FontSize = @FontSize,

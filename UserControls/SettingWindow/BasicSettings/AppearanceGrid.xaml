@@ -13,7 +13,7 @@
     xmlns:helpers="clr-namespace:Quicker.Helpers"
     mc:Ignorable="d"
 
-    d:DesignHeight="1300"
+    d:DesignHeight="1200"
     d:DesignWidth="982"
 
     Unloaded="AppearanceGrid_Unloaded"
@@ -227,10 +227,10 @@
                         </Button>
 
                         <!-- 字体 -->
-                        <Label Content="字体" Margin="15,598,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Label Content="字体" Margin="15,549,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 字体-字体1 -->
-                        <Label Content="字体1：" Margin="10,629,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="107,633,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
+                        <Label Content="字体1：" Margin="15,580,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="107,584,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
@@ -238,8 +238,8 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <!-- 字体-字体2 -->
-                        <Label Content="字体2：" Margin="10,664,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,668,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
+                        <Label Content="字体2：" Margin="15,615,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,619,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
@@ -247,12 +247,12 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <!-- 字体-字体大小 -->
-                        <Label Content="字体大小：" Margin="10,697,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,702,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,698,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F0}'}"/>
+                        <Label Content="字体大小：" Margin="15,648,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,653,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,649,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F0}'}"/>
                         <!-- 字体-字体粗细 -->
-                        <Label Content="字体粗细：" Margin="10,737,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontWeightComboBox" HorizontalAlignment="Left" Margin="107,738,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
+                        <Label Content="字体粗细：" Margin="15,688,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <ComboBox x:Name="FontWeightComboBox" HorizontalAlignment="Left" Margin="107,689,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBoxItem Content="Thin" FontWeight="Thin"/>
                             <ComboBoxItem Content="ExtraLight" FontWeight="ExtraLight"/>
                             <ComboBoxItem Content="UltraLight" FontWeight="UltraLight"/>
@@ -272,11 +272,11 @@
                         </ComboBox>
 
                         <!-- 背景图片 -->
-                        <Label Content="背景图片" Margin="15,783,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Label Content="背景图片" Margin="15,734,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 背景图片-路径 -->
-                        <Label Content="路径：" Margin="10,818,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="107,819,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="176" Text="{Binding BackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="BackgroundImagePathTextBox_TextChanged"/>
-                        <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="288,820,0,0" VerticalAlignment="Top" Width="53" Click="BackgroundImagePathButton_Click"/>
+                        <Label Content="路径：" Margin="15,769,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="107,770,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="176" Text="{Binding BackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="BackgroundImagePathTextBox_TextChanged"/>
+                        <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="288,771,0,0" VerticalAlignment="Top" Width="53" Click="BackgroundImagePathButton_Click"/>
                         <Popup x:Name="BackgroundImagePathPopup" PopupAnimation="Fade" Width="150" Height="62" PlacementTarget="{Binding ElementName=BackgroundImagePathButton}" AllowsTransparency="True" StaysOpen="False">
                             <Grid>
                                 <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
@@ -293,35 +293,35 @@
                             </Grid>
                         </Popup>
                         <!-- 背景图片-不透明度 -->
-                        <Label Content="不透明度：" Margin="10,854,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,859,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,855,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                        <Label Content="不透明度：" Margin="15,805,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,810,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
+                        <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,806,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
 
                         <!-- 模糊与圆角 -->
-                        <Label Content="模糊与圆角" Margin="15,895,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Label Content="模糊与圆角" Margin="15,846,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 模糊与圆角-模糊模式 -->
-                        <Label Content="模糊模式：" Margin="10,930,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Label Content="模糊模式：" Margin="15,881,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 选项说明：
                              0: 无 —— 不显示毛玻璃和阴影，界面为普通不透明背景。
                              1: 毛玻璃 —— 显示毛玻璃（BlurEffect），并带有阴影，类似Win11毛玻璃效果。
                              2: 无（去除窗口阴影）—— 不显示毛玻璃，且去除窗口阴影，界面为纯色无阴影。
                              3: 毛玻璃（去除窗口阴影）—— 显示毛玻璃，但不显示阴影，界面为半透明毛玻璃无阴影。
                         -->
-                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="138,932,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
+                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="144,883,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBoxItem Content="无"/>
                             <ComboBoxItem Content="毛玻璃"/>
                             <ComboBoxItem Content="无（去除窗口阴影）"/>
                             <ComboBoxItem Content="毛玻璃（去除窗口阴影）"/>
                         </ComboBox>
                         <!-- 模糊与圆角-Win11圆角模式 -->
-                        <Label Content="Win11圆角模式：" Margin="10,963,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Label Content="Win11圆角模式：" Margin="15,914,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <!-- 选项说明：
                              0: 默认 —— 使用默认圆角（5px），界面有适度圆角。
                              1: 无 —— 无圆角，所有边为直角。
                              2: 圆角 —— 明显的圆角（5px），与默认相同。
                              3: 小圆角 —— 圆角半径较小（3px），界面略带圆角。
                         -->
-                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="138,965,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
+                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="144,916,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBoxItem Content="默认"/>
                             <ComboBoxItem Content="无"/>
                             <ComboBoxItem Content="圆角"/>
@@ -329,14 +329,14 @@
                         </ComboBox>
 
                         <!-- 选项 -->
-                        <Label Content="选项" Margin="15,1002,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" ToolTip="按钮文字过长时自动缩小以显示全部" HorizontalAlignment="Left" Margin="31,1038,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" ToolTip="鼠标移动到动作上时自动放大按钮" HorizontalAlignment="Left" Margin="31,1058,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" ToolTip="如果动作设置了图标，则只显示图标不显示名称" HorizontalAlignment="Left" Margin="31,1078,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" ToolTip="动作图标显示阴影效果" HorizontalAlignment="Left" Margin="31,1098,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <Label Content="选项" Margin="15,953,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" ToolTip="按钮文字过长时自动缩小以显示全部" HorizontalAlignment="Left" Margin="21,989,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" ToolTip="鼠标移动到动作上时自动放大按钮" HorizontalAlignment="Left" Margin="21,1009,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" ToolTip="如果动作设置了图标，则只显示图标不显示名称" HorizontalAlignment="Left" Margin="21,1029,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" ToolTip="动作图标显示阴影效果" HorizontalAlignment="Left" Margin="21,1049,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
 
                         <!-- 用于扩展可见范围，无功能 -->
-                        <Label Margin="10,1227,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                        <Label Margin="10,1134,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                     </Grid>
                 </ScrollViewer>
                 <ScrollBar x:Name="AppearanceScrollBar" HorizontalAlignment="Right" Width="18" ValueChanged="AppearanceScrollBar_ValueChanged" Margin="0,20,0,0">

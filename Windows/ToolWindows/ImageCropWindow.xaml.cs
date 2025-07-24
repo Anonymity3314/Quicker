@@ -497,7 +497,7 @@ namespace Quicker.Windows.ToolWindows
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             BitmapSource bitmapSource = CropImage.Source as BitmapSource; // 图片源
-            string dir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages"; // 保存目录
+            string dir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\BackgroundImages"; // 保存目录
             string originalFilePath = _originalBitmapSource is BitmapImage bmpImg && bmpImg.UriSource != null ? bmpImg.UriSource.LocalPath : null;
             string fileName = $"{DateTimeOffset.Now.ToUnixTimeMilliseconds():x}.png"; // 默认保存文件名
             string filePath = System.IO.Path.Combine(dir, fileName); // 默认保存路径

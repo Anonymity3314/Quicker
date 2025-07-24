@@ -25,6 +25,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class AppearanceGrid : UserControl, INotifyPropertyChanged // 实现INotifyPropertyChanged接口，支持属性变更通知
     {
+        private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\SharedAppearance"; // 外观分享文件夹路径
+
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
         private readonly List<string> _tempFiles = new(); // 临时文件列表，用于清理
@@ -177,9 +179,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlankButtonMouseOverColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.BlankButtonMouseOverColor));
             TextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ButtonTextColor));
             ButtonTextColorBrush = TextColorButton.Background as SolidColorBrush;
-            ActionIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.ActionIconColor));
-            TriggerKeyTextColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.TriggerKeyTextColor));
-            OtherIconColorButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(settingManager.appearanceConditions.OtherIconColor));
         }
 
         // 字体相关设置
@@ -865,13 +864,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <returns>输出路径</returns>
         private string GetShareAppearanceOutputPath()
         {
-            string baseDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\SharedAppearance"; // 目标文件夹
-            if (!Directory.Exists(baseDir)) // 如果文件夹不存在则自动创建
+            if (!Directory.Exists(folderPath)) // 如果文件夹不存在则自动创建
             {
-                Directory.CreateDirectory(baseDir);
+                Directory.CreateDirectory(folderPath);
             }
             string fileName = $"Quicker外观_{DateTime.Now:yyyyMMdd_HHmmss}.png"; // 文件名格式：Quicker外观_年月日_时分秒.png
-            return Path.Combine(baseDir, fileName);
+            return Path.Combine(folderPath, fileName);
         }
 
         /// <summary>
@@ -1021,7 +1019,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             if (!string.IsNullOrEmpty(appearance.BackgroundImagePath))
             {
-                string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\BackgroundImages"; // 背景图片文件夹路径
+                string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\BackgroundImages"; // 背景图片文件夹路径
                 if (!Directory.Exists(bgDir)) // 如果文件夹不存在则自动创建
                     Directory.CreateDirectory(bgDir);
                 string hash = DateTime.Now.Ticks.ToString("x"); // 随机哈希值作为文件名
@@ -1064,7 +1062,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击"已分享或保存的外观"按钮打开外观分享文件夹
         private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
-            string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\SharedAppearance"; // 外观分享文件夹路径
             if (!Directory.Exists(folderPath)) // 如果文件夹不存在，则自动创建
             {
                 Directory.CreateDirectory(folderPath);
@@ -1213,9 +1210,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlankButtonColor = "#32C8C8C8",
             BlankButtonMouseOverColor = "#05000000",
             ButtonTextColor = "#FF000000",
-            ActionIconColor = "#FF696969",
-            TriggerKeyTextColor = "#D0FF8C00",
-            OtherIconColor = "#FF666666",
 
             // 字体
             Font1 = -1,
@@ -1258,9 +1252,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlankButtonColor = "#32C8C8C8",
             BlankButtonMouseOverColor = "#05000000",
             ButtonTextColor = "#FF000000",
-            ActionIconColor = "#FF696969",
-            TriggerKeyTextColor = "#D0FF8C00",
-            OtherIconColor = "#FF666666",
 
             // 字体
             Font1 = -1,
@@ -1296,9 +1287,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlankButtonColor = "#32C8C8C8",
             BlankButtonMouseOverColor = "#05000000",
             ButtonTextColor = "#FF000000",
-            ActionIconColor = "#FF696969",
-            TriggerKeyTextColor = "#D0FF8C00",
-            OtherIconColor = "#FF666666",
 
             // 字体
             Font1 = -1,
@@ -1334,9 +1322,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlankButtonColor = "#38000000",
             BlankButtonMouseOverColor = "#05000000",
             ButtonTextColor = "#FFFFFFFF",
-            ActionIconColor = "#FFF0F0F0",
-            TriggerKeyTextColor = "#D0FF8C00",
-            OtherIconColor = "#FF666666",
 
             // 字体
             Font1 = -1,
@@ -1372,9 +1357,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlankButtonColor = "#38000000",
             BlankButtonMouseOverColor = "#05000000",
             ButtonTextColor = "#FFFFFFFF",
-            ActionIconColor = "#FFF0F0F0",
-            TriggerKeyTextColor = "#D0FF8C00",
-            OtherIconColor = "#FF666666",
 
             // 字体
             Font1 = -1,

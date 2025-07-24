@@ -27,7 +27,9 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <Button Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="318,11,0,0" VerticalAlignment="Top" Width="27" Height="27"/>
+        <Button x:Name="SelectWindow" Style="{StaticResource WhiteButton}" ToolTip="按下并点击到软件窗口上来快速选择软件" HorizontalAlignment="Left" Margin="318,11,0,0" VerticalAlignment="Top" Width="27" Height="27" Click="SelectWindow_Click">
+            <Image Source="/Resources/Images/Target.png" Height="16" Width="16"/>
+        </Button>
 
         <Label Content="场景标识" HorizontalAlignment="Left" Margin="50,46,0,0" VerticalAlignment="Top"/>
         <TextBlock x:Name="SceneTagTextBlock" HorizontalAlignment="Left" Margin="113,51,0,0" Foreground="#FF326CF3" TextWrapping="Wrap" VerticalAlignment="Top"/>

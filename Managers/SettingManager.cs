@@ -169,9 +169,6 @@ namespace Quicker.Managers
                 BlankButtonColor = Appearance.BlankButtonColor, // 空白按钮颜色
                 BlankButtonMouseOverColor = Appearance.BlankButtonMouseOverColor, // 空白按钮鼠标悬停颜色
                 ButtonTextColor = Appearance.ButtonTextColor, // 按钮文字颜色
-                ActionIconColor = Appearance.ActionIconColor, // 动作图标颜色
-                TriggerKeyTextColor = Appearance.TriggerKeyTextColor, // 触发键文字颜色
-                OtherIconColor = Appearance.OtherIconColor, // 其他位置图标颜色
 
                 // 字体
                 Font1 = Appearance.Font1, // 字体1

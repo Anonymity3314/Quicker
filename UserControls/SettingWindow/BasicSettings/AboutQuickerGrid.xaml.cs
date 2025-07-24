@@ -106,6 +106,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             OpenUrlInDefaultBrowser("https://github.com/LJZ-Anonymity/Quicker/issues"); // 在默认浏览器中打开URL
         }
 
+        // 入正
+        private void getquicker_net_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            OpenUrlInDefaultBrowser("https://getquicker.net/"); // 在默认浏览器中打开URL
+        }
+
         // 基础设置-关于Quicker-隐私声明
         public void Privacy_StatementButton_Click(object sender, RoutedEventArgs e)
         {
@@ -141,7 +147,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 前往程序图标目录
         private void LocalIconsFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\");
+            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\");
         }
 
         // 备份数据

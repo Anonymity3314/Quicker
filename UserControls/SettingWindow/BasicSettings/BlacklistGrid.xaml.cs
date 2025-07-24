@@ -17,6 +17,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
+        private SelectWindowWindow selectWindowWindow; // 类成员变量
         private IconManager iconManager = new(); // 图标管理器
         SettingManager settingManager; // 设置管理器
         private bool isLoading = true; // 是否全屏禁用
@@ -115,7 +116,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 拖动按钮选择屏幕上要禁用的应用
         private void BlacklistDragButton_Click(object sender, RoutedEventArgs e)
         {
-
+            selectWindowWindow = new SelectWindowWindow();
+            selectWindowWindow.WindowSelected += OnWindowSelectedForBlacklist;
+            // 最小化设置窗口
+            if (weakSettingWindow != null && weakSettingWindow.TryGetTarget(out var settingWindow))
+            {
+                settingWindow.WindowState = WindowState.Minimized;
+            }
+            selectWindowWindow.StartSelecting(null); // 进入选择模式
         }
 
         /// <summary>
@@ -577,6 +585,32 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 BlacklistProcessTextBox.Text = string.Join(";", currentWhitelistApps); // 更新文本框内容，避免无限递归
             else
                 BlacklistProcessTextBox.Text = string.Empty; // 清空文本框内容
+        }
+
+        // 处理窗口选择事件
+        private void OnWindowSelectedForBlacklist(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.ProcessPath))
+            {
+                try
+                {
+                    string processName = System.IO.Path.GetFileNameWithoutExtension(e.ProcessPath).ToLower(); // 添加到黑名单
+                    SettingDatabase.ApplyBlacklistApplication(processName, processName, true, false);
+                    AppStateManager.LoadSettings();
+                    AddBlacklistItem(processName, false); // 刷新UI
+                    // 恢复设置窗口
+                    if (weakSettingWindow != null && weakSettingWindow.TryGetTarget(out var settingWindow))
+                    {
+                        settingWindow.WindowState = WindowState.Normal;
+                        settingWindow.Activate();
+                    }
+                }
+                catch { }
+                finally
+                {
+                    selectWindowWindow?.Close();
+                }
+            }
         }
 
         // 控件关闭释放资源

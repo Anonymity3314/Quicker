@@ -11,7 +11,7 @@ namespace Quicker.Database.Upgrade
 {
     public class DatabaseUpdateManager :IDisposable
     {
-        public string NewBasePath => @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\"; // 新图片文件夹路径
+        public string NewBasePath => @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\"; // 新图片文件夹路径
         public const string DatabaseFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 数据库文件夹路径
         private List<IDatabaseUpgradeStep> _upgradeSteps; // 升级步骤列表
         public readonly ButtonDatabase _db2 = new(); // 按钮数据库对象

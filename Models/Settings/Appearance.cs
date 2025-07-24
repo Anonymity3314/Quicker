@@ -22,9 +22,6 @@
         public string BlankButtonColor { get; set; } // 空白按钮颜色
         public string BlankButtonMouseOverColor { get; set; } // 空白按钮鼠标悬停颜色
         public string ButtonTextColor { get; set; } // 按钮文字颜色
-        public string ActionIconColor { get; set; } // 动作矢量图标颜色
-        public string TriggerKeyTextColor { get; set; } // 触发键文字颜色
-        public string OtherIconColor { get; set; } // 其他位置矢量图标颜色
 
         // 字体
         public int Font1 { get; set; } // 字体1

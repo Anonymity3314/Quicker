@@ -190,7 +190,7 @@ namespace Quicker.Windows.MainWindows
             selectWindowWindow.WindowSelected += OnWindowSelected; // 订阅 WindowSelected 事件
             selectWindowWindow.StartSelecting(this); // 开始选择窗口
         }
-        
+
         // 处理选中的窗口
         private void OnWindowSelected(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
         {
@@ -205,29 +205,21 @@ namespace Quicker.Windows.MainWindows
                         Location = e.ProcessPath,
                         Tag = e.ProcessPath
                     };
-                    
-                    // 设置图标 - 直接使用传递过来的图标
-                    if (e.ProcessIcon != null)
+
+                    if (e.ProcessIcon != null) // 设置图标 - 直接使用传递过来的图标
                     {
                         selectedApp.Icon = e.ProcessIcon;
                     }
-                    
-                    // 设置为选中的应用
-                    SelectedApp = selectedApp;
+
+                    SelectedApp = selectedApp; // 设置为选中的应用
                     // 触发应用选中事件
                     ApplicationSelected?.Invoke(this, new ApplicationSelectedEventArgs { SelectedApp = selectedApp });
-                    
-                    // 关闭窗口
-                    this.Close();
+                    this.Close(); // 关闭窗口
                 }
-                catch
-                {
-
-                }
+                catch { }
                 finally
                 {
-                    // 关闭选择窗口
-                    if (selectWindowWindow != null)
+                    if (selectWindowWindow != null) // 关闭选择窗口
                     {
                         selectWindowWindow.Close();
                     }

@@ -53,7 +53,7 @@
                     <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Hidden"/>
                 </Grid>
             </Border>
-            <Button x:Name="BlacklistDragButton" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click" IsEnabled="False">
+            <Button x:Name="BlacklistDragButton" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click">
                 <Grid Width="204">
                     <TextBlock Text="拖动到要禁用Quicker的窗口上" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="12" Margin="30,0,0,0"/>
                     <Image Source="/Resources/Images/Target.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0" Height="18" Width="18"/>
@@ -98,8 +98,6 @@
                 <TextBox x:Name="BlacklistProcessTextBox" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" HorizontalContentAlignment="Stretch" Margin="10,0,1,0" TextChanged="BlacklistProcessTextBox_TextChanged"/>
             </Grid>
             <Label Content="全屏时仍然启用Quicker的进程(分号分隔多个)。进程名等于exe文件名除去扩展名的部分。" Margin="4,407,0,334" Foreground="#FFB4B4B4" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="11" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <!--<Label Content="选项" HorizontalAlignment="Left" Margin="0,458,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Height="30" Width="42"/>
-            <CheckBox x:Name="ApplyBlacklistToExpandHotkeysCheckBox" Content="将黑名单与全屏禁用设置应用于'扩展热键'功能" HorizontalAlignment="Left" Margin="10,493,0,0" VerticalAlignment="Top" Height="15" Width="266" Click="CheckBox_Click"/>-->
         </Grid>
     </Grid>
 </UserControl>

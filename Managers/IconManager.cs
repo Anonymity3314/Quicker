@@ -45,6 +45,8 @@ namespace Quicker.Managers
         private const uint SHGFI_SMALLICON = 0x000000001; // 小图标
         private const uint SHGFI_ICON = 0x000000100; // 获取图标
 
+        private const string saveDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons"; // 保存路径
+
         /// <summary>
         /// 获取应用程序图标
         /// </summary>
@@ -83,7 +85,7 @@ namespace Quicker.Managers
             {
                 string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
                 string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
-                string iconPath = Path.Combine(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons", $"{hash}{ext}"); // 拼接图标文件路径
+                string iconPath = Path.Combine(saveDir, $"{hash}{ext}"); // 拼接图标文件路径
                 return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
             }
             catch
@@ -112,7 +114,6 @@ namespace Quicker.Managers
                     byte[] pngBytes = stream.ToArray(); // 将内存流转换为字节数组
                     // 用内容哈希命名
                     string hash = BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(pngBytes)).Replace("-", "").ToLower();
-                    string saveDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons"; // 保存路径
                     string targetPath = Path.Combine(saveDir, $"{hash}.png"); // 生成目标路径
                     if (!File.Exists(targetPath)) // 如果目标路径不存在
                     {
@@ -467,7 +468,6 @@ namespace Quicker.Managers
         /// <returns>保存路径</returns>
         public string SaveImageToLocalIcons(string filePath)
         {
-            string saveDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons"; // 保存路径
             string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
             string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
             string targetPath = Path.Combine(saveDir, $"{hash}{ext}"); // 生成目标路径

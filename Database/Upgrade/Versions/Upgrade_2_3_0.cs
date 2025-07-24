@@ -18,6 +18,44 @@ namespace Quicker.Database.Upgrade.Versions
             SettingDatabase.InitializeAppearance(); // 新增数据库表
             AddTrayIconColumnsIfNotExist(connection); // 新增托盘图标字段
             RenameDefaultTables(connection, manager); // 重命名默认表
+            UpdateButtonDataImagePath(connection); // 更新ButtonData表ImagePath字段
+        }
+
+        /// <summary>
+        /// 更新 ButtonData 表中 ImagePath 字段的路径
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        private void UpdateButtonDataImagePath(SQLiteConnection connection)
+        {
+            // 获取所有按钮数据表名
+            var tableNames = new List<string>();
+            using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table';", connection))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    string tableName = reader.GetString(0);
+                    // 只处理按钮数据表（可根据实际表名规则过滤）
+                    if (!string.IsNullOrEmpty(tableName) && !tableName.StartsWith("sqlite_"))
+                    {
+                        tableNames.Add(tableName);
+                    }
+                }
+            }
+
+            string oldPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\";
+            string newPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\";
+            foreach (var table in tableNames)
+            {
+                string sql = $"UPDATE [{table}] SET ImagePath = REPLACE(ImagePath, @oldPath, @newPath) WHERE ImagePath LIKE @likePath";
+                using (var cmd = new SQLiteCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@oldPath", oldPath);
+                    cmd.Parameters.AddWithValue("@newPath", newPath);
+                    cmd.Parameters.AddWithValue("@likePath", oldPath + "%");
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         /// <summary>

@@ -171,33 +171,13 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ShortcutKeys.Clear();
         }
 
-        // 基础设置-弹出面板-动作触发按键
-        private void DoActionKeyboard_Click(object sender, RoutedEventArgs e)
-        {
-            settingManager.SetGridVisible(DoActionKeyboardButtonGrid, MainGrid); // 设置Grid可见性
-            settingManager.ButtonStyle3_Click(DoActionKeyboardButton, MainGrid); // 设置Button样式
-        }
-
         // 清理资源
         private void OpenMainWindowGrid_Unloaded(object sender, RoutedEventArgs e)
         {
-            OpenMainWindowByMiddleMouseClickCheckBox = null;
-            OpenMainWindowByX1MouseClickCheckBox = null;
-            OpenMainWindowByX2MouseClickCheckBox = null;
-            OpenMainWindowByCtrl_MiddleMouseClickCheckBox = null;
-            OpenMainWindowByCtrl_RightMouseClickCheckBox = null;
-            OpenMainWindowByMiddleMouseClickLongerCheckBox = null;
-            OpenMainWindowByRightMouseClickLongerCheckBox = null;
-            OpenMainWindowByRightMouseClick_MoveCheckBox = null;
-            OpenMainWindowByCtrlCheckBox = null;
-            WindowStartupLocationComboBox = null;
-            OpenMainWindowButton = null;
-            OpenMainWindowButtonGrid = null;
-            DoActionKeyboardButton = null;
-            DoActionKeyboardButtonGrid = null;
-            TestButton = null; // 清理测试按钮
-
             settingManager = null; // 释放设置管理器资源
+            weakSettingWindow = null; // 清空弱引用
+            ShortcutKeys?.Clear();
+            ShortcutKeys = null;
         }
     }
 }
