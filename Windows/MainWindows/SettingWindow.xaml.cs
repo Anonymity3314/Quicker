@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Quicker.Managers;
 using Microsoft.Win32;
+using Quicker.Helpers;
 using System.Windows;
 
 namespace Quicker.Windows.MainWindows
@@ -625,46 +626,6 @@ namespace Quicker.Windows.MainWindows
         #region 搜索与高亮
 
         /// <summary>
-        /// 根据关键字筛选并高亮BasicSettingsStackPanel中的按钮
-        /// </summary>
-        /// <param name="keyword">查找关键字</param>
-        private void FilterAndHighlightBasicSettingsButtons(string keyword)
-        {
-            foreach (var child in BasicSettingsStackPanel.Children)
-            {
-                if (child is Button btn)
-                {
-                    // 查找按钮内的TextBlock
-                    var textBlock = FindTextBlockInButton(btn);
-                    if (textBlock != null)
-                    {
-                        string text = textBlock.Text ?? "";
-                        if (string.IsNullOrEmpty(keyword) || text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            btn.Visibility = Visibility.Visible;
-                            // 设置高亮
-                            Quicker.Helpers.TextBlockHelper.SetHighlight(textBlock, new Quicker.Helpers.HighlightTextData
-                            {
-                                Text = text,
-                                Keyword = keyword
-                            });
-                        }
-                        else
-                        {
-                            btn.Visibility = Visibility.Collapsed;
-                            // 清除高亮
-                            Quicker.Helpers.TextBlockHelper.SetHighlight(textBlock, new Quicker.Helpers.HighlightTextData
-                            {
-                                Text = text,
-                                Keyword = ""
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// 查找按钮内的TextBlock
         /// </summary>
         /// <param name="btn">按钮</param>
@@ -676,16 +637,159 @@ namespace Quicker.Windows.MainWindows
                 foreach (var child in grid.Children)
                 {
                     if (child is TextBlock tb)
-                        return tb;
+                        return tb; // 返回文本框
                 }
             }
             return null;
         }
 
+        /// <summary>
+        /// 克隆一个按钮（用于Popup搜索结果），并设置高亮关键字。
+        /// </summary>
+        /// <param name="original">原始按钮</param>
+        /// <param name="keyword">需要高亮的关键字</param>
+        /// <returns>克隆后的按钮（带高亮）</returns>
+        private Button CloneButton(Button original, string keyword = "")
+        {
+            var newBtn = new Button // 新建一个Button实例
+            {
+                Content = CloneButtonContent(original.Content, keyword), // 克隆Content并高亮
+                HorizontalAlignment = original.HorizontalAlignment,
+                VerticalAlignment = original.VerticalAlignment,
+                ToolTip = original.ToolTip,
+                Padding = original.Padding,
+                Margin = original.Margin,
+                Style = original.Style, // 沿用原按钮的样式
+                Tag = original.Name // 用于后续识别按钮类型
+            };
+            newBtn.Click += SearchResultButton_Click; // 绑定点击事件，点击后跳转到对应设置页
+            return newBtn; // 返回按钮
+        }
+
+        /// <summary>
+        /// 克隆按钮的Content（主入口，根据类型分发）。
+        /// </summary>
+        /// <param name="content">原始按钮的Content</param>
+        /// <param name="keyword">需要高亮的关键字</param>
+        /// <returns>克隆后的Content对象</returns>
+        private object CloneButtonContent(object content, string keyword = "")
+        {
+            if (content is Grid grid) // 如果是Grid类型，调用专用克隆方法
+                return CloneGridContent(grid, keyword);
+            return content; // 其它类型直接返回
+        }
+
+        /// <summary>
+        /// 克隆Grid及其所有子元素（Image、TextBlock等）。
+        /// </summary>
+        /// <param name="grid">原始Grid</param>
+        /// <param name="keyword">需要高亮的关键字</param>
+        /// <returns>克隆后的Grid</returns>
+        private Grid CloneGridContent(Grid grid, string keyword)
+        {
+            var newGrid = new Grid { Width = grid.Width };
+            foreach (var child in grid.Children)
+            {
+                if (child is Image img)
+                    newGrid.Children.Add(CloneImageContent(img)); // 克隆Image控件
+                else if (child is TextBlock tb)
+                    newGrid.Children.Add(CloneTextBlockContent(tb, keyword)); // 克隆TextBlock并高亮
+            }
+            return newGrid;
+        }
+
+        /// <summary>
+        /// 克隆Image控件，复制其常用属性。
+        /// </summary>
+        /// <param name="img">原始Image控件</param>
+        /// <returns>克隆后的Image控件</returns>
+        private Image CloneImageContent(Image img)
+        {
+            return new Image
+            {
+                Source = img.Source,
+                Width = img.Width,
+                Height = img.Height,
+                Margin = img.Margin,
+                HorizontalAlignment = img.HorizontalAlignment,
+                VerticalAlignment = img.VerticalAlignment
+            };
+        }
+
+        /// <summary>
+        /// 克隆TextBlock控件，并用TextBlockHelper高亮关键字。
+        /// </summary>
+        /// <param name="tb">原始TextBlock控件</param>
+        /// <param name="keyword">需要高亮的关键字</param>
+        /// <returns>克隆后的TextBlock控件</returns>
+        private TextBlock CloneTextBlockContent(TextBlock tb, string keyword)
+        {
+            var newTb = new TextBlock
+            {
+                Margin = tb.Margin,
+                HorizontalAlignment = tb.HorizontalAlignment,
+                VerticalAlignment = tb.VerticalAlignment
+            };
+            // 设置高亮
+            TextBlockHelper.SetHighlight(newTb, new HighlightTextData
+            {
+                Text = tb.Text,
+                Keyword = keyword
+            });
+            return newTb;
+        }
+
+        // Popup中副本按钮的点击事件，根据Tag跳转到对应设置页面。
+        private void SearchResultButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string btnName)
+            {
+                SearchResultPopup.IsOpen = false; // 关闭Popup
+                // 按钮Name映射到pageCode，调用SetLastPage实现完整跳转（包括侧边栏高亮等）
+                int pageCode = btnName switch
+                {
+                    "Convention" => 111,
+                    "OpenMainWindow" => 121,
+                    "FunctionShortcutKeys" => 131,
+                    "Blacklist" => 141,
+                    "Appearance" => 151,
+                    "AboutQuicker" => 161,
+                    "ManageExtensions" => 311,
+                    _ => 0
+                };
+                if (pageCode != 0)
+                {
+                    SetLastPage(pageCode);
+                }
+            }
+        }
+
+        // 搜索框内容变化事件，动态生成高亮的按钮副本并显示在Popup中。
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string keyword = SearchBox.Text.Trim();
-            FilterAndHighlightBasicSettingsButtons(keyword);
+            string keyword = SearchBox.Text.Trim(); // 获取搜索框输入的关键字
+            if (string.IsNullOrEmpty(keyword)) // 如果关键字为空，关闭Popup并返回
+            {
+                SearchResultPopup.IsOpen = false; // 关闭Popup
+                return;
+            }
+
+            SearchResultPanel.Children.Clear(); // 清空原有按钮
+            foreach (var stackPanel in MenuGrid.Children.OfType<StackPanel>()) // 遍历菜单栏的StackPanel
+            {
+                foreach (var child in stackPanel.Children) // 遍历StackPanel的子元素
+                {
+                    Button btn = child as Button; // 获取Button
+                    var textBlock = FindTextBlockInButton(btn); // 获取Button内的TextBlock
+                    string text = textBlock?.Text ?? ""; // 获取Button内的文本
+                    if (text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0) // 如果文本包含关键字，克隆按钮并添加到Popup中
+                    {
+                        var clone = CloneButton(btn, keyword); // 克隆按钮并高亮关键字
+                        SearchResultPanel.Children.Add(clone); // 添加到Popup中
+                    }
+                }
+            }
+            SearchResultPopup.IsOpen = SearchResultPanel.Children.Count > 0; // 如果有按钮，打开Popup
         }
 
         #endregion

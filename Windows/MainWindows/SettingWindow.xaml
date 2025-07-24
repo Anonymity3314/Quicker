@@ -43,6 +43,33 @@
             <Grid Height="60" HorizontalAlignment="Left" VerticalAlignment="Top" Width="192">
                 <Label Content="筛选..." Foreground="#FFABADB3" Visibility="{Binding ElementName=SearchBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" Margin="22,0,0,0" VerticalAlignment="Center"/>
                 <TextBox x:Name="SearchBox" Margin="22,0" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Style="{StaticResource RoundedTextBox}" TextChanged="SearchBox_TextChanged"/>
+                <Button x:Name="ClearSearchTextBoxButton" Margin="149,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="16" Height="16">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource ClearSearchTextBoxButton}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsMouseOver, ElementName=SearchBox}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Popup x:Name="SearchResultPopup" PlacementTarget="{Binding ElementName=SearchBox}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade" Width="192">
+                    <Grid>
+                        <Border Background="White" CornerRadius="3" Margin="3">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Border.Effect>
+                        </Border>
+                        <Border Background="White" CornerRadius="3" Margin="3" Padding="0,3">
+                            <StackPanel x:Name="SearchResultPanel"/>
+                        </Border>
+                    </Grid>
+                </Popup>
             </Grid>
             <!-- 基础设置 -->
             <StackPanel x:Name="BasicSettingsStackPanel" Width="192" Visibility="Visible" Margin="0,60,0,0">
