@@ -270,16 +270,17 @@ Quicker/
 │   └─Styles/                                         # 样式资源文件夹
 │       ├─BorderStyles.xaml                            # 边框样式
 │       ├─ButtonStyles.xaml                            # 按钮样式
-│       ├─ButtonStyles.xaml.cs                         # 按钮样式后台
+│       |   └─ButtonStyles.xaml.cs
 │       ├─CanvasStyles.xaml                            # 画布样式
 │       ├─CheckBoxStyle.xaml                           # 勾选框样式
 │       ├─ComboBoxStyle.xaml                           # 下拉框样式
-│       ├─ComboBoxStyle.xaml.cs                        # 下拉框样式后台
+│       |   └─ComboBoxStyle.xaml.cs
 │       ├─GridStyles.xaml                              # 表格样式
 │       ├─ImageStyles.xaml                             # 图片样式
 │       ├─PanelStyles.xaml                             # 面板样式
 │       ├─ScrollBarStyle.xaml                          # 滚动条样式
 │       ├─SliderStyle.xaml                             # 滑动条样式
+│       |   └─SliderStyle.xaml.cs
 │       ├─TextBlockStyles.xaml                         # 文本块样式
 │       ├─TextBoxStyles.xaml                           # 文本框样式
 │       └─TooltipStyle.xaml                            # 提示框样式

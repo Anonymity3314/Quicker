@@ -45,19 +45,19 @@
         </Border>
 
         <!-- 颜色选择器滑块 -->
-        <Slider x:Name="HueSlider" Value="0" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Height="130" ValueChanged="HueSlider_ValueChanged" HorizontalAlignment="Left" Margin="215,140,0,0">
+        <Slider x:Name="HueSlider" Minimum="0" Maximum="360" Style="{StaticResource ColorPickerSlider}" VerticalAlignment="Top" Height="130" ValueChanged="HueSlider_ValueChanged" HorizontalAlignment="Left" Margin="215,140,0,0">
             <Slider.RenderTransform>
                 <ScaleTransform ScaleY="-1"/>
             </Slider.RenderTransform>
             <Slider.Background>
                 <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
-                    <GradientStop Color="#FF0000" Offset="0"/>
-                    <GradientStop Offset="0.1667" Color="#FF00FF" />
-                    <GradientStop Offset="0.333" Color="#0000FF" />
-                    <GradientStop Offset="0.500" Color="#00FFFF" />
-                    <GradientStop Offset="0.667" Color="#00FF00" />
-                    <GradientStop Offset="0.83" Color="#FFFF00" />
-                    <GradientStop Offset="1.00" Color="#FF0000" />
+                    <GradientStop Offset="0" Color="#FF0000"/>
+                    <GradientStop Offset="0.1667" Color="#FF00FF"/>
+                    <GradientStop Offset="0.333" Color="#0000FF"/>
+                    <GradientStop Offset="0.500" Color="#00FFFF"/>
+                    <GradientStop Offset="0.667" Color="#00FF00"/>
+                    <GradientStop Offset="0.83" Color="#FFFF00"/>
+                    <GradientStop Offset="1.00" Color="#FF0000"/>
                 </LinearGradientBrush>
             </Slider.Background>
         </Slider>
@@ -83,7 +83,7 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="R" VerticalAlignment="Center" Height="16"/>
-                <Slider x:Name="RedSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <Slider x:Name="RedSlider" Minimum="0" Maximum="255" Width="NaN" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
                 <TextBox x:Name="RedValue" Text="{Binding ElementName=RedSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- G 值滑块 -->
@@ -94,7 +94,7 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="G" VerticalAlignment="Center"/>
-                <Slider x:Name="GreenSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <Slider x:Name="GreenSlider" Minimum="0" Maximum="255" Width="NaN" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
                 <TextBox x:Name="GreenValue" Text="{Binding ElementName=GreenSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- B 值滑块 -->
@@ -105,7 +105,7 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="B" VerticalAlignment="Center"/>
-                <Slider x:Name="BlueSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <Slider x:Name="BlueSlider" Minimum="0" Maximum="255" Width="NaN" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
                 <TextBox x:Name="BlueValue" Text="{Binding ElementName=BlueSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
             <!-- A 值滑块 -->
@@ -116,7 +116,7 @@
                     <ColumnDefinition Width="50"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="A" VerticalAlignment="Center"/>
-                <Slider x:Name="AlphaSlider" Minimum="0" Maximum="255" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                <Slider x:Name="AlphaSlider" Minimum="0" Maximum="255" Width="NaN" Grid.Column="1" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
                 <TextBox x:Name="AlphaValue" Text="{Binding ElementName=AlphaSlider, Path=Value, Mode=TwoWay}" Grid.Column="2" Width="40" TextAlignment="Right" TextChanged="Value_TextChanged"/>
             </Grid>
         </StackPanel>
