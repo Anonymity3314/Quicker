@@ -7,7 +7,7 @@ using System.IO;
 
 public class AppUpdateManager : IDisposable
 {
-    private const string UpdateInfoUrl = "https://raw.githubusercontent.com/LJZ-Anonymity/Quicker/Quicker/InfoData/VersionInfo.json"; // 更新信息的 URL 地址
+    private const string UpdateInfoUrl = "https://raw.githubusercontent.com/LJZ-Anonymity/Quicker/Quicker/VersionInfo.json"; // 更新信息的 URL 地址
     public UpdateInfoContainer LatestUpdateInfo { get; private set; } // 最新版本信息容器
     private bool isDisposed = false; // 是否已释放资源
 
