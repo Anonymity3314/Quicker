@@ -16,6 +16,11 @@ namespace Quicker.Managers
 {
     public class ButtonManager
     {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
+        private const int VK_LCONTROL = 0xA2;
+        private const int VK_RCONTROL = 0xA3;
+
         /// <summary>
         /// 查找所有指定类型的子元素
         /// </summary>
@@ -49,10 +54,19 @@ namespace Quicker.Managers
         public void Button_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Handled = true; // 标记事件已处理
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
-                e.Effects = DragDropEffects.Copy; // 设置拖拽效果为复制
-            else if (e.Data.GetDataPresent(typeof(ButtonData))) // 如果拖拽的是按钮
-                e.Effects = DragDropEffects.Move; // 设置拖拽效果为移动
+            bool isCtrlPressed = IsCtrlPressed(); // Ctrl键是否按下
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else if (e.Data.GetDataPresent(typeof(ButtonData)))
+            {
+                e.Effects = isCtrlPressed ? DragDropEffects.Copy : DragDropEffects.Move;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
         }
 
         /// <summary>
@@ -575,7 +589,7 @@ namespace Quicker.Managers
                     if(isMainButton)
                     {
                         if (button.Tag is ButtonData data) // 如果是主按钮
-                            DragDrop.DoDragDrop(button, data, DragDropEffects.Move); // 开始拖拽操作
+                            DragDrop.DoDragDrop(button, data, DragDropEffects.Copy | DragDropEffects.Move); // 开始拖拽操作
                     }
                     else
                     {
@@ -809,6 +823,16 @@ namespace Quicker.Managers
             }; // 设置按钮数据
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
             return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsCtrlPressed()
+        {
+            return (GetAsyncKeyState(VK_LCONTROL) & 0x8000) != 0 ||
+                   (GetAsyncKeyState(VK_RCONTROL) & 0x8000) != 0;
         }
     }
 }

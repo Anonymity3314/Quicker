@@ -46,11 +46,10 @@ namespace Quicker.Windows.FloatingWindows.Windows
         /// <summary>
         /// 加载按钮数据并绑定到按钮
         /// </summary>
-        private void LoadButtonData()
+        public void LoadButtonData()
         {
-            // 通过遍历ActionButtonGrid获取所有按钮
-            var buttons = ActionButtonGrid.Children.OfType<Button>().ToArray();
-
+            viewModel.LoadButtonData(); // 让ViewModel刷新数据集合
+            var buttons = ActionButtonGrid.Children.OfType<Button>().ToArray(); // 通过遍历ActionButtonGrid获取所有按钮
             // 为每个按钮加载数据
             int buttonIndex = 0;
             foreach (var button in buttons)

@@ -11,7 +11,6 @@ namespace Quicker.Windows.Menus
         {
             InitializeComponent();
             SceneTag = sceneTag; // 设置场景标签
-
         }
 
         private void EditSceneMenu_Loaded(object sender, RoutedEventArgs e)

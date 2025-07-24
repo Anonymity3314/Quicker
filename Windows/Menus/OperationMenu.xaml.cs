@@ -291,12 +291,22 @@ namespace Quicker.Windows.Menus
             ActionPageManageWindow actionPageManageWindow = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault(); // 尝试查找现有的菜单栏
             if (actionPageManageWindow != null)
                 actionPageManageWindow.UpdateButton(ButtonID); // 更新菜单栏按钮
+
             var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 尝试查找主窗口
             if (mainWindowList != null)
             {
                 foreach (MainWindow mainWindow in mainWindowList) // 遍历主窗口列表
                 {
                     mainWindow.UpdateButtonContent(ButtonID, TableName); // 更新主窗口按钮
+                }
+            }
+
+            var floatingActionPageWindowList = Application.Current.Windows.OfType<FloatingActionPageWindow>();
+            if (floatingActionPageWindowList != null)
+            {
+                foreach (FloatingActionPageWindow floatingActionPageWindow in floatingActionPageWindowList) // 遍历浮动动作页面窗口列表
+                {
+                    floatingActionPageWindow.LoadButtonData(); // 重新加载Button数据
                 }
             }
         }

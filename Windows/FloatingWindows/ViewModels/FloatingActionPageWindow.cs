@@ -313,12 +313,8 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         {
             ActionPageIndex = actionPageIndex;
             TableName = tableName;
-            
-            // 加载外观设置
-            LoadAppearanceSettings();
-            
-            // 加载按钮数据
-            LoadButtonData();
+            LoadAppearanceSettings(); // 加载外观设置
+            LoadButtonData(); // 加载按钮数据
         }
 
         private void LoadAppearanceSettings()
@@ -349,16 +345,12 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         /// <summary>
         /// 加载按钮数据
         /// </summary>
-        private void LoadButtonData()
+        public void LoadButtonData()
         {
-            // 清空现有数据
-            ButtonDataCollection.Clear();
-
+            ButtonDataCollection.Clear(); // 清空现有数据
             // 获取当前页面的按钮数据
             var pageButtons = _buttonDatabase.GetPagesOfButtons(TableName, ActionPageIndex);
-            
-            // 将按钮数据添加到集合中
-            foreach (var buttonData in pageButtons)
+            foreach (var buttonData in pageButtons) // 将按钮数据添加到集合中
             {
                 ButtonDataCollection.Add(buttonData);
             }
@@ -372,11 +364,8 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         /// <returns>按钮数据，如果没有数据则返回null</returns>
         public ButtonData GetButtonData(int row, int col)
         {
-            // 计算按钮ID：ActionPageIndex * 100 + (row + 1) * 10 + (col + 1)
-            int buttonId = ActionPageIndex * 100 + (row + 1) * 10 + (col + 1);
-            
-            // 在集合中查找对应的按钮数据
-            return ButtonDataCollection.FirstOrDefault(b => b.ButtonID == buttonId);
+            int buttonId = ActionPageIndex * 100 + (row + 1) * 10 + (col + 1); // 计算按钮ID：ActionPageIndex * 100 + (row + 1) * 10 + (col + 1)
+            return ButtonDataCollection.FirstOrDefault(b => b.ButtonID == buttonId); // 在集合中查找对应的按钮数据
         }
 
         /// <summary>
@@ -385,15 +374,13 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
         private void CalculateGridHeight()
         {
             const double titleHeight = 31; // 标题栏高度
-            if (TableName == "_global")
+            if (TableName == "_global") // _global模式：3行按钮，通过调整高度隐藏第4行
             {
-                // Global模式：3行按钮，通过调整高度隐藏第4行
                 ButtonRows = 3;
                 GridHeight = titleHeight + ButtonSize * 3 + ButtonGap * 2;
             }
-            else
+            else // 其他模式：4行按钮
             {
-                // 其他模式：4行按钮
                 ButtonRows = 4;
                 GridHeight = titleHeight + ButtonSize * 4 + ButtonGap * 3;
             }
@@ -420,9 +407,7 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
                 {
                     // 释放托管资源
                     _buttonDataCollection.Clear();
-                    // ButtonDatabase没有实现IDisposable，不需要手动释放
                 }
-                // 释放非托管资源
             }
             _disposed = true;
         }

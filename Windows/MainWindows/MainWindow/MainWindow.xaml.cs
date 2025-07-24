@@ -219,33 +219,33 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// </summary>
         private void Grid_MouseWheel(object sender, MouseWheelEventArgs e, Panel parent, string gridType, int rows, int cols, Panel buttonPanel)
         {
-            e.Handled = true;
-            int delta = e.Delta;
-            int currentIndex = GetVisiblePageGridIndex(parent, gridType);
-            int totalPages = db3.GetSceneData(gridType)?.SceneCount ?? 1;
-            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
-            int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;
-            if (targetIndex < 0)
+            e.Handled = true; // 禁止默认滚轮事件
+            int delta = e.Delta; // 获取滚轮变化量
+            int currentIndex = GetVisiblePageGridIndex(parent, gridType); // 获取当前可见页面索引
+            int totalPages = db3.GetSceneData(gridType)?.SceneCount ?? 1; // 获取总动作页数
+            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true; // 获取是否循环翻页
+            int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;  
+            if (targetIndex < 0) // 超出范围
             {
-                if (loop)
-                    targetIndex = totalPages - 1;
+                if (loop) // 如果循环翻页
+                    targetIndex = totalPages - 1; // 循环翻页
                 else
-                    return;
+                    return; // 退出
             }
-            if (targetIndex >= totalPages)
+            if (targetIndex >= totalPages) // 超出范围
             {
-                if (loop)
-                    targetIndex = 0;
+                if (loop) // 如果循环翻页
+                    targetIndex = 0; // 循环翻页
                 else
-                    return;
+                    return; // 退出
             }
-            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{targetIndex}"))
-                GeneratePageGrid(parent, gridType, targetIndex, rows, cols);
-            ShowPageGrid(parent, gridType, targetIndex, rows, cols);
-            foreach (Button btn in buttonPanel.Children.OfType<Button>())
+            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{targetIndex}")) // 如果目标页面不存在
+                GeneratePageGrid(parent, gridType, targetIndex, rows, cols); // 生成目标页面
+            ShowPageGrid(parent, gridType, targetIndex, rows, cols); // 显示目标页面
+            foreach (Button btn in buttonPanel.Children.OfType<Button>()) // 同步按钮背景
                 btn.Background = btn.Name == $"{gridType}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (gridType != "_global") SetCommonTextBlock(targetIndex);
-            if (gridType == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
+            if (gridType != "_global") SetCommonTextBlock(targetIndex); // 设置通用标签内容
+            if (gridType == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex; // 同步页面索引
         }
 
         // 全局Grid滚轮事件
@@ -336,27 +336,27 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="type">页面类型</param>
         private void SwitchToPreviousPageGrid(int currentIndex, string type)
         {
-            int totalPages = db3.GetSceneData(type)?.SceneCount ?? 1;
-            int targetIndex = currentIndex - 1;
-            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
-            if (targetIndex < 0)
+            int totalPages = db3.GetSceneData(type)?.SceneCount ?? 1; // 获取总动作页数
+            int targetIndex = currentIndex - 1; // 获取当前动作页索引
+            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true; // 获取是否循环翻页
+            if (targetIndex < 0) // 如果当前页为第一页
             {
-                if (loop)
-                    targetIndex = totalPages - 1;
+                if (loop) // 如果循环翻页
+                    targetIndex = totalPages - 1; // 跳转到最后一页
                 else
-                    return;
+                    return; // 否则直接返回
             }
-            Panel parent = type == "_global" ? GlobalGrid : CommonGrid;
-            Panel buttonPanel = type == "_global" ? GlobalButtonPanel : CommonButtonPanel;
-            int rows = type == "_global" ? 3 : 4;
-            int cols = 4;
-            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}"))
-                GeneratePageGrid(parent, type, targetIndex, rows, cols);
-            ShowPageGrid(parent, type, targetIndex, rows, cols);
-            foreach (Button btn in buttonPanel.Children.OfType<Button>())
+            Panel parent = type == "_global" ? GlobalGrid : CommonGrid; // 获取目标 Panel
+            Panel buttonPanel = type == "_global" ? GlobalButtonPanel : CommonButtonPanel; // 获取目标按钮面板
+            int rows = type == "_global" ? 3 : 4; // 获取行数
+            int cols = 4; // 获取列数
+            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}")) // 如果目标页不存在
+                GeneratePageGrid(parent, type, targetIndex, rows, cols); // 生成目标页
+            ShowPageGrid(parent, type, targetIndex, rows, cols); // 显示目标页
+            foreach (Button btn in buttonPanel.Children.OfType<Button>()) // 同步按钮背景
                 btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (type != "_global") SetCommonTextBlock(targetIndex);
-            if (type == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
+            if (type != "_global") SetCommonTextBlock(targetIndex); // 设置通用标签内容
+            if (type == "_global") GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex; // 更新索引
         }
 
         /// <summary>
