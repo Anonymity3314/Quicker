@@ -47,8 +47,8 @@
                     </GroupBox>-->
             <Label Content="键盘方式" HorizontalAlignment="Left" Margin="10,240,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize=" 16" Height="30" Width="74"/>
             <CheckBox x:Name="OpenMainWindowByCtrlCheckBox" Content="单击Ctrl键" Margin="10,275,0,0" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Height="15" Width="76"/>
-            <!--<TextBox x:Name="DIY_ShortcutKeys" ToolTip="请按键" HorizontalAlignment="Left" Margin="10,373,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" KeyDown="DIY_ShortcutKeys_KeyDown" PreviewTextInput="DIY_ShortcutKeys_PreviewTextInput" PreviewKeyUp="DIY_ShortcutKeys_PreviewKeyUp" TextAlignment="Center"/>-->
-            <!--<Button HorizontalAlignment="Left" Margin="240,373,0,0" VerticalAlignment="Top" Width="21" Height="17" Click="ClearDIY_ShortcutKeys"/>-->
+            <!--<TextBox x:Name="DIY_ShortcutKeys" ToolTip="请按键" HorizontalAlignment="Left" Margin="10,303,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" KeyDown="DIY_ShortcutKeys_KeyDown" PreviewTextInput="DIY_ShortcutKeys_PreviewTextInput" PreviewKeyUp="DIY_ShortcutKeys_PreviewKeyUp" TextAlignment="Center" GotFocus="DIY_ShortcutKeys_GotFocus"/>
+            <Button HorizontalAlignment="Left" Margin="240,303,0,0" VerticalAlignment="Top" Width="21" Height="17" Click="ClearDIY_ShortcutKeys"/>-->
             <GroupBox Header="键盘弹出选项" Margin="10,325,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="57" Width="202">
                 <Grid>
                     <!--<CheckBox Content="自动激活鼠标位置窗口" HorizontalAlignment="Left" Margin="10,52,0,10" Height="17"/>-->
