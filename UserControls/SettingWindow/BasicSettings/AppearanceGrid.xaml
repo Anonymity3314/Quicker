@@ -248,8 +248,8 @@
                         </ComboBox>
                         <!-- 字体-字体大小 -->
                         <Label Content="字体大小：" Margin="15,648,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,653,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,649,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F0}'}"/>
+                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,653,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,649,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
                         <!-- 字体-字体粗细 -->
                         <Label Content="字体粗细：" Margin="15,688,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <ComboBox x:Name="FontWeightComboBox" HorizontalAlignment="Left" Margin="107,689,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
@@ -294,8 +294,8 @@
                         </Popup>
                         <!-- 背景图片-不透明度 -->
                         <Label Content="不透明度：" Margin="15,805,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,810,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" Value="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,806,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,810,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.01" IsSnapToTickEnabled="True" Width="120" Value="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
+                        <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,806,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, StringFormat='{}{0:F2}'}"/>
 
                         <!-- 模糊与圆角 -->
                         <Label Content="模糊与圆角" Margin="15,846,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
