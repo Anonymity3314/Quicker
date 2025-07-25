@@ -1145,6 +1145,15 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        // 打开保存背景图片的文件夹
+        private void ExportAppearanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\BackgroundImages"; // 背景图片文件夹路径
+            if (!Directory.Exists(bgDir)) // 如果文件夹不存在则自动创建
+                Directory.CreateDirectory(bgDir);
+            Process.Start("explorer.exe", bgDir); // 打开背景图片文件夹
+        }
+
         /// <summary>
         /// 恢复用户之前保存的选项设置
         /// </summary>

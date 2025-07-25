@@ -377,8 +377,8 @@
             </Popup>
             <Button x:Name="ShareSaveAppearanceButton" Grid.Column="1" Content="分享或保存外观" ToolTip="分享或保存当前的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,78,0,0" VerticalAlignment="Top" Width="122" Click="ShareSaveAppearanceButton_Click"/>
             <Button x:Name="SharedSavedAppearanceButton" Grid.Column="1" Content="已分享或保存的外观" ToolTip="查看已分享或保存的外观" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,107,0,0" VerticalAlignment="Top" Width="122" Click="SharedSavedAppearanceButton_Click"/>
-            <Button x:Name="ImportAppearanceButton" Content="导入外观" ToolTip="导入外观" Click="ImportAppearanceButton_Click" Grid.Column="1" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,136,0,0" VerticalAlignment="Top" Width="122"/>
-            <Button x:Name="WheelAppearanceSettingsButton" Grid.Column="1" Content="轮盘外观设置" ToolTip="修改轮盘外观设置" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,165,0,0" VerticalAlignment="Top" Width="122" Visibility="Collapsed"/>
+            <Button x:Name="ExportAppearanceButton" Grid.Column="1" Content="已保存的背景" ToolTip="查看图片" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,136,0,0" VerticalAlignment="Top" Width="122" Click="ExportAppearanceButton_Click"/>
+            <Button x:Name="ImportAppearanceButton" Content="导入外观" ToolTip="导入外观" Click="ImportAppearanceButton_Click" Grid.Column="1" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="46,165,0,0" VerticalAlignment="Top" Width="122"/>
             <CheckBox x:Name="EnablePreviewCheckBox" Grid.Column="1" Content="开启预览" ToolTip="查看应用设置后的功能面板外观" HorizontalAlignment="Left" Margin="173,23,0,0" VerticalAlignment="Top" FontSize="14" Click="EnablePreviewCheckBox_Click" Panel.ZIndex="1"/>
             <TextBlock Grid.Column="1" Text="只加载全局动作，通用动作用于做空白对照" HorizontalAlignment="Left" Margin="173,54,0,0" VerticalAlignment="Top" FontSize="11" Foreground="#FFB4B4B4" TextWrapping="Wrap" MaxWidth="210"/>
 
