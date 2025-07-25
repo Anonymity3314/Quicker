@@ -79,7 +79,6 @@ namespace Quicker.Managers
         {
             Button TargetButton = sender as Button; // 获取目标按钮
             if (TargetButton == SourceButton) return; // 如果目标按钮和源按钮相同，直接返回
-            
             if (e.Data.GetDataPresent(typeof(ButtonData))) // 如果拖拽的是按钮
                 ProcessButtonDrop(TargetButton, isMainWindow, SourceTableName, tableName); // 处理按钮拖拽
             else if (e.Data.GetDataPresent(DataFormats.FileDrop)) // 如果拖拽的是文件
@@ -153,7 +152,7 @@ namespace Quicker.Managers
         /// <param name="isMainWindow"> 是否为主窗口 </param>
         private void UpdateButtonDisplay(Button button, string tableName, bool isMainWindow)
         {
-            var buttonData = db2.GetButtonDataByID(int.Parse(button.Name), tableName); // 获取按钮数据
+            var buttonData = db2.GetButtonDataByID(int.Parse(button.Name.Replace(tableName, "")), tableName); // 获取按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮显示
         }
 
