@@ -18,7 +18,7 @@
     Loaded="SelectImageWindow_Loaded"
 >
     <Grid>
-        <Button Content="加载更多..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="24,0,0,39" VerticalAlignment="Bottom" Width="81" Click="LoadImages"/>
+        <Button x:Name="LoadMoreButton" Content="加载更多..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="24,0,0,39" VerticalAlignment="Bottom" Width="81" Click="LoadImages"/>
         <Button x:Name="ConfirmButton" Content="选择(S)" Style="{StaticResource BlueButton}" HorizontalAlignment="Right" Margin="0,0,95,39" VerticalAlignment="Bottom" Width="73" IsEnabled="False" Click="AddIcon"/>
         <Button Content="选择其它图标..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,31,27,0" VerticalAlignment="Top" Width="108" Click="SelectLocalIcons"/>
         <Button Content="取消" Style="{StaticResource WhiteButton}" HorizontalAlignment="Right" Margin="0,0,27,39" VerticalAlignment="Bottom" Width="63" Click="CancelSelect"/>

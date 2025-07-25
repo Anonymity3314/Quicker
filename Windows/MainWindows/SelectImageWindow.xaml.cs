@@ -123,19 +123,18 @@ namespace Quicker.Windows.MainWindows
         /// <param name="maxImagesToLoad"> 一次加载的最大图片数量 </param>
         private void LoadImages(int maxImagesToLoad)
         {
-            if (allImageFiles == null || loadedImageCount >= allImageFiles.Length)
+            if (allImageFiles == null || loadedImageCount >= allImageFiles.Length) // 如果所有图片都已加载，则返回
             {
+                LoadMoreButton.IsEnabled = false; // 禁用加载更多按钮
                 return; // 如果所有图片都已加载，则返回
             }
 
-            int remainingImages = allImageFiles.Length - loadedImageCount;
-            int imagesToLoad = Math.Min(maxImagesToLoad, remainingImages);
-
+            int remainingImages = allImageFiles.Length - loadedImageCount; // 计算剩余图片数量
+            int imagesToLoad = Math.Min(maxImagesToLoad, remainingImages); // 计算本次加载的图片数量
             for (int i = 0; i < imagesToLoad; i++)
             {
-                string imagePath = allImageFiles[loadedImageCount + i];
-                FileInfo fileInfo = new FileInfo(imagePath);
-                
+                string imagePath = allImageFiles[loadedImageCount + i]; // 获取图片路径
+                FileInfo fileInfo = new(imagePath); // 获取文件信息
                 var imageItem = new ImageItem // 创建图片项
                 {
                     FilePath = imagePath, // 文件路径
@@ -144,8 +143,7 @@ namespace Quicker.Windows.MainWindows
                 };
                 ImageItems.Add(imageItem); // 添加到图片项集合
             }
-
-            loadedImageCount += imagesToLoad;
+            loadedImageCount += imagesToLoad; // 已加载的图片数量增加
         }
 
         // 加载图片
@@ -263,11 +261,8 @@ namespace Quicker.Windows.MainWindows
         // 继续加载图片
         private void LoadImages(object sender, RoutedEventArgs e)
         {
-            if (loadedImageCount < allImageFiles.Length)
-            {
-                LoadImages(27); // 加载图片
-                UpdateWrapPanelHeight(); // 重新计算 WrapPanel 的高度
-            }
+            LoadImages(27); // 加载图片
+            UpdateWrapPanelHeight(); // 重新计算 WrapPanel 的高度
         }
 
         // 关闭窗口前，释放资源
