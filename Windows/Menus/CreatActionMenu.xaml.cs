@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
 using Quicker.Managers;
+using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
 using System.IO;
@@ -58,42 +59,69 @@ namespace Quicker.Windows.Menus
         // 设置粘贴动作按钮可见性
         private void SetPasteActionButtonVisibility()
         {
-            clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
-            if (!clipboardText.EndsWith("QuickerCommand")) // 剪切板文本不是快捷指令
+            clipboardText = Clipboard.GetText(); // 获取剪贴板文本
+            if (clipboardText.EndsWith("QuickerCommand")) // 判断是否为Quicker命令
             {
-                if (!hasChanged)
+                if (clipboardText.StartsWith("OpenActionPage")) // 判断是否为打开动作页命令
                 {
-                    MainGrid.Height -= 32; // 减少高度
-                    Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
-                    PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
-                    hasChanged = !hasChanged;
+                    HandleOpenActionPageVisibility(); // 处理打开动作页按钮可见性
+                }
+                else if (clipboardText.StartsWith("CopyAction") || clipboardText.StartsWith("CutAction")) // 判断是否为复制或剪切动作命令
+                {
+                    HandleCopyOrCutActionVisibility(); // 处理复制或剪切动作按钮可见性
                 }
             }
-            else if (clipboardText.StartsWith("OpenActionPage"))
+            else
             {
-                string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
-                PasteActionTextBlock.Text = $"粘贴动作：{actionInfo[1]}{actionInfo[2]}"; // 设置文本
-                if (hasChanged)
-                {
-                    MainGrid.Height += 32; // 增加高度
-                    Line1.Visibility = Visibility.Visible; // 显示分割线
-                    PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
-                    hasChanged = !hasChanged;
-                }
+                HidePasteActionButton(); // 隐藏按钮
             }
-            else if (clipboardText.StartsWith("CopyAction") ||
-                clipboardText.StartsWith("CutAction")) // 剪切板文本是动作
+        }
+
+        // 处理打开动作页按钮可见性
+        private void HandleOpenActionPageVisibility()
+        {
+            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
+            PasteActionTextBlock.Text = $"粘贴动作：{actionInfo[1]}{actionInfo[2]}"; // 设置文本
+            ShowPasteActionButton(); // 显示按钮
+        }
+
+        // 处理复制或剪切动作按钮可见性
+        private void HandleCopyOrCutActionVisibility()
+        {
+            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
+            var buttonData = db2.GetButtonDataByID(int.Parse(actionInfo[2]), actionInfo[1]); // 获取按钮数据
+            if (buttonData != null)
             {
-                string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
-                var buttonData = db2.GetButtonDataByID(int.Parse(actionInfo[2]), actionInfo[1]); // 获取按钮数据
                 PasteActionTextBlock.Text = $"粘贴动作：{buttonData.Title}"; // 设置文本
-                if (hasChanged)
-                {
-                    MainGrid.Height += 32; // 增加高度
-                    Line1.Visibility = Visibility.Visible; // 显示分割线
-                    PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
-                    hasChanged = !hasChanged;
-                }
+                ShowPasteActionButton(); // 显示按钮
+            }
+            else
+            {
+                HidePasteActionButton(); // 隐藏按钮
+            }
+        }
+
+        // 显示粘贴动作按钮
+        private void ShowPasteActionButton()
+        {
+            if (hasChanged)
+            {
+                MainGrid.Height += 32; // 增加高度
+                Line1.Visibility = Visibility.Visible; // 显示分割线
+                PasteActionButton.Visibility = Visibility.Visible; // 显示粘贴按钮
+                hasChanged = !hasChanged;
+            }
+        }
+
+        // 隐藏粘贴动作按钮
+        private void HidePasteActionButton()
+        {
+            if (!hasChanged)
+            {
+                MainGrid.Height -= 32; // 减少高度
+                Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
+                PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
+                hasChanged = !hasChanged;
             }
         }
 
@@ -404,22 +432,5 @@ namespace Quicker.Windows.Menus
             GC.Collect(); // 再次强制垃圾回收
         }
         #endregion
-
-        // 辅助方法：查找指定类型的所有子元素
-        private IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T)
-                        yield return (T)child;
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                        yield return childOfChild;
-                }
-            }
-        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Quicker.UserControls.SettingWindow.BasicSettings;
+﻿using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
+using Quicker.UserControls.SettingWindow.BasicSettings;
 using Quicker.UserControls.SettingWindow.Tools;
 using System.Windows.Threading;
 using System.Windows.Controls;
@@ -377,7 +378,7 @@ namespace Quicker.Windows.MainWindows
             }
             else if (element is AboutQuickerGrid)
             {
-                var grid = FindGridByName(element, "Privacy_StatementButtonGrid");
+                var grid = VisualTreeHelper.FindGridByName(element, "Privacy_StatementButtonGrid");
                 if (grid != null && grid.Visibility == Visibility.Visible)
                 {
                     return 162; // 隐私声明页面
@@ -440,30 +441,6 @@ namespace Quicker.Windows.MainWindows
         #endregion
 
         #region 辅助工具方法
-
-        /// <summary>
-        /// 递归查找名为指定名称的 Grid
-        /// </summary>
-        /// <param name="parent"> 父级元素 </param>
-        /// <param name="name"> Grid 名称 </param>
-        /// <returns> 名为指定名称的 Grid </returns>
-        private Grid FindGridByName(DependencyObject parent, string name)
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i); // 获取子元素
-                if (child is Grid grid && grid.Name == name)
-                {
-                    return grid; // 找到 Grid 元素
-                }
-                var result = FindGridByName(child, name); // 递归查找
-                if (result != null)
-                {
-                    return result; // 找到 Grid 元素
-                }
-            }
-            return null; // 没找到 Grid 元素
-        }
 
         /// <summary>
         /// 通用打开自定义控件方法（辅助工具方法）

@@ -1,4 +1,5 @@
 ﻿using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
 using DragEventArgs = System.Windows.DragEventArgs;
 using Button = System.Windows.Controls.Button;
 using Panel = System.Windows.Controls.Panel;
@@ -14,9 +15,9 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Windows.Forms;
 using Quicker.Managers;
+using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
-using WpfAnimatedGif;
 using System.IO;
 
 namespace Quicker.Windows.MainWindows.MainWindow
@@ -783,12 +784,10 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="gridType">Grid类型</param>
         private void BindButtonDataAndEvents(Button button, int buttonIndex, string gridType)
         {
-            // 绑定事件
-            BindButtonEvents(button);
-            // 绑定数据
-            var buttonData = db2.GetButtonDataByID(buttonIndex, gridType);
-            button.Tag = buttonData;
-            buttonManager.RefreshButtonDisplay(button, buttonData, 60, true);
+            BindButtonEvents(button); // 绑定事件
+            var buttonData = db2.GetButtonDataByID(buttonIndex, gridType); // 获取按钮数据
+            button.Tag = buttonData; // 绑定数据
+            buttonManager.RefreshButtonDisplay(button, buttonData, 60, true); // 刷新显示
         }
 
         /// <summary>
@@ -837,19 +836,16 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="appearance">外观设置</param>
         private void AnimateButtonScale(Button btn, dynamic appearance)
         {
-            if (appearance == null || !appearance.ShowActionButtonMouseOver) return;
-            var border = FindVisualChild<Border>(btn);
-            if (border != null)
-            {
-                var scale = new ScaleTransform(1, 1);
-                border.RenderTransformOrigin = new Point(0.5, 0.5);
-                border.RenderTransform = scale;
+            if (appearance == null || !appearance.ShowActionButtonMouseOver) return; // 不显示动画
+            var border = VisualTreeHelper.FindVisualChild<Border>(btn); // 获取按钮边框
+            var scale = new ScaleTransform(1, 1); // 创建缩放动画
+            border.RenderTransformOrigin = new Point(0.5, 0.5); // 设置缩放中心
+            border.RenderTransform = scale; // 设置缩放动画
 
-                var animX = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(100));
-                var animY = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(100));
-                scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX);
-                scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
-            }
+            var animX = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(100)); // 创建X轴缩放动画
+            var animY = new DoubleAnimation(1.05, TimeSpan.FromMilliseconds(100)); 
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX); // 开始动画
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
         }
 
         /// <summary>
@@ -860,9 +856,9 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="conventions">通用设置（用于判断是否显示图片）</param>
         private void ShowAddImageOnButton(Button btn, dynamic appearance, dynamic conventions)
         {
-            if (conventions == null || !conventions.ShowAddImage) return;
-            double btnSize = appearance.ButtonSize;
-            double imageSize = btnSize / 2.0;
+            if (conventions == null || !conventions.ShowAddImage) return; // 不显示图片
+            double btnSize = appearance.ButtonSize; // 获取按钮尺寸
+            double imageSize = btnSize / 2.0; // 计算图片尺寸
             btn.Content = new Image
             {
                 Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Add.png")),
@@ -898,15 +894,15 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="btn">目标按钮</param>
         private void RestoreButtonScale(Button btn)
         {
-            var border = FindVisualChild<Border>(btn);
+            var border = VisualTreeHelper.FindVisualChild<Border>(btn); // 获取按钮边框
             if (border != null)
             {
-                var scale = border.RenderTransform as ScaleTransform;
+                var scale = border.RenderTransform as ScaleTransform; // 获取缩放动画
                 if (scale != null)
                 {
-                    var animX = new DoubleAnimation(1, TimeSpan.FromMilliseconds(100));
+                    var animX = new DoubleAnimation(1, TimeSpan.FromMilliseconds(100)); // 缩放动画
                     var animY = new DoubleAnimation(1, TimeSpan.FromMilliseconds(100));
-                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX);
+                    scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX); // 开始动画
                     scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
                 }
             }
@@ -917,24 +913,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             SearchWindow searchWindow = new(); // 创建搜索窗口
             searchWindow.Show(); // 显示窗口
-        }
-
-        // 辅助方法：查找Button模板里的Border
-        private T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is T t)
-                    return t;
-                else
-                {
-                    T childOfChild = FindVisualChild<T>(child);
-                    if (childOfChild != null)
-                        return childOfChild;
-                }
-            }
-            return null;
         }
     }
 }

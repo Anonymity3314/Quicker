@@ -20,6 +20,7 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
             佛祖保佑       永无BUG
 */
+using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
 using MouseButton = SharpHook.Data.MouseButton;
 using Quicker.Windows.MainWindows.MainWindow;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -376,10 +377,9 @@ namespace Quicker
                     {
                         if (settingWindow.IsVisible)
                         {
-                            var testButton = FindButtonByName(settingWindow, "TestButton"); // 递归查找名为 "TestButton" 的按钮
+                            var testButton = VisualTreeHelper.FindButtonByName(settingWindow, "TestButton"); // 递归查找名为 "TestButton" 的按钮
                             if (testButton != null)
                             {
-                               
                                 var buttonPoint = testButton.PointFromScreen(new System.Windows.Point(mousePosition.X, mousePosition.Y)); // 将屏幕坐标转换为按钮坐标
                                 if (buttonPoint.X >= 0 && buttonPoint.X <= testButton.ActualWidth &&
                                     buttonPoint.Y >= 0 && buttonPoint.Y <= testButton.ActualHeight) // 检查鼠标是否在按钮范围内
@@ -394,31 +394,6 @@ namespace Quicker
             }
             catch { }
             return isMouseOnTestButton; // 返回鼠标是否在测试按钮上
-        }
-
-        /// <summary>
-        /// 递归查找指定名称的按钮
-        /// </summary>
-        /// <param name="parent">父元素</param>
-        /// <param name="buttonName">按钮名称</param>
-        /// <returns>找到的按钮</returns>
-        private Button? FindButtonByName(DependencyObject parent, string buttonName)
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++) // 遍历父元素的子元素
-            {
-                var child = VisualTreeHelper.GetChild(parent, i); // 获取子元素
-                if (child is Button button && button.Name == buttonName) // 如果子元素是按钮且名称匹配
-                {
-                    return button; // 返回按钮
-                }
-
-                var result = FindButtonByName(child, buttonName); // 递归查找子元素中的按钮
-                if (result != null)
-                {
-                    return result; // 返回找到的按钮
-                }
-            }
-            return null; // 没有找到，返回null
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls.Primitives;
+﻿using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.EditWindows;
 using Quicker.Windows.ToolWindows;
@@ -18,17 +19,6 @@ namespace Quicker.Windows.MainWindows
 {
     public partial class ActionPageManageWindow : Window
     {
-        private T FindParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            while (child != null)
-            {
-                if (child is T parent)
-                    return parent; // 找到父级控件
-                child = VisualTreeHelper.GetParent(child); // 获取父级控件
-            }
-            return null;
-        } // 查找父级控件
-
         private bool isDarkModle = false, showUsedTimes = false; // 是否为暗黑模式，是否显示使用次数
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ActionPageDatabase db3 = new(); // 动作页数据库
@@ -792,9 +782,9 @@ namespace Quicker.Windows.MainWindows
                 if (!string.IsNullOrEmpty(sourceButtonName))
                 {
                     Point point = e.GetPosition(MainListView); // 获取鼠标位置
-                    var hitTestResult = VisualTreeHelper.HitTest(MainListView, point); // 获取鼠标位置的项
+                    var hitTestResult = System.Windows.Media.VisualTreeHelper.HitTest(MainListView, point); // 获取鼠标位置的项
                     DependencyObject targetItem = hitTestResult.VisualHit; // 获取鼠标位置的项
-                    Canvas targetCanvas = FindParent<Canvas>(targetItem);// 查找目标 Canvas
+                    Canvas targetCanvas = VisualTreeHelper.FindParent<Canvas>(targetItem);// 查找目标 Canvas
 
                     if (targetCanvas == null) return; // 如果目标 Canvas 为 null，则返回
                     string targetCanvasName = targetCanvas.Name; // 获取目标 Canvas 的 Name
