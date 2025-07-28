@@ -21,22 +21,6 @@ namespace Quicker.Managers
         private const int VK_LCONTROL = 0xA2;
         private const int VK_RCONTROL = 0xA3;
 
-        /// <summary>
-        /// 查找所有指定类型的子元素
-        /// </summary>
-        /// <typeparam name="T"> 目标类型 </typeparam>
-        /// <param name="obj"> 目标对象 </param>
-        /// <returns> 所有指定类型的子元素 </returns>
-        public IEnumerable<T> FindVisualChildren<T>(DependencyObject obj) where T : DependencyObject
-        {
-            if (obj == null) yield break; // 如果对象为空，停止枚举
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i); // 获取子元素
-                if (child is T tChild) yield return tChild; // 如果是目标类型，返回
-                foreach (var grandChild in FindVisualChildren<T>(child)) yield return grandChild; // 递归查找子元素的子元素
-            }
-        } // 递归查找所有指定类型的子元素
         public bool isClosing = false, isDragging, shouldHideTooltip; // 窗口关闭和拖拽状态、隐藏提示标志
         private readonly IconManager iconManager = new(); // 图标管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
@@ -54,10 +38,11 @@ namespace Quicker.Managers
         public void Button_PreviewDragOver(object sender, DragEventArgs e)
         {
             e.Handled = true; // 标记事件已处理
+            Button button = sender as Button; // 获取按钮
             bool isCtrlPressed = IsCtrlPressed(); // Ctrl键是否按下
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = button.Tag == null ? DragDropEffects.Copy : DragDropEffects.None;
             }
             else if (e.Data.GetDataPresent(typeof(ButtonData)))
             {
@@ -588,7 +573,7 @@ namespace Quicker.Managers
                     if(isMainButton)
                     {
                         if (button.Tag is ButtonData data) // 如果是主按钮
-                            DragDrop.DoDragDrop(button, data, DragDropEffects.Copy | DragDropEffects.Move); // 开始拖拽操作
+                            DragDrop.DoDragDrop(button, data, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.None); // 开始拖拽操作
                     }
                     else
                     {

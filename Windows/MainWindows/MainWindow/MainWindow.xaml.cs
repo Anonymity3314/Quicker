@@ -633,9 +633,9 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="grid">要清理的Grid</param>
         private void CleanUpGrid(Grid grid)
         {
-            foreach (Grid Grid in buttonManager.FindVisualChildren<Grid>(grid))
+            foreach (Grid Grid in VisualTreeHelper.FindVisualChildren<Grid>(grid))
             {
-                foreach (Button button in buttonManager.FindVisualChildren<Button>(Grid))
+                foreach (Button button in VisualTreeHelper.FindVisualChildren<Button>(Grid))
                 {
                     // 移除所有事件处理器
                     button.Click -= DoAction; // 左键点击事件
