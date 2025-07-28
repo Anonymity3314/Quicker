@@ -60,7 +60,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"加载设置失败: {ex.Message}", "Error"); // 弹出消息提醒
+                    toast.Show($"加载设置失败: {ex.Message}", ToastType.Error); // 弹出消息提醒
                 }); // 在UI线程更新界面
             }
         }
@@ -268,7 +268,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("应用已添加过：unknown-proc.exe", "Error"); // 弹出消息提醒
+                toast.Show("应用已添加过：unknown-proc.exe", ToastType.Error); // 弹出消息提醒
             }
             else
             {

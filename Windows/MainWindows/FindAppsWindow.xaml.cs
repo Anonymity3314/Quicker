@@ -305,7 +305,7 @@ namespace Quicker.Windows.MainWindows
                     {                        
                         Clipboard.SetText(directoryPath); // 复制目录路径到剪贴板
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show("文件夹路径已复制到剪贴板！", "Common"); // 弹出消息提醒
+                        toast.Show("文件夹路径已复制到剪贴板！", ToastType.Common); // 弹出消息提醒
                     }
                 }
             }

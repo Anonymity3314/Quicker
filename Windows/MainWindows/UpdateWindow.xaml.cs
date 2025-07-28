@@ -70,13 +70,6 @@ namespace Quicker.Windows.MainWindows
         private void NormalDownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadPopup.IsOpen = false; // 关闭Popup
-            if (string.IsNullOrWhiteSpace(_downloadUrl))
-            {
-                using var toast = new ToastManager(); // 创建Toast提示
-                toast.Show("暂无该版本下载方式！", "Common"); // 显示Toast提示
-                return;
-            }
-
             var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
             string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
 
@@ -88,24 +81,11 @@ namespace Quicker.Windows.MainWindows
         private void NetDownloadButton_Click(object sender, RoutedEventArgs e)
         {
             DownloadPopup.IsOpen = false; // 关闭Popup
-            if (string.IsNullOrWhiteSpace(_downloadUrlWithNet))
-            {
-                using var toast = new ToastManager(); // 创建Toast提示
-                toast.Show("暂无该版本下载方式！", "Common"); // 显示Toast提示
-                return;
-            }
-
             var fileName = Path.GetFileName(new Uri(_downloadUrlWithNet).AbsolutePath); // 获取文件名
             string destinationPath = Path.Combine(_downLoadPath, fileName); // 构建保存路径
 
             var downloadWindow = DownloadWindow.Create(_downloadUrlWithNet, destinationPath); // 创建下载窗口
             downloadWindow.Show(); // 显示下载窗口
-        }
-
-        // 取消下载按钮点击事件
-        private void CancelDownloadButton_Click(object sender, RoutedEventArgs e)
-        {
-            DownloadPopup.IsOpen = false; // 关闭Popup
         }
 
         // 前往下载地址查看详细信息
@@ -166,7 +146,7 @@ namespace Quicker.Windows.MainWindows
         private void ShowUpdateFailedMessage()
         {
             using var toast = new ToastManager(); // 创建Toast提示
-            toast.Show("获取更新失败！", "Common"); // 显示Toast提示
+            toast.Show("获取更新失败！", ToastType.Common); // 显示Toast提示
         }
 
         // 显示无更新可用信息
@@ -195,11 +175,11 @@ namespace Quicker.Windows.MainWindows
             _downloadUrl = updateInfo.DownloadUrl; // 保存下载地址
             _downloadUrlWithNet = updateInfo.DownloadUrlWithNet; // 保存下载地址
             string newVersion = updateInfo.Version; // 获取最新版本号
-            
+
             // 更新UI显示
             LatestVersionTextBlock1.Text = newVersion; // 显示最新版本号
             VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
-            
+
             // 检查下载地址可用性并更新按钮状态
             UpdateDownloadButtonsState();
         }

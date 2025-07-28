@@ -189,7 +189,7 @@ namespace Quicker.Windows.MainWindows
             }
             
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show(message, "Common"); // 弹出消息提醒
+            toast.Show(message, ToastType.Common); // 弹出消息提醒
         }
 
         /// <summary>

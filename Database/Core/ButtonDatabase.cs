@@ -249,7 +249,7 @@ namespace Quicker.Database.Core
                 if (isCtrlPressed)
                 {
                     using var toast = new ToastManager(); // 实例化 ToastManager
-                    toast.Show("目标位置已有动作，不可再添加新动作。", "Error"); // 显示提示
+                    toast.Show("目标位置已有动作，不可再添加新动作。", ToastType.Error); // 显示提示
                     return; // 退出函数
                 }
                 else

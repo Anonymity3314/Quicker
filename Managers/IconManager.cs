@@ -68,7 +68,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                ShowToast("获取图标失败。", "Error"); // 显示Toast
+                ShowToast("获取图标失败。", ToastType.Error); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
             return null; // 如果获取失败，返回 null
@@ -90,7 +90,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                ShowToast("检查缓存图标失败。", "Error"); // 显示Toast
+                ShowToast("检查缓存图标失败。", ToastType.Error); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -124,7 +124,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                ShowToast("保存图标失败。", "Error"); // 显示Toast
+                ShowToast("保存图标失败。", ToastType.Error); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
         }
@@ -156,7 +156,7 @@ namespace Quicker.Managers
 
                     if (IsImageEmpty(bitmapImage))
                     {
-                        ShowToast("获取网站图标失败。", "Error"); // 显示Toast
+                        ShowToast("获取网站图标失败。", ToastType.Error); // 显示Toast
                         return null; // 如果获取的网站图标为空图片，返回 null
                     }
                     return bitmapImage; // 返回网站图标
@@ -164,7 +164,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                ShowToast("获取网站图标失败。", "Error"); // 显示Toast
+                ShowToast("获取网站图标失败。", ToastType.Error); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
             finally
@@ -236,7 +236,7 @@ namespace Quicker.Managers
             }
             catch
             {
-                ShowToast("处理图标失败。", "Error"); // 显示Toast
+                ShowToast("处理图标失败。", ToastType.Error); // 显示Toast
                 throw;
             }
         }
@@ -509,7 +509,7 @@ namespace Quicker.Managers
             catch
             {
                 ClearImage(imageControl); // 清空图片
-                ShowToast("背景图片设置失败！", "Error"); // 显示Toast
+                ShowToast("背景图片设置失败！", ToastType.Error); // 显示Toast
             }
         }
 
@@ -573,7 +573,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="message">消息</param>
         /// <param name="title">标题</param>
-        private void ShowToast(string message, string title = "Error")
+        private void ShowToast(string message, ToastType title = ToastType.Error)
         {
             using var toast = new ToastManager(); // 创建ToastManager对象
             toast.Show(message, title); // 显示Toast

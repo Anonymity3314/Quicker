@@ -80,7 +80,7 @@ namespace Quicker.Windows.Menus
             catch (System.IO.IOException)
             {
                 using var toast = new ToastManager(); // 创建Toast管理器
-                toast.Show("加载场景" + data.SceneName + " 图标失败。", "Error"); // 显示Toast提示
+                toast.Show("加载场景" + data.SceneName + " 图标失败。", ToastType.Error); // 显示Toast提示
                 image.Source = new BitmapImage(new Uri("/Resources/Images/Quicker_Enabled.png", UriKind.Relative)); // 设置默认图标
             }
             return image; // 返回图标

@@ -22,12 +22,12 @@ public class AppUpdateManager : IDisposable
             if (latestVersion != null && VersionHelper.IsNewVersionAvailable(SettingDatabase.currentVersion, latestVersion.Version)) // 使用VersionHelper进行版本比较
             {
                 AppStateManager.HasNewVersion = true; // 设置有新版本
-                toast.Show($"发现新版本：{latestVersion.Version}", "Common"); // 弹窗提示
+                toast.Show($"发现新版本：{latestVersion.Version}", ToastType.Common); // 弹窗提示
             }
         }
         else
         {
-            toast.Show("获取更新信息失败！", "Error"); // 弹窗提示
+            toast.Show("获取更新信息失败！", ToastType.Error); // 弹窗提示
         }
     }
 

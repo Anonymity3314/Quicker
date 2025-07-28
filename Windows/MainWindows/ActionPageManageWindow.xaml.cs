@@ -656,7 +656,7 @@ namespace Quicker.Windows.MainWindows
             if (canvasCount == 10) // 如果画布索引等于9
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("当前场景动作页数量已达上限。", "Error"); // 弹出消息提醒
+                toast.Show("当前场景动作页数量已达上限。", ToastType.Error); // 弹出消息提醒
             }
             else if (canvasCount == 0)
             {
@@ -872,7 +872,7 @@ namespace Quicker.Windows.MainWindows
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", "Common"); // 弹出消息提醒
+            toast.Show($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", ToastType.Common); // 弹出消息提醒
         }
 
         // 点击按钮编辑动作页信息
@@ -885,13 +885,13 @@ namespace Quicker.Windows.MainWindows
                 case "_global":
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show("默认全局动作页信息不可修改。", "Common"); // 弹出消息提醒
+                        toast.Show("默认全局动作页信息不可修改。", ToastType.Common); // 弹出消息提醒
                     }
                     break;
                 case "common":
                     {
                         using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show("默认通用动作页信息不可修改。", "Common"); // 弹出消息提醒
+                        toast.Show("默认通用动作页信息不可修改。", ToastType.Common); // 弹出消息提醒
                     }
                     break;
                 default:
@@ -910,7 +910,7 @@ namespace Quicker.Windows.MainWindows
             string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};QuickerCommand"; // 生成打开动作页指令
             Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("已创建动作并写入剪贴板，请粘贴到合适位置。", "Common"); // 弹出消息提醒
+            toast.Show("已创建动作并写入剪贴板，请粘贴到合适位置。", ToastType.Common); // 弹出消息提醒
         }
 
         // 点击按钮删除动作页
@@ -952,7 +952,7 @@ namespace Quicker.Windows.MainWindows
             if (new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(type)) // 如果是默认场景
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("此项不可编辑。", "Common"); // 弹出消息提醒
+                toast.Show("此项不可编辑。", ToastType.Common); // 弹出消息提醒
             }
             else
             {
@@ -969,7 +969,7 @@ namespace Quicker.Windows.MainWindows
             if (new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(type)) // 如果是默认场景
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("此项不可删除。", "Common"); // 弹出消息提醒
+                toast.Show("此项不可删除。", ToastType.Common); // 弹出消息提醒
             }
             else
             {

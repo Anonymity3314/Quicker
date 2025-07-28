@@ -42,7 +42,7 @@ namespace Quicker.Extend
             }
             catch (Exception ex)
             {
-                _toast.Show($"加载模块时出错：{ex.Message}", "Error"); // 通知用户
+                _toast.Show($"加载模块时出错：{ex.Message}", ToastType.Error); // 通知用户
             }
         }
 
@@ -55,7 +55,7 @@ namespace Quicker.Extend
             string[] moduleFiles = Directory.GetFiles(modulesDirectory, "*.dll");
             if (moduleFiles.Length == 0)
             {
-                _toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", "Error"); // 通知用户
+                _toast.Show($"模块目录 {modulesDirectory} 中没有找到模块。", ToastType.Error); // 通知用户
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace Quicker.Extend
                 }
                 catch (Exception ex)
                 {
-                    _toast.Show($"加载程序集 {moduleFile} 时出错：{ex.Message}", "Error");
+                    _toast.Show($"加载程序集 {moduleFile} 时出错：{ex.Message}", ToastType.Error);
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace Quicker.Extend
                 }
                 catch (Exception ex)
                 {
-                    _toast.Show($"发现模块时出错：{ex.Message}", "Error");
+                    _toast.Show($"发现模块时出错：{ex.Message}", ToastType.Error);
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace Quicker.Extend
                     }
                     catch (Exception ex)
                     {
-                        _toast.Show($"初始化模块 {module.Name} 时出错：{ex.Message}", "Error");
+                        _toast.Show($"初始化模块 {module.Name} 时出错：{ex.Message}", ToastType.Error);
                     }
                 }
             }
@@ -163,7 +163,7 @@ namespace Quicker.Extend
 
             if (!_loadedModules.ContainsKey(moduleName)) // 如果找不到模块
             {
-                _toast.Show($"找不到依赖的模块：{moduleName}", "Error"); // 找不到依赖的模块
+                _toast.Show($"找不到依赖的模块：{moduleName}", ToastType.Error); // 找不到依赖的模块
                 return; // 退出
             }
 
@@ -196,7 +196,7 @@ namespace Quicker.Extend
                 }
                 catch (Exception ex)
                 {
-                    _toast.Show($"停止模块 {module.Name} 时出错：{ex.Message}", "Error"); // 通知用户
+                    _toast.Show($"停止模块 {module.Name} 时出错：{ex.Message}", ToastType.Error); // 通知用户
                 }
             }
             _loadedModules.Clear(); // 清空已加载的模块

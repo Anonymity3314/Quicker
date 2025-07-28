@@ -37,7 +37,7 @@ namespace Quicker.Windows.ToolWindows
                 catch
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除", "Error"); // 弹出消息提醒
+                    toast.Show($"图标加载失败：按钮{buttonData.Title}的图标被移动或删除", ToastType.Error); // 弹出消息提醒
                 }
             }
             CreatTimeLabel.Content = buttonData.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"); // 初始化创建时间
@@ -82,7 +82,7 @@ namespace Quicker.Windows.ToolWindows
         {
             Clipboard.SetText(IDTextBlock.Text); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("动作ID已经写入剪贴板。", "Success"); // 显示复制成功的通知
+            toast.Show("动作ID已经写入剪贴板。", ToastType.Success); // 显示复制成功的通知
         }
 
         // 复制动作信息
@@ -95,7 +95,7 @@ namespace Quicker.Windows.ToolWindows
                                 $"URI:quicker:runaction:{buttonData.Data1}{buttonData.Data2}{buttonData.Data3}"; // 复制的文本内容
             Clipboard.SetText(textToCopy); // 复制文本到剪贴板
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("已复制!", "Success"); // 显示复制成功的通知
+            toast.Show("已复制!", ToastType.Success); // 显示复制成功的通知
         }
 
         // 关闭动作信息窗口

@@ -382,7 +382,7 @@ namespace Quicker.Windows.AddWindows
                 default:
                     {
                         using var toast = new ToastManager(); // 创建 ToastManager 实例
-                        toast.Show("功能开发中，敬请期待！", "Common"); // 显示提示消息
+                        toast.Show("功能开发中，敬请期待！", ToastType.Common); // 显示提示消息
                     }
                     break; // 其他情况
             }
@@ -433,7 +433,7 @@ namespace Quicker.Windows.AddWindows
             {
                 ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
                 using var toast = new ToastManager(); // 创建 ToastManager 实例
-                toast.Show("加载图片失败!", "Error"); // 显示错误提示
+                toast.Show("加载图片失败!", ToastType.Error); // 显示错误提示
             }
         }
 

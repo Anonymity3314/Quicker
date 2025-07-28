@@ -4,13 +4,24 @@ using System.Windows;
 
 namespace Quicker.Managers
 {
+    /// <summary>
+    /// Toast消息类型枚举
+    /// </summary>
+    public enum ToastType
+    {
+        Common,// 普通消息
+        Error,// 错误消息
+        Warning,// 警告消息
+        Success// 成功消息
+    }
+
     public class ToastManager : IDisposable
     {
         private ToastWindow? toastWindow;
         private bool isDisposed = false;
 
         // 添加Toast消息
-        public void Show(string message, string toastType)
+        public void Show(string message, ToastType toastType)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -20,7 +31,7 @@ namespace Quicker.Managers
                     toastWindow = new ToastWindow(); // 创建新的ToastWindow实例
                     toastWindow.Show(); // 显示ToastWindow
                 }
-                toastWindow.AddToast(message, toastType); // 添加Toast消息
+                toastWindow.AddToast(message, toastType.ToString()); // 添加Toast消息
             });
         }
 

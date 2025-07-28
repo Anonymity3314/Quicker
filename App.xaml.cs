@@ -128,7 +128,7 @@ namespace Quicker
                 if (Convention.ShowNotification) // 如果设置中允许显示消息提醒
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show("成功启动！", "Common"); // 弹出消息提醒
+                    toast.Show("成功启动！", ToastType.Common); // 弹出消息提醒
                 }
             }); // 异步执行
         }
@@ -141,7 +141,7 @@ namespace Quicker
             if (appearance == null)
             {
                 using var toast = new ToastManager();
-                toast.Show("获取字体设置失败！", "Error");
+                toast.Show("获取字体设置失败！", ToastType.Error);
                 return;
             }
 
@@ -872,7 +872,7 @@ namespace Quicker
             }
             catch
             {
-                toast.Show("请勿频繁操作！", "Warning"); // 弹出消息提醒
+                toast.Show("请勿频繁操作！", ToastType.Warning); // 弹出消息提醒
             }
 
             var toastMessage = AppStateManager.Pause ? "Quicker已恢复" : "Quicker已暂停"; // 消息提醒
@@ -881,7 +881,7 @@ namespace Quicker
             customMenu.PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
             AppStateManager.Pause = !AppStateManager.Pause; // 切换暂停状态
             taskbarIcon.IconSource = AppStateManager.TrayIcon; // 切换托盘图标
-            toast.Show(toastMessage, AppStateManager.Pause ? "Common" : "Success"); // 弹出消息提醒
+            toast.Show(toastMessage, AppStateManager.Pause ? ToastType.Common : ToastType.Success); // 弹出消息提醒
         }
 
         // 退出应用释放资源

@@ -803,7 +803,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             inputPngPath = EnsureTrueColorPng(inputPngPath); // 保证是32位真彩色
             string outputPngPath = GetShareAppearanceOutputPath(); // 获取输出路径（自动创建保存文件夹，文件名带时间戳）
             WriteAppearanceToPng(inputPngPath, outputPngPath, json); // 写入 PNG 文件并嵌入 JSON 数据
-            ShowToast("外观保存成功！", "Success"); // 显示保存成功的 Toast 提示
+            ShowToast("外观保存成功！", ToastType.Success); // 显示保存成功的 Toast 提示
             Process.Start("explorer.exe", $"/select,\"{outputPngPath}\""); // 打开资源管理器并选中刚保存的 PNG 文件
         }
 
@@ -823,7 +823,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             catch
             {
-                ShowToast("图片格式不受支持或文件损坏，已自动使用默认图片导出外观。", "Error");
+                ShowToast("图片格式不受支持或文件损坏，已自动使用默认图片导出外观。", ToastType.Error);
                 string defaultPath = GetAppearanceCarrierImagePath(); // 获取默认图片路径
                 // 防止死循环：如果inputPath已经是默认图片，则不再递归
                 if (!string.Equals(inputPath, defaultPath, StringComparison.OrdinalIgnoreCase))
@@ -901,7 +901,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// </summary>
         /// <param name="message">提示内容</param>
         /// <param name="type">提示类型 (Success, Error, Info)</param>
-        private void ShowToast(string message, string type)
+        private void ShowToast(string message, ToastType type)
         {
             using var toast = new ToastManager();
             toast.Show(message, type);
@@ -982,17 +982,17 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 var appearance = ImportAppearanceFromPng(selectedPngPath); // 导入外观数据
                 if (appearance == null)
                 {
-                    ShowToast("未检测到外观数据！", "Error");
+                    ShowToast("未检测到外观数据！", ToastType.Error);
                     return;
                 }
 
                 HandleImportedAppearanceBackgroundImage(appearance, selectedPngPath); // 处理背景图片
                 ApplyImportedAppearance(appearance); // 应用外观参数并刷新界面
-                ShowToast("导入成功！", "Success");
+                ShowToast("导入成功！", ToastType.Success);
             }
             catch
             {
-                ShowToast("导入失败！", "Error");
+                ShowToast("导入失败！", ToastType.Error);
             }
         }
 

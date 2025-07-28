@@ -533,7 +533,7 @@ namespace Quicker.Windows.ToolWindows
         {
             if (bitmapSource == null)
             {
-                ShowToast("图片加载失败！", "Error");
+                ShowToast("图片加载失败！", ToastType.Error);
                 return null;
             }
             if (!Directory.Exists(dir)) // 创建保存目录
@@ -557,12 +557,12 @@ namespace Quicker.Windows.ToolWindows
                         string ext = Path.GetExtension(originalFilePath).ToLower(); // 获取原图扩展名
                         string fallbackPath = Path.ChangeExtension(filePath, ext); // 生成原格式的目标路径
                         File.Copy(originalFilePath, fallbackPath, true); // 直接复制原图文件
-                        ShowToast("PNG保存失败，已按原格式保存。", "Error");
+                        ShowToast("PNG保存失败，已按原格式保存。", ToastType.Error);
                         return fallbackPath; // 返回原格式路径
                     }
                 }
                 catch { /* 原格式保存也失败，进入下方错误提示 */ }
-                ShowToast("图片保存失败！", "Error"); // 所有方式都失败
+                ShowToast("图片保存失败！", ToastType.Error); // 所有方式都失败
                 return null;
             }
         }
@@ -618,12 +618,12 @@ namespace Quicker.Windows.ToolWindows
                                     image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Png.PngEncoder()); // 兜底
                             }
                         }
-                        ShowToast($"PNG保存失败，已按原格式{ext}保存。", "Info");
+                        ShowToast($"PNG保存失败，已按原格式{ext}保存。", ToastType.Error);
                         return fallbackPath;
                     }
                 }
                 catch { }
-                ShowToast("图片保存失败，已跳过。", "Error");
+                ShowToast("图片保存失败，已跳过。", ToastType.Error);
                 return null;
             }
         }
@@ -642,7 +642,7 @@ namespace Quicker.Windows.ToolWindows
 
             if (bitmapSource == null)
             {
-                ShowToast("图片加载失败！", "Error");
+                ShowToast("图片加载失败！", ToastType.Error);
                 return false;
             }
 
@@ -688,7 +688,7 @@ namespace Quicker.Windows.ToolWindows
 
             if (w <= 0 || h <= 0)
             {
-                ShowToast("裁剪区域无效！", "Error");
+                ShowToast("裁剪区域无效！", ToastType.Error);
                 return false;
             }
 
@@ -726,7 +726,7 @@ namespace Quicker.Windows.ToolWindows
         /// </summary>
         /// <param name="message">消息内容</param>
         /// <param name="type">消息类型</param>
-        private void ShowToast(string message, string type)
+        private void ShowToast(string message, ToastType type)
         {
             using (var toast = new ToastManager())
             {
@@ -821,10 +821,7 @@ namespace Quicker.Windows.ToolWindows
                 }
                 catch
                 {
-                    using (var toast = new ToastManager()) // 加载失败时弹出提示
-                    {
-                        toast.Show("图片加载失败！", "Error");
-                    }
+                    ShowToast("图片加载失败！", ToastType.Error);
                 }
             }
         }

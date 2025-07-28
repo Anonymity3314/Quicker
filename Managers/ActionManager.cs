@@ -69,7 +69,7 @@ namespace Quicker.Managers
                 catch (Exception ex)
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"打开失败：{ex}", "Error"); // 弹出消息提醒
+                    toast.Show($"打开失败：{ex}", ToastType.Error); // 弹出消息提醒
                 }
             } // 如果是快捷方式或者可执行文件
             else
@@ -88,7 +88,7 @@ namespace Quicker.Managers
                 catch (Exception ex)
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"打开失败：{ex}", "Error"); // 弹出消息提醒
+                    toast.Show($"打开失败：{ex}", ToastType.Error); // 弹出消息提醒
                 }
             } // 使用系统默认方式打开文件
         }
@@ -147,7 +147,7 @@ namespace Quicker.Managers
             catch (Exception ex)
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show($"打开网站失败：{ex.Message}", "Error"); // 弹出消息提醒
+                toast.Show($"打开网站失败：{ex.Message}", ToastType.Error); // 弹出消息提醒
             }
         }
 
@@ -331,7 +331,7 @@ namespace Quicker.Managers
             catch (Exception ex)
             {
                 using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show($"打开UWP应用失败：{ex.Message}", "Error"); // 弹出消息提醒
+                toast.Show($"打开UWP应用失败：{ex.Message}", ToastType.Error); // 弹出消息提醒
             }
         }
 
@@ -345,7 +345,7 @@ namespace Quicker.Managers
             if (!System.IO.File.Exists(dllPath)) // 判断DLL文件是否存在
             {
                 using var toast = new ToastManager();
-                toast.Show($"扩展文件不存在: {dllPath}", "Error");
+                toast.Show($"扩展文件不存在: {dllPath}", ToastType.Error);
                 return;
             }
             else

@@ -44,7 +44,7 @@ namespace Quicker.Windows.ToolWindows
             if (existingWindow != null && !existingWindow._isClosed)
             {
                 var toast = new ToastManager();
-                toast.Show("下载中，请勿重复操作", "Common");
+                toast.Show("下载中，请勿重复操作", ToastType.Common);
                 existingWindow.EnableDownloadButton(false);
                 return existingWindow;
             }
@@ -183,7 +183,7 @@ namespace Quicker.Windows.ToolWindows
         {
             var toast = new ToastManager(); // 创建Toast提示
             var fileName = Path.GetFileName(new Uri(_downloadUrl).AbsolutePath); // 获取文件名
-            toast.Show($"{fileName} 下载完成", "Success"); // 显示Toast提示
+            toast.Show($"{fileName} 下载完成", ToastType.Success); // 显示Toast提示
             EnableDownloadButton(true); // 启用下载按钮
             var downloadedFileInfo = new FileInfo(_downloadPath); // 获取下载文件信息
             System.Diagnostics.Process.Start("explorer.exe", $"/select, \"{downloadedFileInfo.FullName}\""); // 打开下载目录并选中文件
@@ -194,7 +194,7 @@ namespace Quicker.Windows.ToolWindows
         private void HandleCancellation()
         {
             var toast = new ToastManager(); // 创建Toast提示
-            toast.Show("下载已取消", "Common"); // 显示Toast提示
+            toast.Show("下载已取消", ToastType.Common); // 显示Toast提示
         }
 
         // 处理下载错误
@@ -206,13 +206,13 @@ namespace Quicker.Windows.ToolWindows
                 if (webEx.Status == WebExceptionStatus.ProtocolError) // 协议错误
                 {
                     var response = webEx.Response as HttpWebResponse; // 获取HttpWebResponse
-                    toast.Show($"服务器返回错误：{(int)response.StatusCode} {response.StatusDescription}", "Error"); // 服务器返回错误
+                    toast.Show($"服务器返回错误：{(int)response.StatusCode} {response.StatusDescription}", ToastType.Error); // 服务器返回错误
                 }
                 else
-                    toast.Show($"网络错误：{webEx.Message}", "Error"); // 网络错误
+                    toast.Show($"网络错误：{webEx.Message}", ToastType.Error); // 网络错误
             }
             else
-                toast.Show($"系统错误：{ex.Message}", "Error"); // 其他错误
+                toast.Show($"系统错误：{ex.Message}", ToastType.Error); // 其他错误
             Close(); // 关闭下载窗口
             EnableDownloadButton(true); // 启用下载按钮
         }
@@ -266,7 +266,7 @@ namespace Quicker.Windows.ToolWindows
                 catch (Exception ex)
                 {
                     var toast = new ToastManager(); // 创建Toast提示
-                    toast.Show($"删除文件失败：{ex.Message}", "Error"); // 显示Toast提示
+                    toast.Show($"删除文件失败：{ex.Message}", ToastType.Error); // 显示Toast提示
                 }
                 this.Close(); // 关闭窗口
             }

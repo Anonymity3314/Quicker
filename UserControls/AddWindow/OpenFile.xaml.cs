@@ -392,7 +392,7 @@ namespace Quicker.UserControls.AddWindow
                 else
                 {
                     using var toast = new ToastManager(); // 创建 ToastManager 实例
-                    toast.Show("图标提取失败!", "Error"); // 显示错误提示
+                    toast.Show("图标提取失败!", ToastType.Error); // 显示错误提示
                 }
             }
         }

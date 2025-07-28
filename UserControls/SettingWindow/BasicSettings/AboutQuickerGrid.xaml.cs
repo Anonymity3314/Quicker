@@ -162,7 +162,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath);
                 CopyFolder(sourceFolderPath, backupFolderPath);
                 using var toast = new ToastManager();
-                toast.Show("操作完成！", "Success");
+                toast.Show("操作完成！", ToastType.Success);
                 OpenFolder(folderPath);
             }
         }
@@ -196,7 +196,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             catch
             {
                 using var toast = new ToastManager(); // 创建 ToastManager 的实例
-                toast.Show("备份失败！", "Error"); // 显示提示
+                toast.Show("备份失败！", ToastType.Error); // 显示提示
             }
         }
 
@@ -247,12 +247,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
                 Directory.CreateDirectory(folderPath); // 重新创建空文件夹
                 using var toastSuccess = new ToastManager();
-                toastSuccess.Show("清理完成！", "Success");
+                toastSuccess.Show("清理完成！", ToastType.Success);
             }
             catch (Exception ex)
             {
                 using var toastError = new ToastManager();
-                toastError.Show("清理失败：" + ex.Message, "Error");
+                toastError.Show("清理失败：" + ex.Message, ToastType.Error);
             }
         }
 

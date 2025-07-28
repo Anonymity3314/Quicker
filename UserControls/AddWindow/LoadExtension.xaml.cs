@@ -130,7 +130,7 @@ namespace Quicker.UserControls.AddWindow
             catch
             {
                 using var toast = new ToastManager(); // 创建ToastManager
-                toast.Show("扩展信息加载失败", "Error"); // 显示错误提示
+                toast.Show("扩展信息加载失败", ToastType.Error); // 显示错误提示
             }
             LoadExtensionPopup.IsOpen = false; // 关闭弹出菜单
         }
@@ -170,7 +170,7 @@ namespace Quicker.UserControls.AddWindow
             using var toast = new ToastManager();
             if (!File.Exists(dllPath) || !dllPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
             {
-                toast.Show("未找到扩展DLL文件", "Error"); // 如果未找到扩展DLL文件，则显示错误提示
+                toast.Show("未找到扩展DLL文件", ToastType.Error); // 如果未找到扩展DLL文件，则显示错误提示
                 return;
             }
 
@@ -182,7 +182,7 @@ namespace Quicker.UserControls.AddWindow
 
                 if (moduleType == null)
                 {
-                    toast.Show("未找到有效的扩展模块类型", "Error"); // 如果未找到有效的扩展模块类型，则显示错误提示
+                    toast.Show("未找到有效的扩展模块类型", ToastType.Error); // 如果未找到有效的扩展模块类型，则显示错误提示
                     return;
                 }
 
@@ -200,7 +200,7 @@ namespace Quicker.UserControls.AddWindow
             }
             catch
             {
-                toast.Show("扩展信息加载失败！", "Error"); // 如果加载扩展信息失败，则显示错误提示
+                toast.Show("扩展信息加载失败！", ToastType.Error); // 如果加载扩展信息失败，则显示错误提示
                 NameTextBlock.Text = "未知";
                 VersionTextBlock.Text = "未知";
                 AuthorTextBlock.Text = "未知";

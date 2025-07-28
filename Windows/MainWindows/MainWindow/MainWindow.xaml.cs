@@ -864,7 +864,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Add.png")),
                 Stretch = Stretch.Uniform,
                 Height = imageSize,
-                Width = imageSize
+                Width = imageSize,
+                Opacity = 0.5
             };
         }
 

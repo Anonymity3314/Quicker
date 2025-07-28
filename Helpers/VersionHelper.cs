@@ -27,7 +27,7 @@ namespace Quicker.Helpers
                 {
                     return v1.CompareTo(v2);
                 }
-                
+
                 // 如果版本号解析失败，回退到字符串比较
                 return string.Compare(version1, version2, StringComparison.OrdinalIgnoreCase);
             }

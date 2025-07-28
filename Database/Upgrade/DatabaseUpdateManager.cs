@@ -49,7 +49,7 @@ namespace Quicker.Database.Upgrade
             catch
             {
                 using var toast = new ToastManager(); // 创建 Toast 管理器
-                toast.Show("数据库更新失败，请删除数据库文件后重试。", "Error"); // 显示 Toast 通知
+                toast.Show("数据库更新失败，请删除数据库文件后重试。", ToastType.Error); // 显示 Toast 通知
             }
             finally
             {
