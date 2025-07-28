@@ -1,5 +1,9 @@
-﻿using Rectangle = System.Windows.Shapes.Rectangle;
+﻿using ImageSharpImage = SixLabors.ImageSharp.Image;
+using Rectangle = System.Windows.Shapes.Rectangle;
 using Quicker.UserControls.SettingWindow;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Processing;
 using Point = System.Windows.Point;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
@@ -96,7 +100,6 @@ namespace Quicker.Windows.ToolWindows
                 ImageBehavior.SetAnimatedSource(CropImage, gifImage); // 显示动图GIF
                 _originalBitmapSource = gifImage; // 保存原图
             }
-            SetGifTipVisibility(ext); // 根据扩展名设置GIF提示的可见性
         }
 
         /// <summary>
@@ -109,15 +112,6 @@ namespace Quicker.Windows.ToolWindows
             HandleColorButton.Tag = new SolidColorBrush(Colors.White);
             ImageGrid.Background = BackgroundColorButton.Tag as SolidColorBrush;
             CropBorder.BorderBrush = BorderColorButton.Tag as SolidColorBrush;
-        }
-
-        /// <summary>
-        /// 根据扩展名设置GIF提示的可见性
-        /// </summary>
-        /// <param name="ext">文件扩展名（小写）</param>
-        private void SetGifTipVisibility(string ext)
-        {
-            GifTipTextBlock.Visibility = ext == ".gif" ? Visibility.Visible : Visibility.Collapsed;
         }
 
         // 监听键盘方向键，微调裁剪框位置
@@ -570,61 +564,243 @@ namespace Quicker.Windows.ToolWindows
         /// <summary>
         /// 优先保存为PNG，失败则用原格式保存裁剪图，返回实际保存路径，失败返回null
         /// </summary>
+        /// <param name="bitmapSource"> 图片源 </param>
+        /// <param name="cropRect"> 裁剪区域 </param>
+        /// <param name="dir"> 保存目录 </param>
+        /// <param name="filePath"> 保存路径 </param>
+        /// <param name="originalFilePath"> 原图路径 </param>
+        /// <returns>实际保存路径，失败返回 null </returns>
         private string SaveCroppedImageWithFallback(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath, string originalFilePath)
         {
-            var cropped = new CroppedBitmap(bitmapSource, cropRect);
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
+            // 尝试GIF动图裁剪
+            if (TrySaveGifAnimation(originalFilePath, cropRect, dir, filePath, out string gifPath))
+            {
+                return gifPath;
+            }
+
+            // 尝试PNG保存
+            if (TrySaveAsPng(bitmapSource, cropRect, dir, filePath))
+            {
+                return filePath;
+            }
+
+            // PNG保存失败，尝试用原格式保存
+            return TrySaveAsOriginalFormat(bitmapSource, cropRect, dir, filePath, originalFilePath);
+        }
+
+        /// <summary>
+        /// 尝试保存GIF动图裁剪
+        /// </summary>
+        /// <param name="originalFilePath">原始文件路径</param>
+        /// <param name="cropRect">裁剪区域</param>
+        /// <param name="dir">保存目录</param>
+        /// <param name="filePath">目标文件路径</param>
+        /// <param name="gifPath">输出：GIF文件路径</param>
+        /// <returns>成功返回true，否则false</returns>
+        private bool TrySaveGifAnimation(string originalFilePath, Int32Rect cropRect, string dir, string filePath, out string gifPath)
+        {
+            gifPath = null;
+            
+            // 检查是否为GIF动图
+            if (!IsGifFile(originalFilePath))
+                return false;
+
+            // 尝试GIF动图裁剪
+            string gifTargetPath = Path.ChangeExtension(filePath, ".gif");
+            if (SaveGifAnimation(originalFilePath, cropRect, dir, gifTargetPath))
+            {
+                gifPath = gifTargetPath;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 检查是否为GIF文件
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>是否为GIF文件</returns>
+        private bool IsGifFile(string filePath)
+        {
+            return !string.IsNullOrEmpty(filePath) && 
+                   Path.GetExtension(filePath).ToLower() == ".gif" &&
+                   _originalBitmapSource is BitmapImage bmpImg && 
+                   bmpImg.UriSource != null;
+        }
+
+        /// <summary>
+        /// 尝试保存为PNG格式
+        /// </summary>
+        /// <param name="bitmapSource">图片源</param>
+        /// <param name="cropRect">裁剪区域</param>
+        /// <param name="dir">保存目录</param>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>成功返回true，否则false</returns>
+        private bool TrySaveAsPng(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath)
+        {
             try
             {
+                EnsureDirectoryExists(dir); // 创建保存目录
+                var cropped = new CroppedBitmap(bitmapSource, cropRect); // 裁剪图片
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(cropped));
-                    encoder.Save(fileStream);
+                    PngBitmapEncoder encoder = new(); // 编码器
+                    encoder.Frames.Add(BitmapFrame.Create(cropped)); // 添加图片
+                    encoder.Save(fileStream); // 保存图片
                 }
-                return filePath;
+                return true;
             }
             catch
             {
-                // PNG保存失败，尝试用原格式保存
-                try
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 尝试用原格式保存
+        /// </summary>
+        /// <param name="bitmapSource">图片源</param>
+        /// <param name="cropRect">裁剪区域</param>
+        /// <param name="dir">保存目录</param>
+        /// <param name="filePath">文件路径</param>
+        /// <param name="originalFilePath">原始文件路径</param>
+        /// <returns>保存成功返回文件路径，失败返回null</returns>
+        private string TrySaveAsOriginalFormat(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath, string originalFilePath)
+        {
+            try
+            {
+                if (!IsValidOriginalFile(originalFilePath))
+                    return null;
+
+                string ext = Path.GetExtension(originalFilePath).ToLower();
+                string fallbackPath = Path.ChangeExtension(filePath, ext);
+                if (SaveCroppedImageAsFormat(bitmapSource, cropRect, fallbackPath, ext))
                 {
-                    if (!string.IsNullOrEmpty(originalFilePath) && File.Exists(originalFilePath))
+                    ShowToast($"PNG保存失败，已按原格式{ext}保存。", ToastType.Error);
+                    return fallbackPath;
+                }
+            }
+            catch { }
+
+            ShowToast("图片保存失败，已跳过。", ToastType.Error);
+            return null;
+        }
+
+        /// <summary>
+        /// 检查原始文件是否有效
+        /// </summary>
+        /// <param name="originalFilePath">原始文件路径</param>
+        /// <returns>文件是否有效</returns>
+        private bool IsValidOriginalFile(string originalFilePath)
+        {
+            return !string.IsNullOrEmpty(originalFilePath) && File.Exists(originalFilePath);
+        }
+
+        /// <summary>
+        /// 确保目录存在
+        /// </summary>
+        /// <param name="dir">目录路径</param>
+        private void EnsureDirectoryExists(string dir)
+        {
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+        }
+
+        /// <summary>
+        /// 将裁剪后的图片保存为指定格式
+        /// </summary>
+        /// <param name="bitmapSource">图片源</param>
+        /// <param name="cropRect">裁剪区域</param>
+        /// <param name="outputPath">输出路径</param>
+        /// <param name="format">目标格式</param>
+        /// <returns>成功返回true，否则false</returns>
+        private bool SaveCroppedImageAsFormat(BitmapSource bitmapSource, Int32Rect cropRect, string outputPath, string format)
+        {
+            try
+            {
+                var cropped = new CroppedBitmap(bitmapSource, cropRect);
+                using (var ms = new MemoryStream())
+                {
+                    // 先用WPF保存为BMP到内存流
+                    BmpBitmapEncoder bmpEncoder = new();
+                    bmpEncoder.Frames.Add(BitmapFrame.Create(cropped));
+                    bmpEncoder.Save(ms);
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    // 用ImageSharp加载BMP流并保存为指定格式
+                    using (var image = ImageSharpImage.Load(ms))
                     {
-                        string ext = Path.GetExtension(originalFilePath).ToLower();
-                        string fallbackPath = Path.ChangeExtension(filePath, ext);
-                        using (var ms = new MemoryStream())
-                        {
-                            // 先用WPF保存为BMP到内存流
-                            BmpBitmapEncoder bmpEncoder = new BmpBitmapEncoder();
-                            bmpEncoder.Frames.Add(BitmapFrame.Create(cropped));
-                            bmpEncoder.Save(ms);
-                            ms.Seek(0, SeekOrigin.Begin);
-                            // 用ImageSharp加载BMP流
-                            using (var image = SixLabors.ImageSharp.Image.Load(ms))
-                            {
-                                if (ext == ".jpg" || ext == ".jpeg")
-                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
-                                else if (ext == ".bmp")
-                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Bmp.BmpEncoder());
-                                else if (ext == ".gif")
-                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Gif.GifEncoder());
-                                else if (ext == ".webp")
-                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Webp.WebpEncoder());
-                                else if (ext == ".tiff")
-                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Tiff.TiffEncoder());
-                                else
-                                    image.Save(fallbackPath, new SixLabors.ImageSharp.Formats.Png.PngEncoder()); // 兜底
-                            }
-                        }
-                        ShowToast($"PNG保存失败，已按原格式{ext}保存。", ToastType.Error);
-                        return fallbackPath;
+                        SaveImageWithEncoder(image, outputPath, format);
                     }
                 }
-                catch { }
-                ShowToast("图片保存失败，已跳过。", ToastType.Error);
-                return null;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 使用指定的编码器保存图片
+        /// </summary>
+        /// <param name="image">图片对象</param>
+        /// <param name="outputPath">输出路径</param>
+        /// <param name="format">格式</param>
+        private void SaveImageWithEncoder(ImageSharpImage image, string outputPath, string format)
+        {
+            switch (format)
+            {
+                case ".jpg":
+                case ".jpeg":
+                    image.Save(outputPath, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder());
+                    break;
+                case ".bmp":
+                    image.Save(outputPath, new SixLabors.ImageSharp.Formats.Bmp.BmpEncoder());
+                    break;
+                case ".gif":
+                    image.Save(outputPath, new GifEncoder());
+                    break;
+                case ".webp":
+                    image.Save(outputPath, new SixLabors.ImageSharp.Formats.Webp.WebpEncoder());
+                    break;
+                case ".tiff":
+                    image.Save(outputPath, new SixLabors.ImageSharp.Formats.Tiff.TiffEncoder());
+                    break;
+                default:
+                    image.Save(outputPath, new SixLabors.ImageSharp.Formats.Png.PngEncoder()); // 兜底
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 保存GIF动图裁剪，保留所有帧的动画效果
+        /// </summary>
+        /// <param name="originalFilePath">原始GIF文件路径</param>
+        /// <param name="cropRect">裁剪区域</param>
+        /// <param name="dir">保存目录</param>
+        /// <param name="filePath">保存路径</param>
+        /// <returns>保存成功返回 true，否则 false</returns>
+        private bool SaveGifAnimation(string originalFilePath, Int32Rect cropRect, string dir, string filePath)
+        {
+            try
+            {
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                using (var image = ImageSharpImage.Load(originalFilePath))
+                {
+                    // 直接对整个图像进行裁剪，ImageSharp会自动处理所有帧
+                    image.Mutate(ctx => ctx.Crop(new SixLabors.ImageSharp.Rectangle(cropRect.X, cropRect.Y, cropRect.Width, cropRect.Height)));
+                    image.Save(filePath, new GifEncoder()); // 保存为GIF，保留所有元数据
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"GIF动图裁剪失败：{ex.Message}", ToastType.Error);
+                return false;
             }
         }
 
@@ -637,12 +813,11 @@ namespace Quicker.Windows.ToolWindows
         /// <returns>成功返回 true，否则 false</returns>
         private bool TryGetCropRect(BitmapSource bitmapSource, out Int32Rect cropRect, out (double scale, double offsetX, double offsetY) scaleInfo)
         {
-            cropRect = new Int32Rect();
-            scaleInfo = (0, 0, 0);
-
+            cropRect = new Int32Rect(); // 裁剪区域
+            scaleInfo = (0, 0, 0); // 缩放信息
             if (bitmapSource == null)
             {
-                ShowToast("图片加载失败！", ToastType.Error);
+                ShowToast("图片加载失败！", ToastType.Error); // 图片加载失败
                 return false;
             }
 
@@ -816,8 +991,6 @@ namespace Quicker.Windows.ToolWindows
                         ImageBehavior.SetAnimatedSource(CropImage, gifImage);
                         _originalBitmapSource = gifImage;
                     }
-                    // 判断是否为GIF，显示或隐藏提示
-                    GifTipTextBlock.Visibility = ext == ".gif" ? Visibility.Visible : Visibility.Collapsed;
                 }
                 catch
                 {
