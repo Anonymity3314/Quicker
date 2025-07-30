@@ -334,7 +334,7 @@ namespace Quicker.UserControls.AddWindow
             bool runByMessager = RunByMessager.IsChecked == true;
             bool tryToOpenExitingWindow = TryToOpenExitingWindow.IsChecked == true;
             int windowState = WindowStateComboBox.SelectedIndex != -1 ? WindowStateComboBox.SelectedIndex : 0;
-            
+
             // 保存图标
             _addWindow.iconPath = _addWindow.ButtonImage.Visibility == Visibility.Visible
                 ? _addWindow.SaveIconToLocal()

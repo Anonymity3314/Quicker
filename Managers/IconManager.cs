@@ -12,6 +12,7 @@ using Quicker.Database;
 using System.Windows;
 using WpfAnimatedGif;
 using System.Drawing;
+using System.Text;
 using System.Net;
 using System.IO;
 using Svg;
@@ -83,10 +84,18 @@ namespace Quicker.Managers
         {
             try
             {
-                string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
                 string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
-                string iconPath = Path.Combine(saveDir, $"{hash}{ext}"); // 拼接图标文件路径
-                return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
+                if (Directory.Exists(filePath)) // 检查是否为文件夹
+                {
+                    string iconPath = Path.Combine(saveDir, $"{hash}.png"); // 拼接图标文件路径
+                    return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
+                }
+                else // 文件使用原始扩展名
+                {
+                    string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
+                    string iconPath = Path.Combine(saveDir, $"{hash}{ext}"); // 拼接图标文件路径
+                    return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
+                }
             }
             catch
             {
@@ -106,9 +115,9 @@ namespace Quicker.Managers
             {
                 BitmapSource bitmapSource = imageSource as BitmapSource; // 将 ImageSource 转换为 BitmapSource
                 if (bitmapSource == null) return null; // 如果转换失败，返回 null
-                using (MemoryStream stream = new MemoryStream()) // 创建内存流
+                using (MemoryStream stream = new()) // 创建内存流
                 {
-                    PngBitmapEncoder encoder = new PngBitmapEncoder(); // 创建 PNG 编码器
+                    PngBitmapEncoder encoder = new(); // 创建 PNG 编码器
                     encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 添加到编码器
                     encoder.Save(stream); // 保存 BitmapSource 到内存流
                     byte[] pngBytes = stream.ToArray(); // 将内存流转换为字节数组
@@ -140,13 +149,13 @@ namespace Quicker.Managers
             loadingWindow.Show(); // 显示加载窗口
             try
             {
-                Uri uri = new Uri(websiteUrl); // 创建 Uri 对象
+                Uri uri = new(websiteUrl); // 创建 Uri 对象
                 string apiFaviconUrl = $"https://icon.bqb.cool?url={uri.Host}"; // 拼接 API 地址
-                using (WebClient client = new WebClient()) // 创建 WebClient 对象
+                using (WebClient client = new()) // 创建 WebClient 对象
                 {
                     byte[] iconData = client.DownloadData(apiFaviconUrl); // 下载网站图标数据
-                    BitmapImage bitmapImage = new BitmapImage(); // 创建 BitmapImage 对象
-                    using (MemoryStream stream = new MemoryStream(iconData)) // 创建内存流
+                    BitmapImage bitmapImage = new(); // 创建 BitmapImage 对象
+                    using (MemoryStream stream = new(iconData)) // 创建内存流
                     {
                         bitmapImage.BeginInit(); // 开始初始化 BitmapImage
                         stream.Seek(0, SeekOrigin.Begin); // 定位到流的开始位置
@@ -187,7 +196,7 @@ namespace Quicker.Managers
 
                 int stride = bitmapImage.PixelWidth * 4; // 计算每行像素的字节数
                 byte[] pixels = new byte[bitmapImage.PixelHeight * stride]; // 创建字节数组
-                FormatConvertedBitmap formatConvertedBitmap = new FormatConvertedBitmap(); // 创建 FormatConvertedBitmap 对象
+                FormatConvertedBitmap formatConvertedBitmap = new(); // 创建 FormatConvertedBitmap 对象
                 formatConvertedBitmap.BeginInit(); // 开始初始化 FormatConvertedBitmap
                 formatConvertedBitmap.Source = bitmapImage; // 设置 BitmapImage 作为源
                 formatConvertedBitmap.DestinationFormat = PixelFormats.Pbgra32; // 转换格式
@@ -248,7 +257,7 @@ namespace Quicker.Managers
         /// <returns>加载的 BitmapImage</returns>
         private BitmapImage LoadBitmapImage(string filePath)
         {
-            BitmapImage bi = new BitmapImage();
+            BitmapImage bi = new();
             try
             {
                 bi.BeginInit();
@@ -273,12 +282,12 @@ namespace Quicker.Managers
         {
             try
             {
-                using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
-                    GifBitmapDecoder decoder = new GifBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    GifBitmapDecoder decoder = new(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
                     if (decoder.Frames.Count == 1) // 静态GIF，直接返回BitmapImage
                     {
-                        BitmapImage bi = new BitmapImage();
+                        BitmapImage bi = new();
                         bi.BeginInit();
                         bi.CacheOption = BitmapCacheOption.OnLoad;
                         bi.UriSource = new Uri(filePath, UriKind.Absolute); // 用UriSource
@@ -307,8 +316,8 @@ namespace Quicker.Managers
         {
             try
             {
-                string svgContent = ReadSvgFileContent(filePath);
-                var svgDocument = ParseSvgDocument(svgContent);
+                string svgContent = File.ReadAllText(filePath);// 读取SVG文件内容
+                var svgDocument = SvgDocument.FromSvg<SvgDocument>(svgContent);// 解析SVG内容为SvgDocument
                 var bitmapSource = RenderSvgToBitmapSource(svgDocument);
                 var bitmapImage = ConvertBitmapSourceToBitmapImage(bitmapSource);
                 return bitmapImage;
@@ -320,26 +329,6 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 读取SVG文件内容
-        /// </summary>
-        /// <param name="filePath">文件路径</param>
-        /// <returns>SVG内容</returns>
-        private string ReadSvgFileContent(string filePath)
-        {
-            return File.ReadAllText(filePath);
-        }
-
-        /// <summary>
-        /// 解析SVG内容为SvgDocument
-        /// </summary>
-        /// <param name="svgContent">SVG内容</param>
-        /// <returns>SvgDocument</returns>
-        private Svg.SvgDocument ParseSvgDocument(string svgContent)
-        {
-            return Svg.SvgDocument.FromSvg<Svg.SvgDocument>(svgContent);
-        }
-
-        /// <summary>
         /// 渲染SvgDocument为BitmapSource
         /// </summary>
         /// <param name="svgDocument">SVG文档</param>
@@ -348,7 +337,7 @@ namespace Quicker.Managers
         {
             double width = svgDocument.Width.Value;
             double height = svgDocument.Height.Value;
-            DrawingVisual visual = new DrawingVisual();
+            DrawingVisual visual = new();
             using (DrawingContext context = visual.RenderOpen())
             {
                 using (var bitmap = svgDocument.Draw())
@@ -365,7 +354,7 @@ namespace Quicker.Managers
                     );
                 }
             }
-            RenderTargetBitmap rtb = new RenderTargetBitmap(
+            RenderTargetBitmap rtb = new(
                 (int)width,
                 (int)height,
                 96, // DPI X
@@ -382,10 +371,10 @@ namespace Quicker.Managers
         /// </summary>
         private BitmapImage ConvertBitmapSourceToBitmapImage(BitmapSource bitmapSource)
         {
-            BitmapImage bitmapImage = new BitmapImage();
+            BitmapImage bitmapImage = new();
             using (var memoryStream = new MemoryStream())
             {
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                PngBitmapEncoder encoder = new();
                 encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
                 encoder.Save(memoryStream);
                 bitmapImage.BeginInit();
@@ -404,7 +393,7 @@ namespace Quicker.Managers
         {
             try
             {
-                System.Drawing.Icon icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath); // 提取图标
+                Icon icon = Icon.ExtractAssociatedIcon(filePath); // 提取图标
                 return ConvertIconToBitmapImage(icon); // 转换为 BitmapImage
             }
             catch (Exception ex)
@@ -414,19 +403,19 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 将 System.Drawing.Icon 转换为 BitmapImage
+        /// 将 Icon 转换为 BitmapImage
         /// </summary>
         /// <param name="icon">图标</param>
         /// <returns>转换后的 BitmapImage</returns>
-        private BitmapImage ConvertIconToBitmapImage(System.Drawing.Icon icon)
+        private BitmapImage ConvertIconToBitmapImage(Icon icon)
         {
             try
             {
-                using (MemoryStream ms = new MemoryStream()) // 创建内存流
+                using (MemoryStream ms = new()) // 创建内存流
                 {
                     icon.Save(ms); // 保存图标到内存流
                     ms.Seek(0, SeekOrigin.Begin); // 定位到流的开始位置
-                    BitmapImage bi = new BitmapImage(); // 创建 BitmapImage 对象
+                    BitmapImage bi = new(); // 创建 BitmapImage 对象
                     bi.BeginInit(); // 开始初始化 BitmapImage
                     bi.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
                     bi.StreamSource = ms; // 设置内存流为 BitmapImage 的源
@@ -455,10 +444,34 @@ namespace Quicker.Managers
         /// <returns>文件内容哈希值</returns>
         public static string GetFileContentHash(string filePath)
         {
-            using var stream = File.OpenRead(filePath); // 打开文件流
-            using var sha256 = System.Security.Cryptography.SHA256.Create(); // 创建SHA256哈希算法
-            var hash = sha256.ComputeHash(stream); // 计算哈希值
-            return BitConverter.ToString(hash).Replace("-", "").ToLower(); // 返回哈希值
+            try
+            {
+                // 检查是否为文件夹
+                if (Directory.Exists(filePath))
+                {
+                    // 对于文件夹，使用路径字符串的哈希值
+                    using var sha256 = SHA256.Create();
+                    var pathBytes = Encoding.UTF8.GetBytes(filePath);
+                    var hash = sha256.ComputeHash(pathBytes);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                }
+                else
+                {
+                    // 对于文件，使用文件内容的哈希值
+                    using var stream = File.OpenRead(filePath);
+                    using var sha256 = SHA256.Create();
+                    var hash = sha256.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                }
+            }
+            catch
+            {
+                // 如果出现异常，使用路径字符串的哈希值作为后备方案
+                using var sha256 = SHA256.Create();
+                var pathBytes = Encoding.UTF8.GetBytes(filePath);
+                var hash = sha256.ComputeHash(pathBytes);
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            }
         }
 
         /// <summary>
@@ -526,7 +539,7 @@ namespace Quicker.Managers
             bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
             bitmap.EndInit(); // 结束初始化BitmapImage
             bitmap.Freeze(); // 冻结BitmapImage
-            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, bitmap); // 设置动画源
+            ImageBehavior.SetAnimatedSource(imageControl, bitmap); // 设置动画源
         }
 
         /// <summary>
@@ -536,7 +549,7 @@ namespace Quicker.Managers
         /// <param name="path">图片路径</param>
         private void SetSvgImage(System.Windows.Controls.Image imageControl, string path)
         {
-            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
+            ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
             var svgBitmap = LoadSvgToBitmapImage(path); // 加载SVG图片
             imageControl.Source = svgBitmap; // 设置图片源
         }
@@ -548,7 +561,7 @@ namespace Quicker.Managers
         /// <param name="path">图片路径</param>
         private void SetNormalImage(System.Windows.Controls.Image imageControl, string path)
         {
-            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
+            ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
             var bitmap = new BitmapImage(); // 创建BitmapImage对象
             bitmap.BeginInit(); // 开始初始化BitmapImage
             bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置图片路径
@@ -565,7 +578,7 @@ namespace Quicker.Managers
         private void ClearImage(System.Windows.Controls.Image imageControl)
         {
             imageControl.Source = null; // 设置图片为空
-            WpfAnimatedGif.ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
+            ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
         }
 
         /// <summary>
