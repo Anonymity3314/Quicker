@@ -337,18 +337,28 @@ namespace Quicker
             bool otherKeyDown = false;
             this.Dispatcher.Invoke(() =>
             {
-                foreach (Key key in Enum.GetValues(typeof(Key))) // 遍历所有按键
+                // 使用LINQ检查是否有任何常用按键被按下
+                otherKeyDown = new[]
                 {
-                    if (key == Key.LeftCtrl || key == Key.RightCtrl || key == Key.None) // 跳过Ctrl键和None键
-                        continue;
-                    if (Keyboard.IsKeyDown(key)) // 如果按键被按下
-                    {
-                        otherKeyDown = true; // 设置其他按键被按下
-                        break; // 找到后退出循环
-                    }
-                }
+                    // 字母键 A-Z
+                    Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J,
+                    Key.K, Key.L, Key.M, Key.N, Key.O, Key.P, Key.Q, Key.R, Key.S, Key.T,
+                    Key.U, Key.V, Key.W, Key.X, Key.Y, Key.Z,
+                    // 数字键 0-9
+                    Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, Key.D9,
+                    // 功能键 F1-F12
+                    Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.F7, Key.F8, Key.F9, Key.F10, Key.F11, Key.F12,
+                    // 导航和编辑键
+                    Key.Space, Key.Enter, Key.Tab, Key.Escape, Key.Back, Key.Delete, Key.Insert,
+                    Key.Up, Key.Down, Key.Left, Key.Right, Key.Home, Key.End, Key.PageUp, Key.PageDown,
+                    Key.PrintScreen, Key.Scroll, Key.Pause,
+                    // 数字键盘
+                    Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3, Key.NumPad4,
+                    Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9,
+                    Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Decimal, Key.Divide
+                }.Any(key => Keyboard.IsKeyDown(key));
             });
-            return otherKeyDown; // 返回其他按键是否被按下
+            return otherKeyDown;
         }
 
         /// <summary>
