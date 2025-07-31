@@ -8,6 +8,7 @@
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Background" Value="White"/>
         <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="MaxWidth" Value="400"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -21,7 +22,13 @@
                         </Border>
                         <!-- 内容区域 -->
                         <Border Background="White" BorderBrush="#C5CFD8" BorderThickness="1" CornerRadius="3" Margin="3">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
                         </Border>
                     </Grid>
                 </ControlTemplate>
