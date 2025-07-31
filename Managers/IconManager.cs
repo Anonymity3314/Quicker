@@ -1,7 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using Image = System.Windows.Controls.Image;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Animation;
 using System.Security.Cryptography;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
@@ -9,6 +9,7 @@ using System.Windows.Interop;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
 using Quicker.Database;
+using System.Net.Http;
 using System.Windows;
 using WpfAnimatedGif;
 using System.Drawing;
@@ -21,6 +22,18 @@ namespace Quicker.Managers
 {
     internal class IconManager
     {
+        // 静态 HttpClient 实例，用于网络请求
+        private static readonly HttpClient httpClient = new(new HttpClientHandler
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, // 启用压缩
+            MaxConnectionsPerServer = 2, // 限制每个服务器的连接数
+            UseProxy = false, // 禁用代理以提高性能
+            ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true // 忽略SSL证书验证错误
+        })
+        {
+            Timeout = TimeSpan.FromSeconds(10) // 设置超时时间
+        };
+
         // 释放图标资源
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr hIcon); // 释放图标资源
@@ -151,29 +164,49 @@ namespace Quicker.Managers
             {
                 Uri uri = new(websiteUrl); // 创建 Uri 对象
                 string apiFaviconUrl = $"https://icon.bqb.cool?url={uri.Host}"; // 拼接 API 地址
-                using (WebClient client = new()) // 创建 WebClient 对象
+                byte[] iconData = httpClient.GetByteArrayAsync(apiFaviconUrl).GetAwaiter().GetResult(); // 使用 HttpClient 下载网站图标数据
+                if (iconData == null || iconData.Length == 0) // 验证下载的数据是否为有效的图像
                 {
-                    byte[] iconData = client.DownloadData(apiFaviconUrl); // 下载网站图标数据
-                    BitmapImage bitmapImage = new(); // 创建 BitmapImage 对象
-                    using (MemoryStream stream = new(iconData)) // 创建内存流
-                    {
-                        bitmapImage.BeginInit(); // 开始初始化 BitmapImage
-                        stream.Seek(0, SeekOrigin.Begin); // 定位到流的开始位置
-                        bitmapImage.StreamSource = stream; // 设置内存流为 BitmapImage 的源
-                        bitmapImage.EndInit(); // 结束初始化 BitmapImage
-                    }
-
-                    if (IsImageEmpty(bitmapImage))
-                    {
-                        ShowToast("获取网站图标失败。", ToastType.Error); // 显示Toast
-                        return null; // 如果获取的网站图标为空图片，返回 null
-                    }
-                    return bitmapImage; // 返回网站图标
+                    ShowToast("获取网站图标失败：数据为空。", ToastType.Error);
+                    return null;
                 }
+
+                if (!IsValidImageData(iconData)) // 检查图像格式
+                {
+                    ShowToast("获取网站图标失败：无效的图像格式。", ToastType.Error);
+                    return null;
+                }
+
+                BitmapImage bitmapImage = new(); // 创建 BitmapImage 对象
+                using (MemoryStream stream = new(iconData)) // 创建内存流
+                {
+                    bitmapImage.BeginInit(); // 开始初始化 BitmapImage
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
+                    stream.Seek(0, SeekOrigin.Begin); // 定位到流的开始位置
+                    bitmapImage.StreamSource = stream; // 设置内存流为 BitmapImage 的源
+                    bitmapImage.EndInit(); // 结束初始化 BitmapImage
+                }
+
+                if (IsImageEmpty(bitmapImage))
+                {
+                    ShowToast("获取网站图标失败：图标为空。", ToastType.Error); // 显示Toast
+                    return null; // 如果获取的网站图标为空图片，返回 null
+                }
+                return bitmapImage; // 返回网站图标
             }
-            catch
+            catch (HttpRequestException ex)
             {
-                ShowToast("获取网站图标失败。", ToastType.Error); // 显示Toast
+                ShowToast($"获取网站图标失败：网络错误 - {ex.Message}", ToastType.Error);
+                return null;
+            }
+            catch (NotSupportedException ex)
+            {
+                ShowToast($"获取网站图标失败：不支持的图像格式 - {ex.Message}", ToastType.Error);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"获取网站图标失败：{ex.Message}", ToastType.Error); // 显示Toast
                 return null; // 如果出现异常，返回 null
             }
             finally
@@ -262,7 +295,7 @@ namespace Quicker.Managers
             {
                 bi.BeginInit();
                 bi.CacheOption = BitmapCacheOption.OnLoad;
-                bi.UriSource = new Uri(filePath, UriKind.Absolute); // 用UriSource
+                bi.UriSource = new(filePath, UriKind.Absolute); // 用UriSource
                 bi.EndInit();
                 bi.Freeze();
                 return bi;
@@ -290,7 +323,7 @@ namespace Quicker.Managers
                         BitmapImage bi = new();
                         bi.BeginInit();
                         bi.CacheOption = BitmapCacheOption.OnLoad;
-                        bi.UriSource = new Uri(filePath, UriKind.Absolute); // 用UriSource
+                        bi.UriSource = new(filePath, UriKind.Absolute); // 用UriSource
                         bi.EndInit();
                         bi.Freeze();
                         return bi;
@@ -350,7 +383,7 @@ namespace Quicker.Managers
                     );
                     context.DrawImage(
                         bitmapSource,
-                        new System.Windows.Rect(new System.Windows.Point(0, 0), new System.Windows.Size(width, height))
+                        new(new System.Windows.Point(0, 0), new System.Windows.Size(width, height))
                     );
                 }
             }
@@ -371,15 +404,15 @@ namespace Quicker.Managers
         /// </summary>
         private BitmapImage ConvertBitmapSourceToBitmapImage(BitmapSource bitmapSource)
         {
-            BitmapImage bitmapImage = new();
-            using (var memoryStream = new MemoryStream())
+            BitmapImage bitmapImage = new(); // 创建 BitmapImage 对象
+            using (var memoryStream = new MemoryStream()) // 创建内存流
             {
-                PngBitmapEncoder encoder = new();
-                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
-                encoder.Save(memoryStream);
-                bitmapImage.BeginInit();
-                bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray());
-                bitmapImage.EndInit();
+                PngBitmapEncoder encoder = new(); // 创建 PNG 编码器
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 添加到编码器
+                encoder.Save(memoryStream); // 保存 BitmapSource 到内存流
+                bitmapImage.BeginInit(); // 开始初始化 BitmapImage
+                bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray()); // 设置内存流为 BitmapImage 的源
+                bitmapImage.EndInit(); // 结束初始化 BitmapImage
             }
             return bitmapImage;
         }
@@ -446,31 +479,26 @@ namespace Quicker.Managers
         {
             try
             {
-                // 检查是否为文件夹
-                if (Directory.Exists(filePath))
+                using var sha256 = SHA256.Create(); // 创建 SHA256 哈希算法
+                byte[] hash;
+                if (Directory.Exists(filePath)) // 对于文件夹，使用路径字符串的哈希值
                 {
-                    // 对于文件夹，使用路径字符串的哈希值
-                    using var sha256 = SHA256.Create();
-                    var pathBytes = Encoding.UTF8.GetBytes(filePath);
-                    var hash = sha256.ComputeHash(pathBytes);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                    var pathBytes = Encoding.UTF8.GetBytes(filePath); // 转换为字节数组
+                    hash = sha256.ComputeHash(pathBytes); // 计算哈希值
                 }
-                else
+                else // 对于文件，使用文件内容的哈希值
                 {
-                    // 对于文件，使用文件内容的哈希值
-                    using var stream = File.OpenRead(filePath);
-                    using var sha256 = SHA256.Create();
-                    var hash = sha256.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                    using var stream = File.OpenRead(filePath); // 打开文件流
+                    hash = sha256.ComputeHash(stream); // 计算哈希值
                 }
+                return BitConverter.ToString(hash).Replace("-", "").ToLower(); // 返回哈希值字符串
             }
-            catch
+            catch // 如果出现异常，使用路径字符串的哈希值作为后备方案
             {
-                // 如果出现异常，使用路径字符串的哈希值作为后备方案
-                using var sha256 = SHA256.Create();
-                var pathBytes = Encoding.UTF8.GetBytes(filePath);
-                var hash = sha256.ComputeHash(pathBytes);
-                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                using var sha256 = SHA256.Create(); // 创建 SHA256 哈希算法
+                var pathBytes = Encoding.UTF8.GetBytes(filePath); // 转换为字节数组
+                var hash = sha256.ComputeHash(pathBytes); // 计算哈希值
+                return BitConverter.ToString(hash).Replace("-", "").ToLower(); // 返回哈希值字符串
             }
         }
 
@@ -496,7 +524,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="imageControl">目标 Image 控件</param>
         /// <param name="path">图片路径</param>
-        public void SetImageWithGifSupport(System.Windows.Controls.Image imageControl, string path)
+        public void SetImageWithGifSupport(Image imageControl, string path)
         {
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
@@ -531,7 +559,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="imageControl">目标 Image 控件</param>
         /// <param name="path">图片路径</param>
-        private void SetGifImage(System.Windows.Controls.Image imageControl, string path)
+        private void SetGifImage(Image imageControl, string path)
         {
             var bitmap = new BitmapImage(); // 创建BitmapImage对象
             bitmap.BeginInit(); // 开始初始化BitmapImage
@@ -547,7 +575,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="imageControl">目标 Image 控件</param>
         /// <param name="path">图片路径</param>
-        private void SetSvgImage(System.Windows.Controls.Image imageControl, string path)
+        private void SetSvgImage(Image imageControl, string path)
         {
             ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
             var svgBitmap = LoadSvgToBitmapImage(path); // 加载SVG图片
@@ -559,7 +587,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="imageControl">目标 Image 控件</param>
         /// <param name="path">图片路径</param>
-        private void SetNormalImage(System.Windows.Controls.Image imageControl, string path)
+        private void SetNormalImage(Image imageControl, string path)
         {
             ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
             var bitmap = new BitmapImage(); // 创建BitmapImage对象
@@ -575,7 +603,7 @@ namespace Quicker.Managers
         /// 清空图片显示
         /// </summary>
         /// <param name="imageControl">目标 Image 控件</param>
-        private void ClearImage(System.Windows.Controls.Image imageControl)
+        private void ClearImage(Image imageControl)
         {
             imageControl.Source = null; // 设置图片为空
             ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
@@ -590,6 +618,46 @@ namespace Quicker.Managers
         {
             using var toast = new ToastManager(); // 创建ToastManager对象
             toast.Show(message, title); // 显示Toast
+        }
+
+        /// <summary>
+        /// 验证图像数据是否为有效的图像格式
+        /// </summary>
+        /// <param name="imageData">图像数据</param>
+        /// <returns>是否为有效的图像</returns>
+        private bool IsValidImageData(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length < 8)
+                return false;
+
+            // 检查常见图像格式的文件头
+            // PNG: 89 50 4E 47 0D 0A 1A 0A
+            if (imageData.Length >= 8 && 
+                imageData[0] == 0x89 && imageData[1] == 0x50 && imageData[2] == 0x4E && imageData[3] == 0x47 &&
+                imageData[4] == 0x0D && imageData[5] == 0x0A && imageData[6] == 0x1A && imageData[7] == 0x0A)
+                return true;
+
+            // JPEG: FF D8 FF
+            if (imageData.Length >= 3 && 
+                imageData[0] == 0xFF && imageData[1] == 0xD8 && imageData[2] == 0xFF)
+                return true;
+
+            // GIF: 47 49 46 38 (GIF8)
+            if (imageData.Length >= 4 && 
+                imageData[0] == 0x47 && imageData[1] == 0x49 && imageData[2] == 0x46 && imageData[3] == 0x38)
+                return true;
+
+            // ICO: 00 00 01 00
+            if (imageData.Length >= 4 && 
+                imageData[0] == 0x00 && imageData[1] == 0x00 && imageData[2] == 0x01 && imageData[3] == 0x00)
+                return true;
+
+            // BMP: 42 4D (BM)
+            if (imageData.Length >= 2 && 
+                imageData[0] == 0x42 && imageData[1] == 0x4D)
+                return true;
+
+            return false;
         }
     }
 }
