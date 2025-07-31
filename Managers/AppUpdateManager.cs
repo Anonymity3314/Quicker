@@ -2,13 +2,23 @@
 using Quicker.Managers;
 using System.Text.Json;
 using Quicker.Helpers;
+using System.Net.Http;
 using System.Net;
 using System.IO;
 
 public class AppUpdateManager : IDisposable
 {
     private const string UpdateInfoUrl = "https://raw.githubusercontent.com/LJZ-Anonymity/Quicker/Quicker/VersionInfo.json"; // 更新信息的 URL 地址
-    public UpdateInfoContainer LatestUpdateInfo { get; private set; } // 最新版本信息容器
+    private static readonly HttpClient httpClient = new(new HttpClientHandler
+    {
+        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate, // 启用压缩
+        MaxConnectionsPerServer = 2, // 限制每个服务器的连接数
+        UseProxy = false // 禁用代理以提高性能
+    })
+    {
+        Timeout = TimeSpan.FromSeconds(10) // 设置超时时间
+    }; // 静态 HttpClient 实例
+    public List<UpdateInfo> Versions { get; private set; } = new(); // 版本列表
     private bool isDisposed = false; // 是否已释放资源
 
     // 同步检查更新
@@ -16,7 +26,7 @@ public class AppUpdateManager : IDisposable
     {
         ReadJsonFromUrl(); // 读取 JSON 数据
         using var toast = new ToastManager(); // 弹窗管理器
-        if (LatestUpdateInfo != null)  // 如果有最新版本信息
+        if (Versions.Count > 0)  // 如果有版本信息
         {
             var latestVersion = GetLatestVersion(); // 获取最新版本信息
             if (latestVersion != null && VersionHelper.IsNewVersionAvailable(SettingDatabase.currentVersion, latestVersion.Version)) // 使用VersionHelper进行版本比较
@@ -37,24 +47,11 @@ public class AppUpdateManager : IDisposable
     /// <returns>最新版本信息</returns>
     public UpdateInfo GetLatestVersion()
     {
-        if (LatestUpdateInfo?.Versions == null || LatestUpdateInfo.Versions.Count == 0)
+        if (Versions.Count == 0)
             return null;
-            
-        return LatestUpdateInfo.Versions.FirstOrDefault(v => v.IsLatest) ?? 
-               LatestUpdateInfo.Versions.OrderByDescending(v => v.Version).First();
-    }
 
-    /// <summary>
-    /// 获取指定版本信息
-    /// </summary>
-    /// <param name="version">版本号</param>
-    /// <returns>指定版本信息</returns>
-    public UpdateInfo GetVersionInfo(string version)
-    {
-        if (LatestUpdateInfo?.Versions == null)
-            return null;
-            
-        return LatestUpdateInfo.Versions.FirstOrDefault(v => v.Version == version);
+        return Versions.FirstOrDefault(v => v.IsLatest) ?? 
+               Versions.OrderByDescending(v => v.Version).First();
     }
 
     /// <summary>
@@ -64,17 +61,11 @@ public class AppUpdateManager : IDisposable
     /// <returns>版本历史记录</returns>
     public List<UpdateInfo> GetVersionHistory(int count = 0)
     {
-        if (LatestUpdateInfo?.Versions == null)
+        if (Versions.Count == 0)
             return new List<UpdateInfo>();
-            
-        var versions = LatestUpdateInfo.Versions.OrderByDescending(v => v.Version).ToList();
-        
-        if (count > 0 && count < versions.Count)
-        {
-            return versions.Take(count).ToList();
-        }
-        
-        return versions;
+
+        var versions = Versions.OrderByDescending(v => v.Version).ToList();
+        return count > 0 && count < versions.Count ? versions.Take(count).ToList() : versions;
     }
 
     // 同步读取 JSON 数据
@@ -82,11 +73,14 @@ public class AppUpdateManager : IDisposable
     {
         try
         {
-            using WebClient client = new(); // 创建 WebClient 实例
-            string jsonResponse = client.DownloadString(UpdateInfoUrl); // 同步下载 JSON 数据
-            LatestUpdateInfo = JsonSerializer.Deserialize<UpdateInfoContainer>(jsonResponse); // 反序列化 JSON 数据
+            string jsonResponse = httpClient.GetStringAsync(UpdateInfoUrl).GetAwaiter().GetResult(); // 使用 HttpClient 获取 JSON 数据
+            var container = JsonSerializer.Deserialize<UpdateInfoContainer>(jsonResponse); // 反序列化 JSON 数据
+            Versions = container?.Versions ?? new();
         }
-        catch { }
+        catch
+        {
+            Versions = new(); // 确保失败时设置为空列表
+        }
     }
 
     // 释放资源
@@ -104,7 +98,7 @@ public class AppUpdateManager : IDisposable
     {
         if (!isDisposed)
         {
-            LatestUpdateInfo = null; // 释放资源
+            Versions?.Clear(); // 清空版本列表
             isDisposed = true;
         }
     }
@@ -114,10 +108,9 @@ public class AppUpdateManager : IDisposable
         Dispose(false);
     }
 
-    // 更新信息容器类
-    public class UpdateInfoContainer
+    // 更新信息容器类（用于JSON反序列化）
+    private class UpdateInfoContainer
     {
-        public string LatestVersion { get; set; } // 最新版本号
         public List<UpdateInfo> Versions { get; set; } = new(); // 版本列表
     }
 

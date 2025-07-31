@@ -123,7 +123,7 @@ namespace Quicker.Windows.MainWindows
         private void LoadLatestVersionInfo()
         {
             _updateManager.ReadJsonFromUrl(); // 读取更新信息
-            if (_updateManager.LatestUpdateInfo != null)
+            if (_updateManager.Versions.Count > 0)
             {
                 var latestVersion = _updateManager.GetLatestVersion(); // 获取最新版本
                 if (latestVersion != null)
