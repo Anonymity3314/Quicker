@@ -12,7 +12,7 @@ namespace Quicker.Helpers
         /// <param name="version2">版本号2</param>
         /// <returns>
         /// -1: version1 < version2
-        ///  0: version1 == version2  
+        ///  0: version1 == version2
         ///  1: version1 > version2
         /// </returns>
         public static int CompareVersions(string version1, string version2)
@@ -21,7 +21,6 @@ namespace Quicker.Helpers
             {
                 string cleanVersion1 = NormalizeVersion(version1);
                 string cleanVersion2 = NormalizeVersion(version2);
-                
                 if (Version.TryParse(cleanVersion1, out Version v1) && 
                     Version.TryParse(cleanVersion2, out Version v2))
                 {

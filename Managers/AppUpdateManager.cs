@@ -1,4 +1,5 @@
-﻿using Quicker.Database.Core;
+﻿using System.Threading.Tasks;
+using Quicker.Database.Core;
 using Quicker.Managers;
 using System.Text.Json;
 using Quicker.Helpers;
@@ -16,7 +17,7 @@ public class AppUpdateManager : IDisposable
         UseProxy = false // 禁用代理以提高性能
     })
     {
-        Timeout = TimeSpan.FromSeconds(10) // 设置超时时间
+        Timeout = TimeSpan.FromSeconds(30) // 增加超时时间到30秒
     }; // 静态 HttpClient 实例
     public List<UpdateInfo> Versions { get; private set; } = new(); // 版本列表
     private bool isDisposed = false; // 是否已释放资源
@@ -34,10 +35,6 @@ public class AppUpdateManager : IDisposable
                 AppStateManager.HasNewVersion = true; // 设置有新版本
                 toast.Show($"发现新版本：{latestVersion.Version}", ToastType.Common); // 弹窗提示
             }
-        }
-        else
-        {
-            toast.Show("获取更新信息失败！", ToastType.Error); // 弹窗提示
         }
     }
 
@@ -77,9 +74,23 @@ public class AppUpdateManager : IDisposable
             var container = JsonSerializer.Deserialize<UpdateInfoContainer>(jsonResponse); // 反序列化 JSON 数据
             Versions = container?.Versions ?? new();
         }
-        catch
+        catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException) // 处理超时异常
         {
-            Versions = new(); // 确保失败时设置为空列表
+            Versions = new();
+            using var toast = new ToastManager();
+            toast.Show("获取更新信息超时，请检查网络连接。", ToastType.Error);
+        }
+        catch (HttpRequestException ex) // 处理HTTP请求异常
+        {
+            Versions = new();
+            using var toast = new ToastManager();
+            toast.Show($"网络请求失败：{ex.Message}", ToastType.Error);
+        }
+        catch (Exception ex) // 处理其他异常
+        {
+            Versions = new();
+            using var toast = new ToastManager();
+            toast.Show($"获取更新信息失败：{ex.Message}", ToastType.Error);
         }
     }
 

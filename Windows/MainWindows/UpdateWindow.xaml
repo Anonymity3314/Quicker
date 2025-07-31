@@ -23,7 +23,7 @@
                     <Border Background="#F8F9FA" CornerRadius="5" VerticalAlignment="Top" Height="60">
                         <Grid>
                             <TextBlock Text="{Binding Version}" HorizontalAlignment="Left" Margin="23,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="26" FontWeight="Bold" Foreground="#FF444461"/>
-                            <TextBlock Text="{Binding ReleaseDate}" HorizontalAlignment="Left" Margin="91,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FF76757D" FontSize="14"/>
+                            <TextBlock Text="{Binding ReleaseDate}" HorizontalAlignment="Left" Margin="100,26,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FF76757D" FontSize="14"/>
                             <TextBlock Text="{Binding LatestVersionText}" HorizontalAlignment="Right" Margin="0,0,20,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="#4DA662" FontSize="12" FontWeight="Bold"/>
                         </Grid>
                     </Border>
@@ -33,6 +33,111 @@
                 </Grid>
             </Border>
         </DataTemplate>
+        
+        <!-- 垂直滚动条滑块样式 -->
+        <Style x:Key="VerticalScrollThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="Background" Value="Gray"/>
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border x:Name="Rectangle" CornerRadius="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{TemplateBinding Background}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Rectangle" Property="Background" Value="#666666"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 垂直滚动条按钮样式 -->
+        <Style x:Key="VerticalScrollButton" TargetType="{x:Type RepeatButton}">
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter x:Name="PART_ContentPresenter" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="PART_ContentPresenter" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="False">
+                                <Setter TargetName="PART_ContentPresenter" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 专用垂直滚动条样式 -->
+        <Style x:Key="VerticalScrollBarStyle" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Background" Value="#FCFCFC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="GridRoot" Height="Auto" Background="#FCFCFC">
+                            <!-- 向上滚动按钮 - 固定在顶部 -->
+                            <RepeatButton x:Name="LineUp" Command="ScrollBar.LineUpCommand" Style="{StaticResource VerticalScrollButton}" VerticalAlignment="Top" Height="16" Margin="0">
+                                <Path x:Name="UpArrow" Data="M 0,6 L 5,0 L 10,6 Z" Fill="Gray" Stroke="Gray" StrokeThickness="0"/>
+                            </RepeatButton>
+                            
+                            <!-- 滚动条轨道和滑块 -->
+                            <Track x:Name="PART_Track" IsDirectionReversed="True" Focusable="False" VerticalAlignment="Stretch" Margin="0,16,0,16">
+                                <!-- 滚动条滑块 -->
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb" Background="Gray" Style="{StaticResource VerticalScrollThumb}"/>
+                                </Track.Thumb>
+                                <!-- 隐藏默认的按钮 -->
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton x:Name="PageUp" Command="ScrollBar.PageUpCommand" Visibility="Collapsed"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton x:Name="PageDown" Command="ScrollBar.PageDownCommand" Visibility="Collapsed"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                            
+                            <!-- 向下滚动按钮 - 固定在底部 -->
+                            <RepeatButton x:Name="LineDown" Command="ScrollBar.LineDownCommand" Style="{StaticResource VerticalScrollButton}" VerticalAlignment="Bottom" Height="16" Margin="0">
+                                <Path x:Name="DownArrow" Data="M 0,0 L 5,6 L 10,0 Z" Fill="Gray" Stroke="Gray" StrokeThickness="0"/>
+                            </RepeatButton>
+                        </Grid>
+                        
+                        <ControlTemplate.Triggers>
+                            <!-- 拖拽时改变滑块颜色 -->
+                            <Trigger SourceName="Thumb" Property="IsDragging" Value="True">
+                                <Setter TargetName="Thumb" Property="Background" Value="#4D4D4D"/>
+                            </Trigger>
+                            <Trigger SourceName="Thumb" Property="IsDragging" Value="False">
+                                <Setter TargetName="Thumb" Property="Background" Value="Gray"/>
+                            </Trigger>
+                            <!-- 鼠标悬停时改变按钮Fill颜色 -->
+                            <Trigger SourceName="LineUp" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="UpArrow" Property="Fill" Value="#4D4D4D"/>
+                            </Trigger>
+                            <Trigger SourceName="LineDown" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="DownArrow" Property="Fill" Value="#4D4D4D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -64,21 +169,26 @@
                 <ToolTip Content="查看此版本详细信息" FontWeight="Normal"/>
             </TextBlock.ToolTip>
         </TextBlock>
-        <ScrollViewer Margin="20,218,20,20" Background="#E0E0E0" BorderBrush="DarkGray" BorderThickness="1" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <Grid Margin="0">
-                <TextBlock TextWrapping="Wrap" Text="版本更新历史" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="53,31,0,0"/>
-                <TextBlock HorizontalAlignment="Left" Margin="245,41,0,0" TextWrapping="Wrap" Text="版本：" VerticalAlignment="Top" Foreground="#FF76757D" FontSize="22"/>
-                <TextBlock x:Name="VersionChangeTextBlock" HorizontalAlignment="Left" Margin="311,46,0,0" TextWrapping="Wrap" Text="2.1.2 -- 2.2.0" VerticalAlignment="Top" Foreground="#FF76757D" FontSize="18"/>
-                
-                <!-- 版本历史列表 -->
-                <ItemsControl x:Name="VersionHistoryItemsControl" ItemTemplate="{StaticResource VersionInfoTemplate}" Margin="0,100,0,20">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </Grid>
-        </ScrollViewer>
+        <Border Margin="20,218,20,20" BorderBrush="DarkGray" BorderThickness="1" Background="#E0E0E0">
+            <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ScrollViewer.Resources>
+                    <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource VerticalScrollBarStyle}"/>
+                </ScrollViewer.Resources>
+                <Grid Margin="0">
+                    <TextBlock TextWrapping="Wrap" Text="版本更新历史" FontSize="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="53,31,0,0"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="245,41,0,0" TextWrapping="Wrap" Text="版本：" VerticalAlignment="Top" Foreground="#FF76757D" FontSize="22"/>
+                    <TextBlock x:Name="VersionChangeTextBlock" HorizontalAlignment="Left" Margin="311,46,0,0" TextWrapping="Wrap" Text="2.1.2 -- 2.2.0" VerticalAlignment="Top" Foreground="#FF76757D" FontSize="18"/>
+                    
+                    <!-- 版本历史列表 -->
+                    <ItemsControl x:Name="VersionHistoryItemsControl" ItemTemplate="{StaticResource VersionInfoTemplate}" Margin="0,100,0,20">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </Window>
