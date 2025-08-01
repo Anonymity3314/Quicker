@@ -68,6 +68,7 @@ public class AppUpdateManager : IDisposable
     // 同步读取 JSON 数据
     public void ReadJsonFromUrl()
     {
+        using var toast = new ToastManager(); // 创建一次ToastManager实例
         try
         {
             string jsonResponse = httpClient.GetStringAsync(UpdateInfoUrl).GetAwaiter().GetResult(); // 使用 HttpClient 获取 JSON 数据
@@ -77,20 +78,17 @@ public class AppUpdateManager : IDisposable
         catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException) // 处理超时异常
         {
             Versions = new();
-            using var toast = new ToastManager();
-            toast.Show("获取更新信息超时，请检查网络连接。", ToastType.Error);
+            toast.Show("检查更新失败：网络连接超时，请检查网络连接。", ToastType.Error);
         }
-        catch (HttpRequestException ex) // 处理HTTP请求异常
+        catch (HttpRequestException) // 处理HTTP请求异常
         {
             Versions = new();
-            using var toast = new ToastManager();
-            toast.Show($"网络请求失败：{ex.Message}", ToastType.Error);
+            toast.Show($"检查更新失败：网络请求失败！", ToastType.Error);
         }
         catch (Exception ex) // 处理其他异常
         {
             Versions = new();
-            using var toast = new ToastManager();
-            toast.Show($"获取更新信息失败：{ex.Message}", ToastType.Error);
+            toast.Show($"检查更新失败：{ex.Message}", ToastType.Error);
         }
     }
 

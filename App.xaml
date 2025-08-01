@@ -4,7 +4,7 @@
     StartupUri="Windows/Menus/CustomMenu.xaml"
     xmlns:local="clr-namespace:Quicker"
     x:Class="Quicker.App"
-    
+
     ShutdownMode="OnMainWindowClose"
 >
     <Application.Resources>

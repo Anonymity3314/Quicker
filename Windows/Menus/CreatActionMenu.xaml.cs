@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
+using System.Globalization;
 using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Helpers;
@@ -128,55 +129,141 @@ namespace Quicker.Windows.Menus
         // 设置创建打开文件动作按钮可见性
         private void SetCreatOpenFileActionButtonVisibility()
         {
-            if (!Clipboard.ContainsFileDropList())
+            if (!Clipboard.ContainsFileDropList()) // 判断是否有文件
             {
-                CreatOpenFileActionButton.Visibility = Visibility.Collapsed; // 隐藏按钮
-                MainGrid.Height -= 25; // 减少高度
+                HideCreatOpenFileActionButton(); // 隐藏按钮
+                return;
             }
-            else
+
+            var fileList = Clipboard.GetFileDropList(); // 获取文件列表
+            string filePath = fileList[0]; // 获取第一个文件路径
+            string fileName = Path.GetFileName(filePath); // 获取文件名
+
+            // 处理文件名并设置按钮文本
+            string processedFileName = ProcessFileNameForDisplay(fileName); // 处理文件名
+            string buttonText = $"创建动作：打开[{processedFileName}]";
+
+            // 设置按钮属性
+            SetCreatOpenFileActionButtonProperties(buttonText, filePath);
+        }
+
+        /// <summary>
+        /// 隐藏创建打开文件动作按钮
+        /// </summary>
+        private void HideCreatOpenFileActionButton()
+        {
+            CreatOpenFileActionButton.Visibility = Visibility.Collapsed; // 隐藏按钮
+            MainGrid.Height -= 25; // 减少高度
+        }
+
+        /// <summary>
+        /// 处理文件名用于显示，如果过长则裁剪
+        /// </summary>
+        /// <param name="fileName">原始文件名</param>
+        /// <returns>处理后的文件名</returns>
+        private string ProcessFileNameForDisplay(string fileName)
+        {
+            const double maxTextWidth = 140; // 最大文本宽度
+            const string prefix = "创建动作：打开["; // 前缀
+            const string suffix = "]"; // 后缀
+
+            // 创建FormattedText的公共参数
+            var typeface = GetTextTypeface(); // 字体信息
+            var culture = CultureInfo.CurrentCulture; // 文化信息
+            var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this).PixelsPerDip; // DPI信息
+
+            // 计算完整文本的宽度
+            string fullText = $"{prefix}{fileName}{suffix}"; // 构造完整文本
+            double textWidth = CalculateTextWidth(fullText, typeface, culture, dpi); // 计算宽度
+            if (textWidth <= maxTextWidth) // 如果文本宽度在限制范围内，直接返回原文件名
             {
-                var fileList = Clipboard.GetFileDropList(); // 获取文件列表
-                if (fileList.Count > 0)
+                return fileName;
+            }
+
+            // 文本过长，需要裁剪
+            return TruncateFileName(fileName, prefix, suffix, maxTextWidth, typeface, culture, dpi);
+        }
+
+        /// <summary>
+        /// 获取文本字体信息
+        /// </summary>
+        /// <returns>字体信息</returns>
+        private Typeface GetTextTypeface()
+        {
+            return new Typeface(
+                CreatOpenFileActionTextBlock.FontFamily, 
+                CreatOpenFileActionTextBlock.FontStyle, 
+                CreatOpenFileActionTextBlock.FontWeight, 
+                CreatOpenFileActionTextBlock.FontStretch); // 字体信息
+        }
+
+        /// <summary>
+        /// 计算文本宽度
+        /// </summary>
+        /// <param name="text">要计算的文本</param>
+        /// <param name="typeface">字体信息</param>
+        /// <param name="culture">文化信息</param>
+        /// <param name="dpi">DPI信息</param>
+        /// <returns>文本宽度</returns>
+        private double CalculateTextWidth(string text, Typeface typeface, CultureInfo culture, double dpi)
+        {
+            var formattedText = new FormattedText(
+                text,
+                culture,
+                FlowDirection.LeftToRight,
+                typeface,
+                CreatOpenFileActionTextBlock.FontSize,
+                Brushes.Black,
+                dpi); // 创建FormattedText
+
+            return formattedText.Width; // 返回宽度
+        }
+
+        /// <summary>
+        /// 裁剪文件名以适应最大宽度限制
+        /// </summary>
+        /// <param name="fileName">原始文件名</param>
+        /// <param name="prefix">前缀文本</param>
+        /// <param name="suffix">后缀文本</param>
+        /// <param name="maxTextWidth">最大文本宽度</param>
+        /// <param name="typeface">字体信息</param>
+        /// <param name="culture">文化信息</param>
+        /// <param name="dpi">DPI信息</param>
+        /// <returns>裁剪后的文件名</returns>
+        private string TruncateFileName(string fileName, string prefix, string suffix, double maxTextWidth, Typeface typeface, CultureInfo culture, double dpi)
+        {
+            // 二分查找合适的文件名长度
+            int left = 1; // 左边界
+            int right = fileName.Length; // 右边界
+            int bestLength = 0; // 最佳长度
+            while (left <= right) // 二分查找
+            {
+                int mid = (left + right) / 2; // 中间值
+                string testFileName = fileName.Substring(0, mid) + "..."; // 裁剪文件名
+                string testText = prefix + testFileName + suffix; // 构造测试文本
+                double testWidth = CalculateTextWidth(testText, typeface, culture, dpi); // 计算宽度
+                if (testWidth <= maxTextWidth) // 如果宽度在限制范围内
                 {
-                    string filePath = fileList[0]; // 获取第一个文件路径
-                    string fileName = System.IO.Path.GetFileName(filePath); // 获取文件名
-                    string buttonText = $"创建动作：打开[{fileName}]"; // 设置文本
-                    CreatOpenFileActionButton.ToolTip = $"创建打开文件或文件夹{filePath}的动作"; // 设置提示
-                    CreatOpenFileActionTextBlock.Text = buttonText; // 设置文本
-
-                    //// 计算文本长度并调整按钮宽度
-                    //var formattedText = new FormattedText(
-                    //    buttonText,
-                    //    System.Globalization.CultureInfo.CurrentCulture,
-                    //    FlowDirection.LeftToRight,
-                    //    new Typeface(CreatOpenFileActionTextBlock.FontFamily, CreatOpenFileActionTextBlock.FontStyle, CreatOpenFileActionTextBlock.FontWeight, CreatOpenFileActionTextBlock.FontStretch),
-                    //    CreatOpenFileActionTextBlock.FontSize,
-                    //    Brushes.Black,
-                    //    VisualTreeHelper.GetDpi(this).PixelsPerDip);
-
-                    //double textWidth = formattedText.Width;
-                    //if (textWidth > 150) // 如果文本宽度超过150像素
-                    //{
-                    //    double newButtonWidth = textWidth + 50; // 设置按钮宽度为文本宽度加上一些边距
-                    //    CreatOpenFileActionButton.Width = newButtonWidth; // 设置按钮宽度
-                    //    MainGrid.Width = Math.Max(MainGrid.Width, newButtonWidth + 20); // 调整主网格宽度
-                        
-                    //    // 调整MainGrid的Margin，保持窗口布局平衡
-                    //    double newRightMargin = 758 - MainGrid.Width - 9; // 窗口宽度(758) - 网格宽度 - 左边距(9)
-                    //    MainGrid.Margin = new Thickness(9, 8, newRightMargin, 211); // 保持上边距(8)和下边距(211)不变
-
-                    //    // 调整所有按钮内部Grid的宽度和对齐方式
-                    //    foreach (Button button in FindVisualChildren<Button>(MainGrid))
-                    //    {
-                    //        if (button.Content is Grid buttonGrid)
-                    //        {
-                    //            buttonGrid.Width = button == CreatOpenFileActionButton ? newButtonWidth - 10 : 168;
-                    //            buttonGrid.HorizontalAlignment = HorizontalAlignment.Left;
-                    //        }
-                    //    }
-                    //}
+                    bestLength = mid;
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
                 }
             }
+            return fileName.Substring(0, bestLength) + "..."; // 返回裁剪后的文件名
+        }
+
+        /// <summary>
+        /// 设置创建打开文件动作按钮的属性
+        /// </summary>
+        /// <param name="buttonText">按钮文本</param>
+        /// <param name="filePath">文件路径</param>
+        private void SetCreatOpenFileActionButtonProperties(string buttonText, string filePath)
+        {
+            CreatOpenFileActionButton.ToolTip = $"创建打开文件或文件夹{filePath}的动作"; // 设置提示
+            CreatOpenFileActionTextBlock.Text = buttonText; // 设置文本
         }
         #endregion
 
