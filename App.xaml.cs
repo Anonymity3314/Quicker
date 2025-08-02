@@ -45,6 +45,11 @@ namespace Quicker
 {
     public partial class App : Application
     {
+        // 常量定义
+        private const string DEFAULT_STYLE = "common";
+        private const string TASKBAR_STYLE = "taskbar";
+        private const string DESKTOP_STYLE = "desktop";
+        
         private TaskPoolGlobalHook? hook; // 全局钩子
         private TaskbarIcon? taskbarIcon; // 托盘图标
         private string _previewRunningPath;
@@ -722,7 +727,7 @@ namespace Quicker
                 AppStateManager.MousePressStartTime = dateTime; // 记录鼠标按下时间
                 if (startTimer) AppStateManager.PressTimer.Start(); // 启动按键计时器
 
-                string windowType = DetermineWindowType(); // 确定窗口类型
+                string windowType = DetermineWindowType() ?? DEFAULT_STYLE; // 确保不为null
                 AppStateManager.PreLoadMainWindow = new MainWindow(windowType); // 创建主窗口
 
                 var settings = AppStateManager.OpenMainWindowConditions; // 获取设置
@@ -761,15 +766,17 @@ namespace Quicker
         {
             string processSceneType = GetProcessSceneType();
             if (AppStateManager.Locked)
-                return AppStateManager.CommonState; // 窗口类型为锁定状态
+            {
+                return AppStateManager.CommonState ?? DEFAULT_STYLE;
+            }
             else if (!string.IsNullOrEmpty(processSceneType))
                 return processSceneType;
             else if (IsMouseOnTaskbar())
-                return "taskbar"; // 鼠标在任务栏上
+                return TASKBAR_STYLE; // 鼠标在任务栏上
             else if (IsMouseOnDesktop())
-                return "desktop"; // 鼠标在桌面上
+                return DESKTOP_STYLE; // 鼠标在桌面上
             else
-                return "common"; // 鼠标在其他窗口上
+                return DEFAULT_STYLE; // 鼠标在其他窗口上
         }
 
         /// <summary>
