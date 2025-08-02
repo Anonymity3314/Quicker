@@ -15,7 +15,6 @@ namespace Quicker.Managers
 {
     public class ActionManager : IDisposable
     {
-        // 移除硬编码路径，使用AppPathHelper
         private bool isDisposed = false; // 是否释放
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
@@ -114,7 +113,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="message"> 消息内容 </param>
         /// <param name="type"> 消息类型 </param>
-        private void ShowToast(string message, ToastType type)
+        public void ShowToast(string message, ToastType type)
         {
             using var toast = new ToastManager(); // 消息提醒管理器
             toast.Show(message, type); // 弹出消息提醒

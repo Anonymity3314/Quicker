@@ -34,6 +34,7 @@ namespace Quicker.Windows.Menus
         public Window FatherWindow { get; private set; } // 父窗口
 
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
+        private readonly ActionManager actionManager = new(); // 动作管理器
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         public event Action? ClosingOrHiding; // 关闭或隐藏操作菜单事件
         private bool close = true; // 是否关闭窗口
@@ -392,8 +393,7 @@ namespace Quicker.Windows.Menus
         {
             ButtonData data = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             Clipboard.SetText(data.Title); // 复制文本到剪贴板
-            using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("已复制。", ToastType.Success); // 弹出消息提醒
+            actionManager.ShowToast("已复制。", ToastType.Success); // 弹出消息提醒
             this.Close(); // 关闭窗口
         }
 
@@ -402,8 +402,7 @@ namespace Quicker.Windows.Menus
         {
             ButtonData data = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             Clipboard.SetText($"{data.ButtonID}"); // 复制文本到剪贴板
-            using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("动作ID已复制。", ToastType.Success); // 弹出消息提醒
+            actionManager.ShowToast("动作ID已复制。", ToastType.Success); // 弹出消息提醒
             this.Close(); // 关闭窗口
         }
         #endregion
@@ -414,21 +413,32 @@ namespace Quicker.Windows.Menus
         {
             buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
             ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
-            List<string> paths = GetFilePaths(buttonData); // 获取文件路径列表
-            
-            if (paths == null)
-                return; // 退出
-
-            try // 检查是否所有文件都在同一个目录下
+            if (buttonData == null)
             {
-                if (AreFilesInSameDirectory(paths))
-                    OpenMultipleFilesInSameDirectory(paths); // 如果所有文件在同一个目录下，打开一个资源管理器窗口并选中所有文件
-                else
-                    OpenMultipleFilesInDifferentDirectories(paths); // 如果文件不在同一个目录下，分别打开多个资源管理器窗口并选中相应文件
+                actionManager.ShowToast("按钮数据不存在", ToastType.Error);
+                return;
+            }
+
+            try
+            {
+                // 根据动作类型调用ActionManager的相应方法
+                switch (buttonData.ActionType)
+                {
+                    case "OpenFile":
+                    case "LoadExtension":
+                        OpenFileInExplorer(buttonData.Location);
+                        break;
+                    case "OpenFiles":
+                        OpenMultiplePathsInExplorer(buttonData.Location);
+                        break;
+                    default:
+                        actionManager.ShowToast($"不支持此动作类型：{buttonData.ActionType}", ToastType.Error);
+                        break;
+                }
             }
             catch (Exception ex)
             {
-                ShowErrorMessage($"打开路径失败：{ex.Message}");
+                actionManager.ShowToast($"打开路径失败：{ex.Message}", ToastType.Error);
             }
             finally
             {
@@ -437,124 +447,351 @@ namespace Quicker.Windows.Menus
         }
 
         /// <summary>
-        /// 获取文件路径列表
+        /// 在资源管理器中打开单个文件或文件夹
         /// </summary>
-        /// <param name="buttonData">按钮数据</param>
-        /// <returns>文件路径列表</returns>
-        private List<string> GetFilePaths(ButtonData buttonData)
+        /// <param name="path">文件或文件夹路径</param>
+        private void OpenFileInExplorer(string path)
         {
-            List<string> paths = new List<string>(); // 文件或文件夹路径列表
-            switch (buttonData.ActionType)
+            // 检查路径是否存在（文件或文件夹）
+            if (!File.Exists(path) && !Directory.Exists(path))
             {
-                case "OpenFile":
-                case "LoadExtension":
-                    paths.Add(buttonData.Location); // 添加文件路径
-                    break;
-                case "OpenFiles":
-                    paths.AddRange(buttonData.Location.Split(';').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p))); // 添加多个文件路径
-                    break;
-                default:
-                    ShowErrorMessage($"不支持此动作类型。"); // 显示错误消息
-                    return null; // 返回空
+                actionManager.ShowToast($"路径不存在：{path}", ToastType.Error);
+                return;
             }
-            return paths;
+
+            IntPtr pidlList = ILCreateFromPathW(path);
+            try
+            {
+                Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0));
+            }
+            finally
+            {
+                ILFree(pidlList);
+            }
         }
 
         /// <summary>
-        /// 检查文件是否在同一目录
+        /// 在资源管理器中打开多个文件或文件夹
         /// </summary>
-        /// <param name="paths">文件路径列表</param>
+        /// <param name="paths">文件或文件夹路径字符串，用分号分隔</param>
+        private void OpenMultiplePathsInExplorer(string paths)
+        {
+            var pathList = paths.Split(';').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)).ToList();
+            
+            if (pathList.Count == 0)
+            {
+                actionManager.ShowToast("没有有效的路径", ToastType.Error);
+                return;
+            }
+
+            // 检查路径是否在同一目录
+            if (ArePathsInSameDirectory(pathList))
+            {
+                OpenMultiplePathsInSameDirectory(pathList);
+            }
+            else
+            {
+                OpenMultiplePathsInDifferentDirectories(pathList);
+            }
+        }
+
+        /// <summary>
+        /// 检查文件或文件夹是否在同一目录
+        /// </summary>
+        /// <param name="paths">文件或文件夹路径列表</param>
         /// <returns>是否在同一目录</returns>
-        private bool AreFilesInSameDirectory(List<string> paths)
+        private bool ArePathsInSameDirectory(List<string> paths)
         {
             if (paths.Count == 0)
                 return false;
 
-            string commonDirectory = null; // 公共目录
-            foreach (string path in paths) // 遍历所有文件路径
+            // 获取所有路径的父目录
+            var parentDirectories = new List<string>();
+            foreach (string path in paths)
             {
-                string directory = Path.GetDirectoryName(path); // 获取文件所在目录
-                if (commonDirectory == null) // 第一次循环
-                    commonDirectory = directory; // 设置公共目录
-                else if (commonDirectory != directory) // 后续循环
+                if (File.Exists(path))
+                {
+                    parentDirectories.Add(Path.GetDirectoryName(path));
+                }
+                else if (Directory.Exists(path))
+                {
+                    parentDirectories.Add(Path.GetDirectoryName(path));
+                }
+                else
+                {
+                    return false; // 路径不存在
+                }
+            }
+
+            if (parentDirectories.Count == 0)
+                return false;
+
+            // 检查所有父目录是否相同
+            string firstParentDirectory = parentDirectories[0];
+            foreach (string parentDirectory in parentDirectories)
+            {
+                if (!string.Equals(parentDirectory, firstParentDirectory, StringComparison.OrdinalIgnoreCase))
                 {
                     return false; // 不在同一目录
                 }
             }
+
             return true;
         }
 
         /// <summary>
-        /// 打开同一目录下的多个文件并在资源管理器中选中
+        /// 打开同一目录下的多个文件或文件夹并在资源管理器中选中
         /// </summary>
-        /// <param name="paths">文件路径列表</param>
-        private void OpenMultipleFilesInSameDirectory(List<string> paths)
+        /// <param name="paths">文件或文件夹路径列表</param>
+        private void OpenMultiplePathsInSameDirectory(List<string> paths)
         {
             try
             {
-                string commonDirectory = Path.GetDirectoryName(paths[0]); // 获取公共目录
-                IntPtr pidlFolder = ILCreateFromPathW(commonDirectory); // 获取公共目录的 PIDL
-                try
+                // 获取公共目录
+                string commonDirectory = GetCommonDirectory(paths);
+                if (string.IsNullOrEmpty(commonDirectory))
                 {
-                    List<IntPtr> pidlItems = new List<IntPtr>(); // 文件 PIDL 列表
-                    foreach (string path in paths) // 遍历所有文件路径
-                    {
-                        IntPtr pidlItem = ILCreateFromPathW(path); // 获取文件 PIDL
-                        if (pidlItem == IntPtr.Zero) // 无法获取 PIDL
-                        {
-                            ShowErrorMessage($"无法获取文件的 PIDL：{path}");
-                            continue; // 跳过当前文件
-                        }
-                        pidlItems.Add(pidlItem); // 添加 PIDL 到列表
-                    }
+                    actionManager.ShowToast("无法确定公共目录", ToastType.Error);
+                    return;
+                }
 
-                    IntPtr pidlArray = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * pidlItems.Count); // 申请内存空间
-                    try
-                    {
-                        for (int i = 0; i < pidlItems.Count; i++) // 遍历 PIDL 列表
-                        {
-                            Marshal.WriteIntPtr(pidlArray, i * Marshal.SizeOf(typeof(IntPtr)), pidlItems[i]); // 写入 PIDL 到内存
-                        }
-                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlFolder, (uint)pidlItems.Count, pidlArray, 0)); // 打开文件夹并选中文件
-                    }
-                    finally
-                    {
-                        Marshal.FreeHGlobal(pidlArray); // 释放内存空间
-                        foreach (IntPtr pidlItem in pidlItems) // 释放 PIDL 资源
-                        {
-                            ILFree(pidlItem); // 释放 PIDL 资源
-                        }
-                    }
-                }
-                finally
-                {
-                    ILFree(pidlFolder); // 释放 PIDL 资源
-                }
+                // 创建并打开资源管理器窗口
+                OpenExplorerWithSelectedItems(commonDirectory, paths);
             }
             catch (Exception ex)
             {
-                ShowErrorMessage($"打开路径失败：{ex.Message}"); // 显示错误消息
+                actionManager.ShowToast($"打开路径失败：{ex.Message}", ToastType.Error);
             }
         }
 
         /// <summary>
-        /// 分别打开不同目录下的文件并在各自的资源管理器窗口中选中
+        /// 创建并打开资源管理器窗口，选中指定项目
         /// </summary>
-        /// <param name="paths">文件路径列表</param>
-        private void OpenMultipleFilesInDifferentDirectories(List<string> paths)
+        /// <param name="folderPath">要打开的文件夹路径</param>
+        /// <param name="itemPaths">要选中的项目路径列表</param>
+        private void OpenExplorerWithSelectedItems(string folderPath, List<string> itemPaths)
+        {
+            IntPtr pidlFolder = ILCreateFromPathW(folderPath);
+            try
+            {
+                // 创建项目PIDL列表
+                List<IntPtr> pidlItems = CreatePidlList(itemPaths);
+                if (pidlItems.Count == 0)
+                {
+                    actionManager.ShowToast("没有有效的路径", ToastType.Error);
+                    return;
+                }
+
+                // 打开资源管理器并选中项目
+                OpenExplorerAndSelectItems(pidlFolder, pidlItems);
+            }
+            finally
+            {
+                ILFree(pidlFolder);
+            }
+        }
+
+        /// <summary>
+        /// 创建项目PIDL列表
+        /// </summary>
+        /// <param name="paths">项目路径列表</param>
+        /// <returns>PIDL列表</returns>
+        private List<IntPtr> CreatePidlList(List<string> paths)
+        {
+            List<IntPtr> pidlItems = new List<IntPtr>();
+            
+            foreach (string path in paths)
+            {
+                IntPtr pidlItem = CreatePidlForPath(path);
+                if (pidlItem != IntPtr.Zero)
+                {
+                    pidlItems.Add(pidlItem);
+                }
+            }
+            
+            return pidlItems;
+        }
+
+        /// <summary>
+        /// 为单个路径创建PIDL
+        /// </summary>
+        /// <param name="path">路径</param>
+        /// <returns>PIDL指针</returns>
+        private IntPtr CreatePidlForPath(string path)
+        {
+            // 检查路径是否存在
+            if (!File.Exists(path) && !Directory.Exists(path))
+            {
+                actionManager.ShowToast($"路径不存在：{path}", ToastType.Error);
+                return IntPtr.Zero;
+            }
+            
+            IntPtr pidlItem = ILCreateFromPathW(path);
+            if (pidlItem == IntPtr.Zero)
+            {
+                actionManager.ShowToast($"无法获取路径的 PIDL：{path}", ToastType.Error);
+                return IntPtr.Zero;
+            }
+            
+            return pidlItem;
+        }
+
+        /// <summary>
+        /// 打开资源管理器并选中指定项目
+        /// </summary>
+        /// <param name="pidlFolder">文件夹PIDL</param>
+        /// <param name="pidlItems">项目PIDL列表</param>
+        private void OpenExplorerAndSelectItems(IntPtr pidlFolder, List<IntPtr> pidlItems)
+        {
+            IntPtr pidlArray = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(IntPtr)) * pidlItems.Count);
+            try
+            {
+                // 将PIDL列表写入内存
+                WritePidlArrayToMemory(pidlArray, pidlItems);
+                
+                // 打开资源管理器并选中项目
+                Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlFolder, (uint)pidlItems.Count, pidlArray, 0));
+            }
+            finally
+            {
+                // 释放资源
+                Marshal.FreeHGlobal(pidlArray);
+                FreePidlItems(pidlItems);
+            }
+        }
+
+        /// <summary>
+        /// 将PIDL列表写入内存
+        /// </summary>
+        /// <param name="pidlArray">内存指针</param>
+        /// <param name="pidlItems">PIDL列表</param>
+        private void WritePidlArrayToMemory(IntPtr pidlArray, List<IntPtr> pidlItems)
+        {
+            for (int i = 0; i < pidlItems.Count; i++)
+            {
+                Marshal.WriteIntPtr(pidlArray, i * Marshal.SizeOf(typeof(IntPtr)), pidlItems[i]);
+            }
+        }
+
+        /// <summary>
+        /// 释放PIDL项目列表
+        /// </summary>
+        /// <param name="pidlItems">PIDL列表</param>
+        private void FreePidlItems(List<IntPtr> pidlItems)
+        {
+            foreach (IntPtr pidlItem in pidlItems)
+            {
+                ILFree(pidlItem);
+            }
+        }
+
+        /// <summary>
+        /// 获取多个路径的公共目录
+        /// </summary>
+        /// <param name="paths">路径列表</param>
+        /// <returns>公共目录</returns>
+        private string GetCommonDirectory(List<string> paths)
+        {
+            if (paths.Count == 0)
+                return string.Empty;
+
+            // 获取所有路径的父目录
+            var parentDirectories = new List<string>();
+            foreach (string path in paths)
+            {
+                if (File.Exists(path))
+                {
+                    parentDirectories.Add(Path.GetDirectoryName(path));
+                }
+                else if (Directory.Exists(path))
+                {
+                    parentDirectories.Add(Path.GetDirectoryName(path));
+                }
+            }
+
+            if (parentDirectories.Count == 0)
+                return string.Empty;
+
+            // 检查所有父目录是否相同
+            string firstParentDirectory = parentDirectories[0];
+            foreach (string parentDirectory in parentDirectories)
+            {
+                if (!string.Equals(parentDirectory, firstParentDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 如果不相同，需要找到公共父目录
+                    return FindCommonPrefix(parentDirectories);
+                }
+            }
+
+            return firstParentDirectory;
+        }
+
+        /// <summary>
+        /// 找到多个路径的公共前缀
+        /// </summary>
+        /// <param name="paths">路径列表</param>
+        /// <returns>公共前缀</returns>
+        private string FindCommonPrefix(List<string> paths)
+        {
+            if (paths.Count == 0)
+                return string.Empty;
+
+            string commonPrefix = paths[0];
+            
+            foreach (string path in paths.Skip(1))
+            {
+                int commonLength = 0;
+                int minLength = Math.Min(commonPrefix.Length, path.Length);
+                
+                for (int i = 0; i < minLength; i++)
+                {
+                    if (char.ToUpperInvariant(commonPrefix[i]) == char.ToUpperInvariant(path[i]))
+                    {
+                        commonLength++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                // 确保在目录分隔符处截断
+                while (commonLength > 0 && commonPrefix[commonLength - 1] != '\\')
+                {
+                    commonLength--;
+                }
+                
+                commonPrefix = commonPrefix.Substring(0, commonLength);
+            }
+            
+            return commonPrefix;
+        }
+
+        /// <summary>
+        /// 分别打开不同目录下的文件或文件夹并在各自的资源管理器窗口中选中
+        /// </summary>
+        /// <param name="paths">文件或文件夹路径列表</param>
+        private void OpenMultiplePathsInDifferentDirectories(List<string> paths)
         {
             try
             {
-                foreach (string path in paths) // 遍历所有文件路径
+                foreach (string path in paths) // 遍历所有路径
                 {
-                    IntPtr pidlList = ILCreateFromPathW(path); // 获取文件 PIDL
+                    // 检查路径是否存在
+                    if (!File.Exists(path) && !Directory.Exists(path))
+                    {
+                        actionManager.ShowToast($"路径不存在：{path}", ToastType.Error);
+                        continue; // 跳过当前路径
+                    }
+                    
+                    IntPtr pidlList = ILCreateFromPathW(path); // 获取路径的 PIDL
                     try
                     {
-                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0)); // 打开文件所在目录并选中文件
+                        Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(pidlList, 0, IntPtr.Zero, 0)); // 打开路径所在目录并选中路径
                     }
                     catch (Exception ex)
                     {
-                        ShowErrorMessage($"打开路径失败：{ex.Message}"); // 显示错误消息
+                        actionManager.ShowToast($"打开路径失败：{ex.Message}", ToastType.Error); // 显示错误消息
                     }
                     finally
                     {
@@ -564,7 +801,7 @@ namespace Quicker.Windows.Menus
             }
             catch (Exception ex)
             {
-                ShowErrorMessage($"打开路径失败：{ex.Message}"); // 显示错误消息
+                actionManager.ShowToast($"打开路径失败：{ex.Message}", ToastType.Error); // 显示错误消息
             }
         }
         #endregion
@@ -661,18 +898,6 @@ namespace Quicker.Windows.Menus
 
         #endregion
 
-        #region 辅助方法
-        /// <summary>
-        /// 显示错误消息
-        /// </summary>
-        /// <param name="message">消息</param>
-        private void ShowErrorMessage(string message)
-        {
-            using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show(message, ToastType.Error); // 弹出消息提醒
-        }
-        #endregion
-
         #region 资源释放
         // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
@@ -680,6 +905,7 @@ namespace Quicker.Windows.Menus
             base.OnClosed(e); // 调用基类的 OnClosed 方法
             ClosingOrHiding = null; // 清理事件
             buttonManager.Dispose(); // 释放按钮管理器资源
+            actionManager.Dispose(); // 释放动作管理器资源
             close = false; // 设置关闭标识符
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
