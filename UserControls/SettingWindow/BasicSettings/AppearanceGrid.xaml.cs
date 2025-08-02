@@ -19,6 +19,8 @@ using System.Text.Json;
 using Quicker.Helpers;
 using System.Windows;
 using WpfAnimatedGif;
+using Quicker.Models;
+using System.Text;
 using System.IO;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
@@ -31,8 +33,10 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
         private readonly List<string> _tempFiles = new(); // 临时文件列表，用于清理
         private DispatcherTimer _settingsChangeTimer; // 设置变化检测计时器
+        private bool _isLoadingGlobalButtons = false; // 是否正在加载全局按钮
         private readonly ButtonDatabase db2 = new(); // 添加按钮数据库
         private SolidColorBrush _currentBrush; // 当前选中的颜色画刷
+        private bool _isInitializing = true; // 是否正在初始化
         private Button _currentColorButton; // 记录当前按钮
         SettingManager settingManager; // 设置管理器
 
@@ -155,6 +159,15 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ApplyBackgroundImageSettings();
                 ApplyBlurAndCornerSettings();
             });
+
+            // 初始化完成
+            _isInitializing = false;
+            
+            // 初始化完成后，如果预览功能开启，则加载一次全局按钮
+            if (settingManager.appearanceConditions.EnablePreview)
+            {
+                await LoadGlobalButtonsForPreviewInternal();
+            }
         }
 
         // 按钮相关设置
@@ -219,8 +232,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             // 直接设置预览区域可见性，避免调用EnablePreviewCheckBox_Click导致的逻辑问题
             ViewPreviewBorder.Visibility = settingManager.appearanceConditions.EnablePreview ? Visibility.Visible : Visibility.Collapsed;
 
-            // 如果开启预览，延迟加载预览区域
-            if (settingManager.appearanceConditions.EnablePreview)
+            // 如果开启预览，延迟加载预览区域（仅在非初始化期间）
+            if (settingManager.appearanceConditions.EnablePreview && !_isInitializing)
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -269,7 +282,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     return; // 其它CheckBox不处理
             }
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-            LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+            
+            // 在非初始化期间才刷新预览
+            if (!_isInitializing)
+            {
+                LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+            }
         }
 
         // 颜色按钮点击事件，弹出颜色选择器并初始化为当前颜色
@@ -393,30 +411,125 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 为预览加载全局按钮
         private async void LoadGlobalButtonsForPreview()
         {
-            // 异步加载按钮数据，避免阻塞UI
-            var globalButtons = await Task.Run(() => db2.GetPagesOfButtons("_global", 0)); // 获取全局按钮数据
-            var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 获取Grid中的所有Button
+            // 防止重复调用
+            if (_isLoadingGlobalButtons) return;
+            
+            // 在初始化期间，只在最后一次调用时执行
+            if (_isInitializing)
+            {
+                // 延迟执行，确保是最后一次调用
+                Dispatcher.BeginInvoke(new Action(async () =>
+                {
+                    await Task.Delay(100); // 等待100ms，确保其他初始化调用完成
+                    if (!_isInitializing) // 如果初始化已完成，则执行加载
+                    {
+                        await LoadGlobalButtonsForPreviewInternal();
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Background);
+                return;
+            }
+
+            await LoadGlobalButtonsForPreviewInternal();
+        }
+
+        /// <summary>
+        /// 内部方法：实际执行全局按钮加载逻辑
+        /// </summary>
+        private async Task LoadGlobalButtonsForPreviewInternal()
+        {
+            if (_isLoadingGlobalButtons) return;
+            _isLoadingGlobalButtons = true;
+            try
+            {
+                // 异步加载按钮数据，避免阻塞UI
+                var globalButtons = await Task.Run(() => db2.GetPagesOfButtons("_global", 0)); // 异步加载全局按钮数据
+                var buttons = GlobalGrid.Children.OfType<Button>().ToList(); // 异步加载全局按钮数据
+                bool hasChanges = ProcessButtonsWithData(buttons, globalButtons); // 处理按钮数据并判断是否有数据变更
+                if (!hasChanges) // 如果没有数据变更，则使用默认数据
+                {
+                    ApplyDefaultDataToGlobal11(buttons);
+                }
+            }
+            finally
+            {
+                _isLoadingGlobalButtons = false;
+            }
+        }
+
+        /// <summary>
+        /// 处理按钮数据，为每个按钮设置对应的数据或清空
+        /// </summary>
+        /// <param name="buttons">按钮列表</param>
+        /// <param name="globalButtons">全局按钮数据</param>
+        /// <returns>是否有数据变更</returns>
+        private bool ProcessButtonsWithData(List<Button> buttons, List<ButtonData> globalButtons)
+        {
+            bool hasChanges = false; // 是否有数据变更
             for (int i = 0; i < buttons.Count; i++)
             {
-                var btn = buttons[i];
-                string buttonName = btn.Name;
+                var btn = buttons[i]; // 获取按钮
                 int buttonIndex = int.Parse(btn.Name.Replace("_global", "")); // 获取按钮索引
-
-                // 查找对应的按钮数据
-                var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex);
+                var buttonData = globalButtons.FirstOrDefault(b => b.ButtonID == buttonIndex);// 根据按钮ID查找对应的按钮数据
                 if (buttonData != null)
                 {
-                    btn.Tag = buttonData; // 绑定按钮数据到Tag
-                    btn.Background = ActionButtonColorButton.Background; // 设置为动作按钮颜色
-                    buttonManager.RefreshButtonDisplay(btn, buttonData, 0); // 刷新按钮显示内容
+                    hasChanges = true; // 有数据变更
+                    ApplyButtonData(btn, buttonData); // 应用按钮数据
                 }
                 else
                 {
-                    btn.Tag = null; // 没有数据则Tag置空
-                    btn.Background = BlankButtonColorButton.Background; // 设置为空白按钮颜色
-                    btn.Content = null; // 清空内容或设置为空白样式
+                    btn.Background = BlankButtonColorButton.Background;
                 }
             }
+            return hasChanges;
+        }
+
+        /// <summary>
+        /// 为按钮应用数据
+        /// </summary>
+        /// <param name="button">目标按钮</param>
+        /// <param name="buttonData">按钮数据</param>
+        private void ApplyButtonData(Button button, ButtonData buttonData)
+        {
+            button.Background = ActionButtonColorButton.Background; // 默认为动作按钮颜色
+            buttonManager.RefreshButtonDisplay(button, buttonData, 0); // 刷新按钮显示
+        }
+
+        /// <summary>
+        /// 为_global11按钮应用默认数据
+        /// </summary>
+        /// <param name="buttons">按钮列表</param>
+        private void ApplyDefaultDataToGlobal11(List<Button> buttons)
+        {
+            var defaultData = CreateDefaultButtonData(); // 创建默认按钮数据
+            var global11Button = buttons.FirstOrDefault(b => b.Name == "_global11"); // 获取_global11按钮
+            if (global11Button != null)
+            {
+                ApplyButtonData(global11Button, defaultData); // 应用默认按钮数据
+            }
+        }
+
+        /// <summary>
+        /// 创建默认按钮数据
+        /// </summary>
+        /// <returns>默认按钮数据</returns>
+        private ButtonData CreateDefaultButtonData()
+        {
+            return new ButtonData
+            {
+                ButtonID = 11,
+                Title = "Quicker",
+                Location = "",
+                //ImagePath = "pack://application:,,,/Resources/Images/Quicker_Enabled.png",
+                ImagePath = "pack://application:,,,/Resources/Images/Quicker.png",
+                Data1 = "",
+                Data2 = "",
+                Data3 = "",
+                Description = "",
+                CreateTime = DateTime.Now,
+                LatestEditTime = DateTime.Now,
+                ActionType = "OpenFlie",
+                UsedTimes = 0
+            };
         }
 
         private void PreviewButton_MouseEnter(object sender, EventArgs e)
@@ -471,7 +584,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     break;
                 case "FontSizeSlider":
                     settingManager.appearanceConditions.FontSize = slider.Value; // 设置字体大小
-                    LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
                     break;
                 case "BackgroundImageOpacitySlider":
                     settingManager.appearanceConditions.BackgroundImageOpacity = slider.Value; // 设置背景图片不透明度
@@ -480,7 +592,10 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     return;
             }
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
-            LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+            if (!_isInitializing) // 在非初始化期间才刷新预览
+            {
+                LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
+            }
         }
 
         // 下拉框选择改变事件
@@ -605,7 +720,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 return; // 字体列表未初始化，直接返回
             }
             int defaultIndex = fontFamilies.Count - 1;
-
             // 设置 ComboBox 选中项（防止越界）
             FontSizeComboBox1.SelectedIndex = (font1Index == -1 || font1Index < 0 || font1Index >= fontFamilies.Count) ? defaultIndex : font1Index;
             FontSizeComboBox2.SelectedIndex = (font2Index == -1 || font2Index < 0 || font2Index >= fontFamilies.Count) ? defaultIndex : font2Index;
@@ -659,7 +773,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
                 else
                 {
-                    // 使用转换器逻辑计算宽高比，避免依赖ViewPreviewBorder的ActualWidth/ActualHeight
+                    // 使用转换器逻辑计算宽高比
                     double btnSize = ButtonSizeSlider.Value;
                     double gap = ButtonGapSlider.Value;
 
@@ -919,14 +1033,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             try
             {
                 // 用 WPF BitmapImage 读取
-                bitmap = new BitmapImage();
+                bitmap = new();
                 bitmap.BeginInit();
                 bitmap.UriSource = new Uri(inputPath, UriKind.Absolute);
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.EndInit();
 
                 // 转换为 32 位 BGRA
-                converted = new FormatConvertedBitmap(bitmap, PixelFormats.Bgra32, null, 0);
+                converted = new(bitmap, PixelFormats.Bgra32, null, 0);
 
                 // 保存为临时 PNG
                 string tempPath = Path.GetTempFileName() + ".png";
@@ -959,10 +1073,10 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 var pngMeta = image.Metadata.GetPngMetadata();
                 var textData = pngMeta.TextData.FirstOrDefault(t => t.Keyword == "QuickerAppearance");
-                string text = textData.Equals(default(PngTextData)) ? null : textData.Value;
-                if (!string.IsNullOrEmpty(text))
+                // 使用更安全的方式检查是否找到了数据
+                if (textData != null && !string.IsNullOrEmpty(textData.Value))
                 {
-                    json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(text));
+                    json = Encoding.UTF8.GetString(Convert.FromBase64String(textData.Value));
                 }
             }
             if (string.IsNullOrEmpty(json))
@@ -1180,9 +1294,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             ApplyBackgroundImageSettings(); // 应用背景图片设置
             ApplyBlurAndCornerSettings(); // 应用模糊与圆角设置
             ApplyOptionSettings(); // 应用选项设置
-            
-            // 只在预览功能开启时才加载预览按钮
-            if (settingManager.appearanceConditions.EnablePreview)
+
+            // 只在预览功能开启时才加载预览按钮（仅在非初始化期间）
+            if (settingManager.appearanceConditions.EnablePreview && !_isInitializing)
             {
                 LoadGlobalButtonsForPreview(); // 加载全局按钮列表并显示预览区
             }

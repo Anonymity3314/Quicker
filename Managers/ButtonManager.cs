@@ -1,4 +1,5 @@
 ﻿using Quicker.Windows.MainWindows.MainWindow;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
@@ -407,10 +408,10 @@ namespace Quicker.Managers
                 Image image = LoadActionIcon(buttonInformation, isMainWindow); // 加载动作图标
 
                 // 检查是否为GIF图片，若是则用WpfAnimatedGif设置动画源
-                string ext = System.IO.Path.GetExtension(buttonInformation.ImagePath ?? "").ToLower();
+                string ext = Path.GetExtension(buttonInformation.ImagePath ?? "").ToLower();
                 if (ext == ".gif" && !string.IsNullOrEmpty(buttonInformation.ImagePath))
                 {
-                    var bitmap = new System.Windows.Media.Imaging.BitmapImage(new System.Uri(buttonInformation.ImagePath));
+                    var bitmap = new BitmapImage(new Uri(buttonInformation.ImagePath));
                     WpfAnimatedGif.ImageBehavior.SetAnimatedSource(image, bitmap);
                 }
 
@@ -474,7 +475,7 @@ namespace Quicker.Managers
             };
 
             image.Effect = appearance.ShowActionIconShadow == true
-            ? new System.Windows.Media.Effects.DropShadowEffect
+            ? new DropShadowEffect
             {
                 Color = Colors.Black,
                 BlurRadius = 8,
