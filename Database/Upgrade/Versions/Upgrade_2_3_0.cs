@@ -1,5 +1,7 @@
 ﻿using Quicker.Database.Core;
 using System.Data.SQLite;
+using Quicker.Helpers;
+using System.IO;
 
 namespace Quicker.Database.Upgrade.Versions
 {
@@ -35,7 +37,7 @@ namespace Quicker.Database.Upgrade.Versions
                 while (reader.Read())
                 {
                     string tableName = reader.GetString(0);
-                    // 只处理按钮数据表（可根据实际表名规则过滤）
+                    // 只处理按钮数据表
                     if (!string.IsNullOrEmpty(tableName) && !tableName.StartsWith("sqlite_"))
                     {
                         tableNames.Add(tableName);
@@ -43,8 +45,9 @@ namespace Quicker.Database.Upgrade.Versions
                 }
             }
 
-            string oldPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\LocalIcons\";
-            string newPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\";
+            // 使用AppPathHelper获取路径
+            string oldPath = Path.Combine(AppPathHelper.AppDataRoot, "LocalIcons") + Path.DirectorySeparatorChar;
+            string newPath = AppPathHelper.LocalIconsFolder + Path.DirectorySeparatorChar;
             foreach (var table in tableNames)
             {
                 string sql = $"UPDATE [{table}] SET ImagePath = REPLACE(ImagePath, @oldPath, @newPath) WHERE ImagePath LIKE @likePath";

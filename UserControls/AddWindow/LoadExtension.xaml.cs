@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using Quicker.Database.Core;
 using Quicker.Managers;
 using Microsoft.Win32;
+using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
 using WpfAnimatedGif;
@@ -17,7 +18,6 @@ namespace Quicker.UserControls.AddWindow
     {
         #region 字段和属性
         
-        private const string folderPath = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Extensions\\"; // 扩展文件夹路径
         private Quicker.Windows.AddWindows.AddActionWindow _addWindow; // AddWindow 的引用
         private readonly ButtonManager _buttonManager = new(); // 按钮管理器接口
         private readonly IconManager _iconManager = new(); // 图标管理器接口
@@ -155,7 +155,7 @@ namespace Quicker.UserControls.AddWindow
             var dialog = new OpenFileDialog()
             {
                 Filter = "扩展模块 (*.dll)|*.dll",
-                InitialDirectory = folderPath, // 默认路径
+                InitialDirectory = AppPathHelper.ExtensionsFolder, // 默认路径
                 Title = "选择扩展模块DLL文件"
             };
             return dialog.ShowDialog() == true ? dialog.FileName : null; // 如果选择文件，则返回文件路径，否则返回null

@@ -8,36 +8,51 @@ namespace Quicker.Database.Core
 {
     public class ActionPageDatabase
     {
-        // 数据库连接字符串
-        private const string db3 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\ActionPage.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
+        // 使用AppPathHelper获取数据库连接字符串
+        private static string GetConnectionString()
+        {
+            return DatabaseHelper.GetConnectionString("ActionPage.db");
+        }
+
+        // 确保数据库目录存在
+        private static void EnsureDatabaseDirectoryExists()
+        {
+            DatabaseHelper.EnsureDatabaseDirectoryExists();
+        }
+
+        // 数据库连接
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
 
         public ActionPageDatabase()
         {
-            string dbFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 获取数据库文件夹路径
-            if (!Directory.Exists(dbFolder)) // 如果数据库文件夹不存在，则创建
-                Directory.CreateDirectory(dbFolder); // 创建数据库文件夹
-            string dbFilePath = Path.Combine(dbFolder, "ActionPage.db"); // 获取数据库文件路径
-            if (!File.Exists(dbFilePath)) // 如果数据库文件不存在，则创建
+            EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
+            DatabaseHelper.EnsureDatabaseExists("ActionPage.db"); // 确保数据库文件存在
+            string dbFilePath = Path.Combine(AppPathHelper.DatabaseFolder, "ActionPage.db"); // 设置数据库文件路径
+            if (!File.Exists(dbFilePath))
             {
-                SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
-                InitializeDatabase(); // 初始化数据库
+                InitializeDatabase(); // 初始化数据库表
             }
         }
 
-        // 初始化数据库
-        private void InitializeDatabase()
+        public SQLiteConnection OpenConnection()
         {
-            using var connection = OpenConnection(); // 打开数据库连接
+            return DatabaseHelper.OpenConnection("ActionPage.db");
+        }
+
+        // 初始化数据库
+        private static void InitializeDatabase()
+        {
+            using var connection = new SQLiteConnection(GetConnectionString()); // 打开数据库连接
+            connection.Open();
             CreateScenesTable(connection); // 创建数据表
-            CreateAndInitTable("_global"); // 创建数据表并初始化
-            CreateAndInitTable("common"); // 创建数据表并初始化
-            CreateAndInitTable("taskbar"); // 创建数据表并初始化
-            CreateAndInitTable("desktop"); // 创建数据表并初始化
+            CreateAndInitTableStatic(connection, "_global"); // 创建数据表并初始化
+            CreateAndInitTableStatic(connection, "common"); // 创建数据表并初始化
+            CreateAndInitTableStatic(connection, "taskbar"); // 创建数据表并初始化
+            CreateAndInitTableStatic(connection, "desktop"); // 创建数据表并初始化
         }
 
         // 创建Scenes表
-        private void CreateScenesTable(SQLiteConnection connection)
+        private static void CreateScenesTable(SQLiteConnection connection)
         {
             using var transaction = connection.BeginTransaction(); // 开启事务
             string createTableQuery = @"
@@ -64,6 +79,48 @@ namespace Quicker.Database.Core
                 ["desktop"] = ("Windows桌面", "桌面", "/Resources/Images/DesktopSceneImage.png", "desktop"),
                 ["taskbar"] = ("Windows任务栏", "任务栏", "/Resources/Images/TaskbarSceneImage.png", "taskbar")
             };
+        }
+
+        // 静态版本的CreateAndInitTable方法
+        private static void CreateAndInitTableStatic(SQLiteConnection connection, string sceneTag)
+        {
+            // 获取场景配置
+            var (defaultSceneProcess, actionPageName, defaultIconPath, defaultTag) =
+                SceneConfig.Configs.GetValueOrDefault(sceneTag, (string.Empty, string.Empty, "", sceneTag));
+
+            string sceneIconPath = defaultIconPath;
+            string sceneName = defaultTag;
+            string sceneProcess = defaultSceneProcess;
+
+            // 创建场景数据
+            var sceneData = new SceneData
+            {
+                SceneName = sceneName,
+                SceneIconPath = sceneIconPath,
+                SceneCount = 0,
+                SceneTag = sceneTag,
+                AutoReturnToFirstPage = false,
+                SceneProcess = sceneProcess
+            };
+
+            // 插入场景数据
+            InsertSceneData(connection, sceneData);
+        }
+
+        // 插入场景数据
+        private static void InsertSceneData(SQLiteConnection connection, SceneData sceneData)
+        {
+            string insertQuery = @"
+                INSERT OR REPLACE INTO Scenes (SceneName, SceneIconPath, SceneCount, SceneTag, AutoReturnToFirstPage, SceneProcess)
+                VALUES (@SceneName, @SceneIconPath, @SceneCount, @SceneTag, @AutoReturnToFirstPage, @SceneProcess)";
+            using var command = new SQLiteCommand(insertQuery, connection);
+            command.Parameters.AddWithValue("@SceneName", sceneData.SceneName);
+            command.Parameters.AddWithValue("@SceneIconPath", sceneData.SceneIconPath);
+            command.Parameters.AddWithValue("@SceneCount", sceneData.SceneCount);
+            command.Parameters.AddWithValue("@SceneTag", sceneData.SceneTag);
+            command.Parameters.AddWithValue("@AutoReturnToFirstPage", sceneData.AutoReturnToFirstPage);
+            command.Parameters.AddWithValue("@SceneProcess", sceneData.SceneProcess);
+            command.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -514,15 +571,11 @@ namespace Quicker.Database.Core
         }
 
         /// <summary>
-        /// 打开数据库连接
+        /// 释放资源
         /// </summary>
-        /// <returns> 数据库连接 </returns>
-        public SQLiteConnection OpenConnection()
+        public void Dispose()
         {
-            var connection = new SQLiteConnection(db3); // 创建数据库连接
-            connection.BusyTimeout = 30000; // 设置超时时间 30秒
-            connection.Open(); // 打开数据库连接
-            return connection; // 返回数据库连接
+            // 释放资源
         }
     }
 }

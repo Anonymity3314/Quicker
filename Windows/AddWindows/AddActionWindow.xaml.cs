@@ -16,6 +16,9 @@ using Quicker.Models;
 using WpfAnimatedGif;
 using System.Media;
 using System.IO;
+using Quicker.Windows.MainWindows.MainWindow;
+using Quicker.Helpers;
+using System;
 
 namespace Quicker.Windows.AddWindows
 {
@@ -33,6 +36,10 @@ namespace Quicker.Windows.AddWindows
         private Appearance _appearance; // 外观设置
         private bool isLoading = true; // 是否正在加载
         public string iconPath; // 图标路径
+        private readonly ActionManager actionManager = new(); // 动作管理器
+        private ButtonData buttonData; // 按钮数据
+        private string selectedImagePath; // 选中的图片路径
+        private bool isEditMode; // 是否为编辑模式
 
         public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
@@ -166,11 +173,10 @@ namespace Quicker.Windows.AddWindows
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
-            string localIconsPath = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Images\\LocalIcons"; // 动态生成路径
-            if (!Directory.Exists(localIconsPath)) Directory.CreateDirectory(localIconsPath); // 如果文件夹不存在，创建它
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.LocalIconsFolder); // 确保目录存在
             Process.Start(new ProcessStartInfo
             {
-                FileName = localIconsPath, // 打开文件夹
+                FileName = AppPathHelper.LocalIconsFolder, // 使用AppPathHelper获取路径
                 UseShellExecute = true // 使用系统外壳程序打开
             });
         }

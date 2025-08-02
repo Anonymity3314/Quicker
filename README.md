@@ -174,9 +174,10 @@ Quicker/
 │   └─SearchHintVisibilityConverter.cs                # 搜索框提示可见性转换器，根据TextBox文本内容控制提示Label的显示/隐藏
 ├─Database/                                           # 数据库相关
 │   ├─Core/                                            # 数据库核心操作
-│   │   ├─SettingDatabase.cs                            # 设置数据库，管理应用配置和设置信息
+│   │   ├─ActionPageDatabase.cs                         # 动作页数据库，管理动作页和场景数据
 │   │   ├─ButtonDatabase.cs                             # 按钮数据库，管理动作按钮的数据存储
-│   │   └─ActionPageDatabase.cs                         # 动作页数据库，管理动作页和场景数据
+│   │   ├─DatabaseHelper.cs                             # 数据库操作助手类，提供统一的数据库连接和初始化功能
+│   │   └─SettingDatabase.cs                            # 设置数据库，管理应用配置和设置信息
 │   └─Upgrade/                                         # 数据库升级相关
 │       ├─IDatabaseUpgradeStep.cs                       # 升级步骤接口，定义数据库升级的标准接口
 │       ├─DatabaseUpdateManager.cs                      # 升级调度主类，负责数据库版本检查和升级流程管理
@@ -186,6 +187,7 @@ Quicker/
 │   ├─IExtensionModule.cs                              # 实现扩展的接口
 │   └─ModuleLoader.cs                                  # 扩展模块加载器
 ├─Helpers/                                            # 通用辅助类/附加属性
+│   ├─AppPathHelper.cs                                 # 应用程序路径管理助手类，统一管理Quicker应用程序的所有路径
 │   ├─TextBlockHelper.cs                               # 文本块辅助类
 │   ├─VersionHelper.cs                                 # 版本号比较工具类，用于版本号比较和检查更新
 │   ├─DataSizeHelper.cs                                # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换

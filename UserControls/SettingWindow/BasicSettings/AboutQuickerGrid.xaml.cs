@@ -15,7 +15,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class AboutQuickerGrid : UserControl
     {
-        private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\TempData"; // 文件夹路径
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         SettingManager settingManager; // 读取设置的管理器
 
@@ -26,6 +25,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             weakSettingWindow = new(settingWindow); // 保存设置窗口
             settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
+
+            // 设置路径文本内容
+            RootFolderPath.Text = AppPathHelper.AppDataRoot;
+            DatabaseFolderPath.Text = AppPathHelper.DatabaseFolder;
+            LocalIconsFolderPath.Text = AppPathHelper.LocalIconsFolder;
+
             GetTempDataSize(); // 获取临时数据大小
         }
 
@@ -135,19 +140,19 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 前往程序数据根目录
         private void RootFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\");
+            OpenFolder(AppPathHelper.AppDataRoot);
         }
 
         // 前往程序数据库目录
         private void DatabaseFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database\");
+            OpenFolder(AppPathHelper.DatabaseFolder);
         }
 
         // 前往程序图标目录
         private void LocalIconsFolderPath_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            OpenFolder(@"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\");
+            OpenFolder(AppPathHelper.LocalIconsFolder);
         }
 
         // 备份数据
@@ -157,7 +162,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string folderPath = folderDialog.SelectedPath;
-                string sourceFolderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker";
+                string sourceFolderPath = AppPathHelper.AppDataRoot;
                 string backupFolderPath = Path.Combine(folderPath, "QuickerData");
                 if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath);
                 CopyFolder(sourceFolderPath, backupFolderPath);
@@ -209,13 +214,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 获取临时数据大小（异步）
         public async Task<string> GetTempDataSizeAsync()
         {
-            if (Directory.Exists(folderPath)) // 检查文件夹是否存在
+            string tempDataPath = AppPathHelper.TempDataFolder;
+            if (Directory.Exists(tempDataPath)) // 检查文件夹是否存在
             {
                 try
                 {
                     long folderSize = 0;
                     string folderSizeString = "B"; // 默认单位为字节
-                    DirectoryInfo directoryInfo = new DirectoryInfo(folderPath); // 创建 DirectoryInfo 对象
+                    DirectoryInfo directoryInfo = new DirectoryInfo(tempDataPath); // 创建 DirectoryInfo 对象
                     var files = directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories); // 获取所有文件（包括子文件夹）                 
                     foreach (var file in files) // 遍历所有文件并累加大小
                     {
@@ -241,11 +247,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             try
             {
-                if (Directory.Exists(folderPath))
+                string tempDataPath = AppPathHelper.TempDataFolder;
+                if (Directory.Exists(tempDataPath))
                 {
-                    Directory.Delete(folderPath, true); // 递归删除整个文件夹
+                    Directory.Delete(tempDataPath, true); // 递归删除整个文件夹
                 }
-                Directory.CreateDirectory(folderPath); // 重新创建空文件夹
+                Directory.CreateDirectory(tempDataPath); // 重新创建空文件夹
                 using var toastSuccess = new ToastManager();
                 toastSuccess.Show("清理完成！", ToastType.Success);
             }

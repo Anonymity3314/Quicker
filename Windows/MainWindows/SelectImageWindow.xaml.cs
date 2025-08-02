@@ -1,9 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using VisualTreeHelper = System.Windows.Media.VisualTreeHelper;
+using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Data;
 using System.Diagnostics;
+using Quicker.Helpers;
 using System.Windows;
 using System.IO;
 
@@ -13,7 +15,6 @@ namespace Quicker.Windows.MainWindows
     {
         public ObservableCollection<ImageItem> ImageItems { get; set; } = new(); // 图片项集合
         public string SelectedImagePath { get; private set; } = string.Empty; // 选中的图片路径
-        private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons\"; // 文件夹路径
         public event EventHandler<string> ImageConfirmed; // 图片确认事件
         private ScrollViewer listViewScrollViewer; // 图片列表的 ScrollViewer
         private int loadedImageCount = 0; // 已加载的图片数量
@@ -101,20 +102,37 @@ namespace Quicker.Windows.MainWindows
         // 从文件夹加载图片
         private void LoadImagesFromFolder()
         {
+            string folderPath = AppPathHelper.LocalIconsFolder; // 获取文件夹路径
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath); // 创建文件夹
-                DirectoryInfo dirInfo = new DirectoryInfo(Path.GetDirectoryName(folderPath)); // 获取文件夹信息
-                return; // 返回
             }
 
-            string[] supportedExtensions = { ".png", ".ico", ".jpg", ".jpeg", ".bmp", ".gif", ".svg" }; // 支持的图片格式
-            allImageFiles = Directory.GetFiles(folderPath)
-                .Where(file => supportedExtensions.Contains(Path.GetExtension(file).ToLower()))
-                .ToArray();
+            allImageFiles = Directory.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly)
+                .Where(file => IsImageFile(file))
+                .ToArray(); // 获取所有图片文件
 
-            LoadImages(45); // 加载图片
-            UpdateWrapPanelHeight(); // 重新计算 WrapPanel 的高度
+            LoadInitialImages(); // 加载初始图片
+        }
+
+        /// <summary>
+        /// 检查文件是否为图片文件
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>是否为图片文件</returns>
+        private bool IsImageFile(string filePath)
+        {
+            string extension = Path.GetExtension(filePath).ToLowerInvariant();
+            return new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".ico", ".svg" }.Contains(extension);
+        }
+
+        /// <summary>
+        /// 加载初始图片
+        /// </summary>
+        private void LoadInitialImages()
+        {
+            LoadImages(27); // 初始加载27张图片
+            LoadMoreButton.IsEnabled = allImageFiles.Length > 27; // 如果还有更多图片，启用加载更多按钮
         }
 
         /// <summary>
@@ -254,8 +272,8 @@ namespace Quicker.Windows.MainWindows
         // 管理本地图标
         private void ManageLocalIcons(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(folderPath))  Directory.CreateDirectory(folderPath); // 创建文件夹
-            Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true }); // 打开文件夹
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.LocalIconsFolder); // 确保目录存在
+            Process.Start(new ProcessStartInfo(AppPathHelper.LocalIconsFolder) { UseShellExecute = true }); // 打开文件夹
         }
 
         // 继续加载图片

@@ -52,11 +52,11 @@
             <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="447" Margin="0,0,0,55">
                 <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,30,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,60,0,0" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker" MouseDown="RootFolderPath_MouseDown"/>
+                <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,60,0,0" Text="" MouseDown="RootFolderPath_MouseDown"/>
                 <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,80,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="DatabaseFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,108,0,0" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database" MouseDown="DatabaseFolderPath_MouseDown"/>
+                <TextBlock x:Name="DatabaseFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,108,0,0" Text="" MouseDown="DatabaseFolderPath_MouseDown"/>
                 <Label Content="图标文件夹：" HorizontalAlignment="Left" Margin="18,128,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="LocalIconsFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,156,0,0" Text="C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons" MouseDown="LocalIconsFolderPath_MouseDown"/>
+                <TextBlock x:Name="LocalIconsFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,156,0,0" Text="" MouseDown="LocalIconsFolderPath_MouseDown"/>
 
                 <Label Content="备份数据" HorizontalAlignment="Left" Margin="0,191,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" Margin="14,226,0,0" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>

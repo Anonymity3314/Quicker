@@ -2,24 +2,21 @@
 using System.Data.SQLite;
 using Quicker.Managers;
 using System.Text.Json;
+using Quicker.Helpers;
 using Quicker.Models;
 using System.IO;
 
 namespace Quicker.Database.Core
 {
-    public class ButtonDatabase
+    public class ButtonDatabase : IDisposable
     {
-        // 数据库连接字符串
-        private const string db2 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Button.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-
         public ButtonDatabase()
         {
-            string dbFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 获取数据库文件夹路径
-            string dbFilePath = Path.Combine(dbFolder, "Button.db"); // 设置数据库文件路径
-            if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
+            DatabaseHelper.EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
+            DatabaseHelper.EnsureDatabaseExists("Button.db"); // 确保数据库文件存在
+            string dbFilePath = Path.Combine(AppPathHelper.DatabaseFolder, "Button.db"); // 设置数据库文件路径
             if (!File.Exists(dbFilePath))
             {
-                SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
                 CreateButtonTable("_global"); // 创建全局表格
                 CreateButtonTable("common"); // 创建通用表格
             }
@@ -501,9 +498,12 @@ namespace Quicker.Database.Core
         /// <returns> 数据库连接 </returns>
         public SQLiteConnection OpenConnection()
         {
-            var connection = new SQLiteConnection(db2); // 打开数据库连接
-            connection.Open(); // 打开数据库连接
-            return connection; // 返回数据库连接
+            return DatabaseHelper.OpenConnection("Button.db");
+        }
+
+        public void Dispose()
+        {
+            // 释放资源
         }
     }
 }

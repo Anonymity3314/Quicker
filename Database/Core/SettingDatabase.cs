@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Quicker.Models.Settings;
 using System.Data.SQLite;
+using Quicker.Helpers;
 using System.IO;
 
 // SQLite数据库操作类
@@ -80,19 +81,15 @@ namespace Quicker.Database.Core
          * EnablePreview: 开启预览功能，默认为false。
          */
 
-        // 数据库连接
-        private const string db1 = "Data Source=C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Database\\Setting.db;Pooling=true;Max Pool Size=100;Journal Mode=Wal;";
-        private readonly static ButtonDatabase db2 = new(); // 按钮数据库
         public const string currentVersion = "2.3.0"; // 当前版本号
 
         static SettingDatabase()
         {
-            string dbFolder = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Database"; // 获取数据库文件夹路径
-            string dbFilePath = Path.Combine(dbFolder, "Setting.db"); // 设置数据库文件路径
-            if (!Directory.Exists(dbFolder)) Directory.CreateDirectory(dbFolder); // 如果"Database"文件夹不存在，则创建它
+            DatabaseHelper.EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
+            DatabaseHelper.EnsureDatabaseExists("Setting.db"); // 确保数据库文件存在
+            string dbFilePath = Path.Combine(AppPathHelper.DatabaseFolder, "Setting.db"); // 设置数据库文件路径
             if (!File.Exists(dbFilePath))
             {
-                SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
                 InitializeConvention(); // 初始化 Convention 表
                 InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
                 InitializeBlacklist(); // 初始化 Blacklist 表
@@ -606,10 +603,7 @@ namespace Quicker.Database.Core
         /// <returns> SQLiteConnection 对象 </returns>
         public static SQLiteConnection OpenConnection()
         {
-            var connection = new SQLiteConnection(db1); // 创建 SQLiteConnection 对象
-            connection.BusyTimeout = 30000; // 设置超时时间为 30 秒
-            connection.Open(); // 打开数据库连接
-            return connection; // 返回打开的连接
+            return DatabaseHelper.OpenConnection("Setting.db");
         }
 
         // 数据库文件路径语句

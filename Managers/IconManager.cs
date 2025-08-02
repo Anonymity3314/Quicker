@@ -10,6 +10,7 @@ using Quicker.Windows.Menus;
 using System.Windows.Media;
 using Quicker.Database;
 using System.Net.Http;
+using Quicker.Helpers;
 using System.Windows;
 using WpfAnimatedGif;
 using System.Drawing;
@@ -59,8 +60,6 @@ namespace Quicker.Managers
         private const uint SHGFI_SMALLICON = 0x000000001; // 小图标
         private const uint SHGFI_ICON = 0x000000100; // 获取图标
 
-        private const string saveDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\LocalIcons"; // 保存路径
-
         /// <summary>
         /// 获取应用程序图标
         /// </summary>
@@ -100,13 +99,13 @@ namespace Quicker.Managers
                 string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
                 if (Directory.Exists(filePath)) // 检查是否为文件夹
                 {
-                    string iconPath = Path.Combine(saveDir, $"{hash}.png"); // 拼接图标文件路径
+                    string iconPath = Path.Combine(AppPathHelper.LocalIconsFolder, $"{hash}.png"); // 拼接图标文件路径
                     return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
                 }
                 else // 文件使用原始扩展名
                 {
                     string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
-                    string iconPath = Path.Combine(saveDir, $"{hash}{ext}"); // 拼接图标文件路径
+                    string iconPath = Path.Combine(AppPathHelper.LocalIconsFolder, $"{hash}{ext}"); // 拼接图标文件路径
                     return File.Exists(iconPath) ? iconPath : null; // 如果文件存在，返回路径
                 }
             }
@@ -136,7 +135,7 @@ namespace Quicker.Managers
                     byte[] pngBytes = stream.ToArray(); // 将内存流转换为字节数组
                     // 用内容哈希命名
                     string hash = BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(pngBytes)).Replace("-", "").ToLower();
-                    string targetPath = Path.Combine(saveDir, $"{hash}.png"); // 生成目标路径
+                    string targetPath = Path.Combine(AppPathHelper.LocalIconsFolder, $"{hash}.png"); // 生成目标路径
                     if (!File.Exists(targetPath)) // 如果目标路径不存在
                     {
                         File.WriteAllBytes(targetPath, pngBytes); // 写入文件
@@ -511,10 +510,10 @@ namespace Quicker.Managers
         {
             string ext = Path.GetExtension(filePath).ToLower(); // 获取文件扩展名
             string hash = GetFileContentHash(filePath); // 获取文件内容哈希值
-            string targetPath = Path.Combine(saveDir, $"{hash}{ext}"); // 生成目标路径
+            string targetPath = Path.Combine(AppPathHelper.LocalIconsFolder, $"{hash}{ext}"); // 生成目标路径
             if (!File.Exists(targetPath)) // 如果目标路径不存在
             {
-                File.Copy(filePath, targetPath, true); // 复制文件
+                File.Copy(filePath, targetPath); // 复制文件
             }
             return targetPath; // 返回目标路径
         }

@@ -5,18 +5,17 @@ using IWshRuntimeLibrary;
 using System.Diagnostics;
 using Quicker.Database;
 using Microsoft.Win32;
+using Quicker.Helpers;
 using Quicker.Extend;
 using Quicker.Models;
 using System.Windows;
 using System.IO;
-using System.Linq; // 记得加上
 
 namespace Quicker.Managers
 {
     public class ActionManager : IDisposable
     {
-        private const string tempDir = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\TempData"; // 临时目录
-        private const string extensionDir = "C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker\\Extensions"; // 扩展目录
+        // 移除硬编码路径，使用AppPathHelper
         private bool isDisposed = false; // 是否释放
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
@@ -28,9 +27,7 @@ namespace Quicker.Managers
         /// <param name="data"> 按钮数据 </param>
         public void OpenFile(ButtonData data)
         {
-            if (!Directory.Exists(tempDir)) // 如果临时目录不存在，则创建
-                Directory.CreateDirectory(tempDir);
-
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.TempDataFolder); // 确保临时目录存在
             if (data.Data2 == "true") // 如果尝试打开已存在的窗口
             {
                 string windowTitle = System.IO.Path.GetFileNameWithoutExtension(data.Location);
@@ -39,58 +36,88 @@ namespace Quicker.Managers
             }
 
             if (Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase) ||
-                Path.GetExtension(data.Location).Equals(".exe", StringComparison.OrdinalIgnoreCase)) // 如果是快捷方式或者可执行文件
+                Path.GetExtension(data.Location).Equals(".url", StringComparison.OrdinalIgnoreCase))
             {
-                string targetPath = Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
-                    ? GetShortcutTargetPath(data.Location)
-                    : data.Location; // 获取快捷方式目标路径
-
-                try
-                {
-                    string fileDirectory = Path.GetExtension(data.Location).Equals(".lnk", StringComparison.OrdinalIgnoreCase)
-                        ? Path.GetDirectoryName(GetShortcutTargetPath(data.Location))
-                        : Path.GetDirectoryName(data.Location); // 获取文件所在的目录
-
-                    ProcessStartInfo processStartInfo = new ProcessStartInfo
-                    {
-                        FileName = targetPath, // 设置启动文件路径
-                        UseShellExecute = data.Data1 == "True", // 是否使用系统默认方式运行
-                        Verb = data.Data1 == "True" ? "runas" : null, // 管理员权限运行
-                        WorkingDirectory = fileDirectory ?? tempDir, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
-                        WindowStyle = int.Parse(data.Data3) switch
-                        {
-                            0 => ProcessWindowStyle.Normal,
-                            1 => ProcessWindowStyle.Minimized,
-                            2 => ProcessWindowStyle.Maximized
-                        } // 设置窗口状态
-                    }; // 创建进程启动信息
-                    Process.Start(processStartInfo); // 启动进程
-                }
-                catch (Exception ex)
-                {
-                    using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"打开失败：{ex}", ToastType.Error); // 弹出消息提醒
-                }
-            } // 如果是快捷方式或者可执行文件
+                ProcessShortcutFile(data); // 处理快捷方式文件
+            }
             else
             {
-                try
+                ProcessNormalFile(data); // 处理普通文件
+            }
+        }
+
+        /// <summary>
+        /// 处理快捷方式文件
+        /// </summary>
+        /// <param name="data">按钮数据</param>
+        private void ProcessShortcutFile(ButtonData data)
+        {
+            try
+            {
+                string fileDirectory = Path.GetDirectoryName(data.Location); // 获取文件所在的目录
+                var startInfo = new ProcessStartInfo
                 {
-                    string fileDirectory = Path.GetDirectoryName(data.Location); // 获取文件所在的目录
-                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    UseShellExecute = data.Data1 == "True", // 是否使用系统默认方式运行
+                    Verb = data.Data1 == "True" ? "runas" : null, // 管理员权限运行
+                    WorkingDirectory = fileDirectory ?? AppPathHelper.TempDataFolder, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
+                    WindowStyle = int.Parse(data.Data3) switch
                     {
-                        FileName = data.Location,
-                        WorkingDirectory = fileDirectory ?? tempDir, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
-                        UseShellExecute = true
-                    }; // 创建进程启动信息
-                    Process.Start(startInfo); // 启动进程
-                }
-                catch (Exception ex)
+                        0 => ProcessWindowStyle.Normal, // 正常窗口
+                        1 => ProcessWindowStyle.Minimized, // 最小化窗口
+                        2 => ProcessWindowStyle.Maximized, // 最大化窗口
+                        _ => ProcessWindowStyle.Normal // 默认正常窗口
+                    }
+                }; // 创建进程启动信息
+
+                if (data.Data1 == "True") // 如果使用系统默认方式运行
                 {
-                    using var toast = new ToastManager(); // 消息提醒管理器
-                    toast.Show($"打开失败：{ex}", ToastType.Error); // 弹出消息提醒
+                    startInfo.FileName = data.Location; // 设置文件路径
                 }
-            } // 使用系统默认方式打开文件
+                else // 否则使用管理员权限运行
+                {
+                    startInfo.FileName = data.Location; // 设置文件路径
+                }
+
+                Process.Start(startInfo); // 启动进程
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"打开文件失败：{ex.Message}", ToastType.Error);
+            }
+        }
+
+        /// <summary>
+        /// 处理普通文件
+        /// </summary>
+        /// <param name="data">按钮数据</param>
+        private void ProcessNormalFile(ButtonData data)
+        {
+            try
+            {
+                string fileDirectory = Path.GetDirectoryName(data.Location); // 获取文件所在的目录
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = data.Location,
+                    WorkingDirectory = fileDirectory ?? AppPathHelper.TempDataFolder, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
+                    UseShellExecute = true
+                }; // 创建进程启动信息
+                Process.Start(startInfo); // 启动进程
+            }
+            catch (Exception ex)
+            {
+                ShowToast($"打开文件失败：{ex.Message}", ToastType.Error);
+            }
+        }
+
+        /// <summary>
+        /// 弹出消息
+        /// </summary>
+        /// <param name="message"> 消息内容 </param>
+        /// <param name="type"> 消息类型 </param>
+        private void ShowToast(string message, ToastType type)
+        {
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.Show(message, type); // 弹出消息提醒
         }
 
         /// <summary>

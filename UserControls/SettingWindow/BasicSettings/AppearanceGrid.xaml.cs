@@ -27,8 +27,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class AppearanceGrid : UserControl, INotifyPropertyChanged // 实现INotifyPropertyChanged接口，支持属性变更通知
     {
-        private const string folderPath = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\SharedAppearance"; // 外观分享文件夹路径
-
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
         private readonly List<string> _tempFiles = new(); // 临时文件列表，用于清理
@@ -978,12 +976,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// <returns>输出路径</returns>
         private string GetShareAppearanceOutputPath()
         {
-            if (!Directory.Exists(folderPath)) // 如果文件夹不存在则自动创建
-            {
-                Directory.CreateDirectory(folderPath);
-            }
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.SharedAppearanceFolder); // 确保目录存在
             string fileName = $"Quicker外观_{DateTime.Now:yyyyMMdd_HHmmss}.png"; // 文件名格式：Quicker外观_年月日_时分秒.png
-            return Path.Combine(folderPath, fileName);
+            return Path.Combine(AppPathHelper.SharedAppearanceFolder, fileName);
         }
 
         /// <summary>
@@ -1133,9 +1128,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             if (!string.IsNullOrEmpty(appearance.BackgroundImagePath))
             {
-                string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\BackgroundImages"; // 背景图片文件夹路径
-                if (!Directory.Exists(bgDir)) // 如果文件夹不存在则自动创建
-                    Directory.CreateDirectory(bgDir);
+                string bgDir = AppPathHelper.BackgroundImagesFolder; // 背景图片文件夹路径
+                AppPathHelper.EnsureDirectoryExists(bgDir); // 确保目录存在
                 string hash = DateTime.Now.Ticks.ToString("x"); // 随机哈希值作为文件名
                 string newBgPath = Path.Combine(bgDir, $"bg_{hash}.png"); // 新背景图片路径
                 RemoveTextChunkAndCopy(srcPngPath, newBgPath); // 去除文本块并复制图片
@@ -1176,11 +1170,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 点击"已分享或保存的外观"按钮打开外观分享文件夹
         private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(folderPath)) // 如果文件夹不存在，则自动创建
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            Process.Start("explorer.exe", folderPath); // 使用资源管理器打开该文件夹
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.SharedAppearanceFolder); // 确保目录存在
+            Process.Start("explorer.exe", AppPathHelper.SharedAppearanceFolder); // 使用资源管理器打开该文件夹
         }
 
         // 预置样式按钮点击事件
@@ -1262,10 +1253,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 打开保存背景图片的文件夹
         private void ExportAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
-            string bgDir = @"C:\Users\LENOVO\AppData\Roaming\Anonymity\Quicker\Images\BackgroundImages"; // 背景图片文件夹路径
-            if (!Directory.Exists(bgDir)) // 如果文件夹不存在则自动创建
-                Directory.CreateDirectory(bgDir);
-            Process.Start("explorer.exe", bgDir); // 打开背景图片文件夹
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.BackgroundImagesFolder); // 确保目录存在
+            Process.Start("explorer.exe", AppPathHelper.BackgroundImagesFolder); // 打开背景图片文件夹
         }
 
         /// <summary>

@@ -35,6 +35,7 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
+using Quicker.Helpers;
 using System.Windows;
 using SharpHook.Data;
 using SharpHook;
@@ -54,6 +55,7 @@ namespace Quicker
         {
             base.OnStartup(e); // 调用基类方法
             EnsureSingleInstance(); // 确保单例运行
+            InitializeAppDirectories(); // 初始化应用程序目录
             CheckAppUpdate(); // 检查应用更新
             CheckAndUpdateDatabase(); // 检查并升级数据库
             RestoreGlobalFontFamilyFromDatabase(); // 恢复全局字体设置
@@ -61,6 +63,12 @@ namespace Quicker
             InitializeTaskbar(); // 初始化托盘图标
             InitializeHookAsync(); // 初始化钩子
             ShowNotification(); // 弹出消息提醒
+        }
+
+        // 初始化应用程序目录
+        private void InitializeAppDirectories()
+        {
+            AppPathHelper.EnsureAllDirectoriesExist();
         }
 
         // 确保单例运行
