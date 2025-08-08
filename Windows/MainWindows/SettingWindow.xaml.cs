@@ -8,10 +8,13 @@ using System.Windows.Shapes;
 using Quicker.Database.Core;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Diagnostics;
+using System.Reflection;
 using Quicker.Managers;
 using Microsoft.Win32;
 using Quicker.Helpers;
 using System.Windows;
+using System.IO;
 
 namespace Quicker.Windows.MainWindows
 {
@@ -201,23 +204,53 @@ namespace Quicker.Windows.MainWindows
         {
             try
             {
-                string appPath = System.Reflection.Assembly.GetExecutingAssembly().Location; // 获取应用程序路径
+                // 获取应用程序可执行文件路径
+                string appPath = Process.GetCurrentProcess().MainModule.FileName;
                 string keyName = "Quicker"; // 注册表中的键名            
                 string registryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; // 获取注册表路径
-                using (RegistryKey localMachine = Registry.LocalMachine.OpenSubKey(registryPath, true)) // 打开注册表
+
+                // 使用HKEY_CURRENT_USER，不需要管理员权限
+                using (RegistryKey currentUser = Registry.CurrentUser.OpenSubKey(registryPath, true))
                 {
-                    if (localMachine != null)
+                    if (currentUser != null)
                     {
                         if (autostart)
-                            localMachine.SetValue(keyName, appPath); // 设置开机自启动
+                        {
+                            // 检查路径是否有效
+                            if (File.Exists(appPath))
+                            {
+                                currentUser.SetValue(keyName, appPath); // 设置开机自启动
+                            }
+                            else
+                            {
+                                // 如果主模块路径不存在，尝试使用程序集路径
+                                string assemblyPath = Assembly.GetExecutingAssembly().Location;
+                                if (File.Exists(assemblyPath))
+                                {
+                                    currentUser.SetValue(keyName, assemblyPath);
+                                }
+                                else
+                                {
+                                    return false; // 无法找到有效的应用程序路径
+                                }
+                            }
+                        }
                         else
-                            localMachine.DeleteValue(keyName, false); // 移除开机自启动
+                        {
+                            currentUser.DeleteValue(keyName, false); // 移除开机自启动
+                        }
                     }
-                    else return false; // 如果无法打开注册表，返回失败
+                    else 
+                    {
+                        return false; // 如果无法打开注册表，返回失败
+                    }
                 }
                 return true; // 返回设置成功
             }
-            catch { return false; } // 出现异常，返回失败
+            catch (Exception ex)
+            {
+                return false; // 出现异常，返回失败
+            }
         }
 
         /// <summary>

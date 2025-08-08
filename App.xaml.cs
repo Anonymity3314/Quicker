@@ -764,16 +764,32 @@ namespace Quicker
         /// <returns> 窗口类型 </returns>
         private string DetermineWindowType()
         {
-            string processSceneType = GetProcessSceneType();
             if (AppStateManager.Locked)
             {
                 return AppStateManager.CommonState ?? DEFAULT_STYLE;
             }
-            else if (!string.IsNullOrEmpty(processSceneType))
+
+            using var windowManager = new WindowManager(); // 使用单个WindowManager实例来处理所有窗口相关操作
+            // 先检查进程场景类型
+            string processSceneType = GetProcessSceneType(windowManager);
+            if (!string.IsNullOrEmpty(processSceneType))
                 return processSceneType;
-            else if (IsMouseOnTaskbar())
+
+            // 再检查鼠标位置类型
+            string mouseLocationType = GetMouseLocationType(windowManager);
+            return mouseLocationType;
+        }
+
+        /// <summary>
+        /// 获取鼠标位置类型
+        /// </summary>
+        /// <param name="windowManager">窗口管理器实例</param>
+        /// <returns>鼠标位置类型</returns>
+        private string GetMouseLocationType(WindowManager windowManager)
+        {
+            if (windowManager.IsMouseOnTaskbar())
                 return TASKBAR_STYLE; // 鼠标在任务栏上
-            else if (IsMouseOnDesktop())
+            else if (windowManager.IsMouseOnDesktop())
                 return DESKTOP_STYLE; // 鼠标在桌面上
             else
                 return DEFAULT_STYLE; // 鼠标在其他窗口上
@@ -782,10 +798,10 @@ namespace Quicker
         /// <summary>
         /// 获取进程对应的场景类型
         /// </summary>
+        /// <param name="windowManager">窗口管理器实例</param>
         /// <returns>如果找到对应的场景类型则返回，否则返回空字符串</returns>
-        private string GetProcessSceneType()
+        private string GetProcessSceneType(WindowManager windowManager)
         {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
             IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
             if (foregroundWindow != IntPtr.Zero) // 如果前台窗口不为空
             {
@@ -842,33 +858,6 @@ namespace Quicker
                         mainWindow.WindowStartupLocation = WindowStartupLocation.Manual;
                     break; // 上次弹出位置
             }
-        }
-
-        /// <summary>
-        /// 判断鼠标是否在任务栏上
-        /// </summary>
-        /// <returns> 是否在任务栏上 </returns>
-        public bool IsMouseOnTaskbar()
-        {
-            Rect workArea = SystemParameters.WorkArea; // 获取工作区域
-            double screenHeight = SystemParameters.PrimaryScreenHeight; // 获取屏幕高度
-            System.Windows.Point mousePosition = new System.Windows.Point(
-                System.Windows.Forms.Cursor.Position.X,
-                System.Windows.Forms.Cursor.Position.Y
-            ); // 获取鼠标位置
-            bool isOnTaskbar = mousePosition.Y >= workArea.Height; // 鼠标在任务栏上
-            return isOnTaskbar; // 返回鼠标是否在任务栏上
-        }
-
-        /// <summary>
-        /// 判断鼠标是否在桌面上
-        /// </summary>
-        /// <returns> 是否在桌面上 </returns>
-        public bool IsMouseOnDesktop()
-        {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
-            return foregroundWindow == IntPtr.Zero; // 如果前台窗口为空，返回 true
         }
 
         // 弹出菜单栏

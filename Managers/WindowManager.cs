@@ -95,6 +95,22 @@ namespace Quicker.Managers
         [DllImport("user32.dll")]
         private static extern int GetWindowTextLength(IntPtr hWnd); // 获取窗口标题长度
 
+        // 获取鼠标下的窗口句柄
+        [DllImport("user32.dll")]
+        private static extern IntPtr WindowFromPoint(System.Drawing.Point point);
+
+        // 获取窗口类名
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        // 获取桌面窗口句柄
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetDesktopWindow();
+
+        // 获取Shell窗口句柄
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetShellWindow();
+
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam); // 枚举窗口委托
 
         /// <summary>
@@ -327,7 +343,64 @@ namespace Quicker.Managers
         // 释放资源
         public void Dispose()
         {
-            GC.SuppressFinalize(this); // 释放资源
+            // 释放资源
+        }
+
+        /// <summary>
+        /// 判断鼠标是否在任务栏上
+        /// </summary>
+        /// <returns> 是否在任务栏上 </returns>
+        public bool IsMouseOnTaskbar()
+        {
+            try
+            {
+                GetCursorPos(out POINT cursorPos); // 获取鼠标位置
+                // 使用WindowFromPoint获取鼠标下的窗口句柄
+                IntPtr windowHandle = WindowFromPoint(new System.Drawing.Point(cursorPos.X, cursorPos.Y));
+                if (windowHandle == IntPtr.Zero) return false;
+
+                // 获取窗口类名
+                StringBuilder className = new StringBuilder(256);
+                GetClassName(windowHandle, className, className.Capacity);
+                string classNameStr = className.ToString().ToLower();
+
+                // 检查是否是任务栏窗口类
+                return classNameStr.Contains("shell_traywnd") || 
+                       classNameStr.Contains("shell_secondarytraywnd") ||
+                       classNameStr.Contains("taskbar");
+            }
+            catch
+            {
+                // 如果API调用失败，回退到坐标比较方法
+                GetCursorPos(out POINT cursorPos);
+                Rect workArea = SystemParameters.WorkArea;
+                return cursorPos.Y >= workArea.Height;
+            }
+        }
+
+        /// <summary>
+        /// 判断鼠标是否在桌面上
+        /// </summary>
+        /// <returns> 是否在桌面上 </returns>
+        public bool IsMouseOnDesktop()
+        {
+            try
+            {
+                IntPtr foregroundWindow = GetCurrentForegroundWindow(); // 获取当前前台窗口句柄
+                if (foregroundWindow == IntPtr.Zero) return true; // 如果前台窗口为空，说明鼠标在桌面上
+
+                // 获取前台窗口的类名
+                StringBuilder className = new StringBuilder(256);
+                GetClassName(foregroundWindow, className, className.Capacity);
+                string classNameStr = className.ToString().ToLower();
+                return classNameStr.Contains("progman") || classNameStr.Contains("workerw"); // 如果前台窗口不是桌面窗口，则认为鼠标不在桌面上
+            }
+            catch
+            {
+                // 如果API调用失败，回退到检查前台窗口的方法
+                IntPtr foregroundWindow = GetCurrentForegroundWindow();
+                return foregroundWindow == IntPtr.Zero;
+            }
         }
     }
 }
