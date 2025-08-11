@@ -310,7 +310,7 @@
                     <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <Grid x:Name="CenterPointGrid" Visibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center" Height="1" Width="1"/>
                     <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                    <Button IsEnabled="False" x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click">
+                    <Button Visibility="Collapsed" x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click">
                         <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
                             <Rectangle.OpacityMask>
                                 <ImageBrush/>

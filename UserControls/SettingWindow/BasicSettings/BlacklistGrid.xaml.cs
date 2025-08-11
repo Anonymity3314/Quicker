@@ -1,4 +1,7 @@
-﻿using System.Windows.Media.Imaging;
+﻿using UserControl = System.Windows.Controls.UserControl;
+using CheckBox = System.Windows.Controls.CheckBox;
+using Button = System.Windows.Controls.Button;
+using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using Quicker.Models.Settings;
@@ -13,7 +16,7 @@ using System.IO;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
-    public partial class BlacklistGrid : System.Windows.Controls.UserControl
+    public partial class BlacklistGrid : UserControl
     {
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
@@ -165,7 +168,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private void AddAppItems(string appPath, bool isBlacklist = true)
         {
             string appNames = Path.GetFileName(appPath); // 获取进程名
-            System.Windows.Controls.Button button = new()
+            Button button = new()
             {
                 Style = FindResource("MenuButton") as Style,
                 Tag = appNames
@@ -177,7 +180,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }; // 创建StackPanel
             button.Content = stackPanel; // 设置按钮内容
 
-            System.Windows.Controls.Image iconImage = new()
+            Image iconImage = new()
             {
                 Style = FindResource("BlacklistItemIcon") as Style,
                 Source = iconManager.GetIcon(appPath)
@@ -232,7 +235,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 将选中的进程添加到名单
         private void AddToBlacklistButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Controls.Button button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
+            Button button = sender as Button; // 转换发送者为按钮对象
             if (button.Tag.ToString() == "从计算机选择程序...") // 如果是选择文件
                 SelectLocalFile(); // 选择本地文件
             else
@@ -247,7 +250,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 将选中的进程添加到白名单
         private void AddToWhitelistButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Controls.Button button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
+            Button button = sender as Button; // 转换发送者为按钮对象
             if (button.Tag.ToString() == "从计算机选择程序...") // 如果是选择文件
                 SelectLocalFile(false); // 选择本地文件
             else
@@ -338,7 +341,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 stackPanel.Children.Add(folderLabel); // 添加TextBlock
             }
 
-            System.Windows.Controls.Button button = new()
+            Button button = new()
             {
                 Style = FindResource("DeleteBlacklistItem") as Style,
                 Tag = process
@@ -366,7 +369,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 从黑名单中删除进程
         private void DeleteFromBlacklist(object sender, RoutedEventArgs e)
         {
-            var button = sender as System.Windows.Controls.Button; // 转换发送者为按钮对象
+            var button = sender as Button; // 转换发送者为按钮对象
             var grid = button.Parent as Grid; // 获取按钮的父容器（Grid）
             var border = grid.Parent as Border; // 获取Grid的父容器（Border）
             var process = button.Tag.ToString(); // 获取进程名
@@ -403,7 +406,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 else
                 {
                     border.Tag = false; // 标记为未选中
-                    border.Background = System.Windows.Media.Brushes.Transparent; // 设置背景色
+                    border.Background = Brushes.Transparent; // 设置背景色
                 }
             }
         }
@@ -411,7 +414,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 勾选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            var checkBox = sender as System.Windows.Controls.CheckBox;
+            var checkBox = sender as CheckBox;
             if (checkBox == null) return;
             bool value = checkBox.IsChecked == true;
             switch (checkBox.Name)
@@ -511,7 +514,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
 
             AddAppItems("从计算机选择程序...", isInBlacklist); // 添加到列表
-
             if (isInBlacklist)
                 AddBlacklistAppsPop.IsOpen = true; // 打开黑名单程序提示框
             else
@@ -529,19 +531,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 ClearAppsListUI(isInBlacklist);
             }));
-
             LoadBlacklistAppsIntoCache(); // 预先加载黑名单缓存
-
-            // 在后台线程处理进程
-            Task.Run(() =>
+            Task.Run(() => // 在后台线程处理进程
             {
                 var processList = GetFilteredProcessList();
-
-                // 在UI线程更新界面
                 System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     UpdateAppsListUI(processList, isInBlacklist);
-                }));
+                })); // 在UI线程更新界面
             });
         }
 
