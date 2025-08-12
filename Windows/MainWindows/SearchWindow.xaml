@@ -21,6 +21,10 @@
     Loaded="SearchWindow_Loaded"
 >
     <Window.Resources>
+        <!-- 图片资源 -->
+        <BitmapImage x:Key="UnpinFromDesktopSource" UriSource="pack://application:,,,/Resources/Images/UnpinFromDesktop.png"/>
+        <BitmapImage x:Key="PinToDesktopSource" UriSource="pack://application:,,,/Resources/Images/PinToDesktop.png"/>
+        <!-- 按钮样式 -->
         <Style x:Key="SearchButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Height" Value="53"/>
@@ -41,16 +45,16 @@
         </Style>
     </Window.Resources>
 
-    <Grid MaxHeight="358" MinHeight="40" Width="719">
+    <Grid MaxHeight="358" MinHeight="{Binding ElementName=SearchBoxGrid, Path=ActualHeight, Mode=OneWay}" Width="719" Margin="10">
         <!-- 窗口阴影 -->
         <Border x:Name="ShadowBorder" Margin="0.6" Background="#FFF3F3F3" CornerRadius="5">
             <Border.Effect>
-                <DropShadowEffect Color="#66000000" Direction="0" BlurRadius="30" RenderingBias="Quality" ShadowDepth="1"/>
+                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="20" RenderingBias="Quality" ShadowDepth="1"/>
             </Border.Effect>
         </Border>
         <Border x:Name="SearchBorder" Margin="0.6" Background="White" CornerRadius="5" helpers:ClipHelper.ClipToBounds="True">
             <StackPanel x:Name="stackPanel">
-                <Grid Height="50">
+                <Grid x:Name="SearchBoxGrid" Height="50">
                     <TextBox x:Name="SearchBox" Text="开始搜索..." Width="700" Height="40" FontSize="28" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0" Foreground="LightGray" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
@@ -59,6 +63,30 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
+                    <ToggleButton x:Name="PinToggle" Margin="5" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Click="PinToggle_Click">
+                        <ToggleButton.Template>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <!-- 命名Border并设置初始背景 -->
+                                <Border x:Name="Border" CornerRadius="4" Background="{TemplateBinding Background}">
+                                    <Image x:Name="IconImage" Source="{StaticResource UnpinFromDesktopSource}" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <!-- 状态切换 -->
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="IconImage" Property="Source" Value="{StaticResource PinToDesktopSource}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter TargetName="IconImage" Property="Source" Value="{StaticResource UnpinFromDesktopSource}"/>
+                                    </Trigger>
+
+                                    <!-- 鼠标悬停效果 -->
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#EFEFEF"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </ToggleButton.Template>
+                    </ToggleButton>
                 </Grid>
                 <Button x:Name="RunasCommandButton" Style="{StaticResource SearchButtonStyle}" Click="RunasCommandButton_Click">
                     <Grid>

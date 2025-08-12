@@ -30,10 +30,10 @@
         <!-- 动态页面切换按钮颜色 -->
         <SolidColorBrush x:Key="UnSelectedBrush" Color="{Binding ToolbarColor, Converter={StaticResource SmartHoverColorConverter}, Mode=OneWay}"/>
         <!-- 图片资源 -->
-        <ImageSource x:Key="PinToDesktopSource">pack://application:,,,/Resources/Images/PinToDesktop.png</ImageSource>
-        <ImageSource x:Key="UnpinFromDesktopSource">pack://application:,,,/Resources/Images/UnpinFromDesktop.png</ImageSource>
-        <ImageSource x:Key="LockIconSource">pack://application:,,,/Resources/Images/Locked.png</ImageSource>
-        <ImageSource x:Key="UnLockIconSource">pack://application:,,,/Resources/Images/UnLocked.png</ImageSource>
+        <BitmapImage x:Key="UnpinFromDesktopSource" UriSource="pack://application:,,,/Resources/Images/UnpinFromDesktop.png"/>
+        <BitmapImage x:Key="PinToDesktopSource" UriSource="pack://application:,,,/Resources/Images/PinToDesktop.png"/>
+        <BitmapImage x:Key="UnLockIconSource" UriSource="pack://application:,,,/Resources/Images/UnLocked.png"/>
+        <BitmapImage x:Key="LockIconSource" UriSource="pack://application:,,,/Resources/Images/Locked.png"/>
         <!-- 转换器 -->
         <conv:SmartHoverColorConverter x:Key="SmartHoverColorConverter" DarkerFactor="0.8" LighterFactor="1.2"/>
         <conv:PathToImageSourceConverter x:Key="PathToImageSourceConverter"/>
@@ -310,7 +310,7 @@
                     <StackPanel x:Name="GlobalButtonPanel" Margin="77.6,0,77.6,13" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <Grid x:Name="CenterPointGrid" Visibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center" Height="1" Width="1"/>
                     <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
-                    <Button Visibility="Collapsed" x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click">
+                    <Button Visibility="Visible" x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click">
                         <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
                             <Rectangle.OpacityMask>
                                 <ImageBrush/>

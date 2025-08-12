@@ -11,8 +11,8 @@ namespace Quicker.Windows.MainWindows
 {
     public partial class SearchWindow : Window
     {
+        private bool _isLoaded = false, _isPinned = false;
         private ActionManager actionManager = new();
-        private bool _isLoaded = false;
 
         public SearchWindow()
         {
@@ -39,17 +39,14 @@ namespace Quicker.Windows.MainWindows
             SearchGoogleCommandButton.Visibility = (string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索...") ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        /// <summary>
-        /// 当窗口失去激活（失去焦点）时关闭窗口。
-        /// </summary>
+        // 当窗口失去焦点时关闭窗口。
         private void SearchWindow_Deactivated(object sender, EventArgs e)
         {
-            Close();
+            if(!_isPinned)
+                Close();
         }
 
-        /// <summary>
-        /// 当搜索框获得焦点时，如果内容为“开始搜索...”，则清空文本。
-        /// </summary>
+        // 当搜索框获得焦点时，如果内容为“开始搜索...”，则清空文本。
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
             var tb = sender as TextBox;
@@ -60,9 +57,7 @@ namespace Quicker.Windows.MainWindows
             }
         }
 
-        /// <summary>
-        /// 当搜索框失去焦点时，如果内容为空，则恢复为初始提示文本和样式
-        /// </summary>
+        // 当搜索框失去焦点时，如果内容为空，则恢复为初始提示文本和样式
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
             var tb = sender as TextBox;
@@ -123,8 +118,8 @@ namespace Quicker.Windows.MainWindows
         private (string fileName, string arguments) SplitCommand(string command)
         {
             command = command.Trim(); // 去除空白字符
-            var buffer = new StringBuilder();
-            bool inQuotes = false;
+            var buffer = new StringBuilder(); // 缓冲区
+            bool inQuotes = false; // 是否在引号内
             for (int i = 0; i < command.Length; i++)
             {
                 char current = command[i];
@@ -167,12 +162,20 @@ namespace Quicker.Windows.MainWindows
             actionManager.LaunchDefaultBrowser(SearchGoogleCommandButton_Text.Text); //谷歌搜索
         }
 
+        // 更新搜索链接
         private void UpdateSearchUrl()
         {
             OpenUrlCommandButton_Text.Text = $"http://{SearchBox.Text}.com";
             SearchBingCommandButton_Text.Text = $"https://cn.bing.com/search?q={Uri.EscapeDataString(SearchBox.Text ?? "")}";
             SearchBaiduCommandButton_Text.Text = $"https://www.baidu.com/s?wd={Uri.EscapeDataString(SearchBox.Text ?? "")}";
             SearchGoogleCommandButton_Text.Text = $"https://www.google.com/search?q={Uri.EscapeDataString(SearchBox.Text ?? "")}";
+        }
+
+        // 置顶切换
+        private void PinToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _isPinned = !_isPinned; // 切换置顶状态
+            Topmost = _isPinned;
         }
     }
 }
