@@ -1,9 +1,14 @@
-﻿using System.Windows.Media.Animation;
+﻿using VisualTreeHelper = System.Windows.Media.VisualTreeHelper;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using System.ComponentModel;
 using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Managers;
+using Quicker.Helpers;
+using Quicker.Models;
 using System.Windows;
 using System.Text;
 
@@ -13,6 +18,8 @@ namespace Quicker.Windows.MainWindows
     {
         private bool _isLoaded = false, _isPinned = false;
         private ActionManager actionManager = new();
+        private ButtonManager buttonManager = new();
+        private ButtonDatabase db2 = new();
 
         public SearchWindow()
         {
@@ -21,28 +28,39 @@ namespace Quicker.Windows.MainWindows
 
         private void SearchWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // 延迟设置按钮可见性，先显示Border后显示按钮
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            const int DesignHeight = 380; // 设计器默认高度
+            SizeToContent = SizeToContent.Manual;  // 仅临时锁定
+            var workArea = SystemParameters.WorkArea; // 获取屏幕工作区
+            Top = (workArea.Height - DesignHeight) / 2 + workArea.Top; // 计算窗口位置
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                UpdateButtonVisibility();
-                _isLoaded = true; // 标记已加载
-            }), System.Windows.Threading.DispatcherPriority.Background);
-            Activate(); // 激活窗口
+                SizeToContent = SizeToContent.Height; // 恢复动态布局能力
+            }), System.Windows.Threading.DispatcherPriority.Render); // 刷新布局
+
+            _isLoaded = true;
+            Activate();
         }
 
+        // 更新按钮可见性
         private void UpdateButtonVisibility()
         {
-            RunasCommandButton.Visibility = (string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索...") ? Visibility.Collapsed : Visibility.Visible;
-            OpenUrlCommandButton.Visibility = (string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索...") ? Visibility.Collapsed : Visibility.Visible;
-            SearchBingCommandButton.Visibility = (string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索...") ? Visibility.Collapsed : Visibility.Visible;
-            SearchBaiduCommandButton.Visibility = (string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索...") ? Visibility.Collapsed : Visibility.Visible;
-            SearchGoogleCommandButton.Visibility = (string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索...") ? Visibility.Collapsed : Visibility.Visible;
+            var buttons = new List<Button>
+            {
+                RunasCommandButton,
+                OpenUrlCommandButton,
+                SearchBingCommandButton,
+                SearchBaiduCommandButton,
+                SearchGoogleCommandButton
+            }; // 按钮列表
+
+            bool isSearchBoxEmpty = string.IsNullOrWhiteSpace(SearchBox.Text) || SearchBox.Text == "开始搜索..."; // 是否搜索框为空
+            buttons.ForEach(button => button.Visibility = isSearchBoxEmpty ? Visibility.Collapsed : Visibility.Visible); // 更新按钮可见性
         }
 
         // 当窗口失去焦点时关闭窗口。
         private void SearchWindow_Deactivated(object sender, EventArgs e)
         {
-            if(!_isPinned)
+            if(!_isPinned && !buttonManager.isClosing)
                 Close();
         }
 
@@ -75,6 +93,7 @@ namespace Quicker.Windows.MainWindows
             {
                 UpdateButtonVisibility();
                 UpdateSearchUrl();
+                AddResultButton();
             }
         }
 
@@ -176,6 +195,159 @@ namespace Quicker.Windows.MainWindows
         {
             _isPinned = !_isPinned; // 切换置顶状态
             Topmost = _isPinned;
+        }
+
+        // 添加搜索结果按钮
+        private void AddResultButton()
+        {
+            ClearSearchResultButtons(); // 清除旧按钮
+            if (string.IsNullOrWhiteSpace(SearchBox.Text)) return; // 空搜索不添加按钮
+            var dataList = db2.GetButtonbyName(SearchBox.Text); // 获取按钮数据列表
+            if (dataList.buttonDataList.Count != dataList.tableNames.Count) return; // 确保两个列表的长度相同，以便一一对应
+            for (int i = 0; i < dataList.buttonDataList.Count; i++)
+            {
+                var btn = CreateSearchResultButton(dataList.buttonDataList[i]); // 创建搜索结果按钮
+                btn.Name = $"{dataList.tableNames[i]}{dataList.buttonDataList[i].ButtonID}"; // 使用对应的表名和按钮ID作为按钮的名称
+                btn.Tag = new Tuple<string, ButtonData>(dataList.tableNames[i], dataList.buttonDataList[i]); // 存储表名和按钮数据
+                stackPanel.Children.Insert(0, btn); // 从头开始添加按钮到面板
+            }
+            ScrollBar.Visibility = stackPanel.Children.Count >= 8 ? Visibility.Visible : Visibility.Collapsed;
+            //ScrollBar.Height = stackPanel.Children.Count > 8 ? 426 : 0; // 设置滚动条高度
+        }
+
+        // 清除所有搜索结果按钮
+        private void ClearSearchResultButtons()
+        {
+            stackPanel.Children.OfType<Button>()
+                .Where(btn => btn.Tag?.ToString() != "DefaultButton")
+                .ToList()
+                .ForEach(btn =>
+                {
+                    stackPanel.Children.Remove(btn);
+                    btn.Click -= Button_Click; // 解绑 Click 事件
+                    btn.MouseRightButtonDown -= Button_MouseRightButtonDown; // 解绑右键菜单事件
+                });
+        }
+
+        /// <summary>
+        /// 创建搜索结果按钮
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        /// <returns> 搜索结果按钮 </returns>
+        private Button CreateSearchResultButton(ButtonData data)
+        {
+            var grid = new Grid();
+            grid.Children.Add(CreateImage(data.ImagePath)); // 添加图像
+            grid.Children.Add(CreateSearchResultTextBlock(data)); // 添加标题文本块
+            grid.Children.Add(CreateTagTextBlock()); // 添加标签文本块
+            var btn = new Button
+            {
+                Style = (Style)FindResource("SearchButtonStyle"),
+                Content = grid,
+                Tag = data
+            }; // 创建按钮
+            btn.Click += Button_Click; // 绑定 Click 事件
+            btn.MouseRightButtonDown += Button_MouseRightButtonDown; // 绑定右键菜单事件
+            return btn; // 返回按钮
+        }
+
+        /// <summary>
+        /// 创建图像
+        /// </summary>
+        /// <param name="imagePath"> 图像路径 </param>
+        /// <returns> 图像 </returns>
+        private Image CreateImage(string imagePath)
+        {
+            return new Image
+            {
+                Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(10),
+                Height = 32,
+                Width = 32
+            };
+        }
+
+        /// <summary>
+        /// 创建标签文本块
+        /// </summary>
+        /// <returns> 标签文本块 </returns>
+        private TextBlock CreateTagTextBlock()
+        {
+            return new TextBlock
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Margin = new Thickness(51, 0, 0, 9),
+                Foreground = Brushes.LightGray,
+                Text = "(Quicker动作)",
+                FontSize = 10
+            };
+        }
+
+        /// <summary>
+        /// 创建搜索结果文本块
+        /// </summary>
+        /// <param name="data"> 按钮数据 </param>
+        /// <returns> 搜索结果文本块 </returns>
+        private TextBlock CreateSearchResultTextBlock(ButtonData data)
+        {
+            TextBlock textBlock = new TextBlock()
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(51, 8, 0, 0),
+                FontSize = 16
+            };
+
+            // 应用高亮逻辑
+            TextBlockHelper.SetHighlight(textBlock, new HighlightTextData
+            {
+                Text = data.Title,
+                Keyword = SearchBox.Text.Trim()
+            });
+            return textBlock;
+        }
+
+        // 点击按钮执行动作
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = (Button)sender;
+            var tag = (Tuple<string, ButtonData>)btn.Tag; // 提取表名和按钮数据
+            string tableName = tag.Item1; // 表名
+            ButtonData data = tag.Item2; // 按钮数据
+            actionManager.DoAction(data, tableName); // 执行动作并传递表名
+        }
+
+        // 右键菜单
+        private void Button_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Button btn = (Button)sender;
+            var tag = (Tuple<string, ButtonData>)btn.Tag; // 提取表名和按钮数据
+            var data = (ButtonData)tag.Item2; // 按钮数据
+            string tableName = tag.Item1; // 表名
+            buttonManager.OpenMenu(sender, "OperationMenu", this, tableName); // 使用表名
+        }
+
+        // 滚动条变化
+        private void ScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            ScrollViewer.ScrollToVerticalOffset(ScrollBar.Value); // 滚动到指定位置
+        }
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            ScrollBar.Maximum = ScrollViewer.ExtentHeight - ScrollViewer.ViewportHeight; // 设置滚动条最大值
+            ScrollBar.ViewportSize = ScrollViewer.ViewportHeight; // 设置滚动条视口大小
+            ScrollBar.Value = ScrollViewer.VerticalOffset; // 设置滚动条值
+        }
+
+        // 清理资源
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            ClearSearchResultButtons(); // 解绑并清除按钮
+            stackPanel.Children.Clear(); // 清除所有子元素
         }
     }
 }

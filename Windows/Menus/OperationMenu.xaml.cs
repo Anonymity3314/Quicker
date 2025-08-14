@@ -135,7 +135,7 @@ namespace Quicker.Windows.Menus
         // 根据上一个窗口调整界面
         private void AdjustUIForPreviousWindow()
         {
-            if (FatherWindow is MainWindow || FatherWindow is ActionPageManageWindow)
+            if (FatherWindow is MainWindow || FatherWindow is ActionPageManageWindow || FatherWindow is SearchWindow)
             {
                 AdjustUIForMainWindow();
             }

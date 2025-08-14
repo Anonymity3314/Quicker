@@ -919,8 +919,16 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 点击按钮打开搜索窗口
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            SearchWindow searchWindow = new(); // 创建搜索窗口
-            searchWindow.Show(); // 显示窗口
+            SearchWindow searchWindow = System.Windows.Application.Current.Windows.OfType<SearchWindow>().FirstOrDefault(); // 获取搜索窗口
+            if (searchWindow == null)
+            {
+                searchWindow = new SearchWindow(); // 创建搜索窗口
+                searchWindow.Show(); // 显示窗口
+            }
+            else
+            {
+                searchWindow.Close(); // 关闭窗口
+            }
         }
     }
 }

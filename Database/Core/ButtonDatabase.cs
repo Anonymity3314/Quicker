@@ -479,6 +479,35 @@ namespace Quicker.Database.Core
         }
 
         /// <summary>
+        /// 通过动作名称获取动作数据，遍历所有表
+        /// </summary>
+        /// <param name="buttonName"> 动作名称 </param>
+        /// <returns> 动作数据 </returns>
+        public (List<ButtonData> buttonDataList, List<string> tableNames) GetButtonbyName(string buttonName)
+        {
+            var buttonDataList = new List<ButtonData>(); // 实例化列表
+            var tableNames = new List<string>(); // 实例化列表
+            var allTableNames = GetAllTableNames(); // 获取所有表名
+            foreach (var tableName in allTableNames)
+            {
+                using var connection = OpenConnection(); // 打开数据库连接
+                using var command = new SQLiteCommand($"SELECT * FROM [{tableName}] WHERE Title LIKE @Title", connection); // 创建命令
+                command.Parameters.AddWithValue("@Title", $"%{buttonName}%"); // 绑定参数
+                using var reader = command.ExecuteReader(); // 执行查询语句
+                while (reader.Read())
+                {
+                    var title = reader["Title"].ToString(); // 标题
+                    if (title.Contains(buttonName, StringComparison.OrdinalIgnoreCase)) // 如果标题包含动作名称
+                    {
+                        buttonDataList.Add(ButtonDataHelper.FromReader(reader)); // 构造 ButtonData 并添加到列表
+                        tableNames.Add(tableName); // 记录表名
+                    }
+                }
+            }
+            return (buttonDataList, tableNames); // 返回动作数据列表和表名列表
+        }
+
+        /// <summary>
         /// 检查表是否存在
         /// </summary>
         /// <param name="tableName"> 要检查的表名 </param>
