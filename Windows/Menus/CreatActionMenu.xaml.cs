@@ -34,7 +34,6 @@ namespace Quicker.Windows.Menus
         public CreatActionMenu(int buttonID, string tableName)
         {
             InitializeComponent();
-            SetButtonVisbility(); // 设置按钮可见性
             ButtonID = buttonID; // 设置当前按钮
             TableName = tableName; // 设置表名
             using var windowManager = new WindowManager(); // 创建窗口管理器
@@ -46,6 +45,7 @@ namespace Quicker.Windows.Menus
         {
             using var windowManager = new WindowManager(); // 创建窗口管理器
             windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+            SetButtonVisbility(); // 设置按钮可见性
         }
         #endregion
 
@@ -122,6 +122,7 @@ namespace Quicker.Windows.Menus
                 MainGrid.Height -= 32; // 减少高度
                 Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
                 PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
+                Top -= 24; // 向上移动
                 hasChanged = !hasChanged;
             }
         }
