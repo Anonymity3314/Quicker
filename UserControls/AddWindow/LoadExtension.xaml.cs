@@ -7,6 +7,7 @@ using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
 using WpfAnimatedGif;
+using Quicker.Extend;
 using System.IO;
 
 namespace Quicker.UserControls.AddWindow
@@ -66,7 +67,7 @@ namespace Quicker.UserControls.AddWindow
             if (buttonData.ActionType != "LoadExtension") return; // 验证动作类型
             UpdateUIFromButtonData(buttonData); // 更新UI
         }
-        
+
         /// <summary>
         /// 从按钮数据更新UI
         /// </summary>
@@ -81,7 +82,7 @@ namespace Quicker.UserControls.AddWindow
             _addWindow.UpdateTooltip(); // 更新提示
             LoadExtensionInfo(_selectedPath); // 加载扩展信息
         }
-        
+
         /// <summary>
         /// 更新标题
         /// </summary>
@@ -95,7 +96,7 @@ namespace Quicker.UserControls.AddWindow
             }
             _addWindow.TitleTextBox.Text = buttonData.Title; // 设置标题文本
         }
-        
+
         /// <summary>
         /// 更新图标
         /// </summary>
@@ -116,7 +117,6 @@ namespace Quicker.UserControls.AddWindow
         {
             LoadExtensionPopup.IsOpen = true; // 打开弹出菜单
         }
-
 
         // 复制地址
         private void CopyLocation(object sender, RoutedEventArgs e)
@@ -178,7 +178,7 @@ namespace Quicker.UserControls.AddWindow
             {
                 var assembly = System.Reflection.Assembly.LoadFrom(dllPath);
                 var moduleType = assembly.GetTypes()
-                    .FirstOrDefault(t => typeof(Quicker.Extend.IExtensionModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+                    .FirstOrDefault(t => typeof(IExtensionModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
 
                 if (moduleType == null)
                 {
@@ -186,7 +186,7 @@ namespace Quicker.UserControls.AddWindow
                     return;
                 }
 
-                var module = (Quicker.Extend.IExtensionModule)Activator.CreateInstance(moduleType); // 创建扩展模块实例
+                var module = (IExtensionModule)Activator.CreateInstance(moduleType); // 创建扩展模块实例
 
                 // 用模块属性更新UI
                 NameTextBlock.Text = module.Name;
@@ -197,6 +197,7 @@ namespace Quicker.UserControls.AddWindow
                 _addWindow.TitleTextBox.Text = module.Name;
                 _addWindow.DescriptionTextBox.Text = module.Description;
                 _addWindow.UpdateTooltip();
+                //_addWindow.SetExtensionModuleImage(module); // 设置扩展模块图标
             }
             catch
             {

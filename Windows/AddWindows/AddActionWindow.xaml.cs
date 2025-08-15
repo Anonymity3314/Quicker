@@ -1,4 +1,5 @@
-﻿using Quicker.UserControls.AddWindow;
+﻿using Quicker.Windows.MainWindows.MainWindow;
+using Quicker.UserControls.AddWindow;
 using System.Security.Cryptography;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
@@ -11,14 +12,13 @@ using System.Windows.Media;
 using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Windows;
+using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
 using WpfAnimatedGif;
+using Quicker.Extend;
 using System.Media;
 using System.IO;
-using Quicker.Windows.MainWindows.MainWindow;
-using Quicker.Helpers;
-using System;
 
 namespace Quicker.Windows.AddWindows
 {
@@ -437,10 +437,50 @@ namespace Quicker.Windows.AddWindows
             }
             catch
             {
-                ButtonImage.Visibility = Visibility.Collapsed; // 隐藏图标
-                using var toast = new ToastManager(); // 创建 ToastManager 实例
-                toast.Show("加载图片失败!", ToastType.Error); // 显示错误提示
+                HandleImageLoadError(); // 错误处理
             }
+        }
+
+        /*
+        /// <summary>
+        /// 专门加载扩展模块图标的方法
+        /// </summary>
+        /// <param name="module">扩展模块</param>
+        public void SetExtensionModuleImage(IExtensionModule module)
+        {
+            try
+            {
+                if (module?.IconData == null || module.IconData.Length == 0)
+                {
+                    return;
+                }
+
+                ButtonImage.Visibility = Visibility.Visible;
+
+                // 直接加载位图格式的图标
+                var bitmap = new BitmapImage();
+                using (var stream = new MemoryStream(module.IconData))
+                {
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.StreamSource = stream;
+                    bitmap.EndInit();
+                }
+                ButtonImage.Source = bitmap;
+            }
+            catch (Exception ex)
+            {
+                HandleImageLoadError();
+            }
+        }
+         */
+
+        // 错误处理逻辑
+        private void HandleImageLoadError()
+        {
+            ButtonImage.Visibility = Visibility.Collapsed;
+            using var toast = new ToastManager();
+            toast.Show("图片加载失败", ToastType.Error);
         }
 
         // 根据选择的选项设置默认图标
