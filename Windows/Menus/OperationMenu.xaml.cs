@@ -310,6 +310,10 @@ namespace Quicker.Windows.Menus
                     floatingActionPageWindow.LoadButtonData(); // 重新加载Button数据
                 }
             }
+
+            var searchWindow = Application.Current.Windows.OfType<SearchWindow>().FirstOrDefault(); // 尝试查找搜索窗口
+            if (searchWindow != null)
+                searchWindow.DeleteButton(); // 更新搜索窗口
         }
 
         // 导出动作数据到指定文件夹

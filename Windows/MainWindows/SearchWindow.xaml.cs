@@ -20,6 +20,7 @@ namespace Quicker.Windows.MainWindows
         private ActionManager actionManager = new();
         private ButtonManager buttonManager = new();
         private ButtonDatabase db2 = new();
+        public Button targetButton;
 
         public SearchWindow()
         {
@@ -201,18 +202,17 @@ namespace Quicker.Windows.MainWindows
         private void AddResultButton()
         {
             ClearSearchResultButtons(); // 清除旧按钮
-            if (string.IsNullOrWhiteSpace(SearchBox.Text)) return; // 空搜索不添加按钮
-            var dataList = db2.GetButtonbyName(SearchBox.Text); // 获取按钮数据列表
-            if (dataList.buttonDataList.Count != dataList.tableNames.Count) return; // 确保两个列表的长度相同，以便一一对应
-            for (int i = 0; i < dataList.buttonDataList.Count; i++)
+            if (!string.IsNullOrWhiteSpace(SearchBox.Text)) // 空搜索不添加按钮
             {
-                var btn = CreateSearchResultButton(dataList.buttonDataList[i]); // 创建搜索结果按钮
-                btn.Name = $"{dataList.tableNames[i]}{dataList.buttonDataList[i].ButtonID}"; // 使用对应的表名和按钮ID作为按钮的名称
-                btn.Tag = new Tuple<string, ButtonData>(dataList.tableNames[i], dataList.buttonDataList[i]); // 存储表名和按钮数据
-                stackPanel.Children.Insert(0, btn); // 从头开始添加按钮到面板
+                var dataList = db2.GetButtonbyName(SearchBox.Text); // 获取按钮数据列表
+                for (int i = 0; i < dataList.buttonDataList.Count; i++)
+                {
+                    var btn = CreateSearchResultButton(dataList.buttonDataList[i]); // 创建搜索结果按钮
+                    btn.Name = $"{dataList.tableNames[i]}{dataList.buttonDataList[i].ButtonID}"; // 使用对应的表名和按钮ID作为按钮的名称
+                    btn.Tag = new Tuple<string, ButtonData>(dataList.tableNames[i], dataList.buttonDataList[i]); // 存储表名和按钮数据
+                    stackPanel.Children.Insert(0, btn); // 从头开始添加按钮到面板
+                }
             }
-            ScrollBar.Visibility = stackPanel.Children.Count >= 8 ? Visibility.Visible : Visibility.Collapsed;
-            //ScrollBar.Height = stackPanel.Children.Count > 8 ? 426 : 0; // 设置滚动条高度
         }
 
         // 清除所有搜索结果按钮
@@ -324,10 +324,23 @@ namespace Quicker.Windows.MainWindows
         private void Button_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Button btn = (Button)sender;
+            targetButton = btn;
             var tag = (Tuple<string, ButtonData>)btn.Tag; // 提取表名和按钮数据
             var data = (ButtonData)tag.Item2; // 按钮数据
             string tableName = tag.Item1; // 表名
             buttonManager.OpenMenu(sender, "OperationMenu", this, tableName); // 使用表名
+        }
+
+        // 移除按钮
+        public void DeleteButton()
+        {
+            if (targetButton!= null)
+            {
+                stackPanel.Children.Remove(targetButton);
+                targetButton.Click -= Button_Click; // 解绑 Click 事件
+                targetButton.MouseRightButtonDown -= Button_MouseRightButtonDown; // 解绑右键菜单事件
+                targetButton = null;
+            }
         }
 
         // 滚动条变化
@@ -342,12 +355,23 @@ namespace Quicker.Windows.MainWindows
             ScrollBar.Value = ScrollViewer.VerticalOffset; // 设置滚动条值
         }
 
+        // 滚动条可见性变化
+        private void Grid_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            ScrollBar.Visibility = stackPanel.Children.Count > 8 ? Visibility.Visible : Visibility.Collapsed; // 设置滚动条可见性
+        }
+        private void Grid_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            ScrollBar.Visibility = Visibility.Collapsed; // 设置滚动条可见性
+        }
+
         // 清理资源
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
             ClearSearchResultButtons(); // 解绑并清除按钮
             stackPanel.Children.Clear(); // 清除所有子元素
+            targetButton = null; // 置空目标按钮
         }
     }
 }

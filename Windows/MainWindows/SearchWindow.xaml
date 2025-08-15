@@ -56,7 +56,7 @@
         <Border x:Name="SearchBorder" Margin="0.6" Background="White" CornerRadius="5" helpers:ClipHelper.ClipToBounds="True">
             <Grid>
                 <Grid x:Name="SearchBoxGrid" Height="50" VerticalAlignment="Top">
-                    <TextBox x:Name="SearchBox" Text="开始搜索..." Width="700" Height="40" FontSize="28" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0" Foreground="LightGray" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBox x:Name="SearchBox" Text="开始搜索..." ToolTip="请输入关键词进行搜索" Width="700" Height="40" FontSize="28" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0" Foreground="LightGray" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
                                 <EventSetter Event="GotFocus" Handler="SearchBox_GotFocus"/>
@@ -64,7 +64,7 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
-                    <ToggleButton x:Name="PinToggle" Margin="5" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Click="PinToggle_Click">
+                    <ToggleButton x:Name="PinToggle" Margin="5" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Click="PinToggle_Click" ToolTip="订住：固定位置，不自动隐藏">
                         <ToggleButton.Template>
                             <ControlTemplate TargetType="ToggleButton">
                                 <!-- 命名Border并设置初始背景 -->
@@ -89,51 +89,53 @@
                         </ToggleButton.Template>
                     </ToggleButton>
                 </Grid>
-                <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0" Width="719" ScrollChanged="ScrollViewer_ScrollChanged">
-                    <StackPanel x:Name="stackPanel">
-                        <Button x:Name="RunasCommandButton" Style="{StaticResource SearchButtonStyle}" Click="RunasCommandButton_Click" Visibility="Collapsed">
-                            <Grid>
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="38" Width="36" Margin="10,0,0,0"/>
-                                <TextBlock Text="作为命令运行" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
-                                <TextBlock Text="运行命令" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
-                                <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="96,0,0,9" FontSize="10" Foreground="LightGray"/>
-                            </Grid>
-                        </Button>
-                        <Button x:Name="OpenUrlCommandButton" Style="{StaticResource SearchButtonStyle}" Click="OpenUrlCommandButton_Click" Visibility="Collapsed">
-                            <Grid>
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
-                                <TextBlock Text="打开网址" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
-                                <TextBlock x:Name="OpenUrlCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
-                                <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
-                            </Grid>
-                        </Button>
-                        <Button x:Name="SearchBingCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchBingCommandButton_Click" Visibility="Collapsed">
-                            <Grid>
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
-                                <TextBlock Text="必应搜索" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
-                                <TextBlock x:Name="SearchBingCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
-                                <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
-                            </Grid>
-                        </Button>
-                        <Button x:Name="SearchBaiduCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchBaiduCommandButton_Click" Visibility="Collapsed">
-                            <Grid>
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
-                                <TextBlock Text="百度搜索" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
-                                <TextBlock x:Name="SearchBaiduCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
-                                <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
-                            </Grid>
-                        </Button>
-                        <Button x:Name="SearchGoogleCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchGoogleCommandButton_Click" Visibility="Collapsed">
-                            <Grid>
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
-                                <TextBlock Text="谷歌搜索" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
-                                <TextBlock x:Name="SearchGoogleCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
-                                <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
-                            </Grid>
-                        </Button>
-                    </StackPanel>
-                </ScrollViewer>
-                <ScrollBar x:Name="ScrollBar" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="705,50,0,0" ValueChanged="ScrollBar_ValueChanged"/>
+                <Grid MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave">
+                    <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0" Width="719" ScrollChanged="ScrollViewer_ScrollChanged">
+                        <StackPanel x:Name="stackPanel">
+                            <Button x:Name="RunasCommandButton" Style="{StaticResource SearchButtonStyle}" Click="RunasCommandButton_Click" Visibility="Collapsed">
+                                <Grid>
+                                    <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="38" Width="36" Margin="10,0,0,0"/>
+                                    <TextBlock Text="作为命令运行" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
+                                    <TextBlock Text="运行命令" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="96,0,0,9" FontSize="10" Foreground="LightGray"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="OpenUrlCommandButton" Style="{StaticResource SearchButtonStyle}" Click="OpenUrlCommandButton_Click" Visibility="Collapsed">
+                                <Grid>
+                                    <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
+                                    <TextBlock Text="打开网址" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
+                                    <TextBlock x:Name="OpenUrlCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="SearchBingCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchBingCommandButton_Click" Visibility="Collapsed">
+                                <Grid>
+                                    <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
+                                    <TextBlock Text="必应搜索" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
+                                    <TextBlock x:Name="SearchBingCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="SearchBaiduCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchBaiduCommandButton_Click" Visibility="Collapsed">
+                                <Grid>
+                                    <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
+                                    <TextBlock Text="百度搜索" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
+                                    <TextBlock x:Name="SearchBaiduCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
+                                </Grid>
+                            </Button>
+                            <Button x:Name="SearchGoogleCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchGoogleCommandButton_Click" Visibility="Collapsed">
+                                <Grid>
+                                    <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
+                                    <TextBlock Text="谷歌搜索" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
+                                    <TextBlock x:Name="SearchGoogleCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
+                                    <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <ScrollBar x:Name="ScrollBar" Height="424" Visibility="Collapsed" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="705,50,0,0" ValueChanged="ScrollBar_ValueChanged"/>
+                </Grid>
             </Grid>
         </Border>
     </Grid>
