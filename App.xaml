@@ -26,6 +26,8 @@
             </Style>
             <!-- 合并资源词典必须放最后 -->
             <ResourceDictionary.MergedDictionaries>
+                <!-- 右键菜单样式 -->
+                <ResourceDictionary Source="Resources/Styles/CustomContextMenuStyle.xaml"/>
                 <!-- 文本块样式 -->
                 <ResourceDictionary Source="Resources/Styles/TextBlockStyles.xaml"/>
                 <!-- 滚动条样式 -->

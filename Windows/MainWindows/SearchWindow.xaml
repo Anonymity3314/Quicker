@@ -58,7 +58,7 @@
                 <Grid x:Name="SearchBoxGrid" Height="50" VerticalAlignment="Top">
                     <TextBox x:Name="SearchBox" Text="开始搜索..." ToolTip="请输入关键词进行搜索" Width="700" Height="40" FontSize="28" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0" Foreground="LightGray" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBox.Style>
-                            <Style TargetType="TextBox">
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                                 <EventSetter Event="GotFocus" Handler="SearchBox_GotFocus"/>
                                 <EventSetter Event="LostFocus" Handler="SearchBox_LostFocus"/>
                             </Style>

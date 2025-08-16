@@ -87,6 +87,7 @@
         
         <!-- 专用垂直滚动条样式 -->
         <Style x:Key="VerticalScrollBarStyle" TargetType="{x:Type ScrollBar}">
+            <Setter Property="ContextMenu" Value="{StaticResource ScrollBarCustomContextMenu}"/>
             <Setter Property="Background" Value="#FCFCFC"/>
             <Setter Property="Template">
                 <Setter.Value>

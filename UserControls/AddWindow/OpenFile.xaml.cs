@@ -90,33 +90,16 @@ namespace Quicker.UserControls.AddWindow
         // 选择打开程序
         public void ChooseProcess(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = CreateOpenFileDialog(); // 创建打开文件对话框
-            if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了"确定"
-            {
-                ProcessSelectedFile(openFileDialog.FileName); // 处理选中的文件
-            }
-        }
-
-        /// <summary>
-        /// 创建打开文件对话框
-        /// </summary>
-        /// <returns>打开文件对话框</returns>
-        private Microsoft.Win32.OpenFileDialog CreateOpenFileDialog()
-        {
-            return new Microsoft.Win32.OpenFileDialog
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
             {
                 Filter = "任意文件(*.*)|*.*|可执行程序(*.exe)|*.exe" // 设置文件类型过滤器
             };
-        }
-
-        /// <summary>
-        /// 处理选中的文件
-        /// </summary>
-        /// <param name="filePath">文件路径</param>
-        private void ProcessSelectedFile(string filePath)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(filePath); // 获取文件名
-            UpdateUIWithFileInfo(filePath, fileName); // 更新UI
+            if (openFileDialog.ShowDialog() == true) // 检查用户是否点击了"确定"
+            {
+                findAppsWindow?.Close(); // 关闭 FindAppsWindow
+                string fileName = Path.GetFileNameWithoutExtension(openFileDialog.FileName); // 获取文件名
+                UpdateUIWithFileInfo(openFileDialog.FileName, fileName); // 更新UI
+            }
         }
 
         /// <summary>
