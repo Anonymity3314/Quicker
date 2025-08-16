@@ -50,11 +50,11 @@ namespace Quicker
         private const string TASKBAR_STYLE = "taskbar";
         private const string DESKTOP_STYLE = "desktop";
         
+        private Action<string, string> _trayIconChangedHandler; // 托盘图标改变事件
+        private string _previewRunningPath; // 预览运行图标路径
+        private string _previewPausedPath; // 预览暂停图标路径
         private TaskPoolGlobalHook? hook; // 全局钩子
         private TaskbarIcon? taskbarIcon; // 托盘图标
-        private string _previewRunningPath;
-        private string _previewPausedPath;
-        private Action<string, string> _trayIconChangedHandler;
 
         protected override void OnStartup(StartupEventArgs e)
         {

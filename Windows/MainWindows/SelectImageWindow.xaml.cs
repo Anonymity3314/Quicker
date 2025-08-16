@@ -52,7 +52,11 @@ namespace Quicker.Windows.MainWindows
             }
         }
 
-        // 计算每行显示的项数
+        /// <summary>
+        /// 计算每行显示的项数
+        /// </summary>
+        /// <param name="itemsPanel"> WrapPanel </param>
+        /// <returns> 每行显示的项数 </returns>
         private int CalculateItemsPerRow(WrapPanel itemsPanel)
         {
             double panelWidth = itemsPanel.ActualWidth; // 获取 WrapPanel 的宽度
@@ -126,9 +130,7 @@ namespace Quicker.Windows.MainWindows
             return new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".ico", ".svg" }.Contains(extension);
         }
 
-        /// <summary>
-        /// 加载初始图片
-        /// </summary>
+        // 加载初始图片
         private void LoadInitialImages()
         {
             LoadImages(27); // 初始加载27张图片
@@ -164,7 +166,11 @@ namespace Quicker.Windows.MainWindows
             loadedImageCount += imagesToLoad; // 已加载的图片数量增加
         }
 
-        // 加载图片
+        /// <summary>
+        /// 加载图片
+        /// </summary>
+        /// <param name="filePath"> 图片文件路径 </param>
+        /// <returns> 图片源 </returns>
         private BitmapImage LoadImage(string filePath)
         {
             try

@@ -312,9 +312,9 @@
                     <StackPanel x:Name="CommonButtonPanel" Margin="0,13,0,0" Orientation="Horizontal" HorizontalAlignment="Center"/>
                     <Button x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click" ToolTip="搜索">
                         <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
-                            <!--<Rectangle.OpacityMask>
-                                <ImageBrush ImageSource="/Resources/Images/Search.png"/>
-                            </Rectangle.OpacityMask>-->
+                            <Rectangle.OpacityMask>
+                                <ImageBrush/>
+                            </Rectangle.OpacityMask>
                         </Rectangle>
                     </Button>
                     <Button x:Name="ActionPageSelecter" HorizontalAlignment="Right" Margin="0,0,34,0" Style="{StaticResource Task}" Click="LockCommonActionPage" MouseRightButtonDown="OpenSelectActionPageMenu">

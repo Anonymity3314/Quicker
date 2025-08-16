@@ -63,12 +63,10 @@
         </Slider>
 
         <!-- 颜色预览 -->
-        <Border Height="25" BorderBrush="LightGray" BorderThickness="1" Margin="10,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="109">
-            <Rectangle x:Name="ColorPreview">
-                <Rectangle.Fill>
-                    <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-                </Rectangle.Fill>
-            </Rectangle>
+        <Border x:Name="ColorPreview" Height="25" BorderBrush="LightGray" BorderThickness="1" Margin="10,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="109">
+            <Border.Background>
+                <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            </Border.Background>
         </Border>
 
         <!-- 十六进制颜色值 -->
