@@ -82,6 +82,7 @@
     <None Remove="Resources\Images\Quicker2.png" />
     <None Remove="Resources\Images\RestartQuicker.png" />
     <None Remove="Resources\Images\RestartQuicker.png" />
+    <None Remove="Resources\Images\Search.png" />
     <None Remove="Resources\Images\SelectLocalImage.png" />
     <None Remove="Resources\Images\SelectLocalImage.png" />
     <None Remove="Resources\Images\SettingImage1.png" />
@@ -117,6 +118,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Images\Search.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="VersionInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

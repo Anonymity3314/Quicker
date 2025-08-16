@@ -261,6 +261,7 @@ Quicker/
 │   │   ├─Quicker_Enabled.png                           # Quicker运行中的图片
 │   │   ├─Quicker_Disabled.png                          # Quicker暂停时的图片
 │   │   ├─RestartQuicker.png                            # 重启Quicker的图片
+│   │   ├─Search.png                                    # 搜索按钮的图片
 │   │   ├─SelectLocalImage.png                          # 从本地文件选择动作按钮图像的图片
 │   │   ├─SettingImage1.png                             # 菜单中打开设置窗口的按钮图片
 │   │   ├─SettingImage2.png                             # 主面板打开设置面板的图片
