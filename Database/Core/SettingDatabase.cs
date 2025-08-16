@@ -86,10 +86,10 @@ namespace Quicker.Database.Core
         static SettingDatabase()
         {
             DatabaseHelper.EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
-            DatabaseHelper.EnsureDatabaseExists("Setting.db"); // 确保数据库文件存在
             string dbFilePath = Path.Combine(AppPathHelper.DatabaseFolder, "Setting.db"); // 设置数据库文件路径
             if (!File.Exists(dbFilePath))
             {
+                SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
                 InitializeConvention(); // 初始化 Convention 表
                 InitializeOpenMainWindow(); // 初始化 OpenMainWindow 表
                 InitializeBlacklist(); // 初始化 Blacklist 表

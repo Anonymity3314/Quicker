@@ -40,18 +40,5 @@ namespace Quicker.Database.Core
             connection.Open();
             return connection;
         }
-
-        /// <summary>
-        /// 检查数据库文件是否存在，如果不存在则创建
-        /// </summary>
-        /// <param name="databaseFileName">数据库文件名</param>
-        public static void EnsureDatabaseExists(string databaseFileName)
-        {
-            string dbFilePath = Path.Combine(AppPathHelper.DatabaseFolder, databaseFileName);
-            if (!File.Exists(dbFilePath))
-            {
-                SQLiteConnection.CreateFile(dbFilePath);
-            }
-        }
     }
 } 

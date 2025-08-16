@@ -13,10 +13,10 @@ namespace Quicker.Database.Core
         public ButtonDatabase()
         {
             DatabaseHelper.EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
-            DatabaseHelper.EnsureDatabaseExists("Button.db"); // 确保数据库文件存在
             string dbFilePath = Path.Combine(AppPathHelper.DatabaseFolder, "Button.db"); // 设置数据库文件路径
             if (!File.Exists(dbFilePath))
             {
+                SQLiteConnection.CreateFile(dbFilePath); // 创建数据库文件
                 CreateButtonTable("_global"); // 创建全局表格
                 CreateButtonTable("common"); // 创建通用表格
             }
