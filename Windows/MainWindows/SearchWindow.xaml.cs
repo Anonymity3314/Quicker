@@ -16,10 +16,20 @@ namespace Quicker.Windows.MainWindows
 {
     public partial class SearchWindow : Window
     {
-        private bool _isLoaded = false, _isPinned = false;
+        public bool IsPinned
+        {
+            get { return (bool)GetValue(IsPinnedProperty); }
+            set { SetValue(IsPinnedProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsPinnedProperty =
+            DependencyProperty.Register("IsPinned", typeof(bool), typeof(SearchWindow),
+                new PropertyMetadata(false));
+
         private ActionManager actionManager = new();
         private ButtonManager buttonManager = new();
         private ButtonDatabase db2 = new();
+        private bool _isLoaded = false;
         public Button targetButton;
 
         public SearchWindow()
@@ -29,6 +39,9 @@ namespace Quicker.Windows.MainWindows
 
         private void SearchWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            IsPinned = AppStateManager.SearchWindowPinned;
+            Topmost = IsPinned;
+
             const int DesignHeight = 380; // 设计器默认高度
             SizeToContent = SizeToContent.Manual;  // 仅临时锁定
             var workArea = SystemParameters.WorkArea; // 获取屏幕工作区
@@ -61,7 +74,7 @@ namespace Quicker.Windows.MainWindows
         // 当窗口失去焦点时关闭窗口。
         private void SearchWindow_Deactivated(object sender, EventArgs e)
         {
-            if(!_isPinned && !buttonManager.isClosing)
+            if (!AppStateManager.SearchWindowPinned && !buttonManager.isClosing)
                 Close();
         }
 
@@ -194,9 +207,11 @@ namespace Quicker.Windows.MainWindows
         // 置顶切换
         private void PinToggle_Click(object sender, RoutedEventArgs e)
         {
-            _isPinned = !_isPinned; // 切换置顶状态
-            Topmost = _isPinned;
+            IsPinned = !IsPinned;
+            AppStateManager.SearchWindowPinned = IsPinned;
+            Topmost = IsPinned;
         }
+
 
         // 添加搜索结果按钮
         private void AddResultButton()
@@ -334,7 +349,7 @@ namespace Quicker.Windows.MainWindows
         // 移除按钮
         public void DeleteButton()
         {
-            if (targetButton!= null)
+            if (targetButton != null)
             {
                 stackPanel.Children.Remove(targetButton);
                 targetButton.Click -= Button_Click; // 解绑 Click 事件

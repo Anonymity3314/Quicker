@@ -64,21 +64,17 @@
                             </Style>
                         </TextBox.Style>
                     </TextBox>
-                    <ToggleButton x:Name="PinToggle" Margin="5" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Click="PinToggle_Click" ToolTip="订住：固定位置，不自动隐藏">
-                        <ToggleButton.Template>
-                            <ControlTemplate TargetType="ToggleButton">
+                    <Button x:Name="PinToggle" Margin="5" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Click="PinToggle_Click" ToolTip="订住：固定位置，不自动隐藏">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
                                 <!-- 命名Border并设置初始背景 -->
                                 <Border x:Name="Border" CornerRadius="4" Background="{TemplateBinding Background}">
                                     <Image x:Name="IconImage" Source="{StaticResource UnpinFromDesktopSource}" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <ControlTemplate.Triggers>
-                                    <!-- 状态切换 -->
-                                    <Trigger Property="IsChecked" Value="True">
+                                    <DataTrigger Binding="{Binding IsPinned, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
                                         <Setter TargetName="IconImage" Property="Source" Value="{StaticResource PinToDesktopSource}"/>
-                                    </Trigger>
-                                    <Trigger Property="IsChecked" Value="False">
-                                        <Setter TargetName="IconImage" Property="Source" Value="{StaticResource UnpinFromDesktopSource}"/>
-                                    </Trigger>
+                                    </DataTrigger>
 
                                     <!-- 鼠标悬停效果 -->
                                     <Trigger Property="IsMouseOver" Value="True">
@@ -86,8 +82,8 @@
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
-                        </ToggleButton.Template>
-                    </ToggleButton>
+                        </Button.Template>
+                    </Button>
                 </Grid>
                 <Grid MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave">
                     <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,50,0,0" Width="719" ScrollChanged="ScrollViewer_ScrollChanged">
