@@ -54,7 +54,7 @@
                 </ListView.ItemsPanel>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Image Source="{Binding Path=FilePath}" Tag="{Binding Path=FileName}" Width="40" Height="40" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ContentControl Content="{Binding ImageControl}" Width="40" Height="40" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

@@ -143,27 +143,35 @@ namespace Quicker.Windows.MainWindows
         /// <param name="maxImagesToLoad"> 一次加载的最大图片数量 </param>
         private void LoadImages(int maxImagesToLoad)
         {
-            if (allImageFiles == null || loadedImageCount >= allImageFiles.Length) // 如果所有图片都已加载，则返回
+            if (allImageFiles == null || loadedImageCount >= allImageFiles.Length) // 如果已加载所有图片，则返回
             {
-                LoadMoreButton.IsEnabled = false; // 禁用加载更多按钮
-                return; // 如果所有图片都已加载，则返回
+                LoadMoreButton.IsEnabled = false;
+                return;
             }
 
             int remainingImages = allImageFiles.Length - loadedImageCount; // 计算剩余图片数量
             int imagesToLoad = Math.Min(maxImagesToLoad, remainingImages); // 计算本次加载的图片数量
+            var iconManager = new Quicker.Managers.IconManager(); // 创建 IconManager 对象
             for (int i = 0; i < imagesToLoad; i++)
             {
                 string imagePath = allImageFiles[loadedImageCount + i]; // 获取图片路径
                 FileInfo fileInfo = new(imagePath); // 获取文件信息
-                var imageItem = new ImageItem // 创建图片项
+                var imageControl = new Image
                 {
-                    FilePath = imagePath, // 文件路径
-                    FileName = fileInfo.Name, // 文件名
-                    ImageSource = LoadImage(imagePath) // 加载图片
+                    Stretch = Stretch.Uniform
                 };
+
+                // 关键：支持 GIF
+                iconManager.SetImageWithGifSupport(imageControl, imagePath); // 设置图片源
+                var imageItem = new ImageItem
+                {
+                    FilePath = imagePath,
+                    FileName = fileInfo.Name,
+                    ImageControl = imageControl
+                }; // 创建图片项
                 ImageItems.Add(imageItem); // 添加到图片项集合
             }
-            loadedImageCount += imagesToLoad; // 已加载的图片数量增加
+            loadedImageCount += imagesToLoad; // 更新已加载的图片数量
         }
 
         /// <summary>
@@ -295,7 +303,7 @@ namespace Quicker.Windows.MainWindows
             base.OnClosed(e); // 调用基类的 OnClosed 方法
 
             foreach (var imageItem in ImageItems) // 遍历图片项集合
-                imageItem.ImageSource = null; // 释放图片资源
+                imageItem.ImageControl = null; // 释放图片资源
             ImageItems.Clear(); // 清空图片项集合
 
             // 清理事件订阅
@@ -316,8 +324,8 @@ namespace Quicker.Windows.MainWindows
     // 图片项的数据模型
     public class ImageItem
     {
-        public string FilePath { get; set; } // 文件路径
-        public string FileName { get; set; } // 文件名
-        public BitmapImage ImageSource { get; set; } // 图片源
+        public string FilePath { get; set; }
+        public string FileName { get; set; }
+        public Image ImageControl { get; set; }  // 用 Image 控件承载，支持 GIF 动图
     }
 }
