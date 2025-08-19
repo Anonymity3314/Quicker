@@ -49,6 +49,10 @@ namespace Quicker.Database.Core
             CreateAndInitTableStatic(connection, "common"); // 创建数据表并初始化
             CreateAndInitTableStatic(connection, "taskbar"); // 创建数据表并初始化
             CreateAndInitTableStatic(connection, "desktop"); // 创建数据表并初始化
+
+            var db = new ActionPageDatabase(); // 创建实例
+            db.CreateAndInitTable("_global"); // 创建动作页数据表
+            db.CreateAndInitTable("common"); // 创建动作页数据表
         }
 
         // 创建Scenes表
@@ -81,7 +85,11 @@ namespace Quicker.Database.Core
             };
         }
 
-        // 静态版本的CreateAndInitTable方法
+        /// <summary>
+        /// 创建并初始化数据表
+        /// </summary>
+        /// <param name="connection"> 数据库连接 </param>
+        /// <param name="sceneTag"> 场景标签 </param>
         private static void CreateAndInitTableStatic(SQLiteConnection connection, string sceneTag)
         {
             // 获取场景配置
@@ -155,7 +163,6 @@ namespace Quicker.Database.Core
             }; // 创建并初始化场景数据
             UpdateSceneTable(sceneData); // 更新场景数据表
 
-            //if (actionPageCount == 0) return; // 没有动作页数量，直接返回
             // 创建并初始化动作页
             for (int i = 0; i < actionPageCount; i++) // 创建动作页
             {
