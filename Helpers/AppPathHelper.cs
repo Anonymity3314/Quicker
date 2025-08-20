@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.IO;
 
 namespace Quicker.Helpers
@@ -75,26 +76,32 @@ namespace Quicker.Helpers
             EnsureDirectoryExists(SharedAppearanceFolder);
             EnsureDirectoryExists(TempDataFolder);
             EnsureDirectoryExists(ExtensionsFolder);
+
+            //LogDirectories(); // 记录路径
         }
 
-        /// <summary>
-        /// 获取相对于应用程序数据根目录的路径
-        /// </summary>
-        /// <param name="relativePath">相对路径</param>
-        /// <returns>完整路径</returns>
-        public static string GetAppDataPath(string relativePath)
+        // 日志记录（修改路径部分）
+        private static void LogDirectories()
         {
-            return Path.Combine(AppDataRoot, relativePath);
-        }
-
-        /// <summary>
-        /// 获取相对于图片文件夹的路径
-        /// </summary>
-        /// <param name="relativePath">相对路径</param>
-        /// <returns>完整路径</returns>
-        public static string GetImagesPath(string relativePath)
-        {
-            return Path.Combine(ImagesFolder, relativePath);
+            var programRoot = AppDomain.CurrentDomain.BaseDirectory; // 运行时路径
+            var logPath = Path.Combine(programRoot, "Directories.txt"); // 日志文件路径
+            File.WriteAllLines(logPath, new[]
+            {
+                $"生成时间：{DateTime.Now}",
+                $"运行时路径 - 程序：{Assembly.GetEntryAssembly()?.GetName().Name}",
+                "",
+                "[应用路径]",
+                AppDataRoot,
+                DatabaseFolder,
+                ImagesFolder,
+                LocalIconsFolder,
+                BackgroundImagesFolder,
+                SharedAppearanceFolder,
+                TempDataFolder,
+                ExtensionsFolder,
+                "",
+                $"[运行时信息] 程序版本：{Assembly.GetEntryAssembly()?.GetName().Version}"
+            });
         }
     }
 } 

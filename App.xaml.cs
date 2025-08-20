@@ -59,8 +59,8 @@ namespace Quicker
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e); // 调用基类方法
-            EnsureSingleInstance(); // 确保单例运行
             InitializeAppDirectories(); // 初始化应用程序目录
+            EnsureSingleInstance(); // 确保单例运行
             CheckAppUpdate(); // 检查应用更新
             CheckAndUpdateDatabase(); // 检查并升级数据库
             RestoreGlobalFontFamilyFromDatabase(); // 恢复全局字体设置
