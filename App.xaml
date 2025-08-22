@@ -9,6 +9,15 @@
 >
     <Application.Resources>
         <ResourceDictionary>
+            <!-- 定义TextBox右键菜单 -->
+            <ContextMenu x:Key="TextBoxCustomContextMenu" Style="{StaticResource CustomContextMenuStyle}">
+                <MenuItem Header="剪切" Command="ApplicationCommands.Cut" Style="{StaticResource CustomMenuItemStyle}"/>
+                <MenuItem Header="复制" Command="ApplicationCommands.Copy" Style="{StaticResource CustomMenuItemStyle}"/>
+                <MenuItem Header="粘贴" Command="ApplicationCommands.Paste" Style="{StaticResource CustomMenuItemStyle}"/>
+                <Separator Style="{StaticResource CustomSeparatorStyle}"/>
+                <MenuItem Header="选择所有" Command="ApplicationCommands.SelectAll" Style="{StaticResource CustomMenuItemStyle}"/>
+            </ContextMenu>
+
             <!-- 字体资源 -->
             <FontFamily x:Key="GlobalFontFamily">微软雅黑</FontFamily>
             <!-- 全局默认控件字体样式 -->
@@ -16,6 +25,7 @@
                 <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
             </Style>
             <Style TargetType="TextBox">
+                <Setter Property="ContextMenu" Value="{DynamicResource TextBoxCustomContextMenu}"/>
                 <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
             </Style>
             <Style TargetType="Label">
