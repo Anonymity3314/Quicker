@@ -27,15 +27,19 @@
             <Label Content="Quicker" HorizontalAlignment="Left" Margin="57,16,0,0" VerticalAlignment="Top" FontSize="24" FontWeight="Bold"/>
             <Image HorizontalAlignment="Left" Height="48" Margin="4,12,0,0" VerticalAlignment="Top" Width="48" Source="/Resources/Images/Quicker_Enabled.png"/>
             <Label x:Name="VersionLabel" Content="版本：" HorizontalAlignment="Left" Margin="4,65,0,0" VerticalAlignment="Top" FontSize="16"/>
-            <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,127,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-            <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" FontSize="14"/>
+            <Label Content="特别感谢" HorizontalAlignment="Left" Margin="4,234,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+            <Label Content="特别感谢给予Quicker各种支持的朋友们。" HorizontalAlignment="Left" Margin="10,270,0,0" VerticalAlignment="Top" FontSize="14"/>
             <!--<Label Content="正是因为你们，Quicker才可以存在并不断进步！" HorizontalAlignment="Left" Margin="10,180,0,0" VerticalAlignment="Top" FontSize="14"/>-->
             <TextBlock x:Name="UpdateHistory" Style="{StaticResource HoverTextBlock}" Text="更新历史" Margin="109,70,0,0" FontSize="16" MouseLeftButtonDown="OpenUpdateHistory">
                 <TextBlock.ToolTip>
                     <ToolTip Content="点击查看" FontSize="12" Foreground="Black"/>
                 </TextBlock.ToolTip>
             </TextBlock>
-            <Label Content="By @Anonymity" HorizontalAlignment="Left" Margin="4,97,0,0" VerticalAlignment="Top" FontSize="16"/>
+            <!-- 开发团队 -->
+            <Label Content="开发团队" HorizontalAlignment="Left" Margin="4,101,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+            <Label Content="策划、代码：@Anonymity" HorizontalAlignment="Left" Margin="10,137,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label Content="美术、代码协助：@墨分璃" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label Content="测试：@巍巍噻" HorizontalAlignment="Left" Margin="10,193,0,0" VerticalAlignment="Top" FontSize="14" />
             <!-- 图标资源 -->
             <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" FontSize="16" Grid.Column="1"/>
             <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,85,0,0" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>

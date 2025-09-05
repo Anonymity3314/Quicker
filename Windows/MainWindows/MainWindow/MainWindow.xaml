@@ -313,6 +313,7 @@
                     <Button x:Name="SearchButton" HorizontalAlignment="Right" Margin="0,0,58,0" Style="{StaticResource Task}" Click="SearchButton_Click" ToolTip="搜索">
                         <Rectangle Width="14" Height="14" Fill="{Binding DataContext.ToolbarIconColor, RelativeSource={RelativeSource AncestorType=Window}}">
                             <Rectangle.OpacityMask>
+                                <!--<ImageBrush ImageSource="/Resources/Images/Search.png"/>-->
                                 <ImageBrush/>
                             </Rectangle.OpacityMask>
                         </Rectangle>
