@@ -66,7 +66,7 @@ namespace Quicker.Windows.Menus
             string directory = Path.GetDirectoryName(exePath); // 获取可执行文件的目录
             string exeName = Path.GetFileNameWithoutExtension(exePath) + ".exe"; // 获取可执行文件的名称
             SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
-            Application.Current.Shutdown(); // 关闭当前应用程序
+            app.Shutdown(); // 通过App类正确关闭当前应用程序
             Process.Start(new ProcessStartInfo // 启动新进程
             {
                 FileName = Path.Combine(directory, exeName), // 指定可执行文件的路径
@@ -77,7 +77,7 @@ namespace Quicker.Windows.Menus
         // 退出应用
         private void Exit(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown(); // 关闭当前应用程序
+            app.Shutdown(); // 通过App类正确关闭应用，确保OnExit方法被调用
         }
 
         // 失去焦点时关闭窗口

@@ -458,7 +458,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             TitlePop.IsOpen = false; // 关闭菜单
             this.Visibility = Visibility.Collapsed; // 隐藏窗口
-            System.Windows.Application.Current.Shutdown(); // 退出程序
+            (System.Windows.Application.Current as App)?.Shutdown(); // 通过App类正确关闭应用，确保OnExit方法被调用
         }
 
         // 打开动作管理窗口
