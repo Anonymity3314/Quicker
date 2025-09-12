@@ -1,4 +1,5 @@
-﻿using Quicker.Windows.MainWindows;
+﻿using MouseButton = System.Windows.Input.MouseButton;
+using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
 using Quicker.UserControls;
 using System.Windows.Input;

@@ -1,3 +1,4 @@
+using MouseButton = System.Windows.Input.MouseButton;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Threading.Tasks;

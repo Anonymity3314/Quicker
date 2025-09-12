@@ -20,10 +20,13 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
             佛祖保佑       永无BUG
 */
+using KeyboardHookEventArgs = SharpHook.KeyboardHookEventArgs;
 using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
+using MouseHookEventArgs = SharpHook.MouseHookEventArgs;
 using MouseButton = SharpHook.Data.MouseButton;
 using Quicker.Windows.MainWindows.MainWindow;
 using Hardcodet.Wpf.TaskbarNotification;
+using KeyCode = SharpHook.Data.KeyCode;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Database.Upgrade;

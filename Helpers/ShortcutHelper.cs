@@ -1,6 +1,5 @@
 ﻿using System.Windows.Input;
-using SharpHook.Native;
-using SharpHook.Data;
+using Quicker.Managers;
 
 namespace Quicker.Helpers
 {
@@ -92,7 +91,7 @@ namespace Quicker.Helpers
         }
 
         /// <summary>
-        /// 将SharpHook的KeyCode和修饰键状态转换为标准快捷键字符串
+        /// 将UI Automation的KeyCode和修饰键状态转换为标准快捷键字符串
         /// </summary>
         /// <param name="keyCode">主键</param>
         /// <param name="ctrl">Ctrl是否按下</param>
@@ -118,43 +117,52 @@ namespace Quicker.Helpers
         }
 
         /// <summary>
-        /// 判断SharpHook的KeyCode是否为修饰键
+        /// 判断UI Automation的KeyCode是否为修饰键
         /// </summary>
         /// <param name="keyCode"></param>
         public static bool IsModifierKeyFromKeyCode(KeyCode keyCode)
         {
             return keyCode == KeyCode.VcLeftControl || keyCode == KeyCode.VcRightControl ||
                    keyCode == KeyCode.VcLeftShift || keyCode == KeyCode.VcRightShift ||
-                   keyCode == KeyCode.VcLeftAlt || keyCode == KeyCode.VcRightAlt ||
-                   keyCode == KeyCode.VcLeftMeta || keyCode == KeyCode.VcRightMeta;
+                   keyCode == KeyCode.VcLeftAlt || keyCode == KeyCode.VcRightAlt;
         }
 
         /// <summary>
-        /// 获取SharpHook的KeyCode的友好显示名称
+        /// 获取UI Automation的KeyCode的友好显示名称
         /// </summary>
         /// <param name="keyCode"></param>
         public static string GetFriendlyKeyNameFromKeyCode(KeyCode keyCode)
         {
             // 主键盘数字
-            if (keyCode >= KeyCode.Vc0 && keyCode <= KeyCode.Vc9)
-                return ((char)('0' + (keyCode - KeyCode.Vc0))).ToString();
-            // 小键盘数字
-            if (keyCode >= KeyCode.VcNumPad0 && keyCode <= KeyCode.VcNumPad9)
-                return "Num" + (keyCode - KeyCode.VcNumPad0);
-            // 常见符号键
+            if (keyCode >= KeyCode.VcD0 && keyCode <= KeyCode.VcD9)
+                return ((char)('0' + (keyCode - KeyCode.VcD0))).ToString();
+            
+            // 字母键
+            if (keyCode >= KeyCode.VcA && keyCode <= KeyCode.VcZ)
+                return ((char)('A' + (keyCode - KeyCode.VcA))).ToString();
+            
+            // 功能键
+            if (keyCode >= KeyCode.VcF1 && keyCode <= KeyCode.VcF12)
+                return "F" + (keyCode - KeyCode.VcF1 + 1);
+            
+            // 常见符号键和特殊键
             switch (keyCode)
             {
-                case KeyCode.VcMinus: return "-";
-                case KeyCode.VcEquals: return "=";
-                case KeyCode.VcOpenBracket: return "[";
-                case KeyCode.VcCloseBracket: return "]";
-                case KeyCode.VcBackslash: return "\\";
-                case KeyCode.VcSemicolon: return ";";
-                case KeyCode.VcQuote: return "'";
-                case KeyCode.VcComma: return ",";
-                case KeyCode.VcPeriod: return ".";
-                case KeyCode.VcSlash: return "/";
-                case KeyCode.VcBackQuote: return "`";
+                case KeyCode.VcSpace: return "Space";
+                case KeyCode.VcEnter: return "Enter";
+                case KeyCode.VcTab: return "Tab";
+                case KeyCode.VcEscape: return "Escape";
+                case KeyCode.VcBack: return "Backspace";
+                case KeyCode.VcDelete: return "Delete";
+                case KeyCode.VcInsert: return "Insert";
+                case KeyCode.VcHome: return "Home";
+                case KeyCode.VcEnd: return "End";
+                case KeyCode.VcPageUp: return "PageUp";
+                case KeyCode.VcPageDown: return "PageDown";
+                case KeyCode.VcUp: return "Up";
+                case KeyCode.VcDown: return "Down";
+                case KeyCode.VcLeft: return "Left";
+                case KeyCode.VcRight: return "Right";
             }
             // 其它按键直接ToString
             return keyCode.ToString();
