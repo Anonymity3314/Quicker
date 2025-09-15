@@ -1,6 +1,4 @@
 ﻿using System.Windows.Input;
-using Quicker.Managers;
-using SharpHook.Data;
 
 namespace Quicker.Helpers
 {
@@ -92,16 +90,16 @@ namespace Quicker.Helpers
         }
 
         /// <summary>
-        /// 将UI Automation的KeyCode和修饰键状态转换为标准快捷键字符串
+        /// 将虚拟键码和修饰键状态转换为标准快捷键字符串
         /// </summary>
-        /// <param name="keyCode">主键</param>
+        /// <param name="virtualKeyCode">虚拟键码</param>
         /// <param name="ctrl">Ctrl是否按下</param>
         /// <param name="shift">Shift是否按下</param>
         /// <param name="alt">Alt是否按下</param>
         /// <param name="win">Win是否按下</param>
         /// <returns>标准快捷键字符串</returns>
         public static string GetShortcutStringFromHook(
-            KeyCode keyCode, bool ctrl, bool shift, bool alt, bool win)
+            int virtualKeyCode, bool ctrl, bool shift, bool alt, bool win)
         {
             List<string> keys = new List<string>();
             if (ctrl) keys.Add("Ctrl");
@@ -109,64 +107,12 @@ namespace Quicker.Helpers
             if (alt) keys.Add("Alt");
             if (win) keys.Add("Windows");
 
-            // 友好显示主键
-            string keyName = GetFriendlyKeyNameFromKeyCode(keyCode);
-            if (!IsModifierKeyFromKeyCode(keyCode))
-                keys.Add(keyName);
+            // 将虚拟键码转换为Key
+            Key key = KeyInterop.KeyFromVirtualKey(virtualKeyCode);
+            if (!IsModifierKey(key))
+                keys.Add(GetFriendlyKeyName(key));
 
             return string.Join("+", keys);
-        }
-
-        /// <summary>
-        /// 判断UI Automation的KeyCode是否为修饰键
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static bool IsModifierKeyFromKeyCode(KeyCode keyCode)
-        {
-            return keyCode == KeyCode.VcLeftControl || keyCode == KeyCode.VcRightControl ||
-                   keyCode == KeyCode.VcLeftShift || keyCode == KeyCode.VcRightShift ||
-                   keyCode == KeyCode.VcLeftAlt || keyCode == KeyCode.VcRightAlt;
-        }
-
-        /// <summary>
-        /// 获取UI Automation的KeyCode的友好显示名称
-        /// </summary>
-        /// <param name="keyCode"></param>
-        public static string GetFriendlyKeyNameFromKeyCode(KeyCode keyCode)
-        {
-            // 主键盘数字
-            if (keyCode >= KeyCode.Vc0 && keyCode <= KeyCode.Vc9)
-                return ((char)('0' + (keyCode - KeyCode.Vc0))).ToString();
-            
-            // 字母键
-            if (keyCode >= KeyCode.VcA && keyCode <= KeyCode.VcZ)
-                return ((char)('A' + (keyCode - KeyCode.VcA))).ToString();
-            
-            // 功能键
-            if (keyCode >= KeyCode.VcF1 && keyCode <= KeyCode.VcF12)
-                return "F" + (keyCode - KeyCode.VcF1 + 1);
-            
-            // 常见符号键和特殊键
-            switch (keyCode)
-            {
-                case KeyCode.VcSpace: return "Space";
-                case KeyCode.VcEnter: return "Enter";
-                case KeyCode.VcTab: return "Tab";
-                case KeyCode.VcEscape: return "Escape";
-                case KeyCode.VcBackspace: return "Backspace";
-                case KeyCode.VcDelete: return "Delete";
-                case KeyCode.VcInsert: return "Insert";
-                case KeyCode.VcHome: return "Home";
-                case KeyCode.VcEnd: return "End";
-                case KeyCode.VcPageUp: return "PageUp";
-                case KeyCode.VcPageDown: return "PageDown";
-                case KeyCode.VcUp: return "Up";
-                case KeyCode.VcDown: return "Down";
-                case KeyCode.VcLeft: return "Left";
-                case KeyCode.VcRight: return "Right";
-            }
-            // 其它按键直接ToString
-            return keyCode.ToString();
         }
     }
 }
