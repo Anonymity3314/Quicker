@@ -51,7 +51,7 @@
             <TextBlock x:Name="icon11_community_github_io" Style="{StaticResource HoverTextBlock}" ToolTip="点击前往" Margin="10,154,0,0" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
             <!-- 入正 -->
             <Label Grid.Column="1" Content="入正" FontSize="16" HorizontalAlignment="Left" Margin="4,279,0,0" VerticalAlignment="Top"/>
-            <TextBlock x:Name="getquicker_net" Grid.Column="1" Style="{StaticResource HoverTextBlock}" Margin="10,315,0,0" Text="getquicker.net" MouseLeftButtonDown="getquicker_net_MouseLeftButtonDown" FontSize="14"/>
+            <TextBlock x:Name="getquicker_net" Grid.Column="1" Style="{StaticResource HoverTextBlock}" ToolTip="前往正版Quicker官网" Margin="10,315,0,0" Text="getquicker.net" MouseLeftButtonDown="getquicker_net_MouseLeftButtonDown" FontSize="14"/>
             <!-- 数据文件夹 -->
             <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="447" Margin="0,0,0,55">
                 <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>

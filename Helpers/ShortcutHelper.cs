@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using Quicker.Managers;
+using SharpHook.Data;
 
 namespace Quicker.Helpers
 {
@@ -134,8 +135,8 @@ namespace Quicker.Helpers
         public static string GetFriendlyKeyNameFromKeyCode(KeyCode keyCode)
         {
             // 主键盘数字
-            if (keyCode >= KeyCode.VcD0 && keyCode <= KeyCode.VcD9)
-                return ((char)('0' + (keyCode - KeyCode.VcD0))).ToString();
+            if (keyCode >= KeyCode.Vc0 && keyCode <= KeyCode.Vc9)
+                return ((char)('0' + (keyCode - KeyCode.Vc0))).ToString();
             
             // 字母键
             if (keyCode >= KeyCode.VcA && keyCode <= KeyCode.VcZ)
@@ -152,7 +153,7 @@ namespace Quicker.Helpers
                 case KeyCode.VcEnter: return "Enter";
                 case KeyCode.VcTab: return "Tab";
                 case KeyCode.VcEscape: return "Escape";
-                case KeyCode.VcBack: return "Backspace";
+                case KeyCode.VcBackspace: return "Backspace";
                 case KeyCode.VcDelete: return "Delete";
                 case KeyCode.VcInsert: return "Insert";
                 case KeyCode.VcHome: return "Home";
