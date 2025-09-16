@@ -1,6 +1,8 @@
 ﻿using System.Runtime.InteropServices;
+using System.Windows.Threading;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Windows;
 using System.Text;
 
 namespace Quicker.Helpers
@@ -142,8 +144,11 @@ namespace Quicker.Helpers
         /// </summary>
         public void Start()
         {
-            InstallMouseHook();
-            InstallKeyboardHook();
+            Application.Current?.Dispatcher.BeginInvoke(() =>
+            {
+                InstallKeyboardHook();
+                InstallMouseHook();
+            }, DispatcherPriority.Render);
         }
 
         /// <summary>
@@ -151,8 +156,11 @@ namespace Quicker.Helpers
         /// </summary>
         public void Stop()
         {
-            UninstallMouseHook();
-            UninstallKeyboardHook();
+            Application.Current?.Dispatcher.BeginInvoke(() =>
+            {
+                UninstallKeyboardHook();
+                UninstallMouseHook();
+            }, DispatcherPriority.Render);
         }
 
         #endregion
@@ -162,49 +170,55 @@ namespace Quicker.Helpers
         // 安装鼠标钩子
         private void InstallMouseHook()
         {
-            if (_mouseHookHandle == IntPtr.Zero)
+            if (_mouseHookHandle != IntPtr.Zero) return;
+            Application.Current?.Dispatcher.BeginInvoke(() =>
             {
-                using (Process curProcess = Process.GetCurrentProcess())
-                using (ProcessModule curModule = curProcess.MainModule)
-                {
-                    _mouseHookHandle = SetWindowsHookEx(WH_MOUSE_LL, _mouseProc,
-                        GetModuleHandle(curModule.ModuleName), 0);
-                }
-            }
+                using var curProcess = Process.GetCurrentProcess();
+                using var curModule = curProcess.MainModule!;
+                _mouseHookHandle = SetWindowsHookEx(
+                    WH_MOUSE_LL, _mouseProc, GetModuleHandle(curModule.ModuleName), 0);
+            }, DispatcherPriority.Render);
         }
 
         // 安装键盘钩子
         private void InstallKeyboardHook()
         {
-            if (_keyboardHookHandle == IntPtr.Zero)
+            if (_keyboardHookHandle != IntPtr.Zero) return;
+            Application.Current?.Dispatcher.BeginInvoke(() =>
             {
-                using (Process curProcess = Process.GetCurrentProcess())
-                using (ProcessModule curModule = curProcess.MainModule)
-                {
-                    _keyboardHookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, _keyboardProc,
-                        GetModuleHandle(curModule.ModuleName), 0);
-                }
-            }
+                using var curProcess = Process.GetCurrentProcess();
+                using var curModule = curProcess.MainModule!;
+                _keyboardHookHandle = SetWindowsHookEx(
+                    WH_KEYBOARD_LL, _keyboardProc, GetModuleHandle(curModule.ModuleName), 0);
+            }, DispatcherPriority.Render);
         }
 
         // 卸载鼠标钩子
         private void UninstallMouseHook()
         {
-            if (_mouseHookHandle != IntPtr.Zero)
+            if (_mouseHookHandle == IntPtr.Zero) return;
+            Application.Current?.Dispatcher.BeginInvoke(() =>
             {
-                UnhookWindowsHookEx(_mouseHookHandle);
-                _mouseHookHandle = IntPtr.Zero;
-            }
+                if (_mouseHookHandle != IntPtr.Zero)
+                {
+                    UnhookWindowsHookEx(_mouseHookHandle);
+                    _mouseHookHandle = IntPtr.Zero;
+                }
+            }, DispatcherPriority.Render);
         }
 
         // 卸载键盘钩子
         private void UninstallKeyboardHook()
         {
-            if (_keyboardHookHandle != IntPtr.Zero)
+            if (_keyboardHookHandle == IntPtr.Zero) return;
+            Application.Current?.Dispatcher.BeginInvoke(() =>
             {
-                UnhookWindowsHookEx(_keyboardHookHandle);
-                _keyboardHookHandle = IntPtr.Zero;
-            }
+                if (_keyboardHookHandle != IntPtr.Zero)
+                {
+                    UnhookWindowsHookEx(_keyboardHookHandle);
+                    _keyboardHookHandle = IntPtr.Zero;
+                }
+            }, DispatcherPriority.Render);
         }
 
         #endregion
@@ -367,18 +381,13 @@ namespace Quicker.Helpers
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (_disposed) return;
+            Application.Current?.Dispatcher.Invoke(() =>
             {
-                if (disposing)
-                {
-                    // 释放托管资源
-                }
-
-                // 释放非托管资源
                 Stop();
+            }, DispatcherPriority.Send);
 
-                _disposed = true;
-            }
+            _disposed = true;
         }
 
         #endregion
