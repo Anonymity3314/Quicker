@@ -66,7 +66,6 @@
 | 程序包                      | 说明                           |
 |:------------------------:|:----------------------------:|
 | Hardcodet.NotifyIcon.Wpf | 实现 WPF 应用的系统托盘图标功能           |
-| SharpHook                | 提供键盘和鼠标钩子功能                  |
 | Svg                      | 提供加载、解析和渲染 SVG 图像的功能         |
 | System.Data.SQLite       | 提供 SQLite 数据库支持              |
 | SixLabors.ImageSharp     | 实现 PNG 图片的元数据读写与外观导入导出       |

@@ -380,7 +380,7 @@ namespace Quicker
         private bool IsOtherKeyDown()
         {
             bool otherKeyDown = false;
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.Invoke(new Action(() =>
             {
                 // 使用LINQ检查是否有任何常用按键被按下
                 otherKeyDown = new[]
@@ -402,7 +402,7 @@ namespace Quicker
                     Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9,
                     Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Decimal, Key.Divide
                 }.Any(key => Keyboard.IsKeyDown(key));
-            });
+            }));
             return otherKeyDown;
         }
 
@@ -424,7 +424,7 @@ namespace Quicker
             bool isMouseOnTestButton = false;
             try
             {
-                this.Dispatcher.Invoke(() =>
+                this.Dispatcher.Invoke(new Action(() =>
                 {
                     var mousePosition = System.Windows.Forms.Cursor.Position; // 获取当前鼠标位置
                     var settingWindows = Application.Current.Windows.OfType<SettingWindow>(); // 检查是否有设置窗口打开
@@ -445,7 +445,7 @@ namespace Quicker
                             }
                         }
                     }
-                });
+                }));
             }
             catch { }
             return isMouseOnTestButton; // 返回鼠标是否在测试按钮上
@@ -460,10 +460,10 @@ namespace Quicker
             bool isCtrlPressed = false; // 是否按下 Ctrl 键
             try
             {
-                this.Dispatcher.Invoke(() =>
+                this.Dispatcher.Invoke(new Action(() =>
                 {
                     isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 获取 Ctrl 键状态
-                }); // 获取 Ctrl 键状态
+                })); // 获取 Ctrl 键状态
             }
             catch { }
             return isCtrlPressed; // 返回 Ctrl 键状态
@@ -480,10 +480,10 @@ namespace Quicker
             bool ctrlDown = false; // 是否按下Ctrl键
             try
             {
-                this.Dispatcher.Invoke(() =>
+                this.Dispatcher.Invoke(new Action(() =>
                 {
                     ctrlDown = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 获取Ctrl键状态
-                });
+                }));
             }
             catch { }
             if (!ctrlDown)
@@ -752,7 +752,7 @@ namespace Quicker
         /// <param name="startTimer"> 是否启动计时器 </param>
         public void PreLoadMainWindow(bool startTimer = false)
         {
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.Invoke(new Action(() =>
             {
                 DateTime dateTime = DateTime.Now; // 获取当前时间
                 AppStateManager.KeyPressStartTime = dateTime; // 记录鼠标按下时间
@@ -767,13 +767,13 @@ namespace Quicker
                 AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden; // 隐藏主窗口
                 AppStateManager.Left = (float)AppStateManager.PreLoadMainWindow.Left; // 记录主窗口位置
                 AppStateManager.Top = (float)AppStateManager.PreLoadMainWindow.Top; // 记录主窗口位置
-            });
+            }));
         }
 
         // 关闭或显示主窗口
         public void CloseOrShowMainWindow()
         {
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.Invoke(new Action(() =>
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
@@ -787,7 +787,7 @@ namespace Quicker
                 else // 否则显示预加载窗口
                     AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible;
                 AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
-            });
+            }));
         }
 
         /// <summary>
