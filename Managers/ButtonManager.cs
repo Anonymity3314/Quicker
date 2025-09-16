@@ -698,6 +698,33 @@ namespace Quicker.Managers
                     break;
             }
         }
+        /*
+        /// <summary>
+        /// 打开任意由 BaseMenuWindow 派生的菜单
+        /// </summary>
+        /// <param name="sender">触发菜单的按钮</param>
+        /// <param name="menuKey">菜单在工厂中注册的 key</param>
+        /// <param name="owner">触发菜单的窗口（用于 Owner/坐标参考）</param>
+        /// <param name="tableName">表名</param>
+        public void OpenMenu(object sender, string menuKey, Window owner, string tableName)
+        {
+            if (sender is not Button btn) return;
+
+            // 如果菜单已打开，先关闭
+            var old = Application.Current.Windows
+                                  .OfType<BaseMenuWindow>()
+                                  .FirstOrDefault(w => w.GetType().Name == menuKey);
+            old?.CloseWithAnimation(); // 带动画关
+
+            // 创建新实例（工厂负责具体类型）
+            int btnId = int.Parse(btn.Name.Replace(tableName, ""));
+            var menu = MenuFactory.Create(menuKey, btnId, tableName, owner);
+
+            // 让菜单自己定位、自己管理动画/失焦
+            menu.Owner = owner; // 防止 owner 最小化时菜单还悬着
+            menu.ShowWithAnimation();   // 基类提供：淡入 → 显示
+        }
+         */
 
         /// <summary>
         /// 关闭面板窗口
@@ -820,4 +847,19 @@ namespace Quicker.Managers
                    (GetAsyncKeyState(VK_RCONTROL) & 0x8000) != 0;
         }
     }
+    /*
+    public static class MenuFactory
+    {
+        public static BaseMenuWindow Create(string key, int buttonId, string tableName, Window owner = null)
+        {
+            return key switch
+            {
+                "OperationMenu" => new OperationMenu(buttonId, tableName, owner),
+                "CreatActionMenu" => new CreatActionMenu(buttonId, tableName),
+                "SelectActionPageMenu" => new SelectActionPageMenu(),
+                _ => throw new ArgumentException($"未知菜单 {key}")
+            };
+        }
+    }
+     */
 }
