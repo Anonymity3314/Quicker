@@ -72,6 +72,8 @@ namespace Quicker
             InitializeTaskbar(); // 初始化托盘图标
             InitializeHookAsync(); // 初始化钩子
             ShowNotification(); // 弹出消息提醒
+
+            this.MainWindow = null; // 设置主窗口为null，避免应用程序在没有窗口时退出
         }
 
         // 初始化应用程序目录
