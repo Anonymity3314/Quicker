@@ -15,7 +15,7 @@ using System.IO;
 
 namespace Quicker.Windows.Menus
 {
-    public partial class CreatActionMenu : Window
+    public partial class CreatActionMenu : BaseMenuWindow
     {
         #region 字段和属性
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
@@ -24,7 +24,6 @@ namespace Quicker.Windows.Menus
         private bool hasChanged = false; // 是否已检查
         public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
-        public event Action? ClosingOrHiding; // 事件
         private bool haveAction = false; // 是否有动作
         private bool close = true; // 是否正在关闭
         private readonly IconManager iconManager = new(); // 图标管理器
@@ -36,15 +35,14 @@ namespace Quicker.Windows.Menus
             InitializeComponent();
             ButtonID = buttonID; // 设置当前按钮
             TableName = tableName; // 设置表名
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowTopmost(this); // 设置窗口置顶
+            base.SetWindowTopmost(); // 设置窗口置顶
         }
 
-        // 窗口加载时设置窗口位置
-        private void CreatActionMenu_Loaded(object sender, RoutedEventArgs e)
+        // 重写基类的窗口加载方法
+        protected override void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+            base.OnWindowLoaded(sender, e); // 调用基类方法处理动画
+            base.SetWindowPositionNearMouse(); // 设置窗口位置
             SetButtonVisbility(); // 设置按钮可见性
         }
         #endregion
@@ -122,7 +120,7 @@ namespace Quicker.Windows.Menus
                 MainGrid.Height -= 32; // 减少高度
                 Line1.Visibility = Visibility.Collapsed; // 隐藏分割线
                 PasteActionButton.Visibility = Visibility.Collapsed; // 隐藏粘贴按钮
-                Top -= 24; // 向上移动
+                base.Top -= 24; // 向上移动
                 hasChanged = !hasChanged;
             }
         }
@@ -171,7 +169,8 @@ namespace Quicker.Windows.Menus
             // 创建FormattedText的公共参数
             var typeface = GetTextTypeface(); // 字体信息
             var culture = CultureInfo.CurrentCulture; // 文化信息
-            var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this).PixelsPerDip; // DPI信息
+            // 获取系统DPI，避免类型转换问题
+            double dpi = GetSystemDpi(); // DPI信息
 
             // 计算完整文本的宽度
             string fullText = $"{prefix}{fileName}{suffix}"; // 构造完整文本
@@ -183,6 +182,27 @@ namespace Quicker.Windows.Menus
 
             // 文本过长，需要裁剪
             return TruncateFileName(fileName, prefix, suffix, maxTextWidth, typeface, culture, dpi);
+        }
+
+        /// <summary>
+        /// 获取系统DPI，避免类型转换问题
+        /// </summary>
+        /// <returns>DPI缩放因子</returns>
+        private double GetSystemDpi()
+        {
+            try
+            {
+                // 使用Graphics获取系统DPI
+                using (var graphics = System.Drawing.Graphics.FromHwnd(IntPtr.Zero))
+                {
+                    return graphics.DpiX / 96.0; // 96是标准DPI
+                }
+            }
+            catch
+            {
+                // 如果无法获取，返回默认值1.0
+                return 1.0;
+            }
         }
 
         /// <summary>
@@ -272,10 +292,10 @@ namespace Quicker.Windows.Menus
         // 粘贴动作
         private void PasteActionButton_Click(object sender, RoutedEventArgs e)
         {
-            Visibility = Visibility.Hidden; // 隐藏窗口
+            base.Visibility = Visibility.Hidden; // 隐藏窗口
             PasteAction(); // 粘贴动作
             UpdateUIAfterActionChange(); // 更新UI
-            Close(); // 关闭窗口
+            base.Close(); // 关闭窗口
         }
 
         // 粘贴动作
@@ -367,40 +387,40 @@ namespace Quicker.Windows.Menus
         private void StartApp(object sender, RoutedEventArgs e)
         {
             haveAction = true; // 有动作
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            base.HideMainWindow(); // 隐藏操作菜单窗口
             AddActionWindow addWindow = new(ButtonID, TableName, 1); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
-            buttonManager.CloseMainWindow(this); // 关闭主窗口
+            base.CloseMainWindow(); // 关闭主窗口
         }
 
         // 打开文件
         private void OpenFile(object sender, RoutedEventArgs e)
         {
             haveAction = true; // 有动作
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            base.HideMainWindow(); // 隐藏操作菜单窗口
             AddActionWindow addWindow = new(ButtonID, TableName, 2); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
-            buttonManager.CloseMainWindow(this); // 关闭主窗口
+            base.CloseMainWindow(); // 关闭主窗口
         }
 
         // 打开文件夹
         private void OpenFolder(object sender, RoutedEventArgs e)
         {
             haveAction = true; // 有动作
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            base.HideMainWindow(); // 隐藏操作菜单窗口
             AddActionWindow addWindow = new(ButtonID, TableName, 3); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
-            buttonManager.CloseMainWindow(this); // 关闭主窗口
+            base.CloseMainWindow(); // 关闭主窗口
         }
 
         // 打开网址
         private void OpenWebsite(object sender, RoutedEventArgs e)
         {
             haveAction = true; // 有动作
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            base.HideMainWindow(); // 隐藏操作菜单窗口
             AddActionWindow addWindow = new(ButtonID, TableName, 4); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
-            buttonManager.CloseMainWindow(this); // 关闭主窗口
+            base.CloseMainWindow(); // 关闭主窗口
         }
 
         // 创建打开文件动作
@@ -409,7 +429,7 @@ namespace Quicker.Windows.Menus
             if (buttonManager.CreateFileActionFromClipboard(ButtonID, TableName))
             {
                 UpdateUIAfterActionChange(); // 更新UI
-                Close(); // 关闭窗口
+                base.Close(); // 关闭窗口
             }
         }
 
@@ -467,36 +487,37 @@ namespace Quicker.Windows.Menus
                 db2.ImportJsonDataToList(TableName, openFileDialog.FileName, ButtonID); // 导入动作数据
             UpdateUIAfterActionChange(); // 更新UI
             close = true; // 关闭窗口
-            this.Close(); // 关闭窗口
+            base.Close(); // 关闭窗口
         }
 
         // 加载扩展
         private void LoadExtension(object sender, RoutedEventArgs e)
         {
             haveAction = true; // 有动作
-            buttonManager.HideMainWindow(this); // 隐藏操作菜单窗口
+            base.HideMainWindow(); // 隐藏操作菜单窗口
             AddActionWindow addWindow = new(ButtonID, TableName, 5); // 传递当前按钮和类型
             addWindow.Show(); // 显示窗口
-            buttonManager.CloseMainWindow(this); // 关闭主窗口
+            base.CloseMainWindow(); // 关闭主窗口
         }
         #endregion
 
         #region 窗口事件处理
-        // 失去焦点时隐藏
-        private void CreatActionMenu_Deactivated(object sender, EventArgs e)
+        // 重写基类的失焦处理方法
+        protected override void HandleDeactivated()
         {
             if (close) 
             {
-                ClosingOrHiding?.Invoke(); // 调用事件
                 if (!haveAction)
                 {
                     using var windowMananger = new WindowManager(); // 创建窗口管理器
                     windowMananger.SetMainWindowFocused(); // 关闭窗口
                 }
-                this.Visibility = Visibility.Hidden; // 隐藏窗口
-                using var windowManager = new WindowManager(); // 创建窗口管理器
-                windowManager.CloseMenuAsync(this); // 延时关闭窗口
+                // 使用基类的动画隐藏方法
+                base.HideWithAnimation();
+                _ = base.CloseMenuAsync(); // 延时关闭窗口（不等待）
             }
+            // 调用基类方法以触发ClosingOrHiding事件
+            base.HandleDeactivated();
         }
         #endregion
 
@@ -504,11 +525,9 @@ namespace Quicker.Windows.Menus
         // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 调用基类的 OnClosed 方法
-            ClosingOrHiding = null; // 清理事件
+            // 清理特定资源
             clipboardText = null; // 清理剪切板文本
             hasChanged = false; // 清理检查状态
-            clipboardText = null; // 清理剪切板文本
             buttonManager.Dispose(); // 释放按钮管理器
             ButtonID = 0; // 清理当前按钮
             TableName = null; // 清理表名
@@ -518,6 +537,8 @@ namespace Quicker.Windows.Menus
             GC.Collect(); // 强制垃圾回收
             GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
             GC.Collect(); // 再次强制垃圾回收
+
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
         }
         #endregion
     }

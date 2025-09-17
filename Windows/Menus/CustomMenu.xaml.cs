@@ -7,32 +7,32 @@ using System.IO;
 
 namespace Quicker.Windows.Menus
 {
-    public partial class CustomMenu : Window
+    public partial class CustomMenu : BaseMenuWindow
     {
         private readonly App app = (App.Current as App); // App实例
 
         public CustomMenu()
         {
             InitializeComponent();
-            this.Visibility = Visibility.Hidden; // 隐藏窗口
+            base.Visibility = Visibility.Hidden; // 隐藏窗口
         }
 
-        // 窗口加载完成后设置窗口位置
-        private void CustomMenu_Loaded(object sender, RoutedEventArgs e)
+        // 重写基类的窗口加载方法
+        protected override void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowBottomLeftNearMouse(this); // 设置窗口左下角在鼠标位置附近
+            base.OnWindowLoaded(sender, e); // 调用基类方法处理动画
+            base.SetWindowBottomLeftNearMouse(); // 使用基类方法设置窗口左下角在鼠标位置附近
         }
 
         // 弹出面板窗口
         private void ShowMainWindow(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(() =>
+            base.Dispatcher.Invoke(new Action(() =>
             {
                 app.PreLoadMainWindow(); // 调用App类中的PreLoadMainWindow方法
                 app.CloseOrShowMainWindow(); // 调用App类中的CloseOrShowMainWindow方法
-            }); // 调用Dispatcher.Invoke方法确保在主线程中执行
-            this.Visibility = Visibility.Hidden; // 隐藏当前窗口
+            })); // 调用Dispatcher.Invoke方法确保在主线程中执行
+            base.Visibility = Visibility.Hidden; // 隐藏当前窗口
         }
 
         // 弹出设置窗口
@@ -52,11 +52,11 @@ namespace Quicker.Windows.Menus
         // 暂停Quicker
         private void PauseQuicker(object sender, RoutedEventArgs e)
         {
-            this.Dispatcher.Invoke(() =>
+            base.Dispatcher.Invoke(new Action(() =>
             {
                 app.PauseQuicker(sender, e); // 调用App类中的PauseQuicker方法 
-            });
-            this.Visibility = Visibility.Hidden; // 隐藏当前窗口
+            }));
+            base.Visibility = Visibility.Hidden; // 隐藏当前窗口
         }
 
         // 重启应用
@@ -80,17 +80,20 @@ namespace Quicker.Windows.Menus
             app.Shutdown(); // 通过App类正确关闭应用，确保OnExit方法被调用
         }
 
-        // 失去焦点时关闭窗口
-        private void CustomMenu_Deactivated(object sender, EventArgs e)
+        // 重写基类的失焦处理方法
+        protected override void HandleDeactivated()
         {
-            this.Visibility = Visibility.Hidden; // 隐藏窗口
+            // 使用基类的动画隐藏方法
+            base.HideWithAnimation();
+            // 调用基类方法以触发ClosingOrHiding事件
+            base.HandleDeactivated();
         }
 
         // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 调用基类的 OnClosed 方法
             GC.Collect(); // 强制回收非托管资源
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
         }
     }
 }

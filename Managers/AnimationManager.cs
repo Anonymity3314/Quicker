@@ -1,17 +1,20 @@
 ﻿using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using System.Windows;
 
 namespace Quicker.Managers
 {
     public class AnimationManager
     {
-        private readonly TimeSpan _fadeDuration; // 淡出时长
+        private readonly TimeSpan _fadeInDuration; // 淡入时长
+        private readonly TimeSpan _fadeOutDuration; // 淡出时长
         private readonly Window _window; // 目标窗口
 
-        public AnimationManager(Window window, TimeSpan? fadeDuration = null)
+        public AnimationManager(Quicker.Windows.Menus.BaseMenuWindow menuWindow, TimeSpan? fadeInDuration = null, TimeSpan? fadeOutDuration = null)
         {
-            _fadeDuration = fadeDuration ?? TimeSpan.FromMilliseconds(200); // 默认淡出时长为200ms
-            _window = window;
+            _fadeInDuration = fadeInDuration ?? TimeSpan.FromMilliseconds(150); // 默认淡入时长150ms
+            _fadeOutDuration = fadeOutDuration ?? TimeSpan.FromMilliseconds(100); // 默认淡出时长100ms
+            _window = menuWindow;
         }
 
         /// <summary>
@@ -24,14 +27,14 @@ namespace Quicker.Managers
             {
                 From = 0,
                 To = 1,
-                Duration = new Duration(_fadeDuration),
+                Duration = new Duration(_fadeInDuration),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
 
-            if (completedCallback != null)
+            fadeInAnimation.Completed += (s, e) =>
             {
-                fadeInAnimation.Completed += (s, e) => completedCallback();
-            }
+                completedCallback?.Invoke();
+            };
 
             _window.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
         }
@@ -46,15 +49,14 @@ namespace Quicker.Managers
             {
                 From = 1,
                 To = 0,
-                Duration = new Duration(_fadeDuration),
+                Duration = new Duration(_fadeOutDuration),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
             };
 
             fadeOutAnimation.Completed += (s, e) =>
             {
                 completedCallback?.Invoke();
-                // 清除动画，防止影响后续操作
-                _window.BeginAnimation(UIElement.OpacityProperty, null);
+                _window.BeginAnimation(UIElement.OpacityProperty, null); // 清除动画，防止影响后续操作
             };
 
             _window.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
@@ -67,10 +69,10 @@ namespace Quicker.Managers
         {
             FadeOut(() =>
             {
-                _window.Dispatcher.BeginInvoke(() =>
+                _window.Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
                 {
                     _window.Close();
-                });
+                }));
             });
         }
     }

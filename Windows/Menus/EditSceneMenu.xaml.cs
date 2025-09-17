@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace Quicker.Windows.Menus
 {
-    public partial class EditSceneMenu : Window
+    public partial class EditSceneMenu : BaseMenuWindow
     {
         private string SceneTag { get; set; } // 场景标签
         public EditSceneMenu(string sceneTag)
@@ -13,10 +13,11 @@ namespace Quicker.Windows.Menus
             SceneTag = sceneTag; // 设置场景标签
         }
 
-        private void EditSceneMenu_Loaded(object sender, RoutedEventArgs e)
+        // 重写基类的窗口加载方法
+        protected override void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            WindowManager windowManager = new(); // 实例化窗口管理器
-            windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+            base.OnWindowLoaded(sender, e); // 调用基类方法处理动画
+            base.SetWindowPositionNearMouse(); // 设置窗口位置
         }
 
         // 点击按钮后打开编辑场景窗口
@@ -26,10 +27,13 @@ namespace Quicker.Windows.Menus
             editSceneWindow.ShowDialog(); // 显示编辑场景窗口
         }
 
-        // 点击空白处关闭菜单
-        private void EditSceneMenu_Deactivated(object sender, EventArgs e)
+        // 重写基类的失焦处理方法
+        protected override void HandleDeactivated()
         {
-            Close(); // 点击空白处关闭菜单
+            // 使用基类的动画关闭方法
+            base.CloseWithAnimation();
+            // 调用基类方法以触发ClosingOrHiding事件
+            base.HandleDeactivated();
         }
     }
 }

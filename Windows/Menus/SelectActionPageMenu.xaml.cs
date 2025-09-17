@@ -8,21 +8,20 @@ using Quicker.Models;
 
 namespace Quicker.Windows.Menus
 {
-    public partial class SelectActionPageMenu : Window
+    public partial class SelectActionPageMenu : BaseMenuWindow
     {
         private ActionPageDatabase db3 = new(); // 动作页数据库
-        public event Action? ClosingOrHiding; // 关闭或隐藏菜单事件
 
         public SelectActionPageMenu()
         {
             InitializeComponent();
         }
 
-        // 加载动作页切换按钮
-        private void SelectActionPageMenu_Loaded(object sender, RoutedEventArgs e)
+        // 重写基类的窗口加载方法
+        protected override void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.SetWindowPositionNearMouse(this); // 设置窗口位置
+            base.OnWindowLoaded(sender, e); // 调用基类方法处理动画
+            base.SetWindowPositionNearMouse(); // 设置窗口位置
 
             var sceneData = db3.GetAllSceneData(); // 获取所有场景数据
             foreach (var data in sceneData) // 遍历所有场景
@@ -45,7 +44,7 @@ namespace Quicker.Windows.Menus
         private void IncreaseMenuSize()
         {
             MainGrid.Height += 25;
-            Height += 25;
+            base.Height += 25;
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace Quicker.Windows.Menus
         {
             Button button = new()
             {
-                Style = FindResource("MenuButton") as Style, // 加载按钮样式
+                Style = (Style)base.FindResource("MenuButton"), // 加载按钮样式
                 ToolTip = data.SceneTag, // 设置按钮提示
                 Name = data.SceneTag, // 设置按钮名称
                 Tag = data.SceneName // 设置按钮标签
@@ -72,7 +71,7 @@ namespace Quicker.Windows.Menus
         /// <returns> 按钮图标 </returns>
         private Image GenerateImage(SceneData data)
         {
-            Image image = new() { Style = FindResource("SelectButtonImage") as Style }; // 生成按钮图标
+            Image image = new() { Style = (Style)base.FindResource("SelectButtonImage") }; // 生成按钮图标
             try
             {
                 image.Source = new BitmapImage(new Uri(data.SceneIconPath, UriKind.RelativeOrAbsolute)); // 设置按钮图标
@@ -95,7 +94,7 @@ namespace Quicker.Windows.Menus
         {
             TextBlock textBlock = new()
             {
-                Style = FindResource("MenuButtonTextBlock") as Style, // 加载按钮文字样式
+                Style = (Style)base.FindResource("MenuButtonTextBlock"), // 加载按钮文字样式
                 Text = db3.GetSceneTitle(data), // 设置按钮文字
             }; // 生成按钮文字
             return textBlock; // 返回文字
@@ -108,26 +107,26 @@ namespace Quicker.Windows.Menus
             MainWindow mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口
             if (mainWindow != null) // 如果主窗口存在
                 mainWindow.OnCommonStyleChanged(button.Name); // 切换动作页时更新样式
-            Close(); // 关闭菜单
+            base.Close(); // 关闭菜单
         }
 
-        // 失去焦点关闭窗口
-        private void SelectActionPageMenu_Deactivated(object sender, EventArgs e)
+        // 重写基类的失焦处理方法
+        protected override void HandleDeactivated()
         {
-            ClosingOrHiding?.Invoke(); // 调用关闭或隐藏事件处理器
             using var windowMananger = new WindowManager(); // 创建窗口管理器
             windowMananger.SetMainWindowFocused(); // 关闭窗口
-            Visibility = Visibility.Hidden; // 失去焦点关闭窗口
-            using var windowManager = new WindowManager(); // 创建窗口管理器
-            windowManager.CloseMenuAsync(this); // 延时关闭窗口
+            // 使用基类的动画隐藏方法
+            base.HideWithAnimation();
+            _ = base.CloseMenuAsync(); // 延时关闭窗口（不等待）
+            // 调用基类方法以触发ClosingOrHiding事件
+            base.HandleDeactivated();
         }
 
         // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 调用基类的 OnClosed 方法
-            ClosingOrHiding = null; // 清理事件处理器
             GC.Collect(); // 强制垃圾回收
+            base.OnClosed(e); // 调用基类的 OnClosed 方法
         }
     }
 }

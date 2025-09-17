@@ -11,6 +11,82 @@ namespace Quicker.Windows.Menus
     /// </summary>
     public abstract class BaseMenuWindow : Window
     {
+        #region 显式属性声明（确保继承关系正确）
+        /// <summary>
+        /// 窗口可见性
+        /// </summary>
+        public new Visibility Visibility
+        {
+            get => base.Visibility;
+            set => base.Visibility = value;
+        }
+
+        /// <summary>
+        /// 窗口顶部位置
+        /// </summary>
+        public new double Top
+        {
+            get => base.Top;
+            set => base.Top = value;
+        }
+
+        /// <summary>
+        /// 窗口高度
+        /// </summary>
+        public new double Height
+        {
+            get => base.Height;
+            set => base.Height = value;
+        }
+
+        /// <summary>
+        /// 窗口宽度
+        /// </summary>
+        public new double Width
+        {
+            get => base.Width;
+            set => base.Width = value;
+        }
+
+        /// <summary>
+        /// 窗口调度器
+        /// </summary>
+        public new Dispatcher Dispatcher => base.Dispatcher;
+
+        /// <summary>
+        /// 关闭窗口
+        /// </summary>
+        public new void Close()
+        {
+            base.Close();
+        }
+
+        /// <summary>
+        /// 显示窗口
+        /// </summary>
+        public new void Show()
+        {
+            base.Show();
+        }
+
+        /// <summary>
+        /// 激活窗口
+        /// </summary>
+        public new bool Activate()
+        {
+            return base.Activate();
+        }
+
+        /// <summary>
+        /// 查找资源
+        /// </summary>
+        public new object FindResource(object resourceKey)
+        {
+            return base.FindResource(resourceKey);
+        }
+
+        #endregion
+
         #region 动画与行为开关
         /// <summary>
         /// 是否启用淡入淡出动画
@@ -28,9 +104,14 @@ namespace Quicker.Windows.Menus
         protected TimeSpan DeactivatedDelay { get; set; } = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
-        /// 动画执行时长
+        /// 淡入动画时长
         /// </summary>
-        protected TimeSpan FadeDuration { get; set; } = TimeSpan.FromMilliseconds(200);
+        protected TimeSpan FadeInDuration { get; set; } = TimeSpan.FromMilliseconds(150);
+
+        /// <summary>
+        /// 淡出动画时长
+        /// </summary>
+        protected TimeSpan FadeOutDuration { get; set; } = TimeSpan.FromMilliseconds(100);
         #endregion
 
         #region 动画管理器（内置）
@@ -51,7 +132,7 @@ namespace Quicker.Windows.Menus
         protected BaseMenuWindow()
         {
             // 初始化动画管理器
-            AnimationManager = new AnimationManager(this, FadeDuration);
+            AnimationManager = new AnimationManager(this, FadeInDuration, FadeOutDuration);
 
             // 默认透明，等待淡入
             Opacity = 0;
@@ -82,11 +163,11 @@ namespace Quicker.Windows.Menus
             if (!CloseOnDeactivated) return;
 
             // 延迟执行，避免鼠标点击其他窗口时立即触发
-            Dispatcher.BeginInvoke(() =>
+            Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             {
                 if (!IsActive && CloseOnDeactivated)
                     HandleDeactivated();
-            }, DispatcherPriority.Render, DeactivatedDelay);
+            }));
         }
         #endregion
 
@@ -113,20 +194,84 @@ namespace Quicker.Windows.Menus
         {
             AnimationManager.FadeOut(() =>
             {
-                Dispatcher.BeginInvoke(() =>
+                Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
                 {
                     Visibility = Visibility.Hidden;
                     Opacity = 0; // 为下次淡入做准备
-                });
+                }));
             });
         }
 
         /// <summary>
         /// 带动画的关闭（淡出→真正Close）
         /// </summary>
-        protected void CloseWithAnimation()
+        public void CloseWithAnimation()
         {
             AnimationManager.CloseWithFade();
+        }
+        #endregion
+
+        #region 窗口管理包装方法
+        /// <summary>
+        /// 获取当前窗口的 Window 实例
+        /// </summary>
+        private Window GetWindowInstance()
+        {
+            return this as Window;
+        }
+
+        /// <summary>
+        /// 设置窗口置顶
+        /// </summary>
+        public void SetWindowTopmost()
+        {
+            using var windowManager = new WindowManager();
+            windowManager.SetWindowTopmost(GetWindowInstance());
+        }
+
+        /// <summary>
+        /// 设置窗口位置到鼠标附近
+        /// </summary>
+        public void SetWindowPositionNearMouse()
+        {
+            using var windowManager = new WindowManager();
+            windowManager.SetWindowPositionNearMouse(GetWindowInstance());
+        }
+
+        /// <summary>
+        /// 设置窗口左下角到鼠标附近
+        /// </summary>
+        public void SetWindowBottomLeftNearMouse()
+        {
+            using var windowManager = new WindowManager();
+            windowManager.SetWindowBottomLeftNearMouse(GetWindowInstance());
+        }
+
+        /// <summary>
+        /// 隐藏主窗口
+        /// </summary>
+        public void HideMainWindow()
+        {
+            var buttonManager = new ButtonManager();
+            buttonManager.HideMainWindow(GetWindowInstance());
+        }
+
+        /// <summary>
+        /// 关闭主窗口
+        /// </summary>
+        public void CloseMainWindow()
+        {
+            var buttonManager = new ButtonManager();
+            buttonManager.CloseMainWindow(GetWindowInstance());
+        }
+
+        /// <summary>
+        /// 延时关闭菜单
+        /// </summary>
+        public async Task CloseMenuAsync()
+        {
+            using var windowManager = new WindowManager();
+            await windowManager.CloseMenuAsync(GetWindowInstance());
         }
         #endregion
 
@@ -139,9 +284,6 @@ namespace Quicker.Windows.Menus
             // 释放动画管理器
             //AnimationManager?.Dispose();
             AnimationManager = null;
-
-            // 触发事件
-            ClosingOrHiding = null;
 
             base.OnClosed(e);
         }

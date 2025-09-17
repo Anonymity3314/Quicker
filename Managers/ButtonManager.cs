@@ -641,7 +641,7 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 打开指定菜单
+        /// 打开指定菜单（统一管理所有菜单的打开）
         /// </summary>
         /// <param name="sender"> 触发菜单的按钮 </param>
         /// <param name="targetMenu"> 要打开的菜单名称 </param>
@@ -649,82 +649,60 @@ namespace Quicker.Managers
         /// <param name="tableName"> 表名 </param>
         public void OpenMenu(object sender, string targetMenu, Window sourceWindow, string tableName)
         {
-            Window menu = null; // 菜单窗口
-            Button button = sender as Button; // 获取触发菜单的按钮
-            Point mousePosition = Mouse.GetPosition(sourceWindow); // 获取鼠标位置
+            if (sender is not Button button) return; // 确保发送者是按钮
+
             bool isMainWindow = sourceWindow is MainWindow || sourceWindow is SearchWindow; // 是否为主窗口
             if (isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
-            switch (targetMenu)
+
+            // 如果菜单已打开，先关闭（使用基类的动画关闭）
+            var existingMenu = Application.Current.Windows
+                .OfType<BaseMenuWindow>()
+                .FirstOrDefault(w => w.GetType().Name == targetMenu);
+            existingMenu?.CloseWithAnimation();
+
+            // 创建新菜单实例
+            Window menuWindow = CreateMenuInstance(targetMenu, button, tableName, sourceWindow);
+            if (menuWindow == null) return;
+            
+            BaseMenuWindow menu = menuWindow as BaseMenuWindow;
+            if (menu == null) return;
+
+            // 设置菜单属性
+            menu.Owner = sourceWindow; // 防止 owner 最小化时菜单还悬着
+
+            // 为主窗口菜单绑定关闭事件
+            if (isMainWindow)
             {
-                case "OperationMenu":
-                    OperationMenu operationMenu = Application.Current.Windows.OfType<OperationMenu>().FirstOrDefault(); // 查找现有的操作菜单
-                    operationMenu?.Close(); // 关闭操作菜单
-                    operationMenu = new(int.Parse(button.Name.Replace(tableName, "")), tableName, sourceWindow); // 设置菜单位置
-                    if (isMainWindow)
-                    {
-                        operationMenu.ClosingOrHiding += () =>
-                        {
-                            isClosing = false; // 关闭标志
-                        }; // 关闭或隐藏操作菜单事件
-                    } // 如果是主窗口
-                    operationMenu.Show(); // 显示操作菜单
-                    break;
-                case "CreatActionMenu":
-                    CreatActionMenu creatActionMenu = Application.Current.Windows.OfType<CreatActionMenu>().FirstOrDefault(); // 查找现有的创建动作菜单
-                    creatActionMenu?.Close(); // 关闭创建动作菜单
-                    creatActionMenu = new(int.Parse(button.Name.Replace(tableName, "")), tableName); // 设置菜单位置
-                    if (isMainWindow)
-                    {
-                        creatActionMenu.ClosingOrHiding += () =>
-                        {
-                            isClosing = false; // 关闭标志
-                        }; // 关闭或隐藏创建动作菜单事件
-                    } // 如果是主窗口
-                    creatActionMenu.Show(); // 显示创建动作菜单
-                    break;
-                case "SelectActionPageMenu":
-                    SelectActionPageMenu selectActionPageMenu = Application.Current.Windows.OfType<SelectActionPageMenu>().FirstOrDefault(); // 查找现有的选择动作页菜单
-                    selectActionPageMenu?.Close();
-                    selectActionPageMenu = new()
-                    {
-                        Left = mousePosition.X,
-                        Top = mousePosition.Y
-                    };
-                    selectActionPageMenu.ClosingOrHiding += () =>
-                    {
-                        isClosing = false;
-                    };
-                    selectActionPageMenu.Show();
-                    break;
+                menu.ClosingOrHiding += new Action(() =>
+                {
+                    isClosing = false; // 重置关闭标志
+                });
             }
+
+            // 显示菜单（基类会自动处理动画）
+            menu.Show();
         }
-        /*
+
         /// <summary>
-        /// 打开任意由 BaseMenuWindow 派生的菜单
+        /// 创建菜单实例的工厂方法
         /// </summary>
-        /// <param name="sender">触发菜单的按钮</param>
-        /// <param name="menuKey">菜单在工厂中注册的 key</param>
-        /// <param name="owner">触发菜单的窗口（用于 Owner/坐标参考）</param>
+        /// <param name="menuType">菜单类型</param>
+        /// <param name="button">触发按钮</param>
         /// <param name="tableName">表名</param>
-        public void OpenMenu(object sender, string menuKey, Window owner, string tableName)
+        /// <param name="sourceWindow">源窗口</param>
+        /// <returns>菜单实例</returns>
+        private Window CreateMenuInstance(string menuType, Button button, string tableName, Window sourceWindow)
         {
-            if (sender is not Button btn) return;
-
-            // 如果菜单已打开，先关闭
-            var old = Application.Current.Windows
-                                  .OfType<BaseMenuWindow>()
-                                  .FirstOrDefault(w => w.GetType().Name == menuKey);
-            old?.CloseWithAnimation(); // 带动画关
-
-            // 创建新实例（工厂负责具体类型）
-            int btnId = int.Parse(btn.Name.Replace(tableName, ""));
-            var menu = MenuFactory.Create(menuKey, btnId, tableName, owner);
-
-            // 让菜单自己定位、自己管理动画/失焦
-            menu.Owner = owner; // 防止 owner 最小化时菜单还悬着
-            menu.ShowWithAnimation();   // 基类提供：淡入 → 显示
+            return menuType switch
+            {
+                "OperationMenu" => new OperationMenu(int.Parse(button.Name.Replace(tableName, "")), tableName, sourceWindow),
+                "CreatActionMenu" => new CreatActionMenu(int.Parse(button.Name.Replace(tableName, "")), tableName),
+                "SelectActionPageMenu" => new SelectActionPageMenu(),
+                "CustomMenu" => new CustomMenu(),
+                "EditSceneMenu" => new EditSceneMenu(tableName), // 假设需要场景标签
+                _ => throw new ArgumentException($"未知菜单类型: {menuType}")
+            };
         }
-         */
 
         /// <summary>
         /// 关闭面板窗口
@@ -847,19 +825,4 @@ namespace Quicker.Managers
                    (GetAsyncKeyState(VK_RCONTROL) & 0x8000) != 0;
         }
     }
-    /*
-    public static class MenuFactory
-    {
-        public static BaseMenuWindow Create(string key, int buttonId, string tableName, Window owner = null)
-        {
-            return key switch
-            {
-                "OperationMenu" => new OperationMenu(buttonId, tableName, owner),
-                "CreatActionMenu" => new CreatActionMenu(buttonId, tableName),
-                "SelectActionPageMenu" => new SelectActionPageMenu(),
-                _ => throw new ArgumentException($"未知菜单 {key}")
-            };
-        }
-    }
-     */
 }

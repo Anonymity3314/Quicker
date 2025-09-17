@@ -124,6 +124,15 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 将菜单窗口置顶
+        /// </summary>
+        /// <param name="menuWindow"> 菜单窗口对象 </param>
+        public void SetWindowTopmost(Quicker.Windows.Menus.BaseMenuWindow menuWindow)
+        {
+            SetWindowTopmost((Window)menuWindow);
+        }
+
+        /// <summary>
         /// 尝试打开已经存在的窗口
         /// </summary>
         /// <param name="windowTitle"> 窗口标题 </param>
@@ -270,6 +279,12 @@ namespace Quicker.Managers
             window.Close(); // 关闭窗口
         }
 
+        // 延时关闭菜单窗口
+        public async Task CloseMenuAsync(Quicker.Windows.Menus.BaseMenuWindow menuWindow)
+        {
+            await CloseMenuAsync((Window)menuWindow);
+        }
+
         /// <summary>
         /// 获取鼠标位置并设置窗口位置
         /// </summary>
@@ -293,6 +308,15 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 将菜单窗口定位到鼠标位置附近
+        /// </summary>
+        /// <param name="menuWindow"> 要定位的菜单窗口 </param>
+        public void SetWindowPositionNearMouse(Quicker.Windows.Menus.BaseMenuWindow menuWindow)
+        {
+            SetWindowPositionNearMouse((Window)menuWindow);
+        }
+
+        /// <summary>
         /// 将窗口左下角定位到鼠标位置附近
         /// </summary>
         /// <param name="window"> 要定位的窗口 </param>
@@ -305,6 +329,15 @@ namespace Quicker.Managers
             int top = cursorPos.Y - 290; // 窗口上边界（鼠标Y坐标减去窗口高度）
 
             SetWindowPosition(window, left, top); // 设置窗口位置
+        }
+
+        /// <summary>
+        /// 将菜单窗口左下角定位到鼠标位置附近
+        /// </summary>
+        /// <param name="menuWindow"> 要定位的菜单窗口 </param>
+        public void SetWindowBottomLeftNearMouse(Quicker.Windows.Menus.BaseMenuWindow menuWindow)
+        {
+            SetWindowBottomLeftNearMouse((Window)menuWindow);
         }
 
         /// <summary>
