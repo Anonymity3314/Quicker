@@ -14,7 +14,6 @@ namespace Quicker.Windows.Menus
         public CustomMenu()
         {
             InitializeComponent();
-            base.Visibility = Visibility.Hidden; // 隐藏窗口
         }
 
         // 重写基类的窗口加载方法
@@ -83,16 +82,18 @@ namespace Quicker.Windows.Menus
         // 重写基类的失焦处理方法
         protected override void HandleDeactivated()
         {
-            // 使用基类的动画隐藏方法
-            base.HideWithAnimation();
-            // 调用基类方法以触发ClosingOrHiding事件
-            base.HandleDeactivated();
+            CloseWithAnimation(); // 使用动画关闭窗口，真正释放资源
+            base.HandleDeactivated(); // 调用基类方法以触发ClosingOrHiding事件
         }
 
         // 关闭窗口前释放资源
         protected override void OnClosed(EventArgs e)
-        {
-            GC.Collect(); // 强制回收非托管资源
+        {            
+            // 强制垃圾回收，确保资源及时释放
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            
             base.OnClosed(e); // 调用基类的 OnClosed 方法
         }
     }

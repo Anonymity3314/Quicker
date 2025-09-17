@@ -70,6 +70,18 @@ namespace Quicker.Windows.Menus
         }
 
         /// <summary>
+        /// 显示窗口并执行淡入动画
+        /// </summary>
+        public void ShowWithAnimation()
+        {
+            base.Show();
+            if (UseAnimation)
+                AnimationManager.FadeIn();
+            else
+                Opacity = 1;
+        }
+
+        /// <summary>
         /// 激活窗口
         /// </summary>
         public new bool Activate()
