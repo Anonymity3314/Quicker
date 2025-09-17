@@ -45,16 +45,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             InitializeComponent(); // 初始化窗口组件
             this.DataContext = new MainWindowViewModel();
             var vm = this.DataContext as MainWindowViewModel; // 只初始化时设置一次背景图片
-            SetBackgroundImage(vm.BackgroundImagePath); // 设置背景图片
-        }
-
-        /// <summary>
-        /// 设置背景图片
-        /// </summary>
-        /// <param name="path"> 图片路径 </param>
-        private void SetBackgroundImage(string path)
-        {
-            iconManager.SetImageWithGifSupport(BackgroundImage, path);
+            iconManager.SetImageWithGifSupport(BackgroundImage, vm.BackgroundImagePath); // 设置背景图片
         }
 
         /// <summary>

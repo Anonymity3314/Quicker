@@ -20,11 +20,13 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
             佛祖保佑       永无BUG
 */
+using KeyboardHookEventArgs = SharpHook.KeyboardHookEventArgs;
 using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
-using Keyboard = System.Windows.Input.Keyboard;
+using MouseHookEventArgs = SharpHook.MouseHookEventArgs;
+using MouseButton = SharpHook.Data.MouseButton;
 using Quicker.Windows.MainWindows.MainWindow;
 using Hardcodet.Wpf.TaskbarNotification;
-using Key = System.Windows.Input.Key;
+using KeyCode = SharpHook.Data.KeyCode;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Database.Upgrade;
@@ -38,6 +40,8 @@ using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Helpers;
 using System.Windows;
+using SharpHook.Data;
+using SharpHook;
 using System.IO;
 
 namespace Quicker
@@ -48,14 +52,13 @@ namespace Quicker
         private const string DEFAULT_STYLE = "common";
         private const string TASKBAR_STYLE = "taskbar";
         private const string DESKTOP_STYLE = "desktop";
-        
+
         private Action<string, string> _trayIconChangedHandler; // 托盘图标改变事件
-        private GlobalHookHelper _globalHook = new(); // 全局钩子
         private string _previewRunningPath; // 预览运行图标路径
         private string _previewPausedPath; // 预览暂停图标路径
+        private TaskPoolGlobalHook? hook; // 全局钩子
         private TaskbarIcon? taskbarIcon; // 托盘图标
-
-        private bool _ctrlDown; // 控制键是否按下
+       
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -67,7 +70,7 @@ namespace Quicker
             RestoreGlobalFontFamilyFromDatabase(); // 恢复全局字体设置
             InitializeTimer(); // 初始化定时器
             InitializeTaskbar(); // 初始化托盘图标
-            InitializeHook(); // 初始化钩子
+            InitializeHookAsync(); // 初始化钩子
             ShowNotification(); // 弹出消息提醒
         }
 
@@ -268,101 +271,80 @@ namespace Quicker
         }
 
         // 初始化钩子
-        private void InitializeHook()
+        private async Task InitializeHookAsync()
         {
-            _globalHook = new GlobalHookHelper();
-            _globalHook.KeyboardEvent += GlobalHook_KeyboardEvent;
-            _globalHook.MouseEvent += GlobalHook_MouseEvent;
-            _globalHook.Start();
+            hook = new(); // 创建钩子
+            hook.KeyPressed += Hook_KeyPressed; // 按键按下事件
+            hook.KeyReleased += Hook_KeyReleased; // 按键松开事件
+            hook.MousePressed += Hook_MousePressed; // 鼠标按下事件
+            hook.MouseReleased += Hook_MouseReleased; // 鼠标松开事件
+            await hook.RunAsync().ConfigureAwait(false); // 启动钩子
         }
 
-        // 处理鼠标事件
-        private void GlobalHook_MouseEvent(object sender, GlobalMouseEventArgs e)
+        /// <summary>
+        /// 触发按键按下事件
+        /// 供 GlobalHookHelper 手动触发
+        /// </summary>
+        /// <param name="btn"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void RaiseMousePressed(MouseButton btn, int x, int y)
         {
             if (!CanProcessHook()) return;
+            var openMainWindowConditions = AppStateManager.OpenMainWindowConditions;
+            if (GetCtrlKeyState() &&
+                ((btn == MouseButton.Button2 && openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick) ||
+                (btn == MouseButton.Button3 && openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick)))
+            {
+                CloseOrShowMainWindow();
+                return;
+            }
+            if (AppStateManager.MousePressStartTime.HasValue) return;
+            ProcessMouseButtonPress(btn, openMainWindowConditions);
+        }
 
+        // 鼠标按下事件
+        private void Hook_MousePressed(object? sender, MouseHookEventArgs e)
+        {
+            if (!CanProcessHook()) return; // 如果不能处理钩子，返回
             // 优先处理Ctrl+鼠标的情况
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
             if (GetCtrlKeyState() &&
-                ((e.Button == MouseButton.Right && openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick) ||
-                (e.Button is MouseButton.Middle && openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick)))
+                ((e.Data.Button == MouseButton.Button2 && openMainWindowConditions.OpenMainWindowByCtrl_RightMouseClick) ||
+                (e.Data.Button == MouseButton.Button3 && openMainWindowConditions.OpenMainWindowByCtrl_MiddleMouseClick)))
             {
-                e.Handled = true; // 阻止事件传递到系统
-                CloseOrShowMainWindow(); // 执行Quicker功能
+                CloseOrShowMainWindow();
                 return;
             }
 
-            switch (e.EventType)
-            {
-                case MouseEventType.ButtonDown:
-                    ProcessMouseButtonDown(e.Button);
-                    break; // 处理鼠标按下
-                case MouseEventType.ButtonUp:
-                    ProcessMouseButtonUp(e.Button);
-                    break; // 处理鼠标释放
-            }
+            // 其他情况
+            if (AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间已记录，返回
+            ProcessMouseButtonPress(e.Data.Button, openMainWindowConditions); // 处理鼠标按下事件
         }
 
-        /// <summary>
-        /// 处理鼠标按下事件
-        /// </summary>
-        /// <param name="button"> 鼠标按键 </param>
-        private void ProcessMouseButtonDown(MouseButton button)
-        {
-            if (!AppStateManager.MousePressStartTime.HasValue)
-            {
-                var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
-                ProcessMouseButtonPress(button, openMainWindowConditions); // 处理鼠标按下事件
-            }
-        }
-
-        /// <summary>
-        /// 处理鼠标抬起事件
-        /// </summary>
-        /// <param name="button"> 鼠标按键 </param>
-        private void ProcessMouseButtonUp(MouseButton button)
+        // 鼠标松开事件
+        private async void Hook_MouseReleased(object? sender, MouseHookEventArgs e)
         {
             AppStateManager.PressTimer?.Stop(); // 停止计时器
             if (!AppStateManager.MousePressStartTime.HasValue) return; // 如果鼠标按下时间未记录，返回
-
+            var pressDuration = GetMousePressDuration(); // 获取鼠标按下时间
             var conventions = AppStateManager.Conventions; // 获取设置
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
-            TimeSpan pressDuration = GetMousePressDuration(); // 获取鼠标按下时间
-            ProcessMouseButtonRelease(button, openMainWindowConditions, conventions, pressDuration); // 处理鼠标松开事件
+            ProcessMouseButtonRelease(e.Data.Button, openMainWindowConditions, conventions, pressDuration); // 处理鼠标松开事件
         }
 
-        // 处理键盘事件
-        private void GlobalHook_KeyboardEvent(object sender, GlobalKeyboardEventArgs e)
+        // 按键按下事件
+        private void Hook_KeyPressed(object sender, KeyboardHookEventArgs e)
         {
-            if (!CanProcessHook()) return;
-            switch (e.EventType)
-            {
-                case KeyboardEventType.KeyDown:
-                    ProcessKeyBoardDown(e.KeyCode);
-                    break; // 处理按键按下
-                case KeyboardEventType.KeyUp:
-                    ProcessKeyBoardUp(e.KeyCode);
-                    break; // 处理按键释放
-            }
-        }
-
-        /// <summary>
-        /// 处理按钮按下事件
-        /// </summary>
-        /// <param name="keyCode"> 键 </param>
-        private void ProcessKeyBoardDown(int keyCode)
-        {
+            if (!CanProcessHook()) return; // 如果不能处理钩子，返回
             if (AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键已经记录，返回
 
             var openMainWindowConditions = AppStateManager.OpenMainWindowConditions; // 获取设置
-            ProcessControlKeyPress(keyCode, openMainWindowConditions); // 处理按键按下事件
+            ProcessControlKeyPress(e.Data.KeyCode, openMainWindowConditions); // 处理按键按下事件
         }
 
-        /// <summary>
-        /// 处理按钮释放事件
-        /// </summary>
-        /// <param name="keyCode"> 键 </param>
-        private void ProcessKeyBoardUp(int keyCode)
+        // 按键松开事件
+        private void Hook_KeyReleased(object sender, KeyboardHookEventArgs e)
         {
             if (!AppStateManager.KeyPressStartTime.HasValue) return; // 如果按键时间未记录，返回
             var conventions = AppStateManager.Conventions; // 获取设置
@@ -370,7 +352,7 @@ namespace Quicker
             TimeSpan pressDuration = GetKeyPressDuration(); // 获取按键按下时间
 
             if (!IsOtherKeyDown())// 如果没有除Ctrl以外的其他按键被按下，处理按键松开事件
-                ProcessControlKeyRelease(keyCode, openMainWindowConditions, conventions, pressDuration); // 处理按键松开事件
+                ProcessControlKeyRelease(e.Data.KeyCode, openMainWindowConditions, conventions, pressDuration); // 处理按键松开事件
         }
 
         /// <summary>
@@ -527,16 +509,16 @@ namespace Quicker
         {
             switch (button)
             {
-                case MouseButton.Right:
+                case MouseButton.Button2:
                     ProcessRightMouseButtonPress(conditions);
                     break; // 右键按下
-                case MouseButton.Middle:
+                case MouseButton.Button3:
                     ProcessMiddleMouseButtonPress(conditions);
                     break; // 中键按下
-                case MouseButton.XButton1:
+                case MouseButton.Button4:
                     ProcessX1MouseButtonPress(conditions);
                     break; // X1鼠标按下
-                case MouseButton.XButton2:
+                case MouseButton.Button5:
                     ProcessX2MouseButtonPress(conditions);
                     break; // X2鼠标按下
             }
@@ -610,11 +592,11 @@ namespace Quicker
         {
             switch (button)
             {
-                case MouseButton.Right:
+                case MouseButton.Button3:
                     ProcessMiddleMouseButtonRelease(conditions, conventions, pressDuration);
                     break; // 中键松开
-                case MouseButton.XButton1:
-                case MouseButton.XButton2:
+                case MouseButton.Button4:
+                case MouseButton.Button5:
                     ProcessXMouseButtonRelease(conditions, conventions, pressDuration);
                     break; // X鼠标松开
             }
@@ -656,10 +638,10 @@ namespace Quicker
         /// </summary>
         /// <param name="keyCode"> 按键代码 </param>
         /// <param name="conditions"> 设置 </param>
-        private void ProcessControlKeyPress(int keyCode, OpenMainWindow conditions)
+        private void ProcessControlKeyPress(KeyCode keyCode, OpenMainWindow conditions)
         {
-            Key key = KeyInterop.KeyFromVirtualKey(keyCode); // 获取按键
-            if ((key == Key.LeftCtrl || key == Key.RightCtrl) &&
+            if ((keyCode == KeyCode.VcLeftControl ||
+                 keyCode == KeyCode.VcRightControl) &&
                 (conditions.OpenMainWindowByCtrl_MiddleMouseClick ||
                  conditions.OpenMainWindowByCtrl_RightMouseClick ||
                  conditions.OpenMainWindowByCtrl))
@@ -675,10 +657,10 @@ namespace Quicker
         /// <param name="conditions"> 设置 </param>
         /// <param name="conventions"> 设置 </param>
         /// <param name="pressDuration"> 按键按下时间 </param>
-        private void ProcessControlKeyRelease(int keyCode, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
+        private void ProcessControlKeyRelease(KeyCode keyCode, OpenMainWindow conditions, Convention conventions, TimeSpan pressDuration)
         {
-            Key key = KeyInterop.KeyFromVirtualKey(keyCode); // 获取按键
-            if ((key == Key.LeftCtrl || key == Key.RightCtrl) &&
+            if ((keyCode == KeyCode.VcLeftControl ||
+                 keyCode == KeyCode.VcRightControl) &&
                 conditions.OpenMainWindowByCtrl &&
                 pressDuration.TotalMilliseconds <= conventions.LongPressThreshold)
             {
@@ -709,9 +691,9 @@ namespace Quicker
 
             string processName = windowManager.GetProcessName(); // 获取进程名称
             var blacklistApplications = AppStateManager.BlacklistApplications; // 获取设置
-            
+
             if (blacklistApplications.Count == 0) return true;
-            
+
             return !blacklistApplications.Any(p => p.ProcessName == processName && !p.IsInBlacklist);
         }
 
@@ -912,8 +894,9 @@ namespace Quicker
             using var toast = new ToastManager(); // 消息提醒管理器
             try
             {
-                _globalHook?.Stop();
-                if (AppStateManager.Pause) InitializeHook(); // 重新初始化钩子
+                hook?.Dispose(); // 销毁当前钩子
+                hook = null; // 清空钩子
+                if (AppStateManager.Pause) InitializeHookAsync(); // 重新初始化钩子
             }
             catch
             {
@@ -958,8 +941,15 @@ namespace Quicker
         // 释放钩子绑定的事件
         private void DisposeHook()
         {
-            _globalHook?.Dispose();
-            _globalHook = null;
+            if (hook != null)
+            {
+                hook.MouseReleased -= Hook_MouseReleased; // 移除鼠标松开事件处理器
+                hook.MousePressed -= Hook_MousePressed; // 移除鼠标按下事件处理器
+                hook.KeyReleased -= Hook_KeyReleased; // 移除按键松开事件处理器
+                hook.KeyPressed -= Hook_KeyPressed; // 移除按键按下事件处理器
+                hook.Dispose(); // 释放钩子
+                hook = null; // 清空钩子
+            }
         }
     }
 }
