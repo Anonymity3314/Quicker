@@ -654,12 +654,6 @@ namespace Quicker.Managers
             bool isMainWindow = sourceWindow is MainWindow || sourceWindow is SearchWindow; // 是否为主窗口
             if (isMainWindow) isClosing = true; // 如果是主窗口，设置关闭标志
 
-            // 如果菜单已打开，先关闭（使用基类的动画关闭）
-            var existingMenu = Application.Current.Windows
-                .OfType<BaseMenuWindow>()
-                .FirstOrDefault(w => w.GetType().Name == targetMenu);
-            existingMenu?.CloseWithAnimation();
-
             // 创建新菜单实例
             Window menuWindow = CreateMenuInstance(targetMenu, button, tableName, sourceWindow);
             if (menuWindow == null) return;
@@ -667,11 +661,7 @@ namespace Quicker.Managers
             BaseMenuWindow menu = menuWindow as BaseMenuWindow;
             if (menu == null) return;
 
-            // 设置菜单属性
-            menu.Owner = sourceWindow; // 防止 owner 最小化时菜单还悬着
-
-            // 为主窗口菜单绑定关闭事件
-            if (isMainWindow)
+            if (isMainWindow) // 为主窗口菜单绑定关闭事件
             {
                 menu.ClosingOrHiding += new Action(() =>
                 {
@@ -679,8 +669,7 @@ namespace Quicker.Managers
                 });
             }
 
-            // 显示菜单（基类会自动处理动画）
-            menu.Show();
+            menu.Show(); // 显示菜单（基类会自动处理动画）
         }
 
         /// <summary>

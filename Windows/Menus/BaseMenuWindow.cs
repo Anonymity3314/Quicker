@@ -99,11 +99,6 @@ namespace Quicker.Windows.Menus
         protected bool CloseOnDeactivated { get; set; } = true;
 
         /// <summary>
-        /// 失焦检测延迟
-        /// </summary>
-        protected TimeSpan DeactivatedDelay { get; set; } = TimeSpan.FromMilliseconds(100);
-
-        /// <summary>
         /// 淡入动画时长
         /// </summary>
         protected TimeSpan FadeInDuration { get; set; } = TimeSpan.FromMilliseconds(150);
@@ -112,6 +107,17 @@ namespace Quicker.Windows.Menus
         /// 淡出动画时长
         /// </summary>
         protected TimeSpan FadeOutDuration { get; set; } = TimeSpan.FromMilliseconds(100);
+
+        /// <summary>
+        /// 菜单创建时间，用于防止新菜单立即被关闭
+        /// </summary>
+        private readonly DateTime _creationTime = DateTime.Now;
+
+        /// <summary>
+        /// 最小显示时间（毫秒），防止菜单转瞬即逝
+        /// 这个时间应该大于淡入动画时长，确保动画完成前菜单不会被关闭
+        /// </summary>
+        protected int MinDisplayTimeMs { get; set; } = 250;
         #endregion
 
         #region 动画管理器（内置）
@@ -140,6 +146,9 @@ namespace Quicker.Windows.Menus
             // 注册生命周期事件
             Loaded += OnWindowLoaded;
             Deactivated += OnWindowDeactivated;
+
+            // 注册到菜单管理器
+            MenuManager.RegisterMenu(this);
         }
         #endregion
 
@@ -166,7 +175,21 @@ namespace Quicker.Windows.Menus
             Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             {
                 if (!IsActive && CloseOnDeactivated)
-                    HandleDeactivated();
+                {
+                    // 检查菜单是否已经显示了足够长的时间
+                    var displayTime = DateTime.Now - _creationTime;
+                    if (displayTime.TotalMilliseconds < MinDisplayTimeMs)
+                    {
+                        // 菜单显示时间太短，不关闭
+                        return;
+                    }
+
+                    // 检查焦点是否真的离开了所有菜单
+                    if (!MenuManager.IsFocusOnMenu())
+                    {
+                        HandleDeactivated();
+                    }
+                }
             }));
         }
         #endregion
@@ -280,6 +303,9 @@ namespace Quicker.Windows.Menus
         {
             Loaded -= OnWindowLoaded;
             Deactivated -= OnWindowDeactivated;
+
+            // 从菜单管理器中注销
+            MenuManager.UnregisterMenu(this);
 
             // 释放动画管理器
             //AnimationManager?.Dispose();
