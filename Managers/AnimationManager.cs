@@ -12,8 +12,8 @@ namespace Quicker.Managers
 
         public AnimationManager(Quicker.Windows.Menus.BaseMenuWindow menuWindow, TimeSpan? fadeInDuration = null, TimeSpan? fadeOutDuration = null)
         {
-            _fadeInDuration = fadeInDuration ?? TimeSpan.FromMilliseconds(150); // 默认淡入时长150ms
-            _fadeOutDuration = fadeOutDuration ?? TimeSpan.FromMilliseconds(100); // 默认淡出时长100ms
+            _fadeInDuration = fadeInDuration ?? TimeSpan.FromMilliseconds(100); // 默认淡入时长100ms
+            _fadeOutDuration = fadeOutDuration ?? TimeSpan.FromMilliseconds(50); // 默认淡出时长50ms
             _window = menuWindow;
         }
 

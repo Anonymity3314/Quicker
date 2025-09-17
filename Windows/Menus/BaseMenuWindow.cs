@@ -113,12 +113,12 @@ namespace Quicker.Windows.Menus
         /// <summary>
         /// 淡入动画时长
         /// </summary>
-        protected TimeSpan FadeInDuration { get; set; } = TimeSpan.FromMilliseconds(150);
+        protected TimeSpan FadeInDuration { get; set; } = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// 淡出动画时长
         /// </summary>
-        protected TimeSpan FadeOutDuration { get; set; } = TimeSpan.FromMilliseconds(100);
+        protected TimeSpan FadeOutDuration { get; set; } = TimeSpan.FromMilliseconds(50);
 
         /// <summary>
         /// 菜单创建时间，用于防止新菜单立即被关闭
