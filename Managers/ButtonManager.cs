@@ -11,6 +11,7 @@ using Quicker.Windows;
 using System.Windows;
 using Quicker.Models;
 using WpfAnimatedGif;
+using Quicker.Extend;
 using System.IO;
 
 namespace Quicker.Managers
@@ -670,6 +671,114 @@ namespace Quicker.Managers
             }
 
             menu.Show(); // 显示菜单（基类会自动处理动画）
+        }
+
+        /// <summary>
+        /// 加载扩展模块实例
+        /// </summary>
+        /// <param name="button">触发按钮</param>
+        /// <returns>扩展模块实例，如果加载失败返回null</returns>
+        private IExtensionModule LoadExtensionModule(Button button)
+        {
+            try
+            {
+                if (button.Tag is not ButtonData buttonData || buttonData.ActionType != "LoadExtension")
+                    return null;
+
+                if (string.IsNullOrEmpty(buttonData.Location) || !File.Exists(buttonData.Location))
+                    return null;
+
+                // 加载扩展DLL
+                var assembly = System.Reflection.Assembly.LoadFrom(buttonData.Location);
+                
+                // 查找扩展模块类型
+                var moduleType = assembly.GetTypes()
+                    .FirstOrDefault(t => typeof(IExtensionModule).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+                if (moduleType == null)
+                    return null;
+
+                return (IExtensionModule)Activator.CreateInstance(moduleType); // 创建扩展模块实例
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 检查扩展是否支持右键菜单
+        /// </summary>
+        /// <param name="button">触发按钮</param>
+        /// <returns>是否支持右键菜单</returns>
+        public bool CheckExtensionHasContextMenu(Button button)
+        {
+            var extensionModule = LoadExtensionModule(button);
+            return extensionModule?.HasContextMenu ?? false;
+        }
+
+        /// <summary>
+        /// 尝试加载扩展的右键菜单
+        /// </summary>
+        /// <param name="button">触发按钮</param>
+        /// <param name="tableName">表名</param>
+        /// <param name="sourceWindow">源窗口</param>
+        public void TryLoadExtensionContextMenu(Button button, string tableName, Window sourceWindow)
+        {
+            try
+            {
+                if (button.Tag is not ButtonData buttonData || buttonData.ActionType != "LoadExtension")
+                    return;
+
+                if (string.IsNullOrEmpty(buttonData.Location) || !File.Exists(buttonData.Location))
+                    return;
+
+                // 加载扩展DLL
+                var assembly = System.Reflection.Assembly.LoadFrom(buttonData.Location);
+
+                // 尝试查找扩展菜单类型
+                var menuType = assembly.GetTypes()
+                    .FirstOrDefault(t => typeof(Quicker.Windows.Menus.BaseMenuWindow).IsAssignableFrom(t) && !t.IsAbstract);
+
+                if (menuType != null)
+                {
+                    // 创建扩展菜单实例
+                    var menuInstance = (Window)Activator.CreateInstance(menuType, 
+                        int.Parse(button.Name.Replace(tableName, "")), tableName, sourceWindow);
+
+                    if (menuInstance != null)
+                    {
+                        // 设置菜单位置和显示
+                        SetMenuPositionAndShow(menuInstance, sourceWindow);
+                    }
+                }
+            }
+            catch
+            {
+                // 不抛出异常，让系统使用默认菜单
+            }
+        }
+
+        /// <summary>
+        /// 设置菜单位置并显示
+        /// </summary>
+        /// <param name="menuWindow">菜单窗口</param>
+        /// <param name="sourceWindow">源窗口</param>
+        private void SetMenuPositionAndShow(Window menuWindow, Window sourceWindow)
+        {
+            // 设置菜单位置到鼠标附近
+            var mousePos = System.Windows.Forms.Cursor.Position;
+            menuWindow.Left = mousePos.X;
+            menuWindow.Top = mousePos.Y;
+
+            // 显示菜单
+            menuWindow.Show();
+
+            // 设置失焦关闭
+            menuWindow.Deactivated += (s, e) =>
+            {
+                menuWindow.Close();
+            };
         }
 
         /// <summary>

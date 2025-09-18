@@ -197,7 +197,9 @@ namespace Quicker.UserControls.AddWindow
                 _addWindow.TitleTextBox.Text = module.Name;
                 _addWindow.DescriptionTextBox.Text = module.Description;
                 _addWindow.UpdateTooltip();
-                //_addWindow.SetExtensionModuleImage(module); // 设置扩展模块图标
+                
+                // 设置扩展模块图标
+                SetExtensionModuleImage(module);
             }
             catch
             {
@@ -239,6 +241,82 @@ namespace Quicker.UserControls.AddWindow
             {
                 _addWindow.SaveButton.IsEnabled = true; // 如果地址栏不为空，则启用保存按钮
                 Grid1.Visibility = Visibility.Visible; // 显示Grid1
+            }
+        }
+
+        /// <summary>
+        /// 设置扩展模块图标
+        /// </summary>
+        /// <param name="module">扩展模块实例</param>
+        private void SetExtensionModuleImage(IExtensionModule module)
+        {
+            try
+            {
+                if (module.IconData != null && module.IconData.Length > 0)
+                {
+                    // 将字节数组转换为BitmapImage
+                    using var stream = new MemoryStream(module.IconData);
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = stream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+
+                    // 保存图标到临时文件并设置按钮图标
+                    string tempIconPath = SaveIconToTempFile(bitmap);
+                    if (!string.IsNullOrEmpty(tempIconPath))
+                    {
+                        _addWindow.SetButtonImage(tempIconPath);
+                    }
+                    else
+                    {
+                        _addWindow.ButtonImage.Visibility = Visibility.Collapsed;
+                    }
+                }
+                else
+                {
+                    // 如果没有图标数据，使用默认图标或隐藏图标
+                    _addWindow.ButtonImage.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch (Exception ex)
+            {
+                // 图标加载失败时，使用默认处理
+                _addWindow.ButtonImage.Visibility = Visibility.Collapsed;
+                using var toast = new ToastManager();
+                toast.Show($"图标加载失败: {ex.Message}", ToastType.Warning);
+            }
+        }
+
+        /// <summary>
+        /// 将BitmapImage保存为临时文件
+        /// </summary>
+        /// <param name="bitmap">位图对象</param>
+        /// <returns>临时文件路径</returns>
+        private string SaveIconToTempFile(BitmapImage bitmap)
+        {
+            try
+            {
+                // 创建临时文件路径
+                string tempPath = Path.Combine(Path.GetTempPath(), $"extension_icon_{Guid.NewGuid()}.png");
+                
+                // 创建编码器
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                
+                // 保存到文件
+                using (var fileStream = new FileStream(tempPath, FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
+                
+                return tempPath;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"保存临时图标文件失败: {ex.Message}");
+                return null;
             }
         }
 

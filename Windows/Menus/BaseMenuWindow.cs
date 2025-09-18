@@ -170,7 +170,8 @@ namespace Quicker.Windows.Menus
         /// </summary>
         protected virtual void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            if (UseAnimation)
+            SetWindowTopmost();  // 设置窗口置顶
+            if (UseAnimation && AnimationManager != null)
                 AnimationManager.FadeIn();
             else
                 Opacity = 1;
@@ -227,14 +228,23 @@ namespace Quicker.Windows.Menus
         /// </summary>
         protected void HideWithAnimation()
         {
-            AnimationManager.FadeOut(() =>
+            if (AnimationManager != null)
             {
-                Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+                AnimationManager.FadeOut(() =>
                 {
-                    Visibility = Visibility.Hidden;
-                    Opacity = 0; // 为下次淡入做准备
-                }));
-            });
+                    Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+                    {
+                        Visibility = Visibility.Hidden;
+                        Opacity = 0; // 为下次淡入做准备
+                    }));
+                });
+            }
+            else
+            {
+                // 如果动画管理器已被释放，直接隐藏
+                Visibility = Visibility.Hidden;
+                Opacity = 0;
+            }
         }
 
         /// <summary>
@@ -242,7 +252,15 @@ namespace Quicker.Windows.Menus
         /// </summary>
         public void CloseWithAnimation()
         {
-            AnimationManager.CloseWithFade();
+            if (AnimationManager != null)
+            {
+                AnimationManager.CloseWithFade();
+            }
+            else
+            {
+                // 如果动画管理器已被释放，直接关闭
+                Close();
+            }
         }
         #endregion
 

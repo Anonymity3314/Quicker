@@ -269,7 +269,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
 
                 if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
-
                 using (var actionManager = new ActionManager())
                 {
                     actionManager.DoAction(data, buttonType);
@@ -391,8 +390,22 @@ namespace Quicker.Windows.MainWindows.MainWindow
         // 右键按钮打开菜单
         public void OpenCreatActionMenu(object sender, MouseButtonEventArgs e)
         {
-            Button button = sender as Button; // 获取Button对象
-            buttonManager.OpenMenu(sender, button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu", this, GetButtonType(sender)); // 打开操作菜单
+            if (sender is not Button button) return;
+            string buttonType = GetButtonType(button);
+
+            // 检查动作是否为扩展类型
+            if (button.Tag is ButtonData buttonData && buttonData.ActionType == "LoadExtension")
+            {
+                if (buttonManager.CheckExtensionHasContextMenu(button))  // 扩展是否支持右键菜单
+                {
+                    buttonManager.TryLoadExtensionContextMenu(button, buttonType, this);  // 尝试加载扩展菜单
+                }
+            }
+            else // 不支持右键菜单，使用默认菜单
+            {
+                string menuType = button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu";
+                buttonManager.OpenMenu(button, menuType, this, buttonType);
+            }
         }
 
         // 添加关闭标志防止报错

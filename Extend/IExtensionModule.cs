@@ -6,7 +6,7 @@
         string Name { get; } // 模块名称
         string Version { get; } // 版本号
         string Author { get; } // 作者
-        //byte[] IconData { get; }  // 扩展图标
+        byte[] IconData { get; }  // 扩展图标
         string Description { get; } // 描述
 
         // 生命周期方法
@@ -19,7 +19,7 @@
         void ShowWindow(); // 显示窗口
 
         // 右键菜单相关
-        //bool HasContextMenu { get; } // 是否具有右键菜单
+        bool HasContextMenu { get; } // 是否具有右键菜单
 
         // 依赖关系
         string[] Dependencies { get; } // 依赖的模块
