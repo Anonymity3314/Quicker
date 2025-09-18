@@ -399,13 +399,12 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 if (buttonManager.CheckExtensionHasContextMenu(button))  // 扩展是否支持右键菜单
                 {
                     buttonManager.TryLoadExtensionContextMenu(button, buttonType, this);  // 尝试加载扩展菜单
+                    return;
                 }
             }
-            else // 不支持右键菜单，使用默认菜单
-            {
-                string menuType = button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu";
-                buttonManager.OpenMenu(button, menuType, this, buttonType);
-            }
+
+            string menuType = button.Tag is ButtonData ? "OperationMenu" : "CreatActionMenu";
+            buttonManager.OpenMenu(button, menuType, this, buttonType);  // 使用默认菜单
         }
 
         // 添加关闭标志防止报错

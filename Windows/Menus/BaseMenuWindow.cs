@@ -214,7 +214,6 @@ namespace Quicker.Windows.Menus
         protected virtual void HandleDeactivated()
         {
             ClosingOrHiding?.Invoke();
-
             if (UseAnimation)
                 HideWithAnimation();
             else

@@ -733,6 +733,10 @@ namespace Quicker.Managers
                 if (string.IsNullOrEmpty(buttonData.Location) || !File.Exists(buttonData.Location))
                     return;
 
+                // 检查是否为主窗口，如果是则设置关闭标志
+                bool isMainWindow = sourceWindow is MainWindow || sourceWindow is SearchWindow;
+                if (isMainWindow) isClosing = true;
+
                 // 加载扩展DLL
                 var assembly = System.Reflection.Assembly.LoadFrom(buttonData.Location);
 
@@ -748,6 +752,15 @@ namespace Quicker.Managers
 
                     if (menuInstance != null)
                     {
+                        // 如果是主窗口菜单，绑定关闭事件来重置关闭标志
+                        if (isMainWindow && menuInstance is BaseMenuWindow menu)
+                        {
+                            menu.ClosingOrHiding += new Action(() =>
+                            {
+                                isClosing = false; // 重置关闭标志
+                            });
+                        }
+
                         // 设置菜单位置和显示
                         SetMenuPositionAndShow(menuInstance, sourceWindow);
                     }
@@ -771,14 +784,8 @@ namespace Quicker.Managers
             menuWindow.Left = mousePos.X;
             menuWindow.Top = mousePos.Y;
 
-            // 显示菜单
+            // 显示菜单（BaseMenuWindow会自动处理失焦关闭和焦点管理）
             menuWindow.Show();
-
-            // 设置失焦关闭
-            menuWindow.Deactivated += (s, e) =>
-            {
-                menuWindow.Close();
-            };
         }
 
         /// <summary>
