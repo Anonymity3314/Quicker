@@ -2,6 +2,7 @@
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 using Quicker.Database.Core;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -326,13 +327,13 @@ namespace Quicker.Windows.MainWindows
         }
 
         // 点击按钮执行动作
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             Button btn = (Button)sender;
             var tag = (Tuple<string, ButtonData>)btn.Tag; // 提取表名和按钮数据
             string tableName = tag.Item1; // 表名
             ButtonData data = tag.Item2; // 按钮数据
-            actionManager.DoAction(data, tableName); // 执行动作并传递表名
+            await actionManager.DoActionAsync(data, tableName); // 执行动作并传递表名
         }
 
         // 右键菜单

@@ -1,5 +1,6 @@
 ﻿using Quicker.Windows.FloatingWindows.ViewModels;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 using Quicker.Windows.Menus;
 using Quicker.Database.Core;
 using System.Windows.Input;
@@ -76,13 +77,13 @@ namespace Quicker.Windows.FloatingWindows.Windows
         /// <summary>
         /// ActionButton点击事件处理
         /// </summary>
-        private void ActionButton_Click(object sender, RoutedEventArgs e)
+        private async void ActionButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Tag is ButtonData buttonData)
             {
                 // 执行按钮动作
                 using var actionManager = new ActionManager();
-                actionManager.DoAction(buttonData, TableName);
+                await actionManager.DoActionAsync(buttonData, TableName);
             }
         }
 

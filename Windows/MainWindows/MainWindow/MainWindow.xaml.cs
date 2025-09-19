@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using Quicker.Windows.AddWindows;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 using Quicker.Windows.Menus;
 using Quicker.Database.Core;
 using System.Windows.Media;
@@ -259,7 +260,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         }
 
         // 左键点击按钮时执行动作
-        private void DoAction(object sender, RoutedEventArgs e)
+        private async void DoAction(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button; // 获取Button对象
             string buttonType = GetButtonType(sender); // 获取按钮类型
@@ -271,7 +272,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
                 if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
                 using (var actionManager = new ActionManager())
                 {
-                    actionManager.DoAction(data, buttonType);
+                    await actionManager.DoActionAsync(data, buttonType);
                 }
                 HandleAutoReturn(buttonType); // 处理自动返回
             }

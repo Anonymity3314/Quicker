@@ -1,4 +1,5 @@
 ﻿using Quicker.Windows.FloatingWindows.ViewModels;
+using System.Threading.Tasks;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -107,13 +108,13 @@ namespace Quicker.Windows.FloatingWindows.Windows
         /// <summary>
         /// 按钮点击事件，未拖动时执行按钮动作
         /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (!_isDragging && viewModel.ButtonData != null)
             {
                 using (var actionManager = new ActionManager())
                 {
-                    actionManager.DoAction(viewModel.ButtonData, viewModel.TableName); // 执行动作
+                    await actionManager.DoActionAsync(viewModel.ButtonData, viewModel.TableName); // 执行动作
                 }
                 viewModel.IncreaseActionUsedTimes(); // 增加动作使用次数
             }

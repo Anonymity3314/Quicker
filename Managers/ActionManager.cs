@@ -1,5 +1,6 @@
 ﻿using Quicker.Windows.MainWindows.MainWindow;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Quicker.Database.Core;
 using IWshRuntimeLibrary;
 using System.Diagnostics;
@@ -385,27 +386,27 @@ namespace Quicker.Managers
         /// 执行动作
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
-        public void DoAction(ButtonData data,string tableName)
+        public async Task DoActionAsync(ButtonData data, string tableName)
         {
             switch (data.ActionType)
             {
                 case "OpenFile":
-                    OpenFile(data);
+                    await Task.Run(() => OpenFile(data));
                     break;
                 case "OpenWebsite":
-                    OpenWebsite(data);
+                    await Task.Run(() => OpenWebsite(data));
                     break;
                 case "OpenFiles":
-                    OpenFiles(data);
+                    await Task.Run(() => OpenFiles(data));
                     break;
                 case "OpenUwpApp":
-                    OpenUwpApp(data);
+                    await Task.Run(() => OpenUwpApp(data));
                     break;
                 case "LoadExtension":
-                    LoadExtension(data);
+                    await Task.Run(() => LoadExtension(data));
                     break;
                 case "OpenActionPage":
-                    OpenActionPage(data);
+                    await Task.Run(() => OpenActionPage(data));
                     break;
             }
             // 增加动作使用次数
