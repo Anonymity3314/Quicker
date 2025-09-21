@@ -20,8 +20,5 @@
 
         // 右键菜单相关
         bool HasContextMenu { get; } // 是否具有右键菜单
-
-        // 依赖关系
-        string[] Dependencies { get; } // 依赖的模块
     }
 }
