@@ -403,7 +403,7 @@ namespace Quicker.Managers
                     await Task.Run(() => OpenUwpApp(data));
                     break;
                 case "LoadExtension":
-                    await Task.Run(() => LoadExtension(data));
+                    LoadExtension(data);
                     break;
                 case "OpenActionPage":
                     await Task.Run(() => OpenActionPage(data));
