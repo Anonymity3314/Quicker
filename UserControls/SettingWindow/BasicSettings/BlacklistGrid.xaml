@@ -50,7 +50,7 @@
                     <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
                         <StackPanel x:Name="BlacklistStackPanel" Margin="0,0,0,2"/>
                     </ScrollViewer>
-                    <ScrollBar x:Name="BlacklistScrollBar" Margin="604,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Hidden"/>
+                    <ScrollBar x:Name="BlacklistScrollBar" Margin="618,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Collapsed"/>
                 </Grid>
             </Border>
             <Button x:Name="BlacklistDragButton" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click">
