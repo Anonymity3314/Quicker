@@ -1303,186 +1303,108 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         // 预置样式静态数据
-        // 原始风格
-        private static readonly Appearance PresetOriginal = new Appearance
+        // 统一的预置构造：提供公共默认值，个别预置只覆盖差异，减少重复
+        private static Appearance CreatePreset()
         {
-            // 尺寸
-            ButtonSize = 79,
-            ButtonGap = 1,
-            BorderWidth = 0,
-            ButtonCornerRadius = 0,
+            return new Appearance
+            {
+                // 尺寸（大多数预置共享）
+                ButtonSize = 72,
+                ButtonGap = 0,
+                BorderWidth = 0,
+                ButtonCornerRadius = 0,
 
-            // 颜色
-            BackgroundColor = "#99B0B0B0",
-            BorderColor = "#00FFFFFF",
-            ToolbarColor = "#18999999",
-            ToolbarIconColor = "#FF666666",
-            ActionButtonColor = "#FFFFFFFF",
-            ActionButtonMouseOverColor = "#FFB2F2FF",
-            BlankButtonColor = "#32C8C8C8",
-            BlankButtonMouseOverColor = "#05000000",
-            ButtonTextColor = "#FF000000",
+                // 颜色（基础为浅色半透）
+                BackgroundColor = "#60FFFFFF",
+                BorderColor = "#00FFFFFF",
+                ToolbarColor = "#1F999999",
+                ToolbarIconColor = "#FF666666",
+                ActionButtonColor = "#9DFFFFFF",
+                ActionButtonMouseOverColor = "#59B2F2FF",
+                BlankButtonColor = "#32C8C8C8",
+                BlankButtonMouseOverColor = "#05000000",
+                ButtonTextColor = "#FF000000",
 
-            // 字体
-            Font1 = -1,
-            Font2 = -1,
-            FontSize = 12,
-            FontWeight = 4,
+                // 字体
+                Font1 = -1,
+                Font2 = -1,
+                FontSize = 12,
+                FontWeight = 4,
 
-            // 背景图片
-            BackgroundImagePath = "",
-            BackgroundImageOpacity = 1.0,
+                // 背景图片
+                BackgroundImagePath = "",
+                BackgroundImageOpacity = 1.0,
 
-            // 模糊与圆角
-            Blur = 1,
-            Win11CornerRadius = 0,
+                // 模糊与圆角
+                Blur = 1,
+                Win11CornerRadius = 0,
 
-            // 选项
-            AutoHideTitleBar = true,
-            ShowActionButtonMouseOver = true,
-            HideActionNameAfterIcon = false,
-            ShowActionIconShadow = false,
-            EnablePreview = true
-        };
+                // 选项
+                AutoHideTitleBar = true,
+                ShowActionButtonMouseOver = true,
+                HideActionNameAfterIcon = false,
+                ShowActionIconShadow = false,
+                EnablePreview = true
+            };
+        }
+        private static Appearance CreatePreset(System.Action<Appearance> configure)
+        {
+            var preset = CreatePreset();
+            configure?.Invoke(preset);
+            return preset;
+        }
+
+        // 原始风格
+        private static readonly Appearance PresetOriginal = CreatePreset(p =>
+        {
+            p.ButtonSize = 79;
+            p.ButtonGap = 1;
+
+            p.BackgroundColor = "#99B0B0B0";
+            p.ToolbarColor = "#18999999";
+            p.ActionButtonColor = "#FFFFFFFF";
+            p.ActionButtonMouseOverColor = "#FFB2F2FF";
+        });
 
         // 小白风格
-        private static readonly Appearance PresetSimple = new Appearance
+        private static readonly Appearance PresetSimple = CreatePreset(p =>
         {
-            // 尺寸
-            ButtonSize = 72,
-            ButtonGap = 0.2,
-            BorderWidth = 0,
-            ButtonCornerRadius = 0,
+            p.ButtonGap = 0.2;
 
-            // 颜色
-            BackgroundColor = "#C5CCCCCC",
-            BorderColor = "#00FFFFFF",
-            ToolbarColor = "#2B999999",
-            ToolbarIconColor = "#FF666666",
-            ActionButtonColor = "#FFFFFFFF",
-            ActionButtonMouseOverColor = "#59B2F2FF",
-            BlankButtonColor = "#32C8C8C8",
-            BlankButtonMouseOverColor = "#05000000",
-            ButtonTextColor = "#FF000000",
-
-            // 字体
-            Font1 = -1,
-            Font2 = -1,
-            FontSize = 12,
-            FontWeight = 4,
-
-            // 背景图片
-            BackgroundImagePath = "",
-            BackgroundImageOpacity = 1.0,
-
-            // 模糊与圆角
-            Blur = 1,
-            Win11CornerRadius = 0,
-        };
+            p.BackgroundColor = "#C5CCCCCC";
+            p.ToolbarColor = "#2B999999";
+            p.ActionButtonColor = "#FFFFFFFF";
+            p.ActionButtonMouseOverColor = "#59B2F2FF";
+        });
 
         // 半透风格
-        private static readonly Appearance PresetTranslucent = new Appearance
-        {
-            // 尺寸
-            ButtonSize = 72,
-            ButtonGap = 0,
-            BorderWidth = 0,
-            ButtonCornerRadius = 0,
-
-            // 颜色
-            BackgroundColor = "#60FFFFFF",
-            BorderColor = "#00FFFFFF",
-            ToolbarColor = "#1F999999",
-            ToolbarIconColor = "#FF666666",
-            ActionButtonColor = "#9DFFFFFF",
-            ActionButtonMouseOverColor = "#59B2F2FF",
-            BlankButtonColor = "#32C8C8C8",
-            BlankButtonMouseOverColor = "#05000000",
-            ButtonTextColor = "#FF000000",
-
-            // 字体
-            Font1 = -1,
-            Font2 = -1,
-            FontSize = 12,
-            FontWeight = 4,
-
-            // 背景图片
-            BackgroundImagePath = "",
-            BackgroundImageOpacity = 1.0,
-
-            // 模糊与圆角
-            Blur = 1,
-            Win11CornerRadius = 0,
-        };
+        private static readonly Appearance PresetTranslucent = CreatePreset();
 
         // 深色风格
-        private static readonly Appearance PresetDark = new Appearance
+        private static readonly Appearance PresetDark = CreatePreset(p =>
         {
-            // 尺寸
-            ButtonSize = 72,
-            ButtonGap = 0.5,
-            BorderWidth = 0,
-            ButtonCornerRadius = 0,
+            p.ButtonGap = 0.5;
 
-            // 颜色
-            BackgroundColor = "#C5737373",
-            BorderColor = "#00FFFFFF",
-            ToolbarColor = "#00999999",
-            ToolbarIconColor = "#FF000000",
-            ActionButtonColor = "#31000000",
-            ActionButtonMouseOverColor = "#59D7D7D7",
-            BlankButtonColor = "#38000000",
-            BlankButtonMouseOverColor = "#05000000",
-            ButtonTextColor = "#FFFFFFFF",
-
-            // 字体
-            Font1 = -1,
-            Font2 = -1,
-            FontSize = 12,
-            FontWeight = 4,
-
-            // 背景图片
-            BackgroundImagePath = "",
-            BackgroundImageOpacity = 1.0,
-
-            // 模糊与圆角
-            Blur = 1,
-            Win11CornerRadius = 0,
-        };
+            p.BackgroundColor = "#C5737373";
+            p.ToolbarColor = "#00999999";
+            p.ToolbarIconColor = "#FF000000";
+            p.ActionButtonColor = "#31000000";
+            p.ActionButtonMouseOverColor = "#59D7D7D7";
+            p.BlankButtonColor = "#38000000";
+            p.ButtonTextColor = "#FFFFFFFF";
+        });
 
         // 深色半透风格
-        private static readonly Appearance PresetDarkTranslucent = new Appearance
+        private static readonly Appearance PresetDarkTranslucent = CreatePreset(p =>
         {
-            // 尺寸
-            ButtonSize = 72,
-            ButtonGap = 0,
-            BorderWidth = 0,
-            ButtonCornerRadius = 0,
-
-            // 颜色
-            BackgroundColor = "#355E5E5E",
-            BorderColor = "#00FFFFFF",
-            ToolbarColor = "#29999999",
-            ToolbarIconColor = "#AA000000",
-            ActionButtonColor = "#31000000",
-            ActionButtonMouseOverColor = "#59D7D7D7",
-            BlankButtonColor = "#38000000",
-            BlankButtonMouseOverColor = "#05000000",
-            ButtonTextColor = "#FFFFFFFF",
-
-            // 字体
-            Font1 = -1,
-            Font2 = -1,
-            FontSize = 12,
-            FontWeight = 4,
-
-            // 背景图片
-            BackgroundImagePath = "",
-            BackgroundImageOpacity = 1.0,
-
-            // 模糊与圆角
-            Blur = 0,
-            Win11CornerRadius = 0,
-        };
+            p.BackgroundColor = "#355E5E5E";
+            p.ToolbarColor = "#29999999";
+            p.ToolbarIconColor = "#AA000000";
+            p.ActionButtonColor = "#31000000";
+            p.ActionButtonMouseOverColor = "#59D7D7D7";
+            p.BlankButtonColor = "#38000000";
+            p.ButtonTextColor = "#FFFFFFFF";
+            p.Blur = 0;
+        });
     }
 }
