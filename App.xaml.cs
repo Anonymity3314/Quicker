@@ -818,29 +818,51 @@ namespace Quicker
         /// <returns>如果找到对应的场景类型则返回，否则返回空字符串</returns>
         private string GetProcessSceneType(WindowManager windowManager)
         {
+            string result = string.Empty;
             IntPtr foregroundWindow = windowManager.GetCurrentForegroundWindow(); // 获取当前前台窗口
-            if (foregroundWindow != IntPtr.Zero) // 如果前台窗口不为空
+            if (foregroundWindow == IntPtr.Zero) return result; // 无前台窗口
+            try
             {
                 uint processId = windowManager.GetWindowProcessId(foregroundWindow); // 获取窗口进程ID
                 using var process = Process.GetProcessById((int)processId); // 获取进程
-                string processFilePath = process.MainModule.FileName; // 获取进程文件路径
-                string processFileName = Path.GetFileNameWithoutExtension(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
-                var db = new ActionPageDatabase(); // 检查是否存在以 文件名+"Scene" 命名的表
-                if (db.SceneExists(processFileName))
+
+                // 访问 MainModule 可能因权限不足抛出 Win32Exception（拒绝访问）或进程退出等异常
+                string processFilePath = string.Empty;
+                try
                 {
-                    var scene = db.GetSceneData(processFileName); // 获取场景数据
-                    if (scene != null)
+                    processFilePath = process.MainModule.FileName; // 获取进程文件路径
+                }
+                catch
+                {
+                    // 无法访问主模块则保持默认结果
+                }
+
+                if (!string.IsNullOrEmpty(processFilePath))
+                {
+                    string processFileName = Path.GetFileNameWithoutExtension(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
+
+                    var db = new ActionPageDatabase(); // 检查是否存在以 文件名+"Scene" 命名的表
+                    if (db.SceneExists(processFileName))
                     {
-                        // 路径相同则返回文件名（带后缀）
-                        if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase))
+                        var scene = db.GetSceneData(processFileName); // 获取场景数据
+                        if (scene != null)
                         {
-                            if (scene.SceneCount > 0)
-                                return processFileName;
+                            // 路径相同则返回文件名（带后缀）
+                            if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase) && scene.SceneCount > 0)
+                            {
+                                result = processFileName;
+                            }
                         }
                     }
                 }
             }
-            return string.Empty;
+            catch
+            {
+                // 包含：Win32Exception(拒绝访问)、ArgumentException(进程不存在)、InvalidOperationException 等
+                // 任意异常均保持默认结果
+            }
+
+            return result;
         }
 
         /// <summary>
