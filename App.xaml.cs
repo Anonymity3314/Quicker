@@ -27,6 +27,7 @@ using MouseButton = SharpHook.Data.MouseButton;
 using Quicker.Windows.MainWindows.MainWindow;
 using Hardcodet.Wpf.TaskbarNotification;
 using KeyCode = SharpHook.Data.KeyCode;
+using System.Runtime.InteropServices;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Database.Upgrade;
@@ -58,7 +59,12 @@ namespace Quicker
         private string _previewPausedPath; // 预览暂停图标路径
         private TaskPoolGlobalHook? hook; // 全局钩子
         private TaskbarIcon? taskbarIcon; // 托盘图标
-       
+
+        // Win32: GetAsyncKeyState 与 VK 常量
+        private const int VK_LCONTROL = 0xA2;
+        private const int VK_RCONTROL = 0xA3;
+        [DllImport("user32.dll")]
+        private static extern short GetAsyncKeyState(int vKey);
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -363,31 +369,17 @@ namespace Quicker
         /// <returns>有则返回true，否则返回false</returns>
         private bool IsOtherKeyDown()
         {
-            bool otherKeyDown = false;
-            this.Dispatcher.Invoke(new Action(() =>
+            // 使用 GetAsyncKeyState 避免阻塞 UI 线程
+            for (int vKey = 8; vKey <= 254; vKey++)
             {
-                // 使用LINQ检查是否有任何常用按键被按下
-                otherKeyDown = new[]
+                if (vKey == VK_LCONTROL || vKey == VK_RCONTROL) continue; // 忽略 Ctrl
+                short state = GetAsyncKeyState(vKey);
+                if ((state & 0x8000) != 0)
                 {
-                    // 字母键 A-Z
-                    Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J,
-                    Key.K, Key.L, Key.M, Key.N, Key.O, Key.P, Key.Q, Key.R, Key.S, Key.T,
-                    Key.U, Key.V, Key.W, Key.X, Key.Y, Key.Z,
-                    // 数字键 0-9
-                    Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, Key.D9,
-                    // 功能键 F1-F12
-                    Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.F7, Key.F8, Key.F9, Key.F10, Key.F11, Key.F12,
-                    // 导航和编辑键
-                    Key.Space, Key.Enter, Key.Tab, Key.Escape, Key.Back, Key.Delete, Key.Insert,
-                    Key.Up, Key.Down, Key.Left, Key.Right, Key.Home, Key.End, Key.PageUp, Key.PageDown,
-                    Key.PrintScreen, Key.Scroll, Key.Pause,
-                    // 数字键盘
-                    Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3, Key.NumPad4,
-                    Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9,
-                    Key.Multiply, Key.Add, Key.Separator, Key.Subtract, Key.Decimal, Key.Divide
-                }.Any(key => Keyboard.IsKeyDown(key));
-            }));
-            return otherKeyDown;
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -441,16 +433,10 @@ namespace Quicker
         /// <returns> Ctrl 键状态 </returns>
         private bool GetCtrlKeyState()
         {
-            bool isCtrlPressed = false; // 是否按下 Ctrl 键
-            try
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    isCtrlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 获取 Ctrl 键状态
-                })); // 获取 Ctrl 键状态
-            }
-            catch { }
-            return isCtrlPressed; // 返回 Ctrl 键状态
+            // 使用 Win32 获取 Ctrl 键状态，避免 Dispatcher.Invoke 阻塞
+            short l = GetAsyncKeyState(VK_LCONTROL);
+            short r = GetAsyncKeyState(VK_RCONTROL);
+            return (l & 0x8000) != 0 || (r & 0x8000) != 0;
         }
 
         /// <summary>
@@ -736,28 +722,32 @@ namespace Quicker
         /// <param name="startTimer"> 是否启动计时器 </param>
         public void PreLoadMainWindow(bool startTimer = false)
         {
-            this.Dispatcher.Invoke(new Action(() =>
+            // 立即记录按压时间，避免依赖 UI 线程
+            DateTime dateTime = DateTime.Now;
+            AppStateManager.KeyPressStartTime = dateTime;
+            AppStateManager.MousePressStartTime = dateTime;
+            if (startTimer) AppStateManager.PressTimer.Start();
+
+            // 在后台线程计算场景类型，避免阻塞 UI
+            Task.Run(() =>
             {
-                DateTime dateTime = DateTime.Now; // 获取当前时间
-                AppStateManager.KeyPressStartTime = dateTime; // 记录鼠标按下时间
-                AppStateManager.MousePressStartTime = dateTime; // 记录鼠标按下时间
-                if (startTimer) AppStateManager.PressTimer.Start(); // 启动按键计时器
-
-                string windowType = DetermineWindowType() ?? DEFAULT_STYLE; // 确保不为null
-                AppStateManager.PreLoadMainWindow = new MainWindow(windowType); // 创建主窗口
-
-                var settings = AppStateManager.OpenMainWindowConditions; // 获取设置
-                SetMainWindowPosition(AppStateManager.PreLoadMainWindow, settings.WindowStartupLocation); // 设置窗口位置
-                AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden; // 隐藏主窗口
-                AppStateManager.Left = (float)AppStateManager.PreLoadMainWindow.Left; // 记录主窗口位置
-                AppStateManager.Top = (float)AppStateManager.PreLoadMainWindow.Top; // 记录主窗口位置
-            }));
+                string windowType = DetermineWindowType() ?? DEFAULT_STYLE;
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
+                {
+                    AppStateManager.PreLoadMainWindow = new MainWindow(windowType);
+                    var settings = AppStateManager.OpenMainWindowConditions;
+                    SetMainWindowPosition(AppStateManager.PreLoadMainWindow, settings.WindowStartupLocation);
+                    AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden;
+                    AppStateManager.Left = (float)AppStateManager.PreLoadMainWindow.Left;
+                    AppStateManager.Top = (float)AppStateManager.PreLoadMainWindow.Top;
+                }));
+            });
         }
 
         // 关闭或显示主窗口
         public void CloseOrShowMainWindow()
         {
-            this.Dispatcher.Invoke(new Action(() =>
+            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
                 var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
@@ -840,20 +830,22 @@ namespace Quicker
                 if (!string.IsNullOrEmpty(processFilePath))
                 {
                     string processFileName = Path.GetFileNameWithoutExtension(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
-
-                    var db = new ActionPageDatabase(); // 检查是否存在以 文件名+"Scene" 命名的表
-                    if (db.SceneExists(processFileName))
+                    try
                     {
-                        var scene = db.GetSceneData(processFileName); // 获取场景数据
-                        if (scene != null)
+                        var db = new ActionPageDatabase();
+                        if (db.SceneExists(processFileName))
                         {
-                            // 路径相同则返回文件名（带后缀）
-                            if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase) && scene.SceneCount > 0)
+                            var scene = db.GetSceneData(processFileName);
+                            if (scene != null)
                             {
-                                result = processFileName;
+                                if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase) && scene.SceneCount > 0)
+                                {
+                                    result = processFileName;
+                                }
                             }
                         }
                     }
+                    catch { }
                 }
             }
             catch

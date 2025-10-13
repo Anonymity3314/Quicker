@@ -31,6 +31,7 @@ namespace Quicker.Windows.MainWindows
         public SettingWindow()
         {
             InitializeComponent(); // 初始化xaml文件
+            InitializePageMappings(); // 初始化页面编码与动作的映射
         }
 
         #region 窗口生命周期
@@ -41,22 +42,21 @@ namespace Quicker.Windows.MainWindows
             await _settingManager.CacheOriginalSettingsAsync(); // 缓存原始设置
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             if (Convention.RememberLastPage)
-                SetLastPage(Convention.LastPage); // 设置上一次关闭时的状态
+                NavigateAndHighlight(Convention.LastPage); // 设置上一次关闭时的状态
             else
             {
                 BasicSettings_Click(null, null); // 显示常规设置面板
                 Convention_Click(null, null); // 显示常规设置
             }
-            
-            // 初始化时隐藏撤销按钮，因为还没有修改
-            CancelSettingsButton.Visibility = Visibility.Hidden;
+
+            CancelSettingsButton.Visibility = Visibility.Hidden; // 初始化时隐藏撤销按钮，因为还没有修改
         }
 
         // 关闭窗口时保存最后打开的页面
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            SetLastPage(); // 保存最后打开的页面
+            SaveLastPage(); // 保存最后打开的页面
         }
 
         // 关闭窗口前，释放资源
@@ -269,89 +269,111 @@ namespace Quicker.Windows.MainWindows
 
         #region 页面导航与管理
 
+        #region 页面编码映射
+        // 统一页面编码常量（每个编码唯一对应一个页面/动作）
+        private const int CODE_CONVENTION = 111;
+        private const int CODE_OPEN_MAIN_WINDOW = 121;
+        private const int CODE_FUNCTION_SHORTCUTS = 131;
+        private const int CODE_BLACKLIST = 141;
+        private const int CODE_APPEARANCE = 151;
+        private const int CODE_ABOUT = 161;
+        private const int CODE_ABOUT_PRIVACY = 162;
+        private const int CODE_MANAGE_EXTENSIONS = 311;
+
+        // 编码 -> 打开页面动作
+        private Dictionary<int, Action> _codeToOpenAction;
+        // 页面类型 -> 编码（基础映射，必要时在获取时做特殊处理）
+        private Dictionary<Type, int> _typeToCode;
+        // 左侧按钮Name -> 编码（用于搜索结果跳转等场景）
+        private Dictionary<string, int> _buttonNameToCode;
+
+        private void InitializePageMappings()
+        {
+            _codeToOpenAction = new Dictionary<int, Action>
+            {
+                { CODE_CONVENTION, () => Convention_Click(null, null) },
+                { CODE_OPEN_MAIN_WINDOW, () => OpenMainWindow_Click(null, null) },
+                { CODE_FUNCTION_SHORTCUTS, () => FunctionShortcutKeys_Click(null, null) },
+                { CODE_BLACKLIST, () => Blacklist_Click(null, null) },
+                { CODE_APPEARANCE, () => Appearance_Click(null, null) },
+                { CODE_ABOUT, () => AboutQuicker_Click(null, null) },
+                { CODE_ABOUT_PRIVACY, () => { AboutQuicker_Click(null, null); if (ResultGrid.Children.OfType<AboutQuickerGrid>().FirstOrDefault() is AboutQuickerGrid g) g.Privacy_StatementButton_Click(null, null); } },
+                { CODE_MANAGE_EXTENSIONS, () => ManageExtensions_Click(null, null) }
+            };
+
+            _typeToCode = new Dictionary<Type, int>
+            {
+                { typeof(ConventionGrid), CODE_CONVENTION },
+                { typeof(OpenMainWindowGrid), CODE_OPEN_MAIN_WINDOW },
+                { typeof(FunctionShortcutKeysGrid), CODE_FUNCTION_SHORTCUTS },
+                { typeof(BlacklistGrid), CODE_BLACKLIST },
+                { typeof(AppearanceGrid), CODE_APPEARANCE },
+                { typeof(AboutQuickerGrid), CODE_ABOUT },
+                { typeof(ExtensionManagementGrid), CODE_MANAGE_EXTENSIONS }
+            };
+
+            _buttonNameToCode = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Convention", CODE_CONVENTION },
+                { "OpenMainWindow", CODE_OPEN_MAIN_WINDOW },
+                { "FunctionShortcutKeys", CODE_FUNCTION_SHORTCUTS },
+                { "Blacklist", CODE_BLACKLIST },
+                { "Appearance", CODE_APPEARANCE },
+                { "AboutQuicker", CODE_ABOUT },
+                { "ManageExtensions", CODE_MANAGE_EXTENSIONS }
+            };
+        }
+
+        /// <summary>
+        /// 高亮所属一级菜单并导航到页面编码
+        /// </summary>
+        /// <param name="code">页面编码</param>
+        private void NavigateAndHighlight(int code)
+        {
+            switch (code / 100)
+            {
+                case 1:
+                    BasicSettings_Click(null, null);
+                    break;
+                case 2:
+                    Auxiliary_Functions_Click(null, null);
+                    break;
+                case 3:
+                    Tools_Click(null, null);
+                    break;
+                default:
+                    BasicSettings_Click(null, null);
+                    break;
+            }
+            NavigateToPageCode(code);
+        }
+        
+        /// <summary>
+        /// 根据编码导航到对应页面
+        /// </summary>
+        /// <param name="code"> 页面编码 </param>
+        private void NavigateToPageCode(int code)
+        {
+            if (_codeToOpenAction != null && _codeToOpenAction.TryGetValue(code, out var action))
+            {
+                action?.Invoke();
+            }
+            else
+            {
+                // 默认回退到常规设置页面
+                Convention_Click(null, null);
+            }
+        }
+        #endregion
+
         #region 页面加载与状态记忆
-
-        /// <summary>
-        /// 设置成上一次关闭时的状态
-        /// </summary>
-        /// <param name="page"> 界面数据 </param>
-        private void SetLastPage(int page)
-        {
-            switch (page / 100)
-            {
-                case 1:
-                    BasicSettings_Click(null, null); // 点击基础设置按钮
-                    LoadBasicSettingPages(page % 100 / 10); // 计算第几个按钮
-                    break;
-                case 2:
-                    Auxiliary_Functions_Click(null, null); // 点击辅助功能按钮
-                    break;
-                case 3:
-                    Tools_Click(null, null); // 点击工具按钮
-                    LoadToolPages(page % 100 / 10); // 计算第几个按钮
-                    break;
-                default:
-                    BasicSettings_Click(null, null); // 点击基础设置按钮
-                    LoadBasicSettingPages(1); // 显示第一个按钮
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 加载第二组按钮
-        /// </summary>
-        /// <param name="num2"> 第几组按钮 </param>
-        private void LoadBasicSettingPages(int num2)
-        {
-            switch (num2)
-            {
-                case 1:
-                    Convention_Click(null, null);
-                    break; // 点击常规设置按钮
-                case 2:
-                    OpenMainWindow_Click(null, null);
-                    break; // 点击弹出面板设置按钮
-                case 3:
-                    FunctionShortcutKeys_Click(null, null);
-                    break; // 点击功能快捷键设置按钮
-                case 4:
-                    Blacklist_Click(null, null);
-                    break; // 点击黑名单设置按钮
-                case 5:
-                    Appearance_Click(null, null);
-                    break; // 点击外观设置按钮
-                case 6:
-                    AboutQuicker_Click(null, null);
-                    break; // 点击关于按钮
-                default:
-                    Convention_Click(null, null);
-                    break; // 点击常规设置按钮
-            }
-        }
-
-        /// <summary>
-        /// 加载第二组按钮
-        /// </summary>
-        /// <param name="num2"> 第几组按钮 </param>
-        private void LoadToolPages(int num2)
-        {
-            switch (num2)
-            {
-                case 1:
-                    ManageExtensions_Click(null, null);
-                    break; // 点击扩展管理按钮
-                default:
-                    ManageExtensions_Click(null, null);
-                    break; // 点击扩展管理按钮
-            }
-        }
 
         #endregion
 
         #region 页面状态保存
 
         // 保存最后打开的页面
-        public void SetLastPage()
+        public void SaveLastPage()
         {
             int lastpage = GetCurrentPageCode();
             SettingDatabase.RecordLastPage(lastpage); // 保存最后打开的页面
@@ -389,38 +411,18 @@ namespace Quicker.Windows.MainWindows
         /// <returns>页面代码</returns>
         private int GetPageCodeByElementType(UIElement element)
         {
-            if (element is ConventionGrid)
+            if (element == null) return 0;
+            var type = element.GetType();
+            if (_typeToCode != null && _typeToCode.TryGetValue(type, out var code))
             {
-                return 111; // 常规设置页面
-            }
-            else if (element is OpenMainWindowGrid)
-            {
-                return 121; // 弹出面板设置页面
-            }
-            else if(element is FunctionShortcutKeysGrid)
-            {
-                return 131; // 功能快捷键设置界面
-            }
-            else if (element is BlacklistGrid)
-            {
-                return 141; // 黑名单设置页面
-            }
-            else if (element is AppearanceGrid)
-            {
-                return 151; // 外观设置页面
-            }
-            else if (element is AboutQuickerGrid)
-            {
-                var grid = VisualTreeHelper.FindGridByName(element, "Privacy_StatementButtonGrid");
-                if (grid != null && grid.Visibility == Visibility.Visible)
+                // About 页面需要根据隐私声明可见性返回特殊编码
+                if (type == typeof(AboutQuickerGrid))
                 {
-                    return 162; // 隐私声明页面
+                    var grid = VisualTreeHelper.FindGridByName(element, "Privacy_StatementButtonGrid");
+                    if (grid != null && grid.Visibility == Visibility.Visible)
+                        return CODE_ABOUT_PRIVACY;
                 }
-                return 161; // 关于Quicker页面
-            }
-            else if (element is ExtensionManagementGrid)
-            {
-                return 311; // 扩展管理页面
+                return code;
             }
             return 0;
         }
@@ -755,21 +757,14 @@ namespace Quicker.Windows.MainWindows
             if (sender is Button btn && btn.Tag is string btnName)
             {
                 SearchResultPopup.IsOpen = false; // 关闭Popup
-                // 按钮Name映射到pageCode，调用SetLastPage实现完整跳转（包括侧边栏高亮等）
-                int pageCode = btnName switch
+                int pageCode = 0;
+                if (_buttonNameToCode != null)
                 {
-                    "Convention" => 111,
-                    "OpenMainWindow" => 121,
-                    "FunctionShortcutKeys" => 131,
-                    "Blacklist" => 141,
-                    "Appearance" => 151,
-                    "AboutQuicker" => 161,
-                    "ManageExtensions" => 311,
-                    _ => 0
-                };
+                    _buttonNameToCode.TryGetValue(btnName, out pageCode);
+                }
                 if (pageCode != 0)
                 {
-                    SetLastPage(pageCode);
+                    NavigateAndHighlight(pageCode);
                 }
             }
         }

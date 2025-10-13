@@ -27,6 +27,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class AppearanceGrid : UserControl, INotifyPropertyChanged // 实现INotifyPropertyChanged接口，支持属性变更通知
     {
+        #region 成员字段
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
         private readonly List<string> _tempFiles = new(); // 临时文件列表，用于清理
@@ -37,14 +38,18 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private bool _isInitializing = true; // 是否正在初始化
         private Button _currentColorButton; // 记录当前按钮
         SettingManager settingManager; // 设置管理器
+        #endregion
 
+        #region INotifyPropertyChanged
         // INotifyPropertyChanged接口实现
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        #endregion
 
+        #region 公开属性
         // 预览区圆角属性，绑定到XAML的CornerRadius
         private CornerRadius _previewCornerRadius = new CornerRadius(5); // 默认圆角为5
         public CornerRadius PreviewCornerRadius
@@ -89,7 +94,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
             }
         }
+        #endregion
 
+        #region 构造与初始化入口
         public AppearanceGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent(); // 初始化xaml界面
@@ -105,7 +112,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 await InitializeFontComboBoxes(); // 异步初始化字体下拉框
             }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
+        #endregion
 
+        #region 设置变化计时器
         // 初始化设置变化检测计时器
         private void InitializeSettingsChangeTimer()
         {
@@ -124,7 +133,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ResetAppearanceButton.Visibility = hasChanges ? Visibility.Visible : Visibility.Collapsed;
             }
         }
+        #endregion
 
+        #region 初始化与加载设置
         // 异步初始化方法
         private async Task InitializeAsync()
         {
@@ -167,7 +178,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 await LoadGlobalButtonsForPreviewInternal();
             }
         }
+        #endregion
 
+        #region 应用设置到UI
         // 按钮相关设置
         private void ApplyButtonSettings()
         {
@@ -239,7 +252,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }), System.Windows.Threading.DispatcherPriority.Background);
             }
         }
+        #endregion
 
+        #region 滚动同步
         // 同步滚动条数据
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
@@ -252,7 +267,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             ScrollViewer.ScrollToVerticalOffset(AppearanceScrollBar.Value); // 设置滚动条值
         }
+        #endregion
 
+        #region 复选框事件
         // 复选框点击事件
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
@@ -287,7 +304,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
             }
         }
+        #endregion
 
+        #region 颜色选择
         // 颜色按钮点击事件，弹出颜色选择器并初始化为当前颜色
         private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
@@ -355,7 +374,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 }
             }
         }
+        #endregion
 
+        #region 资源释放
         // 释放资源
         private void AppearanceGrid_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -399,13 +420,17 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             _tempFiles.Clear();
         }
+        #endregion
 
+        #region 预置样式（菜单入口）
         // 点击按钮打开预设菜单
         private void PresetStyleButton_Click(object sender, RoutedEventArgs e)
         {
             PresetStylePopup.IsOpen = true; // 打开预设样式弹出窗口
         }
+        #endregion
 
+        #region 预览加载与交互
         // 为预览加载全局按钮
         private async void LoadGlobalButtonsForPreview()
         {
@@ -560,7 +585,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 btn.RenderTransform = null; // 还原为默认大小
             }
         }
+        #endregion
 
+        #region 滑块事件
         // 滑块值改变事件，统一处理所有相关Slider
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
@@ -595,7 +622,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 LoadGlobalButtonsForPreview(); // 刷新预览区按钮内容和样式
             }
         }
+        #endregion
 
+        #region 字体与圆角
         // 下拉框选择改变事件
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -654,7 +683,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ClipHelper.UpdateBorderClip(ViewPreviewBorder);
             }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
+        #endregion
 
+        #region 预览开关
         // "开启预览"复选框点击事件
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
@@ -667,7 +698,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
             }
         }
+        #endregion
 
+        #region 重置外观
         // 重置外观设置按钮点击事件
         private void ResetAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
@@ -686,7 +719,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新数据库
             }
         }
+        #endregion
 
+        #region 字体列表初始化与全局字体
         // 初始化字体下拉框
         private async Task InitializeFontComboBoxes()
         {
@@ -749,7 +784,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 
             Application.Current.Resources["GlobalFontFamily"] = fontFamily;
         }
+        #endregion
 
+        #region 背景图片选择与预览
         // 点击"选择..."按钮
         private void BackgroundImagePathButton_Click(object sender, RoutedEventArgs e)
         {
@@ -904,7 +941,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             SettingDatabase.UpdateAppearance(settingManager.appearanceConditions); // 更新外观设置到数据库
             settingManager.appearanceConditions.BackgroundImagePath = BackgroundImagePathTextBox.Text; // 保存路径到缓存
         }
+        #endregion
 
+        #region 外观分享与导入
         // 点击按钮分享外观
         private void ShareSaveAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1172,6 +1211,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 image.Save(destPath);
             }
         }
+        #endregion
 
         // 点击"已分享或保存的外观"按钮打开外观分享文件夹
         private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
@@ -1180,6 +1220,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Process.Start("explorer.exe", AppPathHelper.SharedAppearanceFolder); // 使用资源管理器打开该文件夹
         }
 
+        #region 预置样式（应用与定义）
         // 预置样式按钮点击事件
         private void PresetStyleItem_Click(object sender, RoutedEventArgs e)
         {
@@ -1412,5 +1453,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             p.ButtonTextColor = "#FFFFFFFF";
             p.Blur = 0;
         });
+        #endregion
     }
 }
