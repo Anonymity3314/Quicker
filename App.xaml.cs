@@ -923,8 +923,6 @@ namespace Quicker
 
             var toastMessage = AppStateManager.Pause ? "Quicker已恢复" : "Quicker已暂停"; // 消息提醒
             var text = AppStateManager.Pause ? "暂停" : "恢复"; // 消息提醒
-            CustomMenu customMenu = Current.Windows.OfType<CustomMenu>().FirstOrDefault(); // 尝试查找现有的菜单栏
-            customMenu.PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
             AppStateManager.Pause = !AppStateManager.Pause; // 切换暂停状态
             taskbarIcon.IconSource = AppStateManager.TrayIcon; // 切换托盘图标
             toast.Show(toastMessage, AppStateManager.Pause ? ToastType.Common : ToastType.Success); // 弹出消息提醒

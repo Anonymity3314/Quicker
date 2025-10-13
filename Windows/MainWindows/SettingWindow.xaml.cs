@@ -89,6 +89,7 @@ namespace Quicker.Windows.MainWindows
             RefreshCurrentSettingsDisplay(); // 刷新当前显示的界面
             await SaveSettingsAsync(); // 只保存设置，不显示信息
             CancelSettingsButton.Visibility = Visibility.Hidden; // 设置已恢复，隐藏撤销按钮
+            RefreshTrayIconForBothStates(); // 保存设置后刷新托盘图标
         }
 
         // 应用设置
@@ -103,8 +104,7 @@ namespace Quicker.Windows.MainWindows
             var result = await SaveSettingsAsync(); // 保存设置并获取结果
             ShowSaveResultMessage(result); // 显示保存结果信息
 
-            // 保存设置后刷新托盘图标
-            RefreshTrayIconForBothStates();
+            RefreshTrayIconForBothStates(); // 保存设置后刷新托盘图标
         }
 
         /// <summary>

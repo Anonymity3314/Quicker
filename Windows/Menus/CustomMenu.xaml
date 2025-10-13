@@ -47,7 +47,7 @@
                 <Button Click="PauseQuicker" ToolTip="暂停和恢复Quicker触发" Style="{StaticResource MenuButton}">
                     <Grid Width="194">
                         <Image x:Name="pauseQuicker" Source="/Resources/Images/Pause.png" Style="{StaticResource MenuButtonImage}" Margin="7,0,7,0"/>
-                        <TextBlock Text="暂停" x:Name="PauseQuickerTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
+                        <TextBlock x:Name="PauseQuickerTextBlock" Style="{StaticResource MenuButtonTextBlock}"/>
                     </Grid>
                 </Button>
                 <!--<Button Click="Button_Click" Style="{StaticResource MenuButton}">

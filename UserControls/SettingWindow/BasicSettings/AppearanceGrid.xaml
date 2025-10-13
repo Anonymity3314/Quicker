@@ -276,7 +276,7 @@
                         <!-- 背景图片-路径 -->
                         <Label Content="路径：" Margin="15,769,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="107,770,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="176" Text="{Binding BackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="BackgroundImagePathTextBox_TextChanged"/>
-                        <Button x:Name="BackgroundImagePathButton" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="288,771,0,0" VerticalAlignment="Top" Width="53" Click="BackgroundImagePathButton_Click"/>
+                        <Button x:Name="BackgroundImagePathButton" ToolTip="点击添加背景图片，右键清空当前图片" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="288,771,0,0" VerticalAlignment="Top" Width="53" Click="BackgroundImagePathButton_Click" MouseRightButtonDown="BackgroundImagePathButton_MouseRightButtonDown"/>
                         <Popup x:Name="BackgroundImagePathPopup" PopupAnimation="Fade" Width="150" Height="62" PlacementTarget="{Binding ElementName=BackgroundImagePathButton}" AllowsTransparency="True" StaysOpen="False">
                             <Grid>
                                 <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">

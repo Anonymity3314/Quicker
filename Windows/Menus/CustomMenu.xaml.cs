@@ -21,6 +21,14 @@ namespace Quicker.Windows.Menus
         {
             base.OnWindowLoaded(sender, e); // 调用基类方法处理动画
             base.SetWindowBottomLeftNearMouse(); // 使用基类方法设置窗口左下角在鼠标位置附近
+            SetRunModeText(); // 设置运行模式文本
+        }
+
+        // 设置运行模式文本
+        private void SetRunModeText()
+        {
+            var text = AppStateManager.Pause ? "恢复" : "暂停"; // 消息提醒
+            PauseQuickerTextBlock.Text = text; // 更新菜单栏文本
         }
 
         // 弹出面板窗口
@@ -61,6 +69,7 @@ namespace Quicker.Windows.Menus
         // 重启应用
         public void Restart(object sender, RoutedEventArgs e)
         {
+            base.Visibility = Visibility.Hidden; // 隐藏当前窗口
             string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location; // 获取当前应用程序的完整路径
             string directory = Path.GetDirectoryName(exePath); // 获取可执行文件的目录
             string exeName = Path.GetFileNameWithoutExtension(exePath) + ".exe"; // 获取可执行文件的名称
@@ -76,6 +85,7 @@ namespace Quicker.Windows.Menus
         // 退出应用
         private void Exit(object sender, RoutedEventArgs e)
         {
+            base.Visibility = Visibility.Hidden; // 隐藏当前窗口
             app.Shutdown(); // 通过App类正确关闭应用，确保OnExit方法被调用
         }
 

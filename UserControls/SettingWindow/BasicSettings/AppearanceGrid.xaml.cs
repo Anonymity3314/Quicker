@@ -880,6 +880,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
 
+        // 右键清空图片路径
+        private void BackgroundImagePathButton_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            BackgroundImagePathTextBox.Text = ""; // 清空路径
+        }
+
         /// <summary>
         /// 设置预览区背景图片，支持GIF动图
         /// </summary>
