@@ -26,12 +26,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
 
-            // 设置路径文本内容
-            RootFolderPath.Text = AppPathHelper.AppDataRoot;
-            DatabaseFolderPath.Text = AppPathHelper.DatabaseFolder;
-            LocalIconsFolderPath.Text = AppPathHelper.LocalIconsFolder;
-
-            GetTempDataSize(); // 获取临时数据大小
+            RefreshPathsAndEnsureDirectories(); // 初始化路径与目录
         }
 
         // 基础设置-关于Quicker-关于Quicker
@@ -271,6 +266,144 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             // 清理事件处理程序
             VersionLabel.Content = string.Empty; // 清理文本内容
             TempSize.Text = null; // 清理文本内容
+        }
+
+        // 点击按钮修改配置文件，更改数据文件夹路径
+        private void ChangeDataFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            using var folderDialog = new System.Windows.Forms.FolderBrowserDialog() { Description = "选择新的数据根目录", UseDescriptionForTitle = true };
+            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string selectedPath = folderDialog.SelectedPath;
+                string oldRoot = AppPathHelper.AppDataRoot; // 切换前旧根目录
+                using var toast = new ToastManager();
+                if (AppPathHelper.TrySetAppDataRoot(selectedPath, out var resolved))
+                {
+                    string newRoot = resolved ?? AppPathHelper.AppDataRoot;
+                    HandleMigrationIfNeeded(oldRoot, newRoot, toast);
+
+                    RefreshPathsAndEnsureDirectories();
+
+                    toast.Show($"设置成功！", ToastType.Success);
+                }
+                else
+                {
+                    toast.Show("设置失败，请选择有效路径或检查权限。", ToastType.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 刷新路径展示并确保目录存在，同时更新临时大小
+        /// </summary>
+        private void RefreshPathsAndEnsureDirectories()
+        {
+            AppPathHelper.EnsureAllDirectoriesExist(); // 确保所有目录存在
+            RootFolderPath.Text = AppPathHelper.AppDataRoot; // 设置根文件夹路径
+            DatabaseFolderPath.Text = AppPathHelper.DatabaseFolder; // 设置数据库文件夹路径
+            LocalIconsFolderPath.Text = AppPathHelper.LocalIconsFolder; // 设置图标文件夹路径
+            GetTempDataSize(); // 获取临时数据大小
+        }
+
+        /// <summary>
+        /// 根据用户选择执行数据迁移与可选删除旧目录。
+        /// </summary>
+        /// <param name="oldRoot">旧根目录</param>
+        /// <param name="newRoot">新根目录</param>
+        /// <param name="toast">ToastManager 实例</param>
+        private void HandleMigrationIfNeeded(string oldRoot, string newRoot, ToastManager toast)
+        {
+            if (IsSamePath(oldRoot, newRoot))
+            {
+                return;
+            }
+
+            if (IsSubdirectory(oldRoot, newRoot))
+            {
+                toast.Show("新目录位于旧目录内部，已取消自动迁移。", ToastType.Warning);
+                return;
+            }
+
+            var migrate = MessageBox.Show(
+                $"是否将现有数据从:\n{oldRoot}\n迁移(覆盖)到:\n{newRoot}?",
+                "迁移数据",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (migrate == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    CopyFolder(oldRoot, newRoot);
+                    var deleteOld = MessageBox.Show(
+                        $"迁移完成。是否删除旧数据目录？\n{oldRoot}",
+                        "删除旧数据",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+                    if (deleteOld == MessageBoxResult.Yes)
+                    {
+                        TryDeleteDirectory(oldRoot, toast);
+                    }
+                }
+                catch
+                {
+                    toast.Show("迁移失败，请检查磁盘空间与权限。", ToastType.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 判断路径是否相同（忽略大小写，规范化）
+        /// </summary>
+        /// <param name="pathA">路径A</param>
+        /// <param name="pathB">路径B</param>
+        /// <returns>是否相同</returns>
+        private static bool IsSamePath(string pathA, string pathB)
+        {
+            try
+            {
+                var a = Path.GetFullPath(pathA).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                var b = Path.GetFullPath(pathB).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return false; }
+        }
+
+        /// <summary>
+        /// 判断 child 是否位于 parent 子目录中
+        /// </summary>
+        /// <param name="parent">父目录路径</param>
+        /// <param name="child">子目录路径</param>
+        /// <returns>是否为子目录</returns>
+        private static bool IsSubdirectory(string parent, string child)
+        {
+            try
+            {
+                var parentFull = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                var childFull = Path.GetFullPath(child).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                return childFull.StartsWith(parentFull, StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return false; }
+        }
+
+        /// <summary>
+        /// 尝试删除目录
+        /// </summary>
+        /// <param name="folderPath">目录路径</param>
+        /// <param name="toast">ToastManager 实例</param>
+        private static void TryDeleteDirectory(string folderPath, ToastManager toast)
+        {
+            try
+            {
+                if (Directory.Exists(folderPath))
+                {
+                    Directory.Delete(folderPath, true);
+                }
+            }
+            catch
+            {
+                toast.Show("删除旧数据目录失败，请手动清理。", ToastType.Warning);
+            }
         }
     }
 

@@ -53,8 +53,10 @@
             <Label Grid.Column="1" Content="入正" FontSize="16" HorizontalAlignment="Left" Margin="4,279,0,0" VerticalAlignment="Top"/>
             <TextBlock x:Name="getquicker_net" Grid.Column="1" Style="{StaticResource HoverTextBlock}" ToolTip="前往正版Quicker官网" Margin="10,315,0,0" Text="getquicker.net" MouseLeftButtonDown="getquicker_net_MouseLeftButtonDown" FontSize="14"/>
             <!-- 数据文件夹 -->
-            <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="447" Margin="0,0,0,55">
+            <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="644" Margin="0,0,0,55">
                 <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
+                <Button x:Name="ChangeDataFolderButton" Content="更改..." ToolTip="更改应用数据存储路径" HorizontalAlignment="Left" Style="{StaticResource WhiteButton}" Margin="95,6,0,0" VerticalAlignment="Top" Width="47" Height="20" Click="ChangeDataFolderButton_Click"/>
+
                 <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,30,0,0" VerticalAlignment="Top" FontSize="14"/>
                 <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,60,0,0" Text="" MouseDown="RootFolderPath_MouseDown"/>
                 <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,80,0,0" VerticalAlignment="Top" FontSize="14"/>
