@@ -24,7 +24,7 @@
         <Label IsHitTestVisible="False" Content="可以用英文分号隔开不同路径来添加多个文件" Foreground="DarkGray" Visibility="{Binding ElementName=LocationTextBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,16,0,0" FontSize="11" Panel.ZIndex="1"/>
         <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" SizeChanged="LocationTextBox_SizeChanged"/>
         <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu"/>
-        <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="112" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+        <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="137" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
             <Grid>
                 <Border Background="White" CornerRadius="3" Margin="3">
                     <Border.Effect>
@@ -55,6 +55,12 @@
                             <Grid Width="174" Height="20">
                                 <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
                                 <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                            </Grid>
+                        </Button>
+                        <Button Style="{StaticResource MenuButton}" ToolTip="重新提取文件图标" Click="ReGetFileIcon">
+                            <Grid Width="174" Height="20">
+                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
+                                <TextBlock Text="重新提取图标" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
                             </Grid>
                         </Button>
                     </StackPanel>

@@ -530,6 +530,56 @@ namespace Quicker.Database.Core
             return DatabaseHelper.OpenConnection("Button.db");
         }
 
+        /// <summary>
+        /// 遍历所有表，将 ImagePath 中的旧根路径替换为新根路径。
+        /// </summary>
+        /// <param name="oldRoot">旧图片根路径（例如 C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker）</param>
+        /// <param name="newRoot">新图片根路径（例如 C:\\Downloads）</param>
+        public void MigrateImagePathRoot(string oldRoot, string newRoot)
+        {
+            if (string.IsNullOrWhiteSpace(oldRoot) || string.IsNullOrWhiteSpace(newRoot))
+            {
+                return;
+            }
+
+            // 规范化为完整路径，尽量统一比较
+            string normalizedOld = oldRoot.Trim();
+            string normalizedNew = newRoot.Trim();
+            if (string.Equals(normalizedOld, normalizedNew, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var tableNames = GetAllTableNames();
+            if (tableNames == null || tableNames.Count == 0)
+            {
+                return;
+            }
+
+            using var connection = OpenConnection();
+            using var transaction = connection.BeginTransaction();
+            foreach (var table in tableNames)
+            {
+                // 跳过 SQLite 内部表
+                if (table.StartsWith("sqlite_", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string sql = "UPDATE [" + table + 
+                    "] SET ImagePath = REPLACE(COALESCE(ImagePath, ''), @OldRoot, @NewRoot) " +
+                    "WHERE ImagePath LIKE @OldLike";
+
+                using var cmd = new SQLiteCommand(sql, connection, transaction);
+                cmd.Parameters.AddWithValue("@OldRoot", normalizedOld);
+                cmd.Parameters.AddWithValue("@NewRoot", normalizedNew);
+                cmd.Parameters.AddWithValue("@OldLike", normalizedOld + "%");
+
+                cmd.ExecuteNonQuery();
+            }
+            transaction.Commit();
+        }
+
         public void Dispose()
         {
             // 释放资源

@@ -598,6 +598,38 @@ namespace Quicker.Database.Core
         }
 
         /// <summary>
+        /// 将 Appearance 表中的 BackgroundImagePath 的旧根路径批量替换为新根路径。
+        /// </summary>
+        /// <param name="oldRoot">旧图片根路径（例如 C:\\Users\\LENOVO\\AppData\\Roaming\\Anonymity\\Quicker）</param>
+        /// <param name="newRoot">新图片根路径（例如 C:\\Downloads）</param>
+        public static void MigrateAppearanceBackgroundImagePathRoot(string oldRoot, string newRoot)
+        {
+            if (string.IsNullOrWhiteSpace(oldRoot) || string.IsNullOrWhiteSpace(newRoot))
+            {
+                return;
+            }
+
+            string normalizedOld = oldRoot.Trim();
+            string normalizedNew = newRoot.Trim();
+            if (string.Equals(normalizedOld, normalizedNew, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            using var connection = OpenConnection(); // 打开数据库连接
+            using var transaction = connection.BeginTransaction(); // 开启事务
+            string sql = "UPDATE Appearance SET " +
+                         "BackgroundImagePath = REPLACE(COALESCE(BackgroundImagePath, ''), @OldRoot, @NewRoot) " +
+                         "WHERE BackgroundImagePath LIKE @OldLike";
+            using var cmd = new SQLiteCommand(sql, connection, transaction);
+            cmd.Parameters.AddWithValue("@OldRoot", normalizedOld);
+            cmd.Parameters.AddWithValue("@NewRoot", normalizedNew);
+            cmd.Parameters.AddWithValue("@OldLike", normalizedOld + "%");
+            cmd.ExecuteNonQuery();
+            transaction.Commit();
+        }
+
+        /// <summary>
         /// 打开数据库连接
         /// </summary>
         /// <returns> SQLiteConnection 对象 </returns>

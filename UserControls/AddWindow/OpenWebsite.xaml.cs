@@ -187,11 +187,14 @@ namespace Quicker.UserControls.AddWindow
         // 获取网站图标
         private void FetchWebsiteIcon()
         {
-            if (string.IsNullOrEmpty(LocationTextBox.Text)) return;
-            
-            // 获取网站图标和名称
-            ImageSource icon = _iconManager.GetWebsiteIcon(LocationTextBox.Text);
-            _addWindow.TitleTextBox.Text = _buttonManager.GetWebsiteNameFromUrl(LocationTextBox.Text);
+            if (string.IsNullOrWhiteSpace(LocationTextBox.Text)) return;
+            string url = LocationTextBox.Text.Trim();
+
+            ImageSource icon = _iconManager.GetWebsiteIcon(url); // 获取网站图标和名称
+            if (string.IsNullOrWhiteSpace(_addWindow.TitleTextBox.Text)) // 如果标题为空，则自动获取网站名称
+            {
+                _addWindow.TitleTextBox.Text = _buttonManager.GetWebsiteNameFromUrl(url);
+            }
             
             if (icon == null) return;
             

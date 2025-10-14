@@ -146,6 +146,13 @@ namespace Quicker.UserControls.AddWindow
             OpenFilePopup.IsOpen = false; // 关闭弹出菜单
         }
 
+        // 重新提取文件图标
+        private void ReGetFileIcon(object sender, RoutedEventArgs e)
+        {
+            SetIconFromPath(LocationTextBox.Text); // 设置图标
+            OpenFilePopup.IsOpen = false; // 关闭弹出菜单
+        }
+
         /// <summary>
         /// 处理剪贴板中的地址
         /// </summary>
@@ -223,6 +230,8 @@ namespace Quicker.UserControls.AddWindow
         /// <summary>
         /// 判断是否为打开文件相关的动作类型
         /// </summary>
+        /// <param name="actionType">动作类型</param>
+        /// <returns>是否为打开文件相关的动作类型</returns>
         private bool IsOpenFileAction(string actionType)
         {
             return actionType == "OpenFile" || actionType == "OpenFiles" || actionType == "OpenUwpApp";
@@ -231,6 +240,7 @@ namespace Quicker.UserControls.AddWindow
         /// <summary>
         /// 设置标题和地址栏
         /// </summary>
+        /// <param name="buttonData">按钮数据</param>
         private void SetButtonTitleAndLocation(ButtonData buttonData)
         {
             if (!string.IsNullOrWhiteSpace(buttonData.Title))
@@ -245,6 +255,7 @@ namespace Quicker.UserControls.AddWindow
         /// <summary>
         /// 安全设置图标（带异常处理）
         /// </summary>
+        /// <param name="imagePath">图片路径</param>
         private void SetButtonImageSafe(string imagePath)
         {
             if (!string.IsNullOrEmpty(imagePath))
@@ -264,6 +275,7 @@ namespace Quicker.UserControls.AddWindow
         /// <summary>
         /// 设置其他选项（如复选框、下拉框、描述等）
         /// </summary>
+        /// <param name="buttonData">按钮数据</param>
         private void SetOtherOptions(ButtonData buttonData)
         {
             RunByMessager.IsChecked = buttonData.Data1 == "True"; // 设置运行方式

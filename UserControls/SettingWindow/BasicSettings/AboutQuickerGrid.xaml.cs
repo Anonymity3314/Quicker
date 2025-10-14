@@ -10,6 +10,7 @@ using Quicker.Helpers;
 using System.Windows;
 using System.Text;
 using System.IO;
+using Quicker.Database.Core;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -280,10 +281,18 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 if (AppPathHelper.TrySetAppDataRoot(selectedPath, out var resolved))
                 {
                     string newRoot = resolved ?? AppPathHelper.AppDataRoot;
-                    HandleMigrationIfNeeded(oldRoot, newRoot, toast);
+                    HandleMigrationIfNeeded(oldRoot, newRoot, toast); // 根据用户选择执行数据迁移与可选删除旧目录
 
-                    RefreshPathsAndEnsureDirectories();
+                    // 迁移数据库中路径引用
+                    try
+                    {
+                        using var buttonDb = new ButtonDatabase();
+                        buttonDb.MigrateImagePathRoot(oldRoot, newRoot);
+                        SettingDatabase.MigrateAppearanceBackgroundImagePathRoot(oldRoot, newRoot);
+                    }
+                    catch { }
 
+                    RefreshPathsAndEnsureDirectories(); // 刷新路径展示并确保目录存在，同时更新临时大小
                     toast.Show($"设置成功！", ToastType.Success);
                 }
                 else

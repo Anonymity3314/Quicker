@@ -80,7 +80,7 @@ namespace Quicker.UserControls.AddWindow
             UpdateIconFromButtonData(buttonData); // 更新图标
             _addWindow.DescriptionTextBox.Text = buttonData.Description; // 设置描述
             _addWindow.UpdateTooltip(); // 更新提示
-            LoadExtensionInfo(_selectedPath); // 加载扩展信息
+            LoadExtensionInfo(_selectedPath, false); // 加载扩展信息，但不覆盖图标
         }
 
         /// <summary>
@@ -165,7 +165,8 @@ namespace Quicker.UserControls.AddWindow
         /// 加载扩展信息
         /// </summary>
         /// <param name="dllPath">扩展DLL文件路径</param>
-        private void LoadExtensionInfo(string dllPath)
+        /// <param name="setIcon">是否设置图标，默认为true</param>
+        private void LoadExtensionInfo(string dllPath, bool setIcon = true)
         {
             using var toast = new ToastManager();
             if (!File.Exists(dllPath) || !dllPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
@@ -198,8 +199,11 @@ namespace Quicker.UserControls.AddWindow
                 _addWindow.DescriptionTextBox.Text = module.Description;
                 _addWindow.UpdateTooltip();
                 
-                // 设置扩展模块图标
-                SetExtensionModuleImage(module);
+                // 根据参数决定是否设置扩展模块图标
+                if (setIcon)
+                {
+                    SetExtensionModuleImage(module);
+                }
             }
             catch
             {

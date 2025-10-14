@@ -23,6 +23,8 @@ namespace Quicker.Managers
 {
     internal class IconManager
     {
+        #region 字段
+        
         // 静态 HttpClient 实例，用于网络请求
         private static readonly HttpClient httpClient = new(new HttpClientHandler
         {
@@ -38,6 +40,10 @@ namespace Quicker.Managers
         // 释放图标资源
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr hIcon); // 释放图标资源
+
+        // 提取图标
+        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr ExtractIcon(IntPtr hInst, string lpszExeFileName, int nIconIndex); // 提取图标
 
         // 获取文件图标
         [StructLayout(LayoutKind.Sequential)]
@@ -59,9 +65,13 @@ namespace Quicker.Managers
         private const uint SHGFI_LARGEICON = 0x000000000; // 大图标
         private const uint SHGFI_SMALLICON = 0x000000001; // 小图标
         private const uint SHGFI_ICON = 0x000000100; // 获取图标
+        private const uint SHGFI_ICONLOCATION = 0x000001000; // 获取图标位置
+        private const uint SHGFI_ATTRIBUTES = 0x000000800; // 获取文件属性
+
+        #endregion
 
         /// <summary>
-        /// 获取应用程序图标
+        /// 获取应用程序图标（优先获取原始图标）
         /// </summary>
         /// <param name="appPath"> 应用程序路径 </param>
         /// <returns> 应用图标 </returns>
@@ -69,6 +79,14 @@ namespace Quicker.Managers
         {
             try
             {
+                // 优先尝试获取原始图标（无压缩标识）
+                ImageSource originalIcon = GetOriginalIcon(appPath);
+                if (originalIcon != null)
+                {
+                    return originalIcon;
+                }
+
+                // 如果原始图标获取失败，回退到普通方法
                 uint flags = SHGFI_ICON | SHGFI_LARGEICON; // 获取大图标
                 SHFILEINFO shfi = new SHFILEINFO(); // 创建文件信息结构体
                 IntPtr hIcon = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags); // 获取图标句柄
@@ -85,6 +103,112 @@ namespace Quicker.Managers
                 return null; // 如果出现异常，返回 null
             }
             return null; // 如果获取失败，返回 null
+        }
+
+        /// <summary>
+        /// 获取原始图标（无压缩标识）
+        /// </summary>
+        /// <param name="appPath"> 应用程序路径 </param>
+        /// <returns> 原始图标 </returns>
+        public ImageSource GetOriginalIcon(string appPath)
+        {
+            try
+            {
+                // 方法1：尝试使用 ExtractIcon API 直接提取
+                ImageSource extractedIcon = ExtractIconFromFile(appPath);
+                if (extractedIcon != null)
+                {
+                    return extractedIcon;
+                }
+
+                // 方法2：尝试获取原始图标位置
+                uint flags = SHGFI_ICONLOCATION | SHGFI_ATTRIBUTES;
+                SHFILEINFO shfi = new SHFILEINFO();
+                IntPtr result = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags);
+                if (result != IntPtr.Zero && !string.IsNullOrEmpty(shfi.szDisplayName))
+                {
+                    // 如果找到了原始图标位置，尝试从原始位置获取图标
+                    string originalPath = shfi.szDisplayName;
+                    if (File.Exists(originalPath))
+                    {
+                        return GetIcon(originalPath);
+                    }
+                }
+
+                // 方法3：尝试从系统目录获取原始文件
+                string systemPath = GetSystemOriginalPath(appPath);
+                if (!string.IsNullOrEmpty(systemPath) && File.Exists(systemPath))
+                {
+                    return ExtractIconFromFile(systemPath);
+                }
+
+                return null;
+            }
+            catch
+            {
+                ShowToast("获取原始图标失败。", ToastType.Error);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 获取系统原始文件路径
+        /// </summary>
+        /// <param name="appPath"> 应用程序路径 </param>
+        /// <returns> 系统原始路径 </returns>
+        private string GetSystemOriginalPath(string appPath)
+        {
+            try
+            {
+                string fileName = Path.GetFileName(appPath);
+                if (string.IsNullOrEmpty(fileName)) return null;
+
+                // 常见的系统目录
+                string[] systemPaths = {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), fileName),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SystemX86), fileName),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "System32", fileName),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SysWOW64", fileName)
+                };
+
+                foreach (string path in systemPaths)
+                {
+                    if (File.Exists(path))
+                    {
+                        return path;
+                    }
+                }
+            }
+            catch
+            {
+                // 忽略异常
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 从文件中提取图标（使用 ExtractIcon API）
+        /// </summary>
+        /// <param name="filePath"> 文件路径 </param>
+        /// <returns> 提取的图标 </returns>
+        private ImageSource ExtractIconFromFile(string filePath)
+        {
+            try
+            {
+                // 使用 ExtractIcon API 获取原始图标
+                IntPtr hIcon = ExtractIcon(IntPtr.Zero, filePath, 0);
+                if (hIcon != IntPtr.Zero && hIcon != new IntPtr(1))
+                {
+                    ImageSource iconSource = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                    DestroyIcon(hIcon);
+                    return iconSource;
+                }
+            }
+            catch
+            {
+                return GetIcon(filePath); // 如果 ExtractIcon 失败，回退到普通方法
+            }
+            return null;
         }
 
         /// <summary>
