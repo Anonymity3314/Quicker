@@ -39,11 +39,11 @@
             </Button>
         </StackPanel>
         <!-- 侧边栏2 -->
-        <Grid x:Name="MenuGrid" Background="#FFF0F0F0" HorizontalAlignment="Center" Grid.Column="1" Width="192">
-            <Grid Height="60" HorizontalAlignment="Left" VerticalAlignment="Top" Width="192">
+        <Grid x:Name="MenuGrid" Background="#FFF0F0F0" HorizontalAlignment="Center" Grid.Column="1">
+            <Grid Height="60" VerticalAlignment="Top">
                 <Label Content="筛选..." Foreground="#FFABADB3" Visibility="{Binding ElementName=SearchBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" Margin="22,0,0,0" VerticalAlignment="Center"/>
                 <TextBox x:Name="SearchBox" Margin="22,0" Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Style="{StaticResource RoundedTextBox}" TextChanged="SearchBox_TextChanged"/>
-                <Button x:Name="ClearSearchTextBoxButton" Margin="149,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="16" Height="16">
+                <Button x:Name="ClearSearchTextBoxButton" Margin="140,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="16" Height="16" Click="ClearSearchTextBoxButton_Click">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource ClearSearchTextBoxButton}">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -58,7 +58,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Popup x:Name="SearchResultPopup" PlacementTarget="{Binding ElementName=SearchBox}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade" Width="192">
+                <Popup x:Name="SearchResultPopup" PlacementTarget="{Binding ElementName=SearchBox}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade" Width="180">
                     <Grid>
                         <Border Background="White" CornerRadius="3" Margin="3">
                             <Border.Effect>
@@ -72,39 +72,39 @@
                 </Popup>
             </Grid>
             <!-- 基础设置 -->
-            <StackPanel x:Name="BasicSettingsStackPanel" Width="192" Visibility="Visible" Margin="0,60,0,0">
+            <StackPanel x:Name="BasicSettingsStackPanel" Visibility="Visible" Margin="0,60,0,0">
                 <Button x:Name="Convention" ToolTip="自动启动、鼠标挂钩、版本等" Style="{StaticResource Button2}" Click="Convention_Click" MouseLeave="Convention_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/SettingImage2.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="常规" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
                 <Button x:Name="OpenMainWindow" ToolTip="面板弹出方式" Style="{StaticResource Button2}" Click="OpenMainWindow_Click" MouseLeave="OpenMainWindow_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/OpenMainWindow2.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="弹出面板" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
                 <Button Visibility="Collapsed" x:Name="FunctionShortcutKeys" ToolTip="Quicker功能快捷键" Style="{StaticResource Button2}" Click="FunctionShortcutKeys_Click" MouseLeave="FunctionShortcutKeys_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="功能快捷键" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
                 <Button x:Name="Blacklist" ToolTip="在某些应用上停止使用Quicker" Style="{StaticResource Button2}" Click="Blacklist_Click" MouseLeave="Blacklist_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/BlackList.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="黑名单" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
                 <Button x:Name="Appearance" ToolTip="颜色、字体等样式设置" Style="{StaticResource Button2}" Click="Appearance_Click" MouseLeave="Appearance_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="外观" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
                 </Button>
                 <Button x:Name="AboutQuicker" ToolTip="应用等相关信息" Style="{StaticResource Button2}" Click="AboutQuicker_Click" MouseLeave="AboutQuicker_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/AboutQuicker.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="关于Quicker" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>
@@ -115,7 +115,7 @@
             <!-- 工具 -->
             <StackPanel x:Name="ToolsStackPanel" Width="192" Margin="0,60,0,0" Visibility="Hidden">
                 <Button x:Name="ManageExtensions" ToolTip="进行扩展管理" Style="{StaticResource Button2}" Click="ManageExtensions_Click" MouseLeave="ManageExtensions_MouseLeave">
-                    <Grid Width="195">
+                    <Grid Width="180">
                         <Image Source="/Resources/Images/Quicker_Enabled.png" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="24" Width="24"/>
                         <TextBlock Text="管理扩展" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="39,0,0,0"/>
                     </Grid>

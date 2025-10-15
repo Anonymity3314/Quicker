@@ -637,6 +637,12 @@ namespace Quicker.Windows.MainWindows
 
         #region 搜索与高亮
 
+        // 点击按钮清空搜索
+        private void ClearSearchTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchBox.Text = ""; // 清空搜索框
+        }
+
         /// <summary>
         /// 查找按钮内的TextBlock
         /// </summary>
