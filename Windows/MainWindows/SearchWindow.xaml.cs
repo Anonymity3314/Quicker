@@ -1,4 +1,5 @@
 ﻿using VisualTreeHelper = System.Windows.Media.VisualTreeHelper;
+using System.Text.RegularExpressions;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
@@ -17,6 +18,14 @@ namespace Quicker.Windows.MainWindows
 {
     public partial class SearchWindow : Window
     {
+        private static readonly string[] KnownTldSuffixes = new[]
+        {
+            ".com", ".cn", ".net", ".org", ".io", ".gov", ".edu", ".co", ".me",
+            ".top", ".xyz", ".tech", ".site", ".info", ".biz", ".cc", ".tv",
+            ".uk", ".de", ".jp", ".ru", ".in", ".fr", ".it", ".es", ".nl",
+            ".au", ".ca", ".br", ".mx", ".se", ".no", ".fi", ".pl",
+            ".app", ".dev", ".ai", ".cloud"
+        };
         public bool IsPinned
         {
             get { return (bool)GetValue(IsPinnedProperty); }
@@ -175,7 +184,7 @@ namespace Quicker.Windows.MainWindows
         // 打开指定网址
         private void OpenUrlCommandButton_Click(object sender, RoutedEventArgs e)
         {
-            actionManager.LaunchDefaultBrowser(OpenUrlCommandButton_Text.Text);
+            actionManager.LaunchDefaultBrowser(OpenUrlCommandButton_Text.Text); // 默认浏览器打开网址
         }
 
         // 用必应搜索
@@ -199,10 +208,81 @@ namespace Quicker.Windows.MainWindows
         // 更新搜索链接
         private void UpdateSearchUrl()
         {
-            OpenUrlCommandButton_Text.Text = $"http://{SearchBox.Text}.com";
+            string normalizedUrl = NormalizeUrlFromInput(SearchBox.Text); // 规范化输入
+            OpenUrlCommandButton_Text.Text = normalizedUrl;
+            OpenUrlCommandButton_Title.Text = normalizedUrl;
             SearchBingCommandButton_Text.Text = $"https://cn.bing.com/search?q={Uri.EscapeDataString(SearchBox.Text ?? "")}";
             SearchBaiduCommandButton_Text.Text = $"https://www.baidu.com/s?wd={Uri.EscapeDataString(SearchBox.Text ?? "")}";
             SearchGoogleCommandButton_Text.Text = $"https://www.google.com/search?q={Uri.EscapeDataString(SearchBox.Text ?? "")}";
+        }
+
+        /// <summary>
+        /// 将用户输入规范化为用于“打开网址”的字符串。
+        /// 规则：
+        /// 1) 已含 http:// 或 https:// 前缀时，直接返回原值（不重复添加）。
+        /// 2) 已含其它自定义 scheme（如 mailto:、ftp://）时，直接返回原值。
+        /// 3) 输入已包含点号（如 ChatGPT.com）认为是域名，直接返回原值。
+        /// 4) 其它情况，补全为 http://{输入}.com。
+        /// </summary>
+        private string NormalizeUrlFromInput(string input)
+        {
+            string text = (input ?? string.Empty).Trim();
+            // 移除所有空白字符，避免如 "ChatGPT. com" 导致无效显示
+            text = Regex.Replace(text, "\\s+", "");
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
+            // 记录并识别协议（如 http://、https://、ftp:// 等）
+            string originalScheme = null;
+            int schemeIndex = text.IndexOf("://", StringComparison.Ordinal);
+            if (schemeIndex >= 0)
+            {
+                originalScheme = text.Substring(0, schemeIndex);
+                // 对于非 http/https 的自定义协议，直接返回原输入（保持应用兼容性）
+                if (!originalScheme.Equals("http", StringComparison.OrdinalIgnoreCase) &&
+                    !originalScheme.Equals("https", StringComparison.OrdinalIgnoreCase))
+                    return text;
+                // 去掉协议，转而统一后续规范化主机名
+                text = text.Substring(schemeIndex + 3);
+            }
+            else if (text.StartsWith("//")) // 协议相对 URL，统一按 https 处理
+            {
+                text = text.Substring(2);
+                originalScheme = "https";
+            }
+
+            text = text.TrimStart('/'); // 去除多余的前导斜杠
+            int hostEnd = text.IndexOfAny(new[] { '/', '?', '#' }); // 仅保留主机名部分（忽略路径、查询、片段）
+            if (hostEnd >= 0)
+                text = text.Substring(0, hostEnd);
+
+            text = text.Trim('.'); // 去掉首尾点号
+            if (string.IsNullOrEmpty(text)) // 若已经空了，直接返回空，避免拼出无效的 http://
+                return string.Empty;
+
+            if (!EndsWithKnownTld(text)) // 若主机名不以常见 TLD 结尾，则补全为 .com；否则保留原样
+                text += ".com";
+
+            // 选择协议：保留用户已给出的 http/https，否则默认使用 https
+            string schemeToUse = string.IsNullOrEmpty(originalScheme) ? "https" : originalScheme.ToLowerInvariant();
+            string finalUrl = schemeToUse + "://" + text;
+            return finalUrl;
+        }
+
+        /// <summary>
+        /// 检查给定的主机名是否以已知的顶级域名后缀结尾
+        /// </summary>
+        /// <param name="host">主机名字符串</param>
+        /// <returns> 是否以已知的顶级域名后缀结尾 </returns>
+        private static bool EndsWithKnownTld(string host)
+        {
+            if (string.IsNullOrEmpty(host)) return false;
+            foreach (var tld in KnownTldSuffixes)
+            {
+                if (host.EndsWith(tld, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
 
         // 置顶切换
@@ -212,7 +292,6 @@ namespace Quicker.Windows.MainWindows
             AppStateManager.SearchWindowPinned = IsPinned;
             Topmost = IsPinned;
         }
-
 
         // 添加搜索结果按钮
         private void AddResultButton()

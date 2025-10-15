@@ -101,7 +101,7 @@
                                     <Image Source="/Resources/Images/Quicker_Enabled.png" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="10,0,0,0"/>
                                     <TextBlock Text="打开网址" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="51,8,0,0"/>
                                     <TextBlock x:Name="OpenUrlCommandButton_Text" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="51,0,0,9" FontSize="10" Foreground="LightGray"/>
-                                    <TextBlock Text="{Binding Text, ElementName=SearchBox, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
+                                    <TextBlock x:Name="OpenUrlCommandButton_Title" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="120,8,0,0" FontSize="16"/>
                                 </Grid>
                             </Button>
                             <Button x:Name="SearchBingCommandButton" Style="{StaticResource SearchButtonStyle}" Click="SearchBingCommandButton_Click" Visibility="Collapsed">
