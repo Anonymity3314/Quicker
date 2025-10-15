@@ -1,6 +1,9 @@
 using System.Runtime.InteropServices;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading;
+using System.Text;
 
 namespace Quicker.Helpers
 {
@@ -101,17 +104,66 @@ namespace Quicker.Helpers
         public event EventHandler<MouseHookEventArgs>? MousePressed;
         public event EventHandler<MouseHookEventArgs>? MouseReleased;
 
-        // 将事件分发异步排队，避免在钩子回调线程内执行用户代码
-        private static void FireAsync(Action action)
+        // Ctrl 状态由键盘钩子维护，鼠标回调零成本读取
+        private volatile bool _ctrlDown;
+
+        // 事件泵：单消费者，避免 ThreadPool 风暴与 UI 线程争用
+        private enum EventKind
         {
-            try
+            KeyDownLeftCtrl,
+            KeyDownRightCtrl,
+            KeyUpLeftCtrl,
+            KeyUpRightCtrl,
+            MouseDownRight,
+            MouseUpRight,
+            MouseDownMiddle,
+            MouseUpMiddle,
+            MouseDownX1,
+            MouseUpX1,
+            MouseDownX2,
+            MouseUpX2,
+        }
+
+        private readonly struct EventItem
+        {
+            public EventItem(EventKind kind, int x, int y)
             {
-                System.Threading.ThreadPool.UnsafeQueueUserWorkItem(_ =>
-                {
-                    try { action(); } catch { }
-                }, null);
+                Kind = kind;
+                X = x;
+                Y = y;
             }
-            catch { }
+            public EventItem(EventKind kind)
+            {
+                Kind = kind;
+                X = 0;
+                Y = 0;
+            }
+            public EventKind Kind { get; }
+            public int X { get; }
+            public int Y { get; }
+        }
+
+        // 有界无锁队列 + 信号，防止事件积压导致卡顿；超出容量时丢弃最新事件
+        private const int QueueCapacity = 2048;
+        private readonly ConcurrentQueue<EventItem> _queue = new();
+        private readonly ManualResetEventSlim _signal = new(false, 64);
+        private int _queued = 0;
+        private Thread? _eventThread;
+
+        // 缓存桌面窗口根句柄，避免每次查询类名
+        private readonly HashSet<IntPtr> _desktopRoots = new();
+
+        // 钩子线程入队（极轻量），满载时自动丢弃
+        private void Enqueue(EventItem item)
+        {
+            int newCount = Interlocked.Increment(ref _queued);
+            if (newCount > QueueCapacity)
+            {
+                Interlocked.Decrement(ref _queued);
+                return;
+            }
+            _queue.Enqueue(item);
+            _signal.Set();
         }
 
         // 对外 API
@@ -121,6 +173,11 @@ namespace Quicker.Helpers
             _mouseProc = MouseHookCallback;
             _keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, _keyboardProc, GetModuleHandle(null), 0);
             _mouseHook = SetWindowsHookEx(WH_MOUSE_LL, _mouseProc, GetModuleHandle(null), 0);
+            // 启动单消费者事件线程（前置于窗口打开等耗时操作）
+            _eventThread = new Thread(EventLoop) { IsBackground = true, Name = "LowLevelHook-EventLoop", Priority = ThreadPriority.Highest };
+            _eventThread.Start();
+            // 构建桌面窗口缓存
+            TryBuildDesktopRoots();
             return Task.CompletedTask;
         }
 
@@ -144,72 +201,160 @@ namespace Quicker.Helpers
                 }
             }
             catch { }
+
+            try
+            {
+                if (_eventThread != null && _eventThread.IsAlive)
+                {
+                    _signal.Set();
+                    // 最多等待 200ms，避免阻塞退出
+                    if (!_eventThread.Join(200))
+                    {
+                        try { _eventThread.Interrupt(); } catch { }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private void EventLoop()
+        {
+            try
+            {
+                const int MaxBatch = 128;
+                while (true)
+                {
+                    _signal.Wait();
+                    _signal.Reset();
+                    for (int i = 0; i < MaxBatch; i++)
+                    {
+                        if (!_queue.TryDequeue(out var item)) break;
+                        Interlocked.Decrement(ref _queued);
+                        try
+                        {
+                            switch (item.Kind)
+                            {
+                                case EventKind.KeyDownLeftCtrl:
+                                    KeyPressed?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcLeftControl));
+                                    break;
+                                case EventKind.KeyDownRightCtrl:
+                                    KeyPressed?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcRightControl));
+                                    break;
+                                case EventKind.KeyUpLeftCtrl:
+                                    KeyReleased?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcLeftControl));
+                                    break;
+                                case EventKind.KeyUpRightCtrl:
+                                    KeyReleased?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcRightControl));
+                                    break;
+                                case EventKind.MouseDownRight:
+                                    MousePressed?.Invoke(this, new MouseHookEventArgs(MouseButton.Button2, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseUpRight:
+                                    MouseReleased?.Invoke(this, new MouseHookEventArgs(MouseButton.Button2, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseDownMiddle:
+                                    MousePressed?.Invoke(this, new MouseHookEventArgs(MouseButton.Button3, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseUpMiddle:
+                                    MouseReleased?.Invoke(this, new MouseHookEventArgs(MouseButton.Button3, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseDownX1:
+                                    MousePressed?.Invoke(this, new MouseHookEventArgs(MouseButton.Button4, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseUpX1:
+                                    MouseReleased?.Invoke(this, new MouseHookEventArgs(MouseButton.Button4, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseDownX2:
+                                    MousePressed?.Invoke(this, new MouseHookEventArgs(MouseButton.Button5, item.X, item.Y));
+                                    break;
+                                case EventKind.MouseUpX2:
+                                    MouseReleased?.Invoke(this, new MouseHookEventArgs(MouseButton.Button5, item.X, item.Y));
+                                    break;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
         }
 
         // 键盘回调
-        private IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        private unsafe IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0)
             {
                 int msg = wParam.ToInt32();
-                KBDLLHOOKSTRUCT info = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
+                KBDLLHOOKSTRUCT* p = (KBDLLHOOKSTRUCT*)lParam;
                 if (msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
                 {
-                    if (info.vkCode == VK_LCONTROL)
-                        FireAsync(() => KeyPressed?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcLeftControl)));
-                    else if (info.vkCode == VK_RCONTROL)
-                        FireAsync(() => KeyPressed?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcRightControl)));
+                    if (p->vkCode == VK_LCONTROL)
+                    {
+                        _ctrlDown = true;
+                        Enqueue(new EventItem(EventKind.KeyDownLeftCtrl));
+                    }
+                    else if (p->vkCode == VK_RCONTROL)
+                    {
+                        _ctrlDown = true;
+                        Enqueue(new EventItem(EventKind.KeyDownRightCtrl));
+                    }
                 }
                 else if (msg == WM_KEYUP || msg == WM_SYSKEYUP)
                 {
-                    if (info.vkCode == VK_LCONTROL)
-                        FireAsync(() => KeyReleased?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcLeftControl)));
-                    else if (info.vkCode == VK_RCONTROL)
-                        FireAsync(() => KeyReleased?.Invoke(this, new KeyboardHookEventArgs(KeyCode.VcRightControl)));
+                    if (p->vkCode == VK_LCONTROL)
+                    {
+                        _ctrlDown = false;
+                        Enqueue(new EventItem(EventKind.KeyUpLeftCtrl));
+                    }
+                    else if (p->vkCode == VK_RCONTROL)
+                    {
+                        _ctrlDown = false;
+                        Enqueue(new EventItem(EventKind.KeyUpRightCtrl));
+                    }
                 }
             }
             return CallNextHookEx(_keyboardHook, nCode, wParam, lParam);
         }
 
         // 鼠标回调（包含必要的系统菜单抑制）
-        private IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        private unsafe IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode >= 0)
             {
                 int msg = wParam.ToInt32();
-                MSLLHOOKSTRUCT info = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+                MSLLHOOKSTRUCT* p = (MSLLHOOKSTRUCT*)lParam;
 
                 // 坐标
-                int x = info.pt.x;
-                int y = info.pt.y;
+                int x = p->pt.x;
+                int y = p->pt.y;
 
                 // 先记录是否需要抑制系统菜单，但不要立刻返回，先派发事件供应用处理
-                bool suppressContextMenu = ShouldSuppressContextMenu(msg, info);
+                bool suppressContextMenu = ShouldSuppressContextMenu(msg, x, y);
 
                 switch (msg)
                 {
                     case WM_RBUTTONDOWN:
-                        FireAsync(() => MousePressed?.Invoke(this, new MouseHookEventArgs(MouseButton.Button2, x, y)));
+                        Enqueue(new EventItem(EventKind.MouseDownRight, x, y));
                         break;
                     case WM_RBUTTONUP:
-                        FireAsync(() => MouseReleased?.Invoke(this, new MouseHookEventArgs(MouseButton.Button2, x, y)));
+                        Enqueue(new EventItem(EventKind.MouseUpRight, x, y));
                         break;
                     case WM_MBUTTONDOWN:
-                        FireAsync(() => MousePressed?.Invoke(this, new MouseHookEventArgs(MouseButton.Button3, x, y)));
+                        Enqueue(new EventItem(EventKind.MouseDownMiddle, x, y));
                         break;
                     case WM_MBUTTONUP:
-                        FireAsync(() => MouseReleased?.Invoke(this, new MouseHookEventArgs(MouseButton.Button3, x, y)));
+                        Enqueue(new EventItem(EventKind.MouseUpMiddle, x, y));
                         break;
                     case WM_XBUTTONDOWN:
                         {
-                            var btn = GetXButton(info.mouseData);
-                            FireAsync(() => MousePressed?.Invoke(this, new MouseHookEventArgs(btn, x, y)));
+                            var btn = GetXButton(p->mouseData);
+                            Enqueue(new EventItem(btn == MouseButton.Button4 ? EventKind.MouseDownX1 : EventKind.MouseDownX2, x, y));
                         }
                         break;
                     case WM_XBUTTONUP:
                         {
-                            var btn = GetXButton(info.mouseData);
-                            FireAsync(() => MouseReleased?.Invoke(this, new MouseHookEventArgs(btn, x, y)));
+                            var btn = GetXButton(p->mouseData);
+                            Enqueue(new EventItem(btn == MouseButton.Button4 ? EventKind.MouseUpX1 : EventKind.MouseUpX2, x, y));
                         }
                         break;
                 }
@@ -229,22 +374,92 @@ namespace Quicker.Helpers
             return hiWord == XBUTTON1 ? MouseButton.Button4 : MouseButton.Button5;
         }
 
-        private static bool IsCtrlDown()
+        // 仅在 Ctrl+右键 / Ctrl+中键 配置开启且目标为桌面时，抑制系统菜单
+        private bool ShouldSuppressContextMenu(int msg, int x, int y)
         {
-            short l = GetAsyncKeyState(VK_LCONTROL);
-            short r = GetAsyncKeyState(VK_RCONTROL);
-            return (l & 0x8000) != 0 || (r & 0x8000) != 0;
+            if (!_ctrlDown) return false;
+            if ((msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP) && HookConfig.SuppressCtrlRightClick)
+                return IsDesktopWindowAt(x, y);
+            if ((msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP) && HookConfig.SuppressCtrlMiddleClick)
+                return IsDesktopWindowAt(x, y);
+            return false;
         }
 
-        // 仅在 Ctrl+右键 / Ctrl+中键 配置开启时，抑制系统菜单
-        private static bool ShouldSuppressContextMenu(int msg, MSLLHOOKSTRUCT info)
+        // 判断坐标所在窗口是否为桌面（使用缓存句柄命中，失败时回退类名判断）
+        private bool IsDesktopWindowAt(int x, int y)
         {
-            if (!IsCtrlDown()) return false;
-            if ((msg == WM_RBUTTONDOWN || msg == WM_RBUTTONUP) && HookConfig.SuppressCtrlRightClick)
-                return true;
-            if ((msg == WM_MBUTTONDOWN || msg == WM_MBUTTONUP) && HookConfig.SuppressCtrlMiddleClick)
-                return true;
-            return false;
+            try
+            {
+                POINT pt; pt.x = x; pt.y = y;
+                IntPtr hwnd = WindowFromPoint(pt);
+                if (hwnd == IntPtr.Zero) return false;
+                IntPtr root = GetAncestor(hwnd, GA_ROOT);
+                if (root == IntPtr.Zero) root = hwnd;
+                if (_desktopRoots.Count > 0)
+                    return _desktopRoots.Contains(root);
+                // 缓存尚未建立或为空时的回退
+                var cls = GetClassName(root);
+                if (string.IsNullOrEmpty(cls)) return false;
+                return cls == "Progman" || cls == "WorkerW";
+            }
+            catch { return false; }
+        }
+
+        // 尝试构建桌面窗口根句柄缓存
+        private void TryBuildDesktopRoots()
+        {
+            try
+            {
+                _desktopRoots.Clear();
+                // Progman
+                IntPtr progman = FindWindow("Progman", null);
+                if (progman != IntPtr.Zero)
+                {
+                    IntPtr root = GetAncestor(progman, GA_ROOT);
+                    if (root == IntPtr.Zero) root = progman;
+                    _desktopRoots.Add(root);
+                    // Progman -> SHELLDLL_DefView
+                    IntPtr defView = FindWindowEx(progman, IntPtr.Zero, "SHELLDLL_DefView", null);
+                    if (defView != IntPtr.Zero)
+                    {
+                        IntPtr top = GetAncestor(defView, GA_ROOT);
+                        if (top == IntPtr.Zero) top = defView;
+                        _desktopRoots.Add(top);
+                    }
+                }
+                // 枚举顶层窗口添加 WorkerW 及其 DefView
+                EnumWindows((h, l) =>
+                {
+                    var cls = GetClassName(h);
+                    if (cls == "WorkerW")
+                    {
+                        IntPtr root = GetAncestor(h, GA_ROOT);
+                        if (root == IntPtr.Zero) root = h;
+                        _desktopRoots.Add(root);
+                        IntPtr defView = FindWindowEx(h, IntPtr.Zero, "SHELLDLL_DefView", null);
+                        if (defView != IntPtr.Zero)
+                        {
+                            IntPtr top = GetAncestor(defView, GA_ROOT);
+                            if (top == IntPtr.Zero) top = defView;
+                            _desktopRoots.Add(top);
+                        }
+                    }
+                    return true;
+                }, IntPtr.Zero);
+            }
+            catch { }
+        }
+
+        private static string GetClassName(IntPtr hwnd)
+        {
+            try
+            {
+                var sb = new StringBuilder(256);
+                int len = GetClassNameW(hwnd, sb, sb.Capacity);
+                if (len <= 0) return string.Empty;
+                return sb.ToString();
+            }
+            catch { return string.Empty; }
         }
 
         // Win32 结构与导入
@@ -274,6 +489,8 @@ namespace Quicker.Helpers
             public IntPtr dwExtraInfo;
         }
 
+        private const uint GA_ROOT = 2;
+
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr SetWindowsHookEx(int idHook, Delegate lpfn, IntPtr hMod, uint dwThreadId);
 
@@ -286,7 +503,24 @@ namespace Quicker.Helpers
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string? lpModuleName);
 
-        [DllImport("user32.dll")]
-        private static extern short GetAsyncKeyState(int vKey);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr WindowFromPoint(POINT Point);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int GetClassNameW(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr GetAncestor(IntPtr hWnd, uint gaFlags);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string? lpszClass, string? lpszWindow);
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
     }
 }
