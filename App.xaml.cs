@@ -712,15 +712,15 @@ namespace Quicker
         // 弹出主窗口
         private void ShowMainWindow(object sender, RoutedEventArgs e)
         {
-            PreLoadMainWindow(); // 预加载主窗口
-            CloseOrShowMainWindow(); // 关闭或显示主窗口
+            PreLoadMainWindow(autoShow: true); // 预加载并在准备就绪后显示主窗口，避免竞态
         }
 
         /// <summary>
         /// 预加载主窗口
         /// </summary>
         /// <param name="startTimer"> 是否启动计时器 </param>
-        public void PreLoadMainWindow(bool startTimer = false)
+        /// <param name="autoShow"> 创建完成后是否自动显示主窗口 </param>
+        public void PreLoadMainWindow(bool startTimer = false, bool autoShow = false)
         {
             // 立即记录按压时间，避免依赖 UI 线程
             DateTime dateTime = DateTime.Now;
@@ -740,6 +740,8 @@ namespace Quicker
                     AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden;
                     AppStateManager.Left = (float)AppStateManager.PreLoadMainWindow.Left;
                     AppStateManager.Top = (float)AppStateManager.PreLoadMainWindow.Top;
+
+                    if (autoShow) CloseOrShowMainWindow(); // 自动显示主窗口
                 }));
             });
         }
