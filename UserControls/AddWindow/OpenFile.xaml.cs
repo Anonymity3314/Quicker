@@ -383,6 +383,7 @@ namespace Quicker.UserControls.AddWindow
                 {
                     _addWindow.ButtonImage.Source = iconSource; // 设置图标
                     _addWindow.ButtonImage.Visibility = Visibility.Visible; // 显示图标
+                    _addWindow.iconPath = ""; // 清空旧的图标路径，保证保存时从当前图像源导出
                 }
                 else
                 {
