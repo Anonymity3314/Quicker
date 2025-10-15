@@ -22,16 +22,6 @@
 
 ---
 
-## 核心功能
-
-- **高效操作界面**：直观 UI，快速访问各类任务。
-- **动作管理**：创建、编辑和组织动作，提高效率。
-- **扩展机制**：通过扩展模块增强功能，满足个性化需求。
-- **按钮管理**：自定义与管理界面按钮。
-- **外观导入/导出**：支持将外观参数嵌入 PNG 并恢复。
-
----
-
 ## 开源声明
 
 - 本项目为开源学习项目，作者非计算机专业，仍有优化空间。
@@ -50,42 +40,6 @@
 
 - 仅作为学习交流使用，不得用于商业用途。
 - 任何修改必须开源并保留原始版权声明和许可证。
-
----
-
-## 快速开始指南
-
-1.克隆项目仓库：
-
-```banch
-    git clone https://github.com/LJZ-Anonymity/Quicker.git
-```
-
-2.安装依赖（NuGet）：
-
-| 程序包                      | 说明                           |
-|:------------------------:|:----------------------------:|
-| Hardcodet.NotifyIcon.Wpf | 实现 WPF 应用的系统托盘图标功能           |
-| Svg                      | 提供加载、解析和渲染 SVG 图像的功能         |
-| System.Data.SQLite       | 提供 SQLite 数据库支持              |
-| SixLabors.ImageSharp     | 实现 PNG 图片的元数据读写与外观导入导出       |
-| WpfAnimatedGif           | GIF 动画播放支持，支持 Image 控件直接显示动图 |
-
-3.打开`Quicker.sln`，使用支持 WPF 的开发环境（如 Visual Studio）进行编译和运行。
-
----
-
-## 贡献指南
-
-如果你发现项目中有问题或有改进建议，可以通过以下方式参与贡献：
-
-1. 提交 Issue：如果你发现问题或有功能建议，可以提交 Issue 详细描述问题或建议。
-
-2. Fork 项目：Fork 项目仓库到你的 GitHub 账号。
-
-3. 本地开发：在本地克隆你的 Fork 仓库，并进行开发。
-
-4. 提交 Pull Request：完成开发后，提交 Pull Request 到原始仓库，等待审核。
 
 ---
 
@@ -270,18 +224,18 @@ Quicker/
 │   └─Styles/                                         # 样式资源文件夹
 │       ├─BorderStyles.xaml                            # 边框样式
 │       ├─ButtonStyles.xaml                            # 按钮样式
-│       |   └─ButtonStyles.xaml.cs
+│       │  └─ButtonStyles.xaml.cs
 │       ├─CanvasStyles.xaml                            # 画布样式
 │       ├─CheckBoxStyle.xaml                           # 勾选框样式
 │       ├─ComboBoxStyle.xaml                           # 下拉框样式
-│       |   └─ComboBoxStyle.xaml.cs
+│       │  └─ComboBoxStyle.xaml.cs
 │       ├─CustomContextMenuStyle.xaml                  # 右键菜单样式
 │       ├─GridStyles.xaml                              # 表格样式
 │       ├─ImageStyles.xaml                             # 图片样式
 │       ├─PanelStyles.xaml                             # 面板样式
 │       ├─ScrollBarStyle.xaml                          # 滚动条样式
 │       ├─SliderStyle.xaml                             # 滑动条样式
-│       |   └─SliderStyle.xaml.cs
+│       │  └─SliderStyle.xaml.cs
 │       ├─TextBlockStyles.xaml                         # 文本块样式
 │       ├─TextBoxStyles.xaml                           # 文本框样式
 │       └─TooltipStyle.xaml                            # 提示框样式
@@ -311,8 +265,8 @@ Quicker/
 │       ├─ColorPicker.xaml                              # 颜色选择器
 │       │   └─ColorPicker.xaml.cs
 │       └─Tools/                                        # 工具控件文件夹
-|           └─ExtensionManagementGrid.xaml               # 扩展管理界面
-|               └─ExtensionManagementGrid.xaml.cs
+│          └─ExtensionManagementGrid.xaml               # 扩展管理界面
+│              └─ExtensionManagementGrid.xaml.cs
 ├─Windows/                                            # 界面文件夹
 │   ├─AddWindows/                                     # 添加相关窗口（如添加场景、添加动作等）
 │   │   ├─AddSceneWindow.xaml                         # 添加场景窗口
