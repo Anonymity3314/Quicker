@@ -5,7 +5,7 @@
       "Version": "2.3.0",
       "DownloadUrl": "",
       "DownloadUrlWithNet": "",
-      "Changelog": "~.新增了功能面板外观自定义\n~.新增了动作悬浮功能\n~.新增了扩展加载功能\n~.修复了某些BUG",
+      "Changelog": "~.新增了托盘图标、应用数据位置自定义功能\n~.新增了面板外观自定义功能\n~.新增了动作/动作页悬浮功能\n~.新增了快速搜索功能\n~.新增了扩展加载功能\n~.调整了部分UI显示\n~.修复了某些BUG",
       "ReleaseDate": "",
       "IsLatest": true
     },

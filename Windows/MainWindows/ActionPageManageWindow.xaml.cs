@@ -1079,6 +1079,12 @@ namespace Quicker.Windows.MainWindows
             }
         }
 
+        // 点击按钮清空搜索
+        private void ClearSearchTextBoxButton_Click(object sender, RoutedEventArgs e)
+        {
+            SearchTextBox.Text = ""; // 清空搜索框文本
+        }
+
         // 关闭窗口时释放资源
         protected override void OnClosed(EventArgs e)
         {
