@@ -37,9 +37,9 @@
             </TextBlock>
             <!-- 开发团队 -->
             <Label Content="开发团队" HorizontalAlignment="Left" Margin="4,101,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-            <Label Content="策划、代码、美术：@Anonymity" HorizontalAlignment="Left" Margin="10,137,0,0" VerticalAlignment="Top" FontSize="14" />
-            <Label Content="美术协助、代码协助：@墨分璃" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" FontSize="14" />
-            <Label Content="测试：@巍巍噻" HorizontalAlignment="Left" Margin="10,193,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label x:Name="zhuzi" Content="策划、代码、美术：@Anonymity" HorizontalAlignment="Left" Margin="10,137,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label x:Name="mj" Content="美术协助、代码协助：@墨分璃" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label x:Name="luang_sang" Content="测试：@巍巍噻" HorizontalAlignment="Left" Margin="10,193,0,0" VerticalAlignment="Top" FontSize="14" />
             <!-- 图标资源 -->
             <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" FontSize="16" Grid.Column="1"/>
             <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,85,0,0" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Grid.Column="1"/>

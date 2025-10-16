@@ -1,16 +1,20 @@
-﻿using Quicker.Windows.MainWindows;
+﻿using System.Text.RegularExpressions;
+using Quicker.Windows.MainWindows;
 using System.Windows.Resources;
 using System.Windows.Controls;
+using Quicker.Database.Core;
 using Quicker.UserControls;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
 using System.Text.Json;
 using Quicker.Helpers;
+using System.Net.Http;
 using System.Windows;
 using System.Text;
 using System.IO;
-using Quicker.Database.Core;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -22,12 +26,17 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         public AboutQuickerGrid(Quicker.Windows.MainWindows.SettingWindow settingWindow)
         {
             InitializeComponent();
+            
+            // 注册编码提供程序，支持GBK等中文编码
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            
             settingManager = settingWindow._settingManager; // 创建设置管理器
             weakSettingWindow = new(settingWindow); // 保存设置窗口
             settingManager.LoadConventionsAsync(); // 初始化缓存数据
             VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
 
             RefreshPathsAndEnsureDirectories(); // 初始化路径与目录
+            LoadQQUserInfo(); // 加载QQ用户信息
         }
 
         // 基础设置-关于Quicker-关于Quicker
@@ -405,14 +414,123 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             try
             {
                 if (Directory.Exists(folderPath))
-                {
                     Directory.Delete(folderPath, true);
-                }
             }
             catch
             {
                 toast.Show("删除旧数据目录失败，请手动清理。", ToastType.Warning);
             }
+        }
+
+        /// <summary>
+        /// 加载QQ用户信息
+        /// </summary>
+        private void LoadQQUserInfo()
+        {
+            var teamMembers = new[]
+            {
+                new { 
+                    NameLabel = zhuzi, 
+                    QQNumber = "331433038",
+                    DefaultUserName = "Anonymity"
+                },
+                new { 
+                    NameLabel = mj, 
+                    QQNumber = "2260995976",
+                    DefaultUserName = "墨分璃"
+                },
+                new { 
+                    NameLabel = luang_sang, 
+                    QQNumber = "2574357344",
+                    DefaultUserName = "巍巍噻"
+                }
+            };
+
+            // 后台异步获取真实昵称，不阻塞UI
+            _ = Task.Run(async () =>
+            {
+                var tasks = teamMembers.Select(async member =>
+                {
+                    try
+                    {
+                        string qqNickname = await GetQQNicknameAsync(member.QQNumber);
+                        //System.Diagnostics.Debug.WriteLine($"QQ {member.QQNumber} 获取结果: {qqNickname ?? "null"}");
+                        if (!string.IsNullOrEmpty(qqNickname) && qqNickname != member.DefaultUserName)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                string currentContent = member.NameLabel.Content.ToString();
+                                member.NameLabel.Content = currentContent.Replace($"@{member.DefaultUserName}", $"@{qqNickname}");
+                            });
+                        }
+                    }
+                    catch { }
+                });
+
+                await Task.WhenAll(tasks);
+            });
+        }
+
+        /// <summary>
+        /// 异步获取QQ昵称
+        /// </summary>
+        /// <param name="qqNumber">QQ号码</param>
+        /// <returns>QQ昵称，如果获取失败返回null</returns>
+        private async Task<string> GetQQNicknameAsync(string qqNumber)
+        {
+            using var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+
+            // 使用QQ空间API获取用户信息
+            string apiUrl = $"https://users.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?uins={qqNumber}";
+            byte[] bytes = await httpClient.GetByteArrayAsync(apiUrl); // 获取字节数组
+            var encodings = new[] { "GBK", "GB2312", "UTF-8" }; // 尝试多种编码方式
+            foreach (var encodingName in encodings)
+            {
+                try
+                {
+                    string response = Encoding.GetEncoding(encodingName).GetString(bytes);
+                    var nickname = ParseQQNicknameFromResponse(response, qqNumber);
+                    // 检查昵称是否有效（不包含乱码字符）
+                    if (!string.IsNullOrEmpty(nickname) && !nickname.Contains("锟斤拷") && !nickname.Contains("�"))
+                    {
+                        return nickname;
+                    }
+                }
+                catch { /* 忽略编码错误，继续尝试下一个 */ }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 从API响应中解析QQ昵称
+        /// </summary>
+        /// <param name="response">API响应内容</param>
+        /// <param name="qqNumber">QQ号码</param>
+        /// <returns>解析出的昵称</returns>
+        private static string ParseQQNicknameFromResponse(string response, string qqNumber)
+        {
+            try
+            {
+                var match = Regex.Match(response, @"portraitCallBack\((.+)\)"); // 使用正则表达式提取JSONP回调函数中的JSON数据
+                if (match.Success)
+                {
+                    string jsonData = match.Groups[1].Value;
+                    var jsonDocument = JsonDocument.Parse(jsonData);
+                    if (jsonDocument.RootElement.TryGetProperty(qqNumber, out var userInfo)) // 尝试获取用户信息
+                    {
+                        var userArray = userInfo.EnumerateArray().ToArray(); // 获取用户数组
+                        if (userArray.Length >= 7)
+                        {
+                            string nickname = userArray[6].GetString(); // 根据API文档，第7个元素（索引6）是昵称
+                            return nickname; // 返回昵称
+                        }
+                    }
+                }
+            }
+            catch { }
+            return null; // 解析失败，返回null
         }
     }
 
