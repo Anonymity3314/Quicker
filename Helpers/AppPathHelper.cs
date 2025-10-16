@@ -11,7 +11,7 @@ namespace Quicker.Helpers
     {
         // 程序根目录与配置文件名
         private static readonly string ProgramRoot = AppDomain.CurrentDomain.BaseDirectory;
-        private const string CustomPathConfigFileName = "AppPath.config"; // 放在程序同目录
+        private const string CustomPathConfigFileName = "Quicker.config"; // 放在程序同目录
 
         /// <summary>
         /// 应用程序数据根目录

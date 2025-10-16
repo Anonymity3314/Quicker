@@ -82,9 +82,7 @@ namespace Quicker.Managers
                 // 优先尝试获取原始图标（无压缩标识）
                 ImageSource originalIcon = GetOriginalIcon(appPath);
                 if (originalIcon != null)
-                {
                     return originalIcon;
-                }
 
                 // 如果原始图标获取失败，回退到普通方法
                 uint flags = SHGFI_ICON | SHGFI_LARGEICON; // 获取大图标
@@ -100,7 +98,6 @@ namespace Quicker.Managers
             catch
             {
                 ShowToast("获取图标失败。", ToastType.Error); // 显示Toast
-                return null; // 如果出现异常，返回 null
             }
             return null; // 如果获取失败，返回 null
         }

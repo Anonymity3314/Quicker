@@ -13,8 +13,6 @@ using System.Net.Http;
 using System.Windows;
 using System.Text;
 using System.IO;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -380,9 +378,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             try
             {
-                var a = Path.GetFullPath(pathA).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                var b = Path.GetFullPath(pathB).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+                var a = Path.GetFullPath(pathA).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar); // 规范化路径A
+                var b = Path.GetFullPath(pathB).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar); // 规范化路径B
+                return string.Equals(a, b, StringComparison.OrdinalIgnoreCase); // 判断是否相同
             }
             catch { return false; }
         }
@@ -397,9 +395,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             try
             {
-                var parentFull = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-                var childFull = Path.GetFullPath(child).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-                return childFull.StartsWith(parentFull, StringComparison.OrdinalIgnoreCase);
+                var parentFull = Path.GetFullPath(parent).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar; // 规范化父目录路径
+                var childFull = Path.GetFullPath(child).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar; // 规范化子目录路径
+                return childFull.StartsWith(parentFull, StringComparison.OrdinalIgnoreCase); // 判断是否为子目录
             }
             catch { return false; }
         }
@@ -413,9 +411,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             try
             {
-                if (Directory.Exists(folderPath))
-                    Directory.Delete(folderPath, true);
+                Directory.Delete(folderPath, true);
             }
+            catch (DirectoryNotFoundException){ /* 目录不存在，忽略 */ }
             catch
             {
                 toast.Show("删除旧数据目录失败，请手动清理。", ToastType.Warning);
@@ -429,22 +427,10 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         {
             var teamMembers = new[]
             {
-                new { 
-                    NameLabel = zhuzi, 
-                    QQNumber = "331433038",
-                    DefaultUserName = "Anonymity"
-                },
-                new { 
-                    NameLabel = mj, 
-                    QQNumber = "2260995976",
-                    DefaultUserName = "墨分璃"
-                },
-                new { 
-                    NameLabel = luang_sang, 
-                    QQNumber = "2574357344",
-                    DefaultUserName = "巍巍噻"
-                }
-            };
+                (zhuzi, "331433038", "Anonymity"),
+                (mj, "2260995976", "墨分璃"),
+                (luang_sang, "2574357344", "巍巍噻")
+            }; // 开发团队成员信息
 
             // 后台异步获取真实昵称，不阻塞UI
             _ = Task.Run(async () =>
@@ -453,14 +439,13 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 {
                     try
                     {
-                        string qqNickname = await GetQQNicknameAsync(member.QQNumber);
-                        //System.Diagnostics.Debug.WriteLine($"QQ {member.QQNumber} 获取结果: {qqNickname ?? "null"}");
-                        if (!string.IsNullOrEmpty(qqNickname) && qqNickname != member.DefaultUserName)
+                        string qqNickname = await GetQQNicknameAsync(member.Item2); // 获取QQ用户名
+                        if (!string.IsNullOrEmpty(qqNickname) && qqNickname != member.Item3)
                         {
                             Dispatcher.Invoke(() =>
                             {
-                                string currentContent = member.NameLabel.Content.ToString();
-                                member.NameLabel.Content = currentContent.Replace($"@{member.DefaultUserName}", $"@{qqNickname}");
+                                string currentContent = member.Item1.Content.ToString(); // 获取当前昵称
+                                member.Item1.Content = currentContent.Replace($"@{member.Item3}", $"@{qqNickname}"); // 替换昵称
                             });
                         }
                     }
@@ -491,8 +476,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 {
                     string response = Encoding.GetEncoding(encodingName).GetString(bytes);
                     var nickname = ParseQQNicknameFromResponse(response, qqNumber);
-                    // 检查昵称是否有效（不包含乱码字符）
-                    if (!string.IsNullOrEmpty(nickname) && !nickname.Contains("锟斤拷") && !nickname.Contains("�"))
+                    //System.Diagnostics.Debug.WriteLine($"QQ {qqNumber} 获取结果: {nickname ?? "null"}");
+                    if (!string.IsNullOrEmpty(nickname) && !nickname.Contains("锟斤拷") && !nickname.Contains("�")) // 检查昵称是否有效（不包含乱码字符）
                     {
                         return nickname;
                     }
