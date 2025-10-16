@@ -37,32 +37,32 @@
             </TextBlock>
             <!-- 开发团队 -->
             <Label Content="开发团队" HorizontalAlignment="Left" Margin="4,101,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-            <Label Content="策划、代码：@Anonymity" HorizontalAlignment="Left" Margin="10,137,0,0" VerticalAlignment="Top" FontSize="14" />
-            <Label Content="美术、代码协助：@墨分璃" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label Content="策划、代码、美术：@Anonymity" HorizontalAlignment="Left" Margin="10,137,0,0" VerticalAlignment="Top" FontSize="14" />
+            <Label Content="美术协助、代码协助：@墨分璃" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" FontSize="14" />
             <Label Content="测试：@巍巍噻" HorizontalAlignment="Left" Margin="10,193,0,0" VerticalAlignment="Top" FontSize="14" />
             <!-- 图标资源 -->
             <Label HorizontalAlignment="Left" Margin="0,49,0,0" VerticalAlignment="Top" Content="图标资源" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,85,0,0" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
-            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,131,0,0" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
-            <TextBlock x:Name="icons8_com" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,108,0,0" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
+            <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,85,0,0" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Grid.Column="1"/>
+            <TextBlock x:Name="fontawesome_com" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,131,0,0" Text="fontawesome.com" MouseLeftButtonDown="fontawesome_com_MouseLeftButtonDown" Grid.Column="1"/>
+            <TextBlock x:Name="icons8_com" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,108,0,0" Text="icons8.com" MouseLeftButtonDown="icons8_com_MouseLeftButtonDown" Grid.Column="1"/>
             <!-- 支持 -->
             <Label HorizontalAlignment="Left" Margin="0,198,0,0" VerticalAlignment="Top" Content="支持" FontSize="16" Grid.Column="1"/>
-            <TextBlock x:Name="FeedBack" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,234,0,0" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
-            <TextBlock x:Name="icon11_community_github_io" Style="{StaticResource HoverTextBlock}" ToolTip="点击前往" Margin="10,154,0,0" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" FontSize="14" Grid.Column="1"/>
+            <TextBlock x:Name="FeedBack" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Margin="10,234,0,0" Text="BUG反馈、需求" MouseLeftButtonDown="FeedBack_MouseLeftButtonDown" Grid.Column="1"/>
+            <TextBlock x:Name="icon11_community_github_io" Style="{StaticResource HoverTextBlock}" ToolTip="点击前往" Margin="10,154,0,0" Text="icon11-community.github.io" MouseLeftButtonDown="icon11_community_github_io_MouseLeftButtonDown" Grid.Column="1"/>
             <!-- 入正 -->
             <Label Grid.Column="1" Content="入正" FontSize="16" HorizontalAlignment="Left" Margin="4,279,0,0" VerticalAlignment="Top"/>
             <TextBlock x:Name="getquicker_net" Grid.Column="1" Style="{StaticResource HoverTextBlock}" ToolTip="前往正版Quicker官网" Margin="10,315,0,0" Text="getquicker.net" MouseLeftButtonDown="getquicker_net_MouseLeftButtonDown" FontSize="14"/>
             <!-- 数据文件夹 -->
             <Grid HorizontalAlignment="Left" Height="367" VerticalAlignment="Bottom" Width="644" Margin="0,0,0,55">
                 <Label Content="数据文件夹" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
-                <Button x:Name="ChangeDataFolderButton" Content="更改..." ToolTip="更改应用数据存储路径" HorizontalAlignment="Left" Style="{StaticResource WhiteButton}" Margin="95,6,0,0" VerticalAlignment="Top" Width="47" Height="20" Click="ChangeDataFolderButton_Click"/>
+                <Button x:Name="ChangeDataFolderButton" Content="更改..." ToolTip="更改应用数据存储路径" HorizontalAlignment="Left" Style="{StaticResource WhiteButton}" Margin="98,34,0,0" VerticalAlignment="Top" Width="47" Height="20" Click="ChangeDataFolderButton_Click"/>
 
                 <Label Content="根文件夹：" HorizontalAlignment="Left" Margin="18,30,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,60,0,0" Text="" MouseDown="RootFolderPath_MouseDown"/>
+                <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" ToolTip="打开文件夹" Margin="23,60,0,0"  FontSize="12" MouseDown="RootFolderPath_MouseDown"/>
                 <Label Content="数据库文件夹：" HorizontalAlignment="Left" Margin="18,80,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="DatabaseFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,108,0,0" Text="" MouseDown="DatabaseFolderPath_MouseDown"/>
+                <TextBlock x:Name="DatabaseFolderPath" Style="{StaticResource HoverTextBlock}" ToolTip="打开文件夹" Margin="23,108,0,0" FontSize="12" MouseDown="DatabaseFolderPath_MouseDown"/>
                 <Label Content="图标文件夹：" HorizontalAlignment="Left" Margin="18,128,0,0" VerticalAlignment="Top" FontSize="14"/>
-                <TextBlock x:Name="LocalIconsFolderPath" Style="{StaticResource HoverTextBlock}" Margin="23,156,0,0" Text="" MouseDown="LocalIconsFolderPath_MouseDown"/>
+                <TextBlock x:Name="LocalIconsFolderPath" Style="{StaticResource HoverTextBlock}" ToolTip="打开文件夹" Margin="23,156,0,0" FontSize="12" MouseDown="LocalIconsFolderPath_MouseDown"/>
 
                 <Label Content="备份数据" HorizontalAlignment="Left" Margin="0,191,0,0" VerticalAlignment="Top" FontSize="16" FontWeight="Bold"/>
                 <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" Margin="14,226,0,0" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>

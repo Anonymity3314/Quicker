@@ -55,7 +55,7 @@ namespace Quicker.Database.Core
          *
          * BackgroundColor: 背景颜色，默认为#FFF3F3F3。
          * BorderColor：边框颜色，默认为#FFD3D3D3。
-         * ToolbarColor: 工具栏颜色，默认为#00F3F3F3。
+         * ToolbarColor: 工具栏颜色，默认为#22F3F3F3。
          * ToolbarIconColor: 工具栏图标颜色，默认为#FFA1A1A1。
          * ActionButtonColor: 动作按钮颜色，默认为#FFFFFFFF。
          * ActionButtonMouseOverColor: 动作按钮鼠标悬停颜色，默认为#FFBEE6FD。
@@ -211,7 +211,7 @@ namespace Quicker.Database.Core
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#00F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 4, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#22F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 4, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@ButtonSize"] = defaults.Item1, // 按钮大小

@@ -28,6 +28,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
     public partial class AppearanceGrid : UserControl, INotifyPropertyChanged // 实现INotifyPropertyChanged接口，支持属性变更通知
     {
         #region 成员字段
+
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private readonly ButtonManager buttonManager = new(); // 添加按钮管理器
         private readonly List<string> _tempFiles = new(); // 临时文件列表，用于清理
@@ -38,18 +39,22 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private bool _isInitializing = true; // 是否正在初始化
         private Button _currentColorButton; // 记录当前按钮
         SettingManager settingManager; // 设置管理器
+
         #endregion
 
         #region INotifyPropertyChanged
+
         // INotifyPropertyChanged接口实现
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
         #endregion
 
         #region 公开属性
+
         // 预览区圆角属性，绑定到XAML的CornerRadius
         private CornerRadius _previewCornerRadius = new CornerRadius(5); // 默认圆角为5
         public CornerRadius PreviewCornerRadius
@@ -112,6 +117,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 await InitializeFontComboBoxes(); // 异步初始化字体下拉框
             }), System.Windows.Threading.DispatcherPriority.Loaded);
         }
+
         #endregion
 
         #region 设置变化计时器
@@ -431,17 +437,14 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         #endregion
 
         #region 预览加载与交互
+
         // 为预览加载全局按钮
         private async void LoadGlobalButtonsForPreview()
         {
-            // 防止重复调用
-            if (_isLoadingGlobalButtons) return;
-            
-            // 在初始化期间，只在最后一次调用时执行
-            if (_isInitializing)
+            if (_isLoadingGlobalButtons) return; // 防止重复调用
+            if (_isInitializing) // 在初始化期间，只在最后一次调用时执行
             {
-                // 延迟执行，确保是最后一次调用
-                Dispatcher.BeginInvoke(new Action(async () =>
+                Dispatcher.BeginInvoke(new Action(async () => // 延迟执行，确保是最后一次调用
                 {
                     await Task.Delay(100); // 等待100ms，确保其他初始化调用完成
                     if (!_isInitializing) // 如果初始化已完成，则执行加载
@@ -542,8 +545,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 ButtonID = 11,
                 Title = "Quicker",
                 Location = "",
-                //ImagePath = "pack://application:,,,/Resources/Images/Quicker_Enabled.png",
-                ImagePath = "pack://application:,,,/Resources/Images/Quicker.png",
+                ImagePath = "pack://application:,,,/Resources/Images/Quicker_Enabled.png",
                 Data1 = "",
                 Data2 = "",
                 Data3 = "",
@@ -686,6 +688,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         #endregion
 
         #region 预览开关
+
         // "开启预览"复选框点击事件
         private void EnablePreviewCheckBox_Click(object sender, RoutedEventArgs e)
         {
@@ -698,6 +701,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 LoadGlobalButtonsForPreview(); // 加载全局按钮到预览区
             }
         }
+
         #endregion
 
         #region 重置外观
@@ -944,6 +948,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         #endregion
 
         #region 外观分享与导入
+
         // 点击按钮分享外观
         private void ShareSaveAppearanceButton_Click(object sender, RoutedEventArgs e)
         {
@@ -962,6 +967,13 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             WriteAppearanceToPng(inputPngPath, outputPngPath, json); // 写入 PNG 文件并嵌入 JSON 数据
             ShowToast("外观保存成功！", ToastType.Success); // 显示保存成功的 Toast 提示
             Process.Start("explorer.exe", $"/select,\"{outputPngPath}\""); // 打开资源管理器并选中刚保存的 PNG 文件
+        }
+
+        // 点击"已分享或保存的外观"按钮打开外观分享文件夹
+        private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            AppPathHelper.EnsureDirectoryExists(AppPathHelper.SharedAppearanceFolder); // 确保目录存在
+            Process.Start("explorer.exe", AppPathHelper.SharedAppearanceFolder); // 使用资源管理器打开该文件夹
         }
 
         /// <summary>
@@ -1212,13 +1224,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
         }
         #endregion
-
-        // 点击"已分享或保存的外观"按钮打开外观分享文件夹
-        private void SharedSavedAppearanceButton_Click(object sender, RoutedEventArgs e)
-        {
-            AppPathHelper.EnsureDirectoryExists(AppPathHelper.SharedAppearanceFolder); // 确保目录存在
-            Process.Start("explorer.exe", AppPathHelper.SharedAppearanceFolder); // 使用资源管理器打开该文件夹
-        }
 
         #region 预置样式（应用与定义）
         // 预置样式按钮点击事件

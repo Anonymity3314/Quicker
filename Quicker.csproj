@@ -95,6 +95,7 @@
     <None Remove="Resources\Images\Target.png" />
     <None Remove="Resources\Images\TaskbarSceneImage.png" />
     <None Remove="Resources\Images\UnLocked.png" />
+    <None Remove="Resources\Styles\TextBlockStyles.xaml~RF2e0471d2.TMP" />
     <None Remove="UpdateHistory.txt" />
     <None Remove="Windows\MainWindow.xaml.cs~RF56f46fe.TMP" />
     <None Remove="Windows\MainWindow.xaml.cs~RFc4626a.TMP" />
