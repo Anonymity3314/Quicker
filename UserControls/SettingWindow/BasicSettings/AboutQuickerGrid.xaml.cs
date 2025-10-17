@@ -440,6 +440,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     try
                     {
                         string qqNickname = await GetQQNicknameAsync(member.Item2); // 获取QQ用户名
+                        //Debug.WriteLine($"QQ {member.Item2} 获取结果: {qqNickname}");
                         if (!string.IsNullOrEmpty(qqNickname) && qqNickname != member.Item3)
                         {
                             Dispatcher.Invoke(() =>
@@ -457,65 +458,71 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         /// <summary>
-        /// 异步获取QQ昵称
+        /// 异步获取QQ昵称（使用新API）
         /// </summary>
-        /// <param name="qqNumber">QQ号码</param>
-        /// <returns>QQ昵称，如果获取失败返回null</returns>
-        private async Task<string> GetQQNicknameAsync(string qqNumber)
+        /// <param name="qqNumber">QQ号</param>
+        /// <returns>QQ昵称</returns>
+        public async Task<string> GetQQNicknameAsync(string qqNumber)
         {
             using var httpClient = new HttpClient();
             httpClient.Timeout = TimeSpan.FromSeconds(10);
-
-            // 使用QQ空间API获取用户信息
-            string apiUrl = $"https://users.qzone.qq.com/fcg-bin/cgi_get_portrait.fcg?uins={qqNumber}";
-            byte[] bytes = await httpClient.GetByteArrayAsync(apiUrl); // 获取字节数组
-            var encodings = new[] { "GBK", "GB2312", "UTF-8" }; // 尝试多种编码方式
-            foreach (var encodingName in encodings)
+            using var toast = new ToastManager();
+            try
             {
-                try
+                // 调用新API端点
+                var response = await httpClient.GetAsync($"https://uapis.cn/api/v1/social/qq/userinfo?qq={qqNumber}");
+                if (!response.IsSuccessStatusCode) // 处理错误状态码
                 {
-                    string response = Encoding.GetEncoding(encodingName).GetString(bytes);
-                    var nickname = ParseQQNicknameFromResponse(response, qqNumber);
-                    //System.Diagnostics.Debug.WriteLine($"QQ {qqNumber} 获取结果: {nickname ?? "null"}");
-                    if (!string.IsNullOrEmpty(nickname) && !nickname.Contains("锟斤拷") && !nickname.Contains("�")) // 检查昵称是否有效（不包含乱码字符）
-                    {
-                        return nickname;
-                    }
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    toast.Show($"API请求失败: {response.StatusCode} - {errorContent}", ToastType.Error);
+                    return null;
                 }
-                catch { /* 忽略编码错误，继续尝试下一个 */ }
-            }
 
-            return null;
+                // 解析JSON响应
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                return ParseNicknameFromJsonResponse(jsonResponse);
+            }
+            catch (Exception ex)
+            {
+                toast.Show($"获取QQ昵称异常: {ex.Message}", ToastType.Error);
+                return null;
+            }
         }
 
         /// <summary>
-        /// 从API响应中解析QQ昵称
+        /// 从JSON响应中解析昵称
         /// </summary>
-        /// <param name="response">API响应内容</param>
-        /// <param name="qqNumber">QQ号码</param>
-        /// <returns>解析出的昵称</returns>
-        private static string ParseQQNicknameFromResponse(string response, string qqNumber)
+        /// <param name="jsonResponse">JSON响应</param>
+        /// <returns>QQ昵称</returns>
+        private static string ParseNicknameFromJsonResponse(string jsonResponse)
         {
+            using var toast = new ToastManager();
             try
             {
-                var match = Regex.Match(response, @"portraitCallBack\((.+)\)"); // 使用正则表达式提取JSONP回调函数中的JSON数据
-                if (match.Success)
+                using var doc = JsonDocument.Parse(jsonResponse);
+                var root = doc.RootElement;
+
+                // 根据新的响应格式解析字段
+                if (root.TryGetProperty("nickname", out var nicknameElement) &&
+                    nicknameElement.ValueKind == JsonValueKind.String)
                 {
-                    string jsonData = match.Groups[1].Value;
-                    var jsonDocument = JsonDocument.Parse(jsonData);
-                    if (jsonDocument.RootElement.TryGetProperty(qqNumber, out var userInfo)) // 尝试获取用户信息
-                    {
-                        var userArray = userInfo.EnumerateArray().ToArray(); // 获取用户数组
-                        if (userArray.Length >= 7)
-                        {
-                            string nickname = userArray[6].GetString(); // 根据API文档，第7个元素（索引6）是昵称
-                            return nickname; // 返回昵称
-                        }
-                    }
+                    return nicknameElement.GetString();
                 }
+
+                // 检查错误响应
+                if (root.TryGetProperty("code", out var errorCode) &&
+                    root.TryGetProperty("message", out var errorMessage))
+                {
+                    toast.Show($"API返回错误: {errorCode} - {errorMessage}", ToastType.Error);
+                }
+
+                return null;
             }
-            catch { }
-            return null; // 解析失败，返回null
+            catch (JsonException ex)
+            {
+                toast.Show($"JSON解析失败: {ex.Message}", ToastType.Error);
+                return null;
+            }
         }
     }
 
