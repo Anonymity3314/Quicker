@@ -272,10 +272,15 @@ namespace Quicker
         // 定时器每5min保存使用时长
         private void Timer_Tick(object sender, EventArgs e)
         {
+            // 使用实际经过的时间，避免固定300秒带来的显示回退
+            var now = DateTime.Now;
+            var elapsedSeconds = (now - AppStateManager.RecordedTime).TotalSeconds;
+            if (elapsedSeconds < 0) elapsedSeconds = 0; // 防御系统时间被回拨
+
             var convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
-            convention.TotalUsageTime += 300; // 每 5 分钟增加 300 秒
+            convention.TotalUsageTime += elapsedSeconds; // 增加实际经过秒数
             SettingDatabase.SaveTotalUsageTime(convention.TotalUsageTime); // 保存总使用时长到数据库
-            AppStateManager.RecordedTime = DateTime.Now; // 记录应用保存时间
+            AppStateManager.RecordedTime = now; // 更新记录时间
         }
 
         // 初始化钩子
