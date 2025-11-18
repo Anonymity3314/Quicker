@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Globalization;
 using System.Windows.Data;
+using System.Reflection;
 using System.Windows;
 using System.IO;
 
@@ -107,7 +108,7 @@ namespace Quicker.Resources.Styles
     }
 
     // 内容克隆转换器，用于解决ComboBox中视觉树冲突问题
-    public class ContentCloneConverter : IValueConverter
+    public class ContentCloneConverter : IValueConverter, IMultiValueConverter
     {
         private static readonly Lazy<ContentCloneConverter> _instance = new(() => new ContentCloneConverter()); // 延迟初始化
         public static ContentCloneConverter Instance => _instance.Value; // 获取实例
@@ -147,58 +148,14 @@ namespace Quicker.Resources.Styles
         /// <param name="culture">文化信息</param>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
-                return null; // 如果值为null，返回null
+            return ConvertCore(value, null); // 单值绑定时只传入值
+        }
 
-            // 如果是简单类型，直接返回
-            if (value is string || value.GetType().IsPrimitive)
-                return value; // 如果是简单类型，直接返回
-
-            try
-            {
-                // 尝试获取附加属性中的显示文本
-                if (value is DependencyObject depObj)
-                {
-                    string displayText = ComboBoxHelper.GetDisplayText(depObj); // 获取附加属性中的显示文本
-                    if (!string.IsNullOrEmpty(displayText))
-                    {
-                        return CreateTextBlock(displayText); // 返回显示文本的TextBlock
-                    }
-                }
-
-                // 计算缓存键
-                int cacheKey = CalculateCacheKey(value);
-                
-                // 尝试从缓存获取
-                if (_cloneCache.TryGetValue(cacheKey, out WeakReference weakRef) && 
-                    weakRef.IsAlive && 
-                    weakRef.Target is FrameworkElement cachedElement)
-                {
-                    return cachedElement;
-                }
-
-                // 如果是FrameworkElement，尝试克隆它
-                if (value is FrameworkElement element)
-                {
-                    var cloned = CloneElement(element); // 克隆FrameworkElement
-                    
-                    // 缓存克隆结果
-                    if (cloned is FrameworkElement clonedElement)
-                    {
-                        _cloneCache[cacheKey] = new WeakReference(clonedElement);
-                    }
-                    
-                    return cloned;
-                }
-
-                // 创建一个简单的TextBlock来显示内容的类型名称
-                return CreateTextBlock(value.ToString()); // 返回显示内容的类型名称的TextBlock
-            }
-            catch (Exception ex)
-            {
-                // 发生异常时返回一个显示错误信息的TextBlock
-                return CreateTextBlock($"[显示错误: {ex.Message}]"); // 返回显示错误信息的TextBlock
-            }
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            object selectedItem = values != null && values.Length > 0 ? values[0] : null;
+            ComboBox? comboBox = values != null && values.Length > 1 ? values[1] as ComboBox : null;
+            return ConvertCore(selectedItem, comboBox);
         }
 
         /// <summary>
@@ -250,6 +207,144 @@ namespace Quicker.Resources.Styles
             throw new NotImplementedException(); // 不实现ConvertBack
         }
 
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException(); // 不实现多值ConvertBack
+        }
+
+        /// <summary>
+        /// 统一处理逻辑
+        /// </summary>
+        private object ConvertCore(object value, ComboBox? comboBox)
+        {
+            if (value == null)
+                return null;
+
+            if (value is string || value.GetType().IsPrimitive)
+                return value;
+
+            try
+            {
+                // 优先读取附加的显示文本
+                if (value is DependencyObject depObj)
+                {
+                    string displayText = ComboBoxHelper.GetDisplayText(depObj);
+                    if (!string.IsNullOrEmpty(displayText))
+                    {
+                        return CreateTextBlock(displayText);
+                    }
+                }
+
+                // 支持 ItemTemplate / ItemTemplateSelector
+                if (comboBox != null)
+                {
+                    var templatedContent = CreateTemplateContent(comboBox, value);
+                    if (templatedContent != null)
+                    {
+                        return templatedContent;
+                    }
+                }
+
+                // 原有克隆逻辑
+                int cacheKey = CalculateCacheKey(value);
+                if (_cloneCache.TryGetValue(cacheKey, out WeakReference weakRef) &&
+                    weakRef.IsAlive &&
+                    weakRef.Target is FrameworkElement cachedElement)
+                {
+                    return cachedElement;
+                }
+
+                if (value is FrameworkElement element)
+                {
+                    var cloned = CloneElement(element);
+                    if (cloned is FrameworkElement clonedElement)
+                    {
+                        _cloneCache[cacheKey] = new WeakReference(clonedElement);
+                    }
+                    return cloned;
+                }
+
+                // 对普通对象尝试使用 DisplayMemberPath
+                if (comboBox != null)
+                {
+                    string? displayText = GetDisplayMemberValue(comboBox.DisplayMemberPath, value);
+                    if (!string.IsNullOrEmpty(displayText))
+                    {
+                        return CreateTextBlock(displayText);
+                    }
+                }
+
+                return CreateTextBlock(value.ToString());
+            }
+            catch (Exception ex)
+            {
+                return CreateTextBlock($"[显示错误: {ex.Message}]");
+            }
+        }
+
+        /// <summary>
+        /// 根据 ComboBox 的模板生成内容
+        /// </summary>
+        /// <param name="comboBox">要创建模板的ComboBox</param>
+        /// <param name="dataContext">数据上下文</param>
+        /// <returns>创建的模板内容</returns>
+        private object? CreateTemplateContent(ComboBox comboBox, object dataContext)
+        {
+            DataTemplate? template = null;
+            if (comboBox.ItemTemplateSelector != null) // 如果ItemTemplateSelector不为null，选择模板
+            {
+                template = comboBox.ItemTemplateSelector.SelectTemplate(dataContext, comboBox); // 选择模板
+            }
+
+            template ??= comboBox.ItemTemplate; // 如果模板为null，使用默认模板
+            if (template == null) // 如果模板为null，返回null
+            {
+                return null; // 返回null
+            }
+
+            try
+            {
+                if (template.LoadContent() is FrameworkElement element) // 如果模板加载内容为UI元素，设置数据上下文并重置元素状态
+                {
+                    element.DataContext = dataContext; // 设置数据上下文
+                    ResetElementState(element); // 重置元素状态
+                    return element;
+                }
+            }
+            catch { }
+            return null; 
+        }
+
+        /// <summary>
+        /// 获取 DisplayMemberPath 指定的字符串
+        /// </summary>
+        /// <param name="displayMemberPath">显示成员路径</param>
+        /// <param name="data">数据</param>
+        /// <returns>获取的显示成员值</returns>
+        private string? GetDisplayMemberValue(string? displayMemberPath, object data)
+        {
+            if (string.IsNullOrWhiteSpace(displayMemberPath) || data == null)
+            {
+                return null;
+            }
+
+            object? current = data; // 当前数据
+            string[] parts = displayMemberPath.Split('.'); // 分割显示成员路径
+            foreach (string part in parts)
+            {
+                if (current == null) return null; // 如果当前数据为null，返回null
+                var property = current.GetType().GetProperty(part, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (property == null) // 如果属性为null，返回null
+                {
+                    return null;
+                }
+
+                current = property.GetValue(current);
+            }
+
+            return current?.ToString();
+        }
+
         /// <summary>
         /// 尝试克隆一个UI元素
         /// </summary>
@@ -262,16 +357,12 @@ namespace Quicker.Resources.Styles
                 // 如果是ComboBoxItem，直接提取内容而不是克隆整个项
                 if (original is ComboBoxItem comboBoxItem)
                 {
-                    // 获取ComboBoxItem的内容
-                    object content = comboBoxItem.Content;
-                    
-                    // 如果内容是UI元素，克隆它
-                    if (content is FrameworkElement contentElement)
+                    object content = comboBoxItem.Content; // 获取ComboBoxItem的内容
+                    if (content is FrameworkElement contentElement) // 如果内容是UI元素，克隆它
                     {
                         return CloneElement(contentElement);
                     }
-                    // 如果内容是简单类型，创建TextBlock显示它
-                    else if (content != null)
+                    else if (content != null) // 如果内容是简单类型，创建TextBlock显示它
                     {
                         return CreateTextBlock(content.ToString());
                     }
