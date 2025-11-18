@@ -215,37 +215,13 @@ namespace Quicker.Windows.Menus
         {
             ClosingOrHiding?.Invoke();
             if (UseAnimation)
-                HideWithAnimation();
+                CloseWithAnimation();
             else
-                Visibility = Visibility.Hidden;
+                Close();
         }
         #endregion
 
         #region 动画辅助（供子类调用）
-        /// <summary>
-        /// 带动画的隐藏（淡出→隐藏→重置透明度）
-        /// </summary>
-        protected void HideWithAnimation()
-        {
-            if (AnimationManager != null)
-            {
-                AnimationManager.FadeOut(() =>
-                {
-                    Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
-                    {
-                        Visibility = Visibility.Hidden;
-                        Opacity = 0; // 为下次淡入做准备
-                    }));
-                });
-            }
-            else
-            {
-                // 如果动画管理器已被释放，直接隐藏
-                Visibility = Visibility.Hidden;
-                Opacity = 0;
-            }
-        }
-
         /// <summary>
         /// 带动画的关闭（淡出→真正Close）
         /// </summary>
@@ -253,11 +229,10 @@ namespace Quicker.Windows.Menus
         {
             if (AnimationManager != null)
             {
-                AnimationManager.CloseWithFade();
+                AnimationManager.CloseWithFade(); // 动画管理器可能为空
             }
             else
             {
-                // 如果动画管理器已被释放，直接关闭
                 Close();
             }
         }

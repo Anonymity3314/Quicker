@@ -826,9 +826,6 @@ namespace Quicker.Windows.Menus
             {
                 using var windowMananger = new WindowManager(); // 创建窗口管理器
                 windowMananger.SetMainWindowFocused(); // 关闭窗口
-                // 使用基类的动画隐藏方法
-                base.HideWithAnimation();
-                _ = base.CloseMenuAsync(); // 延时关闭窗口（不等待）
             }
             // 调用基类方法以触发ClosingOrHiding事件
             base.HandleDeactivated();
