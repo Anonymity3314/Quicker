@@ -219,10 +219,7 @@ namespace Quicker.Windows.MainWindows
                 catch { }
                 finally
                 {
-                    if (selectWindowWindow != null) // 关闭选择窗口
-                    {
-                        selectWindowWindow.Close();
-                    }
+                    selectWindowWindow?.Close(); // 关闭选择窗口
                 }
             }
         }

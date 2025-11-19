@@ -1,10 +1,12 @@
-﻿using Quicker.Windows.FloatingWindows.Windows;
+﻿using System;
+using Quicker.Windows.FloatingWindows.Windows;
 using Quicker.Windows.MainWindows.MainWindow;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
 using Quicker.Windows.AddWindows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
@@ -19,7 +21,6 @@ namespace Quicker.Windows.Menus
     public partial class OperationMenu : BaseMenuWindow
     {
         #region Win32 API
-        // 打开文件夹并选中文件
         [DllImport("shell32.dll", ExactSpelling = true)]
         private static extern void ILFree(IntPtr pidlList); // 释放资源
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
@@ -32,6 +33,20 @@ namespace Quicker.Windows.Menus
         public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
         public Window FatherWindow { get; private set; } // 父窗口
+
+        public ICommand CloseFloatCommand { get; private set; }
+        public ICommand EditInformationCommand { get; private set; }
+        public ICommand CopyActionCommand { get; private set; }
+        public ICommand CutActionCommand { get; private set; }
+        public ICommand DeleteActionCommand { get; private set; }
+        public ICommand PasteIconCommand { get; private set; }
+        public ICommand FloatActionCommand { get; private set; }
+        public ICommand FloatActionPageCommand { get; private set; }
+        public ICommand ExportActionCommand { get; private set; }
+        public ICommand CheckInformationCommand { get; private set; }
+        public ICommand CopyActionIdCommand { get; private set; }
+        public ICommand CopyActionNameCommand { get; private set; }
+        public ICommand OpenLocationCommand { get; private set; }
 
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ActionManager actionManager = new(); // 动作管理器
@@ -48,8 +63,9 @@ namespace Quicker.Windows.Menus
         /// <param name="tableName">表名</param>
         public OperationMenu(int buttonID, string tableName, Window window = null)
         {
+            InitializeCommands();
             InitializeComponent(); // 初始化窗口
-            ChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
+            ChildGrid.Visibility = Visibility.Collapsed; // 隐藏悬浮子菜单
             FirstChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             SecondChildGrid.Visibility = Visibility.Collapsed; // 隐藏子菜单
             ButtonID = buttonID; // 设置当前按钮
@@ -58,17 +74,29 @@ namespace Quicker.Windows.Menus
             InitializeMenu(); // 初始化菜单
         }
 
+        private void InitializeCommands()
+        {
+            CloseFloatCommand = new RelayCommand(_ => CloseFloatButton_Click(null, null));
+            EditInformationCommand = new RelayCommand(_ => EditeInformation_Click(null, null));
+            CopyActionCommand = new RelayCommand(_ => CopyAction_Click(null, null));
+            CutActionCommand = new RelayCommand(_ => CutAction_Click(null, null));
+            DeleteActionCommand = new RelayCommand(_ => DeleteAction_Click(null, null));
+            PasteIconCommand = new RelayCommand(_ => PasteIcon_Click(null, null));
+            FloatActionCommand = new RelayCommand(_ => FloatActionButton_Click(null, null));
+            FloatActionPageCommand = new RelayCommand(_ => FloatActionPageButton_Click(null, null));
+            ExportActionCommand = new RelayCommand(_ => ExportAction_Click(null, null));
+            CheckInformationCommand = new RelayCommand(_ => CheckImformation_Click(null, null));
+            CopyActionIdCommand = new RelayCommand(_ => CopyActionID_Click(null, null));
+            CopyActionNameCommand = new RelayCommand(_ => CopyActionName_Click(null, null));
+            OpenLocationCommand = new RelayCommand(_ => OpenLocation_Click(null, null));
+        }
+
         // 重写基类的窗口加载方法
         protected override void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             base.OnWindowLoaded(sender, e); // 调用基类方法处理动画
             base.SetWindowPositionNearMouse(); // 设置窗口位置
-
-            try
-            {
-                SetChidGridsMargin(); // 设置子菜单位置
-            }
-            catch { }
+            Dispatcher.BeginInvoke(new Action(SetChidGridsMargin), DispatcherPriority.Loaded);
         }
 
         // 设置子菜单位置
@@ -78,7 +106,7 @@ namespace Quicker.Windows.Menus
             Point suspendActionScreen = SuspendAction.PointToScreen(new Point(0, 0));
             Point floatActionButtonScreen = FloatActionButton.PointToScreen(new Point(0, 0));
             Point windowScreen = base.PointToScreen(new Point(0, 0));
-            
+
             Point suspendAction = new Point(suspendActionScreen.X - windowScreen.X, suspendActionScreen.Y - windowScreen.Y);
             Point floatActionButton = new Point(floatActionButtonScreen.X - windowScreen.X, floatActionButtonScreen.Y - windowScreen.Y);
             double deltaY1 = suspendAction.Y - floatActionButton.Y;
@@ -87,7 +115,7 @@ namespace Quicker.Windows.Menus
             // 获取按钮的绝对位置
             Point otherFunctionScreen = OtherFunction.PointToScreen(new Point(0, 0));
             Point exportActionScreen = ExportAction.PointToScreen(new Point(0, 0));
-            
+
             Point otherFunctionPoint = new Point(otherFunctionScreen.X - windowScreen.X, otherFunctionScreen.Y - windowScreen.Y);
             Point exportActionPoint = new Point(exportActionScreen.X - windowScreen.X, exportActionScreen.Y - windowScreen.Y);
             double deltaY2 = otherFunctionPoint.Y - exportActionPoint.Y;
@@ -922,5 +950,33 @@ namespace Quicker.Windows.Menus
             base.OnClosed(e); // 调用基类的 OnClosed 方法
         }
         #endregion
+    }
+
+    internal sealed class RelayCommand : ICommand
+    {
+        private readonly Action<object> execute; // 定义执行命令的操作
+        private readonly Predicate<object> canExecute; // 定义判断命令是否可执行的条件
+
+        /// <summary>
+        /// 构造函数，初始化执行命令的操作和可执行条件
+        /// </summary>
+        /// <param name="execute"> 执行命令的操作 </param>
+        /// <param name="canExecute"> 判断命令是否可执行的条件 </param>
+        /// <exception cref="ArgumentNullException"> execute 为 null </exception>
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
+        {
+            this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            this.canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter) => canExecute?.Invoke(parameter) ?? true; // 判断命令是否可执行
+        public void Execute(object parameter) => execute(parameter); // 执行命令
+
+        // 命令可执行状态改变事件，使用CommandManager.RequerySuggested事件
+        public event EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
     }
 }

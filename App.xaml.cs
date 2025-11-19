@@ -1,25 +1,25 @@
-﻿/*
-                   _ooOoo_
-                  o8888888o
-                  88" . "88
-                  (| -_- |)
-                  O\  =  /O
-               ____/`---'\____
-             .'  \\|     |//  `.
-            /  \\|||  :  |||//  \
-           /  _||||| -:- |||||-  \
-           |   | \\\  -  /// |   |
-           | \_|  ''\---/''  |   |
-           \      .-\__  `-`  ___/-. /
-         ___`. .'  /--.--\  `. . __
-      ."" '<  `.___\_<|>_/___.'  >'"".
-     | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-     \  \ `-.   \_ __\ /__ _/   .-` /  /
-======`-.____`-.___\_____/___.-`____.-'======
-                  `=---='
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            佛祖保佑       永无BUG
-*/
+﻿/* 立项日期：2024.12.16
+ *                     _ooOoo_
+ *                    o8888888o
+ *                    88" . "88
+ *                    (| -_- |)
+ *                    O\  =  /O
+ *                 ____/`---'\____
+ *               .'  \\|     |//  `.
+ *              /  \\|||  :  |||//  \
+ *             /  _||||| -:- |||||-  \
+ *             |   | \\\  -  /// |   |
+ *             | \_|  ''\---/''  |   |
+ *             \      .-\__  `-`  ___/-. /
+ *           ___`. .'  /--.--\  `. . __
+ *        ."" '<  `.___\_<|>_/___.'  >'"".
+ *       | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+ *       \  \ `-.   \_ __\ /__ _/   .-` /  /
+ *  ======`-.____`-.___\_____/___.-`____.-'======
+ *                    `=---='
+ *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *              佛祖保佑       永无BUG
+ */
 using KeyboardHookEventArgs = SharpHook.KeyboardHookEventArgs;
 using VisualTreeHelper = Quicker.Helpers.VisualTreeHelper;
 using MouseHookEventArgs = SharpHook.MouseHookEventArgs;
@@ -934,8 +934,8 @@ namespace Quicker
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
             Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
             SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
-            DisposeTaskbarIcon(); // 释放托盘图标绑定的事件
-            DisposeHook(); // 释放钩子绑定的事件
+            DisposeTaskbarIcon(); // 释放托盘图标绑定
+            DisposeHook(); // 释放钩子绑定
             AppStateManager.Dispose(); // 释放所有资源
             SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
             base.OnExit(e); // 调用基类的 OnExit 方法
