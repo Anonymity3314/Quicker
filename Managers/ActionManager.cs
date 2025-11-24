@@ -406,7 +406,7 @@ namespace Quicker.Managers
                     LoadExtension(data);
                     break;
                 case "OpenActionPage":
-                    await Task.Run(() => OpenActionPage(data));
+                    OpenActionPage(data);
                     break;
             }
             // 增加动作使用次数

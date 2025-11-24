@@ -1,4 +1,5 @@
-﻿using Quicker.Windows.MainWindows.MainWindow;
+﻿using System;
+using Quicker.Windows.MainWindows.MainWindow;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using Quicker.Managers;
 using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
+using Quicker.Internal;
 using System.IO;
 
 namespace Quicker.Windows.Menus
@@ -20,7 +22,8 @@ namespace Quicker.Windows.Menus
         #region 字段和属性
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
         private readonly ButtonDatabase db2 = new(); // 设置管理器
-        private string clipboardText; // 剪切板文本
+        private readonly InternalCommandManager internalCommandManager = InternalCommandManager.Instance; // 内部命令管理器
+        private InternalCommand currentInternalCommand; // 当前内部命令
         private bool hasChanged = false; // 是否已检查
         public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
@@ -36,6 +39,7 @@ namespace Quicker.Windows.Menus
             ButtonID = buttonID; // 设置当前按钮
             TableName = tableName; // 设置表名
             base.SetWindowTopmost(); // 设置窗口置顶
+            internalCommandManager.CommandPublished += InternalCommandManager_CommandPublished; // 监听内部命令
         }
 
         // 重写基类的窗口加载方法
@@ -56,39 +60,68 @@ namespace Quicker.Windows.Menus
         }
 
         // 设置粘贴动作按钮可见性
-        private void SetPasteActionButtonVisibility()
+        private void SetPasteActionButtonVisibility(InternalCommand command = null)
         {
-            clipboardText = Clipboard.GetText(); // 获取剪贴板文本
-            if (clipboardText.EndsWith("QuickerCommand")) // 判断是否为Quicker命令
-            {
-                if (clipboardText.StartsWith("OpenActionPage")) // 判断是否为打开动作页命令
-                {
-                    HandleOpenActionPageVisibility(); // 处理打开动作页按钮可见性
-                }
-                else if (clipboardText.StartsWith("CopyAction") || clipboardText.StartsWith("CutAction")) // 判断是否为复制或剪切动作命令
-                {
-                    HandleCopyOrCutActionVisibility(); // 处理复制或剪切动作按钮可见性
-                }
-            }
-            else
+            if (command == null)
+                internalCommandManager.TryGetLatestCommand(out command); // 获取内部命令
+
+            currentInternalCommand = command;
+
+            if (command == null)
             {
                 HidePasteActionButton(); // 隐藏按钮
+                return;
+            }
+
+            switch (command.CommandType)
+            {
+                case InternalCommandType.OpenActionPage:
+                    HandleOpenActionPageVisibility(command); // 处理打开动作页按钮可见性
+                    break;
+                case InternalCommandType.CopyAction:
+                case InternalCommandType.CutAction:
+                    HandleCopyOrCutActionVisibility(command); // 处理复制或剪切动作按钮可见性
+                    break;
+                default:
+                    HidePasteActionButton(); // 隐藏按钮
+                    break;
             }
         }
 
-        // 处理打开动作页按钮可见性
-        private void HandleOpenActionPageVisibility()
+        private void InternalCommandManager_CommandPublished(object sender, InternalCommand command)
         {
-            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
-            PasteActionTextBlock.Text = $"粘贴动作：{actionInfo[1]}{actionInfo[2]}"; // 设置文本
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => SetPasteActionButtonVisibility(command));
+                return;
+            }
+
+            SetPasteActionButtonVisibility(command);
+        }
+
+        // 处理打开动作页按钮可见性
+        private void HandleOpenActionPageVisibility(InternalCommand command)
+        {
+            if (command == null || string.IsNullOrWhiteSpace(command.ActionPageType) || string.IsNullOrWhiteSpace(command.ActionPageIndex))
+            {
+                HidePasteActionButton();
+                return;
+            }
+
+            PasteActionTextBlock.Text = $"粘贴动作：{command.ActionPageType}{command.ActionPageIndex}"; // 设置文本
             ShowPasteActionButton(); // 显示按钮
         }
 
         // 处理复制或剪切动作按钮可见性
-        private void HandleCopyOrCutActionVisibility()
+        private void HandleCopyOrCutActionVisibility(InternalCommand command)
         {
-            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
-            var buttonData = db2.GetButtonDataByID(int.Parse(actionInfo[2]), actionInfo[1]); // 获取按钮数据
+            if (command == null || string.IsNullOrWhiteSpace(command.TableName))
+            {
+                HidePasteActionButton();
+                return;
+            }
+
+            var buttonData = db2.GetButtonDataByID(command.ButtonId, command.TableName); // 获取按钮数据
             if (buttonData != null)
             {
                 PasteActionTextBlock.Text = $"粘贴动作：{buttonData.Title}"; // 设置文本
@@ -301,23 +334,28 @@ namespace Quicker.Windows.Menus
         // 粘贴动作
         private void PasteAction()
         {
-            string[] actionInfo = clipboardText.Split(';'); // 解析剪切板文本
-            switch (actionInfo[0])
+            if (currentInternalCommand == null)
+                return;
+
+            switch (currentInternalCommand.CommandType)
             {
-                case "CopyAction":
-                case "CutAction":
-                    HandleCopyOrCutAction(actionInfo);
+                case InternalCommandType.CopyAction:
+                case InternalCommandType.CutAction:
+                    HandleCopyOrCutAction(currentInternalCommand);
                     break;
-                case "OpenActionPage":
-                    HandleOpenActionPage(actionInfo);
+                case InternalCommandType.OpenActionPage:
+                    HandleOpenActionPage(currentInternalCommand);
                     break;
             }
         }
 
         // 处理复制或剪切动作
-        private void HandleCopyOrCutAction(string[] actionInfo)
+        private void HandleCopyOrCutAction(InternalCommand command)
         {
-            var buttonData = db2.GetButtonDataByID(int.Parse(actionInfo[2]), actionInfo[1]); // 获取按钮数据
+            if (command == null || string.IsNullOrWhiteSpace(command.TableName))
+                return;
+
+            var buttonData = db2.GetButtonDataByID(command.ButtonId, command.TableName); // 获取按钮数据
             ButtonData buttonData1 = new()
             {
                 ButtonID = ButtonID,
@@ -333,25 +371,28 @@ namespace Quicker.Windows.Menus
                 UsedTimes = buttonData.UsedTimes
             }; // 创建按钮数据
             db2.UpdateAction(buttonData1, TableName); // 保存按钮数据
-            if(actionInfo[0] == "CutAction")
+            if(command.CommandType == InternalCommandType.CutAction)
             {
-                db2.DeleteAction(int.Parse(actionInfo[2]), actionInfo[1]); // 删除动作
-                UpdateMainWindowButton(int.Parse(actionInfo[2]), actionInfo[1]); // 更新主窗口按钮
+                db2.DeleteAction(command.ButtonId, command.TableName); // 删除动作
+                UpdateMainWindowButton(command.ButtonId, command.TableName); // 更新主窗口按钮
             }
         }
 
         // 处理打开动作页
-        private void HandleOpenActionPage(string[] actionInfo)
+        private void HandleOpenActionPage(InternalCommand command)
         {
+            if (command == null || string.IsNullOrWhiteSpace(command.ActionPageType) || string.IsNullOrWhiteSpace(command.ActionPageIndex))
+                return;
+
             ButtonData buttonData3 = new()
             {
                 ButtonID = ButtonID,
-                Title = actionInfo[1] + actionInfo[2],
+                Title = command.ActionPageType + command.ActionPageIndex,
                 Location = "",
-                Data1 = actionInfo[1],
-                Data2 = actionInfo[2],
+                Data1 = command.ActionPageType,
+                Data2 = command.ActionPageIndex,
                 ImagePath = "",
-                Description = $"打开动作页{actionInfo[1]}{actionInfo[2]}",
+                Description = $"打开动作页{command.ActionPageType}{command.ActionPageIndex}",
                 CreateTime = DateTime.Now,
                 ActionType = "OpenActionPage",
                 UsedTimes = 0
@@ -523,7 +564,8 @@ namespace Quicker.Windows.Menus
         protected override void OnClosed(EventArgs e)
         {
             // 清理特定资源
-            clipboardText = null; // 清理剪切板文本
+            currentInternalCommand = null; // 清理内部命令
+            internalCommandManager.CommandPublished -= InternalCommandManager_CommandPublished; // 解绑事件
             hasChanged = false; // 清理检查状态
             buttonManager.Dispose(); // 释放按钮管理器
             ButtonID = 0; // 清理当前按钮

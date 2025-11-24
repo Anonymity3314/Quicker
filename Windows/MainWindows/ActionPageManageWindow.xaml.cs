@@ -12,6 +12,7 @@ using System.Windows.Media;
 using Quicker.Managers;
 using Quicker.Helpers;
 using Quicker.Models;
+using Quicker.Internal;
 using System.Windows;
 using System.IO;
 
@@ -907,10 +908,14 @@ namespace Quicker.Windows.MainWindows
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             string actionPageIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取场景名称
-            string openActionPageCommand = $"OpenActionPage;{type};{actionPageIndex};QuickerCommand"; // 生成打开动作页指令
-            Clipboard.SetText(openActionPageCommand); // 复制文本到剪贴板
+            InternalCommandManager.Instance.PublishCommand(new InternalCommand
+            {
+                CommandType = InternalCommandType.OpenActionPage,
+                ActionPageType = type,
+                ActionPageIndex = actionPageIndex
+            });
             using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("已创建动作并写入剪贴板，请粘贴到合适位置。", ToastType.Common); // 弹出消息提醒
+            toast.Show("已创建动作，请在目标位置使用“粘贴动作”。", ToastType.Common); // 弹出消息提醒
         }
 
         // 点击按钮删除动作页

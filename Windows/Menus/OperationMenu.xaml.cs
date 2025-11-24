@@ -14,6 +14,7 @@ using System.Windows.Input;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
+using Quicker.Internal;
 using System.IO;
 
 namespace Quicker.Windows.Menus
@@ -299,8 +300,12 @@ namespace Quicker.Windows.Menus
         private void CopyAction_Click(object sender, RoutedEventArgs e)
         {
             base.Visibility = Visibility.Hidden; // 隐藏窗口
-            Clipboard.SetText($"{ButtonID}"); // 复制文本到剪贴板
-            Clipboard.SetText($"CopyAction;{TableName};{ButtonID};QuickerCommand"); // 复制文本到剪贴板
+            InternalCommandManager.Instance.PublishCommand(new InternalCommand
+            {
+                CommandType = InternalCommandType.CopyAction,
+                TableName = TableName,
+                ButtonId = ButtonID
+            });
             base.Close(); // 关闭窗口
         }
 
@@ -308,7 +313,12 @@ namespace Quicker.Windows.Menus
         private void CutAction_Click(object sender, RoutedEventArgs e)
         {
             base.Visibility = Visibility.Hidden; // 隐藏窗口
-            Clipboard.SetText($"CutAction;{TableName};{ButtonID};QuickerCommand"); // 复制文本到剪贴板
+            InternalCommandManager.Instance.PublishCommand(new InternalCommand
+            {
+                CommandType = InternalCommandType.CutAction,
+                TableName = TableName,
+                ButtonId = ButtonID
+            });
             base.Close(); // 关闭窗口
         }
 
