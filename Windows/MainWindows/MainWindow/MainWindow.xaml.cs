@@ -215,12 +215,16 @@ namespace Quicker.Windows.MainWindows.MainWindow
         }
 
         /// <summary>
-        /// 鼠标滚轮切换页面
+        /// 翻页核心逻辑（根据滚动方向切换到上一页或下一页）
         /// </summary>
-        private void Grid_MouseWheel(object sender, MouseWheelEventArgs e, Panel parent, string gridType, int rows, int cols, Panel buttonPanel)
+        /// <param name="parent">父容器</param>
+        /// <param name="gridType">Grid类型</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        /// <param name="buttonPanel">按钮面板</param>
+        /// <param name="delta">滚动变化量（正数向上滚动，负数向下滚动）</param>
+        private void NavigatePage(Panel parent, string gridType, int rows, int cols, Panel buttonPanel, int delta)
         {
-            e.Handled = true; // 禁止默认滚轮事件
-            int delta = e.Delta; // 获取滚轮变化量
             int currentIndex = GetVisiblePageGridIndex(parent, gridType); // 获取当前可见页面索引
             int totalPages = db3.GetSceneData(gridType)?.SceneCount ?? 1; // 获取总动作页数
             bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true; // 获取是否循环翻页
@@ -248,15 +252,30 @@ namespace Quicker.Windows.MainWindows.MainWindow
             if (gridType == GLOBAL_STYLE) GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex; // 同步页面索引
         }
 
+        /// <summary>
+        /// 鼠标滚轮切换页面
+        /// </summary>
+        /// <param name="e">鼠标滚轮事件参数</param>
+        /// <param name="parent">父容器</param>
+        /// <param name="gridType">Grid类型</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        /// <param name="buttonPanel">按钮面板</param>
+        private void Grid_MouseWheel(MouseWheelEventArgs e, Panel parent, string gridType, int rows, int cols, Panel buttonPanel)
+        {
+            e.Handled = true; // 禁止默认滚轮事件
+            NavigatePage(parent, gridType, rows, cols, buttonPanel, e.Delta); // 调用翻页核心逻辑
+        }
+
         // 全局Grid滚轮事件
         private void GlobalGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            Grid_MouseWheel(sender, e, GlobalGrid, GLOBAL_STYLE, 3, 4, GlobalButtonPanel);
+            Grid_MouseWheel(e, GlobalGrid, GLOBAL_STYLE, 3, 4, GlobalButtonPanel);
         }
         // 通用Grid滚轮事件
         private void CommonGrid_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            Grid_MouseWheel(sender, e, CommonGrid, CommonStyle, 4, 4, CommonButtonPanel);
+            Grid_MouseWheel(e, CommonGrid, CommonStyle, 4, 4, CommonButtonPanel);
         }
 
         // 左键点击按钮时执行动作
@@ -326,66 +345,6 @@ namespace Quicker.Windows.MainWindows.MainWindow
             var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取配置信息
             if (Convention.ShowAddImage) // 如果显示添加按钮
                 buttonManager.OpenMenu(sender, "CreatActionMenu", this, buttonType); // 点击打开菜单
-        }
-
-        /// <summary>
-        /// 切换到上一页Grid
-        /// </summary>
-        /// <param name="currentIndex">当前页索引</param>
-        /// <param name="type">页面类型</param>
-        private void SwitchToPreviousPageGrid(int currentIndex, string type)
-        {
-            int totalPages = db3.GetSceneData(type)?.SceneCount ?? 1; // 获取总动作页数
-            int targetIndex = currentIndex - 1; // 获取当前动作页索引
-            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true; // 获取是否循环翻页
-            if (targetIndex < 0) // 如果当前页为第一页
-            {
-                if (loop) // 如果循环翻页
-                    targetIndex = totalPages - 1; // 跳转到最后一页
-                else
-                    return; // 否则直接返回
-            }
-            Panel parent = type == GLOBAL_STYLE ? GlobalGrid : CommonGrid; // 获取目标 Panel
-            Panel buttonPanel = type == GLOBAL_STYLE ? GlobalButtonPanel : CommonButtonPanel; // 获取目标按钮面板
-            int rows = type == GLOBAL_STYLE ? 3 : 4; // 获取行数
-            int cols = 4; // 获取列数
-            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}")) // 如果目标页不存在
-                GeneratePageGrid(parent, type, targetIndex, rows, cols); // 生成目标页
-            ShowPageGrid(parent, type, targetIndex, rows, cols); // 显示目标页
-            foreach (Button btn in buttonPanel.Children.OfType<Button>()) // 同步按钮背景
-                btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (type != GLOBAL_STYLE) SetCommonTextBlock(targetIndex); // 设置通用标签内容
-            if (type == GLOBAL_STYLE) GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex; // 更新索引
-        }
-
-        /// <summary>
-        /// 切换到下一页Grid
-        /// </summary>
-        /// <param name="currentIndex">当前页索引</param>
-        /// <param name="type">页面类型</param>
-        private void SwitchToNextPageGrid(int currentIndex, string type)
-        {
-            int totalPages = db3.GetSceneData(type)?.SceneCount ?? 1;
-            int targetIndex = currentIndex + 1;
-            bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true;
-            if (targetIndex >= totalPages)
-            {
-                if (loop)
-                    targetIndex = 0;
-                else
-                    return;
-            }
-            Panel parent = type == GLOBAL_STYLE ? GlobalGrid : CommonGrid;
-            Panel buttonPanel = type == GLOBAL_STYLE ? GlobalButtonPanel : CommonButtonPanel;
-            int rows = type == GLOBAL_STYLE ? 3 : 4;
-            int cols = 4;
-            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{type}{targetIndex}"))
-                GeneratePageGrid(parent, type, targetIndex, rows, cols);
-            ShowPageGrid(parent, type, targetIndex, rows, cols);
-            foreach (Button btn in buttonPanel.Children.OfType<Button>())
-                btn.Background = btn.Name == $"{type}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (type != GLOBAL_STYLE) SetCommonTextBlock(targetIndex);
-            if (type == GLOBAL_STYLE) GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex;
         }
 
         // 右键按钮打开菜单
@@ -604,19 +563,33 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <summary>
         /// 切换动作页（根据按钮数据，切换到指定类型和索引的动作页）
         /// </summary>
-        /// <param name="data"> 按钮数据，Data1为类型，Data2为页索引 </param>
+        /// <param name="data"> 按钮数据 </param>
         public void OpenActionPage(ButtonData data)
         {
             string type = data.Data1; // 获取动作页类型
-            int index = int.Parse(data.Data2); // 获取动作页索引
+            int targetIndex = int.Parse(data.Data2); // 获取目标动作页索引
             if (type != GLOBAL_STYLE) OnCommonStyleChanged(type); // 如果切换到非全局动作页，更新样式
-            int currentGridIndex = type == GLOBAL_STYLE ? GloblePageIndex : CommonPageIndex; // 获取当前可见的Grid编号
-            if (currentGridIndex > index) // 如果当前Grid编号大于目标Grid编号
-                for (int i = currentGridIndex; i > index; i--)
-                    SwitchToPreviousPageGrid(i, type); // 向前切换Grid
-            else if (currentGridIndex < index) // 如果当前Grid编号小于目标Grid编号
-                for (int i = currentGridIndex; i < index; i++)
-                    SwitchToNextPageGrid(i, type); // 向后切换Grid
+
+            Panel parent = type == GLOBAL_STYLE ? GlobalGrid : CommonGrid; // 获取当前Grid容器
+            int currentGridIndex = GetVisiblePageGridIndex(parent, type); // 获取当前可见的Grid编号
+            /* 可有可无的逻辑
+                if (currentGridIndex == targetIndex) return; // 已在目标页，无需后续操作
+             */
+
+            bool scrollUp = currentGridIndex > targetIndex; // 判断滚动方向
+            int steps = Math.Abs(currentGridIndex - targetIndex); // 需要滚动的次数
+            int delta = scrollUp ? Mouse.MouseWheelDeltaForOneLine : -Mouse.MouseWheelDeltaForOneLine; // 计算滚动变化量
+
+            // 根据类型确定参数
+            int rows = type == GLOBAL_STYLE ? 3 : 4;
+            int cols = 4;
+            Panel buttonPanel = type == GLOBAL_STYLE ? GlobalButtonPanel : CommonButtonPanel;
+
+            // 循环调用翻页方法
+            for (int i = 0; i < steps; i++)
+            {
+                NavigatePage(parent, type, rows, cols, buttonPanel, delta);
+            }
         }
 
         // 窗口关闭时强制垃圾回收
