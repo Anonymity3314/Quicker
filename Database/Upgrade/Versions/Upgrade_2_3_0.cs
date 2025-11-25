@@ -19,6 +19,7 @@ namespace Quicker.Database.Upgrade.Versions
         {
             SettingDatabase.InitializeAppearance(); // 新增数据库表
             AddTrayIconColumnsIfNotExist(connection); // 新增托盘图标字段
+            AddUseMenuAnimationColumnIfNotExist(connection); // 新增菜单动画字段
             RenameDefaultTables(connection, manager); // 重命名默认表
             UpdateButtonDataImagePath(connection); // 更新ButtonData表ImagePath字段
         }
@@ -62,7 +63,7 @@ namespace Quicker.Database.Upgrade.Versions
         }
 
         /// <summary>
-        /// 为 Convention 表添加托盘图标字段（如果不存在）
+        /// 为 Convention 表添加托盘图标字段
         /// </summary>
         /// <param name="connection"> 数据库连接 </param>
         private void AddTrayIconColumnsIfNotExist(SQLiteConnection connection)
@@ -74,6 +75,18 @@ namespace Quicker.Database.Upgrade.Versions
             }
             // 直接插入 TrayIconPathPaused 字段
             using (var cmd = new SQLiteCommand("ALTER TABLE Convention ADD COLUMN TrayIconPathPaused TEXT DEFAULT 'pack://application:,,,/Resources/Images/Quicker_Disabled.ico'", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        /// <summary>
+        /// 为 Convention 表添加菜单动画字段
+        /// </summary>
+        /// <param name="connection"> 数据库连接 </param>
+        private void AddUseMenuAnimationColumnIfNotExist(SQLiteConnection connection)
+        {
+            using (var cmd = new SQLiteCommand("ALTER TABLE Convention ADD COLUMN UseMenuAnimation BOOLEAN DEFAULT 1", connection))
             {
                 cmd.ExecuteNonQuery();
             }

@@ -110,7 +110,8 @@ namespace Quicker.Managers
                 LastPage = Conventions.LastPage, // 最后打开的页面
                 EnableMemoryOptimization = Conventions.EnableMemoryOptimization, // 是否启用内存优化
                 TrayIconPathRunning = Conventions.TrayIconPathRunning, // 运行时托盘图标路径
-                TrayIconPathPaused = Conventions.TrayIconPathPaused // 暂停时托盘图标路径
+                TrayIconPathPaused = Conventions.TrayIconPathPaused, // 暂停时托盘图标路径
+                UseMenuAnimation = Conventions.UseMenuAnimation // 是否启用菜单动画
             }; // 加载设置数据到缓存
         }
 

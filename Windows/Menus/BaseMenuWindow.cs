@@ -101,14 +101,9 @@ namespace Quicker.Windows.Menus
 
         #region 动画与行为开关
         /// <summary>
-        /// 是否启用淡入淡出动画
+        /// 是否启用淡入淡出动画（从数据库设置中读取）
         /// </summary>
-        protected bool UseAnimation { get; set; } = true;
-
-        /// <summary>
-        /// 是否在失去焦点后关闭/隐藏
-        /// </summary>
-        protected bool CloseOnDeactivated { get; set; } = true;
+        protected bool UseAnimation { get; set; }
 
         /// <summary>
         /// 淡入动画时长
@@ -149,18 +144,23 @@ namespace Quicker.Windows.Menus
         #region 构造与初始化
         protected BaseMenuWindow()
         {
-            // 初始化动画管理器
-            AnimationManager = new AnimationManager(this, FadeInDuration, FadeOutDuration);
-
-            // 默认透明，等待淡入
-            Opacity = 0;
+            LoadUseAnimationFromSettings(); // 从设置中读取是否启用动画
+            AnimationManager = new AnimationManager(this, FadeInDuration, FadeOutDuration); // 初始化动画管理器
+            Opacity = 0; // 默认透明，等待淡入
 
             // 注册生命周期事件
             Loaded += OnWindowLoaded;
             Deactivated += OnWindowDeactivated;
 
-            // 注册到菜单管理器
-            MenuManager.RegisterMenu(this);
+            MenuManager.RegisterMenu(this); // 注册到菜单管理器
+        }
+
+        /// <summary>
+        /// 从设置中加载是否启用菜单动画
+        /// </summary>
+        private void LoadUseAnimationFromSettings()
+        {
+            UseAnimation = Quicker.Database.Core.SettingDatabase.GetAllConventions().FirstOrDefault().UseMenuAnimation;
         }
         #endregion
 
@@ -182,12 +182,10 @@ namespace Quicker.Windows.Menus
         /// </summary>
         protected virtual void OnWindowDeactivated(object sender, EventArgs e)
         {
-            if (!CloseOnDeactivated) return;
-
             // 延迟执行，避免鼠标点击其他窗口时立即触发
             Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             {
-                if (!IsActive && CloseOnDeactivated)
+                if (!IsActive)
                 {
                     // 检查菜单是否已经显示了足够长的时间
                     var displayTime = DateTime.Now - _creationTime;

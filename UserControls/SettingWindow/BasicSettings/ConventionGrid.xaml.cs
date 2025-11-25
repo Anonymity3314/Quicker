@@ -1,12 +1,12 @@
 ﻿using Quicker.Windows.MainWindows;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using System.ComponentModel;
 using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Input;
 using Quicker.Managers;
 using System.Windows;
-using System.ComponentModel;
 
 namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
@@ -89,6 +89,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 LongPressThresholdTextBox.Text = settingManager.conventions.LongPressThreshold.ToString(); // 加载长按阈值设置
                 MouseMovePixelsTextBox.Text = settingManager.conventions.MouseMovePixels.ToString(); // 加载鼠标移动像素设置
                 LoopPageFlippingCheckBox.IsChecked = settingManager.conventions.LoopPageFlipping; // 加载循环翻页设置
+                UseMenuAnimationCheckBox.IsChecked = settingManager.conventions.UseMenuAnimation; // 加载启用菜单动画设置
                 RememberLastPageCheckBox.IsChecked = settingManager.conventions.RememberLastPage; // 加载记住设置窗口中最后打开的页面
                 EnableMemoryOptimizationCheckBox.IsChecked = settingManager.conventions.EnableMemoryOptimization; // 加载启用内存优化设置
             });
@@ -166,6 +167,9 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     break;
                 case "LoopPageFlippingCheckBox":
                     settingManager.conventions.LoopPageFlipping = value;
+                    break;
+                case "UseMenuAnimationCheckBox":
+                    settingManager.conventions.UseMenuAnimation = value;
                     break;
                 case "RememberLastPageCheckBox":
                     settingManager.conventions.RememberLastPage = value;

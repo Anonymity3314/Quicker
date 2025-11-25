@@ -20,5 +20,6 @@
         public bool EnableMemoryOptimization { get; set; } // 是否启用内存优化
         public string TrayIconPathRunning { get; set; } // 运行时托盘图标路径
         public string TrayIconPathPaused { get; set; } // 暂停时托盘图标路径
+        public bool UseMenuAnimation { get; set; } // 是否启用菜单动画
     }
 }

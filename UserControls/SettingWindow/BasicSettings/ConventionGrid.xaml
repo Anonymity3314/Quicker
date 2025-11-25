@@ -53,24 +53,27 @@
                     <CheckBox x:Name="ShowAddImageCheckBox" Content="左键点击空白按钮时显示创建动作菜单" ToolTip="在空白按钮上点击左键也显示右键菜单，可方便快速创建动作。" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
                     <CheckBox x:Name="HideTooltipCheckBox" Content="面板窗口不显示Tooltip提示" ToolTip="当鼠标悬停在动作按钮上时，不显示动作提示信息。" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
                     <CheckBox x:Name="LoopPageFlippingCheckBox" Content="翻页使用循环模式" ToolTip="在末页可以继续向后翻页到第一页，或者在第一页可以向前翻页到最后一页。" HorizontalAlignment="Left" Margin="10,210,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <Label Content="操作触发参数" HorizontalAlignment="Left" Margin="1,258,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                    <Grid Margin="1,302,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <CheckBox x:Name="UseMenuAnimationCheckBox" Content="启用菜单动画" ToolTip="菜单窗口显示和关闭时使用淡入淡出动画效果。" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+
+                    <!-- 操作触发参数 -->
+                    <Label Content="操作触发参数" HorizontalAlignment="Left" Margin="1,276,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                    <Grid Margin="1,320,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Label Content="鼠标滑动触发距离" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14"/>
                         <TextBox x:Name="MouseMovePixelsTextBox" ToolTip="按下鼠标移动超过多远触发滑动操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
                         <Label Content="像素" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="207,0,0,0"/>
                     </Grid>
-                    <Grid Margin="1,335,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Grid Margin="1,353,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <Label Content="鼠标长按触发时间" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14"/>
                         <TextBox x:Name="LongPressThresholdTextBox" ToolTip="鼠标按下并保持不动多长时间后触发操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
                         <Label Content="毫秒" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="207,0,0,0"/>
                     </Grid>
 
                     <!-- 其它 -->
-                    <Label Content="其它" HorizontalAlignment="Left" Margin="1,390,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                    <CheckBox Name="RememberLastPageCheckBox" Content="记住设置窗口中最后打开的页面" ToolTip="打开设置窗口时，自动进入上次最后使用的界面" HorizontalAlignment="Left" Margin="10,434,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <CheckBox Name="EnableMemoryOptimizationCheckBox" Content="启用内存优化" ToolTip="取消一些数据缓存，以减少资源占用。" HorizontalAlignment="Left" Margin="10,457,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <TextBlock Text="托盘图标" HorizontalAlignment="Left" Margin="10,483,0,0" VerticalAlignment="Top" FontSize="14"/>
-                    <Button x:Name="TrayIconButton" Content="编辑" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="71,480,0,0" VerticalAlignment="Top" Width="56" Click="TrayIconButton_Click"/>
+                    <Label Content="其它" HorizontalAlignment="Left" Margin="1,408,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
+                    <CheckBox Name="RememberLastPageCheckBox" Content="记住设置窗口中最后打开的页面" ToolTip="打开设置窗口时，自动进入上次最后使用的界面" HorizontalAlignment="Left" Margin="10,452,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+                    <CheckBox Name="EnableMemoryOptimizationCheckBox" Content="启用内存优化" ToolTip="取消一些数据缓存，以减少资源占用。" HorizontalAlignment="Left" Margin="10,475,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
+                    <TextBlock Text="托盘图标" HorizontalAlignment="Left" Margin="10,501,0,0" VerticalAlignment="Top" FontSize="14"/>
+                    <Button x:Name="TrayIconButton" Content="编辑" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="71,498,0,0" VerticalAlignment="Top" Width="56" Click="TrayIconButton_Click"/>
                     <Popup x:Name="TrayIconPopup" PopupAnimation="Fade" AllowsTransparency="True" IsOpen="False" Placement="Bottom" PlacementTarget="{Binding ElementName=TrayIconButton}" StaysOpen="False">
                         <Grid>
                             <Border Background="White" CornerRadius="3" Margin="3">
