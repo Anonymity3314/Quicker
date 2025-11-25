@@ -97,243 +97,304 @@
                         <Rectangle Fill="#FFD5D5D5" VerticalAlignment="Top" Height="1" Margin="7,40,10,0"/>
 
                         <!-- 尺寸 -->
-                        <Label Content="尺寸" Margin="10,50,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <!-- 尺寸-按钮大小 -->
-                        <Label Content="按钮大小：" Margin="10,90,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="121,95,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="261,92,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
-                        <!-- 尺寸-按钮间隙 -->
-                        <Label Content="按钮间隙：" Margin="10,125,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="121,130,0,0" VerticalAlignment="Top" Minimum="0" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,126,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
-                        <!-- 尺寸-边框宽度 -->
-                        <Label Content="边框宽度：" Margin="10,160,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="121,165,0,0" VerticalAlignment="Top" Minimum="0" Maximum="15" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="BorderWidthTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,161,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=BorderWidthSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
-                        <!-- 尺寸-按钮圆角 -->
-                        <Label Content="按钮圆角：" Margin="10,195,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Slider x:Name="ButtonCornerRadiusSlider" HorizontalAlignment="Left" Margin="121,200,0,0" VerticalAlignment="Top" Minimum="0" Maximum="40" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="ButtonCornerRadiusTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,196,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
-
-                        <!-- 颜色 -->
-                        <Label Content="颜色" Margin="10,240,0,0" FontWeight="Bold" FontSize="16" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <!-- 颜色-背景 -->
-                        <Label Content="背景：" Margin="10,276,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,279,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="BackgroundColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-边框 -->
-                        <Label Content="边框：" Margin="10,303,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BorderColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,306,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="BorderColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-工具栏 -->
-                        <Label Content="工具栏：" Margin="10,330,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ToolbarColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,333,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="ToolbarColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-工具栏图标 -->
-                        <Label Content="工具栏图标：" Margin="10,357,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Button x:Name="ToolbarIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,360,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="ToolbarIconColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-动作按钮 -->
-                        <Label Content="动作按钮：" Margin="10,383,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ActionButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,386,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="ActionButtonColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-动作按钮鼠标悬浮 -->
-                        <Label Content="动作按钮鼠标悬浮：" Margin="10,409,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="ActionButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,412,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="ActionButtonMouseOverColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-空白按钮 -->
-                        <Label Content="空白按钮：" Margin="10,435,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,438,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="BlankButtonColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-空白按钮鼠标悬浮 -->
-                        <Label Content="空白按钮鼠标悬浮：" Margin="10,461,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,464,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="BlankButtonMouseOverColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-按钮文字 -->
-                        <Label Content="按钮文字：" Margin="10,487,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                        <Button x:Name="TextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,490,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="TextColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-动作矢量图标色 -->
-                        <Label Content="动作矢量图标色：" Margin="10,513,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
-                        <Button x:Name="ActionIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,516,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click" Visibility="Collapsed">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="ActionIconColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-触发键文字颜色 -->
-                        <Label Content="触发键文字颜色：" Margin="10,539,0,0" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
-                        <Button x:Name="TriggerKeyTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,542,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click" Visibility="Collapsed">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="TriggerKeyTextColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-                        <!-- 颜色-其他位置矢量图标色 -->
-                        <Label Content="其他位置矢量图标色：" Margin="10,565,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left" Width="152" Visibility="Collapsed"/>
-                        <Button x:Name="OtherIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="167,568,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click" Visibility="Collapsed">
-                            <Rectangle Width="100" Height="16">
-                                <Rectangle.Fill>
-                                    <Binding ElementName="OtherIconColorButton" Path="Background"/>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                        </Button>
-
-                        <!-- 字体 -->
-                        <Label Content="字体" Margin="15,549,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <!-- 字体-字体1 -->
-                        <Label Content="字体1：" Margin="15,580,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="107,584,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <!-- 字体-字体2 -->
-                        <Label Content="字体2：" Margin="15,615,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="107,619,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <!-- 字体-字体大小 -->
-                        <Label Content="字体大小：" Margin="15,648,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="107,653,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="261,649,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
-                        <!-- 字体-字体粗细 -->
-                        <Label Content="字体粗细：" Margin="15,688,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <ComboBox x:Name="FontWeightComboBox" HorizontalAlignment="Left" Margin="107,689,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="ComboBox_SelectionChanged">
-                            <ComboBoxItem Content="Thin" FontWeight="Thin"/>
-                            <ComboBoxItem Content="ExtraLight" FontWeight="ExtraLight"/>
-                            <ComboBoxItem Content="UltraLight" FontWeight="UltraLight"/>
-                            <ComboBoxItem Content="Light" FontWeight="Light"/>
-                            <ComboBoxItem Content="Normal" FontWeight="Normal"/>
-                            <ComboBoxItem Content="Regular" FontWeight="Regular"/>
-                            <ComboBoxItem Content="Medium" FontWeight="Medium"/>
-                            <ComboBoxItem Content="DemiBold" FontWeight="DemiBold"/>
-                            <ComboBoxItem Content="SemiBold" FontWeight="SemiBold"/>
-                            <ComboBoxItem Content="Bold" FontWeight="Bold"/>
-                            <ComboBoxItem Content="ExtraBold" FontWeight="ExtraBold"/>
-                            <ComboBoxItem Content="UltraBold" FontWeight="UltraBold"/>
-                            <ComboBoxItem Content="Black" FontWeight="Black"/>
-                            <ComboBoxItem Content="Heavy" FontWeight="Heavy"/>
-                            <ComboBoxItem Content="ExtraBlack" FontWeight="ExtraBlack"/>
-                            <ComboBoxItem Content="UltraBlack" FontWeight="UltraBlack"/>
-                        </ComboBox>
-
-                        <!-- 背景图片 -->
-                        <Label Content="背景图片" Margin="15,734,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <!-- 背景图片-路径 -->
-                        <Label Content="路径：" Margin="15,769,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="107,770,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="176" Text="{Binding BackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="BackgroundImagePathTextBox_TextChanged"/>
-                        <Button x:Name="BackgroundImagePathButton" ToolTip="左键添加背景图片，右键清空当前图片" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="288,771,0,0" VerticalAlignment="Top" Width="53" Click="BackgroundImagePathButton_Click" MouseRightButtonDown="BackgroundImagePathButton_MouseRightButtonDown"/>
-                        <Popup x:Name="BackgroundImagePathPopup" PopupAnimation="Fade" Width="150" Height="62" PlacementTarget="{Binding ElementName=BackgroundImagePathButton}" AllowsTransparency="True" StaysOpen="False">
+                        <GroupBox Header="尺寸" Style="{StaticResource SettingGroupBox}" Margin="15,55,0,0">
                             <Grid>
-                                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
-                                    <Border.Effect>
-                                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="5" RenderingBias="Quality" ShadowDepth="1"/>
-                                    </Border.Effect>
-                                </Border>
-                                <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
-                                    <StackPanel Background="{x:Null}">
-                                        <Button x:Name="SelectBackgroundImageButton" Content="选择图片" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="SelectBackgroundImageButton_Click"/>
-                                        <Button x:Name="InsertClipboardTextButton" Content="插入剪切贴板文本" Style="{StaticResource MenuButton}" Margin="0,0,0,3" Click="InsertClipboardTextButton_Click"/>
-                                    </StackPanel>
-                                </Border>
+                                <!-- 按钮大小 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label Content="按钮大小：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Slider x:Name="ButtonSizeSlider" HorizontalAlignment="Left" Margin="106,6,0,0" VerticalAlignment="Top" Minimum="40" Maximum="100" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
+                                    <TextBox x:Name="ButtonSizeTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" Margin="245,2,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                                </Grid>
+                                <!-- 按钮间隙 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,33,0,0">
+                                    <Label Content="按钮间隙：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Slider x:Name="ButtonGapSlider" HorizontalAlignment="Left" Margin="106,6,0,0" VerticalAlignment="Top" Minimum="0" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
+                                    <TextBox x:Name="ButtonGapTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="245,2,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonGapSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                                </Grid>
+                                <!-- 边框宽度 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,66,0,0">
+                                    <Label Content="边框宽度：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Slider x:Name="BorderWidthSlider" HorizontalAlignment="Left" Margin="106,6,0,0" VerticalAlignment="Top" Minimum="0" Maximum="15" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
+                                    <TextBox x:Name="BorderWidthTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="245,2,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=BorderWidthSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                                </Grid>
+                                <!-- 按钮圆角 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,99,0,0">
+                                    <Label Content="按钮圆角：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Slider x:Name="ButtonCornerRadiusSlider" HorizontalAlignment="Left" Margin="106,6,0,0" VerticalAlignment="Top" Minimum="0" Maximum="40" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="120" ValueChanged="Slider_ValueChanged"/>
+                                    <TextBox x:Name="ButtonCornerRadiusTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="245,2,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=ButtonCornerRadiusSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                                </Grid>
                             </Grid>
-                        </Popup>
-                        <!-- 背景图片-不透明度 -->
-                        <Label Content="不透明度：" Margin="15,805,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="107,810,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.01" IsSnapToTickEnabled="True" Width="120" Value="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
-                        <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="261,806,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, StringFormat='{}{0:F2}'}"/>
-
+                        </GroupBox>
+                        <!-- 颜色 -->
+                        <GroupBox Header="颜色" Style="{StaticResource SettingGroupBox}" Margin="15,245,0,0">
+                            <Grid>
+                                <!-- 背景 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label Content="背景：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    <Button x:Name="BackgroundColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="BackgroundColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 边框 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,28,0,0">
+                                    <Label Content="边框：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="BorderColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="BorderColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 工具栏 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,56,0,0">
+                                    <Label Content="工具栏：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="ToolbarColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="ToolbarColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 工具栏图标 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,84,0,0">
+                                    <Label Content="工具栏图标：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <Button x:Name="ToolbarIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="ToolbarIconColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 动作按钮 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,112,0,0">
+                                    <Label Content="动作按钮：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="ActionButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="ActionButtonColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 动作按钮鼠标悬浮 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,140,0,0">
+                                    <Label Content="动作按钮鼠标悬浮：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="ActionButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="ActionButtonMouseOverColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 空白按钮 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,168,0,0">
+                                    <Label Content="空白按钮：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="BlankButtonColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="BlankButtonColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 空白按钮鼠标悬浮 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,196,0,0">
+                                    <Label Content="空白按钮鼠标悬浮：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="BlankButtonMouseOverColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="BlankButtonMouseOverColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 按钮文字 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,224,0,0">
+                                    <Label Content="按钮文字：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="TextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="TextColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 动作矢量图标色 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,252,0,0" Visibility="Collapsed">
+                                    <Label Content="动作矢量图标色：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="ActionIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="ActionIconColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 触发键文字颜色 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,280,0,0" Visibility="Collapsed">
+                                    <Label Content="触发键文字颜色：" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <Button x:Name="TriggerKeyTextColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click" >
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="TriggerKeyTextColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                                <!-- 其他位置矢量图标色 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,308,0,0" Visibility="Collapsed">
+                                    <Label Content="其他位置矢量图标色：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left" Width="152"/>
+                                    <Button x:Name="OtherIconColorButton" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="152,0,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="ColorButton_Click">
+                                        <Rectangle Width="100" Height="16">
+                                            <Rectangle.Fill>
+                                                <Binding ElementName="OtherIconColorButton" Path="Background"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
+                        <!-- 字体 -->
+                        <GroupBox Header="字体" Style="{StaticResource SettingGroupBox}" Margin="15,554,0,0">
+                            <Grid>
+                                <!-- 字体1 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label Content="字体1：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <ComboBox x:Name="FontSizeComboBox1" HorizontalAlignment="Left" Margin="124,0,0,0" VerticalAlignment="Center" Width="120" SelectionChanged="ComboBox_SelectionChanged" Height="24">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                                <!-- 字体2 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,33,0,0">
+                                    <Label Content="字体2：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <ComboBox x:Name="FontSizeComboBox2" HorizontalAlignment="Left" Margin="124,0,0,0" VerticalAlignment="Center" Width="120" SelectionChanged="ComboBox_SelectionChanged" Height="24">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                                <!-- 字体大小 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,66,0,0">
+                                    <Label Content="字体大小：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <Slider x:Name="FontSizeSlider" HorizontalAlignment="Left" Margin="106,6,0,0" VerticalAlignment="Top" Width="120" Minimum="4" Maximum="24" TickFrequency="0.1" IsSnapToTickEnabled="True" ValueChanged="Slider_ValueChanged"/>
+                                    <TextBox x:Name="FontSizeTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" Margin="245,2,0,0" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=FontSizeSlider, Path=Value, Mode=TwoWay, StringFormat='{}{0:F1}'}"/>
+                                </Grid>
+                                <!-- 字体粗细 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,99,0,0">
+                                    <Label Content="字体粗细：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <ComboBox x:Name="FontWeightComboBox" HorizontalAlignment="Left" Margin="124,0,0,0" VerticalAlignment="Center" Width="120" SelectionChanged="ComboBox_SelectionChanged" Height="24">
+                                        <ComboBoxItem Content="Thin" FontWeight="Thin"/>
+                                        <ComboBoxItem Content="ExtraLight" FontWeight="ExtraLight"/>
+                                        <ComboBoxItem Content="UltraLight" FontWeight="UltraLight"/>
+                                        <ComboBoxItem Content="Light" FontWeight="Light"/>
+                                        <ComboBoxItem Content="Normal" FontWeight="Normal"/>
+                                        <ComboBoxItem Content="Regular" FontWeight="Regular"/>
+                                        <ComboBoxItem Content="Medium" FontWeight="Medium"/>
+                                        <ComboBoxItem Content="DemiBold" FontWeight="DemiBold"/>
+                                        <ComboBoxItem Content="SemiBold" FontWeight="SemiBold"/>
+                                        <ComboBoxItem Content="Bold" FontWeight="Bold"/>
+                                        <ComboBoxItem Content="ExtraBold" FontWeight="ExtraBold"/>
+                                        <ComboBoxItem Content="UltraBold" FontWeight="UltraBold"/>
+                                        <ComboBoxItem Content="Black" FontWeight="Black"/>
+                                        <ComboBoxItem Content="Heavy" FontWeight="Heavy"/>
+                                        <ComboBoxItem Content="ExtraBlack" FontWeight="ExtraBlack"/>
+                                        <ComboBoxItem Content="UltraBlack" FontWeight="UltraBlack"/>
+                                    </ComboBox>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
+                        <!-- 背景图片 -->
+                        <GroupBox Header="背景图片" Style="{StaticResource SettingGroupBox}" Margin="15,739,0,0">
+                            <Grid>
+                                <!-- 路径 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label Content="路径：" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                    <TextBox x:Name="BackgroundImagePathTextBox" Style="{StaticResource RoundedTextBox}" HorizontalAlignment="Left" TextAlignment="Right" VerticalAlignment="Center" Width="200" Text="{Binding BackgroundImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="BackgroundImagePathTextBox_TextChanged" Margin="57,0,0,0"/>
+                                    <Button x:Name="BackgroundImagePathButton" ToolTip="左键添加背景图片，右键清空当前图片" Content="选择..." Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="272,0,0,0" Width="53" Click="BackgroundImagePathButton_Click" MouseRightButtonDown="BackgroundImagePathButton_MouseRightButtonDown"/>
+                                    <Popup x:Name="BackgroundImagePathPopup" PopupAnimation="Fade" Width="150" Height="62" PlacementTarget="{Binding ElementName=BackgroundImagePathButton}" AllowsTransparency="True" StaysOpen="False">
+                                        <Grid>
+                                            <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                                                <Border.Effect>
+                                                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="5" RenderingBias="Quality" ShadowDepth="1"/>
+                                                </Border.Effect>
+                                            </Border>
+                                            <Border Background="White" BorderThickness="0" CornerRadius="3" Margin="3">
+                                                <StackPanel Background="{x:Null}">
+                                                    <Button x:Name="SelectBackgroundImageButton" Content="选择图片" Style="{StaticResource MenuButton}" Margin="0,3,0,0" Click="SelectBackgroundImageButton_Click"/>
+                                                    <Button x:Name="InsertClipboardTextButton" Content="插入剪切贴板文本" Style="{StaticResource MenuButton}" Margin="0,0,0,3" Click="InsertClipboardTextButton_Click"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Popup>
+                                </Grid>
+                                <!-- 不透明度 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,33,0,0">
+                                    <Label Content="不透明度：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <Slider x:Name="BackgroundImageOpacitySlider" HorizontalAlignment="Left" Margin="106,6,0,0" VerticalAlignment="Top" Minimum="0" Maximum="1" TickFrequency="0.01" IsSnapToTickEnabled="True" Width="120" Value="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ValueChanged="Slider_ValueChanged"/>
+                                    <TextBox x:Name="BackgroundImageOpacityTextBox" Style="{StaticResource ResourceKey=RoundedTextBox}" HorizontalAlignment="Left" Margin="245,2,0,0" TextAlignment="Right" VerticalAlignment="Top" Width="80" Text="{Binding ElementName=PreviewBackgroundImage, Path=Opacity, Mode=TwoWay, StringFormat='{}{0:F2}'}"/>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
                         <!-- 模糊与圆角 -->
-                        <Label Content="模糊与圆角" Margin="15,846,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <!-- 模糊与圆角-模糊模式 -->
-                        <Label Content="模糊模式：" Margin="15,881,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <!-- 选项说明：
-                             0: 无 —— 不显示毛玻璃和阴影，界面为普通不透明背景。
-                             1: 毛玻璃 —— 显示毛玻璃（BlurEffect），并带有阴影，类似Win11毛玻璃效果。
-                             2: 无（去除窗口阴影）—— 不显示毛玻璃，且去除窗口阴影，界面为纯色无阴影。
-                             3: 毛玻璃（去除窗口阴影）—— 显示毛玻璃，但不显示阴影，界面为半透明毛玻璃无阴影。
-                        -->
-                        <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="144,883,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
-                            <ComboBoxItem Content="无"/>
-                            <ComboBoxItem Content="毛玻璃"/>
-                            <ComboBoxItem Content="无（去除窗口阴影）"/>
-                            <ComboBoxItem Content="毛玻璃（去除窗口阴影）"/>
-                        </ComboBox>
-                        <!-- 模糊与圆角-Win11圆角模式 -->
-                        <Label Content="Win11圆角模式：" Margin="15,914,0,0" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <!-- 选项说明：
-                             0: 默认 —— 使用默认圆角（5px），界面有适度圆角。
-                             1: 无 —— 无圆角，所有边为直角。
-                             2: 圆角 —— 明显的圆角（5px），与默认相同。
-                             3: 小圆角 —— 圆角半径较小（3px），界面略带圆角。
-                        -->
-                        <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="144,916,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
-                            <ComboBoxItem Content="默认"/>
-                            <ComboBoxItem Content="无"/>
-                            <ComboBoxItem Content="圆角"/>
-                            <ComboBoxItem Content="小圆角"/>
-                        </ComboBox>
-
+                        <GroupBox Header="模糊与圆角" Style="{StaticResource SettingGroupBox}" Margin="15,851,0,0">
+                            <Grid>
+                                <!-- 模糊模式 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Left">
+                                    <Label Content="模糊模式：" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                    <!-- 选项说明：
+                                         0: 无 —— 不显示毛玻璃和阴影，界面为普通不透明背景。
+                                         1: 毛玻璃 —— 显示毛玻璃（BlurEffect），并带有阴影，类似Win11毛玻璃效果。
+                                         2: 无（去除窗口阴影）—— 不显示毛玻璃，且去除窗口阴影，界面为纯色无阴影。
+                                         3: 毛玻璃（去除窗口阴影）—— 显示毛玻璃，但不显示阴影，界面为半透明毛玻璃无阴影。
+                                     -->
+                                    <ComboBox x:Name="BlurComboBox" HorizontalAlignment="Left" Margin="124,0,0,0" VerticalAlignment="Center" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="无"/>
+                                        <ComboBoxItem Content="毛玻璃"/>
+                                        <ComboBoxItem Content="无（去除窗口阴影）"/>
+                                        <ComboBoxItem Content="毛玻璃（去除窗口阴影）"/>
+                                    </ComboBox>
+                                </Grid>
+                                <!-- Win11圆角模式 -->
+                                <Grid VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,33,0,0">
+                                    <Label Content="Win11圆角模式：" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                    <!-- 选项说明：
+                                         0: 默认 —— 使用默认圆角（5px），界面有适度圆角。
+                                         1: 无 —— 无圆角，所有边为直角。
+                                         2: 圆角 —— 明显的圆角（5px），与默认相同。
+                                         3: 小圆角 —— 圆角半径较小（3px），界面略带圆角。
+                                     -->
+                                    <ComboBox x:Name="Win11CornerRadiusComboBox" HorizontalAlignment="Left" Margin="124,0,0,0" VerticalAlignment="Top" Width="120" Height="24" SelectionChanged="ComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="默认"/>
+                                        <ComboBoxItem Content="无"/>
+                                        <ComboBoxItem Content="圆角"/>
+                                        <ComboBoxItem Content="小圆角"/>
+                                    </ComboBox>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
                         <!-- 选项 -->
-                        <Label Content="选项" Margin="15,953,0,0" FontWeight="Bold" FontSize="16" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                        <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" ToolTip="按钮文字过长时自动缩小以显示全部" HorizontalAlignment="Left" Margin="21,989,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" ToolTip="鼠标移动到动作上时自动放大按钮" HorizontalAlignment="Left" Margin="21,1009,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" ToolTip="如果动作设置了图标，则只显示图标不显示名称" HorizontalAlignment="Left" Margin="21,1029,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
-                        <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" ToolTip="动作图标显示阴影效果" HorizontalAlignment="Left" Margin="21,1049,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                        <GroupBox Header="选项" Style="{StaticResource SettingGroupBox}" Margin="15,958,0,0">
+                            <Grid>
+                                <CheckBox x:Name="AutoHideTitleBarCheckBox" Content="自动缩小动作名称文字" ToolTip="按钮文字过长时自动缩小以显示全部" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14" Margin="4,0,0,0"/>
+                                <CheckBox x:Name="ShowActionButtonMouseOverCheckBox" Content="鼠标悬浮在动作按钮上时，放大显示按钮" ToolTip="鼠标移动到动作上时自动放大按钮" HorizontalAlignment="Left" Margin="4,23,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                                <CheckBox x:Name="HideActionNameAfterIconCheckBox" Content="设置动作图标后隐藏动作名称" ToolTip="如果动作设置了图标，则只显示图标不显示名称" HorizontalAlignment="Left" Margin="4,46,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                                <CheckBox x:Name="ShowActionIconShadowCheckBox" Content="动作图标显示阴影" ToolTip="动作图标显示阴影效果" HorizontalAlignment="Left" Margin="4,69,0,0" VerticalAlignment="Top" Click="CheckBox_Click" FontSize="14"/>
+                            </Grid>
+                        </GroupBox>
 
                         <!-- 用于扩展可见范围，无功能 -->
                         <Label Margin="10,1134,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>

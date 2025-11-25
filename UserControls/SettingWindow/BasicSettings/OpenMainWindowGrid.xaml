@@ -24,44 +24,53 @@
                 <ColumnDefinition Width="186*"/>
                 <ColumnDefinition Width="133*"/>
             </Grid.ColumnDefinitions>
-            <Label Content="鼠标方式" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="74"/>
-            <StackPanel Margin="10,68,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="151" Width="110">
-                <CheckBox x:Name="OpenMainWindowByMiddleMouseClickCheckBox" Content="按下中键" ToolTip="按下鼠标中键" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByX1MouseClickCheckBox" Content="按下X1键" ToolTip="需鼠标支持，通常为侧键" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByX2MouseClickCheckBox" Content="按下X2键" ToolTip="需鼠标支持，通常为侧键" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByCtrl_MiddleMouseClickCheckBox" Content="Ctrl+中键单击" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByCtrl_RightMouseClickCheckBox" Content="Ctrl+右键单击" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByMiddleMouseClickLongerCheckBox" Content="长按中键" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByRightMouseClickLongerCheckBox" Content="长按右键" FontSize="14" Click="CheckBox_Click"/>
-                <CheckBox x:Name="OpenMainWindowByRightMouseClick_MoveCheckBox" Content="按右键移动" FontSize="14" Click="CheckBox_Click"/>
-            </StackPanel>
-            <Label Content="键盘方式" HorizontalAlignment="Left" Margin="10,240,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize=" 16" Height="30" Width="74"/>
-            <CheckBox x:Name="OpenMainWindowByCtrlCheckBox" Content="单击Ctrl键" Margin="10,275,0,0" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <!--<TextBox x:Name="DIY_ShortcutKeys" ToolTip="请按键" HorizontalAlignment="Left" Margin="10,303,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" KeyDown="DIY_ShortcutKeys_KeyDown" PreviewTextInput="DIY_ShortcutKeys_PreviewTextInput" PreviewKeyUp="DIY_ShortcutKeys_PreviewKeyUp" TextAlignment="Center" GotFocus="DIY_ShortcutKeys_GotFocus"/>
-            <Button HorizontalAlignment="Left" Margin="240,303,0,0" VerticalAlignment="Top" Width="21" Height="17" Click="ClearDIY_ShortcutKeys"/>-->
-            <GroupBox Header="键盘弹出选项" Margin="10,325,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="57" Width="202">
+            <!-- 鼠标方式 -->
+            <GroupBox Header="鼠标方式" Style="{StaticResource SettingGroupBox}" Margin="10,33,0,0">
                 <Grid>
-                    <ComboBox x:Name="WindowStartupLocationComboBox" HorizontalAlignment="Left" Margin="70,14,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectionChanged="ComboBox_SelectionChanged">
-                        <ComboBoxItem>
-                            <TextBlock Text="系统默认" Margin="5,0"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem>
-                            <TextBlock Text="跟随鼠标" Margin="5,0"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem>
-                            <TextBlock Text="屏幕中心" Margin="5,0"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem>
-                            <TextBlock Text="当前窗口中心" Margin="5,0"/>
-                        </ComboBoxItem>
-                        <ComboBoxItem>
-                            <TextBlock Text="上次弹出位置" Margin="5,0"/>
-                        </ComboBoxItem>
-                    </ComboBox>
-                    <Label Content="弹出位置：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="OpenMainWindowByMiddleMouseClickCheckBox" Content="按下中键" ToolTip="按下鼠标中键" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByX1MouseClickCheckBox" Content="按下X1键" ToolTip="需鼠标支持，通常为侧键" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,18,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByX2MouseClickCheckBox" Content="按下X2键" ToolTip="需鼠标支持，通常为侧键" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,36,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByCtrl_MiddleMouseClickCheckBox" Content="Ctrl+中键单击" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,54,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByCtrl_RightMouseClickCheckBox" Content="Ctrl+右键单击" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,72,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByMiddleMouseClickLongerCheckBox" Content="长按中键" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,90,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByRightMouseClickLongerCheckBox" Content="长按右键" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,108,0,0"/>
+                    <CheckBox x:Name="OpenMainWindowByRightMouseClick_MoveCheckBox" Content="按右键移动" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,126,0,0"/>
                 </Grid>
             </GroupBox>
-            <Button x:Name="TestButton" Content="按键测试区" ToolTip="在此处点击鼠标按键以显示按键名称。" Style="{StaticResource WhiteButton}" HorizontalAlignment="Stretch" Margin="0,35,17,0" VerticalAlignment="Top" Width="NaN" Height="83" PreviewMouseDown="TestMouseKey" FontSize="16" Grid.Column="1"/>
+            <!-- 键盘方式 -->
+            <GroupBox Header="键盘方式" Style="{StaticResource SettingGroupBox}" Margin="10,235,0,0">
+                <Grid>
+                    <CheckBox x:Name="OpenMainWindowByCtrlCheckBox" Content="单击Ctrl键" Margin="10,10,0,0" Click="CheckBox_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <!--<Grid VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,33,0,0">
+                        <TextBox x:Name="DIY_ShortcutKeys" ToolTip="请按键" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="251" KeyDown="DIY_ShortcutKeys_KeyDown" PreviewTextInput="DIY_ShortcutKeys_PreviewTextInput" PreviewKeyUp="DIY_ShortcutKeys_PreviewKeyUp" TextAlignment="Center" GotFocus="DIY_ShortcutKeys_GotFocus"/>
+                        <Button HorizontalAlignment="Left" VerticalAlignment="Center" Width="21" Height="17" Click="ClearDIY_ShortcutKeys" Margin="256,0,0,0"/>
+                    </Grid>-->
+                    <GroupBox Header="键盘弹出选项" Margin="10,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <Grid>
+                            <ComboBox x:Name="WindowStartupLocationComboBox" HorizontalAlignment="Left" Margin="95,14,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectionChanged="ComboBox_SelectionChanged">
+                                <ComboBoxItem>
+                                    <TextBlock Text="系统默认" Margin="5,0"/>
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock Text="跟随鼠标" Margin="5,0"/>
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock Text="屏幕中心" Margin="5,0"/>
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock Text="当前窗口中心" Margin="5,0"/>
+                                </ComboBoxItem>
+                                <ComboBoxItem>
+                                    <TextBlock Text="上次弹出位置" Margin="5,0"/>
+                                </ComboBoxItem>
+                            </ComboBox>
+                            <Label Content="弹出位置：" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+            <!-- 按键测试区 -->
+            <Button x:Name="TestButton" Content="按键测试区" ToolTip="在此处点击鼠标按键以显示按键名称。" Style="{StaticResource WhiteButton}" HorizontalAlignment="Stretch" Margin="0,33,17,0" VerticalAlignment="Top" Width="NaN" Height="83" PreviewMouseDown="TestMouseKey" FontSize="16" Grid.Column="1"/>
         </Grid>
     </Grid>
 </UserControl>

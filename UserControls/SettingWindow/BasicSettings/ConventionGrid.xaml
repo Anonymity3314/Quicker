@@ -28,77 +28,91 @@
                         <TextBlock x:Name="CurrentUsingTimeTextBlock" HorizontalAlignment="Left" Margin="22,132,0,0" TextWrapping="Wrap" Text="加载中……" VerticalAlignment="Top" FontSize="14"/>
                     </Grid>
                 </GroupBox>
-                <Label x:Name="VersionLabel" Content="当前版本：" Margin="10,31,0,0" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Left"/>
-                <Button x:Name="CheckUpdateButton" Content="检查是否有更新" Style="{StaticResource WhiteButton}" Click="CheckUpdateButton_Click" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" Width="94"/>
-                <Label Content="软件更新" VerticalAlignment="Top" FontSize="16" HorizontalContentAlignment="Right" HorizontalAlignment="Left" FontWeight="Bold"/>
+                <GroupBox Header="软件更新" Style="{StaticResource SettingGroupBox}" Margin="5,5,0,0">
+                    <Grid>
+                        <Label x:Name="VersionLabel" Content="当前版本：" VerticalAlignment="Top" FontSize="14" HorizontalContentAlignment="Right" HorizontalAlignment="Left"/>
+                        <Button x:Name="CheckUpdateButton" Content="检查是否有更新" Style="{StaticResource WhiteButton}" Click="CheckUpdateButton_Click" Margin="6,33,0,0" VerticalAlignment="Top" Width="107" HorizontalAlignment="Left"/>
+                    </Grid>
+                </GroupBox>
             </Grid>
             <ScrollViewer Margin="0,23,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="645" Height="779">
                 <Grid>
                     <!-- 启动 -->
-                    <Label Content="启动" HorizontalAlignment="Left" Margin="1,0,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                    <CheckBox x:Name="AutoStartCheckBox" Content="开机自动启动Quicker" HorizontalAlignment="Left" Margin="9,45,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click">
-                        <CheckBox.ToolTip>
-                            <ToolTip FontSize="12">
-                                <StackPanel>
-                                    <TextBlock Text="如果无法自动启动：有管家或安全类软件阻止了，请检查或卸载此类软件"/>
-                                    <TextBlock Text="可尝试以管理员身份运行来解决此问题"/>
-                                </StackPanel>
-                            </ToolTip>
-                        </CheckBox.ToolTip>
-                    </CheckBox>
-                    <CheckBox x:Name="ShowNotificationCheckBox" Content="显示启动完成提示" ToolTip="Quicker启动后显示提示信息，方便您随后做某些操作。" HorizontalAlignment="Left" Margin="9,68,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-
-                    <!-- 面板窗口 -->
-                    <Label Content="面板窗口" HorizontalAlignment="Left" Margin="1,120,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                    <CheckBox x:Name="ShowAddImageCheckBox" Content="左键点击空白按钮时显示创建动作菜单" ToolTip="在空白按钮上点击左键也显示右键菜单，可方便快速创建动作。" HorizontalAlignment="Left" Margin="10,164,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <CheckBox x:Name="HideTooltipCheckBox" Content="面板窗口不显示Tooltip提示" ToolTip="当鼠标悬停在动作按钮上时，不显示动作提示信息。" HorizontalAlignment="Left" Margin="10,187,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <CheckBox x:Name="LoopPageFlippingCheckBox" Content="翻页使用循环模式" ToolTip="在末页可以继续向后翻页到第一页，或者在第一页可以向前翻页到最后一页。" HorizontalAlignment="Left" Margin="10,210,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <CheckBox x:Name="UseMenuAnimationCheckBox" Content="启用菜单动画" ToolTip="菜单窗口显示和关闭时使用淡入淡出动画效果。" HorizontalAlignment="Left" Margin="10,233,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-
-                    <!-- 操作触发参数 -->
-                    <Label Content="操作触发参数" HorizontalAlignment="Left" Margin="1,276,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                    <Grid Margin="1,320,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <Label Content="鼠标滑动触发距离" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14"/>
-                        <TextBox x:Name="MouseMovePixelsTextBox" ToolTip="按下鼠标移动超过多远触发滑动操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
-                        <Label Content="像素" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="207,0,0,0"/>
-                    </Grid>
-                    <Grid Margin="1,353,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <Label Content="鼠标长按触发时间" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14"/>
-                        <TextBox x:Name="LongPressThresholdTextBox" ToolTip="鼠标按下并保持不动多长时间后触发操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
-                        <Label Content="毫秒" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="207,0,0,0"/>
-                    </Grid>
-
-                    <!-- 其它 -->
-                    <Label Content="其它" HorizontalAlignment="Left" Margin="1,408,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                    <CheckBox Name="RememberLastPageCheckBox" Content="记住设置窗口中最后打开的页面" ToolTip="打开设置窗口时，自动进入上次最后使用的界面" HorizontalAlignment="Left" Margin="10,452,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <CheckBox Name="EnableMemoryOptimizationCheckBox" Content="启用内存优化" ToolTip="取消一些数据缓存，以减少资源占用。" HorizontalAlignment="Left" Margin="10,475,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_Click"/>
-                    <TextBlock Text="托盘图标" HorizontalAlignment="Left" Margin="10,501,0,0" VerticalAlignment="Top" FontSize="14"/>
-                    <Button x:Name="TrayIconButton" Content="编辑" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="71,498,0,0" VerticalAlignment="Top" Width="56" Click="TrayIconButton_Click"/>
-                    <Popup x:Name="TrayIconPopup" PopupAnimation="Fade" AllowsTransparency="True" IsOpen="False" Placement="Bottom" PlacementTarget="{Binding ElementName=TrayIconButton}" StaysOpen="False">
+                    <GroupBox Header="启动" Style="{StaticResource SettingGroupBox}" Margin="10,10,0,0">
                         <Grid>
-                            <Border Background="White" CornerRadius="3" Margin="3">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
-                                </Border.Effect>
-                            </Border>
-                            <Border Background="White" CornerRadius="3" Margin="3" Padding="0,3">
-                                <StackPanel Width="120">
-                                    <Button x:Name="EditRunningTrayIconButton" Style="{StaticResource MenuButton}" HorizontalAlignment="Stretch" ToolTip="左键编辑，右键恢复默认" Click="EditRunningTrayIconButton_Click" MouseRightButtonDown="RestoreDefaultTrayIconButton_MouseRightButtonDown">
-                                        <Grid Width="120">
-                                            <Image Source="{Binding RunningTrayIconImage, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0" HorizontalAlignment="Left" Style="{StaticResource MenuButtonImage}"/>
-                                            <TextBlock Text="运行时图标" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0"/>
-                                        </Grid>
-                                    </Button>
-                                    <Button x:Name="EditPausedTrayIconButton" Style="{StaticResource MenuButton}" HorizontalAlignment="Stretch" ToolTip="左键编辑，右键恢复默认" Click="EditPausedTrayIconButton_Click" MouseRightButtonDown="RestoreDefaultTrayIconButton_MouseRightButtonDown">
-                                        <Grid Width="120">
-                                            <Image Source="{Binding PausedTrayIconImage, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0" HorizontalAlignment="Left" Style="{StaticResource MenuButtonImage}"/>
-                                            <TextBlock Text="暂停时图标" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0"/>
-                                        </Grid>
-                                    </Button>
-                                </StackPanel>
-                            </Border>
+                            <CheckBox x:Name="AutoStartCheckBox" Content="开机自动启动Quicker" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CheckBox_Click" Margin="4,0,0,0">
+                                <CheckBox.ToolTip>
+                                    <ToolTip FontSize="12">
+                                        <StackPanel>
+                                            <TextBlock Text="如果无法自动启动：有管家或安全类软件阻止了，请检查或卸载此类软件"/>
+                                            <TextBlock Text="可尝试以管理员身份运行来解决此问题"/>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </CheckBox.ToolTip>
+                            </CheckBox>
+                            <CheckBox x:Name="ShowNotificationCheckBox" Content="显示启动完成提示" ToolTip="Quicker启动后显示提示信息，方便您随后做某些操作。" HorizontalAlignment="Left" Margin="4,18,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
                         </Grid>
-                    </Popup>
+                    </GroupBox>
+                    <!-- 面板窗口 -->
+                    <GroupBox Header="面板窗口" Style="{StaticResource SettingGroupBox}" Margin="10,102,0,0">
+                        <Grid>
+                            <CheckBox x:Name="ShowAddImageCheckBox" Content="左键点击空白按钮时显示创建动作菜单" ToolTip="在空白按钮上点击左键也显示右键菜单，可方便快速创建动作。" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CheckBox_Click" Margin="4,0,0,0"/>
+                            <CheckBox x:Name="HideTooltipCheckBox" Content="面板窗口不显示Tooltip提示" ToolTip="当鼠标悬停在动作按钮上时，不显示动作提示信息。" HorizontalAlignment="Left" Margin="4,18,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                            <CheckBox x:Name="LoopPageFlippingCheckBox" Content="翻页使用循环模式" ToolTip="在末页可以继续向后翻页到第一页，或者在第一页可以向前翻页到最后一页。" HorizontalAlignment="Left" Margin="4,36,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                            <CheckBox x:Name="UseMenuAnimationCheckBox" Content="启用菜单动画" ToolTip="菜单窗口显示和关闭时使用淡入淡出动画效果。" HorizontalAlignment="Left" Margin="4,54,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <!-- 操作触发参数 -->
+                    <GroupBox Header="操作触发参数" Style="{StaticResource SettingGroupBox}" Margin="10,235,0,0">
+                        <Grid>
+                            <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,0,0,0">
+                                <Label Content="鼠标滑动触发距离" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <TextBox x:Name="MouseMovePixelsTextBox" ToolTip="按下鼠标移动超过多远触发滑动操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
+                                <Label Content="像素" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="207,0,0,0"/>
+                            </Grid>
+                            <Grid Margin="4,28,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Label Content="鼠标长按触发时间" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <TextBox x:Name="LongPressThresholdTextBox" ToolTip="鼠标按下并保持不动多长时间后触发操作。" HorizontalAlignment="Left" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Center" Width="75" Height="24" FontSize="13" TextChanged="TextBox_TextChanged" Margin="127,0,0,0"/>
+                                <Label Content="毫秒" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="207,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <!-- 其它 -->
+                    <GroupBox Header="其它" Style="{StaticResource SettingGroupBox}" Margin="10,360,0,0">
+                        <Grid>
+                            <CheckBox Name="RememberLastPageCheckBox" Content="记住设置窗口中最后打开的页面" ToolTip="打开设置窗口时，自动进入上次最后使用的界面" HorizontalAlignment="Left" VerticalAlignment="Top" Click="CheckBox_Click" Margin="4,0,0,0"/>
+                            <CheckBox Name="EnableMemoryOptimizationCheckBox" Content="启用内存优化" ToolTip="取消一些数据缓存，以减少资源占用。" HorizontalAlignment="Left" Margin="4,18,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                            <Grid Margin="4,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <TextBlock Text="托盘图标" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                <Button x:Name="TrayIconButton" Content="编辑" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="61,0,0,0" Width="56" Click="TrayIconButton_Click"/>
+                            </Grid>
+                            <Popup x:Name="TrayIconPopup" PopupAnimation="Fade" AllowsTransparency="True" IsOpen="False" Placement="Bottom" PlacementTarget="{Binding ElementName=TrayIconButton}" StaysOpen="False">
+                                <Grid>
+                                    <Border Background="White" CornerRadius="3" Margin="3">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
+                                        </Border.Effect>
+                                    </Border>
+                                    <Border Background="White" CornerRadius="3" Margin="3" Padding="0,3">
+                                        <StackPanel Width="120">
+                                            <Button x:Name="EditRunningTrayIconButton" Style="{StaticResource MenuButton}" HorizontalAlignment="Stretch" ToolTip="左键编辑，右键恢复默认" Click="EditRunningTrayIconButton_Click" MouseRightButtonDown="RestoreDefaultTrayIconButton_MouseRightButtonDown">
+                                                <Grid Width="120">
+                                                    <Image Source="{Binding RunningTrayIconImage, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0" HorizontalAlignment="Left" Style="{StaticResource MenuButtonImage}"/>
+                                                    <TextBlock Text="运行时图标" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0"/>
+                                                </Grid>
+                                            </Button>
+                                            <Button x:Name="EditPausedTrayIconButton" Style="{StaticResource MenuButton}" HorizontalAlignment="Stretch" ToolTip="左键编辑，右键恢复默认" Click="EditPausedTrayIconButton_Click" MouseRightButtonDown="RestoreDefaultTrayIconButton_MouseRightButtonDown">
+                                                <Grid Width="120">
+                                                    <Image Source="{Binding PausedTrayIconImage, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0" HorizontalAlignment="Left" Style="{StaticResource MenuButtonImage}"/>
+                                                    <TextBlock Text="暂停时图标" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0"/>
+                                                </Grid>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </GroupBox>
                 </Grid>
             </ScrollViewer>
         </Grid>

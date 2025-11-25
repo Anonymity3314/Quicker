@@ -143,17 +143,23 @@ Quicker/
 │   ├─DataSizeHelper.cs                                # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换
 │   ├─ClipHelper.cs                                    # UI裁剪附加属性，用于为按钮和边框设置自定义裁剪（圆角）
 │   ├─ShortcutHelper.cs                                # 快捷键辅助类，提供快捷键字符串生成、友好显示、比对等功能
+│   ├─LowLevelGlobalHookHelper.cs                      # 全局钩子辅助类，封装底层键鼠监听
 │   └─VisualTreeHelper.cs                              # WPF视觉树辅助类，提供视觉树遍历和查找功能
+├─Internal/                                           # 内部命令相关
+│   └─InternalCommand.cs                               # 内置命令定义
 ├─VersionInfo.json                                    # 版本信息
 ├─LICENSE                                             # 开源协议文件
 ├─Managers/                                           # 管理器文件夹
 │   ├─ActionManager.cs                                 # 动作管理器
+│   ├─AnimationManager.cs                              # 动画效果管理器
 │   ├─AppManager.cs                                    # 应用管理器
 │   ├─AppStateManager.cs                               # 应用状态管理器
 │   ├─AppUpdateManager.cs                              # 应用更新管理器
 │   ├─ButtonManager.cs                                 # 按钮管理器
 │   ├─DatabaseUpdateManager.cs                         # 数据库更新管理器
 │   ├─IconManager.cs                                   # 图标管理器
+│   ├─InternalCommandManager.cs                        # 内部命令调度器
+│   ├─MenuManager.cs                                   # 菜单管理器
 │   ├─SettingManager.cs                                # 设置管理器
 │   ├─SingleInstanceManager .cs                        # 互斥锁管理器
 │   ├─ToastManager.cs                                  # 消息管理器
@@ -231,8 +237,9 @@ Quicker/
 │       │  └─ComboBoxStyle.xaml.cs
 │       ├─CustomContextMenuStyle.xaml                  # 右键菜单样式
 │       ├─GridStyles.xaml                              # 表格样式
+│       ├─GroupBoxStyle.xaml                           # GroupBox 样式
 │       ├─ImageStyles.xaml                             # 图片样式
-│       ├─PanelStyles.xaml                             # 面板样式
+│       ├─StackpanelStyles.xaml                        # 面板样式
 │       ├─ScrollBarStyle.xaml                          # 滚动条样式
 │       ├─SliderStyle.xaml                             # 滑动条样式
 │       │  └─SliderStyle.xaml.cs
@@ -269,10 +276,10 @@ Quicker/
 │              └─ExtensionManagementGrid.xaml.cs
 ├─Windows/                                            # 界面文件夹
 │   ├─AddWindows/                                     # 添加相关窗口（如添加场景、添加动作等）
-│   │   ├─AddSceneWindow.xaml                         # 添加场景窗口
-│   │   │   └─AddSceneWindow.xaml.cs
-│   │   └─AddWindow.xaml                              # 添加动作窗口
-│   │       └─AddWindow.xaml.cs
+│   │   ├─AddActionWindow.xaml                        # 添加动作窗口
+│   │   │   └─AddActionWindow.xaml.cs
+│   │   └─AddSceneWindow.xaml                         # 添加场景窗口
+│   │       └─AddSceneWindow.xaml.cs
 │   ├─FloatingWindows/                                # 悬浮窗口相关
 │   │   ├─Windows/                                    # 悬浮窗口实现文件夹
 │   │   │   ├─FloatingActionPageWindow.xaml           # 悬浮动作页窗口
@@ -305,6 +312,7 @@ Quicker/
 │   │   └─UpdateWindow.xaml                              #  更新窗口
 │   │       └─UpdateWindow.xaml.cs
 │   ├─Menus/                                           # 菜单文件夹
+│   │   ├─BaseMenuWindow.cs                             # 菜单窗口基类
 │   │   ├─CreatActionMenu.xaml                          # 创建动作菜单界面
 │   │   │   └─CreatActionMenu.xaml.cs
 │   │   ├─CustomMenu.xaml                               # 自定义菜单界面

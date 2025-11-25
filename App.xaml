@@ -36,16 +36,21 @@
             <Style TargetType="Window">
                 <Setter Property="FontFamily" Value="{DynamicResource GlobalFontFamily}"/>
             </Style>
+            
             <!-- 合并资源词典必须放最后 -->
             <ResourceDictionary.MergedDictionaries>
                 <!-- 右键菜单样式 -->
                 <ResourceDictionary Source="Resources/Styles/CustomContextMenuStyle.xaml"/>
+                <!-- 堆栈面板样式 -->
+                <!--<ResourceDictionary Source="Resources/Styles/StackpanelStyles.xaml"/>-->
                 <!-- 文本块样式 -->
                 <ResourceDictionary Source="Resources/Styles/TextBlockStyles.xaml"/>
                 <!-- 滚动条样式 -->
                 <ResourceDictionary Source="Resources/Styles/ScrollBarStyle.xaml"/>
                 <!-- 复选框样式 -->
                 <ResourceDictionary Source="Resources/Styles/CheckBoxStyle.xaml"/>
+                <!-- 组框样式 -->
+                <ResourceDictionary Source="Resources/Styles/GroupBoxStyle.xaml"/>
                 <!-- 输入框样式 -->
                 <ResourceDictionary Source="Resources/Styles/TextBoxStyles.xaml"/>
                 <!-- 下拉框样式 -->

@@ -23,81 +23,103 @@
                 <ColumnDefinition Width="163*"/>
                 <ColumnDefinition Width="79*"/>
             </Grid.ColumnDefinitions>
-            <Label Content="禁用Quicker的应用程序" HorizontalAlignment="Left" Margin="0,16,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="184"/>
-            <Border BorderBrush="#FFD5D5D5" BorderThickness="1" Margin="10,52,0,565" CornerRadius="3" VerticalAlignment="Top">
+            <!-- 禁用Quicker的应用程序 -->
+            <GroupBox Header="禁用Quicker的应用程序" Style="{StaticResource SettingGroupBox}" Margin="5,21,10,0" HorizontalAlignment="Stretch">
                 <Grid>
-                    <Grid.Triggers>
-                        <EventTrigger RoutedEvent="MouseEnter">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BlacklistScrollBar" Storyboard.TargetProperty="Visibility">
-                                        <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                        <EventTrigger RoutedEvent="MouseLeave">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BlacklistScrollBar" Storyboard.TargetProperty="Visibility">
-                                        <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Hidden}"/>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </Grid.Triggers>
+                    <Border BorderBrush="#FFD5D5D5" BorderThickness="1" CornerRadius="3" VerticalAlignment="Top" Margin="4,0,0,0">
+                        <Grid>
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BlacklistScrollBar" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BlacklistScrollBar" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Hidden}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Grid.Triggers>
 
-                    <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
-                        <StackPanel x:Name="BlacklistStackPanel" Margin="0,0,0,2"/>
-                    </ScrollViewer>
-                    <ScrollBar x:Name="BlacklistScrollBar" Margin="618,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Collapsed"/>
-                </Grid>
-            </Border>
-            <Button x:Name="BlacklistDragButton" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="10,230,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click">
-                <Grid Width="204">
-                    <TextBlock Text="拖动到要禁用Quicker的窗口上" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="12" Margin="30,0,0,0"/>
-                    <Image Source="/Resources/Images/Target.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0" Height="18" Width="18"/>
-                </Grid>
-            </Button>
-            <Button x:Name="BlacklistAddButton" Content="添加..." Style="{StaticResource WhiteButton}" ToolTip="增加特殊的应用" HorizontalAlignment="Left" Margin="228,230,0,0" VerticalAlignment="Top" Width="57" Height="27" Click="BlacklistAddButton_Click"/>
-            <Popup x:Name="AddBlacklistAppsPop" PopupAnimation="Fade" PlacementTarget="{Binding ElementName=BlacklistAddButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Margin="198,412,197,411">
-                <Grid>
-                    <Rectangle Fill="White" Margin="5,7">
-                        <Rectangle.Effect>
-                            <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
-                        </Rectangle.Effect>
-                    </Rectangle>
-                    <Border Width="240" Background="White" BorderThickness="0" CornerRadius="3" Margin="5">
-                        <StackPanel x:Name="AddBlacklistAppsStackPanel" Margin="-1.6,2"/>
+                            <ScrollViewer x:Name="BlacklistStackScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" ScrollChanged="BlacklistStackScrollViewer_ScrollChanged">
+                                <StackPanel x:Name="BlacklistStackPanel" Margin="0,0,0,2"/>
+                            </ScrollViewer>
+                            <ScrollBar x:Name="BlacklistScrollBar" Margin="618,0,0,0" ValueChanged="BlacklistScrollBar_ValueChanged" HorizontalAlignment="Left" VerticalAlignment="Center" Height="171" Visibility="Collapsed"/>
+                        </Grid>
                     </Border>
+                    <Button x:Name="BlacklistDragButton" Style="{StaticResource WhiteButton}" ToolTip="点击或按住拖动。点击进入选择模式时可最小化当前窗口。" HorizontalAlignment="Left" Margin="4,202,0,0" VerticalAlignment="Top" Width="204" Height="27" Click="BlacklistDragButton_Click">
+                        <Grid Width="204">
+                            <TextBlock Text="拖动到要禁用Quicker的窗口上" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="12" Margin="30,0,0,0"/>
+                            <Image Source="/Resources/Images/Target.png" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0" Height="18" Width="18"/>
+                        </Grid>
+                    </Button>
+                    <Button x:Name="BlacklistAddButton" Content="添加..." Style="{StaticResource WhiteButton}" ToolTip="增加特殊的应用" HorizontalAlignment="Left" Margin="216,202,0,0" VerticalAlignment="Top" Width="57" Height="27" Click="BlacklistAddButton_Click"/>
+                    <Popup x:Name="AddBlacklistAppsPop" PopupAnimation="Fade" PlacementTarget="{Binding ElementName=BlacklistAddButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False" Margin="198,412,197,411">
+                        <Grid>
+                            <Rectangle Fill="White" Margin="5,7">
+                                <Rectangle.Effect>
+                                    <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+                                </Rectangle.Effect>
+                            </Rectangle>
+                            <Border Width="240" Background="White" BorderThickness="0" CornerRadius="3" Margin="5">
+                                <StackPanel x:Name="AddBlacklistAppsStackPanel" Margin="-1.6,2"/>
+                            </Border>
+                        </Grid>
+                    </Popup>
+                    <Button x:Name="UnknownProcessButton" Content="无法识别的应用" Style="{StaticResource WhiteButton}" ToolTip="无法识别的应用统一使用unknown-proc.exe表示。" HorizontalAlignment="Left" Margin="280,202,0,0" VerticalAlignment="Top" Width="112" Height="27" Click="UnknownProcessButton_Click"/>
+                    <Button x:Name="AddDirectoryButton" Content="添加目录" Style="{StaticResource WhiteButton}" ToolTip="目录中所有程序都加入黑名单" HorizontalAlignment="Left" Margin="409,202,0,0" VerticalAlignment="Top" Width="62" Height="27" Click="AddDirectoryButton_Click"/>
                 </Grid>
-            </Popup>
-            <Button x:Name="UnknownProcessButton" Content="无法识别的应用" Style="{StaticResource WhiteButton}" ToolTip="无法识别的应用统一使用unknown-proc.exe表示。" HorizontalAlignment="Left" Margin="295,230,0,0" VerticalAlignment="Top" Width="96" Height="27" Click="UnknownProcessButton_Click"/>
-            <Button x:Name="AddDirectoryButton" Content="添加目录" Style="{StaticResource WhiteButton}" ToolTip="目录中所有程序都加入黑名单" HorizontalAlignment="Left" Margin="402,230,0,0" VerticalAlignment="Top" Width="62" Height="27" Click="AddDirectoryButton_Click"/>
-            <Label Content="全屏状态禁用Quicker" HorizontalAlignment="Left" Margin="0,303,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" Height="30" Width="168"/>
-            <CheckBox x:Name="FullScreenDisableCheckBox" Content="开启全屏或最大化禁用功能" ToolTip="通常在游戏时禁用Quicker" HorizontalAlignment="Left" Margin="10,338,0,0" VerticalAlignment="Top" Height="15" Width="174" Click="CheckBox_Click"/>
-            <Label Content="这些进程即使全屏或最大化也启用Quicker" HorizontalAlignment="Left" Margin="4,358,0,0" VerticalAlignment="Top" Height="25" Width="252"/>
-            <Grid Margin="0,383,0,339">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="539*"/>
-                    <ColumnDefinition Width="104"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="WhitelistSelectButton" Content="选择窗口" Style="{StaticResource WhiteButton}" Width="103" Height="24" HorizontalContentAlignment="Stretch" VerticalAlignment="Top" Grid.Column="1" Click="WhitelistSelectButton_Click" HorizontalAlignment="Right"/>
-                <Popup x:Name="AddWhitelistAppsPop" PopupAnimation="Fade" Width="250" Height="4" PlacementTarget="{Binding ElementName=WhitelistSelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
-                    <Grid>
-                        <Rectangle Fill="White" Margin="5,7">
-                            <Rectangle.Effect>
-                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
-                            </Rectangle.Effect>
-                        </Rectangle>
-                        <Border Width="240" Background="White" BorderThickness="0" CornerRadius="3" Margin="5">
-                            <StackPanel x:Name="AddWhitelistAppsStackPanel" Margin="-1.6,2"/>
-                        </Border>
+            </GroupBox>
+            <!-- 全屏状态禁用Quicker -->
+            <GroupBox Header="全屏状态禁用Quicker" Style="{StaticResource SettingGroupBox}" Margin="5,308,0,0">
+                <Grid>
+                    <CheckBox x:Name="FullScreenDisableCheckBox" Content="开启全屏或最大化禁用功能" ToolTip="通常在游戏时禁用Quicker" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                    <Label Content="这些进程即使全屏或最大化也启用Quicker" HorizontalAlignment="Left" Margin="4,18,0,0" VerticalAlignment="Top"/>
+                    <Grid Margin="0,46,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="539*"/>
+                            <ColumnDefinition Width="104"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="WhitelistSelectButton" Content="选择窗口" Style="{StaticResource WhiteButton}" Width="103" Height="24" HorizontalContentAlignment="Stretch" VerticalAlignment="Top" Grid.Column="1" Click="WhitelistSelectButton_Click" HorizontalAlignment="Right"/>
+                        <Popup x:Name="AddWhitelistAppsPop" PopupAnimation="Fade" Width="250" Height="4" PlacementTarget="{Binding ElementName=WhitelistSelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                            <Grid>
+                                <Rectangle Fill="White" Margin="5,7">
+                                    <Rectangle.Effect>
+                                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="15" RenderingBias="Quality" ShadowDepth="1"/>
+                                    </Rectangle.Effect>
+                                </Rectangle>
+                                <Border Width="240" Background="White" BorderThickness="0" CornerRadius="3" Margin="5">
+                                    <StackPanel x:Name="AddWhitelistAppsStackPanel" Margin="-1.6,2"/>
+                                </Border>
+                            </Grid>
+                        </Popup>
+                        <TextBox x:Name="BlacklistProcessTextBox" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" HorizontalContentAlignment="Stretch" Margin="10,0,1,0" TextChanged="BlacklistProcessTextBox_TextChanged"/>
                     </Grid>
-                </Popup>
-                <TextBox x:Name="BlacklistProcessTextBox" Style="{StaticResource RoundedTextBox}" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" HorizontalContentAlignment="Stretch" Margin="10,0,1,0" TextChanged="BlacklistProcessTextBox_TextChanged"/>
-            </Grid>
-            <Label Content="全屏时仍然启用Quicker的进程(分号分隔多个)。进程名等于exe文件名除去扩展名的部分。" Margin="4,407,0,334" Foreground="#FFB4B4B4" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontSize="11" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBox IsEnabled="False" Text="全屏时仍然启用Quicker的进程(分号分隔多个)。进程名等于exe文件名除去扩展名的部分。" Margin="10,70,0,0" Foreground="#FFB4B4B4" FontSize="11" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="TextBox">
+                                            <ScrollViewer x:Name="PART_ContentHost" Background="{TemplateBinding Background}" BorderThickness="0" Padding="{TemplateBinding Padding}"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </Grid>
+            </GroupBox>
         </Grid>
     </Grid>
 </UserControl>

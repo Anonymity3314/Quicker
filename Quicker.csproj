@@ -291,6 +291,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Resources\Styles\StackpanelStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="UserControls\SettingWindow\Auxiliary_Functions\" />
   </ItemGroup>
 
