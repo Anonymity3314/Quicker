@@ -1,5 +1,4 @@
-﻿using System;
-using Quicker.Windows.FloatingWindows.Windows;
+﻿using Quicker.Windows.FloatingWindows.Windows;
 using Quicker.Windows.MainWindows.MainWindow;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
@@ -11,10 +10,10 @@ using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Input;
+using Quicker.Internal;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
-using Quicker.Internal;
 using System.IO;
 
 namespace Quicker.Windows.Menus

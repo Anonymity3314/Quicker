@@ -9,10 +9,10 @@ using Quicker.Database.Core;
 using Quicker.Windows.Menus;
 using System.Windows.Input;
 using System.Windows.Media;
+using Quicker.Internal;
 using Quicker.Managers;
 using Quicker.Helpers;
 using Quicker.Models;
-using Quicker.Internal;
 using System.Windows;
 using System.IO;
 

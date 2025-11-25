@@ -7,16 +7,9 @@ namespace Quicker.Managers
         private static readonly Lazy<InternalCommandManager> lazyInstance = new(() => new InternalCommandManager()); // 单例实例懒加载
 
         public static InternalCommandManager Instance => lazyInstance.Value; // 单例实例
-
+        public event EventHandler<InternalCommand> CommandPublished; // 内部命令发布事件
         private readonly object syncLock = new(); // 同步锁 用于同步内部命令的访问
         private InternalCommand latestCommand; // 最新内部命令 用于存储最新的内部命令
-
-        private InternalCommandManager()
-        {
-
-        }
-
-        public event EventHandler<InternalCommand> CommandPublished; // 内部命令发布事件
 
         /// <summary>
         /// 发布内部命令

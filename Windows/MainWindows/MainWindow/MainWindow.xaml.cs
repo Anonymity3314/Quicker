@@ -143,9 +143,9 @@ namespace Quicker.Windows.MainWindows.MainWindow
             var globalSceneData = db3.GetSceneData(GLOBAL_STYLE);
             var commonSceneData = db3.GetSceneData(CommonStyle);
             
-            // 生成页面切换按钮
-            GeneratePageButtons(GLOBAL_STYLE, globalSceneData?.SceneCount ?? 1, GlobalPageChangeButton_Click, GlobalButtonPanel);
-            GeneratePageButtons(CommonStyle, commonSceneData?.SceneCount ?? 1, CommonPageChangeButton_Click, CommonButtonPanel);
+            // 生成页面切换按钮，保留当前选中的按钮状态
+            GeneratePageButtons(GLOBAL_STYLE, globalSceneData?.SceneCount ?? 1, GlobalPageChangeButton_Click, GlobalButtonPanel, GloblePageIndex);
+            GeneratePageButtons(CommonStyle, commonSceneData?.SceneCount ?? 1, CommonPageChangeButton_Click, CommonButtonPanel, CommonPageIndex);
         }
 
         /// <summary>
@@ -155,7 +155,8 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// <param name="totalPages"> 总页数 </param>
         /// <param name="clickHandler"> 点击事件 </param>
         /// <param name="panel"> 按钮容器 </param>
-        private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, Panel panel)
+        /// <param name="selectedIndex"> 当前选中的页面索引 </param>
+        private void GeneratePageButtons(string prefix, int totalPages, RoutedEventHandler clickHandler, Panel panel, int selectedIndex = 0)
         {
             if (totalPages == 1) return;
             for (int i = 0; i < totalPages; i++)
@@ -165,7 +166,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     Style = FindResource("ActionPageChangeButton") as Style,
                     Name = $"{prefix}{i}"
                 };
-                if (i == 0) button.Background = SelectedBrush;
+                button.Background = (i == selectedIndex) ? SelectedBrush : UnSelectedBrush; // 根据 selectedIndex 设置按钮背景色，保留当前选中状态
                 button.Click += clickHandler;
                 panel.Children.Add(button);
             }
@@ -183,27 +184,49 @@ namespace Quicker.Windows.MainWindows.MainWindow
         }
 
         /// <summary>
+        /// 显示目标页面并同步相关状态（提取的公共逻辑）
+        /// </summary>
+        /// <param name="parent">父容器</param>
+        /// <param name="gridType">Grid类型</param>
+        /// <param name="targetIndex">目标页面索引</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        /// <param name="buttonPanel">按钮面板</param>
+        private void ShowTargetPage(Panel parent, string gridType, int targetIndex, int rows, int cols, Panel buttonPanel)
+        {
+            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{targetIndex}")) // 如果目标页面不存在
+                GeneratePageGrid(parent, gridType, targetIndex, rows, cols); // 生成目标页面
+            ShowPageGrid(parent, gridType, targetIndex, rows, cols); // 显示目标页面
+            foreach (Button btn in buttonPanel.Children.OfType<Button>()) // 同步按钮背景色
+                btn.Background = btn.Name == $"{gridType}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
+            if (gridType != GLOBAL_STYLE) SetCommonTextBlock(targetIndex); // 设置通用标签内容
+            if (gridType == GLOBAL_STYLE) GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex; // 同步页面索引
+        }
+
+        /// <summary>
         /// 切换到指定的页面Grid
         /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="parent">父容器</param>
+        /// <param name="gridType">Grid类型</param>
+        /// <param name="rows">行数</param>
+        /// <param name="cols">列数</param>
+        /// <param name="buttonPanel">按钮面板</param>
         private void SwitchToPageGrid(object sender, Panel parent, string gridType, int rows, int cols, Panel buttonPanel)
         {
             if (sender is Button clickedButton)
             {
                 int pageIndex = int.Parse(clickedButton.Name.Replace($"{gridType}", ""));
-                if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{pageIndex}"))
-                    GeneratePageGrid(parent, gridType, pageIndex, rows, cols);
-                ShowPageGrid(parent, gridType, pageIndex, rows, cols);
-                // 同步按钮背景
-                foreach (Button btn in buttonPanel.Children.OfType<Button>())
-                    btn.Background = btn.Name == $"{gridType}{pageIndex}" ? SelectedBrush : UnSelectedBrush;
-                if (gridType != GLOBAL_STYLE) SetCommonTextBlock(pageIndex);
-                if (gridType == GLOBAL_STYLE) GloblePageIndex = pageIndex; else CommonPageIndex = pageIndex;
+                ShowTargetPage(parent, gridType, pageIndex, rows, cols, buttonPanel); // 使用公共方法
             }
         }
 
         /// <summary>
         /// 获取当前可见的页面Grid索引
         /// </summary>
+        /// <param name="parent">父容器</param>
+        /// <param name="gridType">Grid类型</param>
+        /// <returns>当前可见的页面Grid索引</returns>
         private int GetVisiblePageGridIndex(Panel parent, string gridType)
         {
             foreach (Grid grid in parent.Children.OfType<Grid>())
@@ -212,6 +235,32 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     return int.Parse(grid.Name.Replace(gridType, ""));
             }
             return 0;
+        }
+
+        /// <summary>
+        /// 处理页面索引边界检查和循环翻页逻辑
+        /// </summary>
+        /// <param name="targetIndex">目标页面索引</param>
+        /// <param name="totalPages">总页数</param>
+        /// <param name="loop">是否循环翻页</param>
+        /// <returns>处理后的页面索引，如果应该退出则返回 null</returns>
+        private int? ValidateAndAdjustPageIndex(int targetIndex, int totalPages, bool loop)
+        {
+            if (targetIndex < 0) // 超出范围
+            {
+                if (loop) // 如果循环翻页
+                    return totalPages - 1; // 循环翻页到最后一页
+                else
+                    return null; // 退出
+            }
+            if (targetIndex >= totalPages) // 超出范围
+            {
+                if (loop) // 如果循环翻页
+                    return 0; // 循环翻页到第一页
+                else
+                    return null; // 退出
+            }
+            return targetIndex; // 索引在有效范围内
         }
 
         /// <summary>
@@ -228,28 +277,12 @@ namespace Quicker.Windows.MainWindows.MainWindow
             int currentIndex = GetVisiblePageGridIndex(parent, gridType); // 获取当前可见页面索引
             int totalPages = db3.GetSceneData(gridType)?.SceneCount ?? 1; // 获取总动作页数
             bool loop = SettingDatabase.GetAllConventions().FirstOrDefault()?.LoopPageFlipping ?? true; // 获取是否循环翻页
-            int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;  
-            if (targetIndex < 0) // 超出范围
-            {
-                if (loop) // 如果循环翻页
-                    targetIndex = totalPages - 1; // 循环翻页
-                else
-                    return; // 退出
-            }
-            if (targetIndex >= totalPages) // 超出范围
-            {
-                if (loop) // 如果循环翻页
-                    targetIndex = 0; // 循环翻页
-                else
-                    return; // 退出
-            }
-            if (!parent.Children.OfType<Grid>().Any(g => g.Name == $"{gridType}{targetIndex}")) // 如果目标页面不存在
-                GeneratePageGrid(parent, gridType, targetIndex, rows, cols); // 生成目标页面
-            ShowPageGrid(parent, gridType, targetIndex, rows, cols); // 显示目标页面
-            foreach (Button btn in buttonPanel.Children.OfType<Button>()) // 同步按钮背景
-                btn.Background = btn.Name == $"{gridType}{targetIndex}" ? SelectedBrush : UnSelectedBrush;
-            if (gridType != GLOBAL_STYLE) SetCommonTextBlock(targetIndex); // 设置通用标签内容
-            if (gridType == GLOBAL_STYLE) GloblePageIndex = targetIndex; else CommonPageIndex = targetIndex; // 同步页面索引
+            int targetIndex = delta > 0 ? currentIndex - 1 : currentIndex + 1;
+            
+            int? validatedIndex = ValidateAndAdjustPageIndex(targetIndex, totalPages, loop); // 验证并调整页面索引
+            if (validatedIndex == null) return; // 如果应该退出，直接返回
+            
+            ShowTargetPage(parent, gridType, validatedIndex.Value, rows, cols, buttonPanel); // 使用公共方法显示目标页面
         }
 
         /// <summary>

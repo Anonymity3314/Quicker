@@ -8,11 +8,11 @@ using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Globalization;
 using System.Windows.Media;
+using Quicker.Internal;
 using Quicker.Managers;
 using Quicker.Helpers;
 using System.Windows;
 using Quicker.Models;
-using Quicker.Internal;
 using System.IO;
 
 namespace Quicker.Windows.Menus
