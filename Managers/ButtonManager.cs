@@ -182,7 +182,7 @@ namespace Quicker.Managers
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开文件: {fileName}", // 设置用途
                 CreateTime = DateTime.Now,
-                ActionType = "OpenFile", // 设置动作类型
+                ActionType = ActionType.OpenFile, // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
@@ -228,7 +228,7 @@ namespace Quicker.Managers
                 Data3 = 0.ToString(),
                 Description = $"打开图片: {fileName}",
                 CreateTime = DateTime.Now,
-                ActionType = "OpenFile",
+                ActionType = ActionType.OpenFile,
             };
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
@@ -285,7 +285,7 @@ namespace Quicker.Managers
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开以{fileName}为首的多个文件:", // 设置用途
                 CreateTime = DateTime.Now,
-                ActionType = "OpenFiles", // 设置动作类型
+                ActionType = ActionType.OpenFiles, // 设置动作类型
             }; // 设置按钮数据
             RefreshButtonDisplay(button, buttonData, 60, isMainWindow); // 刷新按钮
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
@@ -318,7 +318,7 @@ namespace Quicker.Managers
                 Data3 = 0.ToString(),
                 Description = $"打开网页: {url}",
                 CreateTime = DateTime.Now,
-                ActionType = "OpenWebsite",
+                ActionType = ActionType.OpenWebsite,
             }; // 设置按钮数据
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
         }
@@ -682,7 +682,7 @@ namespace Quicker.Managers
         {
             try
             {
-                if (button.Tag is not ButtonData buttonData || buttonData.ActionType != "LoadExtension")
+                if (button.Tag is not ButtonData buttonData || buttonData.ActionType != ActionType.LoadExtension)
                     return null;
 
                 if (string.IsNullOrEmpty(buttonData.Location) || !File.Exists(buttonData.Location))
@@ -727,7 +727,7 @@ namespace Quicker.Managers
         {
             try
             {
-                if (button.Tag is not ButtonData buttonData || buttonData.ActionType != "LoadExtension")
+                if (button.Tag is not ButtonData buttonData || buttonData.ActionType != ActionType.LoadExtension)
                     return;
 
                 if (string.IsNullOrEmpty(buttonData.Location) || !File.Exists(buttonData.Location))
@@ -914,7 +914,7 @@ namespace Quicker.Managers
                 Data3 = 0.ToString(), // 设置窗口状态
                 Description = $"打开文件: {fileName}", // 设置用途
                 CreateTime = DateTime.Now,
-                ActionType = "OpenFile", // 设置动作类型
+                ActionType = ActionType.OpenFile, // 设置动作类型
             }; // 设置按钮数据
             db2.UpdateAction(buttonData, tableName); // 添加按钮数据到数据库
             return true;

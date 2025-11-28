@@ -118,7 +118,7 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
-            if (buttonData.ActionType != "OpenWebsite") return; // 如果不是打开网站动作，则不执行操作
+            if (buttonData.ActionType != ActionType.OpenWebsite) return; // 如果不是打开网站动作，则不执行操作
 
             SetButtonTitle(buttonData); // 设置按钮标题
             SetAddressAndBrowser(buttonData); // 设置地址和浏览器
@@ -225,7 +225,7 @@ namespace Quicker.UserControls.AddWindow
                 Data2 = BrowserLocation.Text,
                 Description = _addWindow.DescriptionTextBox.Text,
                 CreateTime = createdTime,
-                ActionType = "OpenWebsite",
+                ActionType = ActionType.OpenWebsite,
                 UsedTimes = usedTimes
             }; // 创建按钮数据对象
             

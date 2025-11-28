@@ -64,7 +64,7 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
-            if (buttonData.ActionType != "LoadExtension") return; // 验证动作类型
+            if (buttonData.ActionType != ActionType.LoadExtension) return; // 验证动作类型
             UpdateUIFromButtonData(buttonData); // 更新UI
         }
 
@@ -347,7 +347,7 @@ namespace Quicker.UserControls.AddWindow
                 ImagePath = _addWindow.iconPath,
                 Description = _addWindow.DescriptionTextBox.Text,
                 CreateTime = createdTime,
-                ActionType = "LoadExtension",
+                ActionType = ActionType.LoadExtension,
                 UsedTimes = usedTimes
             }; // 创建按钮数据对象
             _buttonDb.UpdateAction(buttonData, _addWindow.TableName); // 更新数据库

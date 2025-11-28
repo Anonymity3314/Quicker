@@ -552,7 +552,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 Description = "",
                 CreateTime = DateTime.Now,
                 LatestEditTime = DateTime.Now,
-                ActionType = "OpenFlie",
+                ActionType = ActionType.OpenFile,
                 UsedTimes = 0
             };
         }

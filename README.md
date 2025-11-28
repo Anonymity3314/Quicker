@@ -138,6 +138,7 @@ Quicker/
 │   └─ModuleLoader.cs                                  # 扩展模块加载器
 ├─Helpers/                                            # 通用辅助类/附加属性
 │   ├─AppPathHelper.cs                                 # 应用程序路径管理助手类，统一管理Quicker应用程序的所有路径
+│   ├─ButtonDataHelper.cs                              # 按钮数据辅助类，提供从SQLiteDataReader读取数据并构造ButtonData对象的方法，包含处理可空字段和枚举类型转换的静态方法
 │   ├─TextBlockHelper.cs                               # 文本块辅助类
 │   ├─VersionHelper.cs                                 # 版本号比较工具类，用于版本号比较和检查更新
 │   ├─DataSizeHelper.cs                                # 数据大小换算工具类，用于字节、KB、MB、GB等单位转换

@@ -318,7 +318,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             string buttonType = GetButtonType(sender); // 获取按钮类型
             if (button.Tag is ButtonData data)
             {
-                if (!AppStateManager.MainWindowPinned && data.ActionType != "OpenActionPage") 
+                if (!AppStateManager.MainWindowPinned && data.ActionType != ActionType.OpenActionPage) 
                     this.Visibility = Visibility.Collapsed; // 隐藏窗口
 
                 if (HandleShiftKeyAction(button, buttonType)) return; // 处理Shift键动作
@@ -387,7 +387,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             string buttonType = GetButtonType(button);
 
             // 检查动作是否为扩展类型
-            if (button.Tag is ButtonData buttonData && buttonData.ActionType == "LoadExtension")
+            if (button.Tag is ButtonData buttonData && buttonData.ActionType == ActionType.LoadExtension)
             {
                 if (buttonManager.CheckExtensionHasContextMenu(button))  // 扩展是否支持右键菜单
                 {

@@ -220,22 +220,21 @@ namespace Quicker.UserControls.AddWindow
         private void LoadButtonInformation()
         {
             ButtonData buttonData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName); // 获取按钮数据
-            if (!IsOpenFileAction(buttonData.ActionType))
-                return;
+            if (buttonData.ActionType == null || !LoadButtonInfoActionTypes.Contains(buttonData.ActionType.Value)) return;
             SetButtonTitleAndLocation(buttonData); // 设置标题和地址
             SetButtonImageSafe(buttonData.ImagePath); // 设置图标
             SetOtherOptions(buttonData); // 设置其他选项
         }
 
         /// <summary>
-        /// 判断是否为打开文件相关的动作类型
+        /// 加载动作信息
         /// </summary>
-        /// <param name="actionType">动作类型</param>
-        /// <returns>是否为打开文件相关的动作类型</returns>
-        private bool IsOpenFileAction(string actionType)
+        private static readonly HashSet<ActionType> LoadButtonInfoActionTypes = new()
         {
-            return actionType == "OpenFile" || actionType == "OpenFiles" || actionType == "OpenUwpApp";
-        }
+            ActionType.OpenFile,
+            ActionType.OpenFiles,
+            ActionType.OpenUwpApp
+        }; // 将来新增的文件相关动作类型可以在这里添加
 
         /// <summary>
         /// 设置标题和地址栏
@@ -336,7 +335,7 @@ namespace Quicker.UserControls.AddWindow
                 : "";
 
             // 确定动作类型
-            string actionType = DetermineActionType();
+            ActionType actionType = DetermineActionType();
 
             // 获取旧数据并保留创建时间
             var oldData = _buttonDb.GetButtonDataByID(_addWindow.ButtonID, _addWindow.TableName);
@@ -397,15 +396,15 @@ namespace Quicker.UserControls.AddWindow
         /// 确定动作类型
         /// </summary>
         /// <returns>动作类型</returns>
-        private string DetermineActionType()
+        private ActionType DetermineActionType()
         {
             if (LocationTextBox.Text.Contains(";"))
             {
-                return "OpenFiles"; // 如果地址栏包含分号，则设置为打开多个文件动作
+                return ActionType.OpenFiles; // 如果地址栏包含分号，则设置为打开多个文件动作
             }
             string pattern = @"^[A-Za-z]:\\(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]*$";
             bool isValidPath = Regex.IsMatch(LocationTextBox.Text, pattern); // 检查路径是否有效
-            return isValidPath ? "OpenFile" : "OpenUwpApp"; // 返回动作类型
+            return isValidPath ? ActionType.OpenFile : ActionType.OpenUwpApp; // 返回动作类型
         }
 
         // 清理资源

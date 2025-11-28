@@ -394,7 +394,7 @@ namespace Quicker.Windows.Menus
                 ImagePath = "",
                 Description = $"打开动作页{command.ActionPageType}{command.ActionPageIndex}",
                 CreateTime = DateTime.Now,
-                ActionType = "OpenActionPage",
+                ActionType = ActionType.OpenActionPage,
                 UsedTimes = 0
             }; // 创建按钮数据
             db2.UpdateAction(buttonData3, TableName); // 保存按钮数据
@@ -512,7 +512,7 @@ namespace Quicker.Windows.Menus
                 Data3 = 0.ToString(),
                 Description = $"打开图片: {fileName}",
                 CreateTime = DateTime.Now,
-                ActionType = "OpenFile",
+                ActionType = ActionType.OpenFile,
             };
             db2.UpdateAction(buttonData, TableName); // 添加按钮数据到数据库
             UpdateUIAfterActionChange(); // 更新UI

@@ -390,23 +390,26 @@ namespace Quicker.Managers
         {
             switch (data.ActionType)
             {
-                case "OpenFile":
+                case ActionType.OpenFile:
                     await Task.Run(() => OpenFile(data));
                     break;
-                case "OpenWebsite":
+                case ActionType.OpenWebsite:
                     await Task.Run(() => OpenWebsite(data));
                     break;
-                case "OpenFiles":
+                case ActionType.OpenFiles:
                     await Task.Run(() => OpenFiles(data));
                     break;
-                case "OpenUwpApp":
+                case ActionType.OpenUwpApp:
                     await Task.Run(() => OpenUwpApp(data));
                     break;
-                case "LoadExtension":
+                case ActionType.LoadExtension:
                     LoadExtension(data);
                     break;
-                case "OpenActionPage":
+                case ActionType.OpenActionPage:
                     OpenActionPage(data);
+                    break;
+                default:
+                    ShowToast($"未知的动作类型：{data.ActionType}", ToastType.Error);
                     break;
             }
             // 增加动作使用次数

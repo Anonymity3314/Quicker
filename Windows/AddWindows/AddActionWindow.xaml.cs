@@ -145,17 +145,17 @@ namespace Quicker.Windows.AddWindows
             ButtonData buttonData = db2.GetButtonDataByID(ButtonID, TableName); // 获取按钮数据
             switch (buttonData.ActionType)
             {
-                case "OpenFile":
-                case "OpenFiles":
-                case "OpenUwpApp":
+                case ActionType.OpenFile:
+                case ActionType.OpenFiles:
+                case ActionType.OpenUwpApp:
                     ChoiceComboBox.SelectedIndex = 0;
                     ActionInfoGrid.Children.Add(new OpenFile(this)); // 添加 OpenFile 控件到布局中
                     break;
-                case "OpenWebsite":
+                case ActionType.OpenWebsite:
                     ChoiceComboBox.SelectedIndex = 1;
                     ActionInfoGrid.Children.Add(new OpenWebsite(this)); // 添加 OpenWebsite 控件到布局中
                     break;
-                case "LoadExtension":
+                case ActionType.LoadExtension:
                     ChoiceComboBox.SelectedIndex = 2;
                     ActionInfoGrid.Children.Add(new LoadExtension(this)); // 添加 LoadExtension 控件到布局中
                     break; // 加载扩展

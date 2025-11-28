@@ -470,7 +470,7 @@ namespace Quicker.Database.Core
             size += data.Data2?.Length * 2 ?? 0; // 数据2字符串长度 * 2
             size += data.Data3?.Length * 2 ?? 0; // 数据3字符串长度 * 2
             size += data.Description?.Length * 2 ?? 0; // 描述字符串长度 * 2
-            size += data.ActionType?.Length * 2 ?? 0; // 动作类型字符串长度 * 2
+            size += 4; // ActionType (enum)
             size += 4; // ButtonID (int)
             size += 8; // CreateTime (DateTime)
             size += 8; // LatestEditTime (DateTime)
