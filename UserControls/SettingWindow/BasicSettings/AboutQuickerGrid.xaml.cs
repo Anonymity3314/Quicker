@@ -47,7 +47,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 打开更新历史文件（从资源型JSON反序列化）
         private void OpenUpdateHistory(object sender, MouseButtonEventArgs e)
         {
-            string resourceName = "VersionInfo.json"; // 资源文件名
+            const string resourceName = "VersionInfo.json"; // 资源文件名
             Uri resourceUri = new(resourceName, UriKind.Relative); // 资源URI
             StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 通过资源URI获取资源流
             using (StreamReader reader = new(streamInfo.Stream)) // 读取资源流内容
@@ -522,6 +522,21 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 toast.Show($"JSON解析失败: {ex.Message}", ToastType.Error);
                 return null;
+            }
+        }
+
+        // 查看开源组件与协议
+        private void ViewOpenSourceButton_Click(object sender, RoutedEventArgs e)
+        {
+            const string resourceName = "ComponentLicenses.txt"; // 资源文件名
+            Uri resourceUri = new(resourceName, UriKind.Relative); // 资源URI
+            StreamResourceInfo streamInfo = Application.GetResourceStream(resourceUri); // 通过资源URI获取资源流
+            using (StreamReader reader = new(streamInfo.Stream)) // 读取资源流内容
+            {
+                string content = reader.ReadToEnd(); // 读取文件内容
+                string tempPath = Path.Combine(Path.GetTempPath(), resourceName); // 构造临时文件路径
+                File.WriteAllText(tempPath, content); // 写入临时文件
+                System.Diagnostics.Process.Start("notepad.exe", tempPath); // 用记事本打开临时文件
             }
         }
     }

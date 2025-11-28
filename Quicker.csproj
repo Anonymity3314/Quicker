@@ -41,6 +41,7 @@
     <None Remove=".gitignore" />
     <None Remove=".gitignore~RF3e5ebf6d.TMP" />
     <None Remove="App.xaml.cs~RF119692ff.TMP" />
+    <None Remove="ComponentLicenses.txt" />
     <None Remove="Quicker.png" />
     <None Remove="Resources\Images\1372BCD4FF819A292E9B6CD87E818C9D965C848D.png" />
     <None Remove="Resources\Images\6BEAA5E098C1BF0BD7305BD14DE6C8658DC00FF5.png" />
@@ -119,6 +120,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="ComponentLicenses.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Images\Search.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -257,11 +261,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HandyControl" Version="3.5.1" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-    <PackageReference Include="SharpHook" Version="7.0.3" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="InputSimulatorPlus" Version="1.0.7" />
+    <PackageReference Include="SharpHook" Version="7.1.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Svg" Version="3.4.7" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+    <PackageReference Include="ToastNotifications" Version="2.5.1" />
+    <PackageReference Include="ToastNotifications.Messages" Version="2.5.1" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
