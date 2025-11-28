@@ -2,17 +2,13 @@
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Quicker.Managers;
 using System.Windows;
 
 namespace Quicker.Windows.ToolWindows
 {
     public partial class ToastWindow : Window
     {
-        private const string commonColor = "#147EC9"; // 示例通用颜色
-        private const string errorColor = "#F5A300"; // 示例错误颜色
-        private const string warningColor = "Red"; // 示例警告颜色
-        private const string successColor = "#11AD45"; // 示例成功颜色
-
         private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
         private Queue<Message> messageQueue = new(); // 创建消息队列
 
@@ -28,9 +24,9 @@ namespace Quicker.Windows.ToolWindows
         /// </summary>
         /// <param name="message"> 消息内容 </param>
         /// <param name="toastType"> 消息类型 </param>
-        public void AddToast(string message, string toastType)
+        public void AddToast(string message, ToastType toastType)
         {
-            var msg = new Message { Content = message, Type = toastType }; // 创建消息对象
+            var msg = new Message { Content = message, ToastType = toastType }; // 创建消息对象
             messageQueue.Enqueue(msg); // 将消息添加到队列中
             CheckAndDisplayToast(); // 检查并显示消息
         }
@@ -55,7 +51,7 @@ namespace Quicker.Windows.ToolWindows
         /// <param name="msg"> 消息内容 </param>
         private void ShowToast(Message msg)
         {
-            var border = InitializeBoarder(msg.Type); // 初始化边框
+            var border = InitializeBoarder(msg.ToastType); // 初始化边框
             var textblock = InitalizeToast(msg.Content); // 初始化消息
             Grid grid = new Grid();
             border.Child = grid; // 将消息添加到边框中
@@ -82,7 +78,7 @@ namespace Quicker.Windows.ToolWindows
         /// 初始化边框
         /// </summary>
         /// <param name="toastType"> 消息类型 </param>
-        private Border InitializeBoarder(string toastType)
+        private Border InitializeBoarder(ToastType toastType)
         {
             Border border = new Border()
             {
@@ -92,26 +88,25 @@ namespace Quicker.Windows.ToolWindows
                 CornerRadius = new CornerRadius(5) // 设置边框圆角
             }; // 创建消息边框
 
-            string color = ""; // 根据消息类型设置边框颜色
-            switch (toastType)
-            {
-                case "Common":
-                    color = commonColor; // 示例通用颜色
-                    break;
-                case "Error":
-                    color = errorColor; // 示例错误颜色
-                    break;
-                case "Warning":
-                    color = warningColor; // 示例警告颜色
-                    break;
-                case "Success":
-                    color = successColor; // 示例成功颜色
-                    break;
-            }
-            border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); // 设置边框颜色
+            Color color = ToastColors.TryGetValue(toastType, out var result) 
+                ? result
+                : ToastColors[ToastType.Common];
+
+            border.Background = new SolidColorBrush(color); // 设置边框颜色
             ToastStackPanel.Children.Add(border); // 添加消息边框到消息面板
             return border; // 返回消息边框
         }
+
+        /// <summary>
+        /// 初始化消息颜色
+        /// </summary>
+        private static readonly Dictionary<ToastType, Color> ToastColors = new()
+        {
+            [ToastType.Common] = Color.FromArgb(0xFF, 0x14, 0x7E, 0xC9),  // 示例通用颜色，蓝色
+            [ToastType.Error] = Color.FromArgb(0xFF, 0xF5, 0xA3, 0x00),   // 示例错误颜色，橙色
+            [ToastType.Warning] = Color.FromArgb(0xFF, 0xFF, 0x00, 0x00), // 示例警告颜色，红色
+            [ToastType.Success] = Color.FromArgb(0xFF, 0x11, 0xAD, 0x45)  // 示例成功颜色，绿色
+        };
 
         /// <summary>
         /// 初始化关闭按钮
@@ -229,6 +224,6 @@ namespace Quicker.Windows.ToolWindows
     public class Message
     {
         public string Content { get; set; } // 消息内容
-        public string Type { get; set; } // 消息类型
+        public ToastType ToastType { get; set; } // 消息类型
     }
 }

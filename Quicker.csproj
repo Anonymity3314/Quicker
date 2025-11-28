@@ -263,7 +263,6 @@
   <ItemGroup>
     <PackageReference Include="HandyControl" Version="3.5.1" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-    <PackageReference Include="InputSimulatorPlus" Version="1.0.7" />
     <PackageReference Include="SharpHook" Version="7.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Svg" Version="3.4.7" />

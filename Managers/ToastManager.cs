@@ -9,10 +9,10 @@ namespace Quicker.Managers
     /// </summary>
     public enum ToastType
     {
-        Common,// 普通消息
-        Error,// 错误消息
+        Common, // 普通消息
+        Error,  // 错误消息
         Warning,// 警告消息
-        Success// 成功消息
+        Success // 成功消息
     }
 
     public class ToastManager : IDisposable
@@ -20,7 +20,11 @@ namespace Quicker.Managers
         private ToastWindow? toastWindow;
         private bool isDisposed = false;
 
-        // 添加Toast消息
+        /// <summary>
+        /// 添加Toast消息
+        /// </summary>
+        /// <param name="message"> 消息内容 </param>
+        /// <param name="toastType"> 消息类型 </param>
         public void Show(string message, ToastType toastType)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -31,7 +35,7 @@ namespace Quicker.Managers
                     toastWindow = new ToastWindow(); // 创建新的ToastWindow实例
                     toastWindow.Show(); // 显示ToastWindow
                 }
-                toastWindow.AddToast(message, toastType.ToString()); // 添加Toast消息
+                toastWindow.AddToast(message, toastType); // 添加Toast消息
             });
         }
 
