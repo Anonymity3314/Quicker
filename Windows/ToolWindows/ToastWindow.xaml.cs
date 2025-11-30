@@ -9,14 +9,37 @@ namespace Quicker.Windows.ToolWindows
 {
     public partial class ToastWindow : Window
     {
+        private readonly CancellationTokenSource _cancellationTokenSource = new(); // 取消令牌源
         private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
         private Queue<Message> messageQueue = new(); // 创建消息队列
+        private readonly Task _queueProcessingTask; // 队列处理任务
 
         public ToastWindow()
         {
             InitializeComponent();
             double screenHeight = SystemParameters.WorkArea.Height; // 获取屏幕高度
             Height = screenHeight; // 设置窗口高度为屏幕高度
+            _queueProcessingTask = Task.Run(() => ProcessQueueAsync(_cancellationTokenSource.Token)); // 启动后台任务处理消息队列
+        }
+
+        /// <summary>
+        /// 异步处理队列中的消息
+        /// </summary>
+        /// <param name="cancellationToken">取消令牌，用于请求取消操作</param>
+        /// <returns>一个表示异步操作的任务</returns>
+        private async Task ProcessQueueAsync(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested) // 循环处理，直到收到取消请求
+            {
+                await Task.Delay(100, cancellationToken); // 等待100毫秒，同时检查取消请求
+                if (messageQueue.Count > 0)  // 检查队列中是否有消息需要处理
+                {
+                    await Dispatcher.InvokeAsync(() => // 使用UI线程调用检查并显示通知的方法
+                    {
+                        CheckAndDisplayToast();
+                    }, DispatcherPriority.Normal);
+                }
+            }
         }
 
         /// <summary>
@@ -27,8 +50,7 @@ namespace Quicker.Windows.ToolWindows
         public void AddToast(string message, ToastType toastType)
         {
             var msg = new Message { Content = message, ToastType = toastType }; // 创建消息对象
-            messageQueue.Enqueue(msg); // 将消息添加到队列中
-            CheckAndDisplayToast(); // 检查并显示消息
+            messageQueue.Enqueue(msg); // 将消息对象添加到队列中
         }
 
         // 检查并显示消息
@@ -100,12 +122,12 @@ namespace Quicker.Windows.ToolWindows
         /// <summary>
         /// 初始化消息颜色
         /// </summary>
-        private static readonly Dictionary<ToastType, Color> ToastColors = new()
+        private static readonly Dictionary<ToastType, Color> ToastColors = new Dictionary<ToastType, Color>
         {
-            [ToastType.Common] = Color.FromArgb(0xFF, 0x14, 0x7E, 0xC9),  // 示例通用颜色，蓝色
-            [ToastType.Error] = Color.FromArgb(0xFF, 0xF5, 0xA3, 0x00),   // 示例错误颜色，橙色
-            [ToastType.Warning] = Color.FromArgb(0xFF, 0xFF, 0x00, 0x00), // 示例警告颜色，红色
-            [ToastType.Success] = Color.FromArgb(0xFF, 0x11, 0xAD, 0x45)  // 示例成功颜色，绿色
+            [ToastType.Common] = Color.FromRgb(0x14, 0x7E, 0xC9),  // 示例通用颜色，蓝色
+            [ToastType.Error] = Color.FromRgb(0xF5, 0xA3, 0x00),   // 示例错误颜色，橙色
+            [ToastType.Warning] = Color.FromRgb(0xFF, 0x00, 0x00), // 示例警告颜色，红色
+            [ToastType.Success] = Color.FromRgb(0x11, 0xAD, 0x45)  // 示例成功颜色，绿色
         };
 
         /// <summary>
@@ -204,19 +226,26 @@ namespace Quicker.Windows.ToolWindows
         }
 
         // 关闭窗口释放资源
-        protected override void OnClosed(EventArgs e)
+        protected override async void OnClosed(EventArgs e)
         {
-            base.OnClosed(e); // 关闭窗口
+            base.OnClosed(e);
+            _cancellationTokenSource.Cancel(); // 取消后台任务
+            try
+            {
+                await _queueProcessingTask;
+            }
+            catch { }
+
             messageQueue.Clear(); // 清空消息队列
             foreach (DispatcherTimer timer in timerDictionary.Values)
             {
-                timer.Stop(); // 停止所有计时器
-                timer.Tick -= Timer_Tick; // 移除计时器事件
-            } // 释放所有计时器资源
-            timerDictionary.Clear(); // 清空字典
-            GC.Collect(); // 垃圾回收
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 再次进行垃圾回收
+                timer.Stop();
+                timer.Tick -= Timer_Tick;
+            }
+            timerDictionary.Clear();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
     }
 
