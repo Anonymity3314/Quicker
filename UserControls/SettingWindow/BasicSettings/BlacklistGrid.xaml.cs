@@ -1,5 +1,6 @@
 ﻿using UserControl = System.Windows.Controls.UserControl;
 using CheckBox = System.Windows.Controls.CheckBox;
+using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
@@ -60,7 +61,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             }
             catch (Exception ex)
             {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(() =>
                 {
                     using var toast = new ToastManager(); // 消息提醒管理器
                     toast.Show($"加载设置失败: {ex.Message}", ToastType.Error); // 弹出消息提醒
@@ -71,7 +72,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 异步更新UI设置
         private async Task UpdateUISettingsAsync()
         {
-            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 FullScreenDisableCheckBox.IsChecked = settingManager.blacklistSettings.IsFullScreenDisabled;
             });
@@ -96,7 +97,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     whitelistDict[app.ApplicationName] = app;
             }
 
-            await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 // 添加黑名单应用
                 foreach (var app in blacklistDict.Values)
@@ -170,26 +171,26 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             string appNames = Path.GetFileName(appPath); // 获取进程名
             Button button = new()
             {
-                Style = FindResource("MenuButton") as Style,
+                Style = (Style)FindResource("MenuButton"),
                 Tag = appNames
             }; // 创建按钮
 
             StackPanel stackPanel = new()
             {
-                Style = FindResource("BlacklistItemStackPanel") as Style
+                Style = (Style)FindResource("BlacklistItemStackPanel")
             }; // 创建StackPanel
             button.Content = stackPanel; // 设置按钮内容
 
             Image iconImage = new()
             {
-                Style = FindResource("BlacklistItemIcon") as Style,
+                Style = (Style)FindResource("BlacklistItemIcon"),
                 Source = iconManager.GetIcon(appPath)
             }; // 创建图标
             stackPanel.Children.Add(iconImage); // 添加到StackPanel
 
             TextBlock textBlock = new()
             {
-                Style = FindResource("BlacklistItemTextBlock") as Style,
+                Style = (Style)FindResource("BlacklistItemTextBlock"),
                 Text = appNames
             }; // 创建TextBlock
             stackPanel.Children.Add(textBlock); // 添加进程名称
@@ -226,7 +227,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                 SettingDatabase.ApplyBlacklistApplication(processName, processName, isBlacklist, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
                 if (isBlacklist)
-                    AddBlacklistItem(processName, false); // 添加到黑名单
+                    AddBlacklistItem(processName); // 添加到黑名单
                 else
                     AddWhitelistItem(processName); // 添加到白名单
             }
@@ -242,7 +243,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 SettingDatabase.ApplyBlacklistApplication(button.Tag.ToString(), Path.GetFileNameWithoutExtension(button.Tag.ToString()), true, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
-                AddBlacklistItem(button.Tag.ToString(), false); // 添加到黑名单
+                AddBlacklistItem(button.Tag.ToString()); // 添加到黑名单
             }
             AddBlacklistAppsPop.IsOpen = false; // 关闭提示框
         }
@@ -277,9 +278,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 SettingDatabase.ApplyBlacklistApplication("unknown-proc.exe", "unknown-proc.exe", true, false); // 添加到设置中
                 AppStateManager.LoadSettings(); // 加载设置
-                AddBlacklistItem("unknown-proc.exe", false); // 添加到黑名单
+                AddBlacklistItem("unknown-proc.exe"); // 添加到黑名单
             }
-
         }
 
         // 将选中文件夹里的 .exe 文件添加到黑名单
@@ -311,45 +311,45 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         /// </summary>
         /// <param name="process">进程名</param>
         /// <param name="isFolder">是否为文件夹</param>
-        private void AddBlacklistItem(string process, bool isFolder)
+        private void AddBlacklistItem(string process, bool isFolder = false)
         {
             Border border = new()
             {
-                Style = FindResource("BlacklistItemBorder") as Style,
+                Style = (Style)FindResource("BlacklistItemBorder"),
                 Tag = false
             }; // 创建Border
             border.MouseEnter += HightLightBlacklistItem; // 绑定鼠标移入事件
             border.MouseLeave += FadeBlacklistItem; // 绑定鼠标移出事件
             border.MouseDown += SelectBlacklistItem; // 绑定鼠标按下事件
 
-            Grid grid = new() { Style = FindResource("BlacklistItemGrid") as Style }; // 创建Grid
+            Grid grid = new() { Style = (Style)FindResource("BlacklistItemGrid") }; // 创建Grid
             border.Child = grid; // 设置Border内容
 
-            StackPanel stackPanel = new() { Style = FindResource("BlacklistItemIconStackPanel") as Style }; // 创建StackPanel
+            StackPanel stackPanel = new() { Style = (Style)FindResource("BlacklistItemIconStackPanel") }; // 创建StackPanel
             grid.Children.Add(stackPanel); // 添加StackPanel
 
             TextBlock textBlock = new()
             {
-                Style = FindResource("BlacklistItemTextBlock") as Style,
+                Style = (Style)FindResource("BlacklistItemTextBlock"),
                 Text = process
             }; // 创建TextBlock
             stackPanel.Children.Add(textBlock); // 添加进程名称
 
             if (isFolder) // 如果是文件夹
             {
-                TextBlock folderLabel = new() { Style = FindResource("BlacklistItemFolderTextBlock") as Style }; // 创建TextBlock
+                TextBlock folderLabel = new() { Style = (Style)FindResource("BlacklistItemFolderTextBlock") }; // 创建TextBlock
                 stackPanel.Children.Add(folderLabel); // 添加TextBlock
             }
 
             Button button = new()
             {
-                Style = FindResource("DeleteBlacklistItem") as Style,
+                Style = (Style)FindResource("DeleteBlacklistItem"),
                 Tag = process
             }; // 创建按钮
             button.Click += DeleteFromBlacklist; // 绑定删除事件
             grid.Children.Add(button); // 添加按钮
 
-            Image image = new() { Style = FindResource("BlacklistItemDeleteIcon") as Style }; // 创建图标
+            Image image = new() { Style = (Style)FindResource("BlacklistItemDeleteIcon") }; // 创建图标
             button.Content = image; // 添加图标
             BlacklistStackPanel.Children.Add(border); // 添加到父容器StackPanel
         }
@@ -527,7 +527,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private void ShowAppsPop(bool isInBlacklist)
         {
             // 异步清理UI
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 ClearAppsListUI(isInBlacklist);
             }));
@@ -535,7 +535,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Task.Run(() => // 在后台线程处理进程
             {
                 var processList = GetFilteredProcessList();
-                System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     UpdateAppsListUI(processList, isInBlacklist);
                 })); // 在UI线程更新界面
@@ -594,7 +594,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     string processName = System.IO.Path.GetFileNameWithoutExtension(e.ProcessPath).ToLower(); // 添加到黑名单
                     SettingDatabase.ApplyBlacklistApplication(processName, processName, true, false);
                     AppStateManager.LoadSettings();
-                    AddBlacklistItem(processName, false); // 刷新UI
+                    AddBlacklistItem(processName); // 刷新UI
                     // 恢复设置窗口
                     if (weakSettingWindow != null && weakSettingWindow.TryGetTarget(out var settingWindow))
                     {

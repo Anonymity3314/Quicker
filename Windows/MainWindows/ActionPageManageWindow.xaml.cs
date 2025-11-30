@@ -173,7 +173,7 @@ namespace Quicker.Windows.MainWindows
         {
             var button = new Button()
             {
-                Style = FindResource("SceneButton") as Style, // 应用样式
+                Style = (Style)FindResource("SceneButton"), // 应用样式
                 Name = sceneData.SceneTag
             };
             Grid buttonContent = CreateButtonContent(sceneData, filter); // 使用模块化方法创建按钮内容
@@ -190,7 +190,7 @@ namespace Quicker.Windows.MainWindows
         /// <returns> 按钮内容 </returns>
         private Grid CreateButtonContent(SceneData sceneData, string filter = null)
         {
-            Grid buttonContent = new() { Style = FindResource("SceneButtonContentGrid") as Style }; // 创建网格
+            Grid buttonContent = new() { Style = (Style)FindResource("SceneButtonContentGrid") }; // 创建网格
             buttonContent.Children.Add(CreateSceneImage(sceneData)); // 添加图片
             buttonContent.Children.Add(CreateSceneNameTextBlock(sceneData, filter)); // 添加场景名称
             buttonContent.Children.Add(CreateSceneTagTextBlock(sceneData, filter)); // 添加场景标签
@@ -233,7 +233,7 @@ namespace Quicker.Windows.MainWindows
             {
                 image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png", UriKind.Absolute));
             }
-            image.Style = FindResource("SceneButtonImage") as Style; // 应用样式
+            image.Style = (Style)FindResource("SceneButtonImage"); // 应用样式
             return image;
         }
 
@@ -247,7 +247,7 @@ namespace Quicker.Windows.MainWindows
         {
             TextBlock sceneName = new()
             {
-                Style = FindResource("SceneNameTextBlock") as Style,
+                Style = (Style)FindResource("SceneNameTextBlock"),
             };
             TextBlockHelper.SetHighlight(sceneName, new HighlightTextData
             {
@@ -267,7 +267,7 @@ namespace Quicker.Windows.MainWindows
         {
             TextBlock sceneTag = new()
             {
-                Style = FindResource("SceneTagTextBlock") as Style,
+                Style = (Style)FindResource("SceneTagTextBlock"),
             };
             string tagText = sceneData.SceneTag; // 先拼接标签文本，如果不是默认场景，则加上.exe后缀（用于区分默认场景和应用场景）
             if (!new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(sceneData.SceneTag))
@@ -346,13 +346,13 @@ namespace Quicker.Windows.MainWindows
             string sceneTitleText = db3.GetSceneTitle(sceneInfo); // 获取场景标题
             TextBlock sceneTitle = new()
             {
-                Style = FindResource("SceneTitleTextBlock") as Style, // 应用样式
+                Style = (Style)FindResource("SceneTitleTextBlock"), // 应用样式
                 Text = sceneTitleText // 场景名称
             }; // 创建场景标题
             SceneTitleStackPanel.Children.Add(sceneTitle); // 添加到标题StackPanel
             TextBlock sceneDescription = new()
             {
-                Style = FindResource("SceneDescriptionTextBlock") as Style, // 应用样式
+                Style = (Style)FindResource("SceneDescriptionTextBlock"), // 应用样式
                 Text = sceneInfo.SceneTag // 场景标签
             }; // 创建场景描述
             if (!new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(sceneInfo.SceneTag))
@@ -441,7 +441,7 @@ namespace Quicker.Windows.MainWindows
                     string buttonName = $"{style}{canvasIndex}{row + 1}{col + 1}"; // 按钮名称
                     Button button = new Button // 创建按钮
                     {
-                        Style = FindResource("ActionButton") as Style, // 按钮样式
+                        Style = (Style)FindResource("ActionButton"), // 按钮样式
                         Name = buttonName // 按钮名称
                     }; // 创建按钮
                     BindButtonEvents(button); // 绑定按钮事件
@@ -469,7 +469,7 @@ namespace Quicker.Windows.MainWindows
             string canvasName = $"{style}{canvasIndex}"; // 画布名称
             Canvas dynamicCanvas = new Canvas // 创建画布
             {
-                Style = FindResource("ActionPageCanvas") as Style,
+                Style = (Style)FindResource("ActionPageCanvas"),
                 Height = style == "_global" ? 215 : 280, // 画布高度
                 Name = canvasName, // 画布名称
             }; // 创建画布
@@ -484,7 +484,7 @@ namespace Quicker.Windows.MainWindows
         /// <returns> 标题 </returns>
         private Grid GenerateTitle(int canvasIndex, string style)
         {
-            Grid grid = new Grid { Style = FindResource("ActionPageTitleGrid") as Style }; // 创建网格
+            Grid grid = new Grid { Style = (Style)FindResource("ActionPageTitleGrid") }; // 创建网格
             return grid; // 返回网格
         }
 
@@ -498,7 +498,7 @@ namespace Quicker.Windows.MainWindows
         {
             Button pageButton = new Button
             {
-                Style = FindResource("ActionChangePageButton") as Style,
+                Style = (Style)FindResource("ActionChangePageButton"),
                 Name = $"{style}{canvasIndex}", // 按钮名称
             }; // 创建按钮
             pageButton.PreviewMouseMove += ChangePageButton_PreviewMouseMove; // 鼠标移动事件
@@ -517,7 +517,7 @@ namespace Quicker.Windows.MainWindows
         {
             Button editPageButton = new Button
             {
-                Style = FindResource("ActionPageEditButton") as Style,
+                Style = (Style)FindResource("ActionPageEditButton"),
                 Name = $"Edit{style}{canvasIndex}", // 按钮名称
             }; // 创建按钮
             editPageButton.Click += OpenEditPopup; // 点击事件
@@ -535,7 +535,7 @@ namespace Quicker.Windows.MainWindows
             var actionPageInfo = db3.GetActionPageData(type, actionPageIndex); // 获取动作页信息
             TextBlock textBlock = new TextBlock
             {
-                Style = FindResource("ActionPageNameTextBlock") as Style,
+                Style = (Style)FindResource("ActionPageNameTextBlock"),
                 Text = actionPageInfo.ActionPageName // 动作页名称
             }; // 创建文本块
             return textBlock; // 返回文本块

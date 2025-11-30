@@ -163,7 +163,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             {
                 Button button = new Button
                 {
-                    Style = FindResource("ActionPageChangeButton") as Style,
+                    Style = (Style)FindResource("ActionPageChangeButton"),
                     Name = $"{prefix}{i}"
                 };
                 button.Background = (i == selectedIndex) ? SelectedBrush : UnSelectedBrush; // 根据 selectedIndex 设置按钮背景色，保留当前选中状态
@@ -703,7 +703,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             AddGridRows(grid, rows, ((MainWindowViewModel)this.DataContext).ButtonGap); // 添加行定义
             AddGridColumns(grid, cols, ((MainWindowViewModel)this.DataContext).ButtonGap); // 添加列定义
             // 添加按钮到Grid
-            AddButtonsToGrid(grid, pageIndex, rows, cols, gridType, FindResource("Button") as Style, ((MainWindowViewModel)this.DataContext).ButtonSize);
+            AddButtonsToGrid(grid, pageIndex, rows, cols, gridType, (Style)FindResource("Button"), ((MainWindowViewModel)this.DataContext).ButtonSize);
             parent.Children.Add(grid); // 添加到父容器
             return grid;
         }

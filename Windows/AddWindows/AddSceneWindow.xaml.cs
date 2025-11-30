@@ -142,7 +142,7 @@ namespace Quicker.Windows.AddWindows
             string appNames = Path.GetFileName(appPath); // 获取进程名
             Button button = new()
             {
-                Style = FindResource("MenuButton") as Style,
+                Style = (Style)FindResource("MenuButton"),
                 Tag = appNames
             };
 
@@ -150,7 +150,7 @@ namespace Quicker.Windows.AddWindows
             Grid grid = new Grid();
             Image iconImage = new()
             {
-                Style = FindResource("MenuButtonImage") as Style,
+                Style = (Style)FindResource("MenuButtonImage"),
                 Source = iconManager.GetIcon(appPath)
             };
             grid.Children.Add(iconImage);

@@ -50,7 +50,7 @@
             <!-- 数据文件夹 -->
             <GroupBox Header="数据文件夹" Style="{StaticResource SettingGroupBox}" Margin="10,397,0,0">
                 <Grid>
-                    <Button x:Name="ChangeDataFolderButton" Content="更改..." ToolTip="更改应用数据存储路径" HorizontalAlignment="Left" Style="{StaticResource WhiteButton}" Margin="85,2,0,0" VerticalAlignment="Top" Width="60" Height="24" Click="ChangeDataFolderButton_Click"/>
+                    <Button x:Name="ChangeDataFolderButton" Content="更改..." ToolTip="更改应用数据存储路径" HorizontalAlignment="Left" Style="{StaticResource WhiteButton}" Margin="85,2,0,0" VerticalAlignment="Top" Width="60" Click="ChangeDataFolderButton_Click" FontSize="12"/>
 
                     <Label Content="根文件夹：" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     <TextBlock x:Name="RootFolderPath" Style="{StaticResource HoverTextBlock}" ToolTip="打开文件夹" Margin="18,28,0,0" FontSize="12" MouseDown="RootFolderPath_MouseDown"/>
@@ -63,7 +63,7 @@
             <!-- 备份数据 -->
             <GroupBox Header="备份数据" Style="{StaticResource SettingGroupBox}" Margin="10,583,0,0">
                 <Grid>
-                    <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88"/>
+                    <Button x:Name="BackupDataButton" Style="{StaticResource WhiteButton}" Content="备份全部数据" HorizontalAlignment="Left" VerticalAlignment="Top" Click="BackupDataButton_Click" Width="88" FontSize="12"/>
                     <Label Content="仅作为备份用途，不支持导入。" HorizontalAlignment="Center" Margin="0,24,0,0" VerticalAlignment="Top" FontSize="10" Foreground="#FFB4B4B4"/>
                 </Grid>
             </GroupBox>
@@ -72,14 +72,14 @@
                 <Grid>
                     <Label Content="大小：" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     <TextBlock x:Name="TempSize" HorizontalAlignment="Left" Margin="57,5,0,0" Text="计算中..." VerticalAlignment="Top"/>
-                    <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="0,28,0,0" VerticalAlignment="Top" Width="61" Click="CleanTempDataButton_Click" IsEnabled="False"/>
+                    <Button x:Name="CleanTempDataButton" Content="清理" Style="{StaticResource WhiteButton}" HorizontalAlignment="Left" Margin="0,28,0,0" VerticalAlignment="Top" Width="60" Click="CleanTempDataButton_Click" IsEnabled="False" FontSize="12"/>
                 </Grid>
             </GroupBox>
 
             <!-- 第三方组件 -->
             <GroupBox Header="第三方组件" Style="{StaticResource SettingGroupBox}" Margin="10,10,0,0" Grid.Column="1">
                 <Grid>
-                    <Button x:Name="ViewOpenSourceButton" Style="{StaticResource WhiteButton}" Content="查看开源组件及许可协议信息" Margin="10,10,0,0" VerticalAlignment="Top" Width="204" HorizontalAlignment="Left" Foreground="#468FFC" Click="ViewOpenSourceButton_Click"/>
+                    <Button x:Name="ViewOpenSourceButton" Style="{StaticResource WhiteButton}" Content="查看开源组件及许可协议信息" Margin="10,10,0,0" VerticalAlignment="Top" Width="167" Foreground="#468FFC" Click="ViewOpenSourceButton_Click" FontSize="12" HorizontalAlignment="Left"/>
                     <GroupBox Header="图标资源" Style="{StaticResource LinkGroupBox}" Margin="5,45,0,0">
                         <Grid>
                             <TextBlock x:Name="www_iconfont_cn" ToolTip="点击前往" Style="{StaticResource HoverTextBlock}" Text="www.iconfont.cn" MouseLeftButtonDown="www_iconfont_cn_MouseLeftButtonDown" Margin="5,0,0,0"/>
@@ -97,7 +97,7 @@
                 </Grid>
             </GroupBox>
             <!-- 入正 -->
-            <GroupBox Header="入正" Style="{StaticResource SettingGroupBox}" Margin="10,284,0,0" Grid.Column="1">
+            <GroupBox Header="入正" Style="{StaticResource SettingGroupBox}" Margin="10,268,0,0" Grid.Column="1">
                 <Grid>
                     <TextBlock x:Name="getquicker_net" ToolTip="前往正版Quicker官网" Style="{StaticResource HoverTextBlock}" Text="getquicker.net" MouseLeftButtonDown="getquicker_net_MouseLeftButtonDown" Margin="4,0,0,0" VerticalAlignment="Center"/>
                 </Grid>
