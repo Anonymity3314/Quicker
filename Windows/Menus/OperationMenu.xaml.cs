@@ -103,14 +103,16 @@ namespace Quicker.Windows.Menus
         private void SetChidGridsMargin()
         {
             // 使用PointToScreen获取屏幕坐标，然后转换为相对于窗口的坐标
-            Point suspendActionScreen = SuspendAction.PointToScreen(new Point(0, 0));
-            Point floatActionButtonScreen = FloatActionButton.PointToScreen(new Point(0, 0));
             Point windowScreen = base.PointToScreen(new Point(0, 0));
-
-            Point suspendAction = new Point(suspendActionScreen.X - windowScreen.X, suspendActionScreen.Y - windowScreen.Y);
-            Point floatActionButton = new Point(floatActionButtonScreen.X - windowScreen.X, floatActionButtonScreen.Y - windowScreen.Y);
-            double deltaY1 = suspendAction.Y - floatActionButton.Y;
-            ChiildGrid1.Margin = new Thickness(219, 91 + deltaY1, 0, 0); // 设置子菜单位置
+            if (FatherWindow is not FloatingActionWindow)
+            {
+                Point suspendActionScreen = SuspendAction.PointToScreen(new Point(0, 0));
+                Point floatActionButtonScreen = FloatActionButton.PointToScreen(new Point(0, 0));
+                Point suspendAction = new Point(suspendActionScreen.X - windowScreen.X, suspendActionScreen.Y - windowScreen.Y);
+                Point floatActionButton = new Point(floatActionButtonScreen.X - windowScreen.X, floatActionButtonScreen.Y - windowScreen.Y);
+                double deltaY1 = suspendAction.Y - floatActionButton.Y;
+                ChiildGrid1.Margin = new Thickness(219, 91 + deltaY1, 0, 0); // 设置子菜单位置
+            }
 
             // 获取按钮的绝对位置
             Point otherFunctionScreen = OtherFunction.PointToScreen(new Point(0, 0));
