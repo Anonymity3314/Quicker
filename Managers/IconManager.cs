@@ -203,55 +203,154 @@ namespace Quicker.Managers
             {
                 Uri uri = new(websiteUrl); // 创建 Uri 对象
                 string apiFaviconUrl = $"https://icon.bqb.cool?url={uri.Host}"; // 拼接 API 地址
-                byte[] iconData = httpClient.GetByteArrayAsync(apiFaviconUrl).GetAwaiter().GetResult(); // 使用 HttpClient 下载网站图标数据
+                byte[] iconData = httpClient.GetByteArrayAsync(apiFaviconUrl).ConfigureAwait(false).GetAwaiter().GetResult(); // 获取图标数据 (网络请求)
                 if (iconData == null || iconData.Length == 0) // 验证下载的数据是否为有效的图像
                 {
-                    ShowToast("获取网站图标失败：数据为空。", ToastType.Error);
+                    ShowToast("获取网站图标失败：API返回数据为空。", ToastType.Error);
                     return null;
                 }
 
-                if (!IsValidImageData(iconData)) // 检查图像格式
-                {
-                    ShowToast("获取网站图标失败：无效的图像格式。", ToastType.Error);
-                    return null;
-                }
-
-                BitmapImage bitmapImage = new(); // 创建 BitmapImage 对象
-                using (MemoryStream stream = new(iconData)) // 创建内存流
-                {
-                    bitmapImage.BeginInit(); // 开始初始化 BitmapImage
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
-                    stream.Seek(0, SeekOrigin.Begin); // 定位到流的开始位置
-                    bitmapImage.StreamSource = stream; // 设置内存流为 BitmapImage 的源
-                    bitmapImage.EndInit(); // 结束初始化 BitmapImage
-                }
-
-                if (IsImageEmpty(bitmapImage))
-                {
-                    ShowToast("获取网站图标失败：图标为空。", ToastType.Error); // 显示Toast
-                    return null; // 如果获取的网站图标为空图片，返回 null
-                }
-                return bitmapImage; // 返回网站图标
+                return LoadIconFromData(iconData); // 解码数据 (逻辑分离到新的私有方法)
             }
             catch (HttpRequestException ex)
             {
-                ShowToast($"获取网站图标失败：网络错误 - {ex.Message}", ToastType.Error);
+                ShowToast($"获取网站图标失败：网络请求错误 - {ex.Message}", ToastType.Error);
                 return null;
             }
-            catch (NotSupportedException ex)
+            catch (Exception ex) // 捕获所有未被 LoadIconFromData 处理的顶级异常
             {
-                ShowToast($"获取网站图标失败：不支持的图像格式 - {ex.Message}", ToastType.Error);
+                ShowToast($"获取网站图标失败：未知错误 - {ex.Message}", ToastType.Error);
                 return null;
-            }
-            catch (Exception ex)
-            {
-                ShowToast($"获取网站图标失败：{ex.Message}", ToastType.Error); // 显示Toast
-                return null; // 如果出现异常，返回 null
             }
             finally
             {
                 loadingWindow?.Close(); // 关闭加载窗口
             }
+        }
+
+        /// <summary>
+        /// 从字节数组中加载并解码图标
+        /// </summary>
+        /// <param name="iconData">图标的字节数据</param>
+        /// <returns>ImageSource 对象</returns>
+        private ImageSource LoadIconFromData(byte[] iconData)
+        {
+            // --- 1. 尝试处理 SVG 格式 (增强容错) ---
+            // SVG 文件以 '<' (0x3C) 开头。
+            if (iconData[0] == 0x3C)
+            {
+                try
+                {
+                    string svgContent = Encoding.UTF8.GetString(iconData);
+
+                    // SvgDocument.FromSvg 会捕获 "multiple root elements" 等错误，避免崩溃
+                    var svgDocument = SvgDocument.FromSvg<SvgDocument>(svgContent);
+                    return ConvertBitmapSourceToBitmapImage(RenderSvgToBitmapSource(svgDocument));
+                }
+                catch (Exception)
+                {
+                    // 捕获所有 SVG 解析失败的情况（包括 API 返回的错误页面、多根元素等）
+                    ShowToast($"获取网站图标失败：解析 SVG 时出错 - API返回了非标准的SVG数据。", ToastType.Error);
+                    return null;
+                }
+            }
+
+            // --- 2. 尝试处理 WebP 格式 (解决不支持的图像格式错误) ---
+            // 检查 WebP 魔术数字：RIFF (0-3) + WEBP (8-11)
+            if (iconData.Length >= 12 &&
+                iconData[0] == 0x52 && iconData[1] == 0x49 && iconData[2] == 0x46 && iconData[3] == 0x46 &&
+                iconData[8] == 0x57 && iconData[9] == 0x45 && iconData[10] == 0x42 && iconData[11] == 0x50)
+            {
+                // WARNING: WPF 默认不支持 WebP。
+                ShowToast("获取网站图标失败：检测到 WebP 格式，但缺少解码器支持。", ToastType.Error);
+                return null;
+            }
+
+            // --- 3. 尝试处理原生 WPF 格式 (PNG, JPG, GIF, ICO, BMP) ---
+            // 确保数据是已知的原生图像格式
+            if (!IsValidImageData(iconData))
+            {
+                ShowToast("获取网站图标失败：无效的图像数据。", ToastType.Error);
+                return null;
+            }
+
+            // 使用 BitmapImage 加载原生格式
+            try
+            {
+                BitmapImage bitmapImage = new();
+                using (MemoryStream stream = new(iconData))
+                {
+                    bitmapImage.BeginInit();
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    stream.Seek(0, SeekOrigin.Begin);
+                    bitmapImage.StreamSource = stream;
+                    // NotSupportedException 会在这里被抛出（如果格式原生不支持）
+                    bitmapImage.EndInit();
+                    bitmapImage.Freeze();
+                }
+
+                if (IsImageEmpty(bitmapImage))
+                {
+                    ShowToast("获取网站图标失败：图标为空或透明。", ToastType.Error);
+                    return null;
+                }
+                return bitmapImage;
+            }
+            catch (NotSupportedException) // 捕获原生 BitmapImage 无法解码的格式错误
+            {
+                ShowToast($"获取网站图标失败：不支持的图像格式 - 未找到适用于完成此操作的图像处理组件。", ToastType.Error);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 验证图像数据是否为有效的图像格式
+        /// </summary>
+        /// <param name="imageData">图像数据</param>
+        /// <returns>是否为有效的图像</returns>
+        private static bool IsValidImageData(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0)
+                return false;
+
+            // 局部函数：用于检查字节序列是否匹配
+            static bool CheckSignature(byte[] data, byte[] signature)
+            {
+                if (data.Length < signature.Length) return false;
+                for (int i = 0; i < signature.Length; i++)
+                {
+                    if (data[i] != signature[i]) return false;
+                }
+                return true;
+            }
+
+            // 1. SVG/XML: 以 '<' (0x3C) 开头
+            if (imageData[0] == 0x3C) return true;
+
+            // 2. PNG: 89 50 4E 47 0D 0A 1A 0A
+            if (CheckSignature(imageData, new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A })) return true;
+
+            // 3. JPEG: FF D8 FF
+            if (CheckSignature(imageData, new byte[] { 0xFF, 0xD8, 0xFF })) return true;
+
+            // 4. GIF: 47 49 46 38 (GIF8)
+            if (CheckSignature(imageData, new byte[] { 0x47, 0x49, 0x46, 0x38 })) return true;
+
+            // 5. ICO: 00 00 01 00
+            if (CheckSignature(imageData, new byte[] { 0x00, 0x00, 0x01, 0x00 })) return true;
+
+            // 6. BMP: 42 4D (BM)
+            if (CheckSignature(imageData, new byte[] { 0x42, 0x4D })) return true;
+
+            // 7. WebP: RIFF (0-3) + WEBP (8-11) - 依赖 LoadIconFromData 中的显式检查来处理
+            // 理论上如果通过了 LoadIconFromData 中的 WebP 检查，它不会走到这里，
+            // 但为了完整性，这里可以包含 WebP 的主要检查。
+            if (imageData.Length >= 12 &&
+                imageData[0] == 0x52 && imageData[1] == 0x49 && imageData[2] == 0x46 && imageData[3] == 0x46 &&
+                imageData[8] == 0x57 && imageData[9] == 0x45 && imageData[10] == 0x42 && imageData[11] == 0x50)
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -663,46 +762,6 @@ namespace Quicker.Managers
         {
             using var toast = new ToastManager(); // 创建ToastManager对象
             toast.Show(message, title); // 显示Toast
-        }
-
-        /// <summary>
-        /// 验证图像数据是否为有效的图像格式
-        /// </summary>
-        /// <param name="imageData">图像数据</param>
-        /// <returns>是否为有效的图像</returns>
-        private static bool IsValidImageData(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length < 8)
-                return false;
-
-            // 检查常见图像格式的文件头
-            // PNG: 89 50 4E 47 0D 0A 1A 0A
-            if (imageData.Length >= 8 && 
-                imageData[0] == 0x89 && imageData[1] == 0x50 && imageData[2] == 0x4E && imageData[3] == 0x47 &&
-                imageData[4] == 0x0D && imageData[5] == 0x0A && imageData[6] == 0x1A && imageData[7] == 0x0A)
-                return true;
-
-            // JPEG: FF D8 FF
-            if (imageData.Length >= 3 && 
-                imageData[0] == 0xFF && imageData[1] == 0xD8 && imageData[2] == 0xFF)
-                return true;
-
-            // GIF: 47 49 46 38 (GIF8)
-            if (imageData.Length >= 4 && 
-                imageData[0] == 0x47 && imageData[1] == 0x49 && imageData[2] == 0x46 && imageData[3] == 0x38)
-                return true;
-
-            // ICO: 00 00 01 00
-            if (imageData.Length >= 4 && 
-                imageData[0] == 0x00 && imageData[1] == 0x00 && imageData[2] == 0x01 && imageData[3] == 0x00)
-                return true;
-
-            // BMP: 42 4D (BM)
-            if (imageData.Length >= 2 && 
-                imageData[0] == 0x42 && imageData[1] == 0x4D)
-                return true;
-
-            return false;
         }
     }
 }
