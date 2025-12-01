@@ -107,7 +107,9 @@ namespace Quicker.Windows.ToolWindows
                 Width = 400, // 设置边框宽度
                 Opacity = 0, // 设置初始不透明度
                 Margin = new Thickness(0, 5, 0, 5), // 设置边距
-                CornerRadius = new CornerRadius(5) // 设置边框圆角
+                CornerRadius = new CornerRadius(5), // 设置边框圆角
+                RenderTransformOrigin = new Point(0.5, 1.0), // 设置缩放中心为底部中心
+                RenderTransform = new ScaleTransform(0.1, 0.1) // 初始大小设置为 0.1
             }; // 创建消息边框
 
             Color color = ToastColors.TryGetValue(toastType, out var result) 
@@ -182,8 +184,8 @@ namespace Quicker.Windows.ToolWindows
         // 初始化动画
         private void InitializeAnimation(Border border)
         {
-            Storyboard fadeInStoryboard = (Storyboard)FindResource("FadeInAnimation"); // 获取淡入动画
-            fadeInStoryboard.Begin(border); // 开始播放淡入动画
+            Storyboard fadeInStoryboard = (Storyboard)FindResource("ScaleInAnimation"); // 获取放大动画
+            fadeInStoryboard.Begin(border); // 开始播放放大动画
         }
 
         // 计时器事件
@@ -193,13 +195,13 @@ namespace Quicker.Windows.ToolWindows
             Border border = (Border)timer.Tag; // 获取消息边框
             if (border != null)
             {
-                // 获取淡出动画并开始播放
-                Storyboard fadeOutStoryboard = (Storyboard)FindResource("FadeOutAnimation"); // 获取淡出动画
+                // 获取缩小动画并开始播放
+                Storyboard fadeOutStoryboard = (Storyboard)FindResource("ScaleOutAnimation"); // 获取缩小动画
                 fadeOutStoryboard.Completed += (s, arg) =>
                 {
                     DeleteToast(border); // 删除消息
-                }; // 淡出动画完成时删除消息
-                fadeOutStoryboard.Begin(border); // 开始播放淡出动画
+                }; // 缩小动画完成时删除消息
+                fadeOutStoryboard.Begin(border); // 开始播放缩小动画
 
                 timer.Stop(); // 停止计时器
                 timer.Tick -= Timer_Tick; // 移除计时器事件
