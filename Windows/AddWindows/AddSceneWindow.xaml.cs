@@ -18,7 +18,6 @@ namespace Quicker.Windows.AddWindows
     {
         public event Action<bool, string?>? SceneAddCompleted; // 参数1: 是否保存, 参数2: 新场景名
         private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
-        private IconManager iconManager = new(); // 图标管理器
         private SceneData currentSceneData; // 当前场景数据
         public AppInfo SelectedApp { get; set; } // 选中的应用
 
@@ -68,7 +67,7 @@ namespace Quicker.Windows.AddWindows
             var uiList = new List<ProcessItem>();
             foreach (var (fileName, processName) in processList)
             {
-                var icon = iconManager.GetIcon(fileName); // 这行必须在UI线程
+                var icon = IconManager.GetIcon(fileName); // 这行必须在UI线程
                 uiList.Add(new ProcessItem
                 {
                     FileName = fileName,
@@ -151,7 +150,7 @@ namespace Quicker.Windows.AddWindows
             Image iconImage = new()
             {
                 Style = (Style)FindResource("MenuButtonImage"),
-                Source = iconManager.GetIcon(appPath)
+                Source = IconManager.GetIcon(appPath)
             };
             grid.Children.Add(iconImage);
 
@@ -173,6 +172,7 @@ namespace Quicker.Windows.AddWindows
             {
                 if (AppComboBox.SelectedItem is ProcessItem item && item.Icon != null) // 保存到数据库前，保存图标到本地文件
                 {
+                    IconManager iconManager = new();
                     string iconPath = iconManager.SaveIconToFile(item.Icon); // 保存图标到本地文件
                     if (!string.IsNullOrEmpty(iconPath)) // 图标保存成功
                     {

@@ -28,18 +28,17 @@ namespace Quicker.Windows.AddWindows
         private const string OPEN_WEBSITE_IMAGE_PATH = "pack://application:,,,/Resources/Images/OpenWebSiteImage.png";
         private const string DEFAULT_IMAGE_PATH = "pack://application:,,,/Resources/Images/Quicker_Enabled.png";
 
+        private readonly ActionManager actionManager = new(); // 动作管理器
         private readonly ButtonManager buttonManager = new(); // 按钮管理器
-        private readonly IconManager iconManager = new(); // 图标管理器
         private SelectWindowWindow selectWindowWindow; // SelectWindowWindow 的实例引用
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private FindAppsWindow findAppsWindow; // FindAppsWindow 的实例引用
-        private Appearance _appearance; // 外观设置
-        private bool isLoading = true; // 是否正在加载
-        public string iconPath; // 图标路径
-        private readonly ActionManager actionManager = new(); // 动作管理器
-        private ButtonData buttonData; // 按钮数据
         private string selectedImagePath; // 选中的图片路径
+        private Appearance _appearance; // 外观设置
+        private ButtonData buttonData; // 按钮数据
+        private bool isLoading = true; // 是否正在加载
         private bool isEditMode; // 是否为编辑模式
+        public string iconPath; // 图标路径
 
         public int ButtonID { get; private set; } // 当前按钮
         public string TableName { get; private set; } // 表名
@@ -425,8 +424,7 @@ namespace Quicker.Windows.AddWindows
                 string ext = Path.GetExtension(imagePath).ToLower(); // 获取文件扩展名
                 if (ext == ".svg") // 如果扩展名是SVG
                 {
-                    var iconManager = new IconManager(); // 创建 IconManager 实例
-                    ButtonImage.Source = iconManager.LoadSvgToBitmapImage(imagePath); // 加载SVG图片
+                    ButtonImage.Source = IconManager.LoadSvgToBitmapImage(imagePath); // 加载SVG图片
                 }
                 else // 如果扩展名不是SVG
                 {
@@ -544,6 +542,7 @@ namespace Quicker.Windows.AddWindows
         /// <returns>保存路径</returns>
         public string SaveIconToLocal()
         {
+            IconManager iconManager = new();
             // 优先用本地文件路径
             if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath) && !iconPath.StartsWith("pack://"))
             {

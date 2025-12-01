@@ -61,149 +61,68 @@ namespace Quicker.Managers
         private static extern nint SHGetFileInfo(string pszPath, uint dwFileAttributes, out SHFILEINFO psfi, uint cbFileInfo, uint uFlags); // 获取文件信息
 
         // 文件图标相关常量
+        private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010; // 使用文件属性
         private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080; // 文件属性
         private const uint SHGFI_LARGEICON = 0x000000000; // 大图标
-        private const uint SHGFI_SMALLICON = 0x000000001; // 小图标
         private const uint SHGFI_ICON = 0x000000100; // 获取图标
-        private const uint SHGFI_ICONLOCATION = 0x000001000; // 获取图标位置
-        private const uint SHGFI_ATTRIBUTES = 0x000000800; // 获取文件属性
-
         #endregion
 
         /// <summary>
-        /// 获取应用程序图标（优先获取原始图标）
+        /// 将 HIcon 转换为 ImageSource。
         /// </summary>
-        /// <param name="appPath"> 应用程序路径 </param>
-        /// <returns> 应用图标 </returns>
-        public ImageSource GetIcon(string appPath)
+        /// <param name="hIcon"> HIcon 指针</param>
+        /// <returns> ImageSource 对象</returns>
+        private static ImageSource ConvertHIconToImageSource(IntPtr hIcon)
         {
-            try
-            {
-                // 优先尝试获取原始图标（无压缩标识）
-                ImageSource originalIcon = GetOriginalIcon(appPath);
-                if (originalIcon != null)
-                    return originalIcon;
+            if (hIcon == IntPtr.Zero) return null;
+            // 使用 Imaging.CreateBitmapSourceFromHIcon 将 HIcon 转换为 ImageSource
+            ImageSource iconSource = Imaging.CreateBitmapSourceFromHIcon(
+                hIcon,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions()
+            );
 
-                // 如果原始图标获取失败，回退到普通方法
-                uint flags = SHGFI_ICON | SHGFI_LARGEICON; // 获取大图标
-                SHFILEINFO shfi = new SHFILEINFO(); // 创建文件信息结构体
-                IntPtr hIcon = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags); // 获取图标句柄
-                if (hIcon != IntPtr.Zero) // 如果获取成功
-                {
-                    ImageSource iconSource = Imaging.CreateBitmapSourceFromHIcon(shfi.hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()); // 将图标句柄转换为ImageSource
-                    DestroyIcon(shfi.hIcon); // 释放图标资源
-                    return iconSource; // 返回图标
-                }
-            }
-            catch
-            {
-                ShowToast("获取图标失败。", ToastType.Error); // 显示Toast
-            }
-            return null; // 如果获取失败，返回 null
+            iconSource.Freeze(); // 冻结 ImageSource 以便在多个线程中访问
+            return iconSource;
         }
 
         /// <summary>
-        /// 获取原始图标（无压缩标识）
+        /// 从指定路径的文件中提取图标，并确保移除压缩标记等叠加图标。
         /// </summary>
-        /// <param name="appPath"> 应用程序路径 </param>
-        /// <returns> 原始图标 </returns>
-        public ImageSource GetOriginalIcon(string appPath)
+        /// <param name="filePath">文件路径。</param>
+        /// <param name="smallIcon">是否获取小图标 (16x16)，否则获取大图标 (32x32)。</param>
+        /// <returns>文件的图标对象 (ImageSource)，如果失败则返回 null。</returns>
+        public static ImageSource GetIcon(string filePath)
         {
-            try
+            SHFILEINFO shfi = new(); // 创建 SHFILEINFO 结构体
+            uint flags = SHGFI_ICON; // 设置标志
+            flags |= SHGFI_LARGEICON; // 使用大图标
+            flags |= SHGFI_USEFILEATTRIBUTES; // 使用文件属性
+            uint dwAttributes = FILE_ATTRIBUTE_NORMAL; // 设置文件属性
+
+            // 调用 Win32 API SHGetFileInfo 获取图标信息
+            IntPtr hIcon = SHGetFileInfo(
+                filePath,
+                dwAttributes, // 使用我们指定的属性
+                out shfi,     // out 关键字，获取 SHFILEINFO 结构体
+                (uint)Marshal.SizeOf(shfi),
+                flags         // 使用我们设置的标志
+            );
+
+            if (hIcon != IntPtr.Zero)
             {
-                // 方法1：尝试使用 ExtractIcon API 直接提取
-                ImageSource extractedIcon = ExtractIconFromFile(appPath);
-                if (extractedIcon != null)
+                try
                 {
-                    return extractedIcon;
-                }
-
-                // 方法2：尝试获取原始图标位置
-                uint flags = SHGFI_ICONLOCATION | SHGFI_ATTRIBUTES;
-                SHFILEINFO shfi = new SHFILEINFO();
-                IntPtr result = SHGetFileInfo(appPath, FILE_ATTRIBUTE_NORMAL, out shfi, (uint)Marshal.SizeOf(typeof(SHFILEINFO)), flags);
-                if (result != IntPtr.Zero && !string.IsNullOrEmpty(shfi.szDisplayName))
-                {
-                    // 如果找到了原始图标位置，尝试从原始位置获取图标
-                    string originalPath = shfi.szDisplayName;
-                    if (File.Exists(originalPath))
-                    {
-                        return GetIcon(originalPath);
-                    }
-                }
-
-                // 方法3：尝试从系统目录获取原始文件
-                string systemPath = GetSystemOriginalPath(appPath);
-                if (!string.IsNullOrEmpty(systemPath) && File.Exists(systemPath))
-                {
-                    return ExtractIconFromFile(systemPath);
-                }
-
-                return null;
-            }
-            catch
-            {
-                ShowToast("获取原始图标失败。", ToastType.Error);
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 获取系统原始文件路径
-        /// </summary>
-        /// <param name="appPath"> 应用程序路径 </param>
-        /// <returns> 系统原始路径 </returns>
-        private string GetSystemOriginalPath(string appPath)
-        {
-            try
-            {
-                string fileName = Path.GetFileName(appPath);
-                if (string.IsNullOrEmpty(fileName)) return null;
-
-                // 常见的系统目录
-                string[] systemPaths = {
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), fileName),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SystemX86), fileName),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "System32", fileName),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SysWOW64", fileName)
-                };
-
-                foreach (string path in systemPaths)
-                {
-                    if (File.Exists(path))
-                    {
-                        return path;
-                    }
-                }
-            }
-            catch
-            {
-                // 忽略异常
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 从文件中提取图标（使用 ExtractIcon API）
-        /// </summary>
-        /// <param name="filePath"> 文件路径 </param>
-        /// <returns> 提取的图标 </returns>
-        private ImageSource ExtractIconFromFile(string filePath)
-        {
-            try
-            {
-                // 使用 ExtractIcon API 获取原始图标
-                IntPtr hIcon = ExtractIcon(IntPtr.Zero, filePath, 0);
-                if (hIcon != IntPtr.Zero && hIcon != new IntPtr(1))
-                {
-                    ImageSource iconSource = Imaging.CreateBitmapSourceFromHIcon(hIcon, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                    DestroyIcon(hIcon);
+                    ImageSource iconSource = ConvertHIconToImageSource(shfi.hIcon); // 转换图标
+                    DestroyIcon(shfi.hIcon); // 必须释放 Win32 图标句柄
                     return iconSource;
                 }
-            }
-            catch
-            {
-                return GetIcon(filePath); // 如果 ExtractIcon 失败，回退到普通方法
+                catch (Exception)
+                {
+                    if (shfi.hIcon != IntPtr.Zero) // 提取或转换失败时，同样尝试释放句柄
+                        DestroyIcon(shfi.hIcon);
+                    return null;
+                }
             }
             return null;
         }
@@ -408,7 +327,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="filePath">文件路径</param>
         /// <returns>加载的 BitmapImage</returns>
-        private BitmapImage LoadBitmapImage(string filePath)
+        private static BitmapImage LoadBitmapImage(string filePath)
         {
             BitmapImage bi = new();
             try
@@ -456,8 +375,9 @@ namespace Quicker.Managers
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"加载GIF图片时出错: {filePath}", ex);
+                ShowToast($"加载GIF图片时出错: {filePath}", ToastType.Error); // 显示Toast
             }
+            return null;
         }
 
         /// <summary>
@@ -465,7 +385,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="filePath">文件路径</param>
         /// <returns>加载的 BitmapImage</returns>
-        public BitmapImage LoadSvgToBitmapImage(string filePath)
+        public static BitmapImage LoadSvgToBitmapImage(string filePath)
         {
             try
             {
@@ -482,58 +402,63 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 渲染SvgDocument为BitmapSource
+        /// 将SVG文档渲染为BitmapSource图像
         /// </summary>
-        /// <param name="svgDocument">SVG文档</param>
-        /// <returns>BitmapSource</returns>
-        private BitmapSource RenderSvgToBitmapSource(Svg.SvgDocument svgDocument)
+        /// <param name="svgDocument">要渲染的SVG文档</param>
+        /// <returns>渲染后的BitmapSource图像</returns>
+        private static BitmapSource RenderSvgToBitmapSource(Svg.SvgDocument svgDocument)
         {
+            // 获取SVG文档的宽度和高度
             double width = svgDocument.Width.Value;
             double height = svgDocument.Height.Value;
+
+            // 创建一个新的DrawingVisual对象用于绘制
             DrawingVisual visual = new();
             using (DrawingContext context = visual.RenderOpen())
             {
-                using (var bitmap = svgDocument.Draw())
+                using var bitmap = svgDocument.Draw(); // 使用SVG文档创建位图
                 {
                     BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
-                        bitmap.GetHbitmap(),
-                        IntPtr.Zero,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions()
+                        bitmap.GetHbitmap(),  // 获取位图的HBitmap句柄
+                        IntPtr.Zero,         // 默认调色板
+                        Int32Rect.Empty,    // 使用整个源矩形
+                        BitmapSizeOptions.FromEmptyOptions()  // 使用空选项
                     );
-                    context.DrawImage(
-                        bitmapSource,
-                        new(new System.Windows.Point(0, 0), new System.Windows.Size(width, height))
-                    );
+
+                    // 在绘制上下文中绘制图像
+                    context.DrawImage(bitmapSource, new(new System.Windows.Point(0, 0), new System.Windows.Size(width, height)));
                 }
             }
+
+            // 创建渲染目标位图
             RenderTargetBitmap rtb = new(
-                (int)width,
-                (int)height,
-                96, // DPI X
-                96, // DPI Y
-                PixelFormats.Pbgra32
+                (int)width,       // 宽度
+                (int)height,      // 高度
+                96,               // 水平DPI
+                96,               // 垂直DPI
+                PixelFormats.Pbgra32  // 像素格式
             );
-            rtb.Render(visual);
-            rtb.Freeze();
+
+            rtb.Render(visual); // 将DrawingVisual渲染到RenderTargetBitmap
+            rtb.Freeze(); // 冻结位图以提高性能
             return rtb;
         }
 
         /// <summary>
         /// 将BitmapSource转换为BitmapImage
         /// </summary>
-        private BitmapImage ConvertBitmapSourceToBitmapImage(BitmapSource bitmapSource)
+        /// <param name="bitmapSource">BitmapSource</param>
+        /// <returns>BitmapImage</returns>
+        private static BitmapImage ConvertBitmapSourceToBitmapImage(BitmapSource bitmapSource)
         {
             BitmapImage bitmapImage = new(); // 创建 BitmapImage 对象
-            using (var memoryStream = new MemoryStream()) // 创建内存流
-            {
-                PngBitmapEncoder encoder = new(); // 创建 PNG 编码器
-                encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 添加到编码器
-                encoder.Save(memoryStream); // 保存 BitmapSource 到内存流
-                bitmapImage.BeginInit(); // 开始初始化 BitmapImage
-                bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray()); // 设置内存流为 BitmapImage 的源
-                bitmapImage.EndInit(); // 结束初始化 BitmapImage
-            }
+            using MemoryStream memoryStream = new(); // 创建内存流
+            PngBitmapEncoder encoder = new(); // 创建 PNG 编码器
+            encoder.Frames.Add(BitmapFrame.Create(bitmapSource)); // 将 BitmapSource 添加到编码器
+            encoder.Save(memoryStream); // 保存 BitmapSource 到内存流
+            bitmapImage.BeginInit(); // 开始初始化 BitmapImage
+            bitmapImage.StreamSource = new MemoryStream(memoryStream.ToArray()); // 设置内存流为 BitmapImage 的源
+            bitmapImage.EndInit(); // 结束初始化 BitmapImage
             return bitmapImage;
         }
 
@@ -745,7 +670,7 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="imageData">图像数据</param>
         /// <returns>是否为有效的图像</returns>
-        private bool IsValidImageData(byte[] imageData)
+        private static bool IsValidImageData(byte[] imageData)
         {
             if (imageData == null || imageData.Length < 8)
                 return false;

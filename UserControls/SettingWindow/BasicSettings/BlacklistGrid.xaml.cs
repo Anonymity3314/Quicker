@@ -22,7 +22,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private HashSet<string> blacklistAppsCache = new(); // 黑名单缓存
         private SelectWindowWindow selectWindowWindow; // 类成员变量
-        private IconManager iconManager = new(); // 图标管理器
         SettingManager settingManager; // 设置管理器
         private bool isLoading = true; // 是否全屏禁用
 
@@ -184,7 +183,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             Image iconImage = new()
             {
                 Style = (Style)FindResource("BlacklistItemIcon"),
-                Source = iconManager.GetIcon(appPath)
+                Source = IconManager.GetIcon(appPath)
             }; // 创建图标
             stackPanel.Children.Add(iconImage); // 添加到StackPanel
 
@@ -630,7 +629,6 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             BlacklistStackScrollViewer.ScrollChanged -= BlacklistStackScrollViewer_ScrollChanged;
 
             // 清理外部资源
-            iconManager?.Dispose();
             settingManager = null;
             blacklistAppsCache.Clear(); // 清理缓存和变量
         }

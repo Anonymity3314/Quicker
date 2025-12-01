@@ -161,7 +161,7 @@ namespace Quicker.Managers
                 return;
             }
 
-            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
+            ImageSource iconSource = IconManager.GetIcon(filePath); // 获取图标
             string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {
@@ -264,7 +264,7 @@ namespace Quicker.Managers
         private void ProcessMultipleFileDrop(Button button, string[] filePaths, bool isMainWindow, string tableName)
         {
             string filePath = string.Join(";", filePaths); // 用" ; "分隔文件路径
-            ImageSource iconSource = iconManager.GetIcon(filePaths[0]); // 获取图标
+            ImageSource iconSource = IconManager.GetIcon(filePaths[0]); // 获取图标
             string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {
@@ -893,7 +893,7 @@ namespace Quicker.Managers
                 return true;
             }
 
-            ImageSource iconSource = iconManager.GetIcon(filePath); // 获取图标
+            ImageSource iconSource = IconManager.GetIcon(filePath); // 获取图标
             string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {

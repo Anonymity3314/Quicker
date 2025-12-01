@@ -308,8 +308,7 @@ namespace Quicker.UserControls.AddWindow
         /// <param name="imagePath">SVG图片路径</param>
         private void SetSvgButtonImage(string imagePath)
         {
-            var iconManager = new IconManager(); // 创建 IconManager 实例
-            _addWindow.ButtonImage.Source = iconManager.LoadSvgToBitmapImage(imagePath); // 加载SVG图片
+            _addWindow.ButtonImage.Source = IconManager.LoadSvgToBitmapImage(imagePath); // 加载SVG图片
         }
 
         /// <summary>
@@ -377,7 +376,7 @@ namespace Quicker.UserControls.AddWindow
             }
             else
             {
-                ImageSource iconSource = _iconManager.GetIcon(path); // 获取图标
+                ImageSource iconSource = IconManager.GetIcon(path); // 获取图标
                 if (iconSource != null)
                 {
                     _addWindow.ButtonImage.Source = iconSource; // 设置图标

@@ -17,7 +17,6 @@ namespace Quicker.Windows.ToolWindows
         public event WindowSelectedEventHandler WindowSelected; // 窗口选择事件
 
         private readonly WindowManager windowManager = new(); // 窗口管理器
-        private readonly IconManager iconManager = new(); // 图标管理器
         private bool isSelecting = false; // 是否正在选择
         private Window ownerWindow; // 所有者窗口
 
@@ -116,7 +115,7 @@ namespace Quicker.Windows.ToolWindows
             {
                 try
                 {
-                    return iconManager.GetIcon(processPath) as BitmapSource; // 获取图标
+                    return IconManager.GetIcon(processPath) as BitmapSource; // 获取图标
                 }
                 catch { }
             }
@@ -195,7 +194,6 @@ namespace Quicker.Windows.ToolWindows
 
             // 释放资源
             windowManager.Dispose();
-            iconManager.Dispose();
         }
 
         #region Win32 API
