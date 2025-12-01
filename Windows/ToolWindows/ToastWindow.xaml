@@ -18,6 +18,12 @@
     Width="480"
 >
     <Window.Resources>
+        <local:ToastTypeToBrushConverter x:Key="ToastColorConverter"/>
+
+        <Style x:Key="ToastBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource Self}, Path=Tag, Converter={StaticResource ToastColorConverter}}"/>
+        </Style>
+
         <Storyboard x:Key="ScaleInAnimation">
             <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)" From="0.1" To="1.0" Duration="0:0:0.2">
                 <DoubleAnimation.EasingFunction>

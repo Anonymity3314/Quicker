@@ -2,6 +2,7 @@
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Data;
 using Quicker.Managers;
 using System.Windows;
 
@@ -11,12 +12,17 @@ namespace Quicker.Windows.ToolWindows
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new(); // 取消令牌源
         private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
+        private readonly SemaphoreSlim _queueSignal = new(0); // 创建一个信号量，初始计数为0
+        private readonly Storyboard _scaleOutStoryboard; // 缩小动画
+        private readonly Storyboard _scaleInStoryboard; // 放大动画
         private Queue<Message> messageQueue = new(); // 创建消息队列
         private readonly Task _queueProcessingTask; // 队列处理任务
 
         public ToastWindow()
         {
             InitializeComponent();
+            _scaleOutStoryboard = (Storyboard)FindResource("ScaleOutAnimation");
+            _scaleInStoryboard = (Storyboard)FindResource("ScaleInAnimation");
             double screenHeight = SystemParameters.WorkArea.Height; // 获取屏幕高度
             Height = screenHeight; // 设置窗口高度为屏幕高度
             _queueProcessingTask = Task.Run(() => ProcessQueueAsync(_cancellationTokenSource.Token)); // 启动后台任务处理消息队列
@@ -31,14 +37,11 @@ namespace Quicker.Windows.ToolWindows
         {
             while (!cancellationToken.IsCancellationRequested) // 循环处理，直到收到取消请求
             {
-                await Task.Delay(100, cancellationToken); // 等待100毫秒，同时检查取消请求
-                if (messageQueue.Count > 0)  // 检查队列中是否有消息需要处理
+                await _queueSignal.WaitAsync(cancellationToken); // 等待信号量，直到有新的消息加入队列
+                await Dispatcher.InvokeAsync(() => // 使用UI线程调用检查并显示通知的方法
                 {
-                    await Dispatcher.InvokeAsync(() => // 使用UI线程调用检查并显示通知的方法
-                    {
-                        CheckAndDisplayToast();
-                    }, DispatcherPriority.Normal);
-                }
+                    CheckAndDisplayToast(); // 检查并显示消息
+                }, DispatcherPriority.Normal);
             }
         }
 
@@ -51,6 +54,7 @@ namespace Quicker.Windows.ToolWindows
         {
             var msg = new Message { Content = message, ToastType = toastType }; // 创建消息对象
             messageQueue.Enqueue(msg); // 将消息对象添加到队列中
+            _queueSignal.Release(); // 释放信号量，通知队列处理任务有新的消息加入
         }
 
         // 检查并显示消息
@@ -102,39 +106,25 @@ namespace Quicker.Windows.ToolWindows
         /// <param name="toastType"> 消息类型 </param>
         private Border InitializeBoarder(ToastType toastType)
         {
-            Border border = new Border()
+            Border border = new()
             {
-                Width = 400, // 设置边框宽度
-                Opacity = 0, // 设置初始不透明度
-                Margin = new Thickness(0, 5, 0, 5), // 设置边距
-                CornerRadius = new CornerRadius(5), // 设置边框圆角
+                Style = (Style)FindResource("ToastBorderStyle"), // 设置边框样式
+                RenderTransform = new ScaleTransform(0.1, 0.1), // 初始大小设置为 0.1
                 RenderTransformOrigin = new Point(0.5, 1.0), // 设置缩放中心为底部中心
-                RenderTransform = new ScaleTransform(0.1, 0.1) // 初始大小设置为 0.1
+                CornerRadius = new CornerRadius(5), // 设置边框圆角
+                Margin = new Thickness(0, 5, 0, 5), // 设置边距
+                Tag = toastType, // 设置消息类型
+                Width = 400 // 设置边框宽度
             }; // 创建消息边框
 
-            Color color = ToastColors.TryGetValue(toastType, out var result) 
-                ? result
-                : ToastColors[ToastType.Common];
-
-            border.Background = new SolidColorBrush(color); // 设置边框颜色
             ToastStackPanel.Children.Add(border); // 添加消息边框到消息面板
             return border; // 返回消息边框
         }
 
         /// <summary>
-        /// 初始化消息颜色
-        /// </summary>
-        private static readonly Dictionary<ToastType, Color> ToastColors = new Dictionary<ToastType, Color>
-        {
-            [ToastType.Common] = Color.FromRgb(0x14, 0x7E, 0xC9),  // 示例通用颜色，蓝色
-            [ToastType.Error] = Color.FromRgb(0xF5, 0xA3, 0x00),   // 示例错误颜色，橙色
-            [ToastType.Warning] = Color.FromRgb(0xFF, 0x00, 0x00), // 示例警告颜色，红色
-            [ToastType.Success] = Color.FromRgb(0x11, 0xAD, 0x45)  // 示例成功颜色，绿色
-        };
-
-        /// <summary>
         /// 初始化关闭按钮
         /// </summary>
+        /// <param name="border"> 消息边框 </param>
         /// <returns> 关闭按钮 </returns>
         private Button InitalizeCloseButton(Border border)
         {
@@ -184,8 +174,7 @@ namespace Quicker.Windows.ToolWindows
         // 初始化动画
         private void InitializeAnimation(Border border)
         {
-            Storyboard fadeInStoryboard = (Storyboard)FindResource("ScaleInAnimation"); // 获取放大动画
-            fadeInStoryboard.Begin(border); // 开始播放放大动画
+            _scaleInStoryboard.Begin(border);
         }
 
         // 计时器事件
@@ -195,13 +184,11 @@ namespace Quicker.Windows.ToolWindows
             Border border = (Border)timer.Tag; // 获取消息边框
             if (border != null)
             {
-                // 获取缩小动画并开始播放
-                Storyboard fadeOutStoryboard = (Storyboard)FindResource("ScaleOutAnimation"); // 获取缩小动画
-                fadeOutStoryboard.Completed += (s, arg) =>
+                _scaleOutStoryboard.Completed += (s, arg) =>
                 {
-                    DeleteToast(border); // 删除消息
+                    DeleteToast(border);
                 }; // 缩小动画完成时删除消息
-                fadeOutStoryboard.Begin(border); // 开始播放缩小动画
+                _scaleOutStoryboard.Begin(border); // 开始播放缩小动画
 
                 timer.Stop(); // 停止计时器
                 timer.Tick -= Timer_Tick; // 移除计时器事件
@@ -245,9 +232,6 @@ namespace Quicker.Windows.ToolWindows
                 timer.Tick -= Timer_Tick;
             }
             timerDictionary.Clear();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
         }
     }
 
@@ -256,5 +240,37 @@ namespace Quicker.Windows.ToolWindows
     {
         public string Content { get; set; } // 消息内容
         public ToastType ToastType { get; set; } // 消息类型
+    }
+
+    // 用于将 ToastType 转换为 SolidColorBrush
+    public class ToastTypeToBrushConverter : IValueConverter
+    {
+        // 颜色字典
+        private static readonly Dictionary<ToastType, Color> ToastColors = new Dictionary<ToastType, Color>
+        {
+            [ToastType.Common] = Color.FromRgb(0x14, 0x7E, 0xC9),  // 示例通用颜色，蓝色
+            [ToastType.Error] = Color.FromRgb(0xF5, 0xA3, 0x00),   // 示例错误颜色，橙色
+            [ToastType.Warning] = Color.FromRgb(0xFF, 0x00, 0x00), // 示例警告颜色，红色
+            [ToastType.Success] = Color.FromRgb(0x11, 0xAD, 0x45)  // 示例成功颜色，绿色
+        };
+
+        /// <summary>
+        /// 将 ToastType 转换为 SolidColorBrush
+        /// </summary>
+        /// <param name="value"> ToastType </param>
+        /// <param name="targetType"> 目标类型 </param>
+        /// <param name="parameter"> 参数 </param>
+        /// <param name="culture"> 文化信息 </param>
+        /// <returns> SolidColorBrush </returns>
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is ToastType toastType && ToastColors.TryGetValue(toastType, out var color))
+            {
+                return new SolidColorBrush(color);
+            }
+            return new SolidColorBrush(ToastColors[ToastType.Common]); // 默认颜色
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();
     }
 }
