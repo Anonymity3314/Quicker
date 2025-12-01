@@ -13,6 +13,7 @@ using Quicker.Models;
 using WpfAnimatedGif;
 using Quicker.Extend;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Quicker.Managers
 {
@@ -298,9 +299,9 @@ namespace Quicker.Managers
         /// <param name="buttonID"> 按钮ID </param>
         /// <param name="tableName"> 表名 </param>
         /// <param name="isMainWindow"> 是否为主窗口 </param>
-        private void ProcessUrlDrop(string url, int buttonID, string tableName, bool isMainWindow)
+        private async Task ProcessUrlDrop(string url, int buttonID, string tableName, bool isMainWindow)
         {
-            ImageSource iconSource = iconManager.GetWebsiteIcon(url); // 获取图标
+            ImageSource iconSource = await iconManager.GetWebsiteIconAsync(url); // 获取图标
             string iconPath = ""; // 默认图标路径
             if (iconSource != null) // 如果图标存在
             {

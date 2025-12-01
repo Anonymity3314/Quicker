@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media.Imaging;
+using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
 using System.Windows.Media;
@@ -54,11 +55,12 @@ namespace Quicker.UserControls.AddWindow
         }
 
         // 复制地址
-        private void CopyLocation(object sender, RoutedEventArgs e)
+        private async void CopyLocation(object sender, RoutedEventArgs e)
         {
             string clipboardText = System.Windows.Clipboard.GetText(); // 获取剪贴板文本
             LocationTextBox.Text = _buttonManager.ProcessLocation(clipboardText); // 设置地址栏文本
             OpenWebsitePopup.IsOpen = false; // 关闭弹出菜单
+            await FetchWebsiteIcon();
         }
 
         // 如果地址栏不为空，则启用保存按钮
@@ -68,9 +70,9 @@ namespace Quicker.UserControls.AddWindow
         }
 
         // 点击按钮获取网站图标
-        private void GetWebsiteIconButton_Click(object sender, RoutedEventArgs e)
+        private async void GetWebsiteIconButton_Click(object sender, RoutedEventArgs e)
         {
-            FetchWebsiteIcon();
+            await FetchWebsiteIcon();
         }
 
         // 如果是自定义浏览器，显示相关控件进行相关设置
@@ -185,23 +187,38 @@ namespace Quicker.UserControls.AddWindow
         }
 
         // 获取网站图标
-        private void FetchWebsiteIcon()
+        private async Task FetchWebsiteIcon()
         {
             if (string.IsNullOrWhiteSpace(LocationTextBox.Text)) return;
             string url = LocationTextBox.Text.Trim();
 
-            ImageSource icon = _iconManager.GetWebsiteIcon(url); // 获取网站图标和名称
-            if (string.IsNullOrWhiteSpace(_addWindow.TitleTextBox.Text)) // 如果标题为空，则自动获取网站名称
+            // 在这里创建和显示 LoadingWindow
+            LoadingWindow loadingWindow = null;
+            try
             {
-                _addWindow.TitleTextBox.Text = _buttonManager.GetWebsiteNameFromUrl(url);
+                // 确保 LoadingWindow 在异步操作开始前显示
+                loadingWindow = new LoadingWindow();
+                loadingWindow.Show();
+
+                // 调用异步版本，UI 线程不会阻塞，可以继续渲染 LoadingWindow
+                ImageSource icon = await _iconManager.GetWebsiteIconAsync(url); // 注意：这里需要调用新的异步方法
+                if (string.IsNullOrWhiteSpace(_addWindow.TitleTextBox.Text)) // 如果标题为空，则自动获取网站名称
+                {
+                    _addWindow.TitleTextBox.Text = _buttonManager.GetWebsiteNameFromUrl(url);
+                }
+
+                if (icon == null) return;
+
+                // 设置图标
+                _addWindow.ButtonImage.Source = icon;
+                _addWindow.ButtonImage.Visibility = Visibility.Visible;
+                _addWindow.iconPath = _iconManager.SaveIconToFile(icon);
             }
-            
-            if (icon == null) return;
-            
-            // 设置图标
-            _addWindow.ButtonImage.Source = icon;
-            _addWindow.ButtonImage.Visibility = Visibility.Visible;
-            _addWindow.iconPath = _iconManager.SaveIconToFile(icon);
+            catch { }
+            finally
+            {
+                loadingWindow?.Close(); // 异步操作完成后关闭窗口
+            }
         }
 
         // 保存动作

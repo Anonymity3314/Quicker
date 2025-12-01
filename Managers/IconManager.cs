@@ -195,22 +195,20 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="websiteUrl"> 网站地址 </param>
         /// <returns> 网站图标 </returns>
-        public ImageSource GetWebsiteIcon(string websiteUrl)
+        public async Task<ImageSource> GetWebsiteIconAsync(string websiteUrl)
         {
-            LoadingWindow loadingWindow = new(); // 创建加载窗口
-            loadingWindow.Show(); // 显示加载窗口
             try
             {
                 Uri uri = new(websiteUrl); // 创建 Uri 对象
                 string apiFaviconUrl = $"https://icon.bqb.cool?url={uri.Host}"; // 拼接 API 地址
-                byte[] iconData = httpClient.GetByteArrayAsync(apiFaviconUrl).ConfigureAwait(false).GetAwaiter().GetResult(); // 获取图标数据 (网络请求)
+                byte[] iconData = await httpClient.GetByteArrayAsync(apiFaviconUrl);
                 if (iconData == null || iconData.Length == 0) // 验证下载的数据是否为有效的图像
                 {
                     ShowToast("获取网站图标失败：API返回数据为空。", ToastType.Error);
                     return null;
                 }
 
-                return LoadIconFromData(iconData); // 解码数据 (逻辑分离到新的私有方法)
+                return LoadIconFromData(iconData); // 解码逻辑仍可以在 UI 线程上执行，如果耗时，可能需要进一步优化
             }
             catch (HttpRequestException ex)
             {
@@ -221,10 +219,6 @@ namespace Quicker.Managers
             {
                 ShowToast($"获取网站图标失败：未知错误 - {ex.Message}", ToastType.Error);
                 return null;
-            }
-            finally
-            {
-                loadingWindow?.Close(); // 关闭加载窗口
             }
         }
 
