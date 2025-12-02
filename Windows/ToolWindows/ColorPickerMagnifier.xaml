@@ -1,0 +1,48 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    x:Class="Quicker.Windows.ToolWindows.ColorPickerMagnifier"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    
+    SizeToContent="WidthAndHeight"
+    Background="Transparent"
+    AllowsTransparency="True"
+    ShowInTaskbar="False"
+    ResizeMode="NoResize"
+    WindowStyle="None"
+    Topmost="True"
+    Height="280"
+    Width="220"
+        
+    Loaded="ColorPickerMagnifier_Loaded"
+>
+    <Border BorderBrush="#FF333333" BorderThickness="2" CornerRadius="4" Background="#F0FFFFFF">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 放大区域 -->
+            <Border Grid.Row="1" Width="200" Height="200" BorderBrush="#FF000000" BorderThickness="1" Margin="10">
+                <Grid>
+                    <Image x:Name="MagnifierImage" Stretch="UniformToFill"/>
+                    <!-- 标识当前选中像素的方框 -->
+                    <Canvas>
+                        <Rectangle x:Name="PixelIndicator" Width="8" Height="8" Stroke="#FFFF0000" StrokeThickness="2" Canvas.Left="96" Canvas.Top="96" Fill="Transparent"/>
+                        <!-- 十字线标识 -->
+                        <Line x:Name="CrosshairH" X1="0" Y1="100" X2="200" Y2="100" Stroke="#FFFF0000" StrokeThickness="1" Opacity="0.6"/>
+                        <Line x:Name="CrosshairV" X1="100" Y1="0" X2="100" Y2="200" Stroke="#FFFF0000" StrokeThickness="1" Opacity="0.6"/>
+                    </Canvas>
+                </Grid>
+            </Border>
+
+            <!-- 颜色信息 -->
+            <StackPanel Grid.Row="2" Margin="10,5" HorizontalAlignment="Center">
+                <Border x:Name="ColorPreviewBorder" Width="100" Height="20" BorderBrush="#FF000000" BorderThickness="1" Margin="0,5"/>
+                <TextBlock x:Name="HexTextBlock" TextAlignment="Center" FontFamily="Consolas" FontSize="12" Margin="0,5"/>
+                <TextBlock x:Name="RgbTextBlock" TextAlignment="Center" FontSize="10" Foreground="#FF666666"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

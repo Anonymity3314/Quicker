@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using Quicker.Windows.ToolWindows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Input;
@@ -9,8 +11,11 @@ namespace Quicker.UserControls.SettingWindow
 {
     public partial class ColorPicker : UserControl
     {
-        private bool _updatingControls = false; //  确保颜色变化事件只被触发一次
+        private ColorPickerMagnifier _magnifierWindow; // 放大镜窗口
         private Color _currentColor = Colors.White; // 当前颜色
+        private DispatcherTimer _magnifierTimer; // 放大镜更新定时器
+        private bool _updatingControls = false; //  确保颜色变化事件只被触发一次
+        private bool _isColorPicking = false; // 是否正在取色
         private double _saturation = 1;  // 饱和度
         private Rectangle _colorRect; // 用于存储颜色画布中的矩形，方便直接访问
         private double _value = 1;  // 亮度
@@ -35,7 +40,7 @@ namespace Quicker.UserControls.SettingWindow
             picker.UpdateControlsFromColor(); // 更新控件状态
             picker.RaiseSelectedColorChanged((Color)e.OldValue, (Color)e.NewValue); // 触发颜色变化事件
         }
-        
+
         /// <summary>
         /// 触发颜色变化事件
         /// </summary>
@@ -378,12 +383,23 @@ namespace Quicker.UserControls.SettingWindow
         //  鼠标按下
         private void ColorCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed) // 左键按下
+            if (e.RightButton == MouseButtonState.Pressed) // 右键按下，启动屏幕取色
             {
-                // 捕获鼠标以获得更流畅的拖动体验
-                ColorCanvas.CaptureMouse();
-                var position = e.GetPosition(ColorCanvas); // 获取鼠标位置
-                UpdateColorFromCanvasPosition(position); // 更新颜色
+                StartScreenColorPicking();
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed) // 左键按下
+            {
+                if (_isColorPicking) // 如果正在取色，则确认选择
+                {
+                    ConfirmColorPick();
+                }
+                else
+                {
+                    // 捕获鼠标以获得更流畅的拖动体验
+                    ColorCanvas.CaptureMouse();
+                    var position = e.GetPosition(ColorCanvas); // 获取鼠标位置
+                    UpdateColorFromCanvasPosition(position); // 更新颜色
+                }
             }
         }
 
@@ -588,6 +604,131 @@ namespace Quicker.UserControls.SettingWindow
         private bool IsValidHexColor(string hexColor)
         {
             return Regex.IsMatch(hexColor, @"^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$"); // 匹配 #RGB、#RRGGBB和#AARRGGBB格式
+        }
+
+        /// <summary>
+        /// 启动屏幕取色模式
+        /// </summary>
+        private void StartScreenColorPicking()
+        {
+            if (_isColorPicking) return;
+
+            _isColorPicking = true;
+
+            // 创建放大镜窗口
+            _magnifierWindow = new ColorPickerMagnifier();
+            _magnifierWindow.Show();
+
+            // 创建定时器，定期更新放大镜和检查鼠标点击
+            _magnifierTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(16) // 约60fps
+            };
+            _magnifierTimer.Tick += MagnifierTimer_Tick;
+            _magnifierTimer.Start();
+
+            // 捕获鼠标以接收全局事件
+            Mouse.Capture(this, CaptureMode.SubTree);
+            PreviewMouseLeftButtonDown += ColorPicker_PreviewMouseLeftButtonDown;
+            PreviewMouseRightButtonDown += ColorPicker_PreviewMouseRightButtonDown;
+        }
+
+        /// <summary>
+        /// 放大镜定时器事件处理
+        /// </summary>
+        private void MagnifierTimer_Tick(object sender, EventArgs e)
+        {
+            if (_magnifierWindow != null && _isColorPicking)
+            {
+                _magnifierWindow.UpdateColor();
+
+                // 检查鼠标左键是否按下（全局检查）
+                if (System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Left)
+                {
+                    ConfirmColorPick();
+                }
+                // 检查鼠标右键是否按下（取消取色）
+                else if (System.Windows.Forms.Control.MouseButtons == System.Windows.Forms.MouseButtons.Right)
+                {
+                    StopScreenColorPicking();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 确认颜色选择
+        /// </summary>
+        private void ConfirmColorPick()
+        {
+            if (!_isColorPicking || _magnifierWindow == null) return;
+
+            // 获取选中的颜色
+            var pickedColor = _magnifierWindow.SelectedColor;
+            
+            // 设置颜色
+            _currentColor = pickedColor;
+            SelectedColor = pickedColor;
+
+            // 停止取色
+            StopScreenColorPicking();
+        }
+
+        /// <summary>
+        /// 停止屏幕取色模式
+        /// </summary>
+        private void StopScreenColorPicking()
+        {
+            if (!_isColorPicking) return;
+
+            _isColorPicking = false;
+
+            // 停止定时器
+            _magnifierTimer?.Stop();
+            _magnifierTimer = null;
+
+            // 关闭放大镜窗口
+            _magnifierWindow?.Close();
+            _magnifierWindow = null;
+
+            // 释放鼠标捕获
+            Mouse.Capture(null);
+            //PreviewMouseMove -= ColorPicker_PreviewMouseMove;
+            PreviewMouseLeftButtonDown -= ColorPicker_PreviewMouseLeftButtonDown;
+            PreviewMouseRightButtonDown -= ColorPicker_PreviewMouseRightButtonDown;
+        }
+
+
+        /// <summary>
+        /// 预览鼠标左键按下事件（用于确认颜色选择）
+        /// </summary>
+        private void ColorPicker_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_isColorPicking)
+            {
+                ConfirmColorPick();
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// 预览鼠标右键按下事件（用于取消取色）
+        /// </summary>
+        private void ColorPicker_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_isColorPicking)
+            {
+                StopScreenColorPicking();
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// 颜色预览区域右键点击事件
+        /// </summary>
+        private void ColorPreview_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            StartScreenColorPicking();
+            e.Handled = true;
         }
     }
 

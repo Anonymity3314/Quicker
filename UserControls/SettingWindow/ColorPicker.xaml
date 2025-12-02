@@ -63,7 +63,7 @@
         </Slider>
 
         <!-- 颜色预览 -->
-        <Border x:Name="ColorPreview" Height="25" BorderBrush="LightGray" BorderThickness="1" Margin="10,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="109">
+        <Border x:Name="ColorPreview" Height="25" BorderBrush="LightGray" BorderThickness="1" Margin="10,115,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="109" MouseRightButtonDown="ColorPreview_MouseRightButtonDown" Cursor="Hand" ToolTip="右键点击开始屏幕取色">
             <Border.Background>
                 <SolidColorBrush Color="{Binding SelectedColor, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
             </Border.Background>
