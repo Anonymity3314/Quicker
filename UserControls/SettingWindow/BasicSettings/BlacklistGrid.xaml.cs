@@ -1,4 +1,5 @@
-﻿using UserControl = System.Windows.Controls.UserControl;
+﻿using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using UserControl = System.Windows.Controls.UserControl;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Application = System.Windows.Application;
 using Button = System.Windows.Controls.Button;
@@ -7,6 +8,7 @@ using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using Quicker.Models.Settings;
 using Quicker.Database.Core;
+using System.Windows.Input;
 using System.Windows.Forms;
 using Quicker.UserControls;
 using System.Windows.Media;
@@ -378,36 +380,37 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         }
 
         // 鼠标移入Border高亮显示黑名单项
-        private void HightLightBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        private void HightLightBlacklistItem(object sender, MouseEventArgs e)
         {
-            Border border = sender as Border; // 转换发送者为Border对象
+            var border = (Border)sender; // 转换发送者为Border对象
             if (!(bool)border.Tag) // 如果Border没有被选中
-                border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3")); // 设置背景色
+                border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3F3F3"));
         }
 
         // 鼠标移出Border恢复原状
-        private void FadeBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        private void FadeBlacklistItem(object sender, MouseEventArgs e)
         {
-            Border border = sender as Border; // 转换发送者为Border对象
+            var border = (Border)sender; // 转换发送者为Border对象
             if (!(bool)border.Tag) // 如果Border没有被选中
-                border.Background = System.Windows.Media.Brushes.Transparent; // 设置背景色
+                border.Background = Brushes.Transparent;
         }
 
         // 鼠标按下Border选中黑名单项
-        private void SelectBlacklistItem(object sender, System.Windows.Input.MouseEventArgs e)
+        private void SelectBlacklistItem(object sender, MouseButtonEventArgs e)
         {
-            Border targetBorder = sender as Border; // 转换发送者为Border对象
-            targetBorder.Tag = true; // 标记为已选中
-            foreach (var border in BlacklistStackPanel.Children.OfType<Border>())
+            Border targetBorder = (Border)sender; // 转换发送者为Border对象
+            foreach (var border in BlacklistStackPanel.Children.OfType<Border>()) // 取消上一个选中项
             {
-                if (border == targetBorder)
-                    border.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA")); // 设置背景色
-                else
+                if ((bool)border.Tag) // 仅处理已选中项
                 {
-                    border.Tag = false; // 标记为未选中
-                    border.Background = Brushes.Transparent; // 设置背景色
+                    border.Tag = false;
+                    border.Background = Brushes.Transparent;
                 }
             }
+
+            // 设置当前选中项
+            targetBorder.Tag = true;
+            targetBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEAEAEA"));
         }
 
         // 勾选框点击事件
