@@ -1,14 +1,18 @@
-﻿using Quicker.Database.Core;
+using Quicker.Database.Core;
 using System.Data.SQLite;
 using Quicker.Helpers;
 using System.IO;
 
 namespace Quicker.Database.Upgrade.Versions
 {
-    internal class Upgrade_2_3_0 : IDatabaseUpgradeStep
+    /// <summary>
+    /// 数据库结构从版本 1 升级到版本 2 的迁移步骤。
+    /// 对应原先 2.2.0 -> 2.3.0 的结构变更。
+    /// </summary>
+    internal class UpgradeSchema_1_to_2 : IDatabaseUpgradeStep
     {
-        public string FromVersion => "2.2.0"; // 升级前的版本号
-        public string ToVersion => "2.3.0"; // 升级后的版本号
+        public int FromSchemaVersion => 1; // 升级前的结构版本号
+        public int ToSchemaVersion => 2;   // 升级后的结构版本号
 
         /// <summary>
         /// 升级数据库
@@ -20,8 +24,99 @@ namespace Quicker.Database.Upgrade.Versions
             SettingDatabase.InitializeAppearance(); // 新增数据库表
             AddTrayIconColumnsIfNotExist(connection); // 新增托盘图标字段
             AddUseMenuAnimationColumnIfNotExist(connection); // 新增菜单动画字段
+            RemoveVersionColumnFromConvention(connection); // 删除 Convention 表中的旧版本号字段
             RenameDefaultTables(connection, manager); // 重命名默认表
             UpdateButtonDataImagePath(connection); // 更新ButtonData表ImagePath字段
+        }
+
+        /// <summary>
+        /// 删除 Convention 表中的旧版本号字段（Version）
+        /// 通过重建表的方式安全移除该列
+        /// </summary>
+        /// <param name="connection">数据库连接</param>
+        private void RemoveVersionColumnFromConvention(SQLiteConnection connection)
+        {
+            using var transaction = connection.BeginTransaction();
+
+            // 创建新的 Convention 表（不包含 Version 字段，但包含所有现有配置字段）
+            const string createNewTableSql = @"
+            CREATE TABLE IF NOT EXISTS Convention_new
+            (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                AutoStart BOOLEAN,
+                ShowNotification BOOLEAN,
+                ShowAddImage BOOLEAN,
+                TotalUsageTime REAL,
+                HideTooltip BOOLEAN,
+                LongPressThreshold INTEGER,
+                MouseMovePixels INTEGER,
+                LoopPageFlipping BOOLEAN,
+                RememberLastPage BOOLEAN,
+                LastPage INTEGER,
+                EnableMemoryOptimization BOOLEAN,
+                TrayIconPathRunning TEXT,
+                TrayIconPathPaused TEXT,
+                UseMenuAnimation BOOLEAN
+            );";
+            using (var createCmd = new SQLiteCommand(createNewTableSql, connection, transaction))
+            {
+                createCmd.ExecuteNonQuery();
+            }
+
+            // 将旧表数据迁移到新表（跳过 Version 列）
+            const string copyDataSql = @"
+            INSERT INTO Convention_new
+            (
+                ID,
+                AutoStart,
+                ShowNotification,
+                ShowAddImage,
+                TotalUsageTime,
+                HideTooltip,
+                LongPressThreshold,
+                MouseMovePixels,
+                LoopPageFlipping,
+                RememberLastPage,
+                LastPage,
+                EnableMemoryOptimization,
+                TrayIconPathRunning,
+                TrayIconPathPaused,
+                UseMenuAnimation
+            )
+            SELECT
+                ID,
+                AutoStart,
+                ShowNotification,
+                ShowAddImage,
+                TotalUsageTime,
+                HideTooltip,
+                LongPressThreshold,
+                MouseMovePixels,
+                LoopPageFlipping,
+                RememberLastPage,
+                LastPage,
+                EnableMemoryOptimization,
+                TrayIconPathRunning,
+                TrayIconPathPaused,
+                UseMenuAnimation
+            FROM Convention;";
+            using (var copyCmd = new SQLiteCommand(copyDataSql, connection, transaction))
+            {
+                copyCmd.ExecuteNonQuery();
+            }
+
+            // 删除旧表并重命名新表
+            using (var dropCmd = new SQLiteCommand("DROP TABLE Convention;", connection, transaction))
+            {
+                dropCmd.ExecuteNonQuery();
+            }
+
+            using (var renameCmd = new SQLiteCommand("ALTER TABLE Convention_new RENAME TO Convention;", connection, transaction))
+            {
+                renameCmd.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
         }
 
         /// <summary>
@@ -129,3 +224,5 @@ namespace Quicker.Database.Upgrade.Versions
         }
     }
 }
+
+

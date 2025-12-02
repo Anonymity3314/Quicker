@@ -6,7 +6,6 @@
     public class Convention
     {
         public int ID { get; set; } // 主键
-        public string Version { get; set; } // 版本号
         public bool AutoStart { get; set; } // 是否开机自启
         public bool ShowNotification { get; set; } // 是否显示通知
         public bool ShowAddImage { get; set; } // 是否显示添加图片

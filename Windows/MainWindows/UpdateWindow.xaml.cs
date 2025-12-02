@@ -1,10 +1,10 @@
 ﻿using Quicker.Windows.ToolWindows;
 using static AppUpdateManager;
-using Quicker.Windows.Menus;
 using Quicker.Database.Core;
 using System.Windows.Media;
 using System.Windows.Forms;
 using Quicker.Managers;
+using Quicker.Helpers;
 using System.Windows;
 using System.IO;
 
@@ -42,7 +42,7 @@ namespace Quicker.Windows.MainWindows
         // 窗口加载时获取更新信息
         private void UpdateWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            VersionTextBlock.Text = $"当前版本：{SettingDatabase.currentVersion}"; // 显示当前版本号
+            VersionTextBlock.Text = $"当前版本：{AppVersionHelper.CurrentVersion}"; // 显示当前版本号
         }
 
         // 点击按钮关闭窗口
@@ -154,7 +154,7 @@ namespace Quicker.Windows.MainWindows
         {
             // 更新UI显示
             TitleTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF7D4D")); // 设置标题颜色
-            LatestVersionTextBlock1.Text = SettingDatabase.currentVersion; // 显示当前版本号
+            LatestVersionTextBlock1.Text = AppVersionHelper.CurrentVersion; // 显示当前版本号
             LatestVersionTextBlock1.FontWeight = FontWeights.Normal; // 设置字体粗细
             DownloadButton.Visibility = Visibility.Collapsed; // 隐藏下载按钮
             TitleTextBlock.Text = "暂无新版本。"; // 更新标题文本
@@ -178,7 +178,7 @@ namespace Quicker.Windows.MainWindows
 
             // 更新UI显示
             LatestVersionTextBlock1.Text = newVersion; // 显示最新版本号
-            VersionChangeTextBlock.Text = $"{SettingDatabase.currentVersion} -- {newVersion}"; // 显示版本号变更
+            VersionChangeTextBlock.Text = $"{AppVersionHelper.CurrentVersion} -- {newVersion}"; // 显示版本号变更
 
             // 检查下载地址可用性并更新按钮状态
             UpdateDownloadButtonsState();
@@ -207,7 +207,7 @@ namespace Quicker.Windows.MainWindows
             if (allVersions.Count > 0)
             {
                 // 获取当前版本和最新版本
-                var currentVersion = new Version(SettingDatabase.currentVersion);
+                var currentVersion = new Version(AppVersionHelper.CurrentVersion);
                 var latestVersion = allVersions.FirstOrDefault(v => v.IsLatest);
                 if (latestVersion != null)
                 {

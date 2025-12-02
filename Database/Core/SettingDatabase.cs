@@ -81,8 +81,6 @@ namespace Quicker.Database.Core
          * EnablePreview: 开启预览功能，默认为false。
          */
 
-        public const string currentVersion = "2.3.0"; // 当前版本号
-
         static SettingDatabase()
         {
             DatabaseHelper.EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
@@ -110,24 +108,23 @@ namespace Quicker.Database.Core
         private static void InsertDefaultConventionData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (currentVersion, false, true, true, 0.0, false, 300, 50, true, false, 111, true, "pack://application:,,,/Resources/Images/Quicker_Enabled.png", "pack://application:,,,/Resources/Images/Quicker_Disabled.ico", true); // 使用参数元组封装默认值
+            var defaults = (false, true, true, 0.0, false, 300, 50, true, false, 111, true, "pack://application:,,,/Resources/Images/Quicker_Enabled.png", "pack://application:,,,/Resources/Images/Quicker_Disabled.ico", true); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
-                ["@Version"] = defaults.Item1,
-                ["@AutoStart"] = defaults.Item2,
-                ["@ShowNotification"] = defaults.Item3,
-                ["@ShowAddImage"] = defaults.Item4,
-                ["@TotalUsageTime"] = defaults.Item5,
-                ["@HideTooltip"] = defaults.Item6,
-                ["@LongPressThreshold"] = defaults.Item7,
-                ["@MouseMovePixels"] = defaults.Item8,
-                ["@LoopPageFlipping"] = defaults.Item9,
-                ["@RememberLastPage"] = defaults.Item10,
-                ["@LastPage"] = defaults.Item11,
-                ["@EnableMemoryOptimization"] = defaults.Item12,
-                ["@TrayIconPathRunning"] = defaults.Item13,
-                ["@TrayIconPathPaused"] = defaults.Item14,
-                ["@UseMenuAnimation"] = defaults.Item15
+                ["@AutoStart"] = defaults.Item1,
+                ["@ShowNotification"] = defaults.Item2,
+                ["@ShowAddImage"] = defaults.Item3,
+                ["@TotalUsageTime"] = defaults.Item4,
+                ["@HideTooltip"] = defaults.Item5,
+                ["@LongPressThreshold"] = defaults.Item6,
+                ["@MouseMovePixels"] = defaults.Item7,
+                ["@LoopPageFlipping"] = defaults.Item8,
+                ["@RememberLastPage"] = defaults.Item9,
+                ["@LastPage"] = defaults.Item10,
+                ["@EnableMemoryOptimization"] = defaults.Item11,
+                ["@TrayIconPathRunning"] = defaults.Item12,
+                ["@TrayIconPathPaused"] = defaults.Item13,
+                ["@UseMenuAnimation"] = defaults.Item14
             }; // 使用字典批量绑定参数
             using var command = new SQLiteCommand(SQLStatements.InsertConvention, connection); // 创建 SQLiteCommand 对象
             foreach (var param in parameters)
@@ -411,21 +408,20 @@ namespace Quicker.Database.Core
                 conventions.Add(new Convention
                 {
                     ID = reader.GetInt32(0), // 主键
-                    Version = reader.GetString(1), // 版本号
-                    AutoStart = reader.GetBoolean(2), // 是否开机自启
-                    ShowNotification = reader.GetBoolean(3), // 是否显示通知
-                    ShowAddImage = reader.GetBoolean(4), // 是否显示添加图片
-                    TotalUsageTime = reader.GetDouble(5), // 总使用时长
-                    HideTooltip = reader.GetBoolean(6), // 是否隐藏提示
-                    LongPressThreshold = reader.GetInt32(7), // 长按阈值
-                    MouseMovePixels = reader.GetInt32(8), // 鼠标移动像素
-                    LoopPageFlipping = reader.GetBoolean(9), // 是否循环翻页
-                    RememberLastPage = reader.GetBoolean(10), // 是否记住设置窗口中最后打开的页面
-                    LastPage = reader.GetInt32(11), // 设置窗口中最后打开的页面
-                    EnableMemoryOptimization = reader.GetBoolean(12), // 是否启用内存优化
-                    TrayIconPathRunning = reader.GetString(13), // 运行时托盘图标路径
-                    TrayIconPathPaused = reader.GetString(14), // 暂停时托盘图标路径
-                    UseMenuAnimation = reader.FieldCount > 15 ? reader.GetBoolean(15) : true // 是否启用菜单动画（如果字段不存在则默认为 true）
+                    AutoStart = reader.GetBoolean(1), // 是否开机自启
+                    ShowNotification = reader.GetBoolean(2), // 是否显示通知
+                    ShowAddImage = reader.GetBoolean(3), // 是否显示添加图片
+                    TotalUsageTime = reader.GetDouble(4), // 总使用时长
+                    HideTooltip = reader.GetBoolean(5), // 是否隐藏提示
+                    LongPressThreshold = reader.GetInt32(6), // 长按阈值
+                    MouseMovePixels = reader.GetInt32(7), // 鼠标移动像素
+                    LoopPageFlipping = reader.GetBoolean(8), // 是否循环翻页
+                    RememberLastPage = reader.GetBoolean(9), // 是否记住设置窗口中最后打开的页面
+                    LastPage = reader.GetInt32(10), // 设置窗口中最后打开的页面
+                    EnableMemoryOptimization = reader.GetBoolean(11), // 是否启用内存优化
+                    TrayIconPathRunning = reader.GetString(12), // 运行时托盘图标路径
+                    TrayIconPathPaused = reader.GetString(13), // 暂停时托盘图标路径
+                    UseMenuAnimation = reader.FieldCount > 14 ? reader.GetBoolean(14) : true // 是否启用菜单动画（如果字段不存在则默认为 true）
                 }); // 将读取到的数据添加到列表中
             }
             transaction.Commit(); // 提交事务
@@ -650,7 +646,6 @@ namespace Quicker.Database.Core
             CREATE TABLE IF NOT EXISTS Convention
             (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Version TEXT,
                 AutoStart BOOLEAN,
                 ShowNotification BOOLEAN,
                 ShowAddImage BOOLEAN,
@@ -669,7 +664,7 @@ namespace Quicker.Database.Core
             public const string InsertConvention = @"
             INSERT INTO Convention
             (
-                Version,            AutoStart, 
+                AutoStart, 
                 ShowNotification,   ShowAddImage,
                 TotalUsageTime,     HideTooltip,
                 LongPressThreshold, MouseMovePixels,
@@ -680,7 +675,7 @@ namespace Quicker.Database.Core
             )
             VALUES
             (
-                @Version,           @AutoStart,
+                @AutoStart,
                 @ShowNotification,  @ShowAddImage,
                 @TotalUsageTime,    @HideTooltip,
                 @LongPressThreshold,@MouseMovePixels,

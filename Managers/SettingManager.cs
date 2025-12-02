@@ -98,7 +98,6 @@ namespace Quicker.Managers
             var Conventions = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置信息
             conventions = new Convention // 常规设置
             {
-                Version = Conventions.Version, // 版本号
                 AutoStart = Conventions.AutoStart, // 开机自启
                 ShowNotification = Conventions.ShowNotification, // 显示通知
                 ShowAddImage = Conventions.ShowAddImage, // 显示添加图片按钮

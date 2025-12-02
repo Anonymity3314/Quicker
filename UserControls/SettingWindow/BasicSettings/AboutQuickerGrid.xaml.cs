@@ -30,8 +30,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             
             settingManager = settingWindow._settingManager; // 创建设置管理器
             weakSettingWindow = new(settingWindow); // 保存设置窗口
-            settingManager.LoadConventionsAsync(); // 初始化缓存数据
-            VersionLabel.Content = $"版本：{settingManager.conventions.Version}"; // 加载版本信息
+            VersionLabel.Content = $"版本：{AppVersionHelper.CurrentVersion}"; // 加载版本信息
 
             RefreshPathsAndEnsureDirectories(); // 初始化路径与目录
             LoadQQUserInfo(); // 加载QQ用户信息

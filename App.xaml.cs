@@ -91,8 +91,7 @@ namespace Quicker
         // 确保单例运行
         private void EnsureSingleInstance()
         {
-            var version = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取数据库版本
-            string mutexName = version.Version; // 互斥锁唯一标识
+            string mutexName = AppVersionHelper.CurrentVersion; // 互斥锁唯一标识
             bool isNewInstance = SingleInstanceManager.CheckForOtherInstances(mutexName, out _); // 检查是否是新实例
             if (!isNewInstance)
             {

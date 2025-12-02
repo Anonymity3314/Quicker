@@ -30,7 +30,7 @@ public class AppUpdateManager : IDisposable
         if (Versions.Count > 0)  // 如果有版本信息
         {
             var latestVersion = GetLatestVersion(); // 获取最新版本信息
-            if (latestVersion != null && VersionHelper.IsNewVersionAvailable(SettingDatabase.currentVersion, latestVersion.Version)) // 使用VersionHelper进行版本比较
+            if (latestVersion != null && VersionHelper.IsNewVersionAvailable(AppVersionHelper.CurrentVersion, latestVersion.Version)) // 使用VersionHelper进行版本比较
             {
                 AppStateManager.HasNewVersion = true; // 设置有新版本
                 toast.Show($"发现新版本：{latestVersion.Version}", ToastType.Common); // 弹窗提示
