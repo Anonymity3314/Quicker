@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
+using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 
@@ -11,47 +12,38 @@ namespace Quicker.Windows.ToolWindows
         #region Win32 API 声明
 
         // 获取设备上下文
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetDC(IntPtr hWnd);
+        [DllImport("user32.dll")] private static extern IntPtr GetDC(IntPtr hWnd);
 
         // 释放设备上下文
-        [DllImport("user32.dll")]
-        private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+        [DllImport("user32.dll")] private static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
 
         // 获取像素颜色
-        [DllImport("gdi32.dll")]
-        private static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
+        [DllImport("gdi32.dll")] private static extern uint GetPixel(IntPtr hdc, int nXPos, int nYPos);
 
         // 创建兼容的设备上下文
-        [DllImport("gdi32.dll")]
-        private static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+        [DllImport("gdi32.dll")] private static extern IntPtr CreateCompatibleDC(IntPtr hdc);
 
         // 创建兼容的位图
-        [DllImport("gdi32.dll")]
-        private static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+        [DllImport("gdi32.dll")] private static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
 
         // 选择对象
-        [DllImport("gdi32.dll")]
-        private static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+        [DllImport("gdi32.dll")] private static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
 
         // 删除对象
-        [DllImport("gdi32.dll")]
-        private static extern bool DeleteObject(IntPtr hObject);
+        [DllImport("gdi32.dll")] private static extern bool DeleteObject(IntPtr hObject);
 
         // 删除设备上下文
-        [DllImport("gdi32.dll")]
-        private static extern bool DeleteDC(IntPtr hdc);
+        [DllImport("gdi32.dll")] private static extern bool DeleteDC(IntPtr hdc);
 
         // 复制位图
-        [DllImport("gdi32.dll")]
-        private static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hObjectSource, int nXSrc, int nYSrc, int dwRop);
+        [DllImport("gdi32.dll")] private static extern bool BitBlt(IntPtr hObject, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hObjectSource, int nXSrc, int nYSrc, int dwRop);
 
         #endregion
 
         #region 常量声明
 
         private const int OFFSET_DISTANCE = 20; // 窗口距离鼠标的偏移距离
-        private const int SRCCOPY = 0x00CC0020;
+        private const int SRCCOPY = 0x00CC0020; // 位图操作常量，表示直接复制
         private const int MAGNIFICATION = 8; // 放大倍数
         private const int CAPTURE_SIZE = 25; // 捕获区域大小（像素），显示 25x25 像素区域
 
@@ -59,8 +51,8 @@ namespace Quicker.Windows.ToolWindows
 
         #region 属性声明
 
-        public Color SelectedColor { get; private set; }
-        
+        public Color SelectedColor { get; private set; } // 选中的颜色
+
         private bool _positionInitialized = false; // 位置是否已初始化
         private double _lastLeft = double.NaN; // 上次窗口位置
         private double _lastTop = double.NaN;
@@ -82,33 +74,48 @@ namespace Quicker.Windows.ToolWindows
         /// </summary>
         private void UpdatePosition()
         {
+            // 获取物理像素坐标 (来自 Windows Forms)
             var mousePos = System.Windows.Forms.Control.MousePosition;
+
+            // 获取当前屏幕的 DPI 缩放比例
+            var source = PresentationSource.FromVisual(this);
+            if (source == null || source.CompositionTarget == null) return; // 窗口未完全加载或没有可视目标，跳过更新
+
+            // TransformFromDevice.M11/M22 给出的是将物理像素转换为设备独立像素的因子
+            double dpiScaleX = source.CompositionTarget.TransformFromDevice.M11;
+            double dpiScaleY = source.CompositionTarget.TransformFromDevice.M22;
+
+            // 将物理像素坐标转换为设备独立像素 (WPF 单位)
+            double wpfMouseX = mousePos.X * dpiScaleX;
+            double wpfMouseY = mousePos.Y * dpiScaleY;
+
+            // 获取屏幕的设备独立像素尺寸
             var screenWidth = SystemParameters.PrimaryScreenWidth;
             var screenHeight = SystemParameters.PrimaryScreenHeight;
-            
+
             // 计算理想位置（鼠标右下方）
-            double idealLeft = mousePos.X + OFFSET_DISTANCE;
-            double idealTop = mousePos.Y + OFFSET_DISTANCE;
-            
+            double idealLeft = wpfMouseX + OFFSET_DISTANCE;
+            double idealTop = wpfMouseY + OFFSET_DISTANCE;
+
             // 如果窗口超出右边界，放在鼠标左侧
             if (idealLeft + Width > screenWidth)
             {
-                idealLeft = mousePos.X - Width - OFFSET_DISTANCE;
+                idealLeft = wpfMouseX - Width - OFFSET_DISTANCE;
             }
-            
+
             // 如果窗口超出下边界，放在鼠标上方
             if (idealTop + Height > screenHeight)
             {
-                idealTop = mousePos.Y - Height - OFFSET_DISTANCE;
+                idealTop = wpfMouseY - Height - OFFSET_DISTANCE;
             }
-            
+
             // 确保窗口不超出左边界和上边界
             idealLeft = Math.Max(0, idealLeft);
             idealTop = Math.Max(0, idealTop);
-            
+
             // 只在位置真正改变时才更新，避免频繁跳动
-            if (!_positionInitialized || 
-                Math.Abs(idealLeft - _lastLeft) > 1 || 
+            if (!_positionInitialized ||
+                Math.Abs(idealLeft - _lastLeft) > 1 ||
                 Math.Abs(idealTop - _lastTop) > 1)
             {
                 Left = idealLeft;
@@ -119,12 +126,15 @@ namespace Quicker.Windows.ToolWindows
             }
         }
 
+        /// <summary>
+        /// 更新颜色和放大镜图像（优化：图像生成移到后台）
+        /// </summary>
         public void UpdateColor()
         {
             var mousePos = System.Windows.Forms.Control.MousePosition;
-            UpdatePosition();
 
-            // 获取屏幕像素颜色
+            // 1. 快速更新位置和颜色信息（保持同步，确保 UI 响应）
+            UpdatePosition();
             var (R, G, B) = GetPixelColor(mousePos.X, mousePos.Y);
             SelectedColor = Color.FromRgb(R, G, B);
 
@@ -133,37 +143,52 @@ namespace Quicker.Windows.ToolWindows
             HexTextBlock.Text = $"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}";
             RgbTextBlock.Text = $"RGB({SelectedColor.R}, {SelectedColor.G}, {SelectedColor.B})";
 
-            // 更新放大镜图像
-            UpdateMagnifierImage(mousePos.X, mousePos.Y);
+            // 2. 将耗时的图像捕获和放大操作移到后台线程执行
+            int centerX = mousePos.X;
+            int centerY = mousePos.Y;
+
+            Task.Run(() =>
+            {
+                var bitmapSource = GenerateMagnifierBitmapSource(centerX, centerY); // 在后台线程中生成 BitmapSource
+                Dispatcher.Invoke(() =>
+                {
+                    if (bitmapSource != null)
+                    {
+                        MagnifierImage.Source = bitmapSource;
+                    }
+                }); // 使用 Dispatcher 将更新 UI 的操作（MagnifierImage.Source）调度回主线程
+            });
         }
 
         /// <summary>
-        /// 更新放大镜图像
+        /// 在后台线程中执行屏幕捕获和放大逻辑
         /// </summary>
-        /// <param name="centerX"> 中心x坐标 </param>
-        /// <param name="centerY"> 中心y坐标 </param>
-        private void UpdateMagnifierImage(int centerX, int centerY)
+        /// <param name="centerX"> 屏幕中心x坐标（物理像素）</param>
+        /// <param name="centerY"> 屏幕中心y坐标（物理像素）</param>
+        /// <returns> 生成的 BitmapSource </returns>
+        private BitmapSource GenerateMagnifierBitmapSource(int centerX, int centerY)
         {
+            IntPtr screenDC = IntPtr.Zero;
+            IntPtr memDC = IntPtr.Zero;
+            IntPtr bitmap = IntPtr.Zero;
+            IntPtr oldBitmap = IntPtr.Zero;
+
             try
             {
-                int size = CAPTURE_SIZE; // 捕获区域大小（像素）
+                int size = CAPTURE_SIZE;
                 int halfSize = size / 2;
                 int magnifiedSize = size * MAGNIFICATION;
 
-                // 使用 Win32 API 捕获屏幕区域
-                IntPtr screenDC = GetDC(IntPtr.Zero);
-                IntPtr memDC = CreateCompatibleDC(screenDC);
-                IntPtr bitmap = CreateCompatibleBitmap(screenDC, size, size);
-                IntPtr oldBitmap = SelectObject(memDC, bitmap);
+                // 1. GDI/Win32 捕获屏幕区域
+                screenDC = GetDC(IntPtr.Zero);
+                memDC = CreateCompatibleDC(screenDC);
+                bitmap = CreateCompatibleBitmap(screenDC, size, size);
+                oldBitmap = SelectObject(memDC, bitmap);
 
                 // 复制屏幕区域到内存位图
                 BitBlt(memDC, 0, 0, size, size, screenDC, centerX - halfSize, centerY - halfSize, SRCCOPY);
 
-                // 创建 WPF WriteableBitmap 用于放大显示
-                var writeableBitmap = new WriteableBitmap(magnifiedSize, magnifiedSize, 96, 96, PixelFormats.Bgr24, null);
-                writeableBitmap.Lock();
-
-                // 读取原始位图数据并放大
+                // 读取原始位图数据
                 byte[] sourceData = new byte[size * size * 3];
                 for (int y = 0; y < size; y++)
                 {
@@ -175,13 +200,13 @@ namespace Quicker.Windows.ToolWindows
                         byte b = (byte)((pixel & 0x00FF0000) >> 16);
 
                         int sourceIndex = (y * size + x) * 3;
-                        sourceData[sourceIndex] = b;
+                        sourceData[sourceIndex] = b; // BGR 格式
                         sourceData[sourceIndex + 1] = g;
                         sourceData[sourceIndex + 2] = r;
                     }
                 }
 
-                // 放大像素（最近邻插值）
+                // 放大像素（最近邻插值），耗时操作
                 byte[] magnifiedData = new byte[magnifiedSize * magnifiedSize * 3];
                 for (int y = 0; y < magnifiedSize; y++)
                 {
@@ -197,23 +222,26 @@ namespace Quicker.Windows.ToolWindows
                     }
                 }
 
-                // 复制放大后的数据到 WriteableBitmap
-                Marshal.Copy(magnifiedData, 0, writeableBitmap.BackBuffer, magnifiedData.Length);
+                // 创建 BitmapSource
+                BitmapSource result = BitmapSource.Create(
+                    magnifiedSize, magnifiedSize,
+                    96, 96, // 默认 DPI
+                    PixelFormats.Bgr24, null,
+                    magnifiedData, magnifiedSize * 3);
 
-                writeableBitmap.AddDirtyRect(new Int32Rect(0, 0, magnifiedSize, magnifiedSize));
-                writeableBitmap.Unlock();
-
-                // 清理资源
-                SelectObject(memDC, oldBitmap);
-                DeleteObject(bitmap);
-                DeleteDC(memDC);
-                ReleaseDC(IntPtr.Zero, screenDC);
-
-                MagnifierImage.Source = writeableBitmap;
+                result.Freeze(); // 冻结 BitmapSource 以使其能够安全地在 UI 线程中使用
+                return result; // 返回结果
             }
             catch
             {
-                // 忽略错误
+                return null;
+            }
+            finally // 清理 GDI 资源
+            {
+                if (oldBitmap != IntPtr.Zero) SelectObject(memDC, oldBitmap);
+                if (bitmap != IntPtr.Zero) DeleteObject(bitmap);
+                if (memDC != IntPtr.Zero) DeleteDC(memDC);
+                if (screenDC != IntPtr.Zero) ReleaseDC(IntPtr.Zero, screenDC);
             }
         }
 
