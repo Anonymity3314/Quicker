@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Quicker.Database.Core;
 using System.ComponentModel;
 using System.Windows.Media;
+using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
 using Quicker.Helpers;
@@ -73,7 +74,7 @@ namespace Quicker.Windows.MainWindows
                 RunasCommandButton,
                 OpenUrlCommandButton,
                 SearchBingCommandButton,
-                SearchBaiduCommandButton,
+                SearchBilibiliCommandButton,
                 SearchGoogleCommandButton
             }; // 按钮列表
 
@@ -91,7 +92,7 @@ namespace Quicker.Windows.MainWindows
         // 当搜索框获得焦点时，如果内容为“开始搜索...”，则清空文本。
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            var tb = sender as TextBox;
+            var tb = (TextBox)sender;
             if (tb != null && tb.Text == "开始搜索...")
             {
                 tb.Text = ""; //清空文本
@@ -102,7 +103,7 @@ namespace Quicker.Windows.MainWindows
         // 当搜索框失去焦点时，如果内容为空，则恢复为初始提示文本和样式
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var tb = sender as TextBox;
+            var tb = (TextBox)sender;
             if (tb != null && string.IsNullOrWhiteSpace(tb.Text))
             {
                 tb.Text = "开始搜索..."; //恢复初始提示文本
@@ -196,7 +197,7 @@ namespace Quicker.Windows.MainWindows
         // 用百度搜索
         private void SearchBaiduCommandButton_Click(object sender, RoutedEventArgs e)
         {
-            actionManager.LaunchDefaultBrowser(SearchBaiduCommandButton_Text.Text); //百度搜索
+            actionManager.LaunchDefaultBrowser(SearchBilibiliCommandButton_Text.Text); //百度搜索
         }
 
         // 用谷歌搜索
@@ -212,8 +213,8 @@ namespace Quicker.Windows.MainWindows
             OpenUrlCommandButton_Text.Text = normalizedUrl;
             OpenUrlCommandButton_Title.Text = normalizedUrl;
             SearchBingCommandButton_Text.Text = $"https://cn.bing.com/search?q={Uri.EscapeDataString(SearchBox.Text ?? "")}";
-            SearchBaiduCommandButton_Text.Text = $"https://www.baidu.com/s?wd={Uri.EscapeDataString(SearchBox.Text ?? "")}";
             SearchGoogleCommandButton_Text.Text = $"https://www.google.com/search?q={Uri.EscapeDataString(SearchBox.Text ?? "")}";
+            SearchBilibiliCommandButton_Text.Text = $"https://search.bilibili.com/all?keyword={Uri.EscapeDataString(SearchBox.Text ?? "")}";
         }
 
         /// <summary>
@@ -331,11 +332,11 @@ namespace Quicker.Windows.MainWindows
         /// <returns> 搜索结果按钮 </returns>
         private Button CreateSearchResultButton(ButtonData data)
         {
-            var grid = new Grid();
+            Grid grid = new();
             grid.Children.Add(CreateImage(data.ImagePath)); // 添加图像
             grid.Children.Add(CreateSearchResultTextBlock(data)); // 添加标题文本块
             grid.Children.Add(CreateTagTextBlock()); // 添加标签文本块
-            var btn = new Button
+            Button btn = new()
             {
                 Style = (Style)FindResource("SearchButtonStyle"),
                 Content = grid,
@@ -388,7 +389,7 @@ namespace Quicker.Windows.MainWindows
         /// <returns> 搜索结果文本块 </returns>
         private TextBlock CreateSearchResultTextBlock(ButtonData data)
         {
-            TextBlock textBlock = new TextBlock()
+            TextBlock textBlock = new()
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
@@ -416,11 +417,10 @@ namespace Quicker.Windows.MainWindows
         }
 
         // 右键菜单
-        private void Button_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Button_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Button btn = (Button)sender;
-            targetButton = btn;
-            var tag = (Tuple<string, ButtonData>)btn.Tag; // 提取表名和按钮数据
+            targetButton = (Button)sender;
+            var tag = (Tuple<string, ButtonData>)targetButton.Tag; // 提取表名和按钮数据
             var data = (ButtonData)tag.Item2; // 按钮数据
             string tableName = tag.Item1; // 表名
             buttonManager.OpenMenu(sender, "OperationMenu", this, tableName); // 使用表名
@@ -455,7 +455,7 @@ namespace Quicker.Windows.MainWindows
         {
             ScrollBar.Visibility = stackPanel.Children.Count > 8 ? Visibility.Visible : Visibility.Collapsed; // 设置滚动条可见性
         }
-        private void Grid_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Grid_MouseLeave(object sender, MouseEventArgs e)
         {
             ScrollBar.Visibility = Visibility.Collapsed; // 设置滚动条可见性
         }

@@ -84,6 +84,9 @@
     <None Remove="Resources\Images\RestartQuicker.png" />
     <None Remove="Resources\Images\RestartQuicker.png" />
     <None Remove="Resources\Images\Search.png" />
+    <None Remove="Resources\Images\SearchBilibili.png" />
+    <None Remove="Resources\Images\SearchBing.png" />
+    <None Remove="Resources\Images\SearchGoogle.png" />
     <None Remove="Resources\Images\SelectLocalImage.png" />
     <None Remove="Resources\Images\SelectLocalImage.png" />
     <None Remove="Resources\Images\SettingImage1.png" />
@@ -124,6 +127,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\Search.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SearchBilibili.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SearchBing.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\SearchGoogle.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="VersionInfo.json">
