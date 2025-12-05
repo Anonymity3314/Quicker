@@ -27,7 +27,11 @@ namespace Quicker.Managers
         /// <param name="toastType"> 消息类型 </param>
         public void Show(string message, ToastType toastType)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null || dispatcher.HasShutdownStarted || isDisposed)
+                return; // 如果 Dispatcher 不可用或已关闭，直接返回
+
+            dispatcher.BeginInvoke(() =>
             {
                 toastWindow = Application.Current.Windows.OfType<ToastWindow>().FirstOrDefault();
                 if (toastWindow == null)
