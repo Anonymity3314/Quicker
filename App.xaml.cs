@@ -404,7 +404,8 @@ namespace Quicker
             bool isMouseOnTestButton = false;
             try
             {
-                this.Dispatcher.Invoke(new Action(() =>
+                // 使用 BeginInvoke 避免阻塞调用线程，如果 UI 线程繁忙则直接返回 false
+                var operation = this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     var mousePosition = System.Windows.Forms.Cursor.Position; // 获取当前鼠标位置
                     var settingWindows = Application.Current.Windows.OfType<SettingWindow>(); // 检查是否有设置窗口打开
@@ -425,7 +426,14 @@ namespace Quicker
                             }
                         }
                     }
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Normal);
+                
+                // 等待操作完成，但设置超时时间避免长时间阻塞
+                if (operation.Status == System.Windows.Threading.DispatcherOperationStatus.Pending)
+                {
+                    // 如果操作还在等待，等待最多 50ms
+                    operation.Wait(TimeSpan.FromMilliseconds(50));
+                }
             }
             catch { }
             return isMouseOnTestButton; // 返回鼠标是否在测试按钮上
@@ -454,12 +462,26 @@ namespace Quicker
             bool ctrlDown = false; // 是否按下Ctrl键
             try
             {
-                this.Dispatcher.Invoke(new Action(() =>
+                // 使用 BeginInvoke 避免阻塞，优先使用 Win32 API 获取 Ctrl 键状态
+                var operation = this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     ctrlDown = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl); // 获取Ctrl键状态
-                }));
+                }), System.Windows.Threading.DispatcherPriority.Normal);
+                
+                // 等待操作完成，但设置超时时间
+                if (operation.Status == System.Windows.Threading.DispatcherOperationStatus.Pending)
+                {
+                    operation.Wait(TimeSpan.FromMilliseconds(30));
+                }
             }
             catch { }
+            
+            // 如果 Dispatcher 操作超时，使用 Win32 API 作为后备方案
+            if (!ctrlDown)
+            {
+                ctrlDown = GetCtrlKeyState();
+            }
+            
             if (!ctrlDown)
             {
                 AppStateManager.KeyPressStartTime = null; // 重置按键按下时间

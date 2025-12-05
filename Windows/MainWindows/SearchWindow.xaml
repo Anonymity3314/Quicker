@@ -56,12 +56,9 @@
         <Border x:Name="SearchBorder" Margin="0.6" Background="White" CornerRadius="5" helpers:ClipHelper.ClipToBounds="True">
             <Grid>
                 <Grid x:Name="SearchBoxGrid" Height="50" VerticalAlignment="Top">
-                    <TextBox x:Name="SearchBox" Text="开始搜索..." ToolTip="请输入关键词进行搜索" Width="700" Height="40" FontSize="28" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0" Foreground="LightGray" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBox x:Name="SearchBox" Text="开始搜索..." ToolTip="请输入关键词进行搜索" Width="700" Height="40" FontSize="28" GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus" KeyDown="SearchBox_KeyDown" TextChanged="SearchBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0" Foreground="LightGray" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBox.Style>
-                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                                <EventSetter Event="GotFocus" Handler="SearchBox_GotFocus"/>
-                                <EventSetter Event="LostFocus" Handler="SearchBox_LostFocus"/>
-                            </Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"/>
                         </TextBox.Style>
                     </TextBox>
                     <Button x:Name="PinToggle" Margin="5" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Top" Background="Transparent" Click="PinToggle_Click" ToolTip="订住：固定位置，不自动隐藏">

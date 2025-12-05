@@ -639,9 +639,10 @@ namespace Quicker.Windows.MainWindows.MainWindow
             iconManager.Dispose(); // 释放图标管理器资源
             buttonManager.Dispose(); // 释放按钮管理器资源
 
-            GC.Collect(); // 强制回收内存
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 再次强制回收内存
+            Task.Run(() =>
+            {
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+            });
         }
 
         /// <summary>

@@ -15,6 +15,7 @@ using Quicker.Helpers;
 using Quicker.Models;
 using System.Windows;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Quicker.Windows.MainWindows
 {
@@ -1107,9 +1108,11 @@ namespace Quicker.Windows.MainWindows
             SceneImage.Source = null; // 清理场景图片
 
             base.OnClosed(e); // 调用基类的 OnClosed 方法
-            GC.Collect(); // 强制垃圾回收
-            GC.WaitForPendingFinalizers(); // 等待垃圾回收完成
-            GC.Collect(); // 再次强制垃圾回收
+
+            Task.Run(() =>
+            {
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+            }); // 在后台线程异步执行垃圾回收
         }
 
         // 清理主列表视图

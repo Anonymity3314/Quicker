@@ -15,6 +15,7 @@ using Microsoft.Win32;
 using Quicker.Helpers;
 using System.Windows;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Quicker.Windows.MainWindows
 {
@@ -72,10 +73,10 @@ namespace Quicker.Windows.MainWindows
             }
             ResultGrid.Children.Clear(); // 清空 ResultGrid 的子元素
 
-            // 强制垃圾回收
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
+            Task.Run(() =>
+            {
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized);
+            }); // 在后台线程异步执行垃圾回收
         }
 
         #endregion

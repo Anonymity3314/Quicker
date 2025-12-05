@@ -460,6 +460,14 @@ namespace Quicker.Windows.MainWindows
             ScrollBar.Visibility = Visibility.Collapsed; // 设置滚动条可见性
         }
 
+        private void SearchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && !string.IsNullOrEmpty(SearchBox.Text)) 
+            {
+                SearchBingCommandButton_Click(null, null); // 执行搜索
+            }
+        }
+
         // 清理资源
         protected override void OnClosing(CancelEventArgs e)
         {
