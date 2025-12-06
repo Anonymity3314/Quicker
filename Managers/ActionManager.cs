@@ -386,21 +386,22 @@ namespace Quicker.Managers
         /// 执行动作
         /// </summary>
         /// <param name="data"> 按钮数据 </param>
+        /// /// <param name="tableName"> 数据库表名 </param>
         public async Task DoActionAsync(ButtonData data, string tableName)
         {
             switch (data.ActionType)
             {
                 case ActionType.OpenFile:
-                    await Task.Run(() => OpenFile(data));
+                    OpenFile(data);
                     break;
                 case ActionType.OpenWebsite:
-                    await Task.Run(() => OpenWebsite(data));
+                    OpenWebsite(data);
                     break;
                 case ActionType.OpenFiles:
-                    await Task.Run(() => OpenFiles(data));
+                    OpenFiles(data);
                     break;
                 case ActionType.OpenUwpApp:
-                    await Task.Run(() => OpenUwpApp(data));
+                    OpenUwpApp(data);
                     break;
                 case ActionType.LoadExtension:
                     LoadExtension(data);
@@ -412,9 +413,17 @@ namespace Quicker.Managers
                     ShowToast($"未知的动作类型：{data.ActionType}", ToastType.Error);
                     break;
             }
-            // 增加动作使用次数
-            var buttonDatabase = new ButtonDatabase();
-            buttonDatabase.IncreaseActionUsedTimes(data.ButtonID, tableName);
+            
+            // 在后台线程异步更新使用次数，避免阻塞 UI
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    using var buttonDatabase = new ButtonDatabase();
+                    buttonDatabase.IncreaseActionUsedTimes(data.ButtonID, tableName);
+                }
+                catch { } // 忽略数据库操作异常，避免影响主流程
+            });
         }
 
         /// <summary>

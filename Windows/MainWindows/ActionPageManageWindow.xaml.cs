@@ -15,7 +15,6 @@ using Quicker.Helpers;
 using Quicker.Models;
 using System.Windows;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace Quicker.Windows.MainWindows
 {

@@ -187,15 +187,25 @@ namespace Quicker.Managers
         public void OpenTargetWindow(string targetWindow)
         {
             Window window = null; // 窗口对象
-            switch (targetWindow)
+            
+            // 优化窗口查找：直接遍历而不是使用 OfType，避免多次枚举
+            try
             {
-                case "SettingWindow":
-                    window = Application.Current.Windows.OfType<SettingWindow>().FirstOrDefault();
-                    break;
-                case "ActionPageManageWindow":
-                    window = Application.Current.Windows.OfType<ActionPageManageWindow>().FirstOrDefault();
-                    break;
+                foreach (Window w in Application.Current.Windows)
+                {
+                    if (targetWindow == "SettingWindow" && w is SettingWindow sw)
+                    {
+                        window = sw;
+                        break;
+                    }
+                    else if (targetWindow == "ActionPageManageWindow" && w is ActionPageManageWindow apmw)
+                    {
+                        window = apmw;
+                        break;
+                    }
+                }
             }
+            catch { } // 忽略枚举异常
 
             if (window != null) // 窗口对象不为空
             {
@@ -207,7 +217,8 @@ namespace Quicker.Managers
             else
             {
                 window = CreateWindow(targetWindow); // 创建窗口对象
-                window.Show(); // 显示窗口
+                if (window != null)
+                    window.Show(); // 显示窗口
             }
             window?.Activate(); // 激活窗口
         }

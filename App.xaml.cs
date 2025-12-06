@@ -276,10 +276,22 @@ namespace Quicker
             var elapsedSeconds = (now - AppStateManager.RecordedTime).TotalSeconds;
             if (elapsedSeconds < 0) elapsedSeconds = 0; // 防御系统时间被回拨
 
-            var convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
-            convention.TotalUsageTime += elapsedSeconds; // 增加实际经过秒数
-            SettingDatabase.SaveTotalUsageTime(convention.TotalUsageTime); // 保存总使用时长到数据库
-            AppStateManager.RecordedTime = now; // 更新记录时间
+            // 在后台线程异步执行数据库操作，避免阻塞 UI 线程
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    var convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
+                    if (convention != null)
+                    {
+                        convention.TotalUsageTime += elapsedSeconds; // 增加实际经过秒数
+                        SettingDatabase.SaveTotalUsageTime(convention.TotalUsageTime); // 保存总使用时长到数据库
+                    }
+                }
+                catch { } // 忽略数据库操作异常，避免影响定时器
+            });
+            
+            AppStateManager.RecordedTime = now; // 更新记录时间（立即更新，不等待数据库操作）
         }
 
         // 初始化钩子
@@ -758,7 +770,8 @@ namespace Quicker
             Task.Run(() =>
             {
                 string windowType = DetermineWindowType() ?? DEFAULT_STYLE;
-                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
+                // 使用 Normal 优先级，确保窗口创建能及时执行
+                this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
                 {
                     AppStateManager.PreLoadMainWindow = new MainWindow(windowType);
                     var settings = AppStateManager.OpenMainWindowConditions;
@@ -775,19 +788,49 @@ namespace Quicker
         // 关闭或显示主窗口
         public void CloseOrShowMainWindow()
         {
-            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
+            // 使用 Normal 优先级，确保窗口操作能及时执行
+            this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
             {
                 if (AppStateManager.PreLoadMainWindow == null) return; // 如果预加载窗口为空，返回
-                var mainWindowList = Application.Current.Windows.OfType<MainWindow>(); // 获取主窗口列表
-                if (mainWindowList.Any(window => window.Visibility == Visibility.Visible)) // 是否有可见窗口
+                
+                // 优化窗口枚举：只检查可见窗口，避免遍历所有窗口
+                bool hasVisibleWindow = false;
+                try
+                {
+                    // 使用更高效的方式检查是否有可见窗口
+                    foreach (Window window in Application.Current.Windows)
+                    {
+                        if (window is MainWindow mainWindow && mainWindow.Visibility == Visibility.Visible)
+                        {
+                            hasVisibleWindow = true;
+                            if (!AppStateManager.MainWindowPinned) // 如果是暂停状态，关闭所有主窗口
+                            {
+                                // 收集需要关闭的窗口，避免在枚举时修改集合
+                                var windowsToClose = new List<MainWindow>();
+                                foreach (Window w in Application.Current.Windows)
+                                {
+                                    if (w is MainWindow mw && mw.Visibility == Visibility.Visible)
+                                        windowsToClose.Add(mw);
+                                }
+                                foreach (var w in windowsToClose)
+                                {
+                                    try { w.Close(); } catch { }
+                                }
+                            }
+                            break; // 找到可见窗口后立即退出
+                        }
+                    }
+                }
+                catch { } // 忽略枚举异常
+                
+                if (hasVisibleWindow)
                 {
                     AppStateManager.PreLoadMainWindow.Close(); // 有可见窗口且处于固定状态，关闭预加载窗口
-                    if (!AppStateManager.MainWindowPinned) // 如果是暂停状态，关闭所有主窗口
-                        foreach (var window in mainWindowList)
-                            window.Close(); // 关闭其他窗口
                 }
                 else // 否则显示预加载窗口
+                {
                     AppStateManager.PreLoadMainWindow.Visibility = Visibility.Visible;
+                }
                 AppStateManager.PreLoadMainWindow = null; // 清空预加载窗口
             }));
         }
@@ -850,9 +893,9 @@ namespace Quicker
                 {
                     processFilePath = process.MainModule.FileName; // 获取进程文件路径
                 }
-                catch
+                catch // 无法访问主模块则保持默认结果
                 {
-                    // 无法访问主模块则保持默认结果
+                    return result;
                 }
 
                 if (!string.IsNullOrEmpty(processFilePath))
@@ -860,28 +903,38 @@ namespace Quicker
                     string processFileName = Path.GetFileNameWithoutExtension(processFilePath).ToLower(); // 获取进程文件名（不含后缀）
                     try
                     {
-                        var db = new ActionPageDatabase();
-                        if (db.SceneExists(processFileName))
+                        // 使用超时任务避免数据库操作阻塞过久
+                        var dbTask = Task.Run(() =>
                         {
-                            var scene = db.GetSceneData(processFileName);
-                            if (scene != null)
+                            try
                             {
-                                if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase) && scene.SceneCount > 0)
+                                var db = new ActionPageDatabase();
+                                if (db.SceneExists(processFileName))
                                 {
-                                    result = processFileName;
+                                    var scene = db.GetSceneData(processFileName);
+                                    if (scene != null)
+                                    {
+                                        if (string.Equals(scene.SceneProcess, processFilePath, StringComparison.OrdinalIgnoreCase) && scene.SceneCount > 0)
+                                        {
+                                            return processFileName;
+                                        }
+                                    }
                                 }
                             }
+                            catch { }
+                            return string.Empty;
+                        });
+
+                        // 等待最多 500ms，超时则返回默认结果
+                        if (dbTask.Wait(TimeSpan.FromMilliseconds(500)))
+                        {
+                            result = dbTask.Result;
                         }
                     }
-                    catch { }
+                    catch { } // 忽略超时或其他异常
                 }
             }
-            catch
-            {
-                // 包含：Win32Exception(拒绝访问)、ArgumentException(进程不存在)、InvalidOperationException 等
-                // 任意异常均保持默认结果
-            }
-
+            catch { } // 忽略所有异常
             return result;
         }
 
@@ -951,12 +1004,29 @@ namespace Quicker
         // 退出应用释放资源
         protected override void OnExit(ExitEventArgs e)
         {
-            double currentSessionTime = (DateTime.Now - AppStateManager.RecordedTime).TotalSeconds; // 计算本次会话时间
-            var Convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
-            Convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
-            SettingDatabase.SaveTotalUsageTime(Convention.TotalUsageTime); // 保存总使用时间
+            // 先释放关键资源，避免阻塞退出流程
             DisposeTaskbarIcon(); // 释放托盘图标绑定
             DisposeHook(); // 释放钩子绑定
+            
+            // 在后台线程异步保存使用时间，不阻塞退出流程
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    double currentSessionTime = (DateTime.Now - AppStateManager.RecordedTime).TotalSeconds; // 计算本次会话时间
+                    if (currentSessionTime > 0)
+                    {
+                        var convention = SettingDatabase.GetAllConventions().FirstOrDefault(); // 获取设置
+                        if (convention != null)
+                        {
+                            convention.TotalUsageTime += currentSessionTime; // 增加本次会话时间
+                            SettingDatabase.SaveTotalUsageTime(convention.TotalUsageTime); // 保存总使用时间
+                        }
+                    }
+                }
+                catch { } // 忽略数据库操作异常，确保程序能正常退出
+            });
+            
             AppStateManager.Dispose(); // 释放所有资源
             SingleInstanceManager.ReleaseMutex(); // 释放互斥锁
             base.OnExit(e); // 调用基类的 OnExit 方法
