@@ -19,7 +19,7 @@
     Closed="ImageCropWindow_Closed"
 >
     <Canvas>
-        <Grid x:Name="ImageGrid" Canvas.Left="10" Canvas.Top="10" Width="600" Height="450" Background="{Binding Tag, ElementName=BorderColorButton}">
+        <Grid x:Name="ImageGrid" Canvas.Left="10" Canvas.Top="10" Width="600" Height="450" Background="{Binding Tag, ElementName=BackgroundColorButton}">
             <Image x:Name="CropImage" Stretch="Uniform"/>
             <Rectangle x:Name="MaskRect" Fill="Black" Opacity="0.5" Height="{Binding ActualHeight, ElementName=ImageGrid}" Width="{Binding ActualWidth, ElementName=ImageGrid}"/>
         </Grid>
@@ -27,69 +27,21 @@
             <!-- 调整锚点 -->
             <Grid>
                 <!-- 左上角 -->
-                <Rectangle x:Name="ResizeHandleTopLeft" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-4,-4,0,0"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeNWSE" Tag="TopLeft"/>
+                <Rectangle x:Name="ResizeHandleTopLeft" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-4,-4,0,0" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeNWSE" Tag="TopLeft"/>
                 <!-- 右上角 -->
-                <Rectangle x:Name="ResizeHandleTopRight" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-4,0"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeNESW" Tag="TopRight"/>
+                <Rectangle x:Name="ResizeHandleTopRight" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-4,0" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeNESW" Tag="TopRight"/>
                 <!-- 左下角 -->
-                <Rectangle x:Name="ResizeHandleBottomLeft" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-4,0,0,-4"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeNESW" Tag="BottomLeft"/>
+                <Rectangle x:Name="ResizeHandleBottomLeft" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="-4,0,0,-4" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeNESW" Tag="BottomLeft"/>
                 <!-- 右下角 -->
-                <Rectangle x:Name="ResizeHandleBottomRight" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-4,-4"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeNWSE" Tag="BottomRight"/>
+                <Rectangle x:Name="ResizeHandleBottomRight" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-4,-4" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeNWSE" Tag="BottomRight"/>
                 <!-- 上边中点 -->
-                <Rectangle x:Name="ResizeHandleTop" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-4,0,0"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeNS" Tag="Top"/>
+                <Rectangle x:Name="ResizeHandleTop" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-4,0,0" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeNS" Tag="Top"/>
                 <!-- 下边中点 -->
-                <Rectangle x:Name="ResizeHandleBottom" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-4"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeNS" Tag="Bottom"/>
+                <Rectangle x:Name="ResizeHandleBottom" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-4" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeNS" Tag="Bottom"/>
                 <!-- 左边中点 -->
-                <Rectangle x:Name="ResizeHandleLeft" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-4,0,0,0"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeWE" Tag="Left"/>
+                <Rectangle x:Name="ResizeHandleLeft" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-4,0,0,0" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeWE" Tag="Left"/>
                 <!-- 右边中点 -->
-                <Rectangle x:Name="ResizeHandleRight" Width="8" Height="8"
-                    Fill="{Binding Tag, ElementName=HandleColorButton}"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,-4,0"
-                    MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown"
-                    MouseMove="ResizeHandle_MouseMove"
-                    MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp"
-                    Cursor="SizeWE" Tag="Right"/>
+                <Rectangle x:Name="ResizeHandleRight" Width="8" Height="8" Fill="{Binding Tag, ElementName=HandleColorButton}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,-4,0" MouseLeftButtonDown="ResizeHandle_MouseLeftButtonDown" MouseMove="ResizeHandle_MouseMove" MouseLeftButtonUp="ResizeHandle_MouseLeftButtonUp" Cursor="SizeWE" Tag="Right"/>
             </Grid>
         </Border>
         <!-- 按钮 -->
@@ -114,18 +66,27 @@
         <Button Content="更改图片" Style="{StaticResource WhiteButton}" Canvas.Left="655" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top" Width="108" Click="ChangeImageButton_Click"/>
         <!-- 颜色选择器 -->
         <Button x:Name="BackgroundColorButton" Canvas.Left="655" Canvas.Top="240" Width="108" Style="{StaticResource WhiteButton}" Click="ColorButton_Click">
+            <Button.Tag>
+                <SolidColorBrush Color="Black"/>
+            </Button.Tag>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Border Width="20" Height="20" CornerRadius="3" Background="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" BorderBrush="LightGray" BorderThickness="1" Margin="0,0,6,0"/>
                 <TextBlock Text="更改背景色" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
         <Button x:Name="BorderColorButton" Canvas.Left="655" Canvas.Top="270" Width="108" Style="{StaticResource WhiteButton}" Click="ColorButton_Click">
+            <Button.Tag>
+                <SolidColorBrush Color="White"/>
+            </Button.Tag>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Border Width="20" Height="20" CornerRadius="3" Background="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" BorderBrush="LightGray" BorderThickness="1" Margin="0,0,6,0"/>
                 <TextBlock Text="更改边框色" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
         <Button x:Name="HandleColorButton" Canvas.Left="655" Canvas.Top="300" Width="108" Style="{StaticResource WhiteButton}" Click="ColorButton_Click">
+            <Button.Tag>
+                <SolidColorBrush Color="White"/>
+            </Button.Tag>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Border Width="20" Height="20" CornerRadius="3" Background="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" BorderBrush="LightGray" BorderThickness="1" Margin="0,0,6,0"/>
                 <TextBlock Text="更改锚点色" VerticalAlignment="Center"/>

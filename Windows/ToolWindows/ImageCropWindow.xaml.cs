@@ -48,9 +48,10 @@ namespace Quicker.Windows.ToolWindows
         private Button _currentColorButton; // 当前正在选择颜色的按钮。
 
         // ================== 其它常量 ==================
+        private const double MinCropSize = 50; // 裁剪框最小尺寸。
         private const double ScaleStep = 0.1; // 图片缩放步长。
-        private const double MinScale = 0.1; // 图片最小缩放比例。
         private const double MaxScale = 10.0; // 图片最大缩放比例。
+        private const double MinScale = 0.1; // 图片最小缩放比例。
 
         /// <summary>
         /// 裁剪完成时调用的方法，触发 CropCompleted 事件并关闭窗口。
@@ -108,11 +109,8 @@ namespace Quicker.Windows.ToolWindows
         /// </summary>
         private void InitColorButtonsAndControls()
         {
-            BackgroundColorButton.Tag = new SolidColorBrush(Colors.Black);
-            BorderColorButton.Tag = new SolidColorBrush(Colors.White);
-            HandleColorButton.Tag = new SolidColorBrush(Colors.White);
-            ImageGrid.Background = BackgroundColorButton.Tag as SolidColorBrush;
-            CropBorder.BorderBrush = BorderColorButton.Tag as SolidColorBrush;
+            var handleBrush = HandleColorButton.Tag as SolidColorBrush; // 获取锚点颜色
+            UpdateAllResizeHandles(handleBrush); // 初始化锚点颜色
         }
 
         // 监听键盘方向键，微调裁剪框位置
@@ -142,15 +140,12 @@ namespace Quicker.Windows.ToolWindows
 
         private void CropBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.OriginalSource is Rectangle) // 如果鼠标点击的是调整手柄，不处理拖动
-                return;
-
+            if (e.OriginalSource is Rectangle) return; // 如果鼠标点击的是调整手柄，不处理拖动
             isDragging = true;
             // 记录鼠标在Border内的偏移
             mouseOffset = e.GetPosition(CropBorder);
             CropBorder.CaptureMouse();
-            // 拖动时隐藏调整手柄
-            HideResizeHandles();
+            HideResizeHandles(); // 拖动时隐藏调整手柄
         }
 
         // 更新蒙版
@@ -197,9 +192,7 @@ namespace Quicker.Windows.ToolWindows
         // 移动鼠标时，更新CropBorder的位置
         private void CropBorder_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isResizing) // 如果正在调整大小，不处理拖动
-                return;
-
+            if (isResizing) return; // 如果正在调整大小，不处理拖动
             if (isDragging)
             {
                 // 获取Grid在Canvas中的位置
@@ -229,8 +222,7 @@ namespace Quicker.Windows.ToolWindows
         {
             isDragging = false;
             CropBorder.ReleaseMouseCapture();
-            // 拖动结束后显示调整手柄
-            ShowResizeHandles();
+            ShowResizeHandles(); // 拖动结束后显示调整手柄
             UpdateMask();
         }
 
@@ -286,42 +278,42 @@ namespace Quicker.Windows.ToolWindows
             switch (resizeHandle)
             {
                 case "TopLeft":
-                    newWidth = Math.Max(50, resizeStartWidth - deltaX); // 最小宽度50
-                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
-                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth); // 根据水平移动距离计算新的左边距
-                    newTop = resizeStartTop + (resizeStartHeight - newHeight); // 根据垂直移动距离计算新的上边距
+                    newWidth = Math.Max(MinCropSize, resizeStartWidth - deltaX);
+                    newHeight = newWidth / aspectRatio;
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
                     break;
                 case "TopRight":
-                    newWidth = Math.Max(50, resizeStartWidth + deltaX); // 最小宽度50
-                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
-                    newTop = resizeStartTop + (resizeStartHeight - newHeight); // 根据垂直移动距离计算新的上边距
+                    newWidth = Math.Max(MinCropSize, resizeStartWidth + deltaX);
+                    newHeight = newWidth / aspectRatio;
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
                     break;
                 case "BottomLeft":
-                    newWidth = Math.Max(50, resizeStartWidth - deltaX); // 最小宽度50
-                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
-                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth); // 根据水平移动距离计算新的左边距
+                    newWidth = Math.Max(MinCropSize, resizeStartWidth - deltaX);
+                    newHeight = newWidth / aspectRatio;
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
                     break;
                 case "BottomRight":
-                    newWidth = Math.Max(50, resizeStartWidth + deltaX); // 最小宽度50
-                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
+                    newWidth = Math.Max(MinCropSize, resizeStartWidth + deltaX);
+                    newHeight = newWidth / aspectRatio;
                     break;
                 case "Top":
-                    newHeight = Math.Max(50, resizeStartHeight - deltaY); // 最小高度50
-                    newWidth = newHeight * aspectRatio; // 根据宽高比计算宽度
-                    newTop = resizeStartTop + (resizeStartHeight - newHeight); // 根据垂直移动距离计算新的上边距
+                    newHeight = Math.Max(MinCropSize, resizeStartHeight - deltaY);
+                    newWidth = newHeight * aspectRatio;
+                    newTop = resizeStartTop + (resizeStartHeight - newHeight);
                     break;
                 case "Bottom":
-                    newHeight = Math.Max(50, resizeStartHeight + deltaY); // 最小高度50
-                    newWidth = newHeight * aspectRatio; // 根据宽高比计算宽度
+                    newHeight = Math.Max(MinCropSize, resizeStartHeight + deltaY);
+                    newWidth = newHeight * aspectRatio;
                     break;
                 case "Left":
-                    newWidth = Math.Max(50, resizeStartWidth - deltaX); // 最小宽度50
-                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
-                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth); // 根据水平移动距离计算新的左边距
+                    newWidth = Math.Max(MinCropSize, resizeStartWidth - deltaX);
+                    newHeight = newWidth / aspectRatio;
+                    newLeft = resizeStartLeft + (resizeStartWidth - newWidth);
                     break;
                 case "Right":
-                    newWidth = Math.Max(50, resizeStartWidth + deltaX); // 最小宽度50
-                    newHeight = newWidth / aspectRatio; // 根据宽高比计算高度
+                    newWidth = Math.Max(MinCropSize, resizeStartWidth + deltaX);
+                    newHeight = newWidth / aspectRatio;
                     break;
             }
         }
@@ -362,14 +354,14 @@ namespace Quicker.Windows.ToolWindows
                 newWidth = newHeight * aspectRatio;
             }
 
-            if (newWidth < 50) // 最小尺寸
+            if (newWidth < MinCropSize)
             {
-                newWidth = 50;
+                newWidth = MinCropSize;
                 newHeight = newWidth / aspectRatio;
             }
-            if (newHeight < 50)
+            if (newHeight < MinCropSize)
             {
-                newHeight = 50;
+                newHeight = MinCropSize;
                 newWidth = newHeight * aspectRatio;
             }
         }
@@ -401,33 +393,48 @@ namespace Quicker.Windows.ToolWindows
             UpdateMask();
         }
 
+        /// <summary>
+        /// 获取所有调整手柄的集合
+        /// </summary>
+        private Rectangle[] GetAllResizeHandles()
+        {
+            return new[]
+            {
+                ResizeHandleTopLeft,
+                ResizeHandleTopRight,
+                ResizeHandleBottomLeft,
+                ResizeHandleBottomRight,
+                ResizeHandleTop,
+                ResizeHandleBottom,
+                ResizeHandleLeft,
+                ResizeHandleRight
+            };
+        }
+
+        /// <summary>
+        /// 更新所有调整手柄的填充颜色
+        /// </summary>
+        /// <param name="brush">要应用的画刷</param>
+        private void UpdateAllResizeHandles(Brush brush)
+        {
+            foreach (var handle in GetAllResizeHandles())
+            {
+                handle.Fill = brush;
+            }
+        }
+
         // 隐藏所有调整手柄
         private void HideResizeHandles()
         {
-            ResizeHandleTopLeft.Fill = Brushes.Transparent;
-            ResizeHandleTopRight.Fill = Brushes.Transparent;
-            ResizeHandleBottomLeft.Fill = Brushes.Transparent;
-            ResizeHandleBottomRight.Fill = Brushes.Transparent;
-            ResizeHandleTop.Fill = Brushes.Transparent;
-            ResizeHandleBottom.Fill = Brushes.Transparent;
-            ResizeHandleLeft.Fill = Brushes.Transparent;
-            ResizeHandleRight.Fill = Brushes.Transparent;
+            UpdateAllResizeHandles(Brushes.Transparent);
         }
 
         // 显示所有调整手柄
         private void ShowResizeHandles()
         {
-            ResizeHandleTopLeft.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleTopRight.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleBottomLeft.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleBottomRight.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleTop.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleBottom.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleLeft.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
-            ResizeHandleRight.Fill = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            var brush = HandleColorButton.Tag as SolidColorBrush ?? new SolidColorBrush(Colors.Red);
+            UpdateAllResizeHandles(brush);
         }
-
-        private TransformedBitmap _currentTransformedBitmap; // 当前变换后的图片
 
         // 顺时针旋转90°
         private void RotateRightButton_Click(object sender, RoutedEventArgs e)
@@ -573,20 +580,9 @@ namespace Quicker.Windows.ToolWindows
         /// <returns>实际保存路径，失败返回 null </returns>
         private string SaveCroppedImageWithFallback(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath, string originalFilePath)
         {
-            // 尝试GIF动图裁剪
-            if (TrySaveGifAnimation(originalFilePath, cropRect, dir, filePath, out string gifPath))
-            {
-                return gifPath;
-            }
-
-            // 尝试PNG保存
-            if (TrySaveAsPng(bitmapSource, cropRect, dir, filePath))
-            {
-                return filePath;
-            }
-
-            // PNG保存失败，尝试用原格式保存
-            return TrySaveAsOriginalFormat(bitmapSource, cropRect, dir, filePath, originalFilePath);
+            if (TrySaveGifAnimation(originalFilePath, cropRect, dir, filePath, out string gifPath)) return gifPath; // 尝试GIF动图裁剪
+            if (TrySaveAsPng(bitmapSource, cropRect, dir, filePath)) return filePath; // 尝试PNG保存
+            return TrySaveAsOriginalFormat(bitmapSource, cropRect, dir, filePath, originalFilePath); // PNG保存失败，尝试用原格式保存
         }
 
         /// <summary>
@@ -601,10 +597,7 @@ namespace Quicker.Windows.ToolWindows
         private bool TrySaveGifAnimation(string originalFilePath, Int32Rect cropRect, string dir, string filePath, out string gifPath)
         {
             gifPath = null;
-            
-            // 检查是否为GIF动图
-            if (!IsGifFile(originalFilePath))
-                return false;
+            if (!IsGifFile(originalFilePath)) return false; // 检查是否为GIF动图
 
             // 尝试GIF动图裁剪
             string gifTargetPath = Path.ChangeExtension(filePath, ".gif");
@@ -874,40 +867,14 @@ namespace Quicker.Windows.ToolWindows
         }
 
         /// <summary>
-        /// 保存裁剪后的图片到指定路径
-        /// </summary>
-        /// <param name="bitmapSource">原始图片源</param>
-        /// <param name="cropRect">裁剪区域</param>
-        /// <param name="dir">保存目录</param>
-        /// <param name="filePath">保存路径</param>
-        /// <returns>保存成功返回 true，否则 false</returns>
-        private bool SaveCroppedImage(BitmapSource bitmapSource, Int32Rect cropRect, string dir, string filePath)
-        {
-            var cropped = new CroppedBitmap(bitmapSource, cropRect);
-
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(cropped));
-                encoder.Save(fileStream);
-            }
-            return true;
-        }
-
-        /// <summary>
         /// 显示消息提示
         /// </summary>
         /// <param name="message">消息内容</param>
         /// <param name="type">消息类型</param>
         private void ShowToast(string message, ToastType type)
         {
-            using (var toast = new ToastManager())
-            {
-                toast.Show(message, type);
-            }
+            using var toast = new ToastManager();
+            toast.Show(message, type);
         }
 
         // 点击按钮关闭窗口
@@ -940,6 +907,11 @@ namespace Quicker.Windows.ToolWindows
                 ImageGrid.Background = newBrush;
             else if (_currentColorButton == BorderColorButton)
                 CropBorder.BorderBrush = newBrush;
+            else if (_currentColorButton == HandleColorButton)
+            {
+                // 直接更新所有锚点的Fill属性，因为Tag不是依赖属性，绑定不会自动更新
+                UpdateAllResizeHandles(newBrush);
+            }
         }
 
         // 关闭窗口释放资源
