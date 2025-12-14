@@ -1,4 +1,4 @@
-﻿using Quicker.Windows.MainWindows.MainWindow;
+using Quicker.Windows.MainWindows.MainWindow;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Quicker.Database.Core;
@@ -55,30 +55,45 @@ namespace Quicker.Managers
             try
             {
                 string fileDirectory = Path.GetDirectoryName(data.Location); // 获取文件所在的目录
-                var startInfo = new ProcessStartInfo
+
+                // 对于快捷方式文件，使用 ShellExecute API 来确保正确打开
+                // 这样可以正确处理系统快捷方式（如控制面板、管理工具等）
+                string operation = data.Data1 == "True" ? "runas" : "open"; // 如果 Data1 为 True，使用管理员权限
+                int nShowCmd = int.TryParse(data.Data3, out int windowStyle) ? windowStyle switch
                 {
-                    UseShellExecute = data.Data1 == "True", // 是否使用系统默认方式运行
-                    Verb = data.Data1 == "True" ? "runas" : null, // 管理员权限运行
-                    WorkingDirectory = fileDirectory ?? AppPathHelper.TempDataFolder, // 设置工作目录为文件所在的目录，如果获取失败则使用临时目录
-                    WindowStyle = int.Parse(data.Data3) switch
+                    0 => 1, // SW_SHOWNORMAL - 正常窗口
+                    1 => 7, // SW_MINIMIZE - 最小化窗口
+                    2 => 3, // SW_MAXIMIZE - 最大化窗口
+                    _ => 1  // 默认正常窗口
+                } : 1; // 默认正常窗口
+
+                IntPtr result = ShellExecute(IntPtr.Zero, operation, data.Location, null, fileDirectory ?? AppPathHelper.TempDataFolder, nShowCmd);
+
+                // ShellExecute 返回值大于 32 表示成功
+                if ((int)result <= 32)
+                {
+                    // 如果 ShellExecute 失败，尝试使用 Process.Start 作为备用方案
+                    var startInfo = new ProcessStartInfo
                     {
-                        0 => ProcessWindowStyle.Normal, // 正常窗口
-                        1 => ProcessWindowStyle.Minimized, // 最小化窗口
-                        2 => ProcessWindowStyle.Maximized, // 最大化窗口
-                        _ => ProcessWindowStyle.Normal // 默认正常窗口
+                        FileName = data.Location,
+                        UseShellExecute = true, // 对于快捷方式，必须使用 ShellExecute
+                        WorkingDirectory = fileDirectory ?? AppPathHelper.TempDataFolder,
+                        WindowStyle = int.TryParse(data.Data3, out int style) ? style switch
+                        {
+                            0 => ProcessWindowStyle.Normal,
+                            1 => ProcessWindowStyle.Minimized,
+                            2 => ProcessWindowStyle.Maximized,
+                            _ => ProcessWindowStyle.Normal
+                        } : ProcessWindowStyle.Normal
+                    };
+
+                    if (data.Data1 == "True")
+                    {
+                        startInfo.Verb = "runas"; // 管理员权限运行
                     }
-                }; // 创建进程启动信息
 
-                if (data.Data1 == "True") // 如果使用系统默认方式运行
-                {
-                    startInfo.FileName = data.Location; // 设置文件路径
+                    Process.Start(startInfo);
                 }
-                else // 否则使用管理员权限运行
-                {
-                    startInfo.FileName = data.Location; // 设置文件路径
-                }
-
-                Process.Start(startInfo); // 启动进程
             }
             catch (Exception ex)
             {
@@ -413,7 +428,7 @@ namespace Quicker.Managers
                     ShowToast($"未知的动作类型：{data.ActionType}", ToastType.Error);
                     break;
             }
-            
+
             // 在后台线程异步更新使用次数，避免阻塞 UI
             _ = Task.Run(() =>
             {
