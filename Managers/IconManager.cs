@@ -165,16 +165,36 @@ namespace Quicker.Managers
         private static ImageSource GetSystemShortcutIcon(string linkFilePath)
         {
             if (string.IsNullOrEmpty(linkFilePath) || !File.Exists(linkFilePath)) return null;
-            
             try
             {
+                // 优先使用系统图标列表方法，可以获取不带叠加图标的图标
+                ImageSource iconFromList = GetIconFromImageList(linkFilePath);
+                if (iconFromList != null)
+                    return iconFromList;
+
+                // 如果系统图标列表方法失败，尝试从目标路径获取
                 string targetPath = GetTargetPathFromLinkFile(linkFilePath);
                 if (string.IsNullOrEmpty(targetPath)) return null;
 
                 // 检查目标路径是否有效（系统文件夹路径、文件或目录）
                 if (!IsSystemFolderPath(targetPath) && !File.Exists(targetPath) && !Directory.Exists(targetPath))
                     return null;
-                return GetIconFromPath(targetPath); // 使用统一的方法获取图标
+
+                // 对于目标路径，也使用系统图标列表方法（不带叠加图标）
+                // 如果目标路径是文件，从文件本身获取；如果是CLSID路径，直接获取
+                if (IsSystemFolderPath(targetPath))
+                {
+                    return GetIconFromPath(targetPath); // CLSID路径直接使用GetIconFromPath
+                }
+                else
+                {
+                    // 普通文件路径，使用系统图标列表方法获取不带叠加图标的图标
+                    ImageSource targetIcon = GetIconFromImageList(targetPath);
+                    if (targetIcon != null)
+                        return targetIcon;
+
+                    return GetIconFromPath(targetPath); // 如果系统图标列表方法失败，回退到标准方法
+                }
             }
             catch
             {
@@ -228,15 +248,13 @@ namespace Quicker.Managers
         public static ImageSource GetIcon(string filePath)
         {
             bool isLinkFile = Path.GetExtension(filePath).Equals(".lnk", StringComparison.OrdinalIgnoreCase);
-            
-            // 如果是操作系统快捷方式，优先使用专门的方法
-            if (isLinkFile && IsSystemShortcut(filePath))
+            if (isLinkFile && IsSystemShortcut(filePath)) // 如果是操作系统快捷方式，优先使用专门的方法
             {
                 ImageSource systemIcon = GetSystemShortcutIcon(filePath);
                 if (systemIcon != null)
                     return systemIcon;
             }
-            
+
             // 如果是快捷方式，尝试获取目标路径的图标
             if (isLinkFile)
             {
@@ -250,25 +268,22 @@ namespace Quicker.Managers
                 if (iconFromList != null)
                     return iconFromList;
 
-                // 系统图标列表方法失败，使用标准方法（快捷方式且无有效目标）
-                return GetIconWithStandardMethod(filePath, isLinkFile, hasValidTarget);
+                return GetIconWithStandardMethod(filePath, isLinkFile, hasValidTarget); // 系统图标列表方法失败，使用标准方法（快捷方式且无有效目标）
             }
-
-            // 对于普通文件，使用标准方法
-            return GetIconWithStandardMethod(filePath, isLinkFile, false);
+            return GetIconWithStandardMethod(filePath, isLinkFile, false); // 对于普通文件，使用标准方法
         }
 
         /// <summary>
         /// 从系统图标列表中获取图标（不带叠加图标）
         /// </summary>
-        /// <param name="linkFilePath">快捷方式文件路径</param>
+        /// <param name="filePath">文件或文件夹路径（可以是快捷方式、普通文件或CLSID路径）</param>
         /// <returns>图标对象 (ImageSource)，如果失败则返回 null</returns>
-        private static ImageSource GetIconFromImageList(string linkFilePath)
+        private static ImageSource GetIconFromImageList(string filePath)
         {
             SHFILEINFO shfi = new();
             uint flags = SHGFI_SYSICONINDEX | SHGFI_LARGEICON;
             IntPtr hImageList = SHGetFileInfo(
-                linkFilePath,
+                filePath,
                 FILE_ATTRIBUTE_NORMAL,
                 out shfi,
                 (uint)Marshal.SizeOf(shfi),
