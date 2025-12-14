@@ -1,4 +1,4 @@
-﻿using Image = System.Windows.Controls.Image;
+using Image = System.Windows.Controls.Image;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Animation;
 using System.Security.Cryptography;
@@ -6,8 +6,10 @@ using System.Windows.Media.Imaging;
 using Quicker.Windows.ToolWindows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using File = System.IO.File;
 using Quicker.Windows.Menus;
 using System.Windows.Media;
+using IWshRuntimeLibrary;
 using Quicker.Database;
 using System.Net.Http;
 using Quicker.Helpers;
@@ -65,6 +67,78 @@ namespace Quicker.Managers
         private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080; // 文件属性
         private const uint SHGFI_LARGEICON = 0x000000000; // 大图标
         private const uint SHGFI_ICON = 0x000000100; // 获取图标
+
+        // 快捷方式解析相关
+        private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
+
+        // 操作Windows快捷方式(.lnk文件)
+        [ComImport]
+        [Guid("0000010c-0000-0000-C000-000000000046")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IShellLink
+        {
+            // 获取快捷方式的目标路径
+            void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, out int pFlags, int fResolve);
+            // 获取快捷方式的ID列表
+            void GetIDList(out IntPtr ppidl);
+            // 设置快捷方式的ID列表
+            void SetIDList(IntPtr pidl);
+            // 获取快捷方式的描述
+            void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
+            // 设置快捷方式的描述
+            void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+            // 获取快捷方式的工作目录
+            void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
+            // 设置快捷方式的工作目录
+            void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+            // 获取快捷方式的参数
+            void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
+            // 设置快捷方式的参数
+            void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+            // 获取快捷方式的热键
+            void GetHotkey(out short pwHotkey);
+            // 设置快捷方式的热键
+            void SetHotkey(short wHotkey);
+            // 获取快捷方式的显示命令
+            void GetShowCmd(out int piShowCmd);
+            // 设置快捷方式的显示命令
+            void SetShowCmd(int iShowCmd);
+            // 获取快捷方式的图标位置
+            void GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
+            // 设置快捷方式的图标位置
+            void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
+            // 设置快捷方式的相对路径
+            void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
+            // 解析快捷方式
+            void Resolve(IntPtr hwnd, int fFlags);
+            // 设置快捷方式的路径
+            void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
+        }
+
+        // IPersistFile 接口，用于加载快捷方式文件
+        [ComImport]
+        [Guid("0000010b-0000-0000-C000-000000000046")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        private interface IPersistFile
+        {
+            void GetClassID(out Guid pClassID);
+            [PreserveSig]
+            int IsDirty();
+            [PreserveSig]
+            int Load([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, uint dwMode);
+            [PreserveSig]
+            int Save([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, [MarshalAs(UnmanagedType.Bool)] bool fRemember);
+            [PreserveSig]
+            int SaveCompleted([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName);
+            [PreserveSig]
+            int GetCurFile([In, MarshalAs(UnmanagedType.LPWStr)] string ppszFileName);
+        }
+
+        // 操作快捷方式
+        [ComImport]
+        [Guid("00021401-0000-0000-C000-000000000046")]
+        [ClassInterface(ClassInterfaceType.None)]
+        private class ShellLink { }
         #endregion
 
         /// <summary>
@@ -87,13 +161,64 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 从快捷方式文件中获取目标路径
+        /// </summary>
+        /// <param name="linkFilePath">快捷方式文件路径</param>
+        /// <returns>目标路径，如果解析失败则返回 null</returns>
+        private static string GetTargetPathFromLinkFile(string linkFilePath)
+        {
+            if (string.IsNullOrEmpty(linkFilePath) || !File.Exists(linkFilePath)) return null; // 文件不存在，返回 null
+            IWshShortcut shortcut = null;
+            WshShell shell = null;
+            try
+            {
+                // 使用 Windows Script Host 的 COM 对象，更安全可靠
+                shell = new WshShell();
+                shortcut = (IWshShortcut)shell.CreateShortcut(linkFilePath);
+                string targetPath = shortcut.TargetPath;
+                if (string.IsNullOrEmpty(targetPath)) return null; // 检查路径是否有效
+                return targetPath; // 返回目标路径
+            }
+            catch (Exception) // 解析失败返回 null
+            {
+                return null;
+            }
+            finally // 释放 COM 对象
+            {
+                if (shortcut != null) Marshal.ReleaseComObject(shortcut);
+                if (shell != null) Marshal.ReleaseComObject(shell);
+            }
+        }
+
+        /// <summary>
+        /// 检查路径是否为系统文件夹路径（CLSID 路径）
+        /// </summary>
+        /// <param name="path">要检查的路径</param>
+        /// <returns>如果是系统文件夹路径则返回 true</returns>
+        private static bool IsSystemFolderPath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return false;
+            // 系统文件夹路径通常以 "::" 开头，例如 "::{645FF040-5081-101B-9F08-00AA002F954E}"（回收站）
+            return path.StartsWith("::", StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// 从指定路径的文件中提取图标，并确保移除压缩标记等叠加图标。
+        /// 如果是 .lnk 文件，将提取目标文件的图标（不带快捷方式标识）。
         /// </summary>
         /// <param name="filePath">文件路径。</param>
-        /// <param name="smallIcon">是否获取小图标 (16x16)，否则获取大图标 (32x32)。</param>
         /// <returns>文件的图标对象 (ImageSource)，如果失败则返回 null。</returns>
         public static ImageSource GetIcon(string filePath)
         {
+            if (Path.GetExtension(filePath).Equals(".lnk", StringComparison.OrdinalIgnoreCase)) // 如果是快捷方式文件，尝试获取目标路径
+            {
+                string targetPath = GetTargetPathFromLinkFile(filePath);
+                if (!string.IsNullOrEmpty(targetPath) && (File.Exists(targetPath) || Directory.Exists(targetPath)))
+                {
+                    filePath = targetPath; // 使用目标路径提取图标
+                }
+            } // 如果目标路径无效或不存在，继续使用原始快捷方式路径
+
             SHFILEINFO shfi = new(); // 创建 SHFILEINFO 结构体
             uint flags = SHGFI_ICON; // 设置标志
             flags |= SHGFI_LARGEICON; // 使用大图标
