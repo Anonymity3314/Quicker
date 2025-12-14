@@ -41,11 +41,7 @@ namespace Quicker.Managers
 
         // 释放图标资源
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern bool DestroyIcon(IntPtr hIcon); // 释放图标资源
-
-        // 提取图标
-        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr ExtractIcon(IntPtr hInst, string lpszExeFileName, int nIconIndex); // 提取图标
+        private static extern bool DestroyIcon(IntPtr hIcon);
 
         // 获取文件图标
         [StructLayout(LayoutKind.Sequential)]
@@ -64,106 +60,30 @@ namespace Quicker.Managers
 
         // 文件图标相关常量
         private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010; // 使用文件属性
-        private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080; // 文件属性
+        private const uint FILE_ATTRIBUTE_NORMAL = 0x00000080; // 正常文件属性
+        private const uint SHGFI_SYSICONINDEX = 0x000004000; // 系统图标索引
         private const uint SHGFI_LARGEICON = 0x000000000; // 大图标
-        private const uint SHGFI_ICON = 0x000000100; // 获取图标
-        private const uint SHGFI_SYSICONINDEX = 0x000004000; // 获取系统图标列表索引
-        private const uint SHGFI_SMALLICON = 0x000000001; // 小图标
-        private const uint ILD_NORMAL = 0x00000000; // 正常图标（无叠加）
+        private const uint SHGFI_ICON = 0x000000100; // 图标
+        private const uint ILD_NORMAL = 0x00000000; // 正常图标
         
-        // 从系统图像列表中获取图标（不带叠加图标）
         [DllImport("comctl32.dll")]
-        private static extern IntPtr ImageList_GetIcon(IntPtr himl, int i, uint flags);
-
-        // 快捷方式解析相关
-        private const int SLR_NO_UI = 0x00000001; // 在解析快捷方式时不显示用户界面
-
-        // 操作Windows快捷方式(.lnk文件)
-        [ComImport]
-        [Guid("0000010c-0000-0000-C000-000000000046")]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface IShellLink
-        {
-            // 获取快捷方式的目标路径
-            void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, out int pFlags, int fResolve);
-            // 获取快捷方式的ID列表
-            void GetIDList(out IntPtr ppidl);
-            // 设置快捷方式的ID列表
-            void SetIDList(IntPtr pidl);
-            // 获取快捷方式的描述
-            void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
-            // 设置快捷方式的描述
-            void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
-            // 获取快捷方式的工作目录
-            void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
-            // 设置快捷方式的工作目录
-            void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
-            // 获取快捷方式的参数
-            void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
-            // 设置快捷方式的参数
-            void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
-            // 获取快捷方式的热键
-            void GetHotkey(out short pwHotkey);
-            // 设置快捷方式的热键
-            void SetHotkey(short wHotkey);
-            // 获取快捷方式的显示命令
-            void GetShowCmd(out int piShowCmd);
-            // 设置快捷方式的显示命令
-            void SetShowCmd(int iShowCmd);
-            // 获取快捷方式的图标位置
-            void GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
-            // 设置快捷方式的图标位置
-            void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
-            // 设置快捷方式的相对路径
-            void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
-            // 解析快捷方式
-            void Resolve(IntPtr hwnd, int fFlags);
-            // 设置快捷方式的路径
-            void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
-        }
-
-        // IPersistFile 接口，用于加载快捷方式文件
-        [ComImport]
-        [Guid("0000010b-0000-0000-C000-000000000046")]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        private interface IPersistFile
-        {
-            void GetClassID(out Guid pClassID);
-            [PreserveSig]
-            int IsDirty();
-            [PreserveSig]
-            int Load([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, uint dwMode);
-            [PreserveSig]
-            int Save([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, [MarshalAs(UnmanagedType.Bool)] bool fRemember);
-            [PreserveSig]
-            int SaveCompleted([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName);
-            [PreserveSig]
-            int GetCurFile([In, MarshalAs(UnmanagedType.LPWStr)] string ppszFileName);
-        }
-
-        // 操作快捷方式
-        [ComImport]
-        [Guid("00021401-0000-0000-C000-000000000046")]
-        [ClassInterface(ClassInterfaceType.None)]
-        private class ShellLink { }
+        private static extern IntPtr ImageList_GetIcon(IntPtr himl, int i, uint flags); // 从系统图像列表中获取图标（不带叠加图标）
         #endregion
 
         /// <summary>
-        /// 将 HIcon 转换为 ImageSource。
+        /// 将 HIcon 转换为 ImageSource
         /// </summary>
-        /// <param name="hIcon"> HIcon 指针</param>
-        /// <returns> ImageSource 对象</returns>
+        /// <param name="hIcon">HIcon 指针</param>
+        /// <returns>ImageSource 对象</returns>
         private static ImageSource ConvertHIconToImageSource(IntPtr hIcon)
         {
             if (hIcon == IntPtr.Zero) return null;
-            // 使用 Imaging.CreateBitmapSourceFromHIcon 将 HIcon 转换为 ImageSource
             ImageSource iconSource = Imaging.CreateBitmapSourceFromHIcon(
                 hIcon,
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions()
             );
-
-            iconSource.Freeze(); // 冻结 ImageSource 以便在多个线程中访问
+            iconSource.Freeze();
             return iconSource;
         }
 
@@ -171,26 +91,25 @@ namespace Quicker.Managers
         /// 从快捷方式文件中获取目标路径
         /// </summary>
         /// <param name="linkFilePath">快捷方式文件路径</param>
-        /// <returns>目标路径，如果解析失败则返回 null</returns>
+        /// <returns>目标路径</returns>
         private static string GetTargetPathFromLinkFile(string linkFilePath)
         {
-            if (string.IsNullOrEmpty(linkFilePath) || !File.Exists(linkFilePath)) return null; // 文件不存在，返回 null
+            if (string.IsNullOrEmpty(linkFilePath) || !File.Exists(linkFilePath)) return null;
             IWshShortcut shortcut = null;
             WshShell shell = null;
             try
             {
-                // 使用 Windows Script Host 的 COM 对象，更安全可靠
                 shell = new WshShell();
                 shortcut = (IWshShortcut)shell.CreateShortcut(linkFilePath);
                 string targetPath = shortcut.TargetPath;
-                if (string.IsNullOrEmpty(targetPath)) return null; // 检查路径是否有效
-                return targetPath; // 返回目标路径
+                if (string.IsNullOrEmpty(targetPath)) return null;
+                return targetPath;
             }
-            catch (Exception) // 解析失败返回 null
+            catch
             {
                 return null;
             }
-            finally // 释放 COM 对象
+            finally
             {
                 if (shortcut != null) Marshal.ReleaseComObject(shortcut);
                 if (shell != null) Marshal.ReleaseComObject(shell);
@@ -200,46 +119,33 @@ namespace Quicker.Managers
         /// <summary>
         /// 检查路径是否为系统文件夹路径（CLSID 路径）
         /// </summary>
-        /// <param name="path">要检查的路径</param>
-        /// <returns>如果是系统文件夹路径则返回 true</returns>
+        /// <param name="path">路径</param>
+        /// <returns>是否为系统文件夹路径</returns>
         private static bool IsSystemFolderPath(string path)
         {
             if (string.IsNullOrEmpty(path)) return false;
-            // 系统文件夹路径通常以 "::" 开头，例如 "::{645FF040-5081-101B-9F08-00AA002F954E}"（回收站）
             return path.StartsWith("::", StringComparison.Ordinal);
         }
 
         /// <summary>
         /// 判断快捷方式是否为操作系统快捷方式
-        /// 操作系统快捷方式通常位于系统目录，如 Start Menu、Desktop 等
         /// </summary>
         /// <param name="linkFilePath">快捷方式文件路径</param>
-        /// <returns>如果是操作系统快捷方式则返回 true</returns>
+        /// <returns>是否为操作系统快捷方式</returns>
         private static bool IsSystemShortcut(string linkFilePath)
         {
             if (string.IsNullOrEmpty(linkFilePath)) return false;
-            
             try
             {
                 string normalizedPath = Path.GetFullPath(linkFilePath).ToLowerInvariant();
-                
-                // 检查是否在常见的系统快捷方式位置
-                // AppData\Microsoft\Windows\Start Menu\Programs
                 string appDataStartMenu = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "Microsoft", "Windows", "Start Menu", "Programs"
                 ).ToLowerInvariant();
-                
-                // CommonPrograms 已经包含了 Programs 路径
                 string commonPrograms = Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms).ToLowerInvariant();
-                
-                // StartMenu 已经包含了 Programs 路径
                 string userStartMenu = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu).ToLowerInvariant();
-                
-                // CommonStartMenu 已经包含了 Programs 路径
                 string commonStartMenu = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu).ToLowerInvariant();
-                
-                // 检查路径是否以这些系统目录开头
+
                 return normalizedPath.StartsWith(appDataStartMenu, StringComparison.OrdinalIgnoreCase) ||
                        normalizedPath.StartsWith(commonPrograms, StringComparison.OrdinalIgnoreCase) ||
                        normalizedPath.StartsWith(commonStartMenu, StringComparison.OrdinalIgnoreCase) ||
@@ -253,83 +159,22 @@ namespace Quicker.Managers
 
         /// <summary>
         /// 获取操作系统快捷方式的源图标（不带快捷方式标识）
-        /// 通过解析快捷方式获取目标路径，然后获取目标路径的图标
         /// </summary>
         /// <param name="linkFilePath">快捷方式文件路径</param>
-        /// <returns>源图标对象 (ImageSource)，如果失败则返回 null</returns>
+        /// <returns>操作系统快捷方式的源图标（不带快捷方式标识）</returns>
         private static ImageSource GetSystemShortcutIcon(string linkFilePath)
         {
             if (string.IsNullOrEmpty(linkFilePath) || !File.Exists(linkFilePath)) return null;
             
             try
             {
-                // 获取快捷方式的目标路径
                 string targetPath = GetTargetPathFromLinkFile(linkFilePath);
-                
                 if (string.IsNullOrEmpty(targetPath)) return null;
-                
-                // 如果目标路径是系统文件夹路径（CLSID路径），直接使用该路径获取图标
-                if (IsSystemFolderPath(targetPath))
-                {
-                    SHFILEINFO shfi = new();
-                    uint flags = SHGFI_ICON | SHGFI_LARGEICON;
-                    
-                    IntPtr hIcon = SHGetFileInfo(
-                        targetPath,
-                        FILE_ATTRIBUTE_NORMAL,
-                        out shfi,
-                        (uint)Marshal.SizeOf(shfi),
-                        flags
-                    );
-                    
-                    if (hIcon != IntPtr.Zero && shfi.hIcon != IntPtr.Zero)
-                    {
-                        try
-                        {
-                            ImageSource iconSource = ConvertHIconToImageSource(shfi.hIcon);
-                            DestroyIcon(shfi.hIcon);
-                            return iconSource;
-                        }
-                        catch
-                        {
-                            if (shfi.hIcon != IntPtr.Zero)
-                                DestroyIcon(shfi.hIcon);
-                            return null;
-                        }
-                    }
-                }
-                // 如果目标路径是普通文件或文件夹，检查是否存在
-                else if (File.Exists(targetPath) || Directory.Exists(targetPath))
-                {
-                    SHFILEINFO shfi = new();
-                    uint flags = SHGFI_ICON | SHGFI_LARGEICON;
-                    
-                    IntPtr hIcon = SHGetFileInfo(
-                        targetPath,
-                        FILE_ATTRIBUTE_NORMAL,
-                        out shfi,
-                        (uint)Marshal.SizeOf(shfi),
-                        flags
-                    );
-                    
-                    if (hIcon != IntPtr.Zero && shfi.hIcon != IntPtr.Zero)
-                    {
-                        try
-                        {
-                            ImageSource iconSource = ConvertHIconToImageSource(shfi.hIcon);
-                            DestroyIcon(shfi.hIcon);
-                            return iconSource;
-                        }
-                        catch
-                        {
-                            if (shfi.hIcon != IntPtr.Zero)
-                                DestroyIcon(shfi.hIcon);
-                            return null;
-                        }
-                    }
-                }
-                
-                return null;
+
+                // 检查目标路径是否有效（系统文件夹路径、文件或目录）
+                if (!IsSystemFolderPath(targetPath) && !File.Exists(targetPath) && !Directory.Exists(targetPath))
+                    return null;
+                return GetIconFromPath(targetPath); // 使用统一的方法获取图标
             }
             catch
             {
@@ -338,119 +183,158 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 从指定路径的文件中提取图标，并确保移除压缩标记等叠加图标。
-        /// 如果是 .lnk 文件，将提取目标文件的图标（不带快捷方式标识）。
+        /// 从指定路径获取图标
         /// </summary>
-        /// <param name="filePath">文件路径。</param>
-        /// <returns>文件的图标对象 (ImageSource)，如果失败则返回 null。</returns>
-        public static ImageSource GetIcon(string filePath)
+        /// <param name="path">文件或文件夹路径</param>
+        /// <returns>图标对象 (ImageSource)，如果失败则返回 null</returns>
+        private static ImageSource GetIconFromPath(string path)
         {
-            bool isLinkFile = Path.GetExtension(filePath).Equals(".lnk", StringComparison.OrdinalIgnoreCase);
-            string originalLinkPath = isLinkFile ? filePath : null;
-            string targetPath = null;
+            SHFILEINFO shfi = new();
+            uint flags = SHGFI_ICON | SHGFI_LARGEICON;
             
-            // 如果是操作系统快捷方式，使用专门的方法获取源图标
-            if (isLinkFile && IsSystemShortcut(filePath))
-            {
-                ImageSource systemIcon = GetSystemShortcutIcon(filePath);
-                if (systemIcon != null)
-                {
-                    return systemIcon;
-                }
-                // 如果获取失败，继续使用常规方法
-            }
-            
-            if (isLinkFile) // 如果是快捷方式文件，尝试获取目标路径
-            {
-                targetPath = GetTargetPathFromLinkFile(filePath);
-                if (!string.IsNullOrEmpty(targetPath) && (File.Exists(targetPath) || Directory.Exists(targetPath) || IsSystemFolderPath(targetPath)))
-                {
-                    filePath = targetPath; // 使用目标路径提取图标
-                }
-                else
-                {
-                    // 如果目标路径无效，仍然使用快捷方式路径，但需要使用特殊方法去除叠加图标
-                    targetPath = null;
-                }
-            }
-
-            SHFILEINFO shfi = new(); // 创建 SHFILEINFO 结构体
-            
-            // 对于快捷方式文件且无法获取目标路径的情况，使用系统图标列表方法
-            // 这样可以获取不带快捷方式叠加图标的图标
-            if (isLinkFile && targetPath == null)
-            {
-                // 使用 SHGFI_SYSICONINDEX 来获取系统图标列表索引
-                uint flags = SHGFI_SYSICONINDEX | SHGFI_LARGEICON; // 获取系统图标列表索引
-                IntPtr hImageList = SHGetFileInfo(
-                    originalLinkPath,
-                    FILE_ATTRIBUTE_NORMAL,
-                    out shfi,
-                    (uint)Marshal.SizeOf(shfi),
-                    flags
-                );
-
-                if (hImageList != IntPtr.Zero && shfi.iIcon >= 0)
-                {
-                    // 从系统图标列表中提取图标（不带叠加图标）
-                    IntPtr hIconFromList = ImageList_GetIcon(hImageList, shfi.iIcon, ILD_NORMAL);
-                    if (hIconFromList != IntPtr.Zero)
-                    {
-                        try
-                        {
-                            ImageSource iconSource = ConvertHIconToImageSource(hIconFromList);
-                            DestroyIcon(hIconFromList);
-                            return iconSource;
-                        }
-                        catch (Exception)
-                        {
-                            if (hIconFromList != IntPtr.Zero)
-                                DestroyIcon(hIconFromList);
-                            return null;
-                        }
-                    }
-                }
-            }
-
-            // 对于普通文件或已获取目标路径的快捷方式，使用标准方法
-            uint standardFlags = SHGFI_ICON | SHGFI_LARGEICON;
-            
-            // 如果使用了目标路径（即快捷方式的目标文件），不使用 SHGFI_USEFILEATTRIBUTES 标志
-            // 这样可以确保获取的是目标文件的原始图标，而不是带快捷方式叠加图标的图标
-            // 对于普通文件，使用 SHGFI_USEFILEATTRIBUTES 可以提高性能
-            if (!(isLinkFile && targetPath != null))
-            {
-                // 普通文件或无法获取目标路径的快捷方式，使用文件属性标志
-                standardFlags |= SHGFI_USEFILEATTRIBUTES;
-            }
-            
-            uint dwAttributes = FILE_ATTRIBUTE_NORMAL; // 设置文件属性
-
-            // 调用 Win32 API SHGetFileInfo 获取图标信息
             IntPtr hIcon = SHGetFileInfo(
-                filePath,
-                dwAttributes,
+                path,
+                FILE_ATTRIBUTE_NORMAL,
                 out shfi,
                 (uint)Marshal.SizeOf(shfi),
-                standardFlags
+                flags
             );
-
-            if (hIcon != IntPtr.Zero)
+            
+            if (hIcon != IntPtr.Zero && shfi.hIcon != IntPtr.Zero)
             {
                 try
                 {
-                    ImageSource iconSource = ConvertHIconToImageSource(shfi.hIcon); // 转换图标
-                    DestroyIcon(shfi.hIcon); // 必须释放 Win32 图标句柄
+                    ImageSource iconSource = ConvertHIconToImageSource(shfi.hIcon);
+                    DestroyIcon(shfi.hIcon);
                     return iconSource;
                 }
-                catch (Exception)
+                catch
                 {
-                    if (shfi.hIcon != IntPtr.Zero) // 提取或转换失败时，同样尝试释放句柄
+                    if (shfi.hIcon != IntPtr.Zero)
                         DestroyIcon(shfi.hIcon);
                     return null;
                 }
             }
+            
             return null;
+        }
+
+        /// <summary>
+        /// 从指定路径的文件中提取图标，并确保移除压缩标记等叠加图标。
+        /// 如果是 .lnk 文件，将提取目标文件的图标（不带快捷方式标识）。
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>图标对象 (ImageSource)，如果失败则返回 null</returns>
+        public static ImageSource GetIcon(string filePath)
+        {
+            bool isLinkFile = Path.GetExtension(filePath).Equals(".lnk", StringComparison.OrdinalIgnoreCase);
+            
+            // 如果是操作系统快捷方式，优先使用专门的方法
+            if (isLinkFile && IsSystemShortcut(filePath))
+            {
+                ImageSource systemIcon = GetSystemShortcutIcon(filePath);
+                if (systemIcon != null)
+                    return systemIcon;
+            }
+            
+            // 如果是快捷方式，尝试获取目标路径的图标
+            if (isLinkFile)
+            {
+                string targetPath = GetTargetPathFromLinkFile(filePath);
+                bool hasValidTarget = !string.IsNullOrEmpty(targetPath) && 
+                    (File.Exists(targetPath) || Directory.Exists(targetPath) || IsSystemFolderPath(targetPath));
+                if (hasValidTarget) return GetIconFromPath(targetPath);
+
+                // 无法获取目标路径时，使用系统图标列表方法（不带叠加图标）
+                ImageSource iconFromList = GetIconFromImageList(filePath);
+                if (iconFromList != null)
+                    return iconFromList;
+
+                // 系统图标列表方法失败，使用标准方法（快捷方式且无有效目标）
+                return GetIconWithStandardMethod(filePath, isLinkFile, hasValidTarget);
+            }
+
+            // 对于普通文件，使用标准方法
+            return GetIconWithStandardMethod(filePath, isLinkFile, false);
+        }
+
+        /// <summary>
+        /// 从系统图标列表中获取图标（不带叠加图标）
+        /// </summary>
+        /// <param name="linkFilePath">快捷方式文件路径</param>
+        /// <returns>图标对象 (ImageSource)，如果失败则返回 null</returns>
+        private static ImageSource GetIconFromImageList(string linkFilePath)
+        {
+            SHFILEINFO shfi = new();
+            uint flags = SHGFI_SYSICONINDEX | SHGFI_LARGEICON;
+            IntPtr hImageList = SHGetFileInfo(
+                linkFilePath,
+                FILE_ATTRIBUTE_NORMAL,
+                out shfi,
+                (uint)Marshal.SizeOf(shfi),
+                flags
+            );
+
+            if (hImageList == IntPtr.Zero || shfi.iIcon < 0)
+                return null;
+
+            IntPtr hIconFromList = ImageList_GetIcon(hImageList, shfi.iIcon, ILD_NORMAL);
+            if (hIconFromList == IntPtr.Zero)
+                return null;
+
+            try
+            {
+                ImageSource iconSource = ConvertHIconToImageSource(hIconFromList);
+                DestroyIcon(hIconFromList);
+                return iconSource;
+            }
+            catch
+            {
+                DestroyIcon(hIconFromList);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 使用标准方法获取图标
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <param name="isLinkFile">是否为快捷方式文件</param>
+        /// <param name="hasValidTarget">快捷方式是否有有效的目标路径（仅当 isLinkFile 为 true 时有效）</param>
+        private static ImageSource GetIconWithStandardMethod(string filePath, bool isLinkFile, bool hasValidTarget = false)
+        {
+            SHFILEINFO shfi = new();
+            uint flags = SHGFI_ICON | SHGFI_LARGEICON;
+
+            // 对于普通文件或无法获取目标路径的快捷方式，使用 SHGFI_USEFILEATTRIBUTES 可以提高性能
+            // 对于快捷方式的目标文件，不使用此标志以确保获取原始图标
+            if (!(isLinkFile && hasValidTarget))
+            {
+                flags |= SHGFI_USEFILEATTRIBUTES;
+            }
+
+            IntPtr hIcon = SHGetFileInfo(
+                filePath,
+                FILE_ATTRIBUTE_NORMAL,
+                out shfi,
+                (uint)Marshal.SizeOf(shfi),
+                flags
+            );
+
+            if (hIcon == IntPtr.Zero || shfi.hIcon == IntPtr.Zero)
+                return null;
+
+            try
+            {
+                ImageSource iconSource = ConvertHIconToImageSource(shfi.hIcon);
+                DestroyIcon(shfi.hIcon);
+                return iconSource;
+            }
+            catch
+            {
+                DestroyIcon(shfi.hIcon);
+                return null;
+            }
         }
 
         /// <summary>
@@ -662,14 +546,6 @@ namespace Quicker.Managers
             // 6. BMP: 42 4D (BM)
             if (CheckSignature(imageData, new byte[] { 0x42, 0x4D })) return true;
 
-            // 7. WebP: RIFF (0-3) + WEBP (8-11) - 依赖 LoadIconFromData 中的显式检查来处理
-            // 理论上如果通过了 LoadIconFromData 中的 WebP 检查，它不会走到这里，
-            // 但为了完整性，这里可以包含 WebP 的主要检查。
-            if (imageData.Length >= 12 &&
-                imageData[0] == 0x52 && imageData[1] == 0x49 && imageData[2] == 0x46 && imageData[3] == 0x46 &&
-                imageData[8] == 0x57 && imageData[9] == 0x45 && imageData[10] == 0x42 && imageData[11] == 0x50)
-                return true;
-
             return false;
         }
 
@@ -837,7 +713,7 @@ namespace Quicker.Managers
             {
                 using var bitmap = svgDocument.Draw(); // 使用SVG文档创建位图
                 {
-                    BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
+            BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
                         bitmap.GetHbitmap(),  // 获取位图的HBitmap句柄
                         IntPtr.Zero,         // 默认调色板
                         Int32Rect.Empty,    // 使用整个源矩形
