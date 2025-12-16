@@ -998,14 +998,14 @@ namespace Quicker.Managers
         /// <param name="path">图片路径</param>
         public void SetImageWithGifSupport(Image imageControl, string path)
         {
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            if (string.IsNullOrEmpty(path)) return;
+            if (!File.Exists(path))
             {
-                ClearImage(imageControl); // 清空图片
-                return;
+                ShowToast("背景图片不存在！", ToastType.Error); // 显示Toast
             }
-            string ext = Path.GetExtension(path).ToLower(); // 获取文件扩展名
             try
             {
+                string ext = Path.GetExtension(path).ToLower(); // 获取文件扩展名
                 if (ext == ".gif")
                 {
                     SetGifImage(imageControl, path); // 设置GIF动图
