@@ -68,6 +68,10 @@ namespace Quicker.Managers
         
         [DllImport("comctl32.dll")]
         private static extern IntPtr ImageList_GetIcon(IntPtr himl, int i, uint flags); // 从系统图像列表中获取图标（不带叠加图标）
+        
+        // 直接从文件提取图标（避免压缩标记）
+        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+        private static extern int ExtractIconEx(string lpszFile, int nIconIndex, out IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons); // 从文件提取图标
         #endregion
 
         /// <summary>
@@ -128,6 +132,58 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 检查目标路径是否有效（系统文件夹路径、文件或目录）
+        /// </summary>
+        /// <param name="targetPath">目标路径</param>
+        /// <returns>是否有效</returns>
+        private static bool IsValidTargetPath(string targetPath)
+        {
+            return !string.IsNullOrEmpty(targetPath) && 
+                   (IsSystemFolderPath(targetPath) || File.Exists(targetPath) || Directory.Exists(targetPath));
+        }
+
+        /// <summary>
+        /// 检查文件扩展名是否为可执行文件
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>是否为可执行文件</returns>
+        private static bool IsExecutableFile(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath)) return false;
+            string ext = Path.GetExtension(filePath).ToLower();
+            return ext == ".exe" || ext == ".dll";
+        }
+
+        /// <summary>
+        /// 从目标路径获取图标，优先使用直接提取方法（避免压缩标记）
+        /// </summary>
+        /// <param name="targetPath">目标路径</param>
+        /// <returns>图标对象 (ImageSource)，如果失败则返回 null</returns>
+        private static ImageSource GetIconFromTargetPath(string targetPath)
+        {
+            if (!IsValidTargetPath(targetPath)) return null;
+            if (IsSystemFolderPath(targetPath)) // 对于 CLSID 路径，直接使用 GetIconFromPath
+            {
+                return GetIconFromPath(targetPath);
+            }
+
+            // 对于 EXE/DLL 文件，优先直接从文件提取图标（完全避免压缩标记）
+            if (IsExecutableFile(targetPath))
+            {
+                ImageSource directIcon = ExtractIconDirectlyFromFile(targetPath);
+                if (directIcon != null)
+                    return directIcon;
+            }
+
+            // 优先使用系统图标列表方法获取不带叠加图标的图标
+            ImageSource targetIcon = GetIconFromImageList(targetPath);
+            if (targetIcon != null)
+                return targetIcon;
+
+            return GetIconFromPath(targetPath); // 如果系统图标列表方法失败，回退到标准方法
+        }
+
+        /// <summary>
         /// 判断快捷方式是否为操作系统快捷方式
         /// </summary>
         /// <param name="linkFilePath">快捷方式文件路径</param>
@@ -165,36 +221,10 @@ namespace Quicker.Managers
         private static ImageSource GetSystemShortcutIcon(string linkFilePath)
         {
             if (string.IsNullOrEmpty(linkFilePath) || !File.Exists(linkFilePath)) return null;
-            try
+            try // 对于快捷方式，始终从目标路径获取图标，而不是从快捷方式文件本身
             {
-                // 优先使用系统图标列表方法，可以获取不带叠加图标的图标
-                ImageSource iconFromList = GetIconFromImageList(linkFilePath);
-                if (iconFromList != null)
-                    return iconFromList;
-
-                // 如果系统图标列表方法失败，尝试从目标路径获取
                 string targetPath = GetTargetPathFromLinkFile(linkFilePath);
-                if (string.IsNullOrEmpty(targetPath)) return null;
-
-                // 检查目标路径是否有效（系统文件夹路径、文件或目录）
-                if (!IsSystemFolderPath(targetPath) && !File.Exists(targetPath) && !Directory.Exists(targetPath))
-                    return null;
-
-                // 对于目标路径，也使用系统图标列表方法（不带叠加图标）
-                // 如果目标路径是文件，从文件本身获取；如果是CLSID路径，直接获取
-                if (IsSystemFolderPath(targetPath))
-                {
-                    return GetIconFromPath(targetPath); // CLSID路径直接使用GetIconFromPath
-                }
-                else
-                {
-                    // 普通文件路径，使用系统图标列表方法获取不带叠加图标的图标
-                    ImageSource targetIcon = GetIconFromImageList(targetPath);
-                    if (targetIcon != null)
-                        return targetIcon;
-
-                    return GetIconFromPath(targetPath); // 如果系统图标列表方法失败，回退到标准方法
-                }
+                return GetIconFromTargetPath(targetPath);
             }
             catch
             {
@@ -259,9 +289,14 @@ namespace Quicker.Managers
             if (isLinkFile)
             {
                 string targetPath = GetTargetPathFromLinkFile(filePath);
-                bool hasValidTarget = !string.IsNullOrEmpty(targetPath) && 
-                    (File.Exists(targetPath) || Directory.Exists(targetPath) || IsSystemFolderPath(targetPath));
-                if (hasValidTarget) return GetIconFromPath(targetPath);
+                bool hasValidTarget = IsValidTargetPath(targetPath);
+                
+                if (hasValidTarget)
+                {
+                    ImageSource targetIcon = GetIconFromTargetPath(targetPath);
+                    if (targetIcon != null)
+                        return targetIcon;
+                }
 
                 // 无法获取目标路径时，使用系统图标列表方法（不带叠加图标）
                 ImageSource iconFromList = GetIconFromImageList(filePath);
@@ -454,7 +489,7 @@ namespace Quicker.Managers
         /// <returns>ImageSource 对象</returns>
         private ImageSource LoadIconFromData(byte[] iconData)
         {
-            // --- 1. 尝试处理 SVG 格式 (增强容错) ---
+            // 尝试处理 SVG 格式 (增强容错) ---
             // SVG 文件以 '<' (0x3C) 开头。
             if (iconData[0] == 0x3C)
             {
@@ -474,7 +509,7 @@ namespace Quicker.Managers
                 }
             }
 
-            // --- 2. 尝试处理 WebP 格式 (解决不支持的图像格式错误) ---
+            // 尝试处理 WebP 格式 (解决不支持的图像格式错误) ---
             // 检查 WebP 魔术数字：RIFF (0-3) + WEBP (8-11)
             if (iconData.Length >= 12 &&
                 iconData[0] == 0x52 && iconData[1] == 0x49 && iconData[2] == 0x46 && iconData[3] == 0x46 &&
@@ -485,7 +520,7 @@ namespace Quicker.Managers
                 return null;
             }
 
-            // --- 3. 尝试处理原生 WPF 格式 (PNG, JPG, GIF, ICO, BMP) ---
+            // 尝试处理原生 WPF 格式 (PNG, JPG, GIF, ICO, BMP) ---
             // 确保数据是已知的原生图像格式
             if (!IsValidImageData(iconData))
             {
@@ -633,21 +668,31 @@ namespace Quicker.Managers
         }
 
         /// <summary>
+        /// 创建 BitmapImage 并加载文件
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>加载的 BitmapImage</returns>
+        private static BitmapImage CreateBitmapImageFromFile(string filePath)
+        {
+            BitmapImage bi = new();
+            bi.BeginInit();
+            bi.CacheOption = BitmapCacheOption.OnLoad;
+            bi.UriSource = new(filePath, UriKind.Absolute);
+            bi.EndInit();
+            bi.Freeze();
+            return bi;
+        }
+
+        /// <summary>
         /// 加载普通图片文件（如 PNG、JPG、JPEG、BMP、ICO）
         /// </summary>
         /// <param name="filePath">文件路径</param>
         /// <returns>加载的 BitmapImage</returns>
         private static BitmapImage LoadBitmapImage(string filePath)
         {
-            BitmapImage bi = new();
             try
             {
-                bi.BeginInit();
-                bi.CacheOption = BitmapCacheOption.OnLoad;
-                bi.UriSource = new(filePath, UriKind.Absolute); // 用UriSource
-                bi.EndInit();
-                bi.Freeze();
-                return bi;
+                return CreateBitmapImageFromFile(filePath);
             }
             catch (Exception ex)
             {
@@ -669,13 +714,7 @@ namespace Quicker.Managers
                     GifBitmapDecoder decoder = new(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
                     if (decoder.Frames.Count == 1) // 静态GIF，直接返回BitmapImage
                     {
-                        BitmapImage bi = new();
-                        bi.BeginInit();
-                        bi.CacheOption = BitmapCacheOption.OnLoad;
-                        bi.UriSource = new(filePath, UriKind.Absolute); // 用UriSource
-                        bi.EndInit();
-                        bi.Freeze();
-                        return bi;
+                        return CreateBitmapImageFromFile(filePath);
                     }
                     else // 动图，返回所有帧
                     {
@@ -728,7 +767,7 @@ namespace Quicker.Managers
             {
                 using var bitmap = svgDocument.Draw(); // 使用SVG文档创建位图
                 {
-            BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
+                    BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
                         bitmap.GetHbitmap(),  // 获取位图的HBitmap句柄
                         IntPtr.Zero,         // 默认调色板
                         Int32Rect.Empty,    // 使用整个源矩形
@@ -773,20 +812,79 @@ namespace Quicker.Managers
         }
 
         /// <summary>
-        /// 从 EXE 文件中提取图标
+        /// 直接从文件提取图标（避免压缩标记等叠加图标）
         /// </summary>
-        /// <param name="filePath">文件路径</param>
-        /// <returns>提取的图标作为 BitmapImage</returns>
-        private BitmapImage ExtractIconFromExe(string filePath)
+        /// <param name="filePath">文件路径（通常是 EXE 或 DLL）</param>
+        /// <returns>提取的图标作为 ImageSource，如果失败则返回 null</returns>
+        private static ImageSource ExtractIconDirectlyFromFile(string filePath)
         {
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return null;
+            
+            IntPtr hIconLarge = IntPtr.Zero;
+            IntPtr hIconSmall = IntPtr.Zero;
             try
             {
-                Icon icon = Icon.ExtractAssociatedIcon(filePath); // 提取图标
-                return ConvertIconToBitmapImage(icon); // 转换为 BitmapImage
+                // 使用 ExtractIconEx 直接从文件提取大图标（索引0通常是主图标）
+                int iconCount = ExtractIconEx(filePath, 0, out hIconLarge, out hIconSmall, 1);
+                if (iconCount > 0 && hIconLarge != IntPtr.Zero)
+                {
+                    ImageSource iconSource = ConvertHIconToImageSource(hIconLarge);
+                    // ConvertHIconToImageSource 会复制图标数据，所以可以立即释放原始句柄
+                    DestroyIcon(hIconLarge);
+                    hIconLarge = IntPtr.Zero; // 标记已释放
+                    if (hIconSmall != IntPtr.Zero)
+                    {
+                        DestroyIcon(hIconSmall);
+                        hIconSmall = IntPtr.Zero; // 标记已释放
+                    }
+                    return iconSource;
+                }
+                
+                // 如果 ExtractIconEx 失败，尝试使用 Icon.ExtractAssociatedIcon
+                try
+                {
+                    Icon icon = Icon.ExtractAssociatedIcon(filePath);
+                    if (icon != null)
+                    {
+                        ImageSource iconSource = ConvertIconToImageSource(icon);
+                        icon.Dispose();
+                        return iconSource;
+                    }
+                }
+                catch
+                {
+                    // 忽略异常，继续返回 null
+                }
+                
+                return null;
             }
-            catch (Exception ex)
+            catch
             {
-                throw new InvalidOperationException($"从 EXE 文件提取图标时出错: {filePath}", ex);
+                return null;
+            }
+            finally
+            {
+                // 清理资源（如果之前没有释放）
+                if (hIconLarge != IntPtr.Zero) DestroyIcon(hIconLarge);
+                if (hIconSmall != IntPtr.Zero) DestroyIcon(hIconSmall);
+            }
+        }
+
+        /// <summary>
+        /// 将 Icon 转换为 ImageSource
+        /// </summary>
+        /// <param name="icon">图标</param>
+        /// <returns>转换后的 ImageSource</returns>
+        private static ImageSource ConvertIconToImageSource(Icon icon)
+        {
+            if (icon == null) return null;
+            try
+            {
+                return ConvertHIconToImageSource(icon.Handle);
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -795,8 +893,9 @@ namespace Quicker.Managers
         /// </summary>
         /// <param name="icon">图标</param>
         /// <returns>转换后的 BitmapImage</returns>
-        private BitmapImage ConvertIconToBitmapImage(Icon icon)
+        private static BitmapImage ConvertIconToBitmapImage(Icon icon)
         {
+            if (icon == null) return null;
             try
             {
                 using (MemoryStream ms = new()) // 创建内存流
@@ -814,6 +913,24 @@ namespace Quicker.Managers
             catch (Exception ex)
             {
                 throw new InvalidOperationException("转换图标时出错", ex);
+            }
+        }
+
+        /// <summary>
+        /// 从 EXE 文件中提取图标
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns>提取的图标作为 BitmapImage</returns>
+        private BitmapImage ExtractIconFromExe(string filePath)
+        {
+            try
+            {
+                Icon icon = Icon.ExtractAssociatedIcon(filePath); // 提取图标
+                return ConvertIconToBitmapImage(icon); // 转换为 BitmapImage
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"从 EXE 文件提取图标时出错: {filePath}", ex);
             }
         }
 
@@ -916,12 +1033,7 @@ namespace Quicker.Managers
         /// <param name="path">图片路径</param>
         private void SetGifImage(Image imageControl, string path)
         {
-            var bitmap = new BitmapImage(); // 创建BitmapImage对象
-            bitmap.BeginInit(); // 开始初始化BitmapImage
-            bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置图片路径
-            bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
-            bitmap.EndInit(); // 结束初始化BitmapImage
-            bitmap.Freeze(); // 冻结BitmapImage
+            var bitmap = CreateBitmapImageFromFile(path);
             ImageBehavior.SetAnimatedSource(imageControl, bitmap); // 设置动画源
         }
 
@@ -945,12 +1057,7 @@ namespace Quicker.Managers
         private void SetNormalImage(Image imageControl, string path)
         {
             ImageBehavior.SetAnimatedSource(imageControl, null); // 设置动画源为空
-            var bitmap = new BitmapImage(); // 创建BitmapImage对象
-            bitmap.BeginInit(); // 开始初始化BitmapImage
-            bitmap.UriSource = new Uri(path, UriKind.Absolute); // 设置图片路径
-            bitmap.CacheOption = BitmapCacheOption.OnLoad; // 设置缓存选项
-            bitmap.EndInit(); // 结束初始化BitmapImage
-            bitmap.Freeze(); // 冻结BitmapImage
+            var bitmap = CreateBitmapImageFromFile(path);
             imageControl.Source = bitmap; // 设置图片源
         }
 
