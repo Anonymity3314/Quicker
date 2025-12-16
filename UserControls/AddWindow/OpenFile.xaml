@@ -21,52 +21,57 @@
 
     <Grid>
         <Label Content="路径/命令" Margin="93,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="63"/>
-        <Label IsHitTestVisible="False" Content="可以用英文分号隔开不同路径来添加多个文件" Foreground="DarkGray" Visibility="{Binding ElementName=LocationTextBox, Path=Text, Converter={StaticResource SearchHintVisibilityConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,16,0,0" FontSize="11" Panel.ZIndex="1"/>
-        <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,15,0,0" TextChanged="LocationTextBox_TextChanged" SizeChanged="LocationTextBox_SizeChanged"/>
-        <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="393,15,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu"/>
-        <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="137" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="161,16,0,0" Width="272">
             <Grid>
-                <Border Background="White" CornerRadius="3" Margin="3">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
-                    </Border.Effect>
-                </Border>
-                <Border Background="White" CornerRadius="3" Margin="3">
-                    <StackPanel Background="{x:Null}" Margin="0,3">
-                        <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications">
-                            <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
-                                <TextBlock Text="已安装的软件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
-                            </Grid>
-                        </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess">
-                            <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
-                                <TextBlock Text="文件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
-                            </Grid>
-                        </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder">
-                            <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
-                                <TextBlock Text="文件夹..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
-                            </Grid>
-                        </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation">
-                            <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
-                                <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
-                            </Grid>
-                        </Button>
-                        <Button Style="{StaticResource MenuButton}" ToolTip="重新提取文件图标" Click="ReGetFileIcon">
-                            <Grid Width="174" Height="20">
-                                <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
-                                <TextBlock Text="重新提取图标" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
-                            </Grid>
-                        </Button>
-                    </StackPanel>
-                </Border>
+                <Label IsHitTestVisible="False" Content="可以用英文分号隔开不同路径来添加多个文件" Foreground="DarkGray" Visibility="{Binding Text, Converter={StaticResource SearchHintVisibilityConverter}, ElementName=LocationTextBox}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="11" Panel.ZIndex="1"/>
+                <TextBox x:Name="LocationTextBox" Style="{StaticResource AddressTextBox}" Width="232" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" TextChanged="LocationTextBox_TextChanged" SizeChanged="LocationTextBox_SizeChanged"/>
+                <Button Style="{StaticResource Select}" x:Name="SelectButton" Content="选择..." HorizontalAlignment="Left" Margin="232,0,0,0" VerticalAlignment="Top" Height="{Binding ActualHeight, ElementName=LocationTextBox}" Width="40" Click="OpenContextMenu"/>
+                <Popup x:Name="OpenFilePopup" PopupAnimation="Fade" Width="180" Height="137" PlacementTarget="{Binding ElementName=SelectButton}" Placement="Bottom" AllowsTransparency="True" StaysOpen="False">
+                    <Grid>
+                        <Border Background="White" CornerRadius="3" Margin="3">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#FFBBBBBB" Direction="0" BlurRadius="6" RenderingBias="Quality" ShadowDepth="1"/>
+                            </Border.Effect>
+                        </Border>
+                        <Border Background="White" CornerRadius="3" Margin="3">
+                            <StackPanel Background="{x:Null}" Margin="0,3">
+                                <Button Style="{StaticResource MenuButton}" ToolTip="选择开始菜单中可以找到的程序" Click="ChooseApplications">
+                                    <Grid Width="174" Height="20">
+                                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
+                                        <TextBlock Text="已安装的软件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource MenuButton}" ToolTip="打开文件或运行程序" Click="ChooseProcess">
+                                    <Grid Width="174" Height="20">
+                                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
+                                        <TextBlock Text="文件..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource MenuButton}" ToolTip="在资源管理器中打开Windows目录" Click="ChooseFolder">
+                                    <Grid Width="174" Height="20">
+                                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
+                                        <TextBlock Text="文件夹..." TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource MenuButton}" ToolTip="将剪切板中的文本作为文件打开或作为命令执行" Click="CopyLocation">
+                                    <Grid Width="174" Height="20">
+                                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
+                                        <TextBlock Text="变量:剪贴板文本" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                                <Button Style="{StaticResource MenuButton}" ToolTip="重新提取文件图标" Click="ReGetFileIcon">
+                                    <Grid Width="174" Height="20">
+                                        <Image Source="/Resources/Images/Quicker_Enabled.png" Style="{StaticResource SelectButtonImage}"/>
+                                        <TextBlock Text="重新提取图标" TextAlignment="Left" VerticalAlignment="Center" Margin="26,0,0,0" FontSize="13"/>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Popup>
             </Grid>
-        </Popup>
+            <Button x:Name="ConvertLnkButton" Content="转换为直接打开目标程序" Style="{StaticResource WhiteButton}" Width="166" Margin="0,5,0,0" Visibility="Collapsed" Click="ConvertLnkButton_Click" HorizontalAlignment="Left"/>
+        </StackPanel>
         <Grid x:Name="Grid1" Margin="93,52,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <ComboBox x:Name="WindowStateComboBox" HorizontalAlignment="Left" Margin="68,0,0,0" VerticalAlignment="Top" Width="272" Height="26" Background="White" VerticalContentAlignment="Center">
                 <ComboBoxItem Content="普通(Normal)" VerticalAlignment="Center"/>

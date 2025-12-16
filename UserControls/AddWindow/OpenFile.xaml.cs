@@ -1,9 +1,12 @@
 ﻿using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using Quicker.Windows.MainWindows;
 using System.Windows.Controls;
 using Quicker.Database.Core;
+using File = System.IO.File;
 using System.Windows.Media;
+using IWshRuntimeLibrary;
 using Quicker.Managers;
 using System.Windows;
 using Quicker.Models;
@@ -22,6 +25,7 @@ namespace Quicker.UserControls.AddWindow
         private Quicker.Windows.AddWindows.AddActionWindow _addWindow; // AddWindow 的引用
         private readonly ButtonManager _buttonManager = new(); // 按钮管理器
         private readonly IconManager _iconManager = new(); // 图标管理器接口
+        private bool _wasConvertLnkButtonVisible = false; // 转换lnk按钮之前的可见性状态
         public FindAppsWindow findAppsWindow; // FindAppsWindow 的引用
         private ButtonDatabase _buttonDb = new(); // 按钮数据库
         private bool isLoading = true; // 是否正在加载
@@ -170,6 +174,7 @@ namespace Quicker.UserControls.AddWindow
         private void LocationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             _addWindow.SaveButton.IsEnabled = !string.IsNullOrWhiteSpace(LocationTextBox.Text);
+            UpdateConvertLnkButtonVisibility();
         }
 
         // 移除控件清理资源
@@ -182,14 +187,21 @@ namespace Quicker.UserControls.AddWindow
         private void LocationTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (isLoading) return; // 防止在加载过程中调整大小
-            if (_addWindow != null)
-            {
-                double heightChange = e.NewSize.Height - e.PreviousSize.Height; // 计算文本框高度变化量
-                _addWindow.Height += heightChange; // 调整窗口高度
-                Thickness currentMargin = Grid1.Margin; // 获取当前的Margin
-                Thickness newMargin = new Thickness(93, currentMargin.Top + heightChange, 0, 0); // 创建一个新的Margin对象，只修改Top属性
-                Grid1.Margin = newMargin; // 将新的Margin赋给Grid1
-            }
+            double heightChange = e.NewSize.Height - e.PreviousSize.Height; // 计算文本框高度变化量
+            AdjustWindowAndGridLayout(heightChange); // 调整窗口和Grid布局
+        }
+
+        /// <summary>
+        /// 调整窗口高度和Grid1的上边距
+        /// </summary>
+        /// <param name="heightChange">高度变化量（正数表示增加，负数表示减少）</param>
+        private void AdjustWindowAndGridLayout(double heightChange)
+        {
+            if (isLoading || _addWindow == null) return; // 防止在加载过程中调整大小
+            _addWindow.Height += heightChange; // 调整窗口高度
+            Thickness grid1Margin = Grid1.Margin; // 获取当前的Margin
+            Thickness newMargin = new Thickness(93, grid1Margin.Top + heightChange, 0, 0); // 创建一个新的Margin对象，只修改Top属性
+            Grid1.Margin = newMargin; // 将新的Margin赋给Grid1
         }
 
         #endregion
@@ -423,10 +435,93 @@ namespace Quicker.UserControls.AddWindow
             WindowStateComboBox.SelectedIndex = -1;
             RunByMessager.IsChecked = false;
             TryToOpenExitingWindow.IsChecked = false;
+            _wasConvertLnkButtonVisible = false; // 重置按钮可见性状态
 
             // 清空引用
             _addWindow = null;
             _buttonDb = null;
+        }
+
+        /// <summary>
+        /// 更新转换lnk按钮的可见性
+        /// </summary>
+        private void UpdateConvertLnkButtonVisibility()
+        {
+            string text = LocationTextBox.Text?.Trim();
+            bool shouldBeVisible = false;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                if (text.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase)) // 检查是否为lnk文件路径
+                {
+                    if (File.Exists(text)) // 检查快捷方式文件是否存在
+                    {
+                        string targetPath = GetLnkTargetPath(text); // 检查目标文件或文件夹是否存在
+                        if (!string.IsNullOrEmpty(targetPath) && (File.Exists(targetPath) || Directory.Exists(targetPath)))
+                        {
+                            shouldBeVisible = true;
+                        }
+                    }
+                }
+            }
+
+            // 确定新的可见性状态
+            Visibility newVisibility = shouldBeVisible ? Visibility.Visible : Visibility.Collapsed;
+            bool isNowVisible = newVisibility == Visibility.Visible;
+
+            // 检测可见性变化并调整布局
+            ConvertLnkButton.Visibility = newVisibility; // 设置按钮可见性
+            if (_wasConvertLnkButtonVisible != isNowVisible)
+            {
+                AdjustWindowAndGridLayout(isNowVisible ? 23 : -23); // 调整布局
+                _wasConvertLnkButtonVisible = isNowVisible; // 更新状态
+            }
+        }
+
+        /// <summary>
+        /// 获取lnk文件的目标路径
+        /// </summary>
+        /// <param name="lnkFilePath">lnk文件路径</param>
+        /// <returns>目标路径，如果获取失败则返回null</returns>
+        private string GetLnkTargetPath(string lnkFilePath)
+        {
+            if (string.IsNullOrEmpty(lnkFilePath) || !File.Exists(lnkFilePath))
+                return null;
+
+            IWshShortcut shortcut = null;
+            WshShell shell = null;
+            try
+            {
+                shell = new WshShell();
+                shortcut = (IWshShortcut)shell.CreateShortcut(lnkFilePath);
+                string targetPath = shortcut.TargetPath;
+                return string.IsNullOrEmpty(targetPath) ? null : targetPath;
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                if (shortcut != null) Marshal.ReleaseComObject(shortcut);
+                if (shell != null) Marshal.ReleaseComObject(shell);
+            }
+        }
+
+        /// <summary>
+        /// 转换lnk按钮点击事件处理
+        /// </summary>
+        private void ConvertLnkButton_Click(object sender, RoutedEventArgs e)
+        {
+            string lnkPath = LocationTextBox.Text?.Trim();
+            if (string.IsNullOrWhiteSpace(lnkPath))
+                return;
+
+            string targetPath = GetLnkTargetPath(lnkPath);
+            if (!string.IsNullOrEmpty(targetPath))
+            {
+                LocationTextBox.Text = targetPath;
+                SetIconFromPath(targetPath); // 更新图标
+            }
         }
 
         #endregion
