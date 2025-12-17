@@ -165,9 +165,10 @@ namespace Quicker.UserControls.AddWindow
         {
             LocationTextBox.Text = location; // 设置地址
             SetIconFromPath(location); // 设置图标
-            _addWindow.TitleTextBox.Text = Directory.Exists(location)
-                ? Path.GetFileName(location) // 如果是文件夹，则设置为文件夹名
-                : Path.GetFileNameWithoutExtension(location); // 否则设置为文件名
+            if (string.IsNullOrWhiteSpace(_addWindow.TitleTextBox.Text))
+                _addWindow.TitleTextBox.Text = Directory.Exists(location)
+                    ? Path.GetFileName(location) // 如果是文件夹，则设置为文件夹名
+                    : Path.GetFileNameWithoutExtension(location); // 否则设置为文件名
         }
 
         // 如果地址栏不为空，则启用保存按钮
