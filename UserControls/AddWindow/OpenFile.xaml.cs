@@ -49,6 +49,7 @@ namespace Quicker.UserControls.AddWindow
         {
             ExecuteChoiceAction(); // 根据上个窗口数据执行对应命令
             isLoading = false; // 加载完成
+            UpdateConvertLnkButtonVisibility(); // 加载后重新计算布局，确保转换按钮留出空间
         }
 
         // 打开菜单
@@ -471,6 +472,9 @@ namespace Quicker.UserControls.AddWindow
 
             // 检测可见性变化并调整布局
             ConvertLnkButton.Visibility = newVisibility; // 设置按钮可见性
+
+            // 加载期间不更新布局状态，防止后续计算失效
+            if (isLoading) return;
             if (_wasConvertLnkButtonVisible != isNowVisible)
             {
                 AdjustWindowAndGridLayout(isNowVisible ? 23 : -23); // 调整布局
