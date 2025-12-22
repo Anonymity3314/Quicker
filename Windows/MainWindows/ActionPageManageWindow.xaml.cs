@@ -42,7 +42,7 @@ namespace Quicker.Windows.MainWindows
         // 加载 Appearance 颜色
         private void InitAppearanceBrushes()
         {
-            var appearance = Quicker.Database.Core.SettingDatabase.GetAllAppearanceSettings()?.FirstOrDefault();
+            var appearance = Quicker.Database.Core.SettingDatabase.GetAppearanceSettings()?.FirstOrDefault();
             if (appearance != null)
             {
                 actionButtonBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonColor));

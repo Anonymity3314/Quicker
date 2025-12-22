@@ -5,7 +5,7 @@
     /// </summary>
     public class Appearance
     {
-        public int ID { get; set; } // 主键
+        public string ThemeName { get; set; } // 主键
         // 尺寸
         public double ButtonSize { get; set; } // 按钮大小
         public double ButtonGap { get; set; } // 按钮间隙

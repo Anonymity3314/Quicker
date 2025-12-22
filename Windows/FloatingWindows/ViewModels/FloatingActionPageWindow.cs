@@ -319,7 +319,7 @@ namespace Quicker.Windows.FloatingWindows.ViewModels
 
         private void LoadAppearanceSettings()
         {
-            var appearance = SettingDatabase.GetAllAppearanceSettings()?.FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings()?.FirstOrDefault();
             if (appearance != null)
             {
                 ButtonSize = appearance.ButtonSize;

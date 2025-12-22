@@ -435,7 +435,7 @@ namespace Quicker.Managers
         /// <param name="maxWidth"> 最大宽度 </param>
         private void AddTitleToGrid(Grid grid, ButtonData buttonInformation, double maxWidth, bool isMainWindow)
         {
-            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault();
             double buttonSize = appearance.ButtonSize; // 获取按钮大小
             double borderWidth = appearance.BorderWidth; // 获取边框宽度
             maxWidth = isMainWindow ? buttonSize - borderWidth * 2 : maxWidth; // 计算最大可用宽度
@@ -463,7 +463,7 @@ namespace Quicker.Managers
         /// <returns> 图像对象 </returns>
         private Image LoadActionIcon(ButtonData buttonInformation, bool isMainWindow)
         {
-            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault();
             double buttonSize = isMainWindow ? appearance.ButtonSize : 65;
             double imageSize = buttonSize / 2.0;
             Image image = new()
@@ -497,7 +497,7 @@ namespace Quicker.Managers
         /// <returns> 文本块对象 </returns>
         private TextBlock LoadActionTitle(ButtonData buttonInformation, double maxWidth, bool isMainWindow)
         {
-            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault();
             var textBlock = new TextBlock
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch, // 水平拉伸填满
@@ -631,7 +631,7 @@ namespace Quicker.Managers
         public void ShrinkTextBlockFontToFit(TextBlock textBlock, double maxWidth)
         {
             if (textBlock == null || string.IsNullOrEmpty(textBlock.Text)) return; // 防止空引用或空文本
-            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault();
             double fontSize = appearance.FontSize; // 获取初始字号
             textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity)); // 测量当前文本块宽度
             while (textBlock.DesiredSize.Width >= maxWidth)

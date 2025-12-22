@@ -161,7 +161,7 @@ namespace Quicker
         private void RestoreGlobalFontFamilyFromDatabase()
         {
             // 读取 Appearance 设置
-            var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault();
             if (appearance == null)
             {
                 using var toast = new ToastManager();

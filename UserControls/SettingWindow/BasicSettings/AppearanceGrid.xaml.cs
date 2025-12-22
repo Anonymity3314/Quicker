@@ -1459,5 +1459,17 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             p.Blur = 0;
         });
         #endregion
+
+        private void DefaultAppearanceSettingButton_Click(object sender, RoutedEventArgs e)
+        {
+            DarkThemeSettingButton.BorderThickness = new Thickness(0);
+            DefaultAppearanceSettingButton.BorderThickness = new Thickness(0, 0, 0, 2);
+        }
+
+        private void DarkThemeSettingButton_Click(object sender, RoutedEventArgs e)
+        {
+            DefaultAppearanceSettingButton.BorderThickness = new Thickness(0);
+            DarkThemeSettingButton.BorderThickness = new Thickness(0, 0, 0, 2);
+        }
     }
 }

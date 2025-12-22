@@ -834,7 +834,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         {
             if (sender is Button btn)
             {
-                var appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault();
+                var appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault();
                 if (btn.Tag != null) // 有数据的按钮，执行放大动画
                 {
                     AnimateButtonScale(btn, appearance);

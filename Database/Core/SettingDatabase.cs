@@ -9,78 +9,6 @@ namespace Quicker.Database.Core
 {
     public static class SettingDatabase
     {
-        // 配置项默认说明：
-        /* [Convention] 常规
-         * Version: 软件的当前版本号，默认为程序版本。
-         * AutoStart: 是否开机自启，默认为false（关闭）。
-         * ShowNotification: 是否显示系统通知，默认为true（开启）。
-         * ShowAddImage: 是否显示添加图片选项，默认为true（开启）。
-         * HideTooltip: 是否隐藏工具提示，默认为false（不隐藏）。
-         * LongPressThreshold: 长按判定阈值（毫秒），默认为300ms。
-         * MouseMovePixels: 鼠标移动触发距离（像素），默认为50px。
-         * LoopPageFlipping: 是否循环翻页，默认为true（开启）。
-         * RememberLastPage: 是否记住设置窗口中最后打开的页面，默认为false（不记住）。
-         * LastPage: 最后打开的页面ID，默认为11。
-         * EnableMemoryOptimization: 是否启用内存优化，默认为true（开启）。
-         * TrayIconPathRunning: 运行时托盘图标路径，默认为"pack://application:,,,/Resources/Images/Quicker_Enabled.png"。
-         * TrayIconPathPaused: 暂停时托盘图标路径，默认为"pack://application:,,,/Resources/Images/Quicker_Disabled.ico"。
-         */
-        /* [OpenMainWindow] 弹出面板
-         * OpenMainWindowByMiddleMouseClick: 按中键点击打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByX1MouseClick: 按X1键点击打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByX2MouseClick: 按X2键点击打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByCtrl_MiddleMouseClick: 按Ctrl+中键点击打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByCtrl_RightMouseClick: 按Ctrl+右键点击打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByMiddleMouseClickLonger: 中键长按打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByRightMouseClickLonger: 右键长按打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByRightMouseClick_Move: 右键移动打开设置窗口，默认为false（关闭）。
-         * OpenMainWindowByCtrl: 按Ctrl打开设置窗口，默认为true（开启）。
-         * WindowStartupLocation: 设置窗口启动位置，默认为2（可能代表屏幕中央或其他位置）。
-         */
-        /* [Blacklist] 黑名单
-         * IsFullScreenDisabled: 是否禁用全屏功能，默认为false（不禁用）。
-         * IsBlacklistEnabledForExtendedHotkey: 扩展快捷键是否启用黑名单，默认为false（不启用）。
-         */
-        /* [BlacklistApplication] 黑名单列表
-         * ApplicationName: 黑名单列表显示的文字，可以是文件夹路径，也可以是应用程序名称。
-         * ProcessName: 确切的应用程序进程名称，应用程序的可执行文件名称。
-         * IsInBlacklist: 此项用于标识该应用程序是否在黑名单中。
-         * IsFolder: 此项用于标识ApplicationName是否为文件夹路径。
-         */
-        /* [Appearance] 外观
-         * ButtonSize: 按钮大小，默认为77.6。
-         * ButtonGap: 按钮间隙，默认为0.2。
-         * BorderWidth: 边框宽度，默认为0.0。
-         * ButtonCornerRadius: 按钮圆角，默认为0.0。
-         *
-         * BackgroundColor: 背景颜色，默认为#FFF3F3F3。
-         * BorderColor：边框颜色，默认为#FFD3D3D3。
-         * ToolbarColor: 工具栏颜色，默认为#22F3F3F3。
-         * ToolbarIconColor: 工具栏图标颜色，默认为#FFA1A1A1。
-         * ActionButtonColor: 动作按钮颜色，默认为#FFFFFFFF。
-         * ActionButtonMouseOverColor: 动作按钮鼠标悬停颜色，默认为#FFBEE6FD。
-         * BlankButtonColor: 空白按钮颜色，默认为#FFF3F3F3。
-         * BlankButtonMouseOverColor: 空白按钮鼠标悬停颜色，默认为#FFEAEAEA。
-         * ButtonTextColor: 按钮文字颜色，默认为#FF000000。
-         *
-         * Font1: 字体1，默认为-1。
-         * Font2: 字体2，默认为-1。
-         * FontSize: 字体大小，默认为12。
-         * FontWeight: 字体粗细，默认为4。
-         *
-         * BackgroundImagePath: 背景图片路径，默认为空。
-         * BackgroundImageOpacity: 背景图片不透明度，默认为1.0。
-         *
-         * Blur: 模糊模式，默认为0。
-         * Win11CornerRadius: Win11圆角模式，默认为0。
-         *
-         * AutoHideTitleBar: 自动缩小动作名称文字，默认为false。
-         * ShowActionButtonMouseOver: 鼠标悬浮在动作按钮上时，放大显示按钮，默认为false。
-         * HideActionNameAfterIcon: 设置动作图标后隐藏动作名称，默认为false。
-         * ShowActionIconShadow: 动作图标显示阴影，默认为false。
-         * EnablePreview: 开启预览功能，默认为false。
-         */
-
         static SettingDatabase()
         {
             DatabaseHelper.EnsureDatabaseDirectoryExists(); // 确保数据库目录存在
@@ -108,7 +36,7 @@ namespace Quicker.Database.Core
         private static void InsertDefaultConventionData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (false, true, true, 0.0, false, 300, 50, true, false, 111, true, "pack://application:,,,/Resources/Images/Quicker_Enabled.png", "pack://application:,,,/Resources/Images/Quicker_Disabled.ico", true); // 使用参数元组封装默认值
+            var defaults = (false, true, true, 0.0, false, 300, 50, true, false, 111, true, "pack://application:,,,/Resources/Images/Quicker_Enabled.png", "pack://application:,,,/Resources/Images/Quicker_Disabled.ico", true, false); // 使用参数元组封装默认值
             var parameters = new Dictionary<string, object>
             {
                 ["@AutoStart"] = defaults.Item1,
@@ -124,7 +52,8 @@ namespace Quicker.Database.Core
                 ["@EnableMemoryOptimization"] = defaults.Item11,
                 ["@TrayIconPathRunning"] = defaults.Item12,
                 ["@TrayIconPathPaused"] = defaults.Item13,
-                ["@UseMenuAnimation"] = defaults.Item14
+                ["@UseMenuAnimation"] = defaults.Item14,
+                ["@IsDarkTheme"] = defaults.Item15
             }; // 使用字典批量绑定参数
             using var command = new SQLiteCommand(SQLStatements.InsertConvention, connection); // 创建 SQLiteCommand 对象
             foreach (var param in parameters)
@@ -209,43 +138,52 @@ namespace Quicker.Database.Core
         private static void InsertDefaultAppearanceData()
         {
             using var connection = OpenConnection(); // 打开数据库连接
-            var defaults = (77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#22F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 4, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            var lightDefaults = ("Light", 77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#22F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 4, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            var darkDefaults = ("Dark", 77.6, 0.2, 0.0, 0.0, "#FFF3F3F3", "#FFD3D3D3", "#22F3F3F3", "#FFA1A1A1", "#FFFFFFFF", "#FFBEE6FD", "#FFF3F3F3", "#FFEAEAEA", "#FF000000", "#FF696969", "#D0FF8C00", "#FF666666", -1, -1, 12, 4, "", 1.0, 0, 0, false, false, false, false, false); // 使用参数元组封装默认值
+            InsertSingleAppearance(connection, lightDefaults); // 插入浅色主题
+            InsertSingleAppearance(connection, darkDefaults); // 插入深色主题
+        }
+
+        // 辅助方法，简化插入逻辑
+        private static void InsertSingleAppearance(SQLiteConnection connection, (string, double, double, double, double, string, string, string, string, string, string, string, string, string, string, string, string, int, int, int, int,string, double, int, int, bool, bool, bool, bool, bool) defaults)
+        {
             var parameters = new Dictionary<string, object>
             {
-                ["@ButtonSize"] = defaults.Item1, // 按钮大小
-                ["@ButtonGap"] = defaults.Item2, // 按钮间隙
-                ["@BorderWidth"] = defaults.Item3, // 边框宽度
-                ["@ButtonCornerRadius"] = defaults.Item4, // 按钮圆角
-                ["@BackgroundColor"] = defaults.Item5, // 背景颜色
-                ["@BorderColor"] = defaults.Item6, // 边框颜色
-                ["@ToolbarColor"] = defaults.Item7, // 工具栏颜色
-                ["@ToolbarIconColor"] = defaults.Item8, // 工具栏图标颜色
-                ["@ActionButtonColor"] = defaults.Item9, // 动作按钮颜色
-                ["@ActionButtonMouseOverColor"] = defaults.Item10, // 动作按钮鼠标悬停颜色
-                ["@BlankButtonColor"] = defaults.Item11, // 空白按钮颜色
-                ["@BlankButtonMouseOverColor"] = defaults.Item12, // 空白按钮鼠标悬停颜色
-                ["@ButtonTextColor"] = defaults.Item13, // 按钮文字颜色
-                ["@ActionIconColor"] = defaults.Item14, // 动作图标颜色
-                ["@TriggerKeyTextColor"] = defaults.Item15, // 触发键文字颜色
-                ["@OtherIconColor"] = defaults.Item16, // 其他位置图标颜色
-                ["@Font1"] = defaults.Item17, // 字体1
-                ["@Font2"] = defaults.Item18, // 字体2
-                ["@FontSize"] = defaults.Item19, // 字体大小
-                ["@FontWeight"] = defaults.Item20, // 字体粗细
-                ["@BackgroundImagePath"] = defaults.Item21, // 背景图片路径
-                ["@BackgroundImageOpacity"] = defaults.Item22, // 背景图片不透明度
-                ["@Blur"] = defaults.Item23, // 模糊模式
-                ["@Win11CornerRadius"] = defaults.Item24, // Win11圆角模式
-                ["@AutoHideTitleBar"] = defaults.Item25, // 自动缩小动作名称文字
-                ["@ShowActionButtonMouseOver"] = defaults.Item26, // 鼠标悬浮在动作按钮上时，放大显示按钮
-                ["@HideActionNameAfterIcon"] = defaults.Item27, // 设置动作图标后隐藏动作名称
-                ["@ShowActionIconShadow"] = defaults.Item28, // 动作图标显示阴影
-                ["@EnablePreview"] = defaults.Item29 // 开启预览功能
+                ["@ThemeName"] = defaults.Item1,
+                ["@ButtonSize"] = defaults.Item2, // 按钮大小
+                ["@ButtonGap"] = defaults.Item3, // 按钮间隙
+                ["@BorderWidth"] = defaults.Item4, // 边框宽度
+                ["@ButtonCornerRadius"] = defaults.Item5, // 按钮圆角
+                ["@BackgroundColor"] = defaults.Item6, // 背景颜色
+                ["@BorderColor"] = defaults.Item7, // 边框颜色
+                ["@ToolbarColor"] = defaults.Item8, // 工具栏颜色
+                ["@ToolbarIconColor"] = defaults.Item9, // 工具栏图标颜色
+                ["@ActionButtonColor"] = defaults.Item10, // 动作按钮颜色
+                ["@ActionButtonMouseOverColor"] = defaults.Item11, // 动作按钮鼠标悬停颜色
+                ["@BlankButtonColor"] = defaults.Item12, // 空白按钮颜色
+                ["@BlankButtonMouseOverColor"] = defaults.Item13, // 空白按钮鼠标悬停颜色
+                ["@ButtonTextColor"] = defaults.Item14, // 按钮文字颜色
+                ["@ActionIconColor"] = defaults.Item15, // 动作图标颜色
+                ["@TriggerKeyTextColor"] = defaults.Item16, // 触发键文字颜色
+                ["@OtherIconColor"] = defaults.Item17, // 其他位置图标颜色
+                ["@Font1"] = defaults.Item18, // 字体1
+                ["@Font2"] = defaults.Item19, // 字体2
+                ["@FontSize"] = defaults.Item20, // 字体大小
+                ["@FontWeight"] = defaults.Item21, // 字体粗细
+                ["@BackgroundImagePath"] = defaults.Item22, // 背景图片路径
+                ["@BackgroundImageOpacity"] = defaults.Item23, // 背景图片不透明度
+                ["@Blur"] = defaults.Item24, // 模糊模式
+                ["@Win11CornerRadius"] = defaults.Item25, // Win11圆角模式
+                ["@AutoHideTitleBar"] = defaults.Item26, // 自动缩小动作名称文字
+                ["@ShowActionButtonMouseOver"] = defaults.Item27, // 鼠标悬浮在动作按钮上时，放大显示按钮
+                ["@HideActionNameAfterIcon"] = defaults.Item28, // 设置动作图标后隐藏动作名称
+                ["@ShowActionIconShadow"] = defaults.Item29, // 动作图标显示阴影
+                ["@EnablePreview"] = defaults.Item30 // 开启预览功能
             };
-            using var command = new SQLiteCommand(SQLStatements.InsertAppearance, connection); // 创建 SQLiteCommand 对象
+            using var command = new SQLiteCommand(SQLStatements.InsertAppearance, connection);
             foreach (var param in parameters)
-                command.Parameters.AddWithValue(param.Key, param.Value); // 绑定参数
-            command.ExecuteNonQuery(); // 执行插入命令
+                command.Parameters.AddWithValue(param.Key, param.Value);
+            command.ExecuteNonQuery();
         }
 
         /// <summary>
@@ -263,7 +201,7 @@ namespace Quicker.Database.Core
         /// <param name="trayIconPathRunning"> 运行时托盘图标路径 </param>
         /// <param name="trayIconPathPaused"> 暂停时托盘图标路径 </param>
         /// <param name="useMenuAnimation"> 是否启用菜单动画 </param>
-        public static void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization, string trayIconPathRunning, string trayIconPathPaused, bool useMenuAnimation)
+        public static void ApplyConventionSettings(bool autostart, bool shownotification, bool showaddimage, bool hideTooltip, int longPressThreshold, int mouseMovePixels, bool loopPageFlipping, bool rememberLastPage, bool enableMemoryOptimization, string trayIconPathRunning, string trayIconPathPaused, bool useMenuAnimation, bool isDarkTheme)
         {
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
@@ -280,6 +218,7 @@ namespace Quicker.Database.Core
             command.Parameters.AddWithValue("@TrayIconPathRunning", trayIconPathRunning); // 运行时托盘图标路径
             command.Parameters.AddWithValue("@TrayIconPathPaused", trayIconPathPaused); // 暂停时托盘图标路径
             command.Parameters.AddWithValue("@UseMenuAnimation", useMenuAnimation); // 是否启用菜单动画
+            command.Parameters.AddWithValue("@IsDarkTheme", isDarkTheme); // 是否启用暗黑主题
             command.ExecuteNonQuery(); // 执行更新命令
             transaction.Commit(); // 提交事务
         }
@@ -421,7 +360,8 @@ namespace Quicker.Database.Core
                     EnableMemoryOptimization = reader.GetBoolean(11), // 是否启用内存优化
                     TrayIconPathRunning = reader.GetString(12), // 运行时托盘图标路径
                     TrayIconPathPaused = reader.GetString(13), // 暂停时托盘图标路径
-                    UseMenuAnimation = reader.FieldCount > 14 ? reader.GetBoolean(14) : true // 是否启用菜单动画（如果字段不存在则默认为 true）
+                    UseMenuAnimation = reader.GetBoolean(14), // 是否启用菜单动画
+                    IsDarkTheme = reader.GetBoolean(15)
                 }); // 将读取到的数据添加到列表中
             }
             transaction.Commit(); // 提交事务
@@ -514,18 +454,25 @@ namespace Quicker.Database.Core
         /// 获取外观设置
         /// </summary>
         /// <returns> Appearance 类 </returns>
-        public static List<Appearance> GetAllAppearanceSettings()
+        public static List<Appearance> GetAppearanceSettings()
         {
+            // 获取当前主题状态：读取 Convention 表，确定 IsDarkTheme 的值
+            var conventions = GetAllConventions().FirstOrDefault();
+            bool isDarkTheme = conventions.IsDarkTheme;
+            string themeName = isDarkTheme ? "Dark" : "Light";
+
+            // 执行 Appearance 表的查询
             var appearances = new List<Appearance>();
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted); // 开启只读事务
-            using var command = new SQLiteCommand(SQLStatements.GetAllAppearanceSettings, connection); // 创建 SQLiteCommand 对象
+            using var command = new SQLiteCommand(SQLStatements.GetAppearanceSettings, connection);
+            command.Parameters.AddWithValue("@ThemeName", themeName);  // 绑定确定的主题名称
             using var reader = command.ExecuteReader(); // 执行查询并获取数据读取器
             while (reader.Read())
             {
                 appearances.Add(new Appearance
                 {
-                    ID = reader.GetInt32(0), // 外观ID
+                    ThemeName = reader.GetString(0), // 外观ID
                     ButtonSize = reader.GetDouble(1), // 按钮大小
                     ButtonGap = reader.GetDouble(2), // 按钮间隙
                     BorderWidth = reader.GetDouble(3), // 边框宽度
@@ -555,7 +502,7 @@ namespace Quicker.Database.Core
                 });
             }
             transaction.Commit(); // 提交事务
-            return appearances; // 返回所有外观设置
+            return appearances; // 返回当前主题的外观设置
         }
 
         /// <summary>
@@ -567,6 +514,7 @@ namespace Quicker.Database.Core
             using var connection = OpenConnection(); // 打开数据库连接
             using var transaction = connection.BeginTransaction(); // 开启事务
             using var command = new SQLiteCommand(SQLStatements.UpdateAppearance, connection); // 创建 SQLiteCommand 对象
+            command.Parameters.AddWithValue("@ThemeName", appearance.ThemeName); // 主题名称
             command.Parameters.AddWithValue("@ButtonSize", appearance.ButtonSize); // 按钮大小
             command.Parameters.AddWithValue("@ButtonGap", appearance.ButtonGap); // 按钮间隙
             command.Parameters.AddWithValue("@BorderWidth", appearance.BorderWidth); // 边框宽度
@@ -659,7 +607,8 @@ namespace Quicker.Database.Core
                 EnableMemoryOptimization BOOLEAN,
                 TrayIconPathRunning TEXT,
                 TrayIconPathPaused TEXT,
-                UseMenuAnimation BOOLEAN
+                UseMenuAnimation BOOLEAN,
+                IsDarkTheme BOOLEAN
             );";
             public const string InsertConvention = @"
             INSERT INTO Convention
@@ -671,7 +620,7 @@ namespace Quicker.Database.Core
                 LoopPageFlipping,   RememberLastPage,
                 LastPage,           EnableMemoryOptimization,
                 TrayIconPathRunning, TrayIconPathPaused,
-                UseMenuAnimation
+                UseMenuAnimation,   IsDarkTheme
             )
             VALUES
             (
@@ -682,7 +631,7 @@ namespace Quicker.Database.Core
                 @LoopPageFlipping,  @RememberLastPage,
                 @LastPage,          @EnableMemoryOptimization,
                 @TrayIconPathRunning, @TrayIconPathPaused,
-                @UseMenuAnimation
+                @UseMenuAnimation,   @IsDarkTheme
             );";
             public const string UpdateConvention = @"
             UPDATE Convention SET
@@ -697,7 +646,8 @@ namespace Quicker.Database.Core
                 EnableMemoryOptimization = @EnableMemoryOptimization,
                 TrayIconPathRunning = @TrayIconPathRunning,
                 TrayIconPathPaused = @TrayIconPathPaused,
-                UseMenuAnimation = @UseMenuAnimation
+                UseMenuAnimation = @UseMenuAnimation,
+                IsDarkTheme = @IsDarkTheme
             WHERE ID = 1;";
             public const string GetAllConventions = "SELECT * FROM Convention;";
             // 打开主窗口设置表
@@ -823,7 +773,7 @@ namespace Quicker.Database.Core
             public const string CreateAppearanceTable = @"
             CREATE TABLE IF NOT EXISTS Appearance
             (
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                ThemeName TEXT PRIMARY KEY NOT NULL,
                 ButtonSize REAL,
                 ButtonGap REAL,
                 BorderWidth REAL,
@@ -854,6 +804,7 @@ namespace Quicker.Database.Core
             public const string InsertAppearance = @"
             INSERT INTO Appearance
             (
+                ThemeName,
                 ButtonSize,
                 ButtonGap,
                 BorderWidth,
@@ -883,6 +834,7 @@ namespace Quicker.Database.Core
             )
             VALUES
             (
+                @ThemeName,
                 @ButtonSize,
                 @ButtonGap,
                 @BorderWidth,
@@ -910,7 +862,7 @@ namespace Quicker.Database.Core
                 @ShowActionIconShadow,
                 @EnablePreview
             );"; // 插入外观设置
-            public const string GetAllAppearanceSettings = "SELECT * FROM Appearance;"; // 获取所有外观设置
+            public const string GetAppearanceSettings = "SELECT * FROM Appearance WHERE ThemeName = @ThemeName;"; // 获取所有外观设置
             public const string UpdateAppearance = @"
             UPDATE Appearance SET
                 ButtonSize = @ButtonSize,
@@ -939,7 +891,7 @@ namespace Quicker.Database.Core
                 HideActionNameAfterIcon = @HideActionNameAfterIcon,
                 ShowActionIconShadow = @ShowActionIconShadow,
                 EnablePreview = @EnablePreview
-            WHERE ID = 1;"; // 更新外观设置
+            WHERE ThemeName = @ThemeName;"; // 更新外观设置
         }
     }
 }

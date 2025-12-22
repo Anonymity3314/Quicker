@@ -93,7 +93,8 @@
             <Grid x:Name="SettingGrid" Grid.Column="0" Margin="0,0,0,10">
                 <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Hidden" ScrollChanged="ScrollViewer_ScrollChanged">
                     <Grid>
-                        <Button Content="默认设置" Style="{StaticResource Button3}" Margin="7,10,0,0" Foreground="#FF0087FC" Width="70"/>
+                        <Button x:Name="DefaultAppearanceSettingButton" Content="默认设置" Style="{StaticResource Button3}" Margin="7,10,0,0" Foreground="#FF0087FC" Width="70" BorderThickness="0,0,0,2" Click="DefaultAppearanceSettingButton_Click"/>
+                        <Button x:Name="DarkThemeSettingButton" Visibility="Collapsed" Content="深色主题设置" Style="{StaticResource Button3}" Margin="77,10,0,0" Foreground="#FF0087FC" Width="110" BorderThickness="0" Click="DarkThemeSettingButton_Click"/>
                         <Rectangle Fill="#FFD5D5D5" VerticalAlignment="Top" Height="1" Margin="7,40,10,0"/>
 
                         <!-- 尺寸 -->

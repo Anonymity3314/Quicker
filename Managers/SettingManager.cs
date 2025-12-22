@@ -150,7 +150,7 @@ namespace Quicker.Managers
         public async Task LoadAppearanceAsync()
         {
             if (appearanceConditions != null) return; // 如果已经初始化了数据，直接返回
-            var Appearance = SettingDatabase.GetAllAppearanceSettings().FirstOrDefault(); // 获取外观设置信息
+            var Appearance = SettingDatabase.GetAppearanceSettings().FirstOrDefault(); // 获取外观设置信息
             appearanceConditions = new Appearance // 外观设置
             {
                 // 按钮

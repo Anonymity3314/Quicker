@@ -293,7 +293,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         public MainWindowViewModel()
         {
             // 加载数据库数据
-            var appearance = SettingDatabase.GetAllAppearanceSettings()?.FirstOrDefault();
+            var appearance = SettingDatabase.GetAppearanceSettings()?.FirstOrDefault();
             if (appearance != null)
             {
                 BackgroundImagePath = appearance.BackgroundImagePath;

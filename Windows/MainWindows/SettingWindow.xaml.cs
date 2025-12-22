@@ -138,7 +138,8 @@ namespace Quicker.Windows.MainWindows
                         _settingManager.conventions.EnableMemoryOptimization,
                         _settingManager.conventions.TrayIconPathRunning,
                         _settingManager.conventions.TrayIconPathPaused,
-                        _settingManager.conventions.UseMenuAnimation
+                        _settingManager.conventions.UseMenuAnimation,
+                        SettingDatabase.GetAllConventions().FirstOrDefault().IsDarkTheme
                     ); // 更新常规设置
                 if (_settingManager.openMainWindowConditions != null)
                     SettingDatabase.ApplyOpenMainWindowSettings(
