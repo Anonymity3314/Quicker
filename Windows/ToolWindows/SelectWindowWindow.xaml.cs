@@ -1,8 +1,8 @@
 using MouseButton = System.Windows.Input.MouseButton;
 using System.Runtime.InteropServices;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Input;
 using System.Diagnostics;
 using Quicker.Managers;
@@ -100,116 +100,19 @@ namespace Quicker.Windows.ToolWindows
         }
 
         /// <summary>
-        /// 根据坐标点获取窗口句柄（优化版本：找到真正的顶层窗口）
+        /// 根据坐标点获取窗口句柄
         /// </summary>
         /// <param name="point"> 坐标点 </param>
         /// <returns> 窗口句柄 </returns>
         private nint GetWindowHandleFromPoint(POINT point)
         {
             nint hWnd = WindowFromPoint(point.X, point.Y); // 获取鼠标下的窗口句柄
-            
             if (hWnd == IntPtr.Zero)
                 return IntPtr.Zero;
-            
-            // 首先检查鼠标下的窗口是否属于文件资源管理器窗口（包括子窗口）
-            // 这样可以确保当文件资源管理器窗口在其他窗口上时，能够正确选择文件资源管理器窗口
-            nint explorerWindow = FindExplorerWindowInHierarchy(hWnd);
-            if (explorerWindow != IntPtr.Zero)
-            {
-                return explorerWindow;
-            }
-            
+
             // 找到真正的顶层窗口（不是子窗口）
             nint topLevelWindow = GetAncestor(hWnd, GetAncestorFlags.GA_ROOT);
-            
-            // 检查是否是控制面板窗口的特殊情况
-            StringBuilder className = new StringBuilder(256);
-            GetClassName(topLevelWindow, className, className.Capacity);
-            string classNameStr = className.ToString();
-            string windowTitle = GetWindowTitle(topLevelWindow);
-            
-            // 控制面板窗口可能是文件资源管理器的子窗口，需要特殊处理
-            // 如果窗口标题包含"控制面板"相关文字，且进程是 explorer.exe，则认为是控制面板窗口
-            if (!string.IsNullOrEmpty(windowTitle) && 
-                (windowTitle.Contains("控制面板", StringComparison.OrdinalIgnoreCase) ||
-                 windowTitle.Contains("Control Panel", StringComparison.OrdinalIgnoreCase)))
-            {
-                // 检查是否是 explorer.exe 的窗口
-                try
-                {
-                    GetWindowThreadProcessId(topLevelWindow, out uint processId);
-                    Process process = Process.GetProcessById((int)processId);
-                    string processName = process.ProcessName.ToLower();
-                    
-                    // 如果是 explorer.exe 的窗口，但标题是控制面板，则返回当前窗口
-                    if (processName == "explorer")
-                    {
-                        return topLevelWindow;
-                    }
-                }
-                catch { }
-            }
-            
             return topLevelWindow;
-        }
-
-        /// <summary>
-        /// 在窗口层次结构中查找文件资源管理器窗口
-        /// </summary>
-        /// <param name="hWnd"> 起始窗口句柄 </param>
-        /// <returns> 文件资源管理器窗口句柄，如果未找到则返回 IntPtr.Zero </returns>
-        private nint FindExplorerWindowInHierarchy(nint hWnd)
-        {
-            if (hWnd == IntPtr.Zero)
-                return IntPtr.Zero;
-            
-            // 从当前窗口开始，向上遍历窗口层次结构
-            nint current = hWnd;
-            StringBuilder className = new StringBuilder(256);
-            
-            // 最多向上查找10层，避免无限循环
-            for (int i = 0; i < 10; i++)
-            {
-                GetClassName(current, className, className.Capacity);
-                string classNameStr = className.ToString();
-                
-                // 检查是否是文件资源管理器窗口
-                if (classNameStr.Contains("CabinetWClass", StringComparison.OrdinalIgnoreCase) || 
-                    classNameStr.Contains("ExploreWClass", StringComparison.OrdinalIgnoreCase))
-                {
-                    // 找到文件资源管理器窗口，继续向上查找其顶层窗口
-                    nint explorerTop = current;
-                    nint parent = GetAncestor(explorerTop, GetAncestorFlags.GA_ROOT);
-                    
-                    while (parent != IntPtr.Zero && parent != explorerTop)
-                    {
-                        GetClassName(parent, className, className.Capacity);
-                        string parentClassNameStr = className.ToString();
-                        
-                        if (parentClassNameStr.Contains("CabinetWClass", StringComparison.OrdinalIgnoreCase) || 
-                            parentClassNameStr.Contains("ExploreWClass", StringComparison.OrdinalIgnoreCase))
-                        {
-                            explorerTop = parent;
-                            parent = GetAncestor(explorerTop, GetAncestorFlags.GA_ROOT);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    
-                    return explorerTop;
-                }
-                
-                // 获取父窗口
-                nint parentWindow = GetAncestor(current, GetAncestorFlags.GA_ROOT);
-                if (parentWindow == IntPtr.Zero || parentWindow == current)
-                    break;
-                
-                current = parentWindow;
-            }
-            
-            return IntPtr.Zero;
         }
 
         /// <summary>
@@ -238,7 +141,7 @@ namespace Quicker.Windows.ToolWindows
                     {
                         return GetWindowIcon(processPath);
                     }
-                    
+
                     // 否则尝试从进程路径获取图标
                     ImageSource icon = IconManager.GetIcon(processPath); // 获取图标
                     if (icon is BitmapSource bitmapSource)
@@ -259,64 +162,30 @@ namespace Quicker.Windows.ToolWindows
         /// <returns> 窗口图标 </returns>
         private BitmapSource GetWindowIcon(string hwndIdentifier)
         {
-            try
+            // 解析窗口句柄
+            if (hwndIdentifier.StartsWith("hwnd:", StringComparison.OrdinalIgnoreCase))
             {
-                // 解析窗口句柄
-                if (hwndIdentifier.StartsWith("hwnd:", StringComparison.OrdinalIgnoreCase))
+                string hexValue = hwndIdentifier.Substring(5);
+                nint hWnd = new nint(Convert.ToInt64(hexValue, 16));
+
+                // 尝试获取进程路径
+                try
                 {
-                    string hexValue = hwndIdentifier.Substring(5);
-                    nint hWnd = new nint(Convert.ToInt64(hexValue, 16));
-
-                    // 获取窗口标题
-                    string windowTitle = GetWindowTitle(hWnd);
-
-                    // 尝试获取进程路径
-                    try
+                    GetWindowThreadProcessId(hWnd, out uint processId);
+                    Process process = Process.GetProcessById((int)processId);
+                    string processPath = process.MainModule?.FileName;
+                    if (!string.IsNullOrEmpty(processPath))
                     {
-                        GetWindowThreadProcessId(hWnd, out uint processId);
-                        Process process = Process.GetProcessById((int)processId);
-                        string processPath = process.MainModule?.FileName;
-                        
-                        if (!string.IsNullOrEmpty(processPath))
+                        // 使用进程路径获取图标
+                        ImageSource processIcon = IconManager.GetIcon(processPath);
+                        if (processIcon is BitmapSource processBitmapSource)
                         {
-                            // 特殊处理：控制面板窗口
-                            // 如果窗口标题是控制面板，但进程是 explorer.exe，使用控制面板的特殊路径
-                            if (!string.IsNullOrEmpty(windowTitle) && 
-                                (windowTitle.Contains("控制面板", StringComparison.OrdinalIgnoreCase) ||
-                                 windowTitle.Contains("Control Panel", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                // 控制面板的CLSID路径
-                                string controlPanelPath = @"::{26EE0668-A00A-44D7-9371-BEB064C98683}";
-                                ImageSource controlPanelIcon = IconManager.GetIcon(controlPanelPath);
-                                if (controlPanelIcon is BitmapSource bitmapSource)
-                                {
-                                    return bitmapSource;
-                                }
-                            }
-                            
-                            // 使用进程路径获取图标
-                            ImageSource processIcon = IconManager.GetIcon(processPath);
-                            if (processIcon is BitmapSource processBitmapSource)
-                            {
-                                return processBitmapSource;
-                            }
-                        }
-                    }
-                    catch { }
-
-                    // 如果无法获取进程路径，尝试使用 explorer.exe 作为默认图标
-                    string explorerPath = Environment.GetFolderPath(Environment.SpecialFolder.Windows) + @"\explorer.exe";
-                    if (File.Exists(explorerPath))
-                    {
-                        ImageSource explorerIcon = IconManager.GetIcon(explorerPath);
-                        if (explorerIcon is BitmapSource explorerBitmapSource)
-                        {
-                            return explorerBitmapSource;
+                            return processBitmapSource;
                         }
                     }
                 }
+                catch { }
             }
-            catch { }
             return null;
         }
 
@@ -377,42 +246,22 @@ namespace Quicker.Windows.ToolWindows
         {
             try
             {
-                // 获取窗口标题和类名，用于识别控制面板窗口
-                string windowTitle = GetWindowTitle(hWnd);
-                StringBuilder className = new StringBuilder(256);
-                GetClassName(hWnd, className, className.Capacity);
-                string classNameStr = className.ToString();
-                
                 GetWindowThreadProcessId(hWnd, out uint processId); // 获取进程ID
                 Process process = Process.GetProcessById((int)processId); // 获取进程对象
                 string processPath = process.MainModule?.FileName ?? string.Empty; // 获取进程路径
-                string processName = process.ProcessName.ToLower();
-                
-                // 特殊处理：控制面板窗口
-                // 控制面板窗口可能是 explorer.exe 的子窗口，但我们需要将其识别为控制面板
-                if (!string.IsNullOrEmpty(windowTitle) && 
-                    (windowTitle.Contains("控制面板", StringComparison.OrdinalIgnoreCase) ||
-                     windowTitle.Contains("Control Panel", StringComparison.OrdinalIgnoreCase)) &&
-                    processName == "explorer")
-                {
-                    // 对于控制面板窗口，使用窗口句柄标识符，而不是 explorer.exe 的路径
-                    // 这样可以在后续处理中正确识别为控制面板窗口
-                    return $"hwnd:{hWnd.ToInt64():X}";
-                }
-                
+
                 // 如果成功获取进程路径，直接返回
                 if (!string.IsNullOrEmpty(processPath))
                 {
                     return processPath;
                 }
-                
+
                 // 如果无法获取进程路径（系统窗口），使用窗口句柄作为标识符
                 return $"hwnd:{hWnd.ToInt64():X}";
             }
             catch
             {
-                // 进程获取失败，使用窗口句柄作为标识符（系统窗口）
-                return $"hwnd:{hWnd.ToInt64():X}";
+                return $"hwnd:{hWnd.ToInt64():X}"; // 进程获取失败，使用窗口句柄作为标识符（系统窗口）
             }
         }
 

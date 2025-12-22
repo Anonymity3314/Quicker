@@ -411,13 +411,41 @@ namespace Quicker.UserControls.AddWindow
         /// <returns>动作类型</returns>
         private ActionType DetermineActionType()
         {
-            if (LocationTextBox.Text.Contains(";"))
+            string location = LocationTextBox.Text?.Trim() ?? string.Empty;
+
+            // 多个文件
+            if (location.Contains(";")) return ActionType.OpenFiles;
+
+            // 系统命令 / Shell 命名空间 / 窗口句柄 标识符：都应按“打开文件/位置”处理
+            if (IsSystemCommand(location) ||
+                IsShellNamespacePath(location) ||
+                location.StartsWith("hwnd:", StringComparison.OrdinalIgnoreCase))
             {
-                return ActionType.OpenFiles; // 如果地址栏包含分号，则设置为打开多个文件动作
+                return ActionType.OpenFile;
             }
-            string pattern = @"^[A-Za-z]:\\(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]*$";
-            bool isValidPath = Regex.IsMatch(LocationTextBox.Text, pattern); // 检查路径是否有效
-            return isValidPath ? ActionType.OpenFile : ActionType.OpenUwpApp; // 返回动作类型
+
+            // 普通本地路径
+            const string pattern = @"^[A-Za-z]:\\(?:[^\\/:*?""<>|\r\n]+\\)*[^\\/:*?""<>|\r\n]*$";
+            bool isValidPath = Regex.IsMatch(location, pattern);
+            return isValidPath ? ActionType.OpenFile : ActionType.OpenUwpApp;
+        }
+
+        /// <summary>
+        /// 是否为系统命令（如 syscmd:controlpanel）
+        /// </summary>
+        private bool IsSystemCommand(string location)
+        {
+            return !string.IsNullOrWhiteSpace(location) &&
+                   location.StartsWith("syscmd:", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// 是否为 Shell 命名空间路径（如 shell:::{CLSID}，用于控制面板等系统位置）
+        /// </summary>
+        private bool IsShellNamespacePath(string location)
+        {
+            return !string.IsNullOrWhiteSpace(location) &&
+                   location.StartsWith("shell:::", StringComparison.OrdinalIgnoreCase);
         }
 
         // 清理资源
