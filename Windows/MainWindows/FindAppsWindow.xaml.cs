@@ -194,17 +194,35 @@ namespace Quicker.Windows.MainWindows
         // 处理选中的窗口
         private void OnWindowSelected(object sender, SelectWindowWindow.WindowSelectedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.ProcessPath))
+            if (!string.IsNullOrEmpty(e.ProcessPath) || e.WindowHandle != IntPtr.Zero)
             {
                 try
                 {
-                    // 创建新的AppInfo对象
-                    AppInfo selectedApp = new AppInfo
+                    AppInfo selectedApp;
+                    // 检查是否是系统窗口（窗口句柄标识符）
+                    if (e.ProcessPath.StartsWith("hwnd:", StringComparison.OrdinalIgnoreCase))
                     {
-                        Name = Path.GetFileNameWithoutExtension(e.ProcessPath),
-                        Location = e.ProcessPath,
-                        Tag = e.ProcessPath
-                    };
+                        // 系统窗口：使用窗口标题作为名称，窗口句柄标识符作为路径
+                        string windowName = !string.IsNullOrEmpty(e.WindowTitle) 
+                            ? e.WindowTitle 
+                            : "系统窗口";
+
+                        selectedApp = new AppInfo
+                        {
+                            Name = windowName,
+                            Location = e.ProcessPath,
+                            Tag = e.ProcessPath
+                        };
+                    }
+                    else // 普通应用程序窗口：使用进程路径
+                    {
+                        selectedApp = new AppInfo
+                        {
+                            Name = Path.GetFileNameWithoutExtension(e.ProcessPath),
+                            Location = e.ProcessPath,
+                            Tag = e.ProcessPath
+                        };
+                    }
 
                     if (e.ProcessIcon != null) // 设置图标 - 直接使用传递过来的图标
                     {
