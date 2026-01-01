@@ -12,11 +12,12 @@ namespace Quicker.Windows.ToolWindows
     public partial class ToastWindow : Window
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new(); // 取消令牌源
-        private Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
+        private readonly Dictionary<Border, DispatcherTimer> timerDictionary = new(); // 用于存储计时器
+        private readonly HashSet<Border> animatingBorders = new(); // 正在动画中的 Border 集合
+        private readonly Queue<Message> messageQueue = new(); // 创建消息队列
         private readonly SemaphoreSlim _queueSignal = new(0); // 创建一个信号量，初始计数为0
         private readonly Storyboard _scaleOutStoryboard; // 缩小动画
         private readonly Storyboard _scaleInStoryboard; // 放大动画
-        private Queue<Message> messageQueue = new(); // 创建消息队列
         private readonly Task _queueProcessingTask; // 队列处理任务
 
         public ToastWindow()
@@ -61,14 +62,15 @@ namespace Quicker.Windows.ToolWindows
         // 检查并显示消息
         private void CheckAndDisplayToast()
         {
-            if (messageQueue.Count > 0 && ToastStackPanel.Children.Count < 5) // 判断消息队列是否有消息并且当前消息数量未达到上限
+            // 如果队列有消息且当前显示数量未达到上限，显示新消息
+            if (messageQueue.Count > 0 && ToastStackPanel.Children.Count < 5)
             {
-                var msg = messageQueue.Dequeue(); // 从队列中取出消息
-                ShowToast(msg); // 显示消息
+                ShowToast(messageQueue.Dequeue());
             }
-            else if (messageQueue.Count == 0 && ToastStackPanel.Children.Count == 0) // 判断消息队列是否为空且没有消息显示
+            // 如果队列为空且没有显示的消息，关闭窗口
+            else if (messageQueue.Count == 0 && ToastStackPanel.Children.Count == 0)
             {
-                Close(); // 关闭窗口
+                Close();
             }
         }
 
@@ -78,24 +80,26 @@ namespace Quicker.Windows.ToolWindows
         /// <param name="msg"> 消息内容 </param>
         private void ShowToast(Message msg)
         {
-            var border = InitializeBoarder(msg.ToastType); // 初始化边框
-            var textblock = InitalizeToast(msg.Content); // 初始化消息
-            Grid grid = new Grid();
+            var border = InitializeBorder(msg.ToastType); // 初始化边框
+            var textblock = InitializeToast(msg.Content); // 初始化消息
+            var grid = new Grid();
             border.Child = grid; // 将消息添加到边框中
             grid.Children.Add(textblock); // 将消息添加到网格中
             border.MouseRightButtonDown += Border_MouseRightButtonDown;
 
             // 初始化关闭按钮，并传入边框对象
-            var closeToastButton = InitalizeCloseButton(border);
+            var closeToastButton = InitializeCloseButton(border);
             closeToastButton.Click += (s, e) => DeleteToast(border); // 关闭按钮点击事件
             grid.Children.Add(closeToastButton); // 将关闭按钮添加到网格中
 
             InitializeAnimation(border); // 初始化动画
 
             // 为每个消息创建一个独立的计时器
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(3); // 设置计时器时间为3秒
-            timer.Tag = border; // 将边框对象存储在计时器的Tag属性中
+            var timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(3), // 设置计时器时间为3秒
+                Tag = border // 将边框对象存储在计时器的Tag属性中
+            };
             timer.Tick += Timer_Tick; // 计时器事件
 
             timerDictionary[border] = timer; // 将计时器存储到字典中
@@ -109,11 +113,13 @@ namespace Quicker.Windows.ToolWindows
         /// <param name="e"></param>
         private void Border_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Border border = (Border)sender;
-            if(border.Tag is ToastType toastType && toastType == ToastType.Error)
+            if (sender is Border border && 
+                border.Tag is ToastType toastType && 
+                toastType == ToastType.Error &&
+                border.Child is Grid grid &&
+                grid.Children.Count > 0 &&
+                grid.Children[0] is TextBlock textblock)
             {
-                Grid grid = (Grid)border.Child;
-                TextBlock textblock = (TextBlock)grid.Children[0];
                 Clipboard.SetText(textblock.Text);
             }
         }
@@ -122,7 +128,7 @@ namespace Quicker.Windows.ToolWindows
         /// 初始化边框
         /// </summary>
         /// <param name="toastType"> 消息类型 </param>
-        private Border InitializeBoarder(ToastType toastType)
+        private Border InitializeBorder(ToastType toastType)
         {
             Border border = new()
             {
@@ -144,49 +150,71 @@ namespace Quicker.Windows.ToolWindows
         /// </summary>
         /// <param name="border"> 消息边框 </param>
         /// <returns> 关闭按钮 </returns>
-        private Button InitalizeCloseButton(Border border)
+        private Button InitializeCloseButton(Border border)
         {
-            Button button = new Button() { Style = (Style)FindResource("CloseToastButton") }; // 设置按钮样式
+            var button = new Button { Style = (Style)FindResource("CloseToastButton") }; // 设置按钮样式
 
-            // 添加鼠标进入和离开事件处理程序
-            button.MouseEnter += (s, e) =>
-            {
-                e.Handled = true; // 阻止事件冒泡
-                if (border.Background is SolidColorBrush borderBrush)
-                {
-                    Color originalColor = borderBrush.Color; // 获取边框颜色
-                    Color darkerColor = Color.FromRgb(
-                        (byte)(originalColor.R * 0.9),
-                        (byte)(originalColor.G * 0.9),
-                        (byte)(originalColor.B * 0.9)
-                    ); // 使背景颜色更深
-                    button.Background = new SolidColorBrush(darkerColor); // 设置按钮的背景色
-                }
-            }; // 鼠标进入事件
+            // 创建命名事件处理器，以便后续可以解绑
+            // 将 border 和 button 存储在闭包中，但使用命名方法以便解绑
+            MouseEventHandler mouseEnterHandler = (s, e) => CloseButton_MouseEnter(s, e, border, button);
+            MouseEventHandler mouseLeaveHandler = (s, e) => CloseButton_MouseLeave(s, e, button);
 
-            button.MouseLeave += (s, e) =>
-            {
-                button.Background = new SolidColorBrush(Colors.Transparent); // 恢复按钮的背景色
-            }; // 鼠标离开事件
+            // 将事件处理器存储在按钮的 Tag 中，以便后续解绑
+            button.Tag = new ButtonEventHandlers { MouseEnterHandler = mouseEnterHandler, MouseLeaveHandler = mouseLeaveHandler };
+            button.MouseEnter += mouseEnterHandler; // 鼠标进入事件
+            button.MouseLeave += mouseLeaveHandler; // 鼠标离开事件
+
             return button; // 返回关闭按钮
+        }
+
+        /// <summary>
+        /// 关闭按钮鼠标进入事件
+        /// </summary>
+        private void CloseButton_MouseEnter(object sender, MouseEventArgs e, Border border, Button button)
+        {
+            if (border.Background is SolidColorBrush borderBrush)
+            {
+                var darkerColor = Color.FromRgb(
+                    (byte)(borderBrush.Color.R * 0.9),
+                    (byte)(borderBrush.Color.G * 0.9),
+                    (byte)(borderBrush.Color.B * 0.9)
+                );
+                button.Background = new SolidColorBrush(darkerColor);
+            }
+        }
+
+        /// <summary>
+        /// 关闭按钮鼠标离开事件
+        /// </summary>
+        private void CloseButton_MouseLeave(object sender, MouseEventArgs e, Button button)
+        {
+            button.Background = new SolidColorBrush(Colors.Transparent); // 恢复按钮的背景色
+        }
+
+        /// <summary>
+        /// 按钮事件处理器存储类
+        /// </summary>
+        private class ButtonEventHandlers
+        {
+            public MouseEventHandler MouseEnterHandler { get; set; }
+            public MouseEventHandler MouseLeaveHandler { get; set; }
         }
 
         /// <summary>
         /// 初始化消息
         /// </summary>
         /// <param name="message"> 消息内容 </param>
-        private TextBlock InitalizeToast(string message)
+        private TextBlock InitializeToast(string message)
         {
-            TextBlock textBlock = new TextBlock()
+            return new TextBlock
             {
-                FontSize = 16, // 设置字体大小
-                Text = message, // 设置消息内容
-                TextWrapping = TextWrapping.Wrap, // 设置消息内容自动换行
-                Margin = new Thickness(20, 20, 20, 20), // 设置边距
-                VerticalAlignment = VerticalAlignment.Center, // 设置垂直对齐方式
-                Foreground = new SolidColorBrush(Colors.White) // 设置字体颜色
-            }; // 创建消息文本框
-            return textBlock; // 返回消息
+                Foreground = new SolidColorBrush(Colors.White),
+                VerticalAlignment = VerticalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(20),
+                Text = message,
+                FontSize = 16
+            };
         }
 
         // 初始化动画
@@ -198,40 +226,113 @@ namespace Quicker.Windows.ToolWindows
         // 计时器事件
         private void Timer_Tick(object sender, EventArgs e)
         {
-            DispatcherTimer timer = (DispatcherTimer)sender; // 获取计时器
-            Border border = (Border)timer.Tag; // 获取消息边框
-            if (border != null)
-            {
-                _scaleOutStoryboard.Completed += (s, arg) =>
-                {
-                    DeleteToast(border);
-                }; // 缩小动画完成时删除消息
-                _scaleOutStoryboard.Begin(border); // 开始播放缩小动画
+            if (sender is not DispatcherTimer timer || timer.Tag is not Border border)
+                return;
 
-                timer.Stop(); // 停止计时器
-                timer.Tick -= Timer_Tick; // 移除计时器事件
-                timer = null; // 释放计时器
+            StopTimer(timer);
+            AnimateToastOut(border);
+        }
+
+        /// <summary>
+        /// 停止计时器
+        /// </summary>
+        /// <param name="timer">计时器</param>
+        private void StopTimer(DispatcherTimer timer)
+        {
+            timer.Stop();
+            timer.Tick -= Timer_Tick;
+        }
+
+        /// <summary>
+        /// 解绑按钮的所有事件
+        /// </summary>
+        /// <param name="button">按钮</param>
+        /// <param name="handlers">事件处理器</param>
+        private void UnbindButtonEvents(Button button, ButtonEventHandlers handlers)
+        {
+            if (handlers.MouseEnterHandler != null)
+            {
+                button.MouseEnter -= handlers.MouseEnterHandler;
+            }
+            if (handlers.MouseLeaveHandler != null)
+            {
+                button.MouseLeave -= handlers.MouseLeaveHandler;
+            }
+            button.Tag = null;
+        }
+
+        /// <summary>
+        /// 解绑 Border 及其子元素的所有事件
+        /// </summary>
+        /// <param name="border">消息边框</param>
+        private void UnbindBorderEvents(Border border)
+        {
+            border.MouseRightButtonDown -= Border_MouseRightButtonDown;
+            if (border.Child is Grid grid)
+            {
+                foreach (var child in grid.Children)
+                {
+                    if (child is Button button && button.Tag is ButtonEventHandlers handlers)
+                    {
+                        UnbindButtonEvents(button, handlers);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// 删除消息
+        /// 核心删除消息逻辑
+        /// </summary>
+        /// <param name="border"> 消息边框 </param>
+        private void RemoveToastCore(Border border)
+        {
+            // 使用 TryGetValue 避免两次字典查找，提高性能
+            if (!timerDictionary.TryGetValue(border, out var timer))
+                return;
+
+            UnbindBorderEvents(border);
+            ToastStackPanel.Children.Remove(border);
+            timerDictionary.Remove(border);
+            StopTimer(timer);
+        }
+
+        /// <summary>
+        /// 播放关闭动画并删除消息
+        /// </summary>
+        /// <param name="border">消息边框</param>
+        private void AnimateToastOut(Border border)
+        {
+            // 如果已经在动画中，直接返回，避免重复动画
+            if (animatingBorders.Contains(border))
+                return;
+
+            // 如果 Border 不在字典中，说明已经被删除，直接返回
+            if (!timerDictionary.TryGetValue(border, out var timer))
+                return;
+
+            StopTimer(timer);
+            animatingBorders.Add(border);
+
+            // 创建一次性事件处理器，避免内存泄漏
+            EventHandler completedHandler = null;
+            completedHandler = (s, arg) =>
+            {
+                _scaleOutStoryboard.Completed -= completedHandler;
+                animatingBorders.Remove(border);
+                RemoveToastCore(border);
+                CheckAndDisplayToast();
+            };
+            _scaleOutStoryboard.Completed += completedHandler;
+            _scaleOutStoryboard.Begin(border);
+        }
+
+        /// <summary>
+        /// 删除消息（带动画效果）
         /// </summary>
         /// <param name="border"> 消息边框 </param>
         private void DeleteToast(Border border)
         {
-            if (timerDictionary.ContainsKey(border)) // 判断计时器是否存在
-            {
-                DispatcherTimer timer = timerDictionary[border]; // 获取计时器
-                // 解绑 Border 事件
-                border.MouseRightButtonDown -= Border_MouseRightButtonDown;
-                ToastStackPanel.Children.Remove(border); // 从消息面板中删除消息边框
-                timerDictionary.Remove(border); // 从字典中移除计时器
-                timer.Stop(); // 停止计时器
-                timer.Tick -= Timer_Tick; // 移除计时器事件
-                timer = null; // 释放计时器
-            }
-            CheckAndDisplayToast(); // 检查并显示新的消息
+            AnimateToastOut(border);
         }
 
         // 关闭窗口释放资源
@@ -245,14 +346,14 @@ namespace Quicker.Windows.ToolWindows
             }
             catch { }
 
-            messageQueue.Clear(); // 清空消息队列
-            foreach (var kvp in timerDictionary) // 解绑所有 Border 的事件并清理计时器
+            messageQueue.Clear();
+            animatingBorders.Clear();
+
+            // 解绑所有 Border 的事件并清理计时器
+            foreach (var (border, timer) in timerDictionary)
             {
-                Border border = kvp.Key;
-                DispatcherTimer timer = kvp.Value;
-                border.MouseRightButtonDown -= Border_MouseRightButtonDown; // 解绑 Border 事件
-                timer.Stop();
-                timer.Tick -= Timer_Tick;
+                UnbindBorderEvents(border);
+                StopTimer(timer);
             }
             timerDictionary.Clear();
         }
