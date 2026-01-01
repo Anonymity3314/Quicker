@@ -773,7 +773,8 @@ namespace Quicker
                 // 使用 Normal 优先级，确保窗口创建能及时执行
                 this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
                 {
-                    AppStateManager.PreLoadMainWindow = new MainWindow(windowType);
+                    AppStateManager.CommonState = windowType; // 将窗口类型设置到 AppStateManager，以便 MainWindow 构造函数可以获取
+                    AppStateManager.PreLoadMainWindow = new MainWindow();
                     var settings = AppStateManager.OpenMainWindowConditions;
                     SetMainWindowPosition(AppStateManager.PreLoadMainWindow, settings.WindowStartupLocation);
                     AppStateManager.PreLoadMainWindow.Visibility = Visibility.Hidden;

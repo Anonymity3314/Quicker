@@ -450,7 +450,8 @@ namespace Quicker.Managers
             var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault(); // 获取主窗口
             if (mainWindow == null)
             {
-                mainWindow = new(data.Data1);
+                AppStateManager.CommonState = data.Data1; // 将窗口类型设置到 AppStateManager，以便 MainWindow 构造函数可以获取
+                mainWindow = new();
                 mainWindow.Show();
             }
             mainWindow.OpenActionPage(data);

@@ -39,14 +39,11 @@ namespace Quicker.Windows.MainWindows.MainWindow
         int GloblePageIndex = 0, CommonPageIndex = 0; // 全局页面、通用页面索引
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string CommonStyle = "common"; // 样式
+        private bool isInitialized = false; // 初始化标志
 
-        public MainWindow(string style)
+        public MainWindow()
         {
-            CommonStyle = style ?? DEFAULT_STYLE; // 添加空值检查
-            InitializeComponent(); // 初始化窗口组件
-            this.DataContext = new MainWindowViewModel();
-            var vm = this.DataContext as MainWindowViewModel; // 只初始化时设置一次背景图片
-            iconManager.SetImageWithGifSupport(BackgroundImage, vm.BackgroundImagePath); // 设置背景图片
+            InitializeComponent(); // 初始化窗口组件（必须在构造函数中调用）
         }
 
         /// <summary>
@@ -590,6 +587,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
         /// </summary>
         private void CloseMainWindow(object sender, EventArgs e)
         {
+            //Visibility = Visibility.Collapsed; // 隐藏窗口
             Close(); // 关闭窗口
         }
 
@@ -631,9 +629,7 @@ namespace Quicker.Windows.MainWindows.MainWindow
             base.OnClosed(e); // 调用基类的关闭事件
             cancellationTokenSource.Cancel(); // 取消所有后台任务
             cancellationTokenSource.Dispose();
-            CleanUpEventHandlers(); // 清理事件处理器
-            CleanUpGrid(GlobalGrid); // 清理全局网格
-            CleanUpGrid(CommonGrid); // 清理通用网格
+            CleanUpResources(); // 清理资源
 
             CommonStyle = null; // 清理通用样式
             iconManager.Dispose(); // 释放图标管理器资源
@@ -688,6 +684,25 @@ namespace Quicker.Windows.MainWindows.MainWindow
             {
                 button.Click -= CommonPageChangeButton_Click; // 通用页面切换按钮点击
             }
+        }
+
+        /// <summary>
+        /// 清理窗口资源（在窗口变为不可见时调用）
+        /// </summary>
+        private void CleanUpResources()
+        {
+            CleanUpEventHandlers(); // 清理事件处理器
+            CleanUpGrid(GlobalGrid); // 清理全局网格
+            CleanUpGrid(CommonGrid); // 清理通用网格
+
+            // 清理背景图片
+            if (BackgroundImage != null)
+            {
+                BackgroundImage.Source = null;
+            }
+            
+            // 清理 DataContext
+            this.DataContext = null;
         }
 
         /// <summary>
@@ -924,6 +939,26 @@ namespace Quicker.Windows.MainWindows.MainWindow
                     scale.BeginAnimation(ScaleTransform.ScaleXProperty, animX); // 开始动画
                     scale.BeginAnimation(ScaleTransform.ScaleYProperty, animY);
                 }
+            }
+        }
+
+        private void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if(Visibility == Visibility.Visible)
+            {
+                if (!isInitialized) // 窗口变为可见时进行初始化
+                {
+                    CommonStyle = AppStateManager.CommonState ?? DEFAULT_STYLE; // 从 AppStateManager 获取样式，如果为空则使用默认值
+                    this.DataContext = new MainWindowViewModel();
+                    var vm = this.DataContext as MainWindowViewModel; // 只初始化时设置一次背景图片
+                    iconManager.SetImageWithGifSupport(BackgroundImage, vm.BackgroundImagePath); // 设置背景图片
+                    isInitialized = true;
+                }
+            }
+            else
+            {
+                CleanUpResources(); // 窗口变为不可见时清除窗口资源
+                isInitialized = false; // 重置初始化标志，以便下次可见时重新初始化
             }
         }
 
