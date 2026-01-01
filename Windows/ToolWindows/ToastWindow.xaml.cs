@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Data;
 using Quicker.Managers;
@@ -82,6 +83,7 @@ namespace Quicker.Windows.ToolWindows
             Grid grid = new Grid();
             border.Child = grid; // 将消息添加到边框中
             grid.Children.Add(textblock); // 将消息添加到网格中
+            border.MouseRightButtonDown += Border_MouseRightButtonDown;
 
             // 初始化关闭按钮，并传入边框对象
             var closeToastButton = InitalizeCloseButton(border);
@@ -98,6 +100,22 @@ namespace Quicker.Windows.ToolWindows
 
             timerDictionary[border] = timer; // 将计时器存储到字典中
             timer.Start(); // 启动计时器
+        }
+
+        /// <summary>
+        /// 右键报错边框复制错误信息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Border_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Border border = (Border)sender;
+            if(border.Tag is ToastType toastType && toastType == ToastType.Error)
+            {
+                Grid grid = (Grid)border.Child;
+                TextBlock textblock = (TextBlock)grid.Children[0];
+                Clipboard.SetText(textblock.Text);
+            }
         }
 
         /// <summary>
@@ -205,6 +223,8 @@ namespace Quicker.Windows.ToolWindows
             if (timerDictionary.ContainsKey(border)) // 判断计时器是否存在
             {
                 DispatcherTimer timer = timerDictionary[border]; // 获取计时器
+                // 解绑 Border 事件
+                border.MouseRightButtonDown -= Border_MouseRightButtonDown;
                 ToastStackPanel.Children.Remove(border); // 从消息面板中删除消息边框
                 timerDictionary.Remove(border); // 从字典中移除计时器
                 timer.Stop(); // 停止计时器
@@ -226,8 +246,11 @@ namespace Quicker.Windows.ToolWindows
             catch { }
 
             messageQueue.Clear(); // 清空消息队列
-            foreach (DispatcherTimer timer in timerDictionary.Values)
+            foreach (var kvp in timerDictionary) // 解绑所有 Border 的事件并清理计时器
             {
+                Border border = kvp.Key;
+                DispatcherTimer timer = kvp.Value;
+                border.MouseRightButtonDown -= Border_MouseRightButtonDown; // 解绑 Border 事件
                 timer.Stop();
                 timer.Tick -= Timer_Tick;
             }
