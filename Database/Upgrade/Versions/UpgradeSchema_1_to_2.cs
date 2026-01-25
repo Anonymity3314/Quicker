@@ -25,7 +25,6 @@ namespace Quicker.Database.Upgrade.Versions
             AddTrayIconColumnsIfNotExist(connection); // 新增托盘图标字段
             AddUseMenuAnimationColumnIfNotExist(connection); // 新增菜单动画字段
             AddIsDarkThemeColumnIfNotExist(connection); //添加 IsDarkTheme 字段
-            //MigrateAppearanceData(connection); //将旧单行 Appearance 数据迁移到新的 Light 主题行
             RemoveVersionColumnFromConvention(connection); // 删除 Convention 表中的旧版本号字段
             RenameDefaultTables(connection, manager); // 重命名默认表
             UpdateButtonDataImagePath(connection); // 更新ButtonData表ImagePath字段
@@ -197,70 +196,6 @@ namespace Quicker.Database.Upgrade.Versions
         {
             const string sql = "ALTER TABLE Convention ADD COLUMN IsDarkTheme BOOLEAN DEFAULT 0";
             using (var cmd = new SQLiteCommand(sql, connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-        /// <summary>
-        /// 将旧的单行 Appearance 表数据迁移到新的 Appearance 表 ThemeName='Light' 的记录中。
-        /// </summary>
-        /// <param name="connection"> 数据库连接 </param>
-        private void MigrateAppearanceData(SQLiteConnection connection)
-        {
-            const string renameSql = "ALTER TABLE Appearance RENAME TO Appearance_Old";
-            using (var cmd = new SQLiteCommand(renameSql, connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
-            SettingDatabase.InitializeAppearance(); // 新增数据库表
-            const string finalUpdateSql = @"
-            UPDATE Appearance SET
-                ButtonSize = (SELECT ButtonSize FROM Appearance_Old WHERE ID = 1),
-                ButtonGap = (SELECT ButtonGap FROM Appearance_Old WHERE ID = 1),
-                BorderWidth = (SELECT BorderWidth FROM Appearance_Old WHERE ID = 1),
-                ButtonCornerRadius = (SELECT ButtonCornerRadius FROM Appearance_Old WHERE ID = 1),
-                BackgroundColor = (SELECT BackgroundColor FROM Appearance_Old WHERE ID = 1),
-                BorderColor = (SELECT BorderColor FROM Appearance_Old WHERE ID = 1),
-                ToolbarColor = (SELECT ToolbarColor FROM Appearance_Old WHERE ID = 1),
-                ToolbarIconColor = (SELECT ToolbarIconColor FROM Appearance_Old WHERE ID = 1),
-                ActionButtonColor = (SELECT ActionButtonColor FROM Appearance_Old WHERE ID = 1),
-                ActionButtonMouseOverColor = (SELECT ActionButtonMouseOverColor FROM Appearance_Old WHERE ID = 1),
-                BlankButtonColor = (SELECT BlankButtonColor FROM Appearance_Old WHERE ID = 1),
-                BlankButtonMouseOverColor = (SELECT BlankButtonMouseOverColor FROM Appearance_Old WHERE ID = 1),
-                ButtonTextColor = (SELECT ButtonTextColor FROM Appearance_Old WHERE ID = 1),
-                Font1 = (SELECT Font1 FROM Appearance_Old WHERE ID = 1),
-                Font2 = (SELECT Font2 FROM Appearance_Old WHERE ID = 1),
-                FontSize = (SELECT FontSize FROM Appearance_Old WHERE ID = 1),
-                FontWeight = (SELECT FontWeight FROM Appearance_Old WHERE ID = 1),
-                BackgroundImagePath = (SELECT BackgroundImagePath FROM Appearance_Old WHERE ID = 1),
-                BackgroundImageOpacity = (SELECT BackgroundImageOpacity FROM Appearance_Old WHERE ID = 1),
-                Blur = (SELECT Blur FROM Appearance_Old WHERE ID = 1),
-                Win11CornerRadius = (SELECT Win11CornerRadius FROM Appearance_Old WHERE ID = 1),
-                AutoHideTitleBar = (SELECT AutoHideTitleBar FROM Appearance_Old WHERE ID = 1),
-                ShowActionButtonMouseOver = (SELECT ShowActionButtonMouseOver FROM Appearance_Old WHERE ID = 1),
-                HideActionNameAfterIcon = (SELECT HideActionNameAfterIcon FROM Appearance_Old WHERE ID = 1),
-                ShowActionIconShadow = (SELECT ShowActionIconShadow FROM Appearance_Old WHERE ID = 1),
-                EnablePreview = (SELECT EnablePreview FROM Appearance_Old WHERE ID = 1)
-            WHERE 
-                ThemeName = 'Light' 
-                AND EXISTS (SELECT 1 FROM Appearance_Old WHERE ID = 1);"; // 仅当旧表存在数据时才执行更新
-
-            using (var cmd = new SQLiteCommand(finalUpdateSql, connection))
-            {
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SQLiteException ex) when (ex.Message.Contains("no such column") || ex.Message.Contains("no such table"))
-                {
-                    // 忽略错误，可能是因为旧表结构不匹配或根本不存在。
-                }
-            }
-
-            // 4. 清理：删除旧表 Appearance_Old
-            const string dropSql = "DROP TABLE IF EXISTS Appearance_Old";
-            using (var cmd = new SQLiteCommand(dropSql, connection))
             {
                 cmd.ExecuteNonQuery();
             }
