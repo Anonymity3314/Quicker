@@ -184,6 +184,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 
             Image iconImage = new()
             {
+                Visibility = appPath == "从计算机选择程序..." ? Visibility.Hidden : Visibility.Visible,
                 Style = (Style)FindResource("BlacklistItemIcon"),
                 Source = IconManager.GetIcon(appPath)
             }; // 创建图标
@@ -610,6 +611,16 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     selectWindowWindow?.Close();
                 }
             }
+        }
+
+        // 鼠标移入/移出显示/隐藏滚动条
+        private void BlacklistStackScrollViewer_MouseEnter(object sender, MouseEventArgs e)
+        {
+            BlacklistScrollBar.Visibility = Visibility.Visible;
+        }
+        private void BlacklistStackScrollViewer_MouseLeave(object sender, MouseEventArgs e)
+        {
+            BlacklistScrollBar.Visibility = Visibility.Collapsed;
         }
 
         // 控件关闭释放资源
