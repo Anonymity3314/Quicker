@@ -26,10 +26,11 @@ namespace Quicker.Windows.MainWindows
         private readonly ButtonDatabase db2 = new(); // 按钮数据库
         private string type; // 场景类型
 
-        private SolidColorBrush actionButtonBrush; // 动作按钮背景色
-        private SolidColorBrush actionButtonMouseOverBrush; // 动作按钮鼠标移入背景色
-        private SolidColorBrush blankButtonBrush; // 空白按钮背景色
-        private SolidColorBrush blankButtonMouseOverBrush; // 空白按钮鼠标移入背景色
+        private static SolidColorBrush actionDarkModleButtonBrush; // 动作按钮暗黑模式背景色
+        private static SolidColorBrush actionButtonBrush; // 动作按钮背景色
+        private static SolidColorBrush actionButtonMouseOverBrush; // 动作按钮鼠标移入背景色
+        private static SolidColorBrush blankButtonBrush; // 空白按钮背景色
+        private static SolidColorBrush blankButtonMouseOverBrush; // 空白按钮鼠标移入背景色
 
         public ActionPageManageWindow(string type = "common")
         {
@@ -45,6 +46,7 @@ namespace Quicker.Windows.MainWindows
             var appearance = Quicker.Database.Core.SettingDatabase.GetAppearanceSettings()?.FirstOrDefault();
             if (appearance != null)
             {
+                actionDarkModleButtonBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"));
                 actionButtonBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonColor));
                 actionButtonMouseOverBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.ActionButtonMouseOverColor));
                 blankButtonBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.BlankButtonColor));
@@ -204,37 +206,54 @@ namespace Quicker.Windows.MainWindows
         /// <returns> Image控件 </returns>
         private Image CreateSceneImage(SceneData sceneData)
         {
-            Image image = new();
-            if (!string.IsNullOrEmpty(sceneData.SceneIconPath))
+            const string defaultImagePath = "pack://application:,,,/Resources/Images/Quicker_Enabled.png";
+            const string resourcePrefix = "/Resources/Images/";
+            const string packPrefix = "pack://application:,,,";
+            try // 如果场景图标路径为空则使用默认图片，否则尝试加载指定图片
             {
-                try
+                Image image = new Image
                 {
-                    if (sceneData.SceneIconPath.StartsWith("/Resources/Images/"))
-                    {
-                        // 资源图片，使用 Pack URI
-                        string packUri = $"pack://application:,,,{sceneData.SceneIconPath}";
-                        image.Source = new BitmapImage(new Uri(packUri, UriKind.Absolute));
-                    }
-                    else if (Path.IsPathRooted(sceneData.SceneIconPath)) // 本地绝对路径
-                    {
-                        image.Source = new BitmapImage(new Uri(sceneData.SceneIconPath, UriKind.Absolute));
-                    }
-                    else // 其它情况，尝试相对路径
-                    {
-                        image.Source = new BitmapImage(new Uri(sceneData.SceneIconPath, UriKind.RelativeOrAbsolute));
-                    }
-                }
-                catch // 加载失败，使用默认图片
-                {
-                    image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png", UriKind.Absolute));
-                }
+                    Source = string.IsNullOrEmpty(sceneData.SceneIconPath)
+                        ? new BitmapImage(new Uri(defaultImagePath, UriKind.Absolute))
+                        : CreateImageSource(sceneData.SceneIconPath, resourcePrefix, packPrefix, defaultImagePath),
+                    Style = (Style)FindResource("SceneButtonImage")
+                };
+                return image;
             }
-            else // 为空时用默认图片
+            catch (Exception ex)
             {
-                image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png", UriKind.Absolute));
+                ShowToast("加载场景图片失败：" + ex.Message, ToastType.Error);
+                return new Image
+                {
+                    Source = new BitmapImage(new Uri(defaultImagePath, UriKind.Absolute)),
+                    Style = (Style)FindResource("SceneButtonImage")
+                };
             }
-            image.Style = (Style)FindResource("SceneButtonImage"); // 应用样式
-            return image;
+        }
+
+        /// <summary>
+        /// 创建场景图片控件
+        /// </summary>
+        /// <param name="path"> 图片路径 </param>
+        /// <param name="resourcePrefix"> 资源前缀 </param>
+        /// <param name="packPrefix"> 打包前缀 </param>
+        /// <param name="defaultImagePath"> 默认图片路径</param>
+        /// <returns> 图片源 </returns>
+        private BitmapImage CreateImageSource(string path, string resourcePrefix, string packPrefix, string defaultImagePath)
+        {
+            try
+            {
+                // 如果路径以资源前缀开头，则添加应用程序包前缀以创建完整的资源URI
+                // 否则直接使用提供的路径
+                string uriString = path.StartsWith(resourcePrefix)
+                    ? $"{packPrefix}{path}"
+                    : path;
+                return new BitmapImage(new Uri(uriString, UriKind.RelativeOrAbsolute));
+            }
+            catch
+            {
+                return new BitmapImage(new Uri(defaultImagePath, UriKind.Absolute));
+            }
         }
 
         /// <summary>
@@ -451,7 +470,7 @@ namespace Quicker.Windows.MainWindows
                     buttonManager.RefreshButtonDisplay(button, data, 60, false); // 刷新按钮显示
 
                     button.Background = isDarkModle
-                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("DarkGray"))
+                        ? (button.Tag is ButtonData ? actionDarkModleButtonBrush : blankButtonBrush)
                         : (button.Tag is ButtonData ? actionButtonBrush : blankButtonBrush); // 设置按钮背景颜色
                 }
             }
@@ -655,10 +674,7 @@ namespace Quicker.Windows.MainWindows
         {
             int canvasCount = MainListView.Items.Count; // 获取画布索引
             if (canvasCount == 10) // 如果画布索引等于9
-            {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("当前场景动作页数量已达上限。", ToastType.Error); // 弹出消息提醒
-            }
+                ShowToast("当前场景动作页数量已达上限。", ToastType.Error); // 弹出消息提醒
             else if (canvasCount == 0)
             {
                 db2.CreateButtonTable(type); // 创建按钮数据表
@@ -872,8 +888,7 @@ namespace Quicker.Windows.MainWindows
         {
             Button bingdingButton = GetBingdingButton(); // 获取绑定按钮
             Clipboard.SetText(bingdingButton.Name.Replace("Edit", "")); // 复制文本到剪贴板
-            using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", ToastType.Common); // 弹出消息提醒
+            ShowToast($"动作页ID已复制到剪贴板：{bingdingButton.Name.Replace("Edit", "")}", ToastType.Common); // 弹出消息提醒
         }
 
         // 点击按钮编辑动作页信息
@@ -884,16 +899,10 @@ namespace Quicker.Windows.MainWindows
             switch (type)
             {
                 case "_global":
-                    {
-                        using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show("默认全局动作页信息不可修改。", ToastType.Common); // 弹出消息提醒
-                    }
+                    ShowToast("默认全局动作页信息不可修改。", ToastType.Common); // 弹出消息提醒
                     break;
                 case "common":
-                    {
-                        using var toast = new ToastManager(); // 消息提醒管理器
-                        toast.Show("默认通用动作页信息不可修改。", ToastType.Common); // 弹出消息提醒
-                    }
+                    ShowToast("默认通用动作页信息不可修改。", ToastType.Common); // 弹出消息提醒
                     break;
                 default:
                     string canvasIndex = bingdingButton.Name.Replace("Edit" + type, ""); // 获取画布索引
@@ -914,8 +923,7 @@ namespace Quicker.Windows.MainWindows
                 ActionPageType = type,
                 ActionPageIndex = actionPageIndex
             });
-            using var toast = new ToastManager(); // 消息提醒管理器
-            toast.Show("已创建动作，请在目标位置使用“粘贴动作”。", ToastType.Common); // 弹出消息提醒
+            ShowToast("已创建动作，请在目标位置使用“粘贴动作”。", ToastType.Common); // 弹出消息提醒
         }
 
         // 点击按钮删除动作页
@@ -955,10 +963,7 @@ namespace Quicker.Windows.MainWindows
         private void EditSceneButton_Click(object sender, RoutedEventArgs e)
         {
             if (new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(type)) // 如果是默认场景
-            {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("此项不可编辑。", ToastType.Common); // 弹出消息提醒
-            }
+                ShowToast("此项不可编辑。", ToastType.Common); // 弹出消息提醒
             else
             {
                 EditSceneWindow editSceneWindow = new(type); // 创建编辑场景窗口
@@ -972,10 +977,7 @@ namespace Quicker.Windows.MainWindows
         private void DeleteSceneButton_Click(object sender, RoutedEventArgs e)
         {
             if (new List<string> { "_global", "common", "taskbar", "desktop" }.Contains(type)) // 如果是默认场景
-            {
-                using var toast = new ToastManager(); // 消息提醒管理器
-                toast.Show("此项不可删除。", ToastType.Common); // 弹出消息提醒
-            }
+                ShowToast("此项不可删除。", ToastType.Common); // 弹出消息提醒
             else
             {
                 db3.DeleteScene(type); // 删除场景数据表
@@ -1088,6 +1090,12 @@ namespace Quicker.Windows.MainWindows
         private void ClearSearchTextBoxButton_Click(object sender, RoutedEventArgs e)
         {
             SearchTextBox.Text = ""; // 清空搜索框文本
+        }
+
+        private void ShowToast(string message, ToastType toastType)
+        {
+            using var toast = new ToastManager(); // 消息提醒管理器
+            toast.Show(message, toastType); // 弹出消息提醒
         }
 
         // 关闭窗口时释放资源
