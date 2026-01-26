@@ -18,7 +18,7 @@ namespace Quicker.Converters
             {
                 return 31 + 25.5 + btnHeight * 7 + gap * 5; // 预览区高度
             }
-            return 0; // 错误值
+            return 0.0; // 错误值，返回 double 类型
         }
         /// <summary>
         /// 不支持反向转换

@@ -30,6 +30,7 @@ using KeyCode = SharpHook.Data.KeyCode;
 using System.Runtime.InteropServices;
 using Quicker.Windows.MainWindows;
 using Quicker.Windows.ToolWindows;
+using System.Windows.Threading;
 using Quicker.Database.Upgrade;
 using Quicker.Models.Settings;
 using System.Windows.Controls;
@@ -438,10 +439,10 @@ namespace Quicker
                             }
                         }
                     }
-                }), System.Windows.Threading.DispatcherPriority.Normal);
+                }), DispatcherPriority.Normal);
                 
                 // 等待操作完成，但设置超时时间避免长时间阻塞
-                if (operation.Status == System.Windows.Threading.DispatcherOperationStatus.Pending)
+                if (operation.Status == DispatcherOperationStatus.Pending)
                 {
                     // 如果操作还在等待，等待最多 50ms
                     operation.Wait(TimeSpan.FromMilliseconds(50));

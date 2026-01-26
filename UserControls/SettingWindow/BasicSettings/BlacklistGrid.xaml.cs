@@ -268,7 +268,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
         // 添加未知应用
         private void UnknownProcessButton_Click(object sender, RoutedEventArgs e)
         {
-            AddDirectoryButton.Margin = new Thickness(295, 230, 0, 0); // 调整按钮位置
+            AddDirectoryButton.Margin = new Thickness(295, 199, 0, 0); // 调整按钮位置
             UnknownProcessButton.Visibility = Visibility.Collapsed; // 隐藏按钮
             var blacklistprocess = SettingDatabase.GetAllBlacklistApplications(); // 获取黑名单进程
             if (blacklistprocess.Any(p => p.ProcessName == "unknown-proc.exe" && p.IsInBlacklist))
