@@ -80,17 +80,17 @@ namespace Quicker.Resources.Styles
                 {
                     return; // 不是最新的，放弃更新
                 }
-                
+
                 try
                 {
                     // 获取当前选中项
                     object selectedItem = comboBox.SelectedItem;
                     if (selectedItem == null) return; // 如果选中项为null，放弃更新
-                    
+
                     // 强制更新布局
                     comboBox.InvalidateVisual();
                     comboBox.UpdateLayout(); // 强制更新布局
-                    
+
                     // 获取ToggleButton
                     if (comboBox.Template.FindName("ToggleButton", comboBox) is ToggleButton toggleButton)
                     {

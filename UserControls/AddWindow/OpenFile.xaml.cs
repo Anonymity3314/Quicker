@@ -115,8 +115,11 @@ namespace Quicker.UserControls.AddWindow
         private void UpdateUIWithFileInfo(string filePath, string fileName)
         {
             LocationTextBox.Text = filePath; // 设置地址
-            _addWindow.TitleTextBox.Text = fileName; // 设置标题
-            _addWindow.ButtonTitle.Text = fileName; // 设置按钮标题
+            if(string.IsNullOrEmpty(_addWindow.TitleTextBox.Text)) // 如果标题为空
+            {
+                _addWindow.TitleTextBox.Text = fileName; // 设置标题
+                _addWindow.ButtonTitle.Text = fileName; // 设置按钮标题
+            }
             _buttonManager.AutoEllipsisTextBlock(_addWindow.ButtonTitle, 70); // 自动省略文本
             SetIconFromPath(filePath); // 设置图标
         }
