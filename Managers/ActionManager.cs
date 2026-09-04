@@ -76,6 +76,7 @@ namespace Quicker.Managers
                     var startInfo = new ProcessStartInfo
                     {
                         FileName = data.Location,
+                        Verb = operation, // 管理员权限运行
                         UseShellExecute = true, // 对于快捷方式，必须使用 ShellExecute
                         WorkingDirectory = fileDirectory ?? AppPathHelper.TempDataFolder,
                         WindowStyle = int.TryParse(data.Data3, out int style) ? style switch
@@ -86,11 +87,6 @@ namespace Quicker.Managers
                             _ => ProcessWindowStyle.Normal
                         } : ProcessWindowStyle.Normal
                     };
-
-                    if (data.Data1 == "True")
-                    {
-                        startInfo.Verb = "runas"; // 管理员权限运行
-                    }
 
                     Process.Start(startInfo);
                 }

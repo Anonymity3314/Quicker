@@ -80,7 +80,7 @@
             </ComboBox>
             <Label Content="窗口风格" Margin="5,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="58"/>
             <Label Content="设置期望的窗口风格，是否有效依赖于具体的软件" HorizontalAlignment="Left" Margin="62,26,0,0" VerticalAlignment="Top" Foreground="DarkGray" Width="284"/>
-            <CheckBox x:Name="RunByMessager" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="68,51,0,0" VerticalAlignment="Top"/>
+            <CheckBox x:Name="RunasAdministrator" Content="用管理员身份运行" HorizontalAlignment="Left" Margin="68,51,0,0" VerticalAlignment="Top"/>
             <CheckBox x:Name="TryToOpenExitingWindow" Content="如果程序已在运行，则尝试激活已打开的窗口" HorizontalAlignment="Left" Margin="68,71,0,0" VerticalAlignment="Top"/>
             <Label Content="选项" HorizontalAlignment="Left" Margin="20,46,0,0" VerticalAlignment="Top"/>
         </Grid>

@@ -294,7 +294,7 @@ namespace Quicker.UserControls.AddWindow
         /// <param name="buttonData">按钮数据</param>
         private void SetOtherOptions(ButtonData buttonData)
         {
-            RunByMessager.IsChecked = buttonData.Data1 == "True"; // 设置运行方式
+            RunasAdministrator.IsChecked = buttonData.Data1 == "True"; // 设置运行方式
             TryToOpenExitingWindow.IsChecked = buttonData.Data2 == "True"; // 设置是否尝试打开已存在的窗口
             WindowStateComboBox.SelectedIndex = int.Parse(buttonData.Data3); // 设置窗口状态
             _addWindow.DescriptionTextBox.Text = buttonData.Description; // 设置描述
@@ -341,7 +341,7 @@ namespace Quicker.UserControls.AddWindow
         // 保存动作
         public void Save()
         {
-            bool runByMessager = RunByMessager.IsChecked == true;
+            bool runasAdministrator = RunasAdministrator.IsChecked == true;
             bool tryToOpenExitingWindow = TryToOpenExitingWindow.IsChecked == true;
             int windowState = WindowStateComboBox.SelectedIndex != -1 ? WindowStateComboBox.SelectedIndex : 0;
 
@@ -363,7 +363,7 @@ namespace Quicker.UserControls.AddWindow
                 Title = _addWindow.TitleTextBox.Text,
                 Location = LocationTextBox.Text,
                 ImagePath = _addWindow.iconPath,
-                Data1 = runByMessager.ToString(),
+                Data1 = runasAdministrator.ToString(),
                 Data2 = tryToOpenExitingWindow.ToString(),
                 Data3 = windowState.ToString(),
                 Description = _addWindow.DescriptionTextBox.Text,
@@ -466,7 +466,7 @@ namespace Quicker.UserControls.AddWindow
             // 重置UI控件状态
             LocationTextBox.Text = "";
             WindowStateComboBox.SelectedIndex = -1;
-            RunByMessager.IsChecked = false;
+            RunasAdministrator.IsChecked = false;
             TryToOpenExitingWindow.IsChecked = false;
             _wasConvertLnkButtonVisible = false; // 重置按钮可见性状态
 

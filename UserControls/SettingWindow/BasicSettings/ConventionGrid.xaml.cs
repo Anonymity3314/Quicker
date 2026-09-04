@@ -13,6 +13,8 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
 {
     public partial class ConventionGrid : UserControl, INotifyPropertyChanged
     {
+        private const string DefaultTrayIconPathRunning = "pack://application:,,,/Resources/Images/Quicker_Enabled.png"; // 运行时托盘图标路径
+        private const string DefaultTrayIconPathPaused = "pack://application:,,,/Resources/Images/Quicker_Disabled.png"; // 暂停时托盘图标路径
         private WeakReference<Quicker.Windows.MainWindows.SettingWindow> weakSettingWindow; // 弱引用设置窗口
         private double currentSessionTime; // 当次应用使用时长
         SettingManager settingManager; // 设置管理器
@@ -38,7 +40,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     }
                     catch { }
                 }
-                return new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Enabled.png"));
+                return new System.Windows.Media.Imaging.BitmapImage(new Uri(DefaultTrayIconPathRunning));
             }
         }
         public ImageSource PausedTrayIconImage
@@ -57,7 +59,7 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
                     }
                     catch { }
                 }
-                return new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Images/Quicker_Disabled.ico"));
+                return new System.Windows.Media.Imaging.BitmapImage(new Uri(DefaultTrayIconPathPaused));
             }
         }
 
@@ -266,12 +268,12 @@ namespace Quicker.UserControls.SettingWindow.BasicSettings
             {
                 if (btn.Name == "EditRunningTrayIconButton") // 恢复运行时图标为默认
                 {
-                    settingManager.conventions.TrayIconPathRunning = "pack://application:,,,/Resources/Images/Quicker_Enabled.png"; // 设置运行时托盘图标路径为默认
+                    settingManager.conventions.TrayIconPathRunning = DefaultTrayIconPathRunning; // 设置运行时托盘图标路径为默认
                     OnPropertyChanged(nameof(RunningTrayIconImage)); // 更新运行时托盘图标
                 }
                 else if (btn.Name == "EditPausedTrayIconButton") // 恢复暂停时图标为默认
                 {
-                    settingManager.conventions.TrayIconPathPaused = "pack://application:,,,/Resources/Images/Quicker_Disabled.ico"; // 设置暂停时托盘图标路径为默认
+                    settingManager.conventions.TrayIconPathPaused = DefaultTrayIconPathPaused; // 设置暂停时托盘图标路径为默认
                     OnPropertyChanged(nameof(PausedTrayIconImage)); // 更新暂停时托盘图标
                 }
             }
